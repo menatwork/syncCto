@@ -38,7 +38,7 @@ if ($handle) {
 	echo 'true';
 	return;
 }
-$openurl = str_replace('GPL.txt', 'index.php', openurl);
+$openurl = str_replace('GPL.txt', 'index.php', $openurl);
 $handle = @fopen($openurl, "r");
 echo ($handle) ? 'true' : 'false';
 @fclose($handle);
