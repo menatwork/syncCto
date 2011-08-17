@@ -1,0 +1,29 @@
+/**
+ * Package    	syncCto Extension
+ * Copyright  	MEN AT WORK 2011
+ * Author		Andreas Isaak <cms@men-at-work.de>, David Maack <cms@men-at-work.de>, Stefan Heimes <cms@men-at-work.de>
+ * Link			http://www.men-at-work.de/
+ * License    	GNU/LGPL
+ */
+ 
+/**
+ * Package    	Icons
+ * Copyright  	Yusuke Kamiyamane
+ * Author		Yusuke Kamiyamane <p@yusukekamiyamane.com>
+ * Link			http://p.yusukekamiyamane.com/
+ * License    	Creative Commons Attribution 3.0
+ */
+ 
+/**
+ * Package    	Simple HTML Dom
+ * Copyright  	S.C. Chen
+ * Author		S.C. Chen <me578022@gmail.com>
+ * Link			http://sourceforge.net/projects/simplehtmldom/
+ * License    	MIT License
+ */
+ 
+/**
+ * Package    	Blowfish
+ * Link			www.php-einfach.de
+ * License    	Royalty-free
+ */
