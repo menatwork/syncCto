@@ -276,6 +276,23 @@ class SyncCtoCallback extends Backend
 
         return $strEncrypt;
     }
+	
+	/* -------------------------------------------------------------------------
+	*/
+	
+    public function pingClientStatus($strAction)
+    {
+
+        // Check if we have a backfav ajax call
+        if ($strAction == 'syncCtoPing')
+        {
+			$objRequest = new Request();
+			$objRequest->send($this->Input->post('hostIP'));
+			echo ($objRequest->code == '200')? "true": "false";
+            exit();
+        }
+    }
+	
 
     /* -------------------------------------------------------------------------
      * Return all sync types as array

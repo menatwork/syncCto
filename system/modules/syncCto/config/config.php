@@ -29,6 +29,7 @@ if (!defined('TL_ROOT'))
  * @license    GNU/LGPL 
  * @filesource
  */
+ 
 /**
  * Defines
  */
@@ -104,6 +105,9 @@ $GLOBALS['TL_HOOKS']['outputBackendTemplate'][] = array('SyncCtoCallback', 'outp
 $GLOBALS['TL_PERMISSIONS'][] = 'syncCto_clients';
 $GLOBALS['TL_PERMISSIONS'][] = 'syncCto_clients_p';
 $GLOBALS['TL_PERMISSIONS'][] = 'syncCto_tables';
+
+// Ajax
+$GLOBALS['TL_HOOKS']['executePreActions'][]   = array('SyncCtoCallback', 'pingClientStatus');
 
 /**
  * Callback is only used for overview screen

@@ -29,374 +29,117 @@ if (!defined('TL_ROOT'))
  * @license    GNU/LGPL
  * @filesource
  */
-class SyncCtoCommunication extends Backend
+class CtoCommunication extends Backend
 {
+    /* -------------------------------------------------------------------------
+     * Vars
+     */
 
-    protected $mixOutput;
-    protected $arrError;
-    protected $arrCookie;
-    //-------
-    protected $arrDebug;
-    //-------
-    protected $intClient;
-    protected $strAddress;
-    protected $strPath;
-    protected $intPort;
-    protected $strUsername;
-    protected $strPassword;
-    protected $strSecKey;
-    //-------    
-    protected $objSyncCtoCodifyengine;
-    protected $objSyncCtoDatabase;
-    protected $objSyncCtoMeasurement;
-    //-------
-    protected $BackendUser;
-    protected $Encryption;
-    protected $Config;
-    //-------
+    //- Singelten pattern --------
     protected static $instance = null;
-    //-------
-    protected $rpclist = array(
-        "RPC_AUTH" => array(
-            "auth" => false,
-            "class" => "SyncCtoRPCFunctions",
-            "function" => "rpc_auth",
-            "parameter" => false,
-            "typ" => "POST"
-        ),
-        "RPC_LOGIN" => array(
-            "auth" => false,
-            "class" => "SyncCtoRPCFunctions",
-            "function" => "rpc_login",
-            "parameter" => array("username", "password"),
-            "typ" => "POST"
-        ),
-        "RPC_LOGOUT" => array(
-            "auth" => false,
-            "class" => "SyncCtoRPCFunctions",
-            "function" => "rpc_logout",
-            "parameter" => false,
-            "typ" => "POST"
-        ),
-        "RPC_REFERER_DISABLE" => array(
-            "auth" => false,
-            "class" => "SyncCtoRPCFunctions",
-            "function" => "rpc_referer_disable",
-            "parameter" => false,
-            "typ" => "GET"
-        ),
-        "RPC_REFERER_ENABLE" => array(
-            "auth" => false,
-            "class" => "SyncCtoRPCFunctions",
-            "function" => "rpc_referer_enable",
-            "parameter" => false,
-            "typ" => "GET"
-        ),
-        //-------
-        "RPC_CALC" => array(
-            "auth" => true,
-            "class" => "SyncCtoRPCFunctions",
-            "function" => "rpc_calc",
-            "parameter" => array("RPC_CALC"),
-            "typ" => "POST"
-        ),
-        "RPC_VERSION" => array(
-            "auth" => false,
-            "class" => "SyncCtoRPCFunctions",
-            "function" => "rpc_version",
-            "parameter" => false,
-            "typ" => "POST"
-        ),
-        "RPC_PARAMETER" => array(
-            "auth" => true,
-            "class" => "SyncCtoRPCFunctions",
-            "function" => "rpc_parameter",
-            "parameter" => false,
-            "typ" => "POST"
-        ),
-        //-------
-        "RPC_CHECKSUM_CHECK" => array(
-            "auth" => true,
-            "class" => "SyncCtoRPCFunctions",
-            "function" => "rpc_parameter",
-            "parameter" => array("RPC_CHECKSUM_CHECK"),
-            "typ" => "POST"
-        ),
-        "RPC_CHECKSUM_CHECK" => array(
-            "auth" => true,
-            "class" => "SyncCtoRPCFunctions",
-            "function" => "rpc_checksum_check",
-            "parameter" => array("RPC_CHECKSUM_CHECK"),
-            "typ" => "POST"
-        ),
-        "RPC_CLEAR_TEMP" => array(
-            "auth" => false,
-            "class" => "SyncCtoRPCFunctions",
-            "function" => "rpc_clear_temp",
-            "parameter" => false,
-            "typ" => "POST"
-        ),
-        "RPC_CHECKSUM_CORE" => array(
-            "auth" => false,
-            "class" => "SyncCtoRPCFunctions",
-            "function" => "rpc_checksum_core",
-            "parameter" => false,
-            "typ" => "POST"
-        ),
-        "RPC_CHECKSUM_TLFILES" => array(
-            "auth" => true,
-            "class" => "SyncCtoRPCFunctions",
-            "function" => "rpc_checksum_tlfiles",
-            "parameter" => false,
-            "typ" => "POST"
-        ),
-        "RPC_SQL_ZIP" => array(
-            "auth" => true,
-            "class" => "SyncCtoRPCFunctions",
-            "function" => "rpc_sql_zip",
-            "parameter" => false,
-            "typ" => "POST"
-        ),
-        "RPC_SQL_SCRIPT" => array(
-            "auth" => true,
-            "class" => "SyncCtoRPCFunctions",
-            "function" => "rpc_sql_script",
-            "parameter" => array("name", "tables"),
-            "typ" => "POST"
-        ),
-        "RPC_SQL_SYNCSCRIPT" => array(
-            "auth" => true,
-            "class" => "SyncCtoRPCFunctions",
-            "function" => "rpc_sql_syncscript",
-            "parameter" => array("name", "tables"),
-            "typ" => "POST"
-        ),
-        "RPC_SQL_CHECK" => array(
-            "auth" => true,
-            "class" => "SyncCtoRPCFunctions",
-            "function" => "rpc_sql_check",
-            "parameter" => array("name"),
-            "typ" => "POST"
-        ),
-        //-------
-        "RPC_RUN_SQL" => array(
-            "auth" => true,
-            "class" => "SyncCtoRPCFunctions",
-            "function" => "rpc_run_sql",
-            "parameter" => array("RPC_RUN_SQL"),
-            "typ" => "POST"
-        ),
-        "RPC_RUN_FILE" => array(
-            "auth" => true,
-            "class" => "SyncCtoRPCFunctions",
-            "function" => "rpc_run_file",
-            "parameter" => array("RPC_RUN_FILE"),
-            "typ" => "POST"
-        ),
-        "RPC_RUN_LOCALCONFIG" => array(
-            "auth" => true,
-            "class" => "SyncCtoRPCFunctions",
-            "function" => "rpc_run_localconfig",
-            "parameter" => array("RPC_RUN_LOCALCONFIG"),
-            "typ" => "POST"
-        ),
-        "RPC_RUN_SPLITFILE" => array(
-            "auth" => true,
-            "class" => "SyncCtoRPCFunctions",
-            "function" => "rpc_run_splitfile",
-            "parameter" => array("splitname", "splitcount", "movepath", "md5"),
-            "typ" => "POST"
-        ),
-        //--------------
-        //- FILE -------
-        "RPC_FILE" => array(
-            "auth" => true,
-            "class" => "SyncCtoRPCFunctions",
-            "function" => "rpc_file",
-            "parameter" => array("metafiles"),
-            "typ" => "POST"
-        ),
-        "RPC_FILE_GET" => array(
-            "auth" => true,
-            "class" => "SyncCtoRPCFunctions",
-            "function" => "rpc_file_get",
-            "parameter" => array("path"),
-            "typ" => "POST"
-        ),
-        "RPC_FILE_DELETE" => array(
-            "auth" => true,
-            "class" => "SyncCtoRPCFunctions",
-            "function" => "rpc_file_delete",
-            "parameter" => array("list"),
-            "typ" => "POST"
-        ),
-        "RPC_FILE_SPLIT" => array(
-            "auth" => true,
-            "class" => "SyncCtoRPCFunctions",
-            "function" => "rpc_file_split",
-            "parameter" => array("srcfile", "desfolder", "desfile", "size"),
-            "typ" => "POST"
-        ),
-            //--------------
-    );
+    //- Vars ---------------------
+    private $arrParameter = array();
+    //- Objects ------------------
+    protected $objCodifyengine;
+
+    /* -------------------------------------------------------------------------
+     * Core
+     */
 
     /**
      * Constructor
      */
-    function __construct()
+    protected function __construct()
     {
-        // Import Contao classes
-        $this->BackendUser = BackendUser::getInstance();
-        $this->Encryption = Encryption::getInstance();
-        $this->Config = Config::getInstance();
-
         parent::__construct();
 
-        // Import SyncCto classes
-        $this->objSyncCtoCodifyengine = SyncCtoCodifyengineFactory::getEngine();
-        $this->objSyncCtoDatabase = SyncCtoDatabase::getInstance();
-        $this->objSyncCtoMeasurement = SyncCtoMeasurement::getInstance();
-
-        // Init vars
-        $this->mixOutput = array();
-        $this->arrError = array();
-        $this->arrDebug = array();
-
-        // Load Vars      
-        $this->loadLanguageFile("syncCto");
-    }
-
-    public function __destruct()
-    {
-        if ($GLOBALS['TL_CONFIG']['syncCto_debug_log'] != true)
-            return;
-
-        if (count($this->arrDebug) == 0)
-            return;
-
-        $intTime = time();
-
-        if (file_exists(TL_ROOT . $GLOBALS['syncCto']['path']['debug'] . "debug.txt") == true)
-        {
-            //unlink(TL_ROOT . $GLOBALS['syncCto']['path']['debug'] . "debug.txt");
-        }
-
-        $fileHand = fopen(TL_ROOT . $GLOBALS['syncCto']['path']['debug'] . "debug.txt", "a+");
-        fwrite($fileHand, "\n<|++++++++++++++++++++++++++++++++++++++++++++++++++++++|>");
-        fwrite($fileHand, "\n  + Hinweis:");
-        fwrite($fileHand, "\n<|++++++++++++++++++++++++++++++++++++++++++++++++++++++|>\n\n");
-        fwrite($fileHand, ">>|------------------------------------------------------");
-        fwrite($fileHand, "\n>>|-- Start Log at " . date("H:i:s d.m.Y", $intTime));
-        fwrite($fileHand, "\n>>");
-        fwrite($fileHand, "\n");
-
-        foreach ($this->arrDebug as $key => $value)
-        {
-            fwrite($fileHand, "\n");
-            fwrite($fileHand, "<|-- Start " . $key . " -----------------------------------|>");
-            fwrite($fileHand, "\n\n");
-
-            fwrite($fileHand, trim($value));
-
-            fwrite($fileHand, "\n\n");
-            fwrite($fileHand, "<|-- End " . $key . " -------------------------------------|>");
-            fwrite($fileHand, "\n");
-            fwrite($fileHand, "\n");
-        }
-
-        fwrite($fileHand, "\n");
-        fwrite($fileHand, "\n>>");
-        fwrite($fileHand, "\n>>|-- Close Log at " . date("H:i:s d.m.Y", $intTime));
-        fwrite($fileHand, "\n>>|------------------------------------------------------\n");
-
-        fclose($fileHand);
+        $this->objCodifyengine = CtoCodifyengineFactory::getEngine();
     }
 
     /**
      * Singelton Pattern
      * 
-     * @return SyncCtoCommunication 
+     * @return CtoCommunication 
      */
     public static function getInstance()
     {
         if (self::$instance == null)
-            self::$instance = new SyncCtoCommunication();
+            self::$instance = new CtoCommunication();
 
         return self::$instance;
     }
+
+    /**
+     * Magical function for setter
+     * 
+     * @param string $name
+     * @param mix $value 
+     */
+    public function __set($name, $value)
+    {
+        switch ($name)
+        {
+            case "srtUrl":
+                $this->arrParameter["strUrl"] = $value;
+                break;
+
+            case "srtKey":
+                $this->arrParameter["srtKey"] = $value;
+                break;
+
+            case "strCodifyEngine":
+                $this->setCodifyEngine($value);
+                break;
+
+            default:
+                break;
+        }
+    }
+
+    /**
+     * Magical functions for getter
+     * 
+     * @param string $name
+     * @return mix 
+     */
+    public function __get($name)
+    {
+        switch ($name)
+        {
+            case "srtUrl":
+                return $this->arrParameter["strUrl"];
+
+            case "srtKey":
+                return $this->arrParameter["srtKey"];
+
+            case "strCodifyEngine":
+                return $this->objCodifyengine->getName();
+
+            default:
+                return null;
+        }
+    }
+
+    /* -------------------------------------------------------------------------
+     * Getter / Setter
+     */
 
     /**
      * Set the client for the connection.
      *
      * @param int $id ID from client
      */
-    public function setClient($id)
+    public function setClient($strUrl, $strKey, $strCodifyEngine = "Blowfish")
     {
-        // Load Client from database
-        $objClient = $this->Database->prepare("SELECT * FROM tl_synccto_clients WHERE id = %s")
-                ->limit(1)
-                ->execute((int) $id);
+        $this->arrParameter["strUrl"] = $strUrl;
+        $this->arrParameter["srtKey"] = $strKey;
 
-        // Check if a client was loaded
-        if ($objClient->numRows == 0)
-            throw new Exception("Unknown Client.");
-
-        // init
-        $this->intClient = (int) $id;
-
-        // Cutting the "http:" and hostadress
-        $arrAdress = explode("/", $objClient->address);
-        if (count($arrAdress) > 3)
-        {
-            for ($i = 3; $i < count($arrAdress); $i++)
-            {
-                if ($arrAdress[$i] == "")
-                    continue;
-
-                $strPath .= $arrAdress[$i] . "/";
-            }
-
-            $strPath .= $objClient->path;
-        }
-        else
-        {
-            $strPath .= $objClient->path;
-        }
-
-        // Set all informtaion
-        $this->strAddress = $arrAdress[2];
-        $this->strPath = $strPath;
-        $this->intPort = $objClient->port;
-
-        $this->arrCookie = deserialize($objClient->cookie);
-        $this->strUsername = $objClient->username;
-
-        if (!function_exists("mdecrypt_generic"))
-        {
-            $this->objSyncCtoCodifyengine->setKey($GLOBALS['TL_CONFIG']['encryptionKey']);
-            $this->strPassword = $this->objSyncCtoCodifyengine->Decrypt($objClient->password);
-            $this->objSyncCtoCodifyengine->resetKey();
-        }
-        else
-        {
-            $this->strPassword = $this->Encryption->decrypt($objClient->password);
-        }
-
-        $this->strSecKey = $objClient->seckey;
-
-        $this->objSyncCtoCodifyengine = SyncCtoCodifyengineFactory::getEngine($objClient->codifyengine);
+        $this->setCodifyEngine($strCodifyEngine);
     }
 
-    public function setCodifyEngine($strName = "")
+    public function setCodifyEngine($strName = Null)
     {
-        if ($strName == "")
-        {
-            $this->objSyncCtoCodifyengine = SyncCtoCodifyengineFactory::getEngine();
-        }
-        else
-        {
-            $this->objSyncCtoCodifyengine = SyncCtoCodifyengineFactory::getEngine($strName);
-        }
+        $this->objSyncCtoCodifyengine = CtoCodifyengineFactory::getEngine($strName);
     }
 
     /*
@@ -409,6 +152,53 @@ class SyncCtoCommunication extends Backend
      * -------------------------------------------------------------------------
      */
 
+    public function runServer($rpc, $arrData = array(), $isGET = FALSE)
+    {
+        $this->objCodifyengine->setKey($this->arrParameter["strKey"]);
+
+        for ($i = 0; $i < 2; $i++)
+        {
+            // New Request
+            $objRequest = new Request();      
+            
+            // Which method get or post
+            if($isGET)
+            {
+                $objRequest->method = "GET";
+            }
+            else
+            {
+                $objRequest->method = "POST";
+            }
+            
+            // Send new request
+            $objRequest->send($this->arrParameter["strUrl"]);
+            
+            // Check if evething is okay for connection
+            if($objRequest->error != "")
+            {
+                throw new Exception("Error by connection to Client", "000", $objRequest->error);
+            }
+            
+            // Check if request is okay
+            
+            
+            
+            
+            print_r($objRequest->code);
+            echo "<br>";            
+            print_r($objRequest->request);
+            echo "<br>";
+            print_r($objRequest->response);
+            echo "<br>";
+            
+        }
+    }
+
+    //--------------------------------------------------------------------------
+    // ALT
+    //--------------------------------------------------------------------------
+    
     /**
      * Run the communication as server
      *
@@ -417,10 +207,9 @@ class SyncCtoCommunication extends Backend
      * @param bool $isFileUpload
      * @return array
      */
-    protected function runServer($rpc, $arrData = array(), $isGET = FALSE)
+    protected function runServerOld($rpc, $arrData = array(), $isGET = FALSE)
     {
-        $this->objSyncCtoMeasurement->startMeasurement(__CLASS__, __FUNCTION__, "RPC: " . $rpc);
-        $this->objSyncCtoCodifyengine->setKey($this->strSecKey);
+        $this->objSyncCtoCodifyengine->setKey($this->arrParameter["strKey"]);
 
         for ($i = 0; $i < 2; $i++)
         {

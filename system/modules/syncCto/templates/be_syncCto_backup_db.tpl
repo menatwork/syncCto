@@ -29,7 +29,8 @@
 <div class="tl_box block">
 <h1><?php echo $GLOBALS['TL_LANG']['tl_syncCto_backup_db']['complete']; ?></h1>
 <p class="tl_help"><?php echo $GLOBALS['TL_LANG']['tl_syncCto_backup_db']['complete_help']; ?> <?php echo $this->file; ?><br />
-<a href="contao/popup.php?src=tl_files/syncCto_backups/database/<?php echo $this->file; ?>&amp;download=1"><?php echo $GLOBALS['TL_LANG']['tl_syncCto_backup_db']['download_backup']; ?></a></p>
+    <a onclick="Backend.openWindow(this, 600, 235); return false;" title="In einem neuen Fenster ansehen" href="contao/popup.php?src=tl_files/syncCto_backups/database/<?php echo $this->file; ?>"><?php echo $GLOBALS['TL_LANG']['tl_syncCto_backup_db']['download_backup']; ?></a>
+</p>
 </div>
 <?php endif; ?>
 
