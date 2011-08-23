@@ -167,7 +167,6 @@ class SyncCtoModuleBackup extends BackendModule
         $this->Template->script = $this->Environment->script;
     }
 
-    
     /* -------------------------------------------------------------------------
      * Functions for 'Backup' and 'Restore'
      */
@@ -179,27 +178,49 @@ class SyncCtoModuleBackup extends BackendModule
      */
     protected function parseDbBackupPage()
     {
+        //- Init ---------------------------------------------------------------
+        $this->objTemplateContent = new BackendTemplate('be_syncCto_steps');
         $this->loadLanguageFile('tl_syncCto_backup_db');
-        $this->objTemplateContent = new BackendTemplate('be_syncCto_backup_db');
+        $this->loadLanguageFile('tl_syncCto_steps');
 
         if ($this->Input->get("step") == "" || $this->Input->get("step") == null)
-        {
-            $step = 1;
-        }
+            $step = 0;
         else
-        {
             $step = intval($this->Input->get("step"));
-        }
+
+        $arrContenData = $this->Session->get("SyncCto_DB_Content");
+        $arrStepPool = $this->Session->get("SyncCto_DB_StepPool");
 
         switch ($step)
         {
+            case 0;
+                $arrContenData = array(
+                    "error" => false,
+                    "error_msg" => "",
+                    "refresh" => true,
+                    "finished" => false,
+                    "step" => 1,
+                    "url" => "contao/main.php?do=syncCto_backups&amp;table=tl_syncCto_backup_db&amp;act=start",
+                    "start" => microtime(true),
+                    "headline" => $GLOBALS['TL_LANG']['tl_syncCto_backup_db']['edit'],
+                    "information" => "",
+                    "data" => array()
+                );
+
+                $arrStepPool = array();
+                $step = 1;
+
             case 1:
+                // Check Table list
                 if ($this->Input->post("table_list_recommend") == "" && $this->Input->post("table_list_none_recommend") == "")
                 {
-                    $this->parseStartPage($GLOBALS['TL_LANG']['syncCto']['no_backup_tables']);
-                    return;
+                    $arrContenData["error"] = true;
+                    $arrContenData["error_msg"] = $GLOBALS['TL_LANG']['syncCto']['no_backup_tables'];
+
+                    break;
                 }
 
+                // Merge recommend and none recommend post arrays
                 if ($this->Input->post("table_list_recommend") != "" && $this->Input->post("table_list_none_recommend") != "")
                     $arrTablesBackup = array_merge($this->Input->post("table_list_recommend"), $this->Input->post("table_list_none_recommend"));
                 else if ($this->Input->post("table_list_recommend"))
@@ -207,125 +228,69 @@ class SyncCtoModuleBackup extends BackendModule
                 else if ($this->Input->post("table_list_none_recommend"))
                     $arrTablesBackup = $this->Input->post("table_list_none_recommend");
 
-                $this->Session->set("SyncCto_Tables", serialize($arrTablesBackup));
+                $arrStepPool["tables"] = $arrTablesBackup;
 
-                $this->objTemplateContent->step = $step;
-                $this->objTemplateContent->condition = array('1' => WORK);
-                $this->objTemplateContent->refresh = true;
+                $arrContenData["data"][1] = array(
+                    "title" => $GLOBALS['TL_LANG']['tl_syncCto_steps']['step'] . " 1",
+                    "description" => $GLOBALS['TL_LANG']['tl_syncCto_backup_db']['step1_help'],
+                    "state" => $GLOBALS['TL_LANG']['tl_syncCto_backup_db']['work']
+                );
 
-                return;
+                break;
 
             case 2:
-                $arrTablesBackup = deserialize($this->Session->get("SyncCto_Tables"));
-                if (!is_array($arrTablesBackup) || $arrTablesBackup == "" || $arrTablesBackup == null)
-                {
-                    $this->parseStartPage($GLOBALS['TL_LANG']['syncCto']['restore_session_tables']);
-                    return;
-                }
-
                 try
                 {
-                    $arrZip = $this->objSyncCtoDatabase->runCreateZip();
-                                    
-                    $this->Session->set("SyncCto_ZipId", $arrZip['id']);
-                    $this->Session->set("SyncCto_ZipName", $arrZip['name']);
+                    $arrStepPool["zipname"] = $this->objSyncCtoDatabase->runDump($arrStepPool["tables"], false);
                 }
                 catch (Exception $exc)
                 {
-                    $this->objTemplateContent->step = $step - 1;
-                    $this->objTemplateContent->condition = array('1' => ERROR);
-                    $this->objTemplateContent->refresh = false;
-                    $this->objTemplateContent->error = $exc->getMessage();
-                    return;
+                    $arrContenData["error"] = true;
+                    $arrContenData["error_msg"] = $exc->getMessage();
+                    $arrContenData["data"][1]["state"] = $GLOBALS['TL_LANG']['tl_syncCto_backup_db']['error'];
+
+                    break;
                 }
 
-                $this->objTemplateContent->step = $step;
-                $this->objTemplateContent->condition = array('1' => OK, '2' => WORK);
-                $this->objTemplateContent->refresh = true;
-                return;
+                break;
 
             case 3:
-                $arrTablesBackup = deserialize($this->Session->get("SyncCto_Tables"));               
-                if (!is_array($arrTablesBackup) || $arrTablesBackup == "" || $arrTablesBackup == null)
-                {
-                    $this->parseStartPage($GLOBALS['TL_LANG']['syncCto']['restore_session_tables']);
-                    return;
-                }
+                $arrContenData["data"][1]["state"] = $GLOBALS['TL_LANG']['tl_syncCto_backup_db']['ok'];
 
-                $strZipId = $this->Session->get("SyncCto_ZipId");                
-                if ($strZipId == "" || $strZipId == null)
-                {
-                    $this->parseStartPage($GLOBALS['TL_LANG']['syncCto']['restore_session_zip_id']);
-                    return;
-                }
+                $arrContenData["finished"] = true;
+                $arrContenData["data"][2]["title"] = $GLOBALS['TL_LANG']['tl_syncCto_steps']['complete'];
+                $arrContenData["data"][2]["description"] = $GLOBALS['TL_LANG']['tl_syncCto_backup_db']['complete_help'] . " " . $arrStepPool["zipname"];
+                $arrContenData["data"][2]["html"] = "<p class='tl_help'><br />";
+                $arrContenData["data"][2]["html"] .= "<a onclick='Backend.openWindow(this, 600, 235); return false;' title='In einem neuen Fenster ansehen' href='contao/popup.php?src=tl_files/syncCto_backups/database/" . $arrStepPool["zipname"] . "'>" . $GLOBALS['TL_LANG']['tl_syncCto_backup_db']['download_backup'] . "</a>";
+                $arrContenData["data"][2]["html"] .= "</p>";
 
-                $strZipName = $this->Session->get("SyncCto_ZipName");                
-                if ($strZipName == "" || $strZipName == null)
-                {
-                    $this->parseStartPage($GLOBALS['TL_LANG']['syncCto']['restore_session_zip_name']);
-                    return;
-                }
-
-                try
-                {
-                    $this->objSyncCtoDatabase->runDumpSQL($arrTablesBackup, $strZipName);
-                    sleep(3);
-                    $this->objSyncCtoDatabase->runDumpInsert($arrTablesBackup, $strZipName);
-                }
-                catch (Exception $exc)
-                {
-                    $this->objTemplateContent->step = $step - 1;
-                    $this->objTemplateContent->condition = array('1' => OK, '2' => ERROR);
-                    $this->objTemplateContent->refresh = false;
-                    $this->objTemplateContent->error = $exc->getMessage();
-                    return;
-                }
-
-                $this->objTemplateContent->step = $step;
-                $this->objTemplateContent->condition = array('1' => OK, '2' => OK, '3' => WORK);
-                $this->objTemplateContent->refresh = true;
-                return;
-
-            case 4:
-                $strZipId = $this->Session->get("SyncCto_ZipId");
-                if ($strZipId == "" || $strZipId == null)
-                {
-                    $this->parseStartPage($GLOBALS['TL_LANG']['syncCto']['restore_session_zip_id']);
-                    return;
-                }
-
-                $strZipName = $this->Session->get("SyncCto_ZipName");
-                if ($strZipName == "" || $strZipName == null)
-                {
-                    $this->parseStartPage($GLOBALS['TL_LANG']['syncCto']['restore_session_zip_name']);
-                    return;
-                }
-
-                try
-                {
-                    $this->objSyncCtoDatabase->runCheckZip($strZipName, false);
-                }
-                catch (Exception $exc)
-                {
-                    $this->objTemplateContent->step = $step - 1;
-                    $this->objTemplateContent->condition = array('1' => OK, '2' => OK, '3' => ERROR);
-                    $this->objTemplateContent->refresh = false;
-                    $this->objTemplateContent->error = $exc->getMessage();
-                    return;
-                }
-
-                $this->objTemplateContent->step = $step + 1;
-                $this->objTemplateContent->file = $strZipName;
-                $this->objTemplateContent->condition = array('1' => OK, '2' => OK, '3' => OK);
-                $this->objTemplateContent->refresh = false;
-                return;
+                $this->Session->set("SyncCto_DB_StepPool", "");
+                break;
 
             default:
-                $this->parseStartPage($GLOBALS['TL_LANG']['syncCto']['unknown_backup_step']);
-                return;
+                $arrContenData["error"] = true;
+                $arrContenData["error_msg"] = $GLOBALS['TL_LANG']['syncCto']['unknown_backup_step'];
+                $arrContenData["data"] = array();
+                break;
         }
 
-        $this->parseStartPage($GLOBALS['TL_LANG']['syncCto']['unknown_backup_error']);
+        // Set templatevars and set session
+        $arrContenData["step"] = $step;
+
+        $this->objTemplateContent->goBack = $this->script . "contao/main.php?do=syncCto_backups&amp;table=tl_syncCto_backup_db";
+        $this->objTemplateContent->data = $arrContenData["data"];
+        $this->objTemplateContent->step = $arrContenData["step"];
+        $this->objTemplateContent->error = $arrContenData["error"];
+        $this->objTemplateContent->error_msg = $arrContenData["error_msg"];
+        $this->objTemplateContent->refresh = $arrContenData["refresh"];
+        $this->objTemplateContent->url = $arrContenData["url"];
+        $this->objTemplateContent->start = $arrContenData["start"];
+        $this->objTemplateContent->headline = $arrContenData["headline"];
+        $this->objTemplateContent->information = $arrContenData["information"];
+        $this->objTemplateContent->finished = $arrContenData["finished"];
+
+        $this->Session->set("SyncCto_DB_Content", $arrContenData);
+        $this->Session->set("SyncCto_DB_StepPool", $arrStepPool);
     }
 
     /**
@@ -335,305 +300,222 @@ class SyncCtoModuleBackup extends BackendModule
      */
     protected function parseDbRestorePage()
     {
+        //- Init ---------------------------------------------------------------
+        $this->objTemplateContent = new BackendTemplate('be_syncCto_steps');
         $this->loadLanguageFile('tl_syncCto_restore_db');
+        $this->loadLanguageFile('tl_syncCto_steps');
 
         if ($this->Input->get("step") == "" || $this->Input->get("step") == null)
-        {
-            $step = 1;
-        }
+            $step = 0;
         else
-        {
             $step = intval($this->Input->get("step"));
-        }
 
-        $this->objTemplateContent = new BackendTemplate('be_syncCto_restore_db');
+        $arrContenData = $this->Session->get("SyncCto_DB_Content");
+        $arrStepPool = $this->Session->get("SyncCto_DB_StepPool");
 
         switch ($step)
         {
+            case 0;
+                $arrContenData = array(
+                    "error" => false,
+                    "error_msg" => "",
+                    "refresh" => true,
+                    "finished" => false,
+                    "step" => 1,
+                    "url" => "contao/main.php?do=syncCto_backups&amp;table=tl_syncCto_restore_db&amp;act=start",
+                    "start" => microtime(true),
+                    "headline" => $GLOBALS['TL_LANG']['tl_syncCto_restore_db']['edit'],
+                    "information" => "",
+                    "data" => array()
+                );
+
+                $arrStepPool = array();
+                $step = 1;
+
             case 1:
+                echo $this->Input->post("filelist");
+
                 if ($this->Input->post("filelist") == "")
                 {
-                    $this->parseStartPage($GLOBALS['TL_LANG']['syncCto']['no_backup_file']);
-                    return;
+                    $arrContenData["error"] = true;
+                    $arrContenData["error_msg"] = $GLOBALS['TL_LANG']['syncCto']['no_backup_file'];
+
+                    break;
                 }
 
-                $this->Session->set("SyncCto_Restore", $this->Input->post("filelist"));
+                if (!file_exists(TL_ROOT . "/" . $this->Input->post("filelist")))
+                {
+                    $arrContenData["error"] = true;
+                    $arrContenData["error_msg"] = $GLOBALS['TL_LANG']['syncCto']['no_backup_file'];
 
-                $this->objTemplateContent->step = $step;
-                $this->objTemplateContent->condition = array('1' => WORK);
-                $this->objTemplateContent->refresh = true;
+                    break;
+                }
 
-                return;
+                $arrStepPool["SyncCto_Restore"] = $this->Input->post("filelist");
+
+                $arrContenData["data"][1] = array(
+                    "title" => $GLOBALS['TL_LANG']['tl_syncCto_steps']['step'] . " 1",
+                    "description" => $GLOBALS['TL_LANG']['tl_syncCto_restore_db']['step1_help'],
+                    "state" => $GLOBALS['TL_LANG']['tl_syncCto_backup_db']['work']
+                );
+
+                break;
 
             case 2:
-                $strRestoreFile = $this->Session->get("SyncCto_Restore");
-                if ($strRestoreFile == "" || $strRestoreFile == null)
+                try
                 {
-                    $this->parseStartPage($GLOBALS['TL_LANG']['syncCto']['session_file_error']);
-                    return;
+                    $this->objSyncCtoDatabase->runRestore($arrStepPool["SyncCto_Restore"]);
+                }
+                catch (Exception $exc)
+                {
+                    $arrContenData["error"] = true;
+                    $arrContenData["error_msg"] = $exc->getMessage();
+
+                    break;
                 }
 
-
-                if (!file_exists(TL_ROOT . "/" . $strRestoreFile))
-                {
-                    $this->objTemplateContent->step = $step - 1;
-                    $this->objTemplateContent->condition = array('1' => ERROR);
-                    $this->objTemplateContent->refresh = false;
-                    $this->objTemplateContent->error = "Datei nicht gefunden.";
-                    return;
-                }
-
-                $this->objTemplateContent->step = $step;
-                $this->objTemplateContent->condition = array('1' => OK, '2' => WORK);
-                $this->objTemplateContent->refresh = true;
-                return;
+                break;
 
             case 3:
-                $strRestoreFile = $this->Session->get("SyncCto_Restore");
-                if ($strRestoreFile == "" || $strRestoreFile == null)
-                {
-                    $this->parseStartPage($GLOBALS['TL_LANG']['syncCto']['session_file_error']);
-                    return;
-                }
+                $arrContenData["data"][1]["state"] = $GLOBALS['TL_LANG']['tl_syncCto_backup_db']['ok'];
 
-                try
-                {
-                    $this->objSyncCtoDatabase->runCheckZip($strRestoreFile);
-                }
-                catch (Exception $exc)
-                {
-                    $this->objTemplateContent->step = $step - 1;
-                    $this->objTemplateContent->condition = array('1' => OK, '2' => ERROR);
-                    $this->objTemplateContent->refresh = false;
-                    $this->objTemplateContent->error = $exc->getMessage();
-                    return;
-                }
+                $arrContenData["finished"] = true;
+                $arrContenData["data"][2]["title"] = $GLOBALS['TL_LANG']['tl_syncCto_steps']['complete'];
+                $arrContenData["data"][2]["description"] = $GLOBALS['TL_LANG']['tl_syncCto_restore_db']['complete_help'];
 
-                $this->objTemplateContent->step = $step;
-                $this->objTemplateContent->condition = array('1' => OK, '2' => OK, '3' => WORK);
-                $this->objTemplateContent->refresh = true;
-                return;
-
-            case 4:
-                $strRestoreFile = $this->Session->get("SyncCto_Restore");
-                if ($strRestoreFile == "" || $strRestoreFile == null)
-                {
-                    $this->parseStartPage($GLOBALS['TL_LANG']['syncCto']['session_file_error']);
-                    return;
-                }
-
-                try
-                {
-                    $strZipId = $this->objSyncCtoDatabase->runRestore($strRestoreFile);
-                }
-                catch (Exception $exc)
-                {
-                    $this->objTemplateContent->step = $step - 1;
-                    $this->objTemplateContent->condition = array('1' => OK, '2' => OK, '3' => ERROR);
-                    $this->objTemplateContent->refresh = false;
-                    $this->objTemplateContent->error = $exc->getMessage();
-                    return;
-                }
-
-                $this->objTemplateContent->step = $step + 1;
-                $this->objTemplateContent->file = $strZipName;
-                $this->objTemplateContent->condition = array('1' => OK, '2' => OK, '3' => OK);
-                $this->objTemplateContent->refresh = false;
-                return;
+                $this->Session->set("SyncCto_DB_StepPool", "");
+                break;
 
             default:
-                $this->parseStartPage($GLOBALS['TL_LANG']['syncCto']['unknown_backup_step']);
-                return;
+                $arrContenData["error"] = true;
+                $arrContenData["error_msg"] = $GLOBALS['TL_LANG']['syncCto']['unknown_backup_step'];
+                $arrContenData["data"] = array();
+                break;
         }
 
-        $this->parseStartPage($GLOBALS['TL_LANG']['syncCto']['unknown_restore_error']);
+        // Set templatevars and set session
+        $arrContenData["step"] = $step;
+
+        $this->objTemplateContent->goBack = $this->script . "contao/main.php?do=syncCto_backups&table=tl_syncCto_restore_db";
+        $this->objTemplateContent->data = $arrContenData["data"];
+        $this->objTemplateContent->step = $arrContenData["step"];
+        $this->objTemplateContent->error = $arrContenData["error"];
+        $this->objTemplateContent->error_msg = $arrContenData["error_msg"];
+        $this->objTemplateContent->refresh = $arrContenData["refresh"];
+        $this->objTemplateContent->url = $arrContenData["url"];
+        $this->objTemplateContent->start = $arrContenData["start"];
+        $this->objTemplateContent->headline = $arrContenData["headline"];
+        $this->objTemplateContent->information = $arrContenData["information"];
+        $this->objTemplateContent->finished = $arrContenData["finished"];
+
+        $this->Session->set("SyncCto_DB_Content", $arrContenData);
+        $this->Session->set("SyncCto_DB_StepPool", $arrStepPool);
     }
 
     protected function parseFileBackupPage()
     {
-        // Init
+        //- Init ---------------------------------------------------------------
+        $this->objTemplateContent = new BackendTemplate('be_syncCto_steps');
         $this->loadLanguageFile('tl_syncCto_backup_file');
-        $this->objTemplateContent = new BackendTemplate('be_syncCto_backup_file');
+        $this->loadLanguageFile('tl_syncCto_steps');
 
-        // Check Step
         if ($this->Input->get("step") == "" || $this->Input->get("step") == null)
-        {
-            $step = 1;
-        }
+            $step = 0;
         else
-        {
             $step = intval($this->Input->get("step"));
-        }
 
-        // Load data
-        if ($step == 1)
-        {            
-            
-            // Check sync. typ
-            if (strlen($this->Input->post('backupType')) != 0)
-            {
-                if ($this->Input->post('backupType') == SYNCCTO_FULL || $this->Input->post('backupType') == SYNCCTO_SMALL)
-                {
-                    $intBackupTyp = $this->Input->post('backupType');
-                    $this->Session->set("syncCto_Typ", $this->Input->post('syncType'));
-                }
-                else
-                {
-                    $this->parseStartPage($GLOBALS['TL_LANG']['syncCto']['unknown_method']);
-                    return;
-                }
-            }
-            else
-            {
-                $intBackupTyp = SYNCCTO_SMALL;
-                $this->Session->set("syncCto_Typ", SYNCCTO_SMALL);
-            }
+        $arrContenData = $this->Session->get("SyncCto_File_Content");
+        $arrStepPool = $this->Session->get("SyncCto_File_StepPool");
 
-            $strBackupName = $this->Input->post('backupName');
-            $arrFilelist = $this->Input->post('filelist');
-            $arrCondition = array();
-
-            $this->Session->set("SyncCto_Typ", $intBackupTyp);
-            $this->Session->set("SyncCto_Name", $strBackupName);
-            $this->Session->set("SyncCto_Filelist", serialize($arrFilelist));
-            $this->Session->set("SyncCto_Condition", serialize($arrCondition));
-        }
-        else
-        {
-            $intBackupTyp = $this->Session->get("SyncCto_Typ");
-            $strBackupName = $this->Session->get("SyncCto_Name");
-            $arrFilelist = deserialize($this->Session->get("SyncCto_Filelist"));
-
-            if ($arrFilelist == "s:0:\"\";")
-                $arrFilelist = array();
-
-            $arrCondition = deserialize($this->Session->get("SyncCto_Condition"));
-            $strZipName = $this->Session->get("SyncCto_ZipName");
-        }
-
-
-
-        if ($arrFilelist == "" && $intBackupTyp == SYNCCTO_SMALL)
-        {
-            $this->parseStartPage($GLOBALS['TL_LANG']['syncCto']['no_backup_file']);
-            return;
-        }
-
-        if ($arrCondition == "" && !is_array($arrCondition))
-        {
-            $this->parseStartPage($GLOBALS['TL_LANG']['syncCto']['unknown_error']);
-            return;
-        }
-
-        if ($strZipName == "" && ($step == 3 || $step == 4))
-        {
-            $this->parseStartPage($GLOBALS['TL_LANG']['syncCto']['restore_session_zip_name']);
-            return;
-        }
-
-
-        // Do function by step
         switch ($step)
         {
-            case 1:
-                $this->objTemplateContent->step = $step;
-                $this->objTemplateContent->condition = $this->saveCondition($arrCondition, array('1' => WORK));
-                $this->objTemplateContent->refresh = true;
+            case 0;
+                $arrContenData = array(
+                    "error" => false,
+                    "error_msg" => "",
+                    "refresh" => true,
+                    "finished" => false,
+                    "step" => 1,
+                    "url" => "contao/main.php?do=syncCto_backups&amp;table=tl_syncCto_restore_db&amp;act=start",
+                    "start" => microtime(true),
+                    "headline" => $GLOBALS['TL_LANG']['tl_syncCto_restore_db']['edit'],
+                    "information" => "",
+                    "data" => array()
+                );
 
-                return;
+                $arrStepPool = array();
+
+                // Check sync. typ
+                if (strlen($this->Input->post('backupType')) != 0)
+                {
+                    if ($this->Input->post('backupType') == SYNCCTO_FULL || $this->Input->post('backupType') == SYNCCTO_SMALL)
+                    {
+                        $arrStepPool["syncCto_Typ"] = $this->Input->post('backupType');
+                    }
+                    else
+                    {
+                        $arrContenData["error"] = true;
+                        $arrContenData["error_msg"] = $GLOBALS['TL_LANG']['syncCto']['unknown_method'];
+                        break;
+                    }
+                }
+                else
+                {
+                    $arrStepPool["syncCto_Typ"] = SYNCCTO_SMALL;
+                }
+
+                $arrStepPool["backupName"] = $this->Input->post('backupName');
+                $arrStepPool["filelist"] = $this->Input->post('filelist');
+
+                $step = 1;
+
+            case 1:
+                if ($arrStepPool["syncCto_Typ"] == SYNCCTO_SMALL)
+                {
+                    //$this->objSyncCtoFiles->run
+                }
+
+                if ($arrStepPool["syncCto_Typ"] == SYNCCTO_FULL)
+                {
+                    
+                }
+
+                break;
 
             case 2:
-                try
-                {
-                    $arrZip = $this->objSyncCtoFiles->runCreateZip($strBackupName);
-                    
-                    $this->Session->set("SyncCto_ZipId", $arrZip['id']);
-                    $this->Session->set("SyncCto_ZipName", $arrZip['name']);
-                }
-                catch (Exception $exc)
-                {
-                    $this->objTemplateContent->step = $step - 1;
-                    $this->objTemplateContent->condition = $this->saveCondition($arrCondition, array('1' => ERROR));
-                    $this->objTemplateContent->refresh = false;
-                    $this->objTemplateContent->error = $exc->getMessage();
-                    return;
-                }
+                $arrContenData["data"][1]["state"] = $GLOBALS['TL_LANG']['tl_syncCto_backup_db']['ok'];
 
-                $this->objTemplateContent->step = $step;
-                $this->objTemplateContent->condition = $this->saveCondition($arrCondition, array('1' => OK, '2' => WORK));
-                $this->objTemplateContent->refresh = true;
+                $arrContenData["finished"] = true;
+                $arrContenData["data"][2]["title"] = $GLOBALS['TL_LANG']['tl_syncCto_steps']['complete'];
+                $arrContenData["data"][2]["description"] = $GLOBALS['TL_LANG']['tl_syncCto_restore_db']['complete_help'];
 
-                return;
-
-            case 3:
-                if ($intBackupTyp == SYNCCTO_SMALL)
-                {
-                    $this->objTemplateContent->step = $step;
-                    $this->objTemplateContent->condition = $this->saveCondition($arrCondition, array('2' => SKIPPED, '3' => WORK));
-                    $this->objTemplateContent->refresh = true;
-                    return;
-                }
-                else
-                {
-                    try
-                    {
-                        $this->objSyncCtoFiles->runCoreFilesDump($strZipName);
-
-                        $this->objTemplateContent->step = $step;
-                        $this->objTemplateContent->condition = $this->saveCondition($arrCondition, array('2' => OK, '3' => WORK));
-                        $this->objTemplateContent->refresh = true;
-                        return;
-                    }
-                    catch (Exception $exc)
-                    {
-                        $this->objTemplateContent->step = $step - 1;
-                        $this->objTemplateContent->condition = $this->saveCondition($arrCondition, array('2' => ERROR));
-                        $this->objTemplateContent->refresh = false;
-                        $this->objTemplateContent->error = $exc->getMessage();
-                        return;
-                    }
-                }
-
-                return;
-
-            case 4:
-                if (count($arrFilelist) == 0)
-                {
-                    $this->objTemplateContent->step = $step + 1;
-                    $this->objTemplateContent->condition = $this->saveCondition($arrCondition, array('3' => SKIPPED));
-                    $this->objTemplateContent->file = $strZipName;
-                    $this->objTemplateContent->refresh = false;
-                    return;
-                }
-                else
-                {
-
-                    try
-                    {   
-                        $this->objSyncCtoFiles->runTlFilesDump($strZipName, $arrFilelist);
-                    }
-                    catch (Exception $exc)
-                    {
-                        $this->objTemplateContent->step = $step - 1;
-                        $this->objTemplateContent->condition = $this->saveCondition($arrCondition, array('3' => ERROR));
-                        $this->objTemplateContent->refresh = false;
-                        $this->objTemplateContent->error = $exc->getMessage();
-                        return;
-                    }
-
-                    $this->objTemplateContent->step = $step + 1;
-                    $this->objTemplateContent->file = $strZipName;
-                    $this->objTemplateContent->condition = $this->saveCondition($arrCondition, array('3' => OK));
-                    $this->objTemplateContent->refresh = false;
-                    return;
-                }
-
-                return;
+                $this->Session->set("SyncCto_DB_StepPool", "");
+                break;
 
             default:
-                $this->parseStartPage($GLOBALS['TL_LANG']['syncCto']['unknown_backup_step']);
-                return;
+                $arrContenData["error"] = true;
+                $arrContenData["error_msg"] = $GLOBALS['TL_LANG']['syncCto']['unknown_backup_step'];
+                $arrContenData["data"] = array();
+                break;
         }
+
+        // Set templatevars and set session
+        $arrContenData["step"] = $step;
+
+        $this->objTemplateContent->goBack = $this->script . "contao/main.php?do=syncCto_backups&table=tl_syncCto_restore_db";
+        $this->objTemplateContent->data = $arrContenData["data"];
+        $this->objTemplateContent->step = $arrContenData["step"];
+        $this->objTemplateContent->error = $arrContenData["error"];
+        $this->objTemplateContent->error_msg = $arrContenData["error_msg"];
+        $this->objTemplateContent->refresh = $arrContenData["refresh"];
+        $this->objTemplateContent->url = $arrContenData["url"];
+        $this->objTemplateContent->start = $arrContenData["start"];
+        $this->objTemplateContent->headline = $arrContenData["headline"];
+        $this->objTemplateContent->information = $arrContenData["information"];
+        $this->objTemplateContent->finished = $arrContenData["finished"];
+
+        $this->Session->set("SyncCto_File_Content", $arrContenData);
+        $this->Session->set("SyncCto_File_StepPool", $arrStepPool);
     }
 
     /**

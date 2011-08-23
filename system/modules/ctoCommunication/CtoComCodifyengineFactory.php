@@ -29,25 +29,41 @@ if (!defined('TL_ROOT'))
  * @license    GNU/LGPL
  * @filesource
  */
-abstract class CtoCodifyengineAbstract
+
+/**
+ * Factory for create the codifyengine
+ */
+class CtoComCodifyengineFactory extends Backend
 {
-    protected $strKey;
-    protected static $strName;
 
-    abstract public function Decrypt($string);
-
-    abstract public function Encrypt($string);
-
-    abstract public function setKey($string);
-
-    public function getKey()
+    /**
+     * Create the codifyengine.
+     * 
+     * @return CtoComCodifyengineAbstract 
+     */
+    public static function getEngine($strEngine = null)
     {
-        return $this->strKey;
-    }
+        if ($strEngine == null || $strEngine == "Blowfish")
+        {
+            $enginge = CtoComCodifyengineImpl_Blowfish::getInstance();
+        }
+        else
+        {
+            if (!file_exists(TL_ROOT . "/system/modules/ctoCommunication/CtoComCodifyengineImpl_" . $strEngine . ".php"))
+                throw new Exception("Unknown codifyengine: " . $strEngine);
 
-    public function getName()
-    {
-        return self::$strName;
+            $strClass = "CtoComCodifyengineImpl_" . $strEngine;
+            $enginge = $strClass::getInstance();
+        }
+
+        if ($enginge instanceof CtoComCodifyengineAbstract)
+        {
+            return $enginge;
+        }
+        else
+        {
+            throw new Exception("Codifyenginge is not instance of CtoComCodifyengineAbstract.");
+        }
     }
 
 }

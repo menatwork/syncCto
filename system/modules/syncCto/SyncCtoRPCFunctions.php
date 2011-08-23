@@ -46,15 +46,15 @@ class SyncCtoRPCFunctions extends Backend
     function __construct()
     {
         $this->BackendUser = BackendUser::getInstance();
+        
+        parent::__construct();
+
         $this->Encryption = Encryption::getInstance();
         $this->Config = Config::getInstance();
-
-        parent::__construct();
 
         $this->objSyncCtoFiles = SyncCtoFiles::getInstance();
         $this->objSyncCtoDatabase = SyncCtoDatabase::getInstance();
         $this->objSyncCtoHelper = SyncCtoHelper::getInstance();
-        $this->objSyncCtoMeasurement = SyncCtoMeasurement::getInstance();
 
         $this->loadLanguageFile("syncCto");
 

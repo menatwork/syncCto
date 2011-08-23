@@ -102,7 +102,7 @@ $GLOBALS['TL_DCA']['tl_synccto_clients'] = array(
     ),
     // Palettes
     'palettes' => array(
-        'default' => '{title_legend},title,description;{connection_label},address,path,port,transmission,codifyengine;{user_label},username,password,seckey;'
+        'default' => '{title_legend},title,description;{connection_label},address,path,port,transmission,codifyengine;{user_label},seckey;'
     ),
     // Fields
     'fields' => array(
@@ -124,7 +124,7 @@ $GLOBALS['TL_DCA']['tl_synccto_clients'] = array(
             'default' => 'http://',
             'search' => true,
             'exclude' => true,
-            'eval' => array('trailingSlash' => true, 'mandatory' => true)
+            'eval' => array('trailingSlash' => false, 'mandatory' => true)
         ),
         'port' => array(
             'label' => &$GLOBALS['TL_LANG']['tl_synccto_clients']['port'],
@@ -139,7 +139,7 @@ $GLOBALS['TL_DCA']['tl_synccto_clients'] = array(
             'inputType' => 'text',
             'default' => 'syncCto.php',
             'exclude' => true,
-            'eval' => array('style' => ' background-color:#f0f0f0; border:1px solid #b8b8b8; "readonly="readonly', 'mandatory' => true)
+            'eval' => array('mandatory' => true)
         ),
         'codifyengine' => array(
             'label' => &$GLOBALS['TL_LANG']['tl_synccto_clients']['codifyengine'],
@@ -148,18 +148,18 @@ $GLOBALS['TL_DCA']['tl_synccto_clients'] = array(
             'options_callback' => array("SyncCtoCallback", "optioncallCodifyengines"),
             'eval' => array('mandatory' => true),
         ),
-        'username' => array(
-            'label' => &$GLOBALS['TL_LANG']['tl_synccto_clients']['username'],
-            'inputType' => 'text',
-            'exclude' => true,
-            'eval' => array('mandatory' => true)
-        ),
-        'password' => array(
-            'label' => &$GLOBALS['TL_LANG']['tl_synccto_clients']['password'],
-            'inputType' => 'text',
-            'exclude' => true,
-            'eval' => array('encrypt' => true, 'mandatory' => true)
-        ),
+//        'username' => array(
+//            'label' => &$GLOBALS['TL_LANG']['tl_synccto_clients']['username'],
+//            'inputType' => 'text',
+//            'exclude' => true,
+//            'eval' => array('mandatory' => true)
+//        ),
+//        'password' => array(
+//            'label' => &$GLOBALS['TL_LANG']['tl_synccto_clients']['password'],
+//            'inputType' => 'text',
+//            'exclude' => true,
+//            'eval' => array('encrypt' => true, 'mandatory' => true)
+//        ),
         'seckey' => array(
             'label' => &$GLOBALS['TL_LANG']['tl_synccto_clients']['seckey'],
             'inputType' => 'text',

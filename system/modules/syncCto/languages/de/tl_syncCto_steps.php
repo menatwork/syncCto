@@ -1,7 +1,4 @@
-<?php
-
-if (!defined('TL_ROOT'))
-    die('You cannot access this file directly!');
+<?php if (!defined('TL_ROOT')) die('You can not access this file directly!');
 
 /**
  * Contao Open Source CMS
@@ -13,51 +10,33 @@ if (!defined('TL_ROOT'))
  * modify it under the terms of the GNU Lesser General Public
  * License as published by the Free Software Foundation, either
  * version 3 of the License, or (at your option) any later version.
- *
+ * 
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
  * Lesser General Public License for more details.
- *
+ * 
  * You should have received a copy of the GNU Lesser General Public
  * License along with this program. If not, please visit the Free
  * Software Foundation website at <http://www.gnu.org/licenses/>.
  *
  * PHP version 5
- * @copyright  MEN AT WORK 2011
- * @package    syncCto
- * @license    GNU/LGPL
+ * @copyright  MEN AT WORK 2011 
+ * @package    Language
+ * @license    GNU/LGPL 
  * @filesource
  */
 
 /**
- * Factory for create the codifyengine
+ * List
  */
-class CtoCodifyengineFactory
-{
+$GLOBALS['TL_LANG']['tl_syncCto_steps']['ok'] = "OK";
+$GLOBALS['TL_LANG']['tl_syncCto_steps']['progress'] = "In Bearbeitung";
+$GLOBALS['TL_LANG']['tl_syncCto_steps']['error'] = "Fehler";
+ 
+$GLOBALS['TL_LANG']['tl_syncCto_steps']['step'] = "Schritt";
+$GLOBALS['TL_LANG']['tl_syncCto_steps']['complete'] = "Fertig!";
 
-    /**
-     * Create the codifyengine.
-     * 
-     * @return SyncCtoCodifyengineInterface 
-     */
-    public static function getEngine($strEngine = null)
-    {
-        if ($strEngine == null || $strEngine == "Blowfish" || true)
-        {
-            $enginge = CtoCodifyengineImpl_Blowfish::getInstance();
-        }
-       
-        if ($enginge instanceof CtoCodifyengineAbstract)
-        {
-            return $enginge;
-        }
-        else
-        {
-            throw new Exception("Codifyenginge is not instance of SyncCtoCodifyengineInterface");
-        }
-    }
-
-}
+$GLOBALS['TL_LANG']['tl_syncCto_steps']['back'] = "Zurück";
 
 ?>

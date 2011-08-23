@@ -38,7 +38,7 @@ $GLOBALS['TL_DCA']['tl_syncCto_settings'] = array(
     // Palettes
     'palettes' => array
         (
-        'default' => '{blacklist_legend:hide},syncCto_folder_blacklist,syncCto_file_blacklist;{whitelist_legend:hide},syncCto_folder_whitelist;{local_blacklist_legend},syncCto_local_blacklist;{hidden_tables_legend:hide},syncCto_table_hidden;{tables_legend},syncCto_table_list;{security_legend},syncCto_seckey;{debug_legend},syncCto_debug_filelist,syncCto_debug_log,syncCto_measurement_log;'
+        'default' => '{blacklist_legend:hide},syncCto_folder_blacklist,syncCto_file_blacklist;{whitelist_legend:hide},syncCto_folder_whitelist;{local_blacklist_legend},syncCto_local_blacklist;{hidden_tables_legend:hide},syncCto_table_hidden;{tables_legend},syncCto_table_list;{debug_legend},syncCto_debug_filelist,syncCto_debug_log,syncCto_measurement_log;'
     ),
     // Fields
     'fields' => array(
@@ -85,13 +85,6 @@ $GLOBALS['TL_DCA']['tl_syncCto_settings'] = array(
             'inputType' => 'checkboxWizard',
             'eval' => array('multiple' => true),
             'options_callback' => array('SyncCtoCallback', 'optioncallTables'),
-        ),
-        'syncCto_seckey' => array
-            (
-            'label' => &$GLOBALS['TL_LANG']['tl_syncCto_settings']['seckey'],
-            'inputType' => 'text',
-            'eval' => array('minlength' => 32, 'maxlength' => 64),
-            'save_callback' => array(array('SyncCtoCallback', 'savecallSecKey')),
         ),
         'syncCto_debug_log' => array
             (

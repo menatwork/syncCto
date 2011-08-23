@@ -44,12 +44,6 @@ define("SYNCCTO_FULL", 2);
 define("SYNCCTO_COMMUNICATION_WAIT", 1);
 define("SYNCCTO_COMMUNICATION_REPLAY", 3);
 
-// Database
-define("DB_SERIALIZED_TABLES", 'DB-Backup_tbl.txt');
-define("DB_SERIALIZED_INSERTS", 'DB-Backup_ins.txt');
-define("DB_SQL", 'DB-Backup.sql');
-define("DB_ZIP", 'DB-Backup.zip');
-
 // File
 define("FILE_ZIP", 'File-Backup.zip');
 
@@ -171,8 +165,7 @@ $GLOBALS['syncCto']['local_blacklist'] = array(
  * Whitelist
  */
 // Folders
-$GLOBALS['syncCto']['folder_whitelist'] = array(
-    'TL_ROOT',
+$GLOBALS['syncCto']['folder_whitelist'] = array(    
     'contao',
     'plugins',
     'system',
@@ -184,10 +177,10 @@ $GLOBALS['syncCto']['folder_whitelist'] = array(
  * Global configuration
  */
 // Folder path configuration
-$GLOBALS['syncCto']['path']['db'] = "/tl_files/syncCto_backups/database/";
-$GLOBALS['syncCto']['path']['tmp'] = "/system/tmp/";
-$GLOBALS['syncCto']['path']['file'] = "/tl_files/syncCto_backups/files/";
-$GLOBALS['syncCto']['path']['debug'] = "/tl_files/syncCto_backups/debug/";
+$GLOBALS['syncCto']['path']['db'] = "tl_files/syncCto_backups/database/";
+$GLOBALS['syncCto']['path']['tmp'] = "system/tmp/";
+$GLOBALS['syncCto']['path']['file'] = "tl_files/syncCto_backups/files/";
+$GLOBALS['syncCto']['path']['debug'] = "tl_files/syncCto_backups/debug/";
 
 // Timestamp for files
 $GLOBALS['syncCto']['settings']['time_format'] = "Ymd_H-i-s";

@@ -33,7 +33,7 @@ if (!defined('TL_ROOT'))
 /**
  * SyncCtoCodifyengineImpl
  */
-class SyncCtoCodifyengineImpl_Blow implements SyncCtoCodifyengineInterface
+class CtoComCodifyengineImpl_Blowfish extends CtoComCodifyengineAbstract
 {
     /* -------------------------------------------------------------------------
      * Diese Arrays enthalte 32 Bit Zahlen.
@@ -236,7 +236,7 @@ class SyncCtoCodifyengineImpl_Blow implements SyncCtoCodifyengineInterface
     /* -------------------------------------------------------------------------
      * Vars
      */
-    protected $strKey = "";
+    protected $strName = "Blowfish";
     protected $cbc;
     protected $sbox3, $sbox2, $sbox1, $sbox0, $pbox;
     // Singelton
@@ -257,12 +257,12 @@ class SyncCtoCodifyengineImpl_Blow implements SyncCtoCodifyengineInterface
     /**
      * Singelton Pattern
      * 
-     * @return SyncCtoCodifyengineInterface 
+     * @return CtoComCodifyengineImpl_Blowfish 
      */
     public static function getInstance()
     {
         if (self::$instance == null)
-            self::$instance = new SyncCtoCodifyengineImpl_Blow();
+            self::$instance = new CtoComCodifyengineImpl_Blowfish();
 
         return self::$instance;
     }
@@ -282,17 +282,7 @@ class SyncCtoCodifyengineImpl_Blow implements SyncCtoCodifyengineInterface
         $this->sbox3 = $this->sbox3Base;
 
         $this->KeySetup($this->strKey);
-    }
-
-    public function getKey()
-    {
-        return $this->strKey;
-    }
-    
-    public function getName()
-    {
-        return "Blow";
-    }
+    }   
 
     /* -------------------------------------------------------------------------
      * Functions

@@ -25,45 +25,34 @@ if (!defined('TL_ROOT'))
  *
  * PHP version 5
  * @copyright  MEN AT WORK 2011
- * @package    syncCto
+ * @package    ctoCommunication
  * @license    GNU/LGPL
  * @filesource
  */
-
-/**
- * Factory for create the codifyengine
- */
-class SyncCtoCodifyengineFactory
+class CtoCommunicationCallback extends Backend
 {
 
-    /**
-     * Create the codifyengine.
-     * 
-     * @return SyncCtoCodifyengineInterface 
-     */
-    public static function getEngine($strEngine = null)
+    public function __construct()
     {
-        if ($strEngine == null)
-        {
-            $enginge = SyncCtoCodifyengineImpl_Blow::getInstance();
-        }
-        else
-        {
-            if (!isset($GLOBALS["syncCto"]["codifyengine"][$strEngine]))
-                throw new Exception(vsprintf($GLOBALS['TL_LANG']['syncCto']['codifyengine_unknown'], array($strEngine)));
+        parent::__construct();
+    }
 
-            $strName = $GLOBALS["syncCto"]["codifyengine"][$strEngine]["classname"];
-            $enginge = $strName::getInstance();
+    /**
+     * Generate the sec key for server
+     * 
+     * @param type $varValue
+     * @param DataContainer $dca
+     * @return type 
+     */
+    public function saveCallSecKey($varValue, DataContainer $dca)
+    {
+        if ($varValue == "")
+        {
+            $objKey = $this->Database->prepare("SELECT UUID() as uid")->execute();
+            return $objKey->uid;
         }
 
-        if ($enginge instanceof SyncCtoCodifyengineInterface)
-        {
-            return $enginge;
-        }
-        else
-        {
-            throw new Exception("Codifyenginge is not instance of SyncCtoCodifyengineInterface");
-        }
+        return $varValue;
     }
 
 }

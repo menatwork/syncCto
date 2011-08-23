@@ -29,7 +29,7 @@ if (!defined('TL_ROOT'))
  * @license    GNU/LGPL
  * @filesource
  */
-class SyncCtoCommunicationClient extends SyncCtoCommunication
+class SyncCtoCommunicationClient extends CtoCommunication
 {
 
     protected static $instance = null;
@@ -43,9 +43,9 @@ class SyncCtoCommunicationClient extends SyncCtoCommunication
     function __construct()
     {
         parent::__construct();
-        
+
         $this->objSyncCtoFiles = SyncCtoFiles::getInstance();
-        $this->objSyncCtoHelper = SyncCtoHelper::getInstance();        
+        $this->objSyncCtoHelper = SyncCtoHelper::getInstance();
     }
 
     /**
@@ -59,6 +59,22 @@ class SyncCtoCommunicationClient extends SyncCtoCommunication
             self::$instance = new SyncCtoCommunicationClient();
 
         return self::$instance;
+    }
+
+    public function setClient($id)
+    {
+        // Load Client from database
+        $objClient = $this->Database->prepare("SELECT * FROM tl_synccto_clients WHERE id = %s")
+                ->limit(1)
+                ->execute((int) $id);
+
+        // Check if a client was loaded
+        if ($objClient->numRows == 0)
+            throw new Exception("Unknown Client.");
+        
+        $strUrl = $objClient->address . ":" . $objClient->port . "/" . $objClient->path;
+
+        parent::setClient($strUrl, $objClient->seckey,  $objClient->codifyengine);
     }
 
     /*

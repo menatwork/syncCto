@@ -1,4 +1,7 @@
-<?php if (!defined('TL_ROOT')) die('You can not access this file directly!');
+<?php
+
+if (!defined('TL_ROOT'))
+    die('You cannot access this file directly!');
 
 /**
  * Contao Open Source CMS
@@ -10,38 +13,43 @@
  * modify it under the terms of the GNU Lesser General Public
  * License as published by the Free Software Foundation, either
  * version 3 of the License, or (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
  * Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public
  * License along with this program. If not, please visit the Free
  * Software Foundation website at <http://www.gnu.org/licenses/>.
  *
  * PHP version 5
- * @copyright  MEN AT WORK 2011 
- * @package    Language
- * @license    GNU/LGPL 
+ * @copyright  MEN AT WORK 2011
+ * @package    ctoCommunication
+ * @license    GNU/LGPL
  * @filesource
  */
- 
-/**
- * Legends
- */
-$GLOBALS['TL_LANG']['tl_syncCto_restore_db']['filelist_legend'] = "Dateien";
-$GLOBALS['TL_LANG']['tl_syncCto_restore_db']['edit'] = 'Ein Backup der Datenbank einspielen';
+abstract class CtoComCodifyengineAbstract
+{
+    protected $strKey;
+    protected $strName;
 
-/**
- * Fields
- */
-$GLOBALS['TL_LANG']['tl_syncCto_restore_db']['filelist'] = array("Quelldatei", "Bitte wählen Sie eine Datei aus der Dateiübersicht.");
+    abstract public function Decrypt($string);
 
-/**
- * List
- */
-$GLOBALS['TL_LANG']['tl_syncCto_restore_db']['step1_help'] = "Datenbank importieren.";
-$GLOBALS['TL_LANG']['tl_syncCto_restore_db']['complete_help'] = "Die Datenbank wurde erfolgreich importiert.";
+    abstract public function Encrypt($string);
+
+    abstract public function setKey($string);
+
+    public function getKey()
+    {
+        return $this->strKey;
+    }
+
+    public function getName()
+    {
+        return $this->strName;
+    }
+
+}
 
 ?>

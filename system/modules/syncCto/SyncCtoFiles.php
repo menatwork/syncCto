@@ -31,16 +31,26 @@ if (!defined('TL_ROOT'))
  */
 class SyncCtoFiles extends Backend
 {
+    /* -------------------------------------------------------------------------
+     * Vars
+     */
 
-    // Variables    
-    protected $objSyncCtoHelper;
+    //- Singelten pattern --------
     protected static $instance = null;
+    //- Vars ---------------------   
+    protected $strSuffixZipName = "File-Backup.zip";
+    protected $strTimestampFormat = "Ymd_H-i-s";
+    //- Objects ------------------
+    protected $objSyncCtoHelper;
+
+    /* -------------------------------------------------------------------------
+     * Core
+     */
 
     public function __construct()
     {
         parent::__construct();
         $this->objSyncCtoHelper = SyncCtoHelper::getInstance();
-
     }
 
     /**
@@ -50,205 +60,149 @@ class SyncCtoFiles extends Backend
     {
         if (self::$instance == null)
             self::$instance = new SyncCtoFiles();
-        
+
         return self::$instance;
     }
 
     /* -------------------------------------------------------------------------
-     * Create functions
+     * Getter / Setter - Functions
      */
 
-    public function runCreateZip($name = "", $booTempFolder = false)
+    public function getSuffixZipName()
     {
-        @set_time_limit(30);
-
-        $intTstamp = time();
-
-        if ($booTempFolder == TRUE)
-            $strFilename = TL_ROOT . $GLOBALS['syncCto']['path']['tmp'] . $this->buildFilename($intTstamp, $name);
-        else
-            $strFilename = TL_ROOT . $GLOBALS['syncCto']['path']['file'] . $this->buildFilename($intTstamp, $name);
-
-        $objZip = new ZipArchive();
-
-        if ($objZip->open($strFilename, ZIPARCHIVE::CREATE) !== TRUE)
-            throw new Exception(vsprintf($GLOBALS['TL_LANG']['syncCto']['cant_open'], array($strFilename)));
-
-        $objZip->addFromString("readme.txt", "foo");
-
-        $objZip->close();
-
-        if (!file_exists($strFilename))
-            throw new Exception(vsprintf($GLOBALS['TL_LANG']['syncCto']['file_not_exists'], array($strFilename)));
-
-        return array("id" => $intTstamp, "name" => $this->buildFilename($intTstamp, $name));
+        return $this->strSuffixZipName;
     }
 
-    // Checksum Functions ------------------------------------------------------
+    public function setSuffixZipName($strSuffixZipName)
+    {
+        $this->strSuffixZipName = $strSuffixZipName;
+    }
+
+    public function getTimestampFormat()
+    {
+        return $this->strTimestampFormat;
+    }
+
+    public function setTimestampFormat($strTimestampFormat)
+    {
+        $this->strTimestampFormat = $strTimestampFormat;
+    }
+
+    /* -------------------------------------------------------------------------
+     * Checksum Functions
+     */
 
     /**
-     * Create a checksum list from tl_files.
+     * Create a checksum list from contao core.
      * 
-     * @param array $arrFileList List of files in tl_files
      * @return array 
      */
-    public function runTlFilesChecksum($arrFileList)
+    public function runChecksumCore()
     {
-        @set_time_limit(600);
-
+        $arrFileList = $this->recrusiveFileList(array(), "");
         $arrChecksum = array();
 
-        foreach ($arrFileList as $value)
+        foreach ($arrFileList as $key => $value)
         {
-            // Kick empty values
-            if ($value == "" || $value == null)
-                continue;
+            $intSize = filesize($this->objSyncCtoHelper->buildPath($value));
 
-            // Check if we are still in tl_files
-            if (strpos($value, "tl_files") === FALSE)
-                continue;
-
-            //Build checksum
-            $arrChecksum = $this->recursiveChecksum($value, $arrChecksum);
+            if ($intSize >= $GLOBALS['syncCto']['size_limit_ignore'])
+            {
+                $arrChecksum[md5($value)] = array(
+                    "path" => $value,
+                    "checksum" => 0,
+                    "size" => $intSize,
+                    "state" => SyncCtoEnum::FILESTATE_BOMBASTIC_BIG,
+                    "raw" => "file bombastic",
+                    "transmission" => SyncCtoEnum::FILETRANS_WAITING,
+                    "path_raw" => standardize($value),
+                );
+            }
+            else if ($intSize >= $GLOBALS['syncCto']['size_limit'])
+            {
+                $arrChecksum[md5($value)] = array(
+                    "path" => $value,
+                    "checksum" => md5_file($this->objSyncCtoHelper->buildPath($value)),
+                    "size" => $intSize,
+                    "state" => SyncCtoEnum::FILESTATE_TOO_BIG,
+                    "raw" => "file big",
+                    "transmission" => SyncCtoEnum::FILETRANS_WAITING,
+                    "path_raw" => standardize($value),
+                );
+            }
+            else
+            {
+                $arrChecksum[md5($value)] = array(
+                    "path" => $value,
+                    "checksum" => md5_file($this->objSyncCtoHelper->buildPath($value)),
+                    "size" => $intSize,
+                    "state" => SyncCtoEnum::FILESTATE_FILE,
+                    "raw" => "file",
+                    "transmission" => SyncCtoEnum::FILETRANS_WAITING,
+                    "path_raw" => standardize($value),
+                );
+            }
         }
 
         return $arrChecksum;
     }
 
     /**
-     * Create a checksum list from the contao core.
+     * Create a checksum list from contao tl_files.
      * 
      * @return array 
      */
-    public function runCoreFilesChecksum()
+    public function runChecksumTlFiles()
     {
-        @set_time_limit(600);
-
+        $arrFileList = $this->recrusiveFileList(array(), "tl_files", true);
         $arrChecksum = array();
 
-        foreach ($this->objSyncCtoHelper->getWhitelistFolder() as $value)
+        foreach ($arrFileList as $key => $value)
         {
-            // Kick empty values
-            if ($value == "" || $value == null)
-                continue;
+            $intSize = filesize($this->objSyncCtoHelper->buildPath($value));
 
-            if ($value == "." || $value == "/" || $value == "TL_ROOT")
+            if ($intSize >= $GLOBALS['syncCto']['size_limit_ignore'])
             {
-                // Build checksum from root, only files
-                $arrChecksum = $this->recursiveChecksum("", $arrChecksum, TRUE);
+                $arrChecksum[md5($value)] = array(
+                    "path" => $value,
+                    "checksum" => 0,
+                    "size" => $intSize,
+                    "state" => SyncCtoEnum::FILESTATE_BOMBASTIC_BIG,
+                    "raw" => "file bombastic",
+                    "transmission" => SyncCtoEnum::FILETRANS_WAITING,
+                    "path_raw" => standardize($value),
+                );
+            }
+            else if ($intSize >= $GLOBALS['syncCto']['size_limit'])
+            {
+                $arrChecksum[md5($value)] = array(
+                    "path" => $value,
+                    "checksum" => md5_file($this->objSyncCtoHelper->buildPath($value)),
+                    "size" => $intSize,
+                    "state" => SyncCtoEnum::FILESTATE_TOO_BIG,
+                    "raw" => "file big",
+                    "transmission" => SyncCtoEnum::FILETRANS_WAITING,
+                    "path_raw" => standardize($value),
+                );
             }
             else
             {
-                // Build checksum
-                $arrChecksum = $this->recursiveChecksum($value, $arrChecksum);
+                $arrChecksum[md5($value)] = array(
+                    "path" => $value,
+                    "checksum" => md5_file($this->objSyncCtoHelper->buildPath($value)),
+                    "size" => $intSize,
+                    "state" => SyncCtoEnum::FILESTATE_FILE,
+                    "raw" => "file",
+                    "transmission" => SyncCtoEnum::FILETRANS_WAITING,
+                    "path_raw" => standardize($value),
+                );
             }
         }
 
         return $arrChecksum;
     }
 
-    // Dump Functions ----------------------------------------------------------
-
-    public function runTlFilesDump($strZip, $arrBackupList)
-    {
-        @set_time_limit(3600);
-
-        $strFilename = TL_ROOT . $GLOBALS['syncCto']['path']['file'] . $strZip;
-
-        if (!file_exists($strFilename))
-            throw new Exception(vsprintf($GLOBALS['TL_LANG']['syncCto']['file_not_exists'], array($strFilename)));
-
-        $objZip = new ZipArchive();
-
-        if ($objZip->open($strFilename) !== TRUE)
-            throw new Exception(vsprintf($GLOBALS['TL_LANG']['syncCto']['cant_open'], array($strFilename)));
-
-        foreach ($arrBackupList as $value)
-        {
-            $this->recursiveZip($value, TL_ROOT . "/" . $value, $objZip);
-        }
-
-        $objZip->close();
-
-        return;
-    }
-
-    public function runCoreFilesDump($strZip)
-    {
-        @set_time_limit(60);
-
-        $strFilename = TL_ROOT . $GLOBALS['syncCto']['path']['file'] . $strZip;
-
-        if (!file_exists($strFilename))
-            throw new Exception(vsprintf($GLOBALS['TL_LANG']['syncCto']['file_not_exists'], array($strFilename)));
-
-        $objZip = new ZipArchive();
-
-        if ($objZip->open($strFilename) !== TRUE)
-            throw new Exception(vsprintf($GLOBALS['TL_LANG']['syncCto']['cant_open'], array($strFilename)));
-
-        foreach ($GLOBALS['syncCto']['folder_whitelist'] as $value)
-        {
-            if ($value == "." || $value == "/" || $value == "TL_ROOT")
-            {
-                $this->recursiveZip(null, TL_ROOT, $objZip, true);
-            }
-            else
-            {
-                $this->recursiveZip($value, TL_ROOT . "/" . $value, $objZip);
-            }
-        }
-
-        $objZip->close();
-
-        return;
-    }
-
-    public function runSyncDump($strZip, $arrFiles)
-    {
-        @set_time_limit(60);
-
-        $strFilename = TL_ROOT . $GLOBALS['syncCto']['path']['tmp'] . $strZip;
-
-        if (!file_exists($strFilename))
-            throw new Exception(vsprintf($GLOBALS['TL_LANG']['syncCto']['file_not_exists'], array($strFilename)));
-
-        $objZip = new ZipArchive();
-
-        if ($objZip->open($strFilename) !== TRUE)
-            throw new Exception(vsprintf($GLOBALS['TL_LANG']['syncCto']['cant_open'], array($strFilename)));
-
-        foreach ($arrFiles as $value)
-        {
-            $this->recursiveZip($value["path"], TL_ROOT . "/" . $value["path"], $objZip);
-        }
-
-        $objZip->close();
-
-        return;
-    }
-
-    public function runRestore($strRestoreFile)
-    {
-        $strRestoreFile = (TL_ROOT . "/" . $strRestoreFile);
-
-        $zip = new ZipArchive();
-
-        if ($zip->open($strRestoreFile) === TRUE)
-        {
-            $zip->extractTo(TL_ROOT);
-            $zip->close();
-        }
-        else
-        {
-            $zip->close();
-            throw new Exception("Could not open");
-        }
-
-        return;
-    }
-
-    public function runCecksum($arrChecksumList)
+    public function runCecksumCompare($arrChecksumList)
     {
         $arrFileList = array();
 
@@ -315,345 +269,280 @@ class SyncCtoFiles extends Backend
         return $arrFileList;
     }
 
-    /* -------------------------------------------------------------------------
-     * Helper functions
-     */
+    // Dump Functions ----------------------------------------------------------
 
-    private function buildFilename($intTstamp, $name = "")
+    public function runDump($strZip = "", $arrTlFiles = null)
     {
-        if ($name == "")
+        if ($strZip == "")
         {
-            return vsprintf("%s_" . FILE_ZIP, array(date($GLOBALS['syncCto']['settings']['time_format'], intval($intTstamp))));
+            $strFilename = date($this->strTimestampFormat) . "_" . $this->strSuffixZipName;
         }
         else
         {
-            return vsprintf("%s_%s.zip", array(date($GLOBALS['syncCto']['settings']['time_format'], intval($intTstamp)), standardize($name)));
+            if (preg_match("/.*\.zip\z/i", $subject) == 0)
+                $strFilename = $strZip . ".zip";
+            else
+                $strFilename = $strZip;
         }
+
+        $strPath = $this->objSyncCtoHelper->buildPathWoTL($GLOBALS['syncCto']['path']['file'], $strFilename);
+
+        $objZipWrite = new ZipWriter($strPath);
+
+        $arrFileList = $this->recrusiveFileList(array(), "", false);
+        
+        if(is_array($arrTlFiles) == true && count($arrTlFiles) != 0)
+        {
+            foreach ($arrTlFiles as $key => $value)
+            {
+                if(!file_exists($this->objSyncCtoHelper->buildPath($value)))
+                        unset($arrTlFiles[$key]);
+            }
+            
+            $arrFileList = array_merge($arrFileList, $arrTlFiles);
+        }        
+
+        foreach ($arrFileList as $key => $value)
+        {
+            $value = preg_replace("/^\//i", "", $value);
+            $objZipWrite->addFile($value);
+        }
+
+        $objZipWrite->close();
+
+        unset($objZipWrite);
+        unset($arrFileList);
     }
 
-    private function recursiveZip($strIntern, $strExtern, ZipArchive $zip, $booSkipFolder = false)
+    public function runDumpTlFiles($strZip = "", $arrFileList = null)
     {
-        $arrFolderBlacklist = $this->objSyncCtoHelper->getBlacklistFolder();
-        $arrFileBlacklist = $this->objSyncCtoHelper->getBlacklistFile();
-
-        if ($strIntern != "")
+        if ($strZip == "")
         {
-            foreach ($arrFolderBlacklist as $valule)
-            {
-                $valule = str_replace(array("\\", ".", "^", "?", "*"), array("\\\\", "\\.", "\\^", ".?", ".*"), $valule);
-                if (preg_match("^" . $valule . "^i", $strIntern) != 0)
-                {
-                    return;
-                }
-            }
-        }
-
-        if (is_dir($strExtern))
-        {
-            $zip->addEmptyDir($strSource);
-
-            // Open folder
-            $hanDir = opendir($strExtern);
-
-            // Switch throw all folders and datas
-            while ($file = readdir($hanDir))
-            {
-                // Skip "." and ".."
-                if ($file != '.' && $file != '..')
-                {
-                    // If dir open it and read it
-                    if (is_dir($this->buildPath($strExtern, $file)) && $booSkipFolder == false)
-                    {
-                        if ($strIntern == null)
-                        {
-                            $this->recursiveZip($file, $this->buildPath($strExtern, $file), $zip);
-                        }
-                        else
-                        {
-                            $this->recursiveZip($strIntern . "/" . $file, $this->buildPath($strExtern, $file), $zip);
-                        }
-                    }
-                    // If file, copy to the zip archive
-                    else if (is_file($this->buildPath($strExtern, $file)))
-                    {
-                        // Check if file in blacklist
-                        foreach ($arrFileBlacklist as $valule)
-                        {
-                            $valule = str_replace(array("\\", ".", "^", "?", "*"), array("\\\\", "\\.", "\\^", ".?", ".*"), $valule);
-                            if (preg_match("^" . $valule . "^i", $strIntern . "/" . $file) != 0)
-                            {
-                                return;
-                            }
-                        }
-
-                        if ($strIntern == null)
-                        {
-                            $zip->addFile($this->buildPath($strExtern, $file), $file);
-                        }
-                        else
-                        {
-                            $zip->addFile($this->buildPath($strExtern, $file), $strIntern . "/" . $file);
-                        }
-                    }
-                }
-            }
+            $strFilename = date($this->strTimestampFormat) . "_" . $this->strSuffixZipName;
         }
         else
         {
-            // Check if file in blacklist            
-            foreach ($arrFileBlacklist as $valule)
-            {
-                $valule = str_replace(array("\\", ".", "^", "?", "*"), array("\\\\", "\\.", "\\^", ".?", ".*"), $valule);
-                if (preg_match("^" . $valule . "^i", $strIntern) != 0)
-                {
-                    return;
-                }
-            }
-
-            $zip->addFile($this->buildPath($strExtern), $strIntern);
+            if (preg_match("/.*\.zip\z/i", $subject) == 0)
+                $strFilename = $strZip . ".zip";
+            else
+                $strFilename = $strZip;
         }
+
+        $strPath = $this->objSyncCtoHelper->buildPathWoTL($GLOBALS['syncCto']['path']['file'], $strFilename);
+
+        $objZipWrite = new ZipWriter($strPath);
+
+        if ($arrFileList == null)
+        {
+            $arrFileList = $this->recrusiveFileList(array(), "tl_files", true);
+        }
+
+        foreach ($arrFileList as $key => $value)
+        {
+            $value = preg_replace("/^\//i", "", $value);
+            $objZipWrite->addFile($value);
+        }
+
+        $objZipWrite->close();
+
+        unset($objZipWrite);
+        unset($arrFileList);
+    }
+
+    public function runDumpCore($strZip = "")
+    {
+        if ($strZip == "")
+        {
+            $strFilename = date($this->strTimestampFormat) . "_" . $this->strSuffixZipName;
+        }
+        else
+        {
+            if (preg_match("/.*\.zip\z/i", $subject) == 0)
+                $strFilename = $strZip . ".zip";
+            else
+                $strFilename = $strZip;
+        }
+
+        $strPath = $this->objSyncCtoHelper->buildPathWoTL($GLOBALS['syncCto']['path']['file'], $strFilename);
+
+        $objZipWrite = new ZipWriter($strPath);
+
+        $arrFileList = $this->recrusiveFileList(array(), "", false);
+
+        foreach ($arrFileList as $key => $value)
+        {
+            $value = preg_replace("/^\//i", "", $value);
+            $objZipWrite->addFile($value);
+        }
+
+        $objZipWrite->close();
+
+        unset($objZipWrite);
+        unset($arrFileList);
+    }
+
+    /**
+     * ToDo
+     * @param type $strRestoreFile
+     * @return type 
+     */
+    public function runRestore($strRestoreFile)
+    {
+        $objZipRead = new ZipReader($strRestoreFile);
+
+        $arrFileList = $objZipRead->getFileList();
+
+        foreach ($arrFileList as $key => $value)
+        {
+            if ($objZipRead->getFile($value) != true)
+                throw new Exception("Error by unziping file. File not found in zip archive.");
+
+            $objFile = new File($GLOBALS['syncCto']['path']['tmp'] . $value);
+            $objFile->write($objZipRead->unzip());
+            $objFile->close();
+            
+            unset($objFile);
+        }
+
+        unset($objZipWrite);
+        
+        // Move Files
+        
+        unset($arrFileList);
 
         return;
     }
 
-    function recursiveChecksum($strIntern, $arrChecksum, $booSkipFolder = false)
+    /* -------------------------------------------------------------------------
+     * Helper functions
+     */
+
+    public function recrusiveFileList($arrList, $strPath, $blnTlFiles = false)
     {
+        // Load blacklists and whitelists
         $arrFolderBlacklist = $this->objSyncCtoHelper->getBlacklistFolder();
         $arrFileBlacklist = $this->objSyncCtoHelper->getBlacklistFile();
+        $arrFolderWhiteList = $this->objSyncCtoHelper->getWhitelistFolder();
 
-        if ($strIntern != "")
+        if ($blnTlFiles)
         {
-            foreach ($arrFolderBlacklist as $valule)
+            $arrFolderWhiteList[] = "tl_files";
+        }
+
+        // Build path with and without TL_ROOT
+        $strPath = $this->objSyncCtoHelper->buildPathWoTL($strPath);
+        $strPathTl = $this->objSyncCtoHelper->buildPath($strPath);
+
+        // Check if the current path is on blacklist
+        if ($strPath != "")
+        {
+            // Run through each entry in blacklistfolder
+            foreach ($arrFolderBlacklist as $valueBalck)
             {
+                // Search with preg for values
+                $valueBalck = str_replace(array("\\", ".", "^", "?", "*"), array("\\\\", "\\.", "\\^", ".?", ".*"), $valueBalck);
+                if (preg_match("^" . $valueBalck . "^i", $strPath) != 0)
+                {
+                    return $arrList;
+                }
+            }
+
+            // Run through each entry in whitelistfolder
+            $blnWhite = false;
+            foreach ($arrFolderWhiteList as $valueWhite)
+            {
+                // Search with preg for values
+                $valueWhite = str_replace(array("\\", ".", "^", "?", "*", "/"), array("\\\\", "\\.", "\\^", ".?", ".*", "\/"), $this->objSyncCtoHelper->buildPathWoTL($valueWhite));
+                if (preg_match("/^" . $valueWhite . ".*/i", $strPath) != 0)
+                {
+                    $blnWhite = true;
+                }
+            }
+
+            if (!$blnWhite)
+                return $arrList;
+        }
+
+        // Is the given string a file
+        if (is_file($strPathTl))
+        {
+            // Run through each entry in blacklistfile     
+            foreach ($arrFileBlacklist as $valule)
+            {
+                // Search with preg for values
                 $valule = str_replace(array("\\", ".", "^", "?", "*"), array("\\\\", "\\.", "\\^", ".?", ".*"), $valule);
-                if (preg_match("^" . $valule . "^i", $strIntern) != 0)
+                if (preg_match("^" . $valule . "^i", $strPath) != 0)
                 {
-                    return $arrChecksum;
+                    return $arrList;
                 }
             }
+
+            $arrList[] = $strPathTl;
         }
-
-        if (is_dir($this->buildPath($strIntern)))
+        // Is the given string a folder
+        else
         {
-            // Open folder
-            $hanDir = opendir($this->buildPath($strIntern));
+            // Scann Folder
+            $arrFolder = scandir($strPathTl);
 
-            // Switch throw all folders and datas
-            while ($file = readdir($hanDir))
+            // Rund through each file
+            foreach ($arrFolder as $key => $value)
             {
-                // Skip "." and ".."
-                if ($file != '.' && $file != '..')
-                {
-                    if ($strIntern == "" || $strIntern == null)
-                    {
-                        // If dir open it and read it
-                        if (is_dir($this->buildPath($file)) && $booSkipFolder == false)
-                        {
-                            $arrChecksum = $this->recursiveChecksum($file, $arrChecksum);
-                        }
-                        // If file, copy to the zip archive
-                        else if (is_file($this->buildPath($file)))
-                        {
-                            foreach ($arrFileBlacklist as $valule)
-                            {
-                                $valule = str_replace(array("\\", ".", "^", "?", "*"), array("\\\\", "\\.", "\\^", ".?", ".*"), $valule);
-                                if (preg_match("^" . $valule . "^i", $file) != 0)
-                                {
-                                    return $arrChecksum;
-                                }
-                            }
-
-                            if (in_array($file, $arrFileBlacklist))
-                                continue;
-
-                            $intSize = filesize($this->buildPath($file));
-
-                            if ($intSize >= $GLOBALS['syncCto']['size_limit_ignore'])
-                            {
-                                $arrChecksum[md5($file)] = array(
-                                    "path" => $file,
-                                    "checksum" => 0,
-                                    "size" => $intSize,
-                                    "state" => SyncCtoEnum::FILESTATE_BOMBASTIC_BIG,
-                                    "raw" => "file bombastic",
-                                    "transmission" => SyncCtoEnum::FILETRANS_WAITING,
-                                    "path_raw" => standardize($file),
-                                );
-                            }
-                            else if ($intSize >= $GLOBALS['syncCto']['size_limit'])
-                            {
-                                $arrChecksum[md5($file)] = array(
-                                    "path" => $file,
-                                    "checksum" => md5_file($this->buildPath($file)),
-                                    "size" => $intSize,
-                                    "state" => SyncCtoEnum::FILESTATE_TOO_BIG,
-                                    "raw" => "file big",
-                                    "transmission" => SyncCtoEnum::FILETRANS_WAITING,
-                                    "path_raw" => standardize($file),
-                                );
-                            }
-                            else
-                            {
-                                $arrChecksum[md5($file)] = array(
-                                    "path" => $file,
-                                    "checksum" => md5_file($this->buildPath($file)),
-                                    "size" => $intSize,
-                                    "state" => SyncCtoEnum::FILESTATE_FILE,
-                                    "raw" => "file",
-                                    "transmission" => SyncCtoEnum::FILETRANS_WAITING,
-                                    "path_raw" => standardize($file),
-                                );
-                            }
-                        }
-                    }
-                    else
-                    {
-                        // If dir open it and read it
-                        if (is_dir($this->buildPath($strIntern, $file)) && $booSkipFolder == false)
-                        {
-                            $arrChecksum = $this->recursiveChecksum($strIntern . "/" . $file, $arrChecksum);
-                        }
-                        // If file, copy to the zip archive
-                        else if (is_file($this->buildPath($strIntern, $file)))
-                        {
-                            foreach ($arrFileBlacklist as $valule)
-                            {
-                                $valule = str_replace(array("\\", ".", "^", "?", "*"), array("\\\\", "\\.", "\\^", ".?", ".*"), $valule);
-                                if (preg_match("^" . $valule . "^i", $strIntern . "/" . $file) != 0)
-                                {
-                                    return $arrChecksum;
-                                }
-                            }
-
-                            $intSize = filesize($this->buildPath($strIntern, $file));
-
-                            if ($intSize >= $GLOBALS['syncCto']['size_limit_ignore'])
-                            {
-                                $arrChecksum[md5($strIntern . "/" . $file)] = array(
-                                    "path" => $strIntern . "/" . $file,
-                                    "checksum" => 0,
-                                    "size" => $intSize,
-                                    "state" => SyncCtoEnum::FILESTATE_BOMBASTIC_BIG,
-                                    "raw" => "file bombastic",
-                                    "transmission" => SyncCtoEnum::FILETRANS_WAITING,
-                                    "path_raw" => standardize($file),
-                                );
-                            }
-                            else if ($intSize >= $GLOBALS['syncCto']['size_limit'])
-                            {
-                                $arrChecksum[md5($strIntern . "/" . $file)] = array(
-                                    "path" => $strIntern . "/" . $file,
-                                    "checksum" => md5_file($this->buildPath($strIntern, $file)),
-                                    "size" => $intSize,
-                                    "state" => SyncCtoEnum::FILESTATE_TOO_BIG,
-                                    "raw" => "file big",
-                                    "transmission" => SyncCtoEnum::FILETRANS_WAITING,
-                                    "path_raw" => standardize($file),
-                                );
-                            }
-                            else
-                            {
-                                $arrChecksum[md5($strIntern . "/" . $file)] = array(
-                                    "path" => $strIntern . "/" . $file,
-                                    "checksum" => md5_file($this->buildPath($strIntern, $file)),
-                                    "size" => $intSize,
-                                    "state" => SyncCtoEnum::FILESTATE_FILE,
-                                    "raw" => "file",
-                                    "transmission" => SyncCtoEnum::FILETRANS_WAITING,
-                                    "path_raw" => standardize($file),
-                                );
-                            }
-                        }
-                    }
-                }
-            }
-        }
-        else if (is_file($this->buildPath($strIntern)))
-        {
-            // Check if file in blacklist            
-            if (in_array($strIntern, $arrFileBlacklist))
-                return $arrChecksum;
-
-            $intSize = filesize($this->buildPath($strIntern));
-
-            if ($intSize >= $GLOBALS['syncCto']['size_limit_ignore'])
-            {
-                $arrChecksum[md5($strIntern)] = array(
-                    "path" => $strIntern,
-                    "checksum" => 0,
-                    "size" => $intSize,
-                    "state" => SyncCtoEnum::FILESTATE_BOMBASTIC_BIG,
-                    "raw" => "file bombastic",
-                    "transmission" => SyncCtoEnum::FILETRANS_WAITING,
-                    "path_raw" => standardize($file),
-                );
-            }
-            else if ($intSize >= $GLOBALS['syncCto']['size_limit'])
-            {
-                $arrChecksum[md5($strIntern)] = array(
-                    "path" => $strIntern,
-                    "checksum" => md5_file($this->buildPath($strIntern)),
-                    "size" => $intSize,
-                    "state" => SyncCtoEnum::FILESTATE_TOO_BIG,
-                    "raw" => "file big",
-                    "transmission" => SyncCtoEnum::FILETRANS_WAITING,
-                    "path_raw" => standardize($file),
-                );
-            }
-            else
-            {
-                $arrChecksum[md5($strIntern)] = array(
-                    "path" => $strIntern,
-                    "checksum" => md5_file($this->buildPath($strIntern)),
-                    "size" => $intSize,
-                    "state" => SyncCtoEnum::FILESTATE_FILE,
-                    "raw" => "file",
-                    "transmission" => SyncCtoEnum::FILETRANS_WAITING,
-                    "path_raw" => standardize($file),
-                );
-            }
-        }
-
-        return $arrChecksum;
-    }
-
-    // New Part--------------------
-
-    /* -------------------------------------------------------------------------
-     * Path Operations 
-     */
-
-    /**
-     * Baut einen Ordnerlink zusammen, dabei wird der TL_ROOT gelöscht und 
-     * neu hinzugefügt. Dabei ist es egal wo "/" gesetzt sind.
-     * 
-     * @param array $arrPath Array der einzelnen Ordner teilen
-     * @return string 
-     */
-    public function buildPath()
-    {
-        $arrPath = func_get_args();
-
-        if (count($arrPath) == 0 || $arrPath == null || $arrPath == "")
-            return TL_ROOT;
-
-        $strVar = "";
-
-        foreach ($arrPath as $itPath)
-        {
-            $itPath = str_replace(TL_ROOT, "", $itPath);
-            $itPath = explode("/", $itPath);
-
-            foreach ($itPath as $itFolder)
-            {
-                if ($itFolder == "" || $itFolder == "." || $itFolder == "..")
+                // Handle open_basedir
+                if ($value == '.' || $value == '..')
                     continue;
 
-                $strVar .= "/" . $itFolder;
+                // Have we a file or ...
+                if (is_file($this->objSyncCtoHelper->buildPath($strPath, $value)))
+                {
+                    // Check if file is in blacklist    
+                    $blnBlack = false;
+                    // Run through each entry in blacklistfile           
+                    foreach ($arrFileBlacklist as $valule)
+                    {
+                        // Search with preg for values
+                        $valule = str_replace(array("\\", ".", "^", "?", "*"), array("\\\\", "\\.", "\\^", ".?", ".*"), $valule);
+                        if (preg_match("^" . $valule . "^i", $this->objSyncCtoHelper->buildPathWoTL($strPath, $value)) != 0)
+                        {
+                            $blnBlack = true;
+                            break;
+                        }
+                    }
+
+                    // Skip if file is in blacklist
+                    if ($blnBlack)
+                        continue;
+
+                    // Add to list
+                    $arrList[] = $this->objSyncCtoHelper->buildPathWoTL($strPath, $value);
+                }
+                // ... a folder
+                else
+                {
+                    // Check if folder is in whitelist    
+                    $blnWhitelist = false;
+                    foreach ($arrFolderWhiteList as $valueWhite)
+                    {
+                        // Search with preg for values
+                        $valueWhite = str_replace(array("\\", ".", "^", "?", "*", "/"), array("\\\\", "\\.", "\\^", ".?", ".*", "\/"), $this->objSyncCtoHelper->buildPathWoTL($valueWhite));
+                        if (preg_match("/^" . $valueWhite . ".*/i", $this->objSyncCtoHelper->buildPathWoTL($strPath, $value)) != 0)
+                        {
+                            $blnWhitelist = true;
+                            break;
+                        }
+                    }
+
+                    if (!$blnWhitelist)
+                        continue;
+
+                    // Recursive-Call
+                    $arrList = $this->recrusiveFileList($arrList, $this->objSyncCtoHelper->buildPathWoTL($strPath, $value), $blnTlFiles);
+                }
             }
         }
 
-        return TL_ROOT . $strVar;
+        // Return list
+        return $arrList;
     }
 
     /* -------------------------------------------------------------------------
@@ -661,114 +550,40 @@ class SyncCtoFiles extends Backend
      */
 
     /**
-     * Prüft ob die syncCto Ordner bestehen und erstellt diese bei bedarf.
-     * 
-     * @param bool $booCreate 
+     * Create syncCto folders if not exists
      */
-    public function checkSyncCtoFolders($booCreate = true)
+    public function checkSyncCtoFolders()
     {
-        $mixPath = explode("/", $GLOBALS['syncCto']['path']['db']);
-        $strVar = "";
-        foreach ($mixPath as $value)
-        {
-            if ($value == "")
-                continue;
-
-            $strVar = "/" . $value;
-
-            if (!file_exists(TL_ROOT . $strVar))
-                mkdir(TL_ROOT . $strVar);
-        }
-
-        $mixPath = explode("/", $GLOBALS['syncCto']['path']['tmp']);
-        $strVar = "";
-        foreach ($mixPath as $value)
-        {
-            if ($value == "")
-                continue;
-
-            $strVar = "/" . $value;
-
-            if (!file_exists(TL_ROOT . $strVar))
-                mkdir(TL_ROOT . $strVar);
-        }
-
-        $mixPath = explode("/", $GLOBALS['syncCto']['path']['file']);
-        $strVar = "";
-        foreach ($mixPath as $value)
-        {
-            if ($value == "")
-                continue;
-
-            $strVar = "/" . $value;
-
-            if (!file_exists(TL_ROOT . $strVar))
-                mkdir(TL_ROOT . $strVar);
-        }
+        $objFile = new Folder($this->objSyncCtoHelper->buildPathWoTL($GLOBALS['syncCto']['path']['db']));
+        $objFile = new Folder($this->objSyncCtoHelper->buildPathWoTL($GLOBALS['syncCto']['path']['tmp']));
+        $objFile = new Folder($this->objSyncCtoHelper->buildPathWoTL($GLOBALS['syncCto']['path']['file']));
     }
 
     /**
-     * Löscht den Temp Ordner bzw. Ordner innerhalb des Temp Ordners.
+     * Clear tempfolder or a folder inside of temp
      * 
      * @param string $strFolder
-     * @return type 
      */
     public function purgeTemp($strFolder = null)
     {
-        try
-        {
-            if ($strFolder == null || $strFolder == "")
-                $strPath = $this->buildPath($GLOBALS['syncCto']['path']['tmp']);
-            else
-                $strPath = $this->buildPath($GLOBALS['syncCto']['path']['tmp'], $strFolder);
+        if ($strFolder == null || $strFolder == "")
+            $strPath = $this->buildPathWoTL($GLOBALS['syncCto']['path']['tmp']);
+        else
+            $strPath = $this->buildPathWoTL($GLOBALS['syncCto']['path']['tmp'], $strFolder);
 
-            if (strpos($strPath, TL_ROOT . "/system/tmp") === FALSE)
-                return;
-
-            $arrScan = scandir($strPath);
-
-            foreach ($arrScan as $key => $value)
-            {
-                // Skip
-                if ($value == "." || $value == "..")
-                    continue;
-
-                if (strpos($strPath, TL_ROOT . "/system/tmp/.htaccess") !== FALSE)
-                    continue;
-
-                if (is_dir($this->buildPath($strPath, $value)))
-                {
-                    // Clear folder
-                    $this->purgeTemp($strFolder . "/" . $value);
-                    // Kill folder
-                    rmdir($this->buildPath($strPath, $value));
-                }
-                else if (is_file($this->buildPath($strPath, $value)))
-                {
-                    if (strpos($this->buildPath($strPath, $value), TL_ROOT . "/system/tmp/.htaccess") !== FALSE)
-                        continue;
-
-                    // Kill file
-                    unlink($this->buildPath($strPath, $value));
-                }
-            }
-
-            // Check for .htaccess
-            if (!file_exists($this->buildPath('/system/tmp/.htaccess')))
-            {
-                $objFile = new File($this->buildPath('/system/tmp/.htaccess'));
-                $objFile->write("order deny,allow\ndeny from all");
-                $objFile->close();
-            }
-
-            return;
-        }
-        catch (Exception $exc)
-        {
-            $this->log("Error by purge temp folder. Errormsg: " . $exc->getMessage(), __CLASS__ . " " . __FUNCTION__, "SyncCto Communication");
-            return;
-        }
+        $objFolder = new Folder($strFolder);
+        $objFolder->clear();
     }
+
+    /*
+     * ------------------------------------------------------------------------
+     * ------------------------------------------------------------------------
+     * ALT
+     * ------------------------------------------------------------------------
+     * ------------------------------------------------------------------------
+     */
+
+
 
     /* -------------------------------------------------------------------------
      * File Operations 

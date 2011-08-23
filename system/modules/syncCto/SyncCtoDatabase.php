@@ -1,7 +1,4 @@
-<?php
-
-if (!defined('TL_ROOT'))
-    die('You cannot access this file directly!');
+<?php if (!defined('TL_ROOT')) die('You cannot access this file directly!');
 
 /**
  * Contao Open Source CMS
@@ -39,17 +36,15 @@ class SyncCtoDatabase extends Backend
      * Vars
      */
 
-    /**
-     * Instance
-     * @var SyncCtoDatabase 
-     */
+    //- Singelten pattern --------
     protected static $instance = null;
-
-    /**
-     * Array of Backups
-     * @var array
-     */
+    //- Vars ---------------------
     protected $arrBackupTables;
+    protected $strSuffixZipName = "DB-Backup.zip";
+    protected $strFilenameTable = "DB-Backup_tbl.txt";
+    protected $strFilenameInsert = "DB-Backup_ins.txt";
+    protected $strFilenameSQL = "DB-Backup.sql";
+    protected $strTimestampFormat = "Ymd_H-i-s";
 
     /**
      * -= Config =-
@@ -88,11 +83,11 @@ class SyncCtoDatabase extends Backend
      * Constructor
      * Load language
      */
-    public function __construct()
+    protected function __construct()
     {
         parent::__construct();
-        $this->loadLanguageFile('SyncCtoController');
-        
+        //$this->loadLanguageFile('SyncCtoController');
+        $this->arrBackupTables = array();
     }
 
     /**
@@ -107,172 +102,112 @@ class SyncCtoDatabase extends Backend
         return self::$instance;
     }
 
+    public function __set($name, $value)
+    {
+        switch ($name)
+        {
+            case "backupTables":
+                if (!is_array($value))
+                    throw new Exception("Value must be type of array.");
+
+                $this->arrBackupTables = $value;
+                break;
+
+            case "filenameInsert":
+                $this->strFilenameInsert = $value;
+                break;
+
+            case "filenameTable":
+                $this->strFilenameTable = $value;
+                break;
+
+            case "filenameSQL":
+                $this->strFilenameSQL = $value;
+                break;
+
+            case "suffixZipname":
+                $this->strSuffixZipName = $value;
+                break;
+
+            case "timestampFormat":
+                $this->strTimestampFormat = $value;
+                break;
+
+            default:
+                break;
+        }
+    }
+
+    public function __get($name)
+    {
+        switch ($name)
+        {
+            case "backupTables":
+                return $this->arrBackupTables;
+
+            case "filenameInsert":
+                return $this->strFilenameInsert;
+
+            case "filenameTable":
+                return $this->strFilenameTable;
+
+            case "filenameSQL":
+                return $this->strFilenameSQL;
+
+            case "suffixZipname":
+                return $this->strSuffixZipName;
+
+            case "timestampFormat":
+                return $this->strTimestampFormat;
+
+            default:
+                return null;
+        }
+    }
+
     /* -------------------------------------------------------------------------
      * Create functions
      */
 
     /**
-     * Function for creating a empty zip folder.
-     * 
-     * @param bool $booTempFolder Should the zip file create in the tmp folder instead of db backup folder.
-     * @return array("id"=>[int],"name"=>[string]) 
-     */
-    public function runCreateZip($booTempFolder = false)
-    {
-        $intTstamp = time();
-
-        $objZip = new ZipArchive();
-
-        if ($booTempFolder == TRUE)
-            $strFilename = TL_ROOT . $GLOBALS['syncCto']['path']['tmp'] . $this->buildFilename($intTstamp);
-        else
-            $strFilename = TL_ROOT . $GLOBALS['syncCto']['path']['db'] . $this->buildFilename($intTstamp);
-
-        if ($objZip->open($strFilename, ZIPARCHIVE::CREATE) !== TRUE)
-            throw new Exception(vsprintf($GLOBALS['TL_LANG']['syncCto']['cant_open'], array($strFilename)));
-
-        $objZip->addFromString("readme.txt", vsprintf($GLOBALS['TL_LANG']['syncCto']['readme'], array(date($GLOBALS['SyncCto']['settings']['time_format'], $intTstamp))));
-
-        $objZip->close();
-        
-        unset($objZip);
-
-        if (!file_exists($strFilename))
-            throw new Exception(vsprintf($GLOBALS['TL_LANG']['syncCto']['file_not_exists'], array($strFilename)));
-
-        return array("id" => $intTstamp, "name" => $this->buildFilename($intTstamp));
-    }
-
-    /**
-     * Function for creating a sql dump file and save it in an exsisting zip file.
+     * Function for creating a sql dump file.
      * 
      * @param array $arrTables Table list for backup
      * @param string $strZip Name of zip file
      * @param bool $booTempFolder Schould the tmp folde used instead of backupfolder
      * @return null 
      */
-    public function runDumpSQL($arrTables, $strZip, $booTempFolder = false)
+    public function runDump($arrTables, $booTemplFolder)
     {
-        $this->arrBackupTables = $arrTables;
-
-        if ($booTempFolder == TRUE)
-            $strFilename = TL_ROOT . $GLOBALS['syncCto']['path']['tmp'] . $strZip;
-        else
-            $strFilename = TL_ROOT . $GLOBALS['syncCto']['path']['db'] . $strZip;
-
-        if (!file_exists($strFilename))
-            throw new Exception(vsprintf($GLOBALS['TL_LANG']['syncCto']['file_not_exists'], array($strFilename)));
-
-        $objZip = new ZipArchive();
-
-        if ($objZip->open($strFilename) !== TRUE)
-            throw new Exception(vsprintf($GLOBALS['TL_LANG']['syncCto']['cant_open'], array($strFilename)));
-
-        $arrTables = $this->getTableStructure();
-        $arrData = $this->getTableData();
-
-        $objZip->addFromString(DB_SQL, $this->buildSQL($arrTables) . $this->buildInsert($arrData));
-
-        $objZip->close();
-
-        return;
-    }
-
-    /**
-     * Function for creating a sql file for syncCto and save it in an exsisting zip file.
-     * 
-     * @param array $arrTables Table list for backup
-     * @param string $strZip Name of zip file
-     * @param bool $booTempFolder Schould the tmp folde used instead of backupfolder
-     * @return null 
-     */
-    public function runDumpInsert($arrTables, $strZip, $booTempFolder = false)
-    {
-        @set_time_limit(60);
-
-        $this->arrBackupTables = $arrTables;
-
-        if ($booTempFolder == TRUE)
-            $strFilename = TL_ROOT . "/" . $GLOBALS['syncCto']['path']['tmp'] . $strZip;
-        else
-            $strFilename = TL_ROOT . "/" . $GLOBALS['syncCto']['path']['db'] . $strZip;
-
-        if (!file_exists($strFilename))
-            throw new Exception(vsprintf($GLOBALS['TL_LANG']['syncCto']['file_not_exists'], array($strFilename)));
-
-        $objZip = new ZipArchive();
-
-        if ($objZip->open($strFilename) !== TRUE)
-            throw new Exception(vsprintf($GLOBALS['TL_LANG']['syncCto']['cant_open'], array($strFilename)));
-
-        $arrTables = $this->getTableStructure();
-        $arrData = $this->getTableData();
-
-        $objZip->addFromString(DB_SERIALIZED_TABLES, serialize($arrTables));
-        $objZip->addFromString(DB_SERIALIZED_INSERTS, serialize($arrData));
-
-        $objZip->close();
-
-        return;
-    }
-
-    /**
-     * Check if all files inside the zip are okay.
-     *
-     * @param string $strRestoreFile FilePath, start at TL_ROOT. Example tl_files/syncCto_backups/database/20110511_08-18-40_DB-Backup.zip
-     * @param bool $booTlRoot Should we start at TL_ROOT or by SyncCto DB-Backup folder.
-     * @param bool $booTempFolder Schould we start at temp folder of syncCto. The TL_ROOT, if activated, is first.
-     * @return bool
-     */
-    public function runCheckZip($strRestoreFile, $booTlRoot = true, $booTempFolder = false)
-    {
-        @set_time_limit(20);
-
-        if ($booTlRoot)
-            $strFilename = TL_ROOT . "/" . $strRestoreFile;
-        else if ($booTempFolder)
-            $strFilename = TL_ROOT . $GLOBALS['syncCto']['path']['tmp'] . $strRestoreFile;
-        else
-            $strFilename = TL_ROOT . $GLOBALS['syncCto']['path']['db'] . $strRestoreFile;
-
-        if (!file_exists($strFilename))
-            throw new Exception(vsprintf($GLOBALS['TL_LANG']['syncCto']['file_not_exists'], array($strFilename)));
-
-        $objZip = zip_open($strFilename);
-
-        $booTables = FALSE;
-        $booInsert = FALSE;
-
-        while (($objRead = zip_read($objZip)) !== false)
+        if (is_array($arrTables) && is_array($this->arrBackupTables))
         {
-            if (zip_entry_name($objRead) == DB_SERIALIZED_TABLES)
-            {
-                $intSize = zip_entry_filesize($objRead);
-                $arrRestoreTables = deserialize(zip_entry_read($objRead, $intSize));
-                if (is_array($arrRestoreTables))
-                    $booTables = true;
-                else
-                    throw new Exception($GLOBALS['TL_LANG']['syncCto']['table_dmg']);
-            }
-
-            if (zip_entry_name($objRead) == DB_SERIALIZED_INSERTS)
-            {
-                $intSize = zip_entry_filesize($objRead);
-                $arrInsert = deserialize(zip_entry_read($objRead, $intSize));
-                if (is_array($arrInsert))
-                    $booInsert = true;
-                else
-                    throw new Exception($GLOBALS['TL_LANG']['syncCto']['insert_dmg']);
-            }
+            $this->arrBackupTables = array_unique(array_merge($this->arrBackupTables, $arrTables));
         }
 
-        if (!$booTables)
-            throw new Exception($GLOBALS['TL_LANG']['syncCto']['missing_table_file']);
+        if (!is_array($this->arrBackupTables) || $this->arrBackupTables == null || count($this->arrBackupTables) == 0)
+        {
+            throw new Exception("Now tables found for backup.");
+        }
 
-        if (!$booInsert)
-            throw new Exception($GLOBALS['TL_LANG']['syncCto']['missing_insert_file']);
+        $strFilename = date($this->strTimestampFormat) . "_" . $this->strSuffixZipName;
 
-        return true;
+        if ($booTemplFolder)
+            $strPath = $GLOBALS['syncCto']['path']['tmp'];
+        else
+            $strPath = $GLOBALS['syncCto']['path']['db'];
+
+        $objZipWrite = new ZipWriter($strPath . $strFilename);
+
+        $arrTables = $this->getTableStructure();
+        $arrData = $this->getTableData();
+
+        $objZipWrite->addString($this->buildFileSQLTables($arrTables) . $this->buildFileSQLInsert($arrData), $this->strFilenameSQL);
+        $objZipWrite->addString(serialize($arrData), $this->strFilenameInsert);
+        $objZipWrite->addString(serialize($arrTables), $this->strFilenameTable);
+
+        $objZipWrite->close();
+
+        return $strFilename;
     }
 
     /**
@@ -282,75 +217,46 @@ class SyncCtoDatabase extends Backend
      * @param bool $booTruncate 
      * @return type 
      */
-    public function runRestore($strRestoreFile, $booTruncate = false)
+    public function runRestore($strRestoreFile)
     {
-        @set_time_limit(60);
+        $objZipRead = new ZipReader($strRestoreFile);
 
-        $arrRestoreTables = FALSE;
-        $arrInsert = FALSE;
+        if (!$objZipRead->getFile($this->strFilenameInsert))
+            throw new Exception("Could not load Insert SQL File. Maybe damaged?");
 
-        $objZip = zip_open(TL_ROOT . "/" . $strRestoreFile);
+        $arrInsert = deserialize($objZipRead->unzip());
 
-        while (($objRead = zip_read($objZip)) !== false)
-        {
-            if (zip_entry_name($objRead) == DB_SERIALIZED_TABLES)
-            {
-                $intSize = zip_entry_filesize($objRead);
-                $arrRestoreTables = deserialize(zip_entry_read($objRead, $intSize));
-            }
+        if (!$objZipRead->getFile($this->strFilenameTable))
+            throw new Exception("Could not load Table SQL File. Maybe damaged?");
 
-            if (zip_entry_name($objRead) == DB_SERIALIZED_INSERTS)
-            {
-                $intSize = zip_entry_filesize($objRead);
-                $arrInsert = deserialize(zip_entry_read($objRead, $intSize));
-            }
-        }
+        $arrRestoreTables = deserialize($objZipRead->unzip());
+
+        if (!is_array($arrInsert) || !is_array($arrRestoreTables))
+            throw new Exception("Could not load SQL Files. Maybe damaged?");
 
         try
         {
-            /**
-             * Create Table
-             */
-            if ($arrRestoreTables !== FALSE)
+            // Create temp tables
+            foreach ($arrRestoreTables as $key => $value)
             {
-                foreach ($arrRestoreTables as $key => $value)
-                {
-                    $this->Database->prepare("DROP TABLE IF EXISTS " . "synccto_temp_" . $key)->execute();
-                    $this->Database->prepare($this->buildCreateTableSQL($value, "synccto_temp_" . $key))->execute();
-                }
-            }
-            else
-            {
-                throw new Exception($GLOBALS['TL_LANG']['syncCto']['reading_table_file']);
+                $this->Database->prepare("DROP TABLE IF EXISTS " . "synccto_temp_" . $key)->execute();
+                $this->Database->prepare($this->buildSQLTable($value, "synccto_temp_" . $key))->execute();
             }
 
-            /**
-             * Create Insert
-             */
-            if ($arrInsert !== FALSE)
+            // Inserts
+            foreach ($arrInsert as $table)
             {
-                foreach ($arrInsert as $table)
+                if (!empty($table['values']))
                 {
-                    if (!empty($table['values']))
+                    foreach ($table['values'] as $value)
                     {
-                        foreach ($table['values'] as $value)
-                        {
-                            $arrSQL = $this->buildInsertDataSQL("synccto_temp_" . $table['name'], $table['keys'], $value);
-
-                            call_user_func_array(array($this->Database->prepare($arrSQL["body"]), "execute"), $arrSQL["value"]);
-                            //$this->Database->prepare($arrSQL["body"])->execute($arrSQL["value"]);                            
-                        }
+                        $arrSQL = $this->buildSQLInsert("synccto_temp_" . $table['name'], $table['keys'], $value, true);
+                        call_user_func_array(array($this->Database->prepare($arrSQL["body"]), "execute"), $arrSQL["value"]);
                     }
                 }
             }
-            else
-            {
-                throw new Exception($GLOBALS['TL_LANG']['syncCto']['reading_insert_file']);
-            }
-
-            /**
-             * Rename Temptables
-             */
+            
+            // Rename temp tables
             foreach ($arrRestoreTables as $key => $value)
             {
                 $this->Database->prepare("DROP TABLE IF EXISTS " . $key)->execute();
@@ -371,17 +277,6 @@ class SyncCtoDatabase extends Backend
     /* -------------------------------------------------------------------------
      * Helper Functions for building tables and inserts.
      */
-
-    /**
-     * Build a file name. 
-     * 
-     * @param int $intTstamp
-     * @return string 
-     */
-    private function buildFilename($intTstamp)
-    {
-        return vsprintf("%s_" . DB_ZIP, array(date($GLOBALS['syncCto']['settings']['time_format'], $intTstamp)));
-    }
 
     /**
      * Build a array with the structer of the database
@@ -576,7 +471,7 @@ class SyncCtoDatabase extends Backend
      * @param type $strName Table name
      * @return string 
      */
-    private function buildCreateTableSQL($arrTable, $strName)
+    private function buildSQLTable($arrTable, $strName)
     {
         $string = "";
 
@@ -598,27 +493,33 @@ class SyncCtoDatabase extends Backend
      * @param type $arrData Data for insert
      * @return string 
      */
-    private function buildInsertDataSQL($strTable, $arrKeys, $arrData)
+    private function buildSQLInsert($strTable, $arrKeys, $arrData, $booPrepare = false)
     {
         $strBody = "INSERT IGNORE INTO " . $strTable . " (";
-
-        for ($i = 0; $i < count($arrKeys); $i++)
-        {
-            $strBody .= $arrKeys[$i];
-
-            if ($i < count($arrKeys) - 1)
-                $strBody .= ", ";
-        }
-
+        $strBody .= implode(", ", $arrKeys);
         $strBody .= ") VALUES ( ";
 
         $arrValues = array();
-
         for ($i = 0; $i < count($arrData); $i++)
         {
-            $arrValues[$i] = trim(str_replace("'", "", $arrData[$arrKeys[$i]]));
+            if ($booPrepare)
+            {
+                $arrValues[$i] = trim(str_replace("'", "", $arrData[$arrKeys[$i]]));
+                $strBody .= "?";
+            }
+            else
+            {
+                $values = trim(str_replace("'", "", $arrData[$arrKeys[$i]]));
 
-            $strBody .= "?";
+                if ($values == "NULL")
+                {
+                    $strBody .= $values;
+                }
+                else
+                {
+                    $strBody .= "'" . $values . "'";
+                }
+            }
 
             if ($i < count($arrData) - 1)
                 $strBody .= ", ";
@@ -626,11 +527,18 @@ class SyncCtoDatabase extends Backend
 
         $strBody .= ")";
 
-        return array("body" => $strBody, "value" => $arrValues);
+        if ($booPrepare)
+        {
+            return array("body" => $strBody, "value" => $arrValues);
+        }
+        else
+        {
+            return $strBody;
+        }
     }
 
     /* -------------------------------------------------------------------------
-     * Build Section
+     * Functions for creating SQL for backup
      */
 
     /**
@@ -639,7 +547,7 @@ class SyncCtoDatabase extends Backend
      * @param array $arrTables Array with Tables
      * @return string 
      */
-    private function buildSQL($arrTables)
+    private function buildFileSQLTables($arrTables)
     {
         $heute = date("Y-m-d");
         $uhrzeit = date("H:i:s");
@@ -686,10 +594,8 @@ class SyncCtoDatabase extends Backend
      * @param array $arrData Array with datas
      * @return stirng 
      */
-    private function buildInsert($arrData)
+    private function buildFileSQLInsert($arrData)
     {
-
-
         if (count($arrData) == 0)
             $string .= "-- No tables found in database.\r\n";
         else
@@ -703,9 +609,9 @@ class SyncCtoDatabase extends Backend
                     $string .= "-- \r\n";
                     $string .= "\r\n";
 
-                    foreach ($table['values'] as $valueaaa)
+                    foreach ($table['values'] as $value)
                     {
-                        $string .= $this->buildInsertDataSQL($table['name'], $table['keys'], $valueaaa);
+                        $string .= $this->buildSQLInsert($table['name'], $table['keys'], $value, false);
                         $string .= "\r\n";
                     }
 

@@ -44,18 +44,7 @@ $GLOBALS['TL_LANG']['tl_syncCto_backup_db']['table_list_none_recommend'] = array
 /**
  * List
  */
-$GLOBALS['TL_LANG']['tl_syncCto_backup_db']['ok'] = "OK";
-$GLOBALS['TL_LANG']['tl_syncCto_backup_db']['progress'] = "In Bearbeitung";
-$GLOBALS['TL_LANG']['tl_syncCto_backup_db']['error'] = "Fehler";
- 
-$GLOBALS['TL_LANG']['tl_syncCto_backup_db']['step1'] = "Schritt 1";
-$GLOBALS['TL_LANG']['tl_syncCto_backup_db']['step2'] = "Schritt 2";
-$GLOBALS['TL_LANG']['tl_syncCto_backup_db']['step3'] = "Schritt 3";
-$GLOBALS['TL_LANG']['tl_syncCto_backup_db']['complete'] = "Fertig!";
-
-$GLOBALS['TL_LANG']['tl_syncCto_backup_db']['step1_help'] = "ZIP-Datei erstellen.";
-$GLOBALS['TL_LANG']['tl_syncCto_backup_db']['step2_help'] = "SQL-Scripte und Inserts für syncCto erstellen.";
-$GLOBALS['TL_LANG']['tl_syncCto_backup_db']['step3_help'] = "ZIP-Datei prüfen.";
+$GLOBALS['TL_LANG']['tl_syncCto_backup_db']['step1_help'] = "SQL-Scripte und Inserts für syncCto erstellen.";
 $GLOBALS['TL_LANG']['tl_syncCto_backup_db']['complete_help'] = "Backup erstellt unter";
 $GLOBALS['TL_LANG']['tl_syncCto_backup_db']['download_backup'] = "Backup herunterladen.";
 

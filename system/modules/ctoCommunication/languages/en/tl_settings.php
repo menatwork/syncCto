@@ -1,4 +1,4 @@
-<?php if (!defined('TL_ROOT')) die('You can not access this file directly!');
+<?php if (!defined('TL_ROOT')) die('You cannot access this file directly!');
 
 /**
  * Contao Open Source CMS
@@ -22,26 +22,18 @@
  *
  * PHP version 5
  * @copyright  MEN AT WORK 2011 
- * @package    Language
+ * @package    ctoCommunication
  * @license    GNU/LGPL 
  * @filesource
  */
- 
-/**
- * Legends
- */
-$GLOBALS['TL_LANG']['tl_syncCto_restore_db']['filelist_legend'] = "Dateien";
-$GLOBALS['TL_LANG']['tl_syncCto_restore_db']['edit'] = 'Ein Backup der Datenbank einspielen';
 
 /**
  * Fields
  */
-$GLOBALS['TL_LANG']['tl_syncCto_restore_db']['filelist'] = array("Quelldatei", "Bitte wählen Sie eine Datei aus der Dateiübersicht.");
+$GLOBALS['TL_LANG']['tl_settings']['ctoCom_APIKey'] = array('CtoCommunication API Key', 'Use this key to connect other projects to this one.');
 
 /**
- * List
+ * Legends
  */
-$GLOBALS['TL_LANG']['tl_syncCto_restore_db']['step1_help'] = "Datenbank importieren.";
-$GLOBALS['TL_LANG']['tl_syncCto_restore_db']['complete_help'] = "Die Datenbank wurde erfolgreich importiert.";
-
+$GLOBALS['TL_LANG']['tl_settings']['ctoCommunication_legend'] = 'Cto Communication';
 ?>

@@ -1,7 +1,4 @@
-<?php
-
-if (!defined('TL_ROOT'))
-    die('You can not access this file directly!');
+<?php if (!defined('TL_ROOT')) die('You can not access this file directly!');
 
 /**
  * Contao Open Source CMS
@@ -29,10 +26,16 @@ if (!defined('TL_ROOT'))
  * @license    GNU/LGPL 
  * @filesource
  */
+
+/**
+ * Folder Path
+ */
+
+
 /**
  * Register for RPC-Call functions
  */
-$GLOBALS["CTO_COMMUNICTAION"]["RPC_FUNCTION"][] = array(
+$GLOBALS["CTO_COMMUNICTAION"]["RPC_FUNCTION"] = array(
     "RPC_AUTH" => array(
         "auth" => false,
         "class" => "SyncCtoRPCFunctions",

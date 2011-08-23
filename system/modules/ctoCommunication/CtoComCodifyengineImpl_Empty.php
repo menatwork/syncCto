@@ -30,9 +30,10 @@
 /**
  * SyncCtoCodifyengineImpl_Empty
  */
-class SyncCtoCodifyengineImpl_Empty implements SyncCtoCodifyengineInterface
+class CtoComCodifyengineImpl_Empty extends CtoComCodifyengineAbstract
 {
     protected static $instance = null;
+    protected $strName = "Empty";
     
     /**
      * Constructor
@@ -45,12 +46,12 @@ class SyncCtoCodifyengineImpl_Empty implements SyncCtoCodifyengineInterface
     /**
      * Singelton Pattern
      * 
-     * @return SyncCtoCodifyengineInterface 
+     * @return CtoComCodifyengineAbstract 
      */
     public static function getInstance()
     {
         if (self::$instance == null)
-            self::$instance = new SyncCtoCodifyengineImpl_Empty();
+            self::$instance = new CtoComCodifyengineImpl_Empty();
 
         return self::$instance;
     }
@@ -62,16 +63,6 @@ class SyncCtoCodifyengineImpl_Empty implements SyncCtoCodifyengineInterface
     public function setKey($strKey)
     {
         $this->strKey = $strKey;
-    }
-
-    public function getKey()
-    {
-        return $this->strKey;
-    }
-    
-    public function getName()
-    {
-        return "Empty";
     }
 
     /* -------------------------------------------------------------------------

@@ -56,7 +56,7 @@ class SyncCtoCallback extends Backend
 
         // Import SyncCto classes
         $this->objSyncCtoHelper = SyncCtoHelper::getInstance();
-        $this->objSyncCtoCodifyengine = SyncCtoCodifyengineFactory::getEngine();
+        //$this->objSyncCtoCodifyengine = SyncCtoCodifyengineFactory::getEngine();
 
         $this->loadLanguageFile("SyncCto");
     }

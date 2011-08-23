@@ -33,11 +33,12 @@ if (!defined('TL_ROOT'))
 /**
  * SyncCtoCodifyengineImpl_Mcrypt
  */
-class CtoCodifyengineImpl_Mcrypt implements CtoCodifyengineAbstract
+class CtoComCodifyengineImpl_Mcrypt implements CtoComCodifyengineAbstract
 {
 
     protected static $instance = null;
     protected $strKey = "";
+    protected $strName = "Mcypt";
 
     /**
      * Constructor
@@ -50,12 +51,12 @@ class CtoCodifyengineImpl_Mcrypt implements CtoCodifyengineAbstract
     /**
      * Singelton Pattern
      * 
-     * @return SyncCtoCodifyengineInterface 
+     * @return CtoComCodifyengineImpl_Mcrypt 
      */
     public static function getInstance()
     {
         if (self::$instance == null)
-            self::$instance = new SyncCtoCodifyengineImpl_Mcrypt();
+            self::$instance = new CtoComCodifyengineImpl_Mcrypt();
 
         return self::$instance;
     }

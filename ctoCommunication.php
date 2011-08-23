@@ -32,15 +32,10 @@
  */
 define('TL_MODE', 'BE');
 require('system/initialize.php');
-require_once 'system/modules/syncCto/SyncCtoCommunication.php';
-require_once 'system/modules/syncCto/SyncCtoMeasurement.php';
+require_once 'system/modules/ctoCommunication/CtoCommunication.php';
 
-$objSyncCtoMeasurement = SyncCtoMeasurement::getInstance();
-
-$objSyncCtoMeasurement->startMeasurement("syncCto-Startup", "startup");
-
-$communication = SyncCtoCommunication::getInstance();
+$communication = CtoCommunication::getInstance();
 echo $communication->runClient();
 
-$objSyncCtoMeasurement->stopMeasurement("syncCto-Startup", "startup");
+
 ?>

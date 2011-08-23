@@ -25,7 +25,7 @@ if (!defined('TL_ROOT'))
  *
  * PHP version 5
  * @copyright  MEN AT WORK 2011
- * @package    syncCto
+ * @package    ctoCommunication
  * @license    GNU/LGPL
  * @filesource
  */
@@ -38,9 +38,16 @@ class CtoCommunication extends Backend
     //- Singelten pattern --------
     protected static $instance = null;
     //- Vars ---------------------
-    private $arrParameter = array();
+    protected $strUrl;
+    protected $strApiKey;
+    protected $arrCookies;
+    protected $arrRpcList;
+    protected $arrError;
+    protected $mixOutput;
     //- Objects ------------------
     protected $objCodifyengine;
+    protected $objCodifyengineBlow;
+    protected $objDebug;
 
     /* -------------------------------------------------------------------------
      * Core
@@ -53,7 +60,12 @@ class CtoCommunication extends Backend
     {
         parent::__construct();
 
-        $this->objCodifyengine = CtoCodifyengineFactory::getEngine();
+        $this->objCodifyengine = CtoComCodifyengineFactory::getEngine();
+        $this->objCodifyengineBlow = CtoComCodifyengineFactory::getEngine("Blowfish");
+        $this->objDebug = CtoComDebug::getInstance();
+
+        $this->arrRpcList = $GLOBALS["CTO_COMMUNICTAION"]["RPC_FUNCTION"];
+        $this->arrError = array();
     }
 
     /**
@@ -79,16 +91,20 @@ class CtoCommunication extends Backend
     {
         switch ($name)
         {
-            case "srtUrl":
-                $this->arrParameter["strUrl"] = $value;
+            case "activateDebug":
+                $this->objDebug->activateDebug = $value;
                 break;
 
-            case "srtKey":
-                $this->arrParameter["srtKey"] = $value;
+            case "activateMeasurement":
+                $this->objDebug->activateMeasurement = $value;
                 break;
 
-            case "strCodifyEngine":
-                $this->setCodifyEngine($value);
+            case "PathDebug":
+                $this->objDebug->pathDebug = $value;
+                break;
+
+            case "PathMeasurement":
+                $this->objDebug->pathMeasurement = $value;
                 break;
 
             default:
@@ -106,14 +122,17 @@ class CtoCommunication extends Backend
     {
         switch ($name)
         {
-            case "srtUrl":
-                return $this->arrParameter["strUrl"];
+            case "activateDebug":
+                return $this->objDebug->activateDebug;
 
-            case "srtKey":
-                return $this->arrParameter["srtKey"];
+            case "activateMeasurement":
+                return $this->objDebug->activateMeasurement;
 
-            case "strCodifyEngine":
-                return $this->objCodifyengine->getName();
+            case "PathDebug":
+                return $this->objDebug->pathDebug;
+
+            case "PathMeasurement":
+                return $this->objDebug->pathMeasurement;
 
             default:
                 return null;
@@ -124,141 +143,251 @@ class CtoCommunication extends Backend
      * Getter / Setter
      */
 
+    //- Setter -------------------
+
+    /**
+     * Set the url for connection
+     * 
+     * @param type $strUrl 
+     */
+    public function setUrl($strUrl)
+    {
+        $this->strUrl = $strUrl;
+    }
+
+    /**
+     * Set the API Key
+     * 
+     * @param stirng $strApiKey 
+     */
+    public function setApiKey($strApiKey)
+    {
+        $this->strApiKey = $strApiKey;
+    }
+
     /**
      * Set the client for the connection.
      *
      * @param int $id ID from client
      */
-    public function setClient($strUrl, $strKey, $strCodifyEngine = "Blowfish")
+    public function setClient($strUrl, $strCodifyEngine = "Blowfish")
     {
-        $this->arrParameter["strUrl"] = $strUrl;
-        $this->arrParameter["srtKey"] = $strKey;
+        $this->strUrl = $strUrl;
 
-        $this->setCodifyEngine($strCodifyEngine);
+        $this->setCodifyengine($strCodifyEngine);
     }
 
-    public function setCodifyEngine($strName = Null)
-    {
-        $this->objSyncCtoCodifyengine = CtoCodifyengineFactory::getEngine($strName);
-    }
-
-    /*
-     * -------------------------------------------------------------------------
-     * -------------------------------------------------------------------------
+    /**
+     * Change codifyengine
      * 
+     * @param string $strName 
+     */
+    public function setCodifyengine($strName = Null)
+    {
+        $this->objCodifyengine = CtoComCodifyengineFactory::getEngine($strName);
+    }
+
+    /**
+     * Set Cookie information
+     * 
+     * @param string $name Key name of array
+     * @param mix $value Value for Cookie 
+     */
+    public function setCookies($name, $value)
+    {
+        if ($value == "")
+            unset($this->arrCookies[$name]);
+        else
+            $this->arrCookies[$name] = $value;
+    }
+
+    //- Getter -------------------
+
+    /**
+     * Retrun Url
+     * 
+     * @return string 
+     */
+    public function getUrl()
+    {
+        return $this->strUrl;
+    }
+
+    /**
+     * Return Api Key
+     * 
+     * @return string 
+     */
+    public function getApiKey()
+    {
+        return $this->strApiKey;
+    }
+
+    /**
+     * Return Cookies
+     * @return array
+     */
+    public function getCookies()
+    {
+        return $this->arrCookies;
+    }
+
+    /**
+     * Return name of the codifyengine
+     * 
+     * @return string 
+     */
+    public function getCodifyengine()
+    {
+        return $this->objCodifyengine->getName();
+    }
+
+    /* -------------------------------------------------------------------------
      * Server / Client Run Functions
-     * 
-     * -------------------------------------------------------------------------
-     * -------------------------------------------------------------------------
      */
 
     public function runServer($rpc, $arrData = array(), $isGET = FALSE)
     {
-        $this->objCodifyengine->setKey($this->arrParameter["strKey"]);
+        $this->objDebug->startMeasurement(__CLASS__, __FUNCTION__, "RPC: " . $rpc);
 
-        for ($i = 0; $i < 2; $i++)
+        // Check if everything is set
+        if ($this->strApiKey == "" || $this->strApiKey == null)
+            throw new Exception("Key not set");
+
+        if ($this->strUrl == "" || $this->strUrl == null)
+            throw new Exception("Url not set");
+
+        // Merge Cookie Array
+        if ($arrCookies != null && count($arrCookies) != 0)
         {
-            // New Request
-            $objRequest = new Request();      
-            
-            // Which method get or post
-            if($isGET)
-            {
-                $objRequest->method = "GET";
-            }
-            else
-            {
-                $objRequest->method = "POST";
-            }
-            
-            // Send new request
-            $objRequest->send($this->arrParameter["strUrl"]);
-            
-            // Check if evething is okay for connection
-            if($objRequest->error != "")
-            {
-                throw new Exception("Error by connection to Client", "000", $objRequest->error);
-            }
-            
-            // Check if request is okay
-            
-            
-            
-            
-            print_r($objRequest->code);
-            echo "<br>";            
-            print_r($objRequest->request);
-            echo "<br>";
-            print_r($objRequest->response);
-            echo "<br>";
-            
-        }
-    }
-
-    //--------------------------------------------------------------------------
-    // ALT
-    //--------------------------------------------------------------------------
-    
-    /**
-     * Run the communication as server
-     *
-     * @param string $rpc
-     * @param array $arrData
-     * @param bool $isFileUpload
-     * @return array
-     */
-    protected function runServerOld($rpc, $arrData = array(), $isGET = FALSE)
-    {
-        $this->objSyncCtoCodifyengine->setKey($this->arrParameter["strKey"]);
-
-        for ($i = 0; $i < 2; $i++)
-        {
-            $arrResponse = $this->communication($arrData, $rpc, $isGET);
-
-            if ($arrResponse["error"] == 303)
-            {
-                if ($i > 0)
-                {
-                    $this->objSyncCtoMeasurement->stopMeasurement(__CLASS__, __FUNCTION__);
-                    throw new Exception($GLOBALS['TL_LANG']['syncCto']['rpc_maximum_logins']);
-                }
-
-                $arrDataLogin = array(
-                    array(
-                        "name" => "username",
-                        "value" => $this->strUsername,
-                    ),
-                    array(
-                        "name" => "password",
-                        "value" => $this->strPassword,
-                    ),
-                );
-
-                $arrResponseLogin = $this->communication($arrDataLogin, "RPC_LOGIN");
-
-                if ($arrResponseLogin["success"] != 1)
-                {
-                    $this->objSyncCtoMeasurement->stopMeasurement(__CLASS__, __FUNCTION__);
-                    throw new Exception($arrResponseLogin["error"][0]["msg"]);
-                }
-
-                $arrResponse = $this->communication($arrData, $rpc, $isGET);
-            }
-            else if ($arrResponse["success"] == 1)
-            {
-                $this->objSyncCtoMeasurement->stopMeasurement(__CLASS__, __FUNCTION__);
-                return $arrResponse["response"];
-            }
-            else if ($arrResponse["success"] == 0)
-            {
-                $this->objSyncCtoMeasurement->stopMeasurement(__CLASS__, __FUNCTION__);
-                throw new Exception($arrResponse["error"][0]["msg"]);
-            }
+            $this->arrCookies = array_unique(array_merge($this->arrCookies, $arrCookies));
         }
 
-        $this->objSyncCtoMeasurement->stopMeasurement(__CLASS__, __FUNCTION__);
+        // Add Get Parameter
+        $strCryptApiKey = $this->objCodifyengineBlow->Encrypt($rpc . "@|@" . $this->strApiKey);
+        $strCryptApiKey = urlencode($strCryptApiKey);
 
-        throw new Exception($GLOBALS['TL_LANG']['syncCto']['rpc_maximum_calls']);
+        if (strpos($this->strUrl, "?") !== FALSE)
+        {
+            $this->strUrl .= "&engine=" . $this->objCodifyengine->getName() . "&act=" . $rpc . "&apikey=" . $strCryptApiKey;
+        }
+        else
+        {
+            $this->strUrl .= "?engine=" . $this->objCodifyengine->getName() . "&act=" . $rpc . "&apikey=" . $strCryptApiKey;
+        }
+
+        var_dump($this->strUrl);
+
+        // Set Key for codifyengine
+        $this->objCodifyengine->setKey($this->strApiKey);
+
+        // Last exception
+        $objLastException = null;
+
+        // New Request
+        $objRequest = new RequestExtended();
+
+        // Which method ? GET or POST
+        if ($isGET)
+        {
+            $objRequest->method = "GET";
+            foreach ($arrData as $key => $value)
+            {
+                $this->strUrl .= "&" . $value["name"] . "=" . $value["value"];
+            }
+        }
+        else
+        {
+            // Build Multipart Post Data
+            $objMultipartFormdata = new MultipartFormdata();
+            foreach ($arrData as $key => $value)
+            {
+                if (isset($value["filename"]) == true && strlen($value["filename"]) != 0)
+                {
+                    // Set field for file
+                    $objMultipartFormdata->setFileField($value["name"], $value["filename"], $value["mime"]);
+                }
+                else
+                {
+                    // Encrypt funktion
+                    $strValue = $this->objCodifyengine->Encrypt($value["value"]);
+                    // Set field
+                    $objMultipartFormdata->setField($value["name"], $strValue);
+                }
+            }
+
+            // Create HTTP Data code
+            $objRequest->data = $objMultipartFormdata->compile();
+
+            // Set typ and mime typ
+            $objRequest->method = "POST";
+            $objRequest->datamime = $objMultipartFormdata->getContentTypeHeader();
+        }
+
+        // Send new request
+        $objRequest->send($this->strUrl);
+
+        print_r($objRequest->request);
+        echo "\n\n|------|\n\n";
+        print_r($objRequest->response);
+        echo "\n\n|------|\n\n";
+
+        // Debug
+        $this->objDebug->addDebug("Request", $objRequest->request);
+        $this->objDebug->addDebug("Response", $objRequest->response);
+
+        // Check if evething is okay for connection
+        if ($objRequest->hasError())
+        {
+            $this->objDebug->stopMeasurement(__CLASS__, __FUNCTION__);
+            throw new Exception($objRequest->error);
+        }
+
+        if (strlen($objRequest->response) == 0)
+        {
+            $this->objDebug->stopMeasurement(__CLASS__, __FUNCTION__);
+            throw new Exception("We got a blank response from server.");
+        }
+
+        if (preg_match("^\<\|\@\|.*\|\@\|\>^i", $objRequest->response) == 0)
+        {
+            $this->objDebug->stopMeasurement(__CLASS__, __FUNCTION__);
+            throw new Exception("Could not find start or endtag from response.");
+        }
+
+        $mixContent = $objRequest->response;
+
+        $intStart = intval(strpos($mixContent, "<|@|") + 4);
+        $intLength = intval(strpos($mixContent, "|@|>") - $intStart);
+
+        $mixContent = $this->objCodifyengine->Decrypt(substr($mixContent, $intStart, $intLength));
+
+        // Check response for ser. array
+        if (preg_match("^a:.*:{.*}^i", $mixContent) == 0)
+        {
+            $this->objDebug->stopMeasurement(__CLASS__, __FUNCTION__);
+            throw new Exception("Response is not a array. Maybe wrong key or codifyengine.");
+        }
+
+        $mixContent = deserialize($mixContent);
+        if (is_array($mixContent) == false)
+        {
+            $this->objDebug->stopMeasurement(__CLASS__, __FUNCTION__);
+            throw new Exception("Response is not a array. Maybe wrong key or codifyengine.");
+        }
+
+        if ($mixContent["success"] == 1)
+        {
+            $this->objDebug->stopMeasurement(__CLASS__, __FUNCTION__);
+            return $mixContent["response"];
+        }
+        else
+        {
+            $this->objDebug->stopMeasurement(__CLASS__, __FUNCTION__);
+            throw new Exception("Error");
+        }
+
+        $this->objDebug->stopMeasurement(__CLASS__, __FUNCTION__);
     }
 
     /**
@@ -269,10 +398,42 @@ class CtoCommunication extends Backend
     public function runClient()
     {
         // Start measurement
-        $this->objSyncCtoMeasurement->startMeasurement(__CLASS__, __FUNCTION__, "RPC: " . $this->Input->get("act"));
+        $this->objDebug->startMeasurement(__CLASS__, __FUNCTION__, "RPC: " . $this->Input->get("act"));
 
         /** --------------------------------------------------------------------
-         * Chanke Codifyengine if set
+         * API Key - Check
+         */
+        if (strlen($this->Input->get("apikey")) == 0)
+        {
+            $this->log(vsprintf("Call from %s without a API Key.", $this->Environment->ip), __FUNCTION__ . " | " . __CLASS__, TL_ERROR);
+            exit();
+        }
+
+        $mixVar = urldecode($this->Input->get("apikey"));
+        $mixVar = $this->objCodifyengineBlow->Decrypt($mixVar);
+        $mixVar = trimsplit("@|@", $mixVar);
+        $strApiKey = $mixVar[1];
+        $strAction = $mixVar[0];
+
+        if ($strAction != $this->Input->get("act"))
+        {
+            $this->log(vsprintf("Error Api Key from %s. Request action: %s | Key action: %s | Api: %s", array(
+                        $this->Environment->ip,
+                        $this->Input->get("$strAction"),
+                        $strAction,
+                        $strApiKey
+                    )), __FUNCTION__ . " | " . __CLASS__, TL_ERROR);
+            exit();
+        }
+
+        if ($this->Input->get("apikey") != $strApiKey)
+        {
+            $this->log(vsprintf("Call from %s with a wrong API Key: %s", array($this->Environment->ip, $this->Input->get("apikey"))), __FUNCTION__ . " | " . __CLASS__, TL_ERROR);
+            exit();
+        }
+
+        /** --------------------------------------------------------------------
+         * Change the Codifyengine if set
          */
         if (strlen($this->Input->get("engine")) != 0)
         {
@@ -280,34 +441,20 @@ class CtoCommunication extends Backend
             try
             {
                 // Set new an reload key
-                $this->setCodifyEngine($this->Input->get("engine"));
-                $this->objSyncCtoCodifyengine->setKey($GLOBALS['TL_CONFIG']['syncCto_seckey']);
+                $this->setCodifyengine($this->Input->get("engine"));
+                $this->objCodifyengine->setKey($GLOBALS['TL_CONFIG']['syncCto_seckey']);
             }
             // Error by setting new enigne. Send msg in cleartext
             catch (Exception $exc)
             {
-                $this->arrError[] = array(
-                    "language" => "codifyengine_unknown",
-                    "id" => 10,
-                    "object" => "",
-                    "msg" => "Unknown Codifyengine",
-                    "rpc" => "",
-                    "class" => "",
-                    "function" => "",
-                );
-
-                // Set cleartext engine
-                $this->setCodifyEngine("Empty");
-
-                // Return
-                $this->objSyncCtoMeasurement->stopMeasurement(__CLASS__, __FUNCTION__);
-                return $this->generateOutput();
+                $this->log("Try to load codifyengine for ctoCommunication with error: " . $exc->getMessage(), __FUNCTION__ . " | " . __CLASS__, TL_ERROR);
+                exit();
             }
         }
         else
         {
-            $this->setCodifyEngine("Empty");
-            $this->objSyncCtoCodifyengine->setKey($GLOBALS['TL_CONFIG']['syncCto_seckey']);
+            $this->setCodifyengine("Blowfish");
+            $this->objCodifyengine->setKey($GLOBALS['TL_CONFIG']['syncCto_seckey']);
         }
 
         /** --------------------------------------------------------------------
@@ -329,7 +476,7 @@ class CtoCommunication extends Backend
         }
         else
         {
-            if (!key_exists($mixRPCCall, $this->rpclist))
+            if (!key_exists($mixRPCCall, $this->arrRpcList))
             {
                 $this->arrError[] = array(
                     "language" => "rpc_unknown",
@@ -343,23 +490,20 @@ class CtoCommunication extends Backend
             }
             else
             {
-                if ($this->rpclist[$mixRPCCall]["auth"] == TRUE)
-                {
-                    $this->auth();
-                }
+
 
                 $arrParameter = array();
 
-                if ($this->rpclist[$mixRPCCall]["parameter"] != FALSE && is_array($this->rpclist[$mixRPCCall]["parameter"]))
+                if ($this->arrRpcList[$mixRPCCall]["parameter"] != FALSE && is_array($this->arrRpcList[$mixRPCCall]["parameter"]))
                 {
-                    switch ($this->rpclist[$mixRPCCall]["typ"])
+                    switch ($this->arrRpcList[$mixRPCCall]["typ"])
                     {
                         case "POST":
                             // Decode post 
                             foreach ($_POST as $key => $value)
                             {
                                 $mixPost = $this->Input->post($key);
-                                $mixPost = $this->objSyncCtoCodifyengine->Decrypt($mixPost);
+                                $mixPost = $this->objCodifyengine->Decrypt($mixPost);
                                 $mixPost = deserialize($mixPost);
                                 $mixPost = $mixPost["data"];
 
@@ -367,7 +511,7 @@ class CtoCommunication extends Backend
                             }
 
                             // Check if all post are set
-                            foreach ($this->rpclist[$mixRPCCall]["parameter"] as $value)
+                            foreach ($this->arrRpcList[$mixRPCCall]["parameter"] as $value)
                             {
                                 if (!$this->Input->post($value))
                                 {
@@ -377,8 +521,8 @@ class CtoCommunication extends Backend
                                         "object" => $value,
                                         "msg" => "Missing data for " . $value,
                                         "rpc" => $mixRPCCall,
-                                        "class" => $this->rpclist[$mixRPCCall]["class"],
-                                        "function" => $this->rpclist[$mixRPCCall]["function"],
+                                        "class" => $this->arrRpcList[$mixRPCCall]["class"],
+                                        "function" => $this->arrRpcList[$mixRPCCall]["function"],
                                     );
                                 }
                                 else
@@ -396,7 +540,7 @@ class CtoCommunication extends Backend
 
             if (count($this->arrError) != 0)
             {
-                $this->objSyncCtoMeasurement->stopMeasurement(__CLASS__, __FUNCTION__);
+                $this->objDebug->stopMeasurement(__CLASS__, __FUNCTION__);
                 return $this->generateOutput();
             }
 
@@ -405,23 +549,36 @@ class CtoCommunication extends Backend
              */
             try
             {
-                if ($this->rpclist[$mixRPCCall]["class"] == "this")
+                $this->objDebug->startMeasurement($this->arrRpcList[$mixRPCCall]["class"], $this->arrRpcList[$mixRPCCall]["function"]);
+
+                $strClassname = $this->arrRpcList[$mixRPCCall]["class"];
+
+                if (!class_exists($strClassname))
                 {
-                    $this->objSyncCtoMeasurement->startMeasurement(__CLASS__, $this->rpclist[$mixRPCCall]["function"]);
+                    $this->arrError[] = array(
+                        "language" => "rpc_class_not_exists",
+                        "id" => 4,
+                        "object" => "",
+                        "msg" => "The choosen class didn`t exists.",
+                        "rpc" => $mixRPCCall,
+                        "class" => $this->arrRpcList[$mixRPCCall]["class"],
+                        "function" => $this->arrRpcList[$mixRPCCall]["function"],
+                    );
+                }
 
-                    $this->mixOutput = call_user_func_array(array($this, $this->rpclist[$mixRPCCall]["function"]), $arrParameter);
-
-                    $this->objSyncCtoMeasurement->stopMeasurement(__CLASS__, $this->rpclist[$mixRPCCall]["function"]);
+                $objReflection = new ReflectionClass($strClassname);
+                if ($objReflection->hasMethod("getInstance"))
+                {
+                    $object = call_user_func_array(array($this->arrRpcList[$mixRPCCall]["class"], "getInstance"), array());
+                    $this->mixOutput = call_user_func_array(array($object, $this->arrRpcList[$mixRPCCall]["function"]), $arrParameter);
                 }
                 else
                 {
-                    $this->objSyncCtoMeasurement->startMeasurement($this->rpclist[$mixRPCCall]["class"], $this->rpclist[$mixRPCCall]["function"]);
-
-                    $class = new $this->rpclist[$mixRPCCall]["class"];
-                    $this->mixOutput = call_user_func_array(array($class, $this->rpclist[$mixRPCCall]["function"]), $arrParameter);
-
-                    $this->objSyncCtoMeasurement->stopMeasurement($this->rpclist[$mixRPCCall]["class"], $this->rpclist[$mixRPCCall]["function"]);
+                    $object = new $this->arrRpcList[$mixRPCCall]["class"];
+                    $this->mixOutput = call_user_func_array(array($object, $this->arrRpcList[$mixRPCCall]["function"]), $arrParameter);
                 }
+
+                $this->objDebug->stopMeasurement($this->arrRpcList[$mixRPCCall]["class"], $this->arrRpcList[$mixRPCCall]["function"]);
             }
             catch (Exception $exc)
             {
@@ -429,15 +586,15 @@ class CtoCommunication extends Backend
                     "language" => "rpc_unknown_exception",
                     "id" => 3,
                     "object" => "",
-                    "msg" => $exc->getMessage(),
+                    "msg" => $exc->getTraceAsString(),
                     "rpc" => $mixRPCCall,
-                    "class" => $this->rpclist[$mixRPCCall]["class"],
-                    "function" => $this->rpclist[$mixRPCCall]["function"],
+                    "class" => $this->arrRpcList[$mixRPCCall]["class"],
+                    "function" => $this->arrRpcList[$mixRPCCall]["function"],
                 );
             }
         }
 
-        $this->objSyncCtoMeasurement->stopMeasurement(__CLASS__, __FUNCTION__);
+        $this->objDebug->stopMeasurement(__CLASS__, __FUNCTION__);
         return $this->generateOutput();
     }
 
@@ -452,7 +609,7 @@ class CtoCommunication extends Backend
      */
     protected function generateOutput()
     {
-        $this->objSyncCtoMeasurement->startMeasurement(__CLASS__, __FUNCTION__);
+        $this->objDebug->startMeasurement(__CLASS__, __FUNCTION__);
 
         if (count($this->arrError) == 0)
         {
@@ -471,507 +628,11 @@ class CtoCommunication extends Backend
                     ));
         }
 
-        $strOutput = $this->objSyncCtoCodifyengine->Encrypt($strOutput);
+        $strOutput = $this->objCodifyengine->Encrypt($strOutput);
 
-        $this->objSyncCtoMeasurement->stopMeasurement(__CLASS__, __FUNCTION__);
+        $this->objDebug->stopMeasurement(__CLASS__, __FUNCTION__);
 
         return "<|@|" . $strOutput . "|@|>";
-    }
-
-    /**
-     * Funktion die auswählt welche form des Post genutzt werden soll, sowie
-     * die Ver / Entschlüsselung vornimmt und überprüft ob ein Array zurück
-     * gegeben wurde. Sollte dies nicht der Fall sein wird solange die
-     * Anfrage wiederholt bis eine Array zurück gegeben wird oder
-     * die maximale Aufrufanzahl erreicht wurde.
-     *
-     * @param array $arrData Daten zum senden
-     * @param string $strRpc ID der RPC. Siehe RPC defines
-     * @param bool $isFile Wird eine Datei gesendet
-     * @return array("success"=>[0|1],"error"=>[""|Array],"response"=>[""|Array])
-     */
-    protected function communication($arrData, $strRpc, $isGET = FALSE)
-    {
-        // Codify
-        if (is_array($arrData) && count($arrData) != 0 && $isGET == FALSE)
-        {
-            $this->objSyncCtoMeasurement->startMeasurement("SyncCtoCodifyengineInterface", "Encrypt");
-
-            foreach ($arrData as $key => $value)
-            {
-                if (isset($value["filename"]) && strlen($value["filename"]) != 0)
-                    continue;
-
-                $arrData[$key]["value"] = $this->objSyncCtoCodifyengine->Encrypt(serialize(array("data" => $value["value"])));
-            }
-
-            $this->objSyncCtoMeasurement->stopMeasurement("SyncCtoCodifyengineInterface", "Encrypt");
-        }
-
-        if ($isGET)
-        {
-            $arrResponse = $this->parseResponse($this->requestGet($strRpc, $arrData));
-        }
-        else
-        {
-            $arrResponse = $this->parseResponse($this->requestPostMultipart($arrData, $strRpc, $isClearText));
-        }
-
-        return $arrResponse;
-    }
-
-    protected function requestGet($strRpc = null, $arrData = null)
-    {
-        $this->objSyncCtoMeasurement->startMeasurement(__CLASS__, __FUNCTION__, "RPC: " . $strRpc);
-
-        try
-        {
-            // Init
-            $boundary = "---------------------------103832778631715";
-
-            // Make a string from cookie array for post sending
-            if (!empty($this->arrCookie) && count($this->arrCookie) != 0)
-            {
-                $strCookie = "";
-                foreach ($this->arrCookie as $key => $value)
-                {
-                    $strCookie .= " " . $key . "=" . $value . ";";
-                }
-            }
-
-            // ---------------------------------------------------------------------
-            // Build Header
-            $header = "";
-            $strData = "";
-
-            if ($arrData != null)
-            {
-                foreach ($arrData as $key => $value)
-                {
-                    if ($strData == "")
-                        $strData .= $value["name"] . "=" . $value["value"];
-                    else
-                        $strData .= "&" . $value["name"] . "=" . $value["value"];
-                }
-            }
-
-            if ($strRpc == null)
-            {
-                if ($strData != "")
-                    $strData = "?" . $strData;
-            }
-            else
-            {
-                if ($strData != "")
-                    $strData = "?engine=" . $this->objSyncCtoCodifyengine->getName() . "&act=" . $strRpc . "&" . $strData;
-                else
-                    $strData = "?engine=" . $this->objSyncCtoCodifyengine->getName() . "&act=" . $strRpc;
-            }
-
-            $header .= "GET /" . $this->strPath . $strData . " HTTP/1.1\r\n";
-            $header .= "Host: " . $this->strAddress . "\n";
-            $header .= "Referer: " . $this->Environment->__get("base") . "\n";
-            if ($strCookie != "")
-                $header .= "Cookie:" . $strCookie . "\r\n";
-            $header .= "Connection: close\r\n\r\n";
-
-            $this->arrDebug["Sendpart RPC " . $strRpc . " " . microtime(true)] = $header . $content2;
-
-            try
-            {
-                // Open Socket
-                $this->fsocket = fsockopen($this->strAddress, $this->intPort, $errno, $errstr, 5);
-            }
-            catch (Exception $exc)
-            {
-                $this->log("Error by sending data over fsocket. Error: " . $exc->getMessage());
-                throw new Exception("Error by sending data over fsocket. Error: " . $exc->getMessage());
-            }
-
-            //Check Socket
-            if (!$this->fsocket)
-            {
-                $this->log("Error by sending data over fsocket. Errno: " . $errno . " Errmsg: " . $errstr, __CLASS__ . " " . __FUNCTION__, "SyncCto");
-                throw new Exception("Error by sending data over fsocket. Errno: " . $errno . " Errmsg: " . $errstr);
-            }
-
-//        if (!stream_set_timeout($this->fsocket, 1))
-//            throw new Exception("Error by setting timeout for stream.");
-
-            $this->objSyncCtoMeasurement->startMeasurement(__CLASS__, __FUNCTION__ . " WRITE", "RPC: " . $strRpc);
-
-            //send data
-            fputs($this->fsocket, $header);
-            fputs($this->fsocket, $content);
-
-            $this->objSyncCtoMeasurement->stopMeasurement(__CLASS__, __FUNCTION__ . " WRITE");
-
-            $this->objSyncCtoMeasurement->startMeasurement(__CLASS__, __FUNCTION__ . " READ++", "RPC: " . $strRpc);
-
-            stream_set_timeout($this->fsocket, 8);
-
-            $strResponse = "";
-            while (true)
-            {
-                $res = fread($this->fsocket, 8000);
-
-                $strResponse .= $res;
-
-                $stream_meta_data = stream_get_meta_data($this->fsocket);
-                if ($stream_meta_data['timed_out'] == 1)
-                    break;
-
-                if (strlen($res) < 8000)
-                    break;
-            }
-
-            $this->objSyncCtoMeasurement->stopMeasurement(__CLASS__, __FUNCTION__ . " READ++");
-
-            fclose($this->fsocket);
-
-            $this->objSyncCtoMeasurement->stopMeasurement(__CLASS__, __FUNCTION__);
-
-            return $strResponse;
-        }
-        catch (Exception $exc)
-        {
-            // Write ContaoLog
-            $this->log("Error by sending data over fsocket. " . $exc->getMessage(), __CLASS__ . " " . __FUNCTION__, __FUNCTION__);
-            throw $exc;
-        }
-    }
-
-    protected function requestPostMultipart($arrData, $strRpc = null)
-    {
-        $this->objSyncCtoMeasurement->startMeasurement(__CLASS__, __FUNCTION__, "RPC: " . $strRpc);
-
-        // Init
-        $boundary = "---------------------------103832778631715";
-
-        // Make a string from cookie array for post sending
-        if (!empty($this->arrCookie) && count($this->arrCookie) != 0)
-        {
-            $strCookie = "";
-            foreach ($this->arrCookie as $key => $value)
-            {
-                $strCookie .= " " . $key . "=" . $value . ";";
-            }
-        }
-
-        // ---------------------------------------------------------------------
-        // Build Content
-        $content = "";
-        $content2 = "";
-
-        foreach ($arrData as $key => $value)
-        {
-            $content .= vsprintf("--%s\n", array($boundary));
-            $content2 .= vsprintf("--%s\n", array($boundary));
-
-            if (isset($value["filename"]) == true && strlen($value["filename"]) != 0)
-            {
-                $content .= vsprintf("Content-Disposition: form - data; name=\"%s\"; filename=\"%s\"\n", array($value["name"], $value["filename"]));
-                $content .= "Content-Type: " . $value["mime"] . "\n";
-
-                $content2 .= vsprintf("Content-Disposition: form-data; name=\"%s\"; filename=\"%s\"\n", array($value["name"], $value["filename"]));
-                $content2 .= "Content-Type: " . $value["mime"] . "\n";
-            }
-            else
-            {
-                $content .= vsprintf("Content-Disposition: form-data; name=\"%s\"\n", array($value["name"]));
-                $content2 .= vsprintf("Content-Disposition: form-data; name=\"%s\"\n", array($value["name"]));
-            }
-
-            $content .= "\n";
-            $content2 .= "\n";
-
-            if (strlen($value["value"]) < 4098)
-            {
-                $content .= $value["value"] . "\n";
-                $content2 .= $value["value"] . "\n";
-            }
-            else
-            {
-                $content .= $value["value"] . "\n";
-                $content2 .= "skipped" . "\n";
-            }
-        }
-
-        $content .= vsprintf("--%s--\n", array($boundary));
-        $content2 .= vsprintf("--%s--\n", array($boundary));
-
-        // Build Header
-        $header = "";
-
-        if ($strRpc != null)
-        {
-            $header .= "POST /" . $this->strPath . "?engine=" . $this->objSyncCtoCodifyengine->getName() . "&act=" . $strRpc . " HTTP/1.1\r\n";
-        }
-        else
-        {
-            $header .= "POST /" . $this->strPath . "?engine=" . $this->objSyncCtoCodifyengine->getName() . " HTTP/1.1\r\n";
-        }
-
-        $header .= "Host: " . $this->strAddress . "\n";
-        $header .= "Referer: " . $this->Environment->__get("base") . "\n";
-        if ($strCookie != "")
-            $header .= "Cookie:" . $strCookie . "\r\n";
-        $header .= "Content-type: multipart/form-data; boundary=$boundary\n";
-        $header .= "Content-length: " . strlen($content) . " \n";
-        $header .= "\n";
-
-        $this->arrDebug["Sendpart RPC " . $strRpc . " " . microtime(true)] = $header . $content2;
-
-        try
-        {
-            // Open Socket
-            $this->fsocket = fsockopen($this->strAddress, $this->intPort, $errno, $errstr, 5);
-        }
-        catch (Exception $exc)
-        {
-            $this->log("Error by sending data over fsocket. Error: " . $exc->getMessage());
-            throw new Exception("Error by sending data over fsocket. Error: " . $exc->getMessage());
-        }
-
-        //Check Socket
-        if (!$this->fsocket)
-        {
-            $this->log("Error by sending data over fsocket. Error No.: " . $errno . " Errmsg: " . $errstr, __CLASS__ . " " . __FUNCTION__, "SyncCto");
-            throw new Exception("Error by sending data over fsocket. Error No.: " . $errno . " Errmsg: " . $errstr);
-        }
-
-        $this->objSyncCtoMeasurement->startMeasurement(__CLASS__, __FUNCTION__ . " WRITE", "RPC: " . $strRpc);
-
-        //send data
-        fputs($this->fsocket, $header);
-        fputs($this->fsocket, $content);
-
-        $this->objSyncCtoMeasurement->stopMeasurement(__CLASS__, __FUNCTION__ . " WRITE");
-
-        $this->objSyncCtoMeasurement->startMeasurement(__CLASS__, __FUNCTION__ . " READ", "RPC: " . $strRpc);
-
-        stream_set_timeout($this->fsocket, 2);
-
-        $strResponse = "";
-        $intBlank = 0;
-        for ($i = 0; $i < 1024000; $i++)
-        {
-            $res = fread($this->fsocket, 512);
-
-            $strResponse .= $res;
-
-            if (strpos($strResponse, "<|@|") !== FALSE && strpos($strResponse, "|@|>") !== FALSE && strlen($res) == 0)
-                break;
-
-            if (strlen($res) == 0)
-                $intBlank++;
-
-            if ($intBlank == 10000)
-                break;
-
-            //usleep(100);
-        }
-
-        $this->objSyncCtoMeasurement->stopMeasurement(__CLASS__, __FUNCTION__ . " READ");
-
-        fclose($this->fsocket);
-
-        $this->objSyncCtoMeasurement->stopMeasurement(__CLASS__, __FUNCTION__);
-
-        return $strResponse;
-    }
-
-    /**
-     * Wandel die HTTP Antwort des Servers um und prÃ¼fe ob alles okay ist.
-     *
-     * @param string $strResponse HTTP Header + Daten
-     * @return string serArray
-     */
-    protected function parseResponse($strResponse)
-    {
-        print_r($strResponse);
-
-        $this->objSyncCtoMeasurement->startMeasurement(__CLASS__, __FUNCTION__);
-
-        // Explode
-        $arrResponse = explode("\r\n", $strResponse);
-        $arrHTTPInformation = explode(" ", $arrResponse[0]);
-
-        // Get HTTP No
-        $intHTTPNo = $arrHTTPInformation[1];
-        // Get HTTP Status
-        $strHTTPStatus = $arrHTTPInformation[2];
-
-        // Check if move on
-        if ($intHTTPNo == 303)
-        {
-            // Debuging
-            if ($GLOBALS['TL_CONFIG']['syncCto_debug_log'] == true)
-                $this->arrDebug["Responsepart " . microtime(true)] = substr($strResponse, 0, 4098);;
-
-            return array(
-                "success" => 0,
-                "error" => 303,
-                "response" => "",
-            );
-        }
-
-        // Check if everthing is okay
-//        if ( $strHTTPStatus != "OK" )
-//        {
-//            // Debuging
-//            $this->arrDebug["Responsepart " . microtime(true)] = $strResponse;
-//
-//            $this->log(vsprintf("Error by sending XML to Server. Server answer with %s, %s", array($intHTTPNo, $strHTTPStatus)), __CLASS__ . " " . __FUNCTION__, __FUNCTION__);
-//            throw new Exception(vsprintf("Error by sending XML to Server. Server answer with %s, %s", array($intHTTPNo, $strHTTPStatus)));
-//        }
-//        if ( $intHTTPNo != 200 )
-//        {
-//            // Debuging
-//            $this->arrDebug["Responsepart " . microtime(true)] = $strResponse;
-//
-//            $this->log(vsprintf("Error by sending XML to Server. Server answer with %s, %s", array($intHTTPNo, $strHTTPStatus)), __CLASS__ . " " . __FUNCTION__, __FUNCTION__);
-//            throw new Exception(vsprintf("Error by sending XML to Server. Server answer with %s, %s", array($intHTTPNo, $strHTTPStatus)));
-//        }
-
-        $booEncodeChunk = false;
-        $intContentStart = -1;
-
-        for ($i = 0; $i < count($arrResponse); $i++)
-        {
-            if (strpos($arrResponse[$i], "Transfer-Encoding: chunked") !== FALSE)
-            {
-                $booEncodeChunk = true;
-                continue;
-            }
-            else if (strpos($arrResponse[$i], "Content-Type: text/html") !== FALSE)
-            {
-                $intContentStart = $i;
-                continue;
-            }
-            else if (strpos($arrResponse[$i], "Set-Cookie:") !== FALSE)
-            {
-                $mixCookie = str_replace("Set-Cookie:", "", $arrResponse[$i]);
-                $mixCookie = explode("; ", $mixCookie);
-
-                foreach ($mixCookie as $itCookie)
-                {
-                    $itCookie = explode("=", $itCookie);
-                    if ($itCookie[1] == "deleted")
-                        unset($this->arrCookie[trim($itCookie[0])]);
-                    else
-                        $this->arrCookie[trim($itCookie[0])] = trim($itCookie[1]);
-
-                    $this->Database->prepare("UPDATE tl_synccto_clients %s WHERE id = ?")
-                            ->set(array("cookie" => serialize($this->arrCookie)))
-                            ->execute($this->intClient);
-                }
-            }
-        }
-
-        $strContentPart = "";
-        $strChunkPart = "";
-        $intChunkLength = 0;
-        $booStartContent = false;
-
-        for ($i = 0; $i < count($arrResponse); $i++)
-        {
-            if ($booEncodeChunk == TRUE)
-            {
-                if ($booStartContent == false && $arrResponse[$i] != "")
-                {
-                    continue;
-                }
-                else if ($booStartContent == false && $arrResponse[$i] == "")
-                {
-                    $booStartContent = true;
-                    continue;
-                }
-
-                if ($intChunkLength == 0)
-                {
-                    $intChunkLength = hexdec($arrResponse[$i]);
-
-                    if ($intChunkLength == 0)
-                        break;
-                }
-                else
-                {
-                    $strChunkPart .= trim($arrResponse[$i]);
-
-                    if (strlen($strChunkPart) == $intChunkLength)
-                    {
-                        $intChunkLength = 0;
-                        $strContentPart .= $strChunkPart;
-                        $strChunkPart = "";
-                    }
-                }
-            }
-            else
-            {
-                $strContentPart .= $arrResponse[$i];
-            }
-        }
-
-        if (($intStart = strpos($strContentPart, "<|@|")) !== FALSE)
-        {
-            if (($intEnd = strpos($strContentPart, "|@|>")) !== FALSE)
-            {
-                $strContent = $this->objSyncCtoCodifyengine->Decrypt(substr($strContentPart, $intStart + 4, $intEnd - $intStart));
-            }
-            else
-            {
-                // Debuging
-                if ($GLOBALS['TL_CONFIG']['syncCto_debug_log'] == true)
-                    $this->arrDebug["Responsepart " . microtime(true)] = substr($strResponse, 0, 4098);
-
-                throw new Exception($GLOBALS['TL_LANG']['syncCto']['rpc_missing_endtag']);
-            }
-        }
-        else
-        {
-            // Debuging
-            if ($GLOBALS['TL_CONFIG']['syncCto_debug_log'] == true)
-                $this->arrDebug["Responsepart " . microtime(true)] = substr($strResponse, 0, 4098);
-
-            throw new Exception($GLOBALS['TL_LANG']['syncCto']['rpc_missing_starttag']);
-        }
-
-        $arrContent = deserialize($strContent);
-
-        if (!is_array($arrContent))
-        {
-            // Debuging
-            if ($GLOBALS['TL_CONFIG']['syncCto_debug_log'] == true)
-                $this->arrDebug["Responsepart " . microtime(true)] = substr($strResponse, 0, 4098);
-
-            throw new Exception($GLOBALS['TL_LANG']['syncCto']['rpc_answer_no_array']);
-        }
-
-        // Debuging
-        if ($GLOBALS['TL_CONFIG']['syncCto_debug_log'] == true)
-            $this->arrDebug["Responsepart " . microtime(true)] = substr($strResponse, 0, 4098) . "\n\nDecryption:\n" . $strContent;
-
-        $this->objSyncCtoMeasurement->stopMeasurement(__CLASS__, __FUNCTION__);
-
-        // Return content
-        return deserialize($arrContent);
-    }
-
-    /**
-     * Authenticate the user.
-     */
-    private function auth()
-    {
-        // Try to authenticate user
-        try
-        {
-            $this->BackendUser->authenticate();
-        }
-        catch (Exception $exc)
-        {
-            
-        }
     }
 
 }
