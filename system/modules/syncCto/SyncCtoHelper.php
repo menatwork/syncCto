@@ -29,7 +29,6 @@ if (!defined('TL_ROOT'))
  * @license    GNU/LGPL
  * @filesource
  */
-include_once 'SyncCtoSimpleHtmlDom.php';
 
 class SyncCtoHelper extends Backend
 {
@@ -43,7 +42,6 @@ class SyncCtoHelper extends Backend
     {
         $this->BackendUser = BackendUser::getInstance();
         parent::__construct();
-
     }
 
     /**
@@ -93,35 +91,35 @@ class SyncCtoHelper extends Backend
     public function getBlacklistFolder()
     {
         $arrLocalconfig = deserialize($GLOBALS['TL_CONFIG']['syncCto_folder_blacklist']);
-        $arrSyncCtoConfig = $GLOBALS['syncCto']['folder_blacklist'];
+        $arrSyncCtoConfig = $GLOBALS['SYC_CONFIG']['folder_blacklist'];
         return $this->mergerConfigs($arrLocalconfig, $arrSyncCtoConfig);
     }
 
     public function getWhitelistFolder()
     {
         $arrLocalconfig = deserialize($GLOBALS['TL_CONFIG']['syncCto_folder_whitelist']);
-        $arrSyncCtoConfig = $GLOBALS['syncCto']['folder_whitelist'];
+        $arrSyncCtoConfig = $GLOBALS['SYC_CONFIG']['folder_whitelist'];
         return $this->mergerConfigs($arrLocalconfig, $arrSyncCtoConfig);
     }
 
     public function getBlacklistFile()
     {
         $arrLocalconfig = deserialize($GLOBALS['TL_CONFIG']['syncCto_file_blacklist']);
-        $arrSyncCtoConfig = $GLOBALS['syncCto']['file_blacklist'];
+        $arrSyncCtoConfig = $GLOBALS['SYC_CONFIG']['file_blacklist'];
         return $this->mergerConfigs($arrLocalconfig, $arrSyncCtoConfig);
     }
 
     public function getBlacklistLocalconfig()
     {
         $arrLocalconfig = deserialize($GLOBALS['TL_CONFIG']['syncCto_local_blacklist']);
-        $arrSyncCtoConfig = $GLOBALS['syncCto']['local_blacklist'];
+        $arrSyncCtoConfig = $GLOBALS['SYC_CONFIG']['local_blacklist'];
         return $this->mergerConfigs($arrLocalconfig, $arrSyncCtoConfig);
     }
 
     public function getTablesHidden()
     {
         $arrLocalconfig = deserialize($GLOBALS['TL_CONFIG']['syncCto_table_hidden']);
-        $arrSyncCtoConfig = $GLOBALS['syncCto']['table_hidden'];
+        $arrSyncCtoConfig = $GLOBALS['SYC_CONFIG']['table_hidden'];
         return $this->mergerConfigs($arrLocalconfig, $arrSyncCtoConfig);
     }
 
@@ -236,7 +234,7 @@ class SyncCtoHelper extends Backend
             }
         }
 
-        return $strVar;
+        return preg_replace("/^\//i", "", $strVar);
     }
 
     /* -------------------------------------------------------------------------

@@ -29,24 +29,12 @@ if (!defined('TL_ROOT'))
  * @license    GNU/LGPL 
  * @filesource
  */
- 
+$objInput = Input::getInstance();
+
 /**
- * Defines
+ * Current syncCto Version
  */
-// Version
-define("SYNCCTO_GET_VERSION", '1.1.0');
-
-// Backup
-define("SYNCCTO_SMALL", 1);
-define("SYNCCTO_FULL", 2);
-
-// Communication
-define("SYNCCTO_COMMUNICATION_WAIT", 1);
-define("SYNCCTO_COMMUNICATION_REPLAY", 3);
-
-// File
-define("FILE_ZIP", 'File-Backup.zip');
-
+$GLOBALS['SYC_VERSION'] = '2.0.0';
 
 /**
  * Back end modules
@@ -81,58 +69,69 @@ $GLOBALS['BE_MOD'] = array_merge(
         ), array_slice($GLOBALS['BE_MOD'], $i)
 );
 
-$GLOBALS['TL_SYC'] = array_merge_recursive(array(
+// Backup
+define("SYNCCTO_SMALL", 1);
+define("SYNCCTO_FULL", 2);
+
+$GLOBALS['SYC_BACKUP'] = array_merge_recursive(array(
+    'backup' => array(
+        'option_small' => SYNCCTO_SMALL,
+        'option_full' => SYNCCTO_FULL,
+    ),
+        ), is_array($GLOBALS['SYC_BACKUP']) ? $GLOBALS['SYC_BACKUP'] : array()
+);
+
+$GLOBALS['SYC_SYNC'] = array_merge_recursive(array(
     'files' => array(
         'option_small' => SYNCCTO_SMALL,
         'option_full' => SYNCCTO_FULL,
     ),
-        ), is_array($GLOBALS['TL_SYC']) ? $GLOBALS['TL_SYC'] : array()
+        ), is_array($GLOBALS['SYC_SYNC']) ? $GLOBALS['SYC_SYNC'] : array()
 );
 
 /**
  * Hooks
  */
-// Template
-$GLOBALS['TL_HOOKS']['outputBackendTemplate'][] = array('SyncCtoCallback', 'outputBackendTemplate');
+$GLOBALS['TL_HOOKS']['executePreActions'][] = array('tl_synccto_clients', 'pingClientStatus');
+$GLOBALS['TL_HOOKS']['parseBackendTemplate'][] = array('SyncCtoCallback', 'checkExtensions');
 
-// Permissions
+/**
+ * Permissions
+ */
 $GLOBALS['TL_PERMISSIONS'][] = 'syncCto_clients';
 $GLOBALS['TL_PERMISSIONS'][] = 'syncCto_clients_p';
 $GLOBALS['TL_PERMISSIONS'][] = 'syncCto_tables';
 
-// Ajax
-$GLOBALS['TL_HOOKS']['executePreActions'][]   = array('SyncCtoCallback', 'pingClientStatus');
-
 /**
  * Callback is only used for overview screen
  */
-if ($_GET['do'] == 'syncCto_backups' && strlen($_GET['table']) != 0 && strlen($_GET['act']) == 0)
+if ($objInput->get("do") == 'syncCto_backups' && $objInput->get("table") != '' && $objInput->get("act") == '')
 {
     unset($GLOBALS['BE_MOD']['syncCto']['syncCto_backups']['callback']);
 }
 
-if (!($_GET['do'] == 'synccto_clients' && ($_GET['table'] == 'tl_syncCto_clients_syncTo' || $_GET['table'] == 'tl_syncCto_clients_syncFrom' ) && strlen($_GET['act']) != 0 ))
+if (!($objInput->get("do") == 'synccto_clients' && ($objInput->get("table") == 'tl_syncCto_clients_syncTo' || $objInput->get("table") == 'tl_syncCto_clients_syncFrom' ) && $objInput->get("act")) != '')
 {
     unset($GLOBALS['BE_MOD']['syncCto']['synccto_clients']['callback']);
 }
 
+// Size limit for files in bytes, will be checked
+$GLOBALS['SYC_SIZE']['limit'] = 104857600;
+// Size limit for files in bytes, completely ignored
+$GLOBALS['SYC_SIZE']['limit_ignore'] = 209715200;
+
 /**
  * Blacklists
  */
-// Size limit for files in bytes, will be checked
-$GLOBALS['syncCto']['size_limit'] = 104857600;
-// Size limit for files in bytes, completely ignored
-$GLOBALS['syncCto']['size_limit_ignore'] = 209715200;
-
 // Tables
-$GLOBALS['syncCto']['table_hidden'] = array(
+$GLOBALS['SYC_CONFIG']['table_hidden'] = array(
     'tl_log',
     'tl_session',
     'tl_undo',
 );
 
 // Folders
-$GLOBALS['syncCto']['folder_blacklist'] = array(
+$GLOBALS['SYC_CONFIG']['folder_blacklist'] = array(
     'system/tmp*',
     'system/htm*',
     'system/logs*',
@@ -140,13 +139,13 @@ $GLOBALS['syncCto']['folder_blacklist'] = array(
 );
 
 // Files only Sync.
-$GLOBALS['syncCto']['file_blacklist'] = array(
+$GLOBALS['SYC_CONFIG']['file_blacklist'] = array(
     "*.htaccess",
     "system/config/localconfig.php",
 );
 
 // Folders
-$GLOBALS['syncCto']['local_blacklist'] = array(
+$GLOBALS['SYC_CONFIG']['local_blacklist'] = array(
     "websitePath",
     "installPassword",
     "encryptionKey",
@@ -165,7 +164,7 @@ $GLOBALS['syncCto']['local_blacklist'] = array(
  * Whitelist
  */
 // Folders
-$GLOBALS['syncCto']['folder_whitelist'] = array(    
+$GLOBALS['SYC_CONFIG']['folder_whitelist'] = array(
     'contao',
     'plugins',
     'system',
@@ -177,51 +176,63 @@ $GLOBALS['syncCto']['folder_whitelist'] = array(
  * Global configuration
  */
 // Folder path configuration
-$GLOBALS['syncCto']['path']['db'] = "tl_files/syncCto_backups/database/";
-$GLOBALS['syncCto']['path']['tmp'] = "system/tmp/";
-$GLOBALS['syncCto']['path']['file'] = "tl_files/syncCto_backups/files/";
-$GLOBALS['syncCto']['path']['debug'] = "tl_files/syncCto_backups/debug/";
+$GLOBALS['SYC_PATH']['db'] = "tl_files/syncCto_backups/database/";
+$GLOBALS['SYC_PATH']['tmp'] = "system/tmp/";
+$GLOBALS['SYC_PATH']['file'] = "tl_files/syncCto_backups/files/";
+$GLOBALS['SYC_PATH']['debug'] = "tl_files/syncCto_backups/debug/";
 
 // Timestamp for files
-$GLOBALS['syncCto']['settings']['time_format'] = "Ymd_H-i-s";
+$GLOBALS['SYC_CONFIG']['format'] = "Ymd_H-i-s";
 
-/**
- * Codifyengines
- * You can change/remove/add the codifyengines here. 
- * 
- * --= Caution =--
- * -> You have to change the configuration on both systems.
- * -> Never change the Empty and Blow. Both are core engines.
- */
-$GLOBALS["syncCto"]["codifyengine"] = array(
-    "Empty" => array(
-        "name" => &$GLOBALS['TL_LANG']['syncCto']['codifyengine_name']["Empty"],
-        "classname" => "SyncCtoCodifyengineImpl_Empty",
-        "folder" => "system/modules/syncCto",        
-    ),
-    "Mcrypt" => array(
-        "name" => &$GLOBALS['TL_LANG']['syncCto']['codifyengine_name']["Mcrypt"],
-        "classname" => "SyncCtoCodifyengineImpl_Empty",
-        "folder" => "system/modules/syncCto",        
-    ),
-    "Blow" => array(
-        "name" => &$GLOBALS['TL_LANG']['syncCto']['codifyengine_name']["Blow"],
-        "classname" => "SyncCtoCodifyengineImpl_Empty",
-        "folder" => "system/modules/syncCto",        
-    ),
-);
 
 /**
  * CSS
  */
-if (($_GET['do'] == 'syncCto_check')
-        || (($_GET['do'] == 'group') && ($_GET['act'] == 'edit'))
-        || (($_GET['do'] == 'user') && ($_GET['act'] == 'edit'))
-        || (($_GET['do'] == 'syncCto_backups') && ($_GET['table'] == 'tl_syncCto_backup_db'))
-        || (($_GET['do'] == 'synccto_clients') && ($_GET['table'] == 'tl_syncCto_clients_syncTo'))
-        || (($_GET['do'] == 'synccto_clients') && ($_GET['table'] == 'tl_syncCto_clients_syncFrom')))
+if (($objInput->get("do") == 'syncCto_check') || ($objInput->get("table") == 'tl_syncCto_clients_syncTo') || ($objInput->get("table") == 'tl_syncCto_clients_syncFrom'))
+{
     $GLOBALS['TL_CSS'][] = 'system/modules/syncCto/html/syncCto.css';
+}
 
-if (($_GET['do'] == 'synccto_clients') && (strlen($_GET["act"]) == 0) && (strlen($_GET["table"]) == 0))
+if ((($objInput->get("do") == 'synccto_clients') && $objInput->get("act") == '') && $objInput->get("table") == '')
+{
     $GLOBALS['TL_JAVASCRIPT'][] = 'system/modules/syncCto/html/syncCto.js';
+}
+
+/**
+ * CtoCommunication RPC Calls
+ */
+$GLOBALS["CTOCOM_FUNCTIONS"]["SYNCCTO_VERSION"] = array(
+    "class" => "SyncCtoRPCFunctions",
+    "function" => "getVersionSyncCto",
+    "typ" => "GET",
+    "parameter" => false,
+);
+
+$GLOBALS["CTOCOM_FUNCTIONS"]["SYNCCTO_PARAMETER"] = array(
+    "class" => "SyncCtoRPCFunctions",
+    "function" => "getClientParameter",
+    "typ" => "GET",
+    "parameter" => false,
+);
+
+$GLOBALS["CTOCOM_FUNCTIONS"]["SYNCCTO_FILEBACKUP"] = array(
+    "class" => "SyncCtoFiles",
+    "function" => "runDump",
+    "typ" => "GET",
+    "parameter" => false,
+);
+
+$GLOBALS["CTOCOM_FUNCTIONS"]["SYNCCTO_CHECKSUMCORE"] = array(
+    "class" => "SyncCtoFiles",
+    "function" => "runChecksumCore",
+    "typ" => "GET",
+    "parameter" => false,
+);
+
+$GLOBALS["CTOCOM_FUNCTIONS"]["SYNCCTO_PURGETEMP"] = array(
+    "class" => "SyncCtoFiles",
+    "function" => "purgeTemp",
+    "typ" => "GET",
+    "parameter" => false,
+);
 ?>

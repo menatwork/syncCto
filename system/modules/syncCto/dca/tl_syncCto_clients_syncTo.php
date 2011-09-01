@@ -33,11 +33,15 @@ $GLOBALS['TL_DCA']['tl_syncCto_clients_syncTo'] = array(
     // Config
     'config' => array
         (
-        'dataContainer' => 'File',
+        'dataContainer' => 'Memory',
         'closed' => true,
-        'onload_callback' => array
-            (
-            array('SyncCtoCallback', 'checkPermissionFiletree'),
+        'disableSubmit' => false,
+        'onload_callback' => array(
+            array('tl_syncCto_clients_syncTo', 'onload_callback'),
+			array('tl_syncCto_clients_syncTo', 'checkPermission'),
+        ),
+        'onsubmit_callback' => array(
+            array('tl_syncCto_clients_syncTo', 'onsubmit_callback'),
         )
     ),
     // Palettes
@@ -59,18 +63,18 @@ $GLOBALS['TL_DCA']['tl_syncCto_clients_syncTo'] = array(
         'table_list_recommend' => array
             (
             'label' => &$GLOBALS['TL_LANG']['tl_syncCto_clients_syncTo']['table_list_recommend'],
-            'inputType' => 'checkboxWizard',
+            'inputType' => 'checkbox',
             'exclude' => true,
             'eval' => array('multiple' => true),
-            'options_callback' => array('SyncCtoCallback', 'optioncallTablesRecommend'),
+            'options_callback' => array('SyncCtoCallback', 'databaseTablesRecommended'),
         ),
         'table_list_none_recommend' => array
             (
             'label' => &$GLOBALS['TL_LANG']['tl_syncCto_clients_syncTo']['table_list_none_recommend'],
-            'inputType' => 'checkboxWizard',
+            'inputType' => 'checkbox',
             'exclude' => true,
             'eval' => array('multiple' => true),
-            'options_callback' => array('SyncCtoCallback', 'optioncallTablesNoneRecommend'),
+            'options_callback' => array('SyncCtoCallback', 'databaseTablesNoneRecommended'),
         ),
         'filelist' => array
             (
@@ -81,4 +85,50 @@ $GLOBALS['TL_DCA']['tl_syncCto_clients_syncTo'] = array(
         ),
     )
 );
+
+class tl_syncCto_clients_syncTo extends Backend
+{
+    // Constructor and singelten pattern
+    public function __construct()
+    {
+        // Import Contao classes
+        $this->BackendUser = BackendUser::getInstance();
+
+        parent::__construct();
+    }
+
+	public function onload_callback(DataContainer $dc)
+    {
+        $dc->removeButton('save');
+        $dc->removeButton('saveNclose');
+
+        $arrData = array
+            (
+            'id' => 'start_sync',
+            'formkey' => 'start_sync',
+            'class' => '',
+            'accesskey' => 'g',
+            'value' => specialchars($GLOBALS['TL_LANG']['MSC']['syncTo']),
+            'button_callback' => array('tl_syncCto_clients_syncTo', 'onsubmit_callback')
+        );
+
+        $dc->addButton('start_sync', $arrData);
+    }
+	
+	public function onsubmit_callback(DataContainer $dc)
+    {
+        $this->redirect($this->Environment->base . "contao/main.php?do=synccto_clients&amp;table=tl_syncCto_clients_syncTo&amp;act=start&amp;id=" . $this->Input->get("id"));
+    }
+
+    public function checkPermission()
+    {
+        if ($this->BackendUser->isAdmin)
+        {
+            return;
+        }
+
+        $GLOBALS['TL_DCA']['tl_syncCto_clients_syncTo']['list']['sorting']['root'] = $this->BackendUser->filemounts;
+    }
+}
+
 ?>

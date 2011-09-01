@@ -31,8 +31,15 @@ $GLOBALS['TL_DCA']['tl_syncCto_backup_file'] = array(
     // Config
     'config' => array
         (
-        'dataContainer' => 'File',
+        'dataContainer' => 'Memory',
         'closed' => true,
+        'disableSubmit' => false,
+        'onload_callback' => array(
+            array('tl_syncCto_backup_file', 'onload_callback'),
+        ),
+        'onsubmit_callback' => array(
+            array('tl_syncCto_backup_file', 'onsubmit_callback'),
+        )
     ),
     // Palettes
     'palettes' => array
@@ -46,11 +53,8 @@ $GLOBALS['TL_DCA']['tl_syncCto_backup_file'] = array(
             'label' => &$GLOBALS['TL_LANG']['tl_syncCto_backup_file']['backupType'],
             'inputType' => 'select',
 			'exclude' => true,
-            'options' => array
-                (
-                SYNCCTO_SMALL => $GLOBALS['TL_LANG']['tl_syncCto_backup_file']['option_small'],
-				SYNCCTO_FULL => $GLOBALS['TL_LANG']['tl_syncCto_backup_file']['option_full']
-            ),
+            'reference' => &$GLOBALS['TL_LANG']['SYC'],
+            'options_callback' => array('SyncCtoCallback', 'getBackupType'),
         ),
         'filelist' => array
             (
@@ -68,4 +72,33 @@ $GLOBALS['TL_DCA']['tl_syncCto_backup_file'] = array(
         ),
     )
 );
+
+class tl_syncCto_backup_file extends Backend
+{
+
+    public function onload_callback(DataContainer $dc)
+    {
+        $dc->removeButton('save');
+        $dc->removeButton('saveNclose');
+
+        $arrData = array
+            (
+            'id' => 'start_backup',
+            'formkey' => 'start_backup',
+            'class' => '',
+            'accesskey' => 'g',
+            'value' => specialchars($GLOBALS['TL_LANG']['MSC']['start_backup']),
+            'button_callback' => array('tl_syncCto_backup_file', 'onsubmit_callback')
+        );
+
+        $dc->addButton('start_backup', $arrData);
+    }
+	
+	public function onsubmit_callback(DataContainer $dc)
+    {
+        $this->redirect($this->Environment->base . "contao/main.php?do=syncCto_backups&amp;table=tl_syncCto_backup_file&amp;act=start");
+    }
+
+}
+
 ?>

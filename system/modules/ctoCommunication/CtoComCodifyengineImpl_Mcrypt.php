@@ -70,16 +70,6 @@ class CtoComCodifyengineImpl_Mcrypt implements CtoComCodifyengineAbstract
         $this->strKey = $strKey;
     }
 
-    public function getKey()
-    {
-        return $this->strKey;
-    }
-
-    public function getName()
-    {
-        return "Mcrypt";
-    }
-
     /* -------------------------------------------------------------------------
      * Functions
      */

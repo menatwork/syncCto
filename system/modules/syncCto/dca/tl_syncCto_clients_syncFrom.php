@@ -33,8 +33,16 @@ $GLOBALS['TL_DCA']['tl_syncCto_clients_syncFrom'] = array(
     // Config
     'config' => array
         (
-        'dataContainer' => 'File',
+        'dataContainer' => 'Memory',
         'closed' => true,
+        'disableSubmit' => false,
+        'onload_callback' => array(
+            array('tl_syncCto_clients_syncFrom', 'onload_callback'),
+			// array('tl_syncCto_clients_syncTo', 'checkPermission'),
+        ),
+        'onsubmit_callback' => array(
+            array('tl_syncCto_clients_syncFrom', 'onsubmit_callback'),
+        )
     ),
     // Palettes
     'palettes' => array
@@ -60,4 +68,31 @@ $GLOBALS['TL_DCA']['tl_syncCto_clients_syncFrom'] = array(
         )
     )
 );
+
+class tl_syncCto_clients_syncFrom extends Backend
+{
+	public function onload_callback(DataContainer $dc)
+    {
+        $dc->removeButton('save');
+        $dc->removeButton('saveNclose');
+
+        $arrData = array
+            (
+            'id' => 'start_sync',
+            'formkey' => 'start_sync',
+            'class' => '',
+            'accesskey' => 'g',
+            'value' => specialchars($GLOBALS['TL_LANG']['MSC']['syncFrom']),
+            'button_callback' => array('tl_syncCto_clients_syncFrom', 'onsubmit_callback')
+        );
+
+        $dc->addButton('start_sync', $arrData);
+    }
+	
+	public function onsubmit_callback(DataContainer $dc)
+    {
+        $this->redirect($this->Environment->base . "contao/main.php?do=synccto_clients&amp;table=tl_syncCto_clients_syncFrom&amp;act=start&amp;id=" . $this->Input->get("id"));
+    }
+}
+
 ?>

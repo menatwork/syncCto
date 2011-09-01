@@ -192,9 +192,9 @@ class SyncCtoDatabase extends Backend
         $strFilename = date($this->strTimestampFormat) . "_" . $this->strSuffixZipName;
 
         if ($booTemplFolder)
-            $strPath = $GLOBALS['syncCto']['path']['tmp'];
+            $strPath = $GLOBALS['SYC_PATH']['tmp'];
         else
-            $strPath = $GLOBALS['syncCto']['path']['db'];
+            $strPath = $GLOBALS['SYC_PATH']['db'];
 
         $objZipWrite = new ZipWriter($strPath . $strFilename);
 

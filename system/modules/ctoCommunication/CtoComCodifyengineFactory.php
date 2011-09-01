@@ -43,26 +43,29 @@ class CtoComCodifyengineFactory extends Backend
      */
     public static function getEngine($strEngine = null)
     {
-        if ($strEngine == null || $strEngine == "Blowfish")
+        if ($strEngine == "" || $strEngine == null)
+            $strEngine = "Blowfish";
+
+        if (!key_exists($strEngine, $GLOBALS["CTOCOM_ENGINE"]))
         {
-            $enginge = CtoComCodifyengineImpl_Blowfish::getInstance();
+            throw new Exception(vsprintf($GLOBALS['TL_LANG']['ERR']['unknown_engine'], array($strEngine)));
+        }
+
+        $arrEngine = $GLOBALS["CTOCOM_ENGINE"][$strEngine];
+
+        if (!file_exists(TL_ROOT . "/" . $arrEngine["folder"] . "/" . $arrEngine["classname"] . ".php"))
+            throw new Exception(vsprintf($GLOBALS['TL_LANG']['ERR']['missing_engine'], array($arrEngine["classname"] . ".php")));
+
+        $strClass = $arrEngine["classname"];        
+        $objEnginge = new $strClass();
+
+        if ($objEnginge instanceof CtoComCodifyengineAbstract)
+        {
+            return $objEnginge;
         }
         else
         {
-            if (!file_exists(TL_ROOT . "/system/modules/ctoCommunication/CtoComCodifyengineImpl_" . $strEngine . ".php"))
-                throw new Exception("Unknown codifyengine: " . $strEngine);
-
-            $strClass = "CtoComCodifyengineImpl_" . $strEngine;
-            $enginge = $strClass::getInstance();
-        }
-
-        if ($enginge instanceof CtoComCodifyengineAbstract)
-        {
-            return $enginge;
-        }
-        else
-        {
-            throw new Exception("Codifyenginge is not instance of CtoComCodifyengineAbstract.");
+            throw new Exception($GLOBALS['TL_LANG']['ERR']['not_a_engine']);
         }
     }
 

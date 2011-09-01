@@ -26,65 +26,10 @@
  * @license    GNU/LGPL 
  * @filesource
  */
- 
-/**
- * Backups
- */
-$GLOBALS['TL_LANG']['syncCto']['welcome_backup'] = "Manage backups";
-$GLOBALS['TL_LANG']['syncCto']['title_make_backup'] = "Create backups";    
-$GLOBALS['TL_LANG']['syncCto']['title_import_backup'] = "Import backups"; 
-$GLOBALS['TL_LANG']['syncCto']['db_make_backup'] = array("Create database backup", "Here you can create a backup of the database."); 
-$GLOBALS['TL_LANG']['syncCto']['file_make_backup'] = array("Create file backup", "Here you can create a backup of the files."); 
-$GLOBALS['TL_LANG']['syncCto']['db_import_backup'] = array("Import database backup", "Here you can import a backup of the database."); 
-$GLOBALS['TL_LANG']['syncCto']['file_import_backup'] = array("Import file backup", "Here you can import a backup of the files."); 
-
-/**
- * Buttons
- */
-$GLOBALS['TL_LANG']['syncCto']['start_backup'] = "Start backup";
-$GLOBALS['TL_LANG']['syncCto']['restore_backup'] = "Import backup";
-$GLOBALS['TL_LANG']['syncCto']['sync_client'] = "Synchronize client";
-$GLOBALS['TL_LANG']['syncCto']['sync_server'] = "Synchronize server";
-
-/**
- * Headline
- */
-$GLOBALS['TL_LANG']['syncCto']['check'] = "System check";
-$GLOBALS['TL_LANG']['syncCto']['configuration'] = "PHP configuration";
-
-/**
- * Table
- */
-$GLOBALS['TL_LANG']['syncCto']['parameter'] = "Parameter";
-$GLOBALS['TL_LANG']['syncCto']['value'] = "Value";
-$GLOBALS['TL_LANG']['syncCto']['description'] = "Description";
-$GLOBALS['TL_LANG']['syncCto']['on'] = "On";
-$GLOBALS['TL_LANG']['syncCto']['off'] = "Off";
-$GLOBALS['TL_LANG']['syncCto']['safemode'] = array("Safe mode", "Recommended setting is Off."); 
-$GLOBALS['TL_LANG']['syncCto']['met'] = array("Maximum execution time", "Recommended setting is 30 or greater."); 
-$GLOBALS['TL_LANG']['syncCto']['memory_limit'] = array("Memory limit", "Recommended setting is 128M or greater."); 
-$GLOBALS['TL_LANG']['syncCto']['register_globals'] = array("Register globals", "Recommended setting is Off."); 
-$GLOBALS['TL_LANG']['syncCto']['file_uploads'] = array("File uploads", "Recommended setting is On."); 
-$GLOBALS['TL_LANG']['syncCto']['umf'] = array("Upload maximum filesize", "Recommended setting is 8M or greater.");
-$GLOBALS['TL_LANG']['syncCto']['pms'] = array("Post maximum size", "Recommended setting is 8M or greater."); 
-$GLOBALS['TL_LANG']['syncCto']['mit'] = array("Maximum input time", "Recommended setting is -1, 60 or greater."); 
-$GLOBALS['TL_LANG']['syncCto']['dst'] = array("Default socket timeout", "Recommended setting is 30 or greater.");
-$GLOBALS['TL_LANG']['syncCto']['fsocket'] = array("Fsockopen", "Recommended setting is On.");
-$GLOBALS['TL_LANG']['syncCto']['fopen'] = array("Fopen", "Recommended setting is On.");
-$GLOBALS['TL_LANG']['syncCto']['zip_archive'] = array("ZipArchive", "Recommended setting is On.");
 
 /**
  * Text
  */
- 
-$GLOBALS['TL_LANG']['syncCto']['other_sync_issues'] = "Other known issues";
-$GLOBALS['TL_LANG']['syncCto']['explanation_sync_issues'] = "Some server configuration settings are preventing the synchronization, which cannot be detected by the system check.";
-$GLOBALS['TL_LANG']['syncCto']['known_issues'] = "Some known settings are:";
-$GLOBALS['TL_LANG']['syncCto']['suhosin'] = "Suhosin is preventing the synchronisation";
-$GLOBALS['TL_LANG']['syncCto']['max_request_len'] = "The MaxRequestLen is too low";
-
-$GLOBALS['TL_LANG']['syncCto']['safemodehack'] = 'syncCto cannot be used because of missing write permissions.';
-
 $GLOBALS['TL_LANG']['syncCto']['ok'] = "OK";
 $GLOBALS['TL_LANG']['syncCto']['progress'] = "In Progress";
 $GLOBALS['TL_LANG']['syncCto']['error'] = "Error";
@@ -108,15 +53,8 @@ $GLOBALS['TL_LANG']['syncCto']['ignored_files'] = 'Too big File(s) for processin
 $GLOBALS['TL_LANG']['syncCto']['information_last_sync'] = 'The last synchronization was done at %s on %s by the User %s (%s).';
 
 /**
- * Title attributes
- */
-$GLOBALS['TL_LANG']['syncCto']['server_online'] = "Client ID %s is online";
-$GLOBALS['TL_LANG']['syncCto']['server_missing'] = "syncCto is missing on the client ID %s";
-$GLOBALS['TL_LANG']['syncCto']['server_offline'] = "Client ID %s is offline";
-
-/**
  * Errors
- */
+
 $GLOBALS['TL_LANG']['syncCto']['cant_open'] = "File %s can not be opened.";
 $GLOBALS['TL_LANG']['syncCto']['file_not_exists'] = "File %s could not be created.";
 $GLOBALS['TL_LANG']['syncCto']['zero_tables'] = "There are no sql tables for backup.";
@@ -150,4 +88,5 @@ $GLOBALS['TL_LANG']['syncCto']['unknown_response'] = "Unknown response from serv
 $GLOBALS['TL_LANG']['syncCto']['rpc_call_missing'] = "Missing RPC ID.";
 $GLOBALS['TL_LANG']['syncCto']['rpc_data_missing'] = "Missing RPC Data";
 $GLOBALS['TL_LANG']['syncCto']['rpc_unknown'] = "Unknown RPC call.";
+ */
 ?>

@@ -38,7 +38,7 @@ $GLOBALS['TL_DCA']['tl_syncCto_settings'] = array(
     // Palettes
     'palettes' => array
         (
-        'default' => '{blacklist_legend:hide},syncCto_folder_blacklist,syncCto_file_blacklist;{whitelist_legend:hide},syncCto_folder_whitelist;{local_blacklist_legend},syncCto_local_blacklist;{hidden_tables_legend:hide},syncCto_table_hidden;{tables_legend},syncCto_table_list;{debug_legend},syncCto_debug_filelist,syncCto_debug_log,syncCto_measurement_log;'
+        'default' => '{blacklist_legend:hide},syncCto_folder_blacklist,syncCto_file_blacklist;{whitelist_legend:hide},syncCto_folder_whitelist;{local_blacklist_legend},syncCto_local_blacklist;{hidden_tables_legend:hide},syncCto_table_hidden;{tables_legend},syncCto_table_list;{debug_legend},syncCto_debug_mode;'
     ),
     // Fields
     'fields' => array(
@@ -46,21 +46,21 @@ $GLOBALS['TL_DCA']['tl_syncCto_settings'] = array(
             (
             'label' => &$GLOBALS['TL_LANG']['tl_syncCto_settings']['folder_blacklist'],
             'inputType' => 'textwizard',
-            'eval' => array('trailingSlash' => false, 'style' => 'width:320px', 'allowHtml' => false),
+            'eval' => array('trailingSlash' => false, 'style' => 'width:420px', 'allowHtml' => false),
             'load_callback' => array(array('SyncCtoCallback', 'loadcallFolderBlacklist')),
         ),
         'syncCto_file_blacklist' => array
             (
             'label' => &$GLOBALS['TL_LANG']['tl_syncCto_settings']['file_blacklist'],
             'inputType' => 'textwizard',
-            'eval' => array('trailingSlash' => false, 'style' => 'width:320px', 'allowHtml' => false),
+            'eval' => array('trailingSlash' => false, 'style' => 'width:420px', 'allowHtml' => false),
             'load_callback' => array(array('SyncCtoCallback', 'loadcallFileBlacklist')),
         ),
         'syncCto_folder_whitelist' => array
             (
             'label' => &$GLOBALS['TL_LANG']['tl_syncCto_settings']['folder_whitelist'],
             'inputType' => 'textwizard',
-            'eval' => array('trailingSlash' => false, 'style' => 'width:320px', 'allowHtml' => false),
+            'eval' => array('trailingSlash' => false, 'style' => 'width:420px', 'allowHtml' => false),
             'load_callback' => array(array('SyncCtoCallback', 'loadcallFolderWhitelist')),
         ),
         'syncCto_local_blacklist' => array
@@ -68,7 +68,7 @@ $GLOBALS['TL_DCA']['tl_syncCto_settings'] = array(
             'label' => &$GLOBALS['TL_LANG']['tl_syncCto_settings']['local_blacklist'],
             'inputType' => 'checkboxWizard',
             'eval' => array('multiple' => true),
-            'options_callback' => array('SyncCtoCallback', 'optioncallLocalConfig'),
+            'options_callback' => array('SyncCtoCallback', 'localconfigEntries'),
             'load_callback' => array(array('SyncCtoCallback', 'loadcallLocalConfig')),
         ),
         'syncCto_table_hidden' => array
@@ -76,7 +76,7 @@ $GLOBALS['TL_DCA']['tl_syncCto_settings'] = array(
             'label' => &$GLOBALS['TL_LANG']['tl_syncCto_settings']['table_hidden'],
             'inputType' => 'checkboxWizard',
             'eval' => array('multiple' => true),
-            'options_callback' => array('SyncCtoCallback', 'optioncallHiddenTables'),
+            'options_callback' => array('SyncCtoCallback', 'hiddenTables'),
             'load_callback' => array(array('SyncCtoCallback', 'loadcallTableHidden')),
         ),
         'syncCto_table_list' => array
@@ -84,21 +84,11 @@ $GLOBALS['TL_DCA']['tl_syncCto_settings'] = array(
             'label' => &$GLOBALS['TL_LANG']['tl_syncCto_settings']['table_list'],
             'inputType' => 'checkboxWizard',
             'eval' => array('multiple' => true),
-            'options_callback' => array('SyncCtoCallback', 'optioncallTables'),
+            'options_callback' => array('SyncCtoCallback', 'databaseTables'),
         ),
-        'syncCto_debug_log' => array
+        'syncCto_debug_mode' => array
             (
-            'label' => &$GLOBALS['TL_LANG']['tl_syncCto_settings']['debug_log'],
-            'inputType' => 'checkbox',
-        ),
-        'syncCto_debug_filelist' => array
-            (
-            'label' => &$GLOBALS['TL_LANG']['tl_syncCto_settings']['debug_filelist'],
-            'inputType' => 'checkbox',
-        ),
-        'syncCto_measurement_log' => array
-            (
-            'label' => &$GLOBALS['TL_LANG']['tl_syncCto_settings']['measurement_log'],
+            'label' => &$GLOBALS['TL_LANG']['tl_syncCto_settings']['debug_mode'],
             'inputType' => 'checkbox',
         ),
     )

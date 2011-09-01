@@ -15,8 +15,7 @@
 <div class="<?php echo ($key == 1) ? "tl_tbox" : "tl_box"; ?> block">
 <h1 id="step<?php echo $key; ?>"><?php echo $value["title"] ?></h1>
 <p class="tl_help">
-<?php echo $value["description"]; ?>
-<?php echo $value["state"]  ?>
+<?php echo $value["description"]; ?> - <?php echo $value["state"]  ?>
 </p>
 
 <?php if (strlen($value["msg"])) : ?>
@@ -38,7 +37,7 @@
 <?php if ($this->error) : ?>
 <div class="tl_tbox block">
 <h1><?php echo $GLOBALS['TL_LANG']['syncCto']['error']; ?></h1>
-<p class="tl_help"><?php echo $this->arrContentData["error_msg"]; ?></p>
+<p class="tl_help"><?php echo $this->error_msg; ?></p>
 </div>
 <?php endif; ?>
 

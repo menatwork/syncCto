@@ -58,7 +58,7 @@ class SyncCtoModuleBackup extends BackendModule
         $this->objSyncCtoFiles = SyncCtoFiles::getInstance();
         $this->objSyncCtoCallback = SyncCtoCallback::getInstance();
 
-        $this->loadLanguageFile('SyncCto');
+        $this->loadLanguageFile('tl_syncCto_backup');
     }
 
     /* -------------------------------------------------------------------------
@@ -207,28 +207,31 @@ class SyncCtoModuleBackup extends BackendModule
                     "data" => array()
                 );
 
-                $arrStepPool = array();
+                //$arrStepPool = array();
                 $step = 1;
+                
+                print_r($arrStepPool);
+                exit();
 
             case 1:
-                // Check Table list
-                if ($this->Input->post("table_list_recommend") == "" && $this->Input->post("table_list_none_recommend") == "")
-                {
-                    $arrContenData["error"] = true;
-                    $arrContenData["error_msg"] = $GLOBALS['TL_LANG']['syncCto']['no_backup_tables'];
-
-                    break;
-                }
-
-                // Merge recommend and none recommend post arrays
-                if ($this->Input->post("table_list_recommend") != "" && $this->Input->post("table_list_none_recommend") != "")
-                    $arrTablesBackup = array_merge($this->Input->post("table_list_recommend"), $this->Input->post("table_list_none_recommend"));
-                else if ($this->Input->post("table_list_recommend"))
-                    $arrTablesBackup = $this->Input->post("table_list_recommend");
-                else if ($this->Input->post("table_list_none_recommend"))
-                    $arrTablesBackup = $this->Input->post("table_list_none_recommend");
-
-                $arrStepPool["tables"] = $arrTablesBackup;
+//                // Check Table list
+//                if ($this->Input->post("table_list_recommend") == "" && $this->Input->post("table_list_none_recommend") == "")
+//                {
+//                    $arrContenData["error"] = true;
+//                    $arrContenData["error_msg"] = $GLOBALS['TL_LANG']['syncCto']['no_backup_tables'];
+//
+//                    break;
+//                }
+//
+//                // Merge recommend and none recommend post arrays
+//                if ($this->Input->post("table_list_recommend") != "" && $this->Input->post("table_list_none_recommend") != "")
+//                    $arrTablesBackup = array_merge($this->Input->post("table_list_recommend"), $this->Input->post("table_list_none_recommend"));
+//                else if ($this->Input->post("table_list_recommend"))
+//                    $arrTablesBackup = $this->Input->post("table_list_recommend");
+//                else if ($this->Input->post("table_list_none_recommend"))
+//                    $arrTablesBackup = $this->Input->post("table_list_none_recommend");
+//
+//                $arrStepPool["tables"] = $arrTablesBackup;
 
                 $arrContenData["data"][1] = array(
                     "title" => $GLOBALS['TL_LANG']['tl_syncCto_steps']['step'] . " 1",

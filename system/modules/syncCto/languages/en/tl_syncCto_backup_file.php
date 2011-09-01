@@ -67,4 +67,5 @@ $GLOBALS['TL_LANG']['tl_syncCto_backup_file']['step2_help'] = "Save contao insta
 $GLOBALS['TL_LANG']['tl_syncCto_backup_file']['step3_help'] = "Save tl_files.";
 $GLOBALS['TL_LANG']['tl_syncCto_backup_file']['complete_help'] = "Create file backup";
 $GLOBALS['TL_LANG']['tl_syncCto_backup_file']['download_backup'] = "Download file backup.";
+
 ?>

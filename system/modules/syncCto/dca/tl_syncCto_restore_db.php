@@ -28,14 +28,19 @@
  */
  
 $GLOBALS['TL_DCA']['tl_syncCto_restore_db'] = array(
-
     // Config
     'config' => array
         (
-        'dataContainer' => 'File',
-        'closed' => true,        
-    ),
-	
+        'dataContainer' => 'Memory',
+        'closed' => true,
+        'disableSubmit' => false,
+        'onload_callback' => array(
+            array('tl_syncCto_restore_db', 'onload_callback'),
+        ),
+        'onsubmit_callback' => array(
+            array('tl_syncCto_restore_db', 'onsubmit_callback'),
+        )
+    ),	
     // Palettes
     'palettes' => array
         (
@@ -54,5 +59,33 @@ $GLOBALS['TL_DCA']['tl_syncCto_restore_db'] = array(
     )
 	
 );
+
+class tl_syncCto_restore_db extends Backend
+{
+
+    public function onload_callback(DataContainer $dc)
+    {
+        $dc->removeButton('save');
+        $dc->removeButton('saveNclose');
+
+        $arrData = array
+            (
+            'id' => 'restore_backup',
+            'formkey' => 'restore_backup',
+            'class' => '',
+            'accesskey' => 'g',
+            'value' => specialchars($GLOBALS['TL_LANG']['MSC']['restore_backup']),
+            'button_callback' => array('tl_syncCto_restore_db', 'onsubmit_callback')
+        );
+
+        $dc->addButton('restore_backup', $arrData);
+    }
+	
+	public function onsubmit_callback(DataContainer $dc)
+    {
+        $this->redirect($this->Environment->base . "contao/main.php?do=syncCto_backups&amp;table=tl_syncCto_backup_file&amp;act=start");
+    }
+
+}
 
 ?>

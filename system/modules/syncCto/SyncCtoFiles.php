@@ -50,6 +50,8 @@ class SyncCtoFiles extends Backend
     public function __construct()
     {
         parent::__construct();
+
+        // My Class
         $this->objSyncCtoHelper = SyncCtoHelper::getInstance();
     }
 
@@ -106,7 +108,7 @@ class SyncCtoFiles extends Backend
         {
             $intSize = filesize($this->objSyncCtoHelper->buildPath($value));
 
-            if ($intSize >= $GLOBALS['syncCto']['size_limit_ignore'])
+            if ($intSize >= $GLOBALS['SYC_SIZE']['limit_ignore'])
             {
                 $arrChecksum[md5($value)] = array(
                     "path" => $value,
@@ -118,7 +120,7 @@ class SyncCtoFiles extends Backend
                     "path_raw" => standardize($value),
                 );
             }
-            else if ($intSize >= $GLOBALS['syncCto']['size_limit'])
+            else if ($intSize >= $GLOBALS['SYC_SIZE']['limit'])
             {
                 $arrChecksum[md5($value)] = array(
                     "path" => $value,
@@ -161,7 +163,7 @@ class SyncCtoFiles extends Backend
         {
             $intSize = filesize($this->objSyncCtoHelper->buildPath($value));
 
-            if ($intSize >= $GLOBALS['syncCto']['size_limit_ignore'])
+            if ($intSize >= $GLOBALS['SYC_SIZE']['limit_ignore'])
             {
                 $arrChecksum[md5($value)] = array(
                     "path" => $value,
@@ -173,7 +175,7 @@ class SyncCtoFiles extends Backend
                     "path_raw" => standardize($value),
                 );
             }
-            else if ($intSize >= $GLOBALS['syncCto']['size_limit'])
+            else if ($intSize >= $GLOBALS['SYC_SIZE']['limit'])
             {
                 $arrChecksum[md5($value)] = array(
                     "path" => $value,
@@ -285,22 +287,22 @@ class SyncCtoFiles extends Backend
                 $strFilename = $strZip;
         }
 
-        $strPath = $this->objSyncCtoHelper->buildPathWoTL($GLOBALS['syncCto']['path']['file'], $strFilename);
+        $strPath = $this->objSyncCtoHelper->buildPathWoTL($GLOBALS['SYC_PATH']['file'], $strFilename);
 
         $objZipWrite = new ZipWriter($strPath);
 
         $arrFileList = $this->recrusiveFileList(array(), "", false);
-        
-        if(is_array($arrTlFiles) == true && count($arrTlFiles) != 0)
+
+        if (is_array($arrTlFiles) == true && count($arrTlFiles) != 0)
         {
             foreach ($arrTlFiles as $key => $value)
             {
-                if(!file_exists($this->objSyncCtoHelper->buildPath($value)))
-                        unset($arrTlFiles[$key]);
+                if (!file_exists($this->objSyncCtoHelper->buildPath($value)))
+                    unset($arrTlFiles[$key]);
             }
-            
+
             $arrFileList = array_merge($arrFileList, $arrTlFiles);
-        }        
+        }
 
         foreach ($arrFileList as $key => $value)
         {
@@ -328,7 +330,7 @@ class SyncCtoFiles extends Backend
                 $strFilename = $strZip;
         }
 
-        $strPath = $this->objSyncCtoHelper->buildPathWoTL($GLOBALS['syncCto']['path']['file'], $strFilename);
+        $strPath = $this->objSyncCtoHelper->buildPathWoTL($GLOBALS['SYC_PATH']['file'], $strFilename);
 
         $objZipWrite = new ZipWriter($strPath);
 
@@ -363,7 +365,7 @@ class SyncCtoFiles extends Backend
                 $strFilename = $strZip;
         }
 
-        $strPath = $this->objSyncCtoHelper->buildPathWoTL($GLOBALS['syncCto']['path']['file'], $strFilename);
+        $strPath = $this->objSyncCtoHelper->buildPathWoTL($GLOBALS['SYC_PATH']['file'], $strFilename);
 
         $objZipWrite = new ZipWriter($strPath);
 
@@ -397,17 +399,17 @@ class SyncCtoFiles extends Backend
             if ($objZipRead->getFile($value) != true)
                 throw new Exception("Error by unziping file. File not found in zip archive.");
 
-            $objFile = new File($GLOBALS['syncCto']['path']['tmp'] . $value);
+            $objFile = new File($GLOBALS['SYC_PATH']['tmp'] . $value);
             $objFile->write($objZipRead->unzip());
             $objFile->close();
-            
+
             unset($objFile);
         }
 
         unset($objZipWrite);
-        
+
         // Move Files
-        
+
         unset($arrFileList);
 
         return;
@@ -554,9 +556,9 @@ class SyncCtoFiles extends Backend
      */
     public function checkSyncCtoFolders()
     {
-        $objFile = new Folder($this->objSyncCtoHelper->buildPathWoTL($GLOBALS['syncCto']['path']['db']));
-        $objFile = new Folder($this->objSyncCtoHelper->buildPathWoTL($GLOBALS['syncCto']['path']['tmp']));
-        $objFile = new Folder($this->objSyncCtoHelper->buildPathWoTL($GLOBALS['syncCto']['path']['file']));
+        $objFile = new Folder($this->objSyncCtoHelper->buildPathWoTL($GLOBALS['SYC_PATH']['db']));
+        $objFile = new Folder($this->objSyncCtoHelper->buildPathWoTL($GLOBALS['SYC_PATH']['tmp']));
+        $objFile = new Folder($this->objSyncCtoHelper->buildPathWoTL($GLOBALS['SYC_PATH']['file']));
     }
 
     /**
@@ -567,11 +569,11 @@ class SyncCtoFiles extends Backend
     public function purgeTemp($strFolder = null)
     {
         if ($strFolder == null || $strFolder == "")
-            $strPath = $this->buildPathWoTL($GLOBALS['syncCto']['path']['tmp']);
+            $strPath = $this->objSyncCtoHelper->buildPathWoTL($GLOBALS['SYC_PATH']['tmp']);
         else
-            $strPath = $this->buildPathWoTL($GLOBALS['syncCto']['path']['tmp'], $strFolder);
+            $strPath = $this->objSyncCtoHelper->buildPathWoTL($GLOBALS['SYC_PATH']['tmp'], $strFolder);
 
-        $objFolder = new Folder($strFolder);
+        $objFolder = new Folder($strPath);
         $objFolder->clear();
     }
 
@@ -605,7 +607,7 @@ class SyncCtoFiles extends Backend
     {
         foreach ($arrFilelist as $key => $value)
         {
-            if (!file_exists($this->buildPath($GLOBALS['syncCto']['path']['tmp'], "sync", $value["path"])))
+            if (!file_exists($this->buildPath($GLOBALS['SYC_PATH']['tmp'], "sync", $value["path"])))
             {
                 $arrFilelist[$key]["saved"] = false;
                 $arrFilelist[$key]["error"] = "missing file";
@@ -624,8 +626,8 @@ class SyncCtoFiles extends Backend
                     mkdir(TL_ROOT . $strVar);
             }
 
-            if (copy(TL_ROOT . $GLOBALS['syncCto']['path']['tmp'] . "sync/" . $value["path"], TL_ROOT . "/" . $value["path"]) == false)
-                $arrFilelist[$key]["error"] = "file copy error Src:" . $this->buildPath($GLOBALS['syncCto']['path']['tmp'], "sync", $value["path"]) . " | Des: " . $this->buildPath($value["path"]);
+            if (copy(TL_ROOT . $GLOBALS['SYC_PATH']['tmp'] . "sync/" . $value["path"], TL_ROOT . "/" . $value["path"]) == false)
+                $arrFilelist[$key]["error"] = "file copy error Src:" . $this->buildPath($GLOBALS['SYC_PATH']['tmp'], "sync", $value["path"]) . " | Des: " . $this->buildPath($value["path"]);
         }
 
         return $arrFileList;

@@ -15,14 +15,6 @@
  */
  
 /**
- * Package    	Simple HTML Dom
- * Copyright  	S.C. Chen
- * Author		S.C. Chen <me578022@gmail.com>
- * Link			http://sourceforge.net/projects/simplehtmldom/
- * License    	MIT License
- */
- 
-/**
  * Package    	Blowfish
  * Link			www.php-einfach.de
  * License    	Royalty-free

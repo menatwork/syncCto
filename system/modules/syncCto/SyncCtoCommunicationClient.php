@@ -61,7 +61,7 @@ class SyncCtoCommunicationClient extends CtoCommunication
         return self::$instance;
     }
 
-    public function setClient($id)
+    public function setClientBy($id)
     {
         // Load Client from database
         $objClient = $this->Database->prepare("SELECT * FROM tl_synccto_clients WHERE id = %s")
@@ -71,17 +71,95 @@ class SyncCtoCommunicationClient extends CtoCommunication
         // Check if a client was loaded
         if ($objClient->numRows == 0)
             throw new Exception("Unknown Client.");
-        
-        $strUrl = $objClient->address . ":" . $objClient->port . "/" . $objClient->path;
 
-        parent::setClient($strUrl, $objClient->seckey,  $objClient->codifyengine);
+        $strUrl = $objClient->address . ":" . $objClient->port . "/" . $objClient->path . "/ctoCommunication.php";
+
+        $this->setClient($strUrl, $objClient->codifyengine);
+        $this->setApiKey($objClient->seckey);
+    }
+
+    /* -------------------------------------------------------------------------
+     * Security Function
+     */
+
+    /**
+     * Disable the refferer check on the client
+     * 
+     * @return boolean 
+     */
+    public function refererDisable()
+    {
+        return $this->runServer("CTOCOM_REFERER_DISABLE");
+    }
+
+    /**
+     * Enable the refferer check on the client
+     * 
+     * @return boolean 
+     */
+    public function refererEnable()
+    {
+        return $this->runServer("CTOCOM_REFERER_ENABLE");
+    }
+
+    /* -------------------------------------------------------------------------
+     * Informations
+     */
+
+    /**
+     * Get version from client syncCto
+     *
+     * @return string
+     */
+    public function getVersionSyncCto()
+    {
+        return $this->runServer("SYNCCTO_VERSION");
+    }
+
+    /**
+     * Get version from client contao
+     *
+     * @return string
+     */
+    public function getVersionContao()
+    {
+        return $this->runServer("CONTAO_VERSION");
+    }
+
+    /**
+     * Get version from client contao
+     *
+     * @return string
+     */
+    public function getVersionCtoCommunication()
+    {
+        return $this->runServer("CTOCOM_VERSION");
+    }
+
+    /**
+     * Get parameter from client
+     *
+     * @return array
+     */
+    public function getClientParameter()
+    {
+        return $this->runServer("SYNCCTO_PARAMETER");
+    }
+
+    /* -------------------------------------------------------------------------
+     * File Operations
+     */
+
+    public function purgeTemp()
+    {
+        return $this->runServer("SYNCCTO_PURGETEMP");
     }
 
     /*
      * -------------------------------------------------------------------------
      * -------------------------------------------------------------------------
      * 
-     * RPC FUNCTIONS REQUEST CALL for client 
+     * ALT
      * 
      * -------------------------------------------------------------------------
      * -------------------------------------------------------------------------
@@ -98,43 +176,6 @@ class SyncCtoCommunicationClient extends CtoCommunication
 
         $this->setCodifyEngine(SyncCtoEnum::CODIFY_EMPTY);
         return $this->runServer("RPC_CHECKSUM_CHECK", $arrData);
-    }
-
-    /**
-     * Get version from client
-     *
-     * @return string
-     */
-    public function getClientVersion()
-    {
-        return $this->runServer("RPC_VERSION");
-    }
-
-    /**
-     * Make a game
-     *
-     * @return string
-     */
-    public function makeAGame()
-    {
-        $arrData = array(
-            array(
-                "name" => "RPC_CALC",
-                "value" => rand(0, 5000),
-            ),
-        );
-
-        return $this->runServer("RPC_CALC", $arrData);
-    }
-
-    /**
-     * Get parameter from client
-     *
-     * @return array
-     */
-    public function getClientParameter()
-    {
-        return $this->runServer("RPC_PARAMETER");
     }
 
     /**
@@ -210,11 +251,6 @@ class SyncCtoCommunicationClient extends CtoCommunication
         unset($content);
 
         return $this->runServer("RPC_FILE", $arrData);
-    }
-
-    public function clearClientTempFolder()
-    {
-        return $this->runServer("RPC_CLEAR_TEMP");
     }
 
     public function startSQLImport($filename)
@@ -422,22 +458,6 @@ class SyncCtoCommunicationClient extends CtoCommunication
     public function getClientLocalconfig()
     {
         return $this->runServer("RPC_CONFIG_LOAD");
-    }
-
-    /* -------------------------------------------------------------------------
-     * Security Function
-     */
-
-    public function refererDisable()
-    {
-        $arrResponse = $this->runServer("RPC_REFERER_DISABLE", null, TRUE);
-        return;
-    }
-
-    public function refererEnable()
-    {
-        $arrResponse = $this->runServer("RPC_REFERER_ENABLE", null, TRUE);
-        return;
     }
 
     public function deleteFiles($arrFilelist)

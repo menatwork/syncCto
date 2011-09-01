@@ -49,8 +49,5 @@ $GLOBALS['TL_LANG']['tl_syncCto_settings']['local_blacklist'] = array("localconf
 $GLOBALS['TL_LANG']['tl_syncCto_settings']['table_list'] = array("Not recommended tables", "Here you can define which database tables you do not recommend for the synchronization.");
 $GLOBALS['TL_LANG']['tl_syncCto_settings']['table_hidden'] = array("Hidden tables", "Here you can grant access to one or more database tables for the synchronization.");
 $GLOBALS['TL_LANG']['tl_syncCto_settings']['seckey'] = array("Encryption key", "The key is used for the encrypted data storage.");
-$GLOBALS['TL_LANG']['tl_syncCto_settings']['debug_filelist'] = array("Enable debug mode", "Print information like runtime or synchronized data to the screen.");
-$GLOBALS['TL_LANG']['tl_syncCto_settings']['debug_log'] = array("Enable debug log", "Save the communication between server and client in the debug.txt.");
-$GLOBALS['TL_LANG']['tl_syncCto_settings']['measurement_log'] = array("Enable measurement log", "Save runtime information in the measurement.txt");
-
+$GLOBALS['TL_LANG']['tl_syncCto_settings']['debug_mode'] = array("Enable debug mode", "Print information like runtime or synchronized data to the screen.");
 ?>

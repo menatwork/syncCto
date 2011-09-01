@@ -29,47 +29,35 @@ if (!defined('TL_ROOT'))
  * @license    GNU/LGPL
  * @filesource
  */
-/**
- * Defines
- */
-define("OK", 1);
-define("ERROR", 2);
-define("WORK", 3);
-define("SKIPPED", 4);
 
 class SyncCtoModuleClient extends BackendModule
 {
 
     // Variablen
-    protected $strTemplate = 'be_syncCto_empty';
+    protected $strTemplate = 'be_syncCto_steps';
     protected $objTemplateContent;
     protected $step;
+    protected $clientID;
     // Helper Class
     protected $objSyncCtoDatabase;
     protected $objSyncCtoFiles;
     protected $objSyncCtoCommunicationClient;
     protected $objSyncCtoCallback;
     protected $objSyncCtoHelper;
-    protected $objSyncCtoMeasurement;
-    // Defines step state
-    public static $WORK_OK = 1;
-    public static $WORK_ERROR = 2;
-    public static $WORK_WORK = 3;
-    public static $WORK_SKIPPED = 4;
+    protected $objSyncCtoMeasurement;    
 
     function __construct(DataContainer $objDc = null)
     {
-        $this->import('BackendUser', 'User');
         parent::__construct($objDc);
 
-
+        // Load Helper
         $this->objSyncCtoDatabase = SyncCtoDatabase::getInstance();
         $this->objSyncCtoFiles = SyncCtoFiles::getInstance();
         $this->objSyncCtoCallback = SyncCtoCallback::getInstance();
         $this->objSyncCtoCommunicationClient = SyncCtoCommunicationClient::getInstance();
         $this->objSyncCtoHelper = SyncCtoHelper::getInstance();
-        $this->objSyncCtoMeasurement = SyncCtoMeasurement::getInstance();
 
+        // Load language
         $this->loadLanguageFile('SyncCto');
     }
 
@@ -82,67 +70,17 @@ class SyncCtoModuleClient extends BackendModule
      */
     protected function compile()
     {
-        if ($this->Input->get("do") == "synccto_clients"
-                && strlen($this->Input->get("act")) != 0
-                && strlen($this->Input->get("table")) != 0)
+        // Which table is in use
+        switch ($this->Input->get("table"))
         {
-            // Which table is in use
-            switch ($this->Input->get("table"))
-            {
-                case "tl_syncCto_clients_syncTo":
-                    $this->pageSyncTo();
-                    break;
+            case "tl_syncCto_clients_syncTo":
+                $this->pageSyncTo();
+                break;
 
-                case "tl_syncCto_clients_syncFrom":
-                    $this->pageSyncFrom();
-                    break;
-
-                default:
-                    $this->parseStartPage("Unbekannte Tabelle");
-                    break;
-            }
+            case "tl_syncCto_clients_syncFrom":
+                $this->pageSyncFrom();
+                break;
         }
-        else
-        {
-            $this->parseStartPage();
-        }
-
-        $this->parseTemplate();
-    }
-
-    /**
-     * Show main page of syncCto backup.
-     * 
-     * @param string $message - Error msg.
-     */
-    protected function parseStartPage($message = null)
-    {
-        $this->objTemplateContent = new BackendTemplate('be_syncCto_backup');
-        $this->objTemplateContent->message = $message;
-    }
-
-    /**
-     * Generate the pages
-     */
-    protected function parseTemplate()
-    {
-        $this->objTemplateContent->script = $this->Environment->script;
-        $this->Template->content = $this->objTemplateContent->parse();
-        $this->Template->script = $this->Environment->script;
-    }
-
-    private function parseSyncTo($arrContent)
-    {
-        $this->objTemplateContent->step = $this->step;
-        $this->objTemplateContent->id = (int) $this->Input->get("id");
-        $this->objTemplateContent->content = $arrContent;
-    }
-
-    private function parseSyncFrom($arrContent)
-    {
-        $this->objTemplateContent->step = $this->step;
-        $this->objTemplateContent->id = (int) $this->Input->get("id");
-        $this->objTemplateContent->content = $arrContent;
     }
 
     /* -------------------------------------------------------------------------
@@ -153,36 +91,108 @@ class SyncCtoModuleClient extends BackendModule
     {
         // Build Step
         if ($this->Input->get("step") == "" || $this->Input->get("step") == null)
-        {
-            $this->step = 1;
-        }
+            $this->step = 0;
         else
-        {
             $this->step = intval($this->Input->get("step"));
-        }
-
-        $this->objSyncCtoMeasurement->startMeasurement(__CLASS__, __FUNCTION__, "Step: " . $this->step);
 
         // Load language and template
         $this->loadLanguageFile('tl_syncCto_clients_syncTo');
         $this->loadLanguageFile('syncCto');
-        $this->objTemplateContent = new BackendTemplate('be_syncCto_clients_syncTo');
+        $this->loadLanguageFile('tl_syncCto_steps');
 
         // Set client for communication
         try
         {
-            $this->objSyncCtoCommunicationClient->setClient(intval($this->Input->get("id")));
-            
+            $this->objSyncCtoCommunicationClient->setClientBy(intval($this->Input->get("id")));
         }
         catch (Exception $exc)
         {
-            $this->parseStartPage($exc->getMessage());
-            return;
+            $_SESSION["TL_ERROR"] = array("Could not set client");
+            $this->redirect("contao/main.php?do=synccto_clients");
         }
 
         // Do step x
         switch ($this->step)
         {
+            case 0:
+                // Check sync. typ
+                if (strlen($this->Input->post('sync_type')) != 0)
+                {
+                    if ($this->Input->post('sync_type') == SYNCCTO_FULL || $this->Input->post('sync_type') == SYNCCTO_SMALL)
+                    {
+                        $this->Session->set("syncCto_Typ", $this->Input->post('sync_type'));
+                    }
+                    else
+                    {
+                        $_SESSION["TL_ERROR"] = array($GLOBALS['TL_LANG']['syncCto']['unknown_method']);
+                        $this->redirect("contao/main.php?do=synccto_clients");
+                    }
+                }
+                else
+                {
+                    $this->Session->set("syncCto_Typ", SYNCCTO_SMALL);
+                }
+
+                // Load table lists and merge them
+                if ($this->Input->post("table_list_recommend") != "" || $this->Input->post("table_list_none_recommend") != "")
+                {
+                    if ($this->Input->post("table_list_recommend") != "" && $this->Input->post("table_list_none_recommend") != "")
+                        $arrSyncTables = array_merge($this->Input->post("table_list_recommend"), $this->Input->post("table_list_none_recommend"));
+                    else if ($this->Input->post("table_list_recommend"))
+                        $arrSyncTables = $this->Input->post("table_list_recommend");
+                    else if ($this->Input->post("table_list_none_recommend"))
+                        $arrSyncTables = $this->Input->post("table_list_none_recommend");
+
+                    $this->Session->set("syncCto_SyncTables", $arrSyncTables);
+                }
+                else
+                {
+                    $this->Session->set("syncCto_SyncTables", FALSE);
+                }
+
+                // Files for backup tl_files       
+                if (is_array($this->Input->post('filelist')) && count($this->Input->post('filelist')) != 0)
+                {
+                    $this->Session->set("syncCto_Filelist", $this->Input->post('filelist'));
+                }
+                else
+                {
+                    $this->Session->set("syncCto_Filelist", FALSE);
+                }
+
+                $this->Session->set("syncCto_Start", microtime(true));
+
+                // Step 1
+                $this->Session->set("syncCto_StepPool1", FALSE);
+                // Step 2
+                $this->Session->set("syncCto_StepPool2", FALSE);
+                // Step 3
+                $this->Session->set("syncCto_StepPool3", FALSE);
+                // Step 4
+                $this->Session->set("syncCto_StepPool4", FALSE);
+                // Step 5
+                $this->Session->set("syncCto_StepPool5", FALSE);
+                // Step 6
+                $this->Session->set("syncCto_StepPool6", FALSE);
+
+                $arrContenData = array(
+                    "error" => false,
+                    "error_msg" => "",
+                    "refresh" => true,
+                    "finished" => false,
+                    "step" => 1,
+                    "url" => "contao/main.php?do=synccto_clients&amp;table=tl_syncCto_clients_syncTo&amp;act=start&amp;id=" . (int) $this->Input->get("id"),
+                    "goBack" => "contao/main.php?do=synccto_clients",
+                    "start" => microtime(true),
+                    "headline" => $GLOBALS['TL_LANG']['tl_syncCto_clients_syncTo']['edit'],
+                    "information" => "",
+                    "data" => array()
+                );
+
+                $this->Session->set("syncCto_Content", $arrContenData);
+
+                $this->step++;
+
             case 1:
                 $this->Database->prepare("UPDATE `tl_synccto_clients` %s WHERE `tl_synccto_clients`.`id` = ?")
                         ->set(array("syncTo_user" => $this->User->id, "syncTo_tstamp" => time()))
@@ -212,1544 +222,180 @@ class SyncCtoModuleClient extends BackendModule
                 break;
 
             default:
-                $this->parseStartPage("Unbekannter Schritt für Backup.");
-                $this->objSyncCtoMeasurement->stopMeasurement(__CLASS__, __FUNCTION__);
-                return;
-                break;
-        }
-
-        $this->objSyncCtoMeasurement->stopMeasurement(__CLASS__, __FUNCTION__);
-    }
-
-    private function pageSyncFrom()
-    {
-        // Build Step
-        if ($this->Input->get("step") == "" || $this->Input->get("step") == null)
-        {
-            $this->step = 1;
-        }
-        else
-        {
-            $this->step = intval($this->Input->get("step"));
-        }
-
-        // Load language and template
-        $this->loadLanguageFile('tl_syncCto_clients_syncFrom');
-        $this->objTemplateContent = new BackendTemplate('be_syncCto_clients_syncFrom');
-
-        // Set client for communication
-        try
-        {
-            $this->objSyncCtoCommunicationClient->setClient(intval($this->Input->get("id")));
-        }
-        catch (Exception $exc)
-        {
-            $this->parseStartPage($exc->getMessage());
-            return;
-        }
-
-        // Do step x
-        switch ($this->step)
-        {
-            case 1:
-                $this->pageSyncFromShowStep1();
-                break;
-
-            case 2:
-                $this->pageSyncFromShowStep2();
-                break;
-
-            case 3:
-                $this->pageSyncFromShowStep3();
-                break;
-
-            case 4:
-                $this->pageSyncFromShowStep4();
-                break;
-
-            case 5:
-                $this->pageSyncFromShowStep5();
-                break;
-
-            case 6:
-                $this->pageSyncFromShowStep6();
-                break;
-
-            default:
-                $this->parseStartPage("Unbekannter Schritt für Backup.");
-                return;
+                $_SESSION["TL_ERROR"] = array("Unbekannter Schritt für Backup.");
+                $this->redirect("contao/main.php?do=synccto_clients");
                 break;
         }
     }
-
-    /* -------------------------------------------------------------------------
-     * Start SyncCto Sync. From
-     */
-
-    private function pageSyncFromShowStep1()
-    {
-        $this->log(vsprintf("Start synchronization server from client ID %s.", array($this->Input->get("id"))), __CLASS__ . " " . __FUNCTION__, "INFO");
-
-        @set_time_limit(60);
-
-        /* ---------------------------------------------------------------------
-         * POST data validate and session save
-         */
-
-        // Check sync. typ
-        if (strlen($this->Input->post('sync_type')) != 0)
-        {
-            if ($this->Input->post('sync_type') == SYNCCTO_FULL || $this->Input->post('sync_type') == SYNCCTO_SMALL)
-            {
-                $this->Session->set("syncCto_Typ", $this->Input->post('sync_type'));
-            }
-            else
-            {
-                $this->parseStartPage($GLOBALS['TL_LANG']['syncCto']['unknown_method']);
-                return;
-            }
-        }
-        else
-        {
-            $this->Session->set("syncCto_Typ", SYNCCTO_SMALL);
-        }
-
-        // Load table lists and merge them
-        if ($this->Input->post("table_list_recommend") != "" || $this->Input->post("table_list_none_recommend") != "")
-        {
-            if ($this->Input->post("table_list_recommend") != "" && $this->Input->post("table_list_none_recommend") != "")
-                $arrSyncTables = array_merge($this->Input->post("table_list_recommend"), $this->Input->post("table_list_none_recommend"));
-            else if ($this->Input->post("table_list_recommend"))
-                $arrSyncTables = $this->Input->post("table_list_recommend");
-            else if ($this->Input->post("table_list_none_recommend"))
-                $arrSyncTables = $this->Input->post("table_list_none_recommend");
-
-            $this->Session->set("syncCto_SyncTables", serialize($arrSyncTables));
-        }
-        else
-        {
-            $this->Session->set("syncCto_SyncTables", FALSE);
-        }
-
-        // Files for backup tl_files       
-        if (is_array($this->Input->post('filelist')) && count($this->Input->post('filelist')) != 0)
-        {
-            $this->Session->set("syncCto_Filelist", serialize($this->Input->post('filelist')));
-        }
-        else
-        {
-            $this->Session->set("syncCto_Filelist", FALSE);
-        }
-
-        $this->Session->set("syncCto_Start", microtime(true));
-
-        /* ---------------------------------------------------------------------
-         * None form data
-         */
-
-        $this->Session->set("syncCto_FileCount", 0);
-        $this->Session->set("syncCto_FileSkipped", FALSE);
-        $this->Session->set("syncCto_SplitFiles", FALSE);
-        $this->Session->set("syncCto_SyncFiles", FALSE);
-
-        /* ---------------------------------------------------------------------
-         * Step Session 
-         */
-
-        // Step 2
-        $this->Session->set("syncCto_StepPool2", FALSE);
-        // Step 3
-        $this->Session->set("syncCto_StepPool3", FALSE);
-        // Step 4
-        $this->Session->set("syncCto_StepPool4", FALSE);
-        // Step 5
-        $this->Session->set("syncCto_StepPool5", FALSE);
-        // Step 6
-        $this->Session->set("syncCto_StepPool6", FALSE);
-
-        /* ---------------------------------------------------------------------
-         * Build page
-         */
-
-        $this->parseSyncFrom($this->saveContent(array(), array(
-                    1 => array(
-                        "step" => $this->step,
-                        "state" => WORK,
-                        "msg" => "",
-                        "error" => "",
-                        "refresh" => TRUE,
-                        "desc" => $GLOBALS['TL_LANG']['tl_syncCto_clients_syncTo']['step1_help']
-                    ),
-                ))
-        );
-    }
-
-    /**
-     * Check client communication
-     */
-    private function pageSyncFromShowStep2()
-    {
-        set_time_limit(60);
-
-        // State save for this step
-        $mixStepPool2 = $this->Session->get("syncCto_StepPool2");
-
-        if ($mixStepPool2 == FALSE)
-            $mixStepPool2 = array("step" => 1);
-        else
-            $mixStepPool2 = deserialize($mixStepPool2);
-
-        $arrContent = $this->loadContent();
-
-        try
-        {
-            switch ($mixStepPool2["step"])
-            {
-                case 1:
-                    $mixStepPool2["step"] = 2;
-                    $this->Session->set("syncCto_StepPool2", serialize($mixStepPool2));
-
-                    $arrContent[$this->step - 1]["state"] = WORK;
-                    $arrContent[$this->step - 1]["msg"] = $GLOBALS['TL_LANG']['tl_syncCto_clients_syncTo']['step1_msg1'];
-
-                    $this->step--;
-
-                    break;
-
-                case 2:
-                    // Referer check deactivate
-                    $this->objSyncCtoCommunicationClient->refererDisable();
-
-                    $mixStepPool2["step"] = 3;
-                    $this->Session->set("syncCto_StepPool2", serialize($mixStepPool2));
-
-                    $arrContent[$this->step - 1]["state"] = WORK;
-                    $arrContent[$this->step - 1]["msg"] = $GLOBALS['TL_LANG']['tl_syncCto_clients_syncTo']['step1_msg1'];
-
-                    $this->step--;
-
-                    break;
-
-                case 3:
-                    // Check magical number
-                    $intMagicNumber = $this->objSyncCtoCommunicationClient->makeAGame();
-
-                    $mixStepPool2["step"] = 4;
-                    $this->Session->set("syncCto_StepPool2", serialize($mixStepPool2));
-
-                    $arrContent[$this->step - 1]["state"] = WORK;
-                    $arrContent[$this->step - 1]["msg"] = $GLOBALS['TL_LANG']['tl_syncCto_clients_syncTo']['step1_msg1'];
-
-                    $this->step--;
-
-                    break;
-
-                case 4:
-                    // Check version
-                    $strVersion = $this->objSyncCtoCommunicationClient->getClientVersion();
-                    if ($strVersion != SYNCCTO_GET_VERSION)
-                    {
-                        $this->log(vsprintf("Not the same version on synchronization client ID %s. Serverversion: %s. Clientversion: %s", array($this->Input->get("id"), SYNCCTO_GET_VERSION, $strVersion)), __CLASS__ . " " . __FUNCTION__, "INFO");
-
-                        $arrContent[$this->step - 1]["state"] = ERROR;
-                        $arrContent[$this->step - 1]["error"] = $GLOBALS['TL_LANG']['tl_syncCto_clients_syncTo']['step1_msg2'];
-                        $arrContent[$this->step - 1]["refresh"] = false;
-
-                        $this->parseSyncTo($this->saveContent($arrContent));
-                        return;
-                    }
-
-                    $mixStepPool2["step"] = 5;
-                    $this->Session->set("syncCto_StepPool2", serialize($mixStepPool2));
-
-                    $arrContent[$this->step - 1]["state"] = WORK;
-                    $arrContent[$this->step - 1]["msg"] = $GLOBALS['TL_LANG']['tl_syncCto_clients_syncTo']['step1_msg1'];
-
-                    $this->step--;
-
-                    break;
-
-                case 5:
-                    // Cleare client temp folder   
-                    $this->objSyncCtoCommunicationClient->clearClientTempFolder();
-
-                    $mixStepPool2["step"] = 6;
-                    $this->Session->set("syncCto_StepPool2", serialize($mixStepPool2));
-
-                    $arrContent[$this->step - 1]["state"] = WORK;
-                    $arrContent[$this->step - 1]["msg"] = $GLOBALS['TL_LANG']['tl_syncCto_clients_syncTo']['step1_msg1'];
-
-                    $this->step--;
-
-                    break;
-
-                case 6:
-                    // Clear Temp Folder
-                    $this->objSyncCtoFiles->purgeTemp();
-
-                    $arrContent[$this->step - 1]["state"] = OK;
-                    $arrContent[$this->step - 1]["msg"] = "";
-                    $arrContent[] = array(
-                        "step" => $this->step,
-                        "state" => WORK,
-                        "msg" => "",
-                        "error" => "",
-                        "refresh" => true,
-                        "desc" => $GLOBALS['TL_LANG']['tl_syncCto_clients_syncTo']['step2_help']
-                    );
-
-                    break;
-            }
-        }
-        catch (Exception $exc)
-        {
-            $this->log(vsprintf("Error on synchronization client ID %s", array($this->Input->get("id"))), __CLASS__ . " " . __FUNCTION__, "ERROR");
-
-            $arrContent[$this->step - 1]["state"] = ERROR;
-            $arrContent[$this->step - 1]["error"] = $exc->getMessage();
-            $arrContent[$this->step - 1]["refresh"] = FALSE;
-        }
-
-        $this->parseSyncTo($this->saveContent($arrContent));
-    }
-
-    /**
-     * Build checksumlist and ask client
-     */
-    private function pageSyncFromShowStep3()
-    {
-        /* ---------------------------------------------------------------------
-         * Init
-         */
-
-        // Time out 
-        @set_time_limit(60);
-
-        // State save for this step
-        $mixStepPool3 = $this->Session->get("syncCto_StepPool3");
-
-        if ($mixStepPool3 == FALSE)
-            $mixStepPool3 = array("step" => 1);
-        else
-            $mixStepPool3 = deserialize($mixStepPool3);
-
-        // Needed files/information
-        $mixFilelist = $this->Session->get("syncCto_Filelist");
-        $intSyncTyp = $this->Session->get("syncCto_Typ");
-
-        // Content data for page
-        $arrContent = $this->loadContent();
-
-        /* ---------------------------------------------------------------------
-         * Run page
-         */
-
-        try
-        {
-            switch ($mixStepPool3["step"])
-            {
-                case 1:
-                    if ($intSyncTyp == SYNCCTO_FULL)
-                    {
-                        $mixStepPool3["core_checksum"] = $this->objSyncCtoCommunicationClient->getChecksumCore();
-                        $mixStepPool3["step"] = 2;
-                        $this->Session->set("syncCto_StepPool3", serialize($mixStepPool3));
-
-                        $arrContent[$this->step - 1]["state"] = WORK;
-                        $arrContent[$this->step - 1]["msg"] = "Have Corefile List. Next TL Files.";
-
-                        $this->step--;
-
-                        break;
-                    }
-                    else
-                    {
-                        $mixStepPool3["core_checksum"] = array();
-                        $mixStepPool3["step"] = 2;
-                    }
-
-                case 2:
-                    $mixStepPool3["tlfiles_checksum"] = $this->objSyncCtoCommunicationClient->getChecksumTlfiles();
-
-                    $mixStepPool3["step"] = 3;
-                    $this->Session->set("syncCto_StepPool3", serialize($mixStepPool3));
-
-                    $arrContent[$this->step - 1]["state"] = WORK;
-                    $arrContent[$this->step - 1]["msg"] = "Have TL FileList. Next check it.";
-
-                    $this->step--;
-
-                    break;
-
-                case 3:
-                    $arrChecksum = array_merge($mixStepPool3["tlfiles_checksum"], $mixStepPool3["core_checksum"]);
-
-                    unset($mixStepPool3["tlfiles_checksum"]);
-                    unset($mixStepPool3["core_checksum"]);
-                    $mixStepPool3["checksum"] = $arrChecksum;
-
-                    $mixStepPool3["sync_list"] = $this->objSyncCtoFiles->runCecksum($arrChecksum);
-                    $mixStepPool3["step"] = 4;
-                    $this->Session->set("syncCto_StepPool3", serialize($mixStepPool3));
-
-                    $arrContent[$this->step - 1]["state"] = WORK;
-                    $arrContent[$this->step - 1]["msg"] = "Build list. Pleas wait analyze it.";
-
-                    $this->step--;
-
-                    break;
-
-                case 4:
-                    // Save list
-                    $arrSyncFileList = $mixStepPool3["sync_list"];
-                    $arrChecksum = $mixStepPool3["checksum"];
-
-                    // Counter
-                    $intCountMissing = 0;
-                    $intCountNeed = 0;
-                    $intTotalSize = 0;
-
-                    // Count files
-                    foreach ($arrSyncFileList as $key => $value)
-                    {
-                        if ($value['state'] == FILE_MISSING)
-                            $intCountMissing++;
-
-                        if ($value['state'] == FILE_NEED)
-                            $intCountNeed++;
-
-                        $intTotalSize += $arrChecksum[$key]["size"];
-
-                        $arrSyncFileList[$key]["checksum"] = $arrChecksum[$key]["checksum"];
-                        $arrSyncFileList[$key]["size"] = $arrChecksum[$key]["size"];
-                    }
-
-                    $mixStepPool3["missing"] = $intCountMissing;
-                    $mixStepPool3["need"] = $intCountNeed;
-
-                    // Save files
-                    if ($intCountMissing == 0 && $intCountNeed == 0)
-                    {
-                        $this->Session->set("syncCto_SyncFiles", false);
-
-                        $arrContent[$this->step - 1]["state"] = OK;
-                        $arrContent[$this->step - 1]["msg"] = vsprintf("We have %s missing and %s needing files.", array($mixStepPool3["missing"], $mixStepPool3["need"]));
-                        $arrContent[] = array(
-                            "step" => $this->step,
-                            "state" => WORK,
-                            "msg" => "",
-                            "error" => "",
-                            "refresh" => true,
-                            "desc" => "Build and send SQL and import it."
-                        );
-
-                        $this->Session->set("syncCto_StepPool3", FALSE);
-
-                        break;
-                    }
-                    else
-                    {
-                        $this->Session->set("syncCto_SyncFiles", serialize($arrSyncFileList));
-                    }
-
-                    $objTemp = new BackendTemplate("be_syncCto_clients_filelist");
-                    $objTemp->filelist = $arrSyncFileList;
-                    $objTemp->id = $this->Input->get("id");
-                    $objTemp->step = $this->step;
-                    $objTemp->totalsize = $intTotalSize;
-                    $objTemp->direction = "From";
-
-                    // Build content
-                    $arrContent[$this->step - 1]["state"] = WORK;
-                    $arrContent[$this->step - 1]["msg"] = vsprintf("We have %s missing and %s needing files. %s ", array($intCountMissing, $intCountNeed, $objTemp->parse()));
-                    $arrContent[$this->step - 1]["refresh"] = false;
-
-                    $this->step--;
-
-                    $mixStepPool3["step"] = 5;
-                    $this->Session->set("syncCto_StepPool3", serialize($mixStepPool3));
-
-                    break;
-
-                case 5:
-
-                    $arrContent[$this->step - 1]["state"] = OK;
-                    $arrContent[$this->step - 1]["msg"] = vsprintf("We have %s missing and %s needing files.", array($mixStepPool3["missing"], $mixStepPool3["need"]));
-                    $arrContent[] = array(
-                        "step" => $this->step,
-                        "state" => WORK,
-                        "msg" => "",
-                        "error" => "",
-                        "refresh" => true,
-                        "desc" => "Build and send SQL and import it."
-                    );
-
-                    $this->Session->set("syncCto_StepPool3", FALSE);
-            }
-        }
-        catch (Exception $exc)
-        {
-            $arrContent[$this->step - 1]["state"] = ERROR;
-            $arrContent[$this->step - 1]["error"] = $exc->getMessage();
-            $arrContent[$this->step - 1]["refresh"] = FALSE;
-        }
-
-
-        $this->parseSyncTo($this->saveContent($arrContent));
-    }
-
-    /**
-     * Build SQL Zip and Send it to client
-     */
-    private function pageSyncFromShowStep4()
-    {
-        /* ---------------------------------------------------------------------
-         * Init
-         */
-
-        // Time out 
-        @set_time_limit(60);
-
-        // State save for this step
-        $mixStepPool4 = $this->Session->get("syncCto_StepPool4");
-
-        if ($mixStepPool4 == FALSE)
-            $mixStepPool4 = array("step" => 1);
-        else
-            $mixStepPool4 = deserialize($mixStepPool4);
-
-        $mixSyncTable = $this->Session->get("syncCto_SyncTables");
-
-        $arrContent = $this->loadContent();
-
-        // Check if there is a filelist
-        if ($mixSyncTable == FALSE)
-        {
-            $arrContent[$this->step - 1]["state"] = SKIPPED;
-            $arrContent[] = array(
-                "step" => $this->step,
-                "state" => WORK,
-                "msg" => "",
-                "error" => "",
-                "refresh" => true,
-                "desc" => "Send BIG Files."
-            );
-        }
-        else
-        {
-            try
-            {
-                $mixSyncTable = deserialize($mixSyncTable);
-                $intStart = time();
-
-                switch ($mixStepPool4["step"])
-                {
-                    case 1:
-                        $arrZip = $this->objSyncCtoCommunicationClient->runClientSQLZip();
-
-                        $mixStepPool4["zip"] = $arrZip;
-                        $mixStepPool4["step"] = 2;
-                        $this->Session->set("syncCto_StepPool4", serialize($mixStepPool4));
-
-                        $arrContent[$this->step - 1]["state"] = WORK;
-                        $arrContent[$this->step - 1]["msg"] = "Create Zip. Save Database next from client.";
-
-                        $this->step--;
-
-                        break;
-
-                    case 2:
-                        if ($this->objSyncCtoCommunicationClient->runClientSQLScript($mixStepPool4["zip"]["name"], $mixSyncTable))
-                        {
-                            $mixStepPool4["step"] = 3;
-                            $this->Session->set("syncCto_StepPool4", serialize($mixStepPool4));
-
-                            $arrContent[$this->step - 1]["state"] = WORK;
-                            $arrContent[$this->step - 1]["msg"] = "Save SQL Script. Next Sync Script.";
-                        }
-                        else
-                        {
-                            $mixStepPool4["step"] = 2;
-                            $this->Session->set("syncCto_StepPool4", serialize($mixStepPool4));
-
-                            $arrContent[$this->step - 1]["state"] = WORK;
-                            $arrContent[$this->step - 1]["msg"] = "Save SQL Script.";
-                            $arrContent[$this->step - 1]["error"] = "Error by saving. Try again.";
-                            $arrContent[$this->step - 1]["refresh"] = false;
-                        }
-
-                        $this->step--;
-                        break;
-
-                    case 3:
-                        if ($this->objSyncCtoCommunicationClient->runClientSQLSyncscript($mixStepPool4["zip"]["name"], $mixSyncTable))
-                        {
-                            $mixStepPool4["step"] = 4;
-                            $this->Session->set("syncCto_StepPool4", serialize($mixStepPool4));
-
-                            $arrContent[$this->step - 1]["state"] = WORK;
-                            $arrContent[$this->step - 1]["msg"] = "Save Sync Script. Next check Zip.";
-                        }
-                        else
-                        {
-                            $mixStepPool4["step"] = 3;
-                            $this->Session->set("syncCto_StepPool4", serialize($mixStepPool4));
-
-                            $arrContent[$this->step - 1]["state"] = WORK;
-                            $arrContent[$this->step - 1]["msg"] = "Save Sync Script.";
-                            $arrContent[$this->step - 1]["error"] = "Error by saving. Try again.";
-                            $arrContent[$this->step - 1]["refresh"] = false;
-                        }
-
-                        $this->step--;
-                        break;
-
-                    case 4:
-                        if ($this->objSyncCtoCommunicationClient->runClientSQLCheck($mixStepPool4["zip"]['name']))
-                        {
-                            $mixStepPool4["step"] = 5;
-                            $this->Session->set("syncCto_StepPool4", serialize($mixStepPool4));
-
-                            $arrContent[$this->step - 1]["state"] = WORK;
-                            $arrContent[$this->step - 1]["msg"] = "Zip seems to be okay. Next, get it.";
-                        }
-                        else
-                        {
-                            $mixStepPool4["step"] = 4;
-                            $this->Session->set("syncCto_StepPool4", serialize($mixStepPool4));
-
-                            $arrContent[$this->step - 1]["state"] = WORK;
-                            $arrContent[$this->step - 1]["msg"] = "Zip Check.";
-                            $arrContent[$this->step - 1]["error"] = "Error by checking the zip. Try again.";
-                            $arrContent[$this->step - 1]["refresh"] = false;
-                        }
-
-                        $this->step--;
-                        break;
-
-                    case 5:
-                        $this->objSyncCtoCommunicationClient->getFile($GLOBALS['syncCto']['path']['tmp'] . $mixStepPool4["zip"]['name'], $GLOBALS['syncCto']['path']['tmp'] . "sql/" . $mixStepPool4["zip"]['name']);
-
-                        $mixStepPool4["step"] = 6;
-                        $this->Session->set("syncCto_StepPool4", serialize($mixStepPool4));
-
-                        $arrContent[$this->step - 1]["state"] = WORK;
-                        $arrContent[$this->step - 1]["msg"] = "Have File. Next make Backup.";
-
-                        $this->step--;
-
-                        break;
-
-                    case 6:
-                        $arrZip = $this->objSyncCtoDatabase->runCreateZip();
-                        sleep(1);
-                        $this->objSyncCtoDatabase->runDumpSQL($this->Database->listTables(), $arrZip["name"]);
-                        sleep(1);
-                        $this->objSyncCtoDatabase->runDumpInsert($this->Database->listTables(), $arrZip["name"]);
-
-                        $mixStepPool4["step"] = 7;
-                        $this->Session->set("syncCto_StepPool4", serialize($mixStepPool4));
-
-                        $arrContent[$this->step - 1]["state"] = WORK;
-                        $arrContent[$this->step - 1]["msg"] = "Make Backup. Now start Import.";
-
-                        $this->step--;
-
-                        break;
-
-                    case 7:
-                        $this->objSyncCtoDatabase->runRestore($GLOBALS['syncCto']['path']['tmp'] . "sql/" . $mixStepPool4["zip"]['name']);
-
-                        $arrContent[$this->step - 1]["state"] = OK;
-                        $arrContent[$this->step - 1]["msg"] = vsprintf("Send file %s with SQL scripten to client.", array($mixStepPool4["zip"]['name']));
-                        $arrContent[] = array(
-                            "step" => $this->step,
-                            "state" => WORK,
-                            "msg" => "",
-                            "error" => "",
-                            "refresh" => true,
-                            "desc" => "Send BIG Files."
-                        );
-
-                        $this->Session->set("syncCto_StepPool4", FALSE);
-                }
-            }
-            catch (Exception $exc)
-            {
-                $arrContent[$this->step - 1]["state"] = ERROR;
-                $arrContent[$this->step - 1]["error"] = $exc->getMessage();
-                $arrContent[$this->step - 1]["refresh"] = FALSE;
-            }
-        }
-
-        $this->parseSyncTo($this->saveContent($arrContent));
-    }
-
-    /**
-     * Split Files
-     */
-    private function pageSyncFromShowStep5()
-    {
-        /* ---------------------------------------------------------------------
-         * Init
-         */
-
-        // Time out 
-        @set_time_limit(60);
-
-        // State save for this step
-        $mixStepPool5 = $this->Session->get("syncCto_StepPool5");
-
-        if ($mixStepPool5 == FALSE)
-            $mixStepPool5 = array("step" => 1);
-        else
-            $mixStepPool5 = deserialize($mixStepPool5);
-
-        $arrSplitFiles = $this->Session->get("syncCto_SplitFiles");
-
-        if ($arrSplitFiles == false)
-            $arrSplitFiles = array();
-        else
-            $arrSplitFiles = deserialize($arrSplitFiles);
-
-        $mixSyncFiles = $this->Session->get("syncCto_SyncFiles");
-
-        $arrContent = $this->loadContent();
-
-        // Check if there is any file for upload
-        if ($mixSyncFiles == false)
-        {
-            $arrContent[$this->step - 1]["state"] = SKIPPED;
-            $arrContent[] = array(
-                "step" => $this->step,
-                "state" => WORK,
-                "msg" => "",
-                "error" => "",
-                "refresh" => true,
-                "desc" => "Send normal files to server."
-            );
-        }
-        else
-        {
-            try
-            {
-                // Load sync list
-                $mixSyncFiles = deserialize($mixSyncFiles);
-
-                // Timer 
-                $intStar = time();
-
-                switch ($mixStepPool5["step"])
-                {
-                    case 1:
-                        // Load parameter from client
-                        $arrClientParameter = $this->objSyncCtoCommunicationClient->getClientParameter();
-
-                        // Check if there is a file whih is too big                        
-                        $intClientMemoryLimit = intval(str_replace("M", "000000", $arrClientParameter['memory_limit']));
-                        $intLocalMemoryLimit = intval(str_replace("M", "000000", ini_get('memory_limit')));
-
-                        // Check if memory limit on server is enoug for upload  
-                        $intLimit = min($intClientMemoryLimit, $intLocalMemoryLimit);
-
-                        //ToDo Prozentzahlen neu setzen.
-                        if ($intLimit > 1000000000)
-                            $intPercent = 45;
-                        else if ($intLimit > 500000000)
-                            $intPercent = 45;
-                        else if ($intLimit > 100000000)
-                            $intPercent = 45;
-                        else if ($intLimit > 50000000)
-                            $intPercent = 45;
-                        else
-                            $intPercent = 45;
-
-                        $intLimit = $intLimit / 100 * $intPercent;
-
-                        $mixStepPool5["limit"] = $intLimit;
-                        $mixStepPool5["percent"] = $intPercent;
-                        $mixStepPool5["step"] = 2;
-                        $this->Session->set("syncCto_StepPool5", serialize($mixStepPool5));
-
-                        $arrContent[$this->step - 1]["state"] = WORK;
-                        $arrContent[$this->step - 1]["msg"] = "Search files which are too big.";
-
-                        $this->step--;
-
-                        break;
-
-                    case 2:
-                        foreach ($mixSyncFiles as $key => $value)
-                        {
-                            if ($value["size"] > $mixStepPool5["limit"])
-                                $arrSplitFiles[] = $key;
-                        }
-
-                        $arrSplitFiles = array_unique($arrSplitFiles);
-
-                        // Skip page if no big file is found
-                        if (count($arrSplitFiles) == 0)
-                        {
-                            $arrContent[$this->step - 1]["state"] = SKIPPED;
-                            $arrContent[$this->step - 1]["msg"] = "No too big files found.";
-                            $arrContent[] = array(
-                                "step" => $this->step,
-                                "state" => WORK,
-                                "msg" => "",
-                                "error" => "",
-                                "refresh" => true,
-                                "desc" => "Send normal files to server."
-                            );
-
-                            $this->Session->set("syncCto_StepPool5", FALSE);
-
-                            break;
-                        }
-                        else
-                        {
-                            $arrTempList = array();
-                            $intTotalsize = 0;
-
-                            foreach ($arrSplitFiles as $value)
-                            {
-                                $arrTempList[$value] = $mixSyncFiles[$value];
-                                $intTotalsize += $mixSyncFiles[$value]["size"];
-                            }
-
-                            $mixStepPool5["step"] = 3;
-                            $mixStepPool5["splitfiles"] = $arrSplitFiles;
-                            $mixStepPool5["splitfiles_count"] = 0;
-                            $mixStepPool5["splitfiles_send"] = 0;
-                            $this->Session->set("syncCto_StepPool5", serialize($mixStepPool5));
-                            $this->Session->set("syncCto_SplitFiles", serialize($arrSplitFiles));
-
-                            $objTemp = new BackendTemplate("be_syncCto_clients_filelist");
-                            $objTemp->filelist = $arrTempList;
-                            $objTemp->id = $this->Input->get("id");
-                            $objTemp->step = $this->step;
-                            $objTemp->direction = "From";
-                            $objTemp->totalsize = $intTotalsize;
-
-                            $arrContent[$this->step - 1]["state"] = WORK;
-                            $arrContent[$this->step - 1]["msg"] = vsprintf("Next split %s files. %s", array(count($arrSplitFiles)));
-                            $arrContent[$this->step - 1]["refresh"] = FALSE;
-                            $arrContent[$this->step - 1]["compare"] = $objTemp->parse();
-
-                            $this->step--;
-
-                            break;
-                        }
-                        break;
-
-                    case 3:
-                        $i = 0;
-
-                        // Split files
-                        foreach ($mixStepPool5["splitfiles"] as $value)
-                        {
-                            if ($mixStepPool5["splitfiles_count"] == count($mixStepPool5["splitfiles"]))
-                                break;
-
-                            if ($i < $mixStepPool5["splitfiles_count"])
-                                continue;
-
-                            $intSplits = $this->objSyncCtoCommunicationClient->runClientFileSplit($mixSyncFiles[$value]["path"], $GLOBALS['syncCto']['path']['tmp'] . $value, $value, ($mixStepPool5["limit"] / 100 * $mixStepPool5["percent"]));
-
-                            $mixSyncFiles[$value]["split"] = true;
-                            $mixSyncFiles[$value]["splitcount"] = $intSplits;
-                            $mixSyncFiles[$value]["splitname"] = $value;
-
-                            $i++;
-
-                            $mixStepPool5["step"] = 3;
-                            $mixStepPool5["splitfiles_count"] = $i;
-                            $this->Session->set("syncCto_StepPool5", serialize($mixStepPool5));
-
-                            $arrContent[$this->step - 1]["state"] = WORK;
-                            $arrContent[$this->step - 1]["msg"] = "We have split " . $i . " from " . count($arrSplitFiles) . " files.";
-                            $arrContent[$this->step - 1]["refresh"] = true;
-
-                            $this->Session->set("syncCto_SyncFiles", serialize($mixSyncFiles));
-                            $this->Session->set("syncCto_SplitFiles", serialize($arrSplitFiles));
-
-                            $this->step--;
-
-                            $this->parseSyncTo($this->saveContent($arrContent));
-                            return;
-                        }
-
-                        $mixStepPool5["step"] = 4;
-                        $mixStepPool5["splitfiles_count"] = $i;
-                        $this->Session->set("syncCto_StepPool5", serialize($mixStepPool5));
-                        $this->Session->set("syncCto_SyncFiles", serialize($mixSyncFiles));
-                        $this->Session->set("syncCto_SplitFiles", serialize($arrSplitFiles));
-
-                        $arrContent[$this->step - 1]["state"] = WORK;
-                        $arrContent[$this->step - 1]["msg"] = "We have split " . $mixStepPool5["splitfiles_count"] . " from " . count($arrSplitFiles) . " files. Next get them.";
-                        $arrContent[$this->step - 1]["refresh"] = true;
-
-                        $this->step--;
-
-                        break;
-
-                    case 4:
-                        $i = 0;
-
-                        // Send bigfiles 
-                        foreach ($mixStepPool5["splitfiles"] as $value)
-                        {
-                            if ($mixStepPool5["splitfiles_send"] == count($mixStepPool5["splitfiles"]))
-                                break;
-
-                            if ($i < $mixStepPool5["splitfiles_send"])
-                                continue;
-
-                            for ($ii = 0; $ii < $mixSyncFiles[$value]["splitcount"]; $ii++)
-                            {
-                                $strPath = $GLOBALS['syncCto']['path']['tmp'] . $mixSyncFiles[$value]["splitname"] . "/" . $mixSyncFiles[$value]["splitname"] . ".sync" . $i;
-                                //$this->objSyncCtoCommunication->getFile($strPath, $strPath);
-                            }
-
-                            //$this->objSyncCtoCommunication->buildSingleFile($mixSyncFiles[$value]["splitname"], $mixSyncFiles[$value]["splitcount"], $mixSyncFiles[$value]["path"], $mixSyncFiles[$value]["checksum"]);
-
-                            $i++;
-                            $mixStepPool5["splitfiles_send"] = $i;
-
-                            if ($intStar < time() - 15)
-                            {
-                                $mixStepPool5["step"] = 4;
-                                $this->Session->set("syncCto_StepPool5", serialize($mixStepPool5));
-
-                                $arrContent[$this->step - 1]["state"] = WORK;
-                                $arrContent[$this->step - 1]["msg"] = "Send " . $i . " from " . count($arrSplitFiles) . " files.";
-
-                                $this->Session->set("syncCto_SyncFiles", serialize($mixSyncFiles));
-                                $this->Session->set("syncCto_SplitFiles", serialize($arrSplitFiles));
-
-                                $this->step--;
-
-                                $this->parseSyncTo($this->saveContent($arrContent));
-                                return;
-                            }
-                        }
-
-                        $arrContent[$this->step - 1]["state"] = OK;
-                        $arrContent[$this->step - 1]["msg"] = "We have finished send file " . $mixStepPool5["splitfiles_send"] . " of " . count($arrSplitFiles) . " of big files.";
-                        $arrContent[] = array(
-                            "step" => $this->step,
-                            "state" => WORK,
-                            "msg" => "",
-                            "error" => "",
-                            "refresh" => true,
-                            "desc" => "Send normal files to server."
-                        );
-
-                        $this->Session->set("syncCto_StepPool5", FALSE);
-                }
-            }
-            catch (Exception $exc)
-            {
-                $arrContent[$this->step - 1]["state"] = ERROR;
-                $arrContent[$this->step - 1]["error"] = $exc->getMessage();
-                $arrContent[$this->step - 1]["refresh"] = FALSE;
-            }
-        }
-
-        $this->parseSyncTo($this->saveContent($arrContent));
-    }
-
-    /**
-     * File send part have fun, much todo here so let`s play a round :P
-     */
-    private function pageSyncFromShowStep6()
-    {
-        /* ---------------------------------------------------------------------
-         * Init
-         */
-
-        // Time out 
-        @set_time_limit(60);
-
-        // State save for this step
-        $mixStepPool6 = $this->Session->get("syncCto_StepPool6");
-
-        if ($mixStepPool6 == FALSE)
-            $mixStepPool6 = array("step" => 1);
-        else
-            $mixStepPool6 = deserialize($mixStepPool6);
-
-        $arrSplitFiles = $this->Session->get("syncCto_SplitFiles");
-
-        if ($arrSplitFiles == false)
-            $arrSplitFiles = array();
-        else
-            $arrSplitFiles = deserialize($arrSplitFiles);
-
-        $mixSyncFiles = $this->Session->get("syncCto_SyncFiles");
-
-        $arrContent = $this->loadContent();
-
-        /* ---------------------------------------------------------------------
-         * RUN
-         */
-        // Check if there is any file for upload
-        if ($mixSyncFiles == false)
-        {
-            $arrContent[$this->step - 1]["state"] = SKIPPED;
-            $arrContent[$this->step - 1]["refresh"] = false;
-
-            $this->parseSyncTo($this->saveContent($arrContent));
-            return;
-        }
-
-        $mixSyncFiles = deserialize($mixSyncFiles);
-
-        if (count($mixSyncFiles) == count($arrSplitFiles))
-        {
-//            try
-//            {
-//                $arrResponse = $this->objSyncCtoCommunication->startFileImport($mixSyncFiles);
-//                $this->objSyncCtoCommunication->startLocalConfigImport();
-//                $this->objSyncCtoCommunication->clearClientTempFolder();
-//                $this->objSyncCtoCommunication->refererEnable();
-//
-//                $this->objSyncCtoHelper->pergeTemp();
-//
-//                $arrContent[$this->step - 1]["state"] = OK;
-//                $arrContent[$this->step - 1]["msg"] = "Import File - OK. Import Config - OK. Cleanup - OK.";
-//                $arrContent[$this->step - 1]["refresh"] = false;
-//            }
-//            catch (Exception $exc)
-//            {
-//                $arrContent[$this->step - 1]["state"] = ERROR;
-//                $arrContent[$this->step - 1]["error"] = $exc->getMessage();
-//                $arrContent[$this->step - 1]["refresh"] = FALSE;
-//            }
-        }
-        else
-        {
-            try
-            {
-                $intStart = time();
-
-                switch ($mixStepPool6["step"])
-                {
-                    /** --------------------------------------------------------
-                     * Get files
-                     */
-                    case 1:
-                        $i = 0;
-                        $intCountTransfer = 0;
-
-                        // Send allfiles exclude the big things
-                        foreach ($mixSyncFiles as $key => $value)
-                        {
-
-                            if ($mixStepPool6["files_send"] == count($mixSyncFiles))
-                            {
-                                break;
-                            }
-
-
-                            if ($i < $mixStepPool6["files_send"])
-                            {
-                                $i++;
-                                continue;
-                            }
-
-                            if (in_array($key, $arrSplitFiles))
-                            {
-                                $i++;
-                                continue;
-                            }
-
-                            try
-                            {
-                                $this->objSyncCtoCommunicationClient->getFile($value["path"], TL_ROOT . $GLOBALS['syncCto']['path']['tmp'] . "sync/" . $value["path"]);
-
-                                $intCountTransfer++;
-                                if ($intCountTransfer == 100)
-                                {
-                                    $intCountTransfer = 0;
-                                    sleep(1);
-                                }
-                            }
-                            catch (Exception $exc)
-                            {
-                                try
-                                {
-                                    sleep(1);
-                                    $this->objSyncCtoCommunicationClient->getFile("/" . $value["path"], $GLOBALS['syncCto']['path']['tmp'] . "sync/" . $value["path"]);
-                                }
-                                catch (Exception $exc)
-                                {
-                                    $mixStepPool6["skipped"][] = $value['path'] . " Error: " . $exc->getMessage();
-                                }
-                            }
-
-                            $i++;
-                            $mixStepPool6["files_send"] = $i;
-
-                            if ($intStart < (time() - 20))
-                            {
-                                $mixStepPool6["step"] = 1;
-                                $this->Session->set("syncCto_StepPool6", serialize($mixStepPool6));
-
-                                $arrContent[$this->step - 1]["state"] = WORK;
-
-                                if ($i < count($arrSplitFiles))
-                                {
-                                    $msg = vsprintf("Send %s from %s files.", array($i - count($mixStepPool6["skipped"]), count($mixSyncFiles) - count($arrSplitFiles)));
-                                }
-                                else
-                                {
-                                    $msg = vsprintf("Send %s from %s files.", array($i - count($arrSplitFiles) - count($mixStepPool6["skipped"]), count($mixSyncFiles) - count($arrSplitFiles)));
-                                }
-
-                                if (count($mixStepPool6["skipped"]) != 0)
-                                {
-                                    $msg .= "<br/>Skipped files " . count($mixStepPool6["skipped"]);
-
-                                    foreach ($mixStepPool6["skipped"] as $value)
-                                    {
-                                        $msg .= "<br/>" . $value;
-                                    }
-                                }
-
-                                $arrContent[$this->step - 1]["msg"] = $msg;
-
-                                $this->step--;
-
-                                $this->parseSyncTo($this->saveContent($arrContent));
-                                return;
-                            }
-                        }
-
-                        $mixStepPool6["step"] = 2;
-                        $this->Session->set("syncCto_StepPool6", serialize($mixStepPool6));
-
-                        $arrContent[$this->step - 1]["state"] = WORK;
-
-                        if ($mixStepPool6["files_send"] < count($arrSplitFiles))
-                        {
-                            $msg = vsprintf("Send %s from %s files.", array($mixStepPool6["files_send"], count($mixSyncFiles) - count($arrSplitFiles)));
-                        }
-                        else
-                        {
-                            $msg = vsprintf("Send %s from %s files.", array($mixStepPool6["files_send"] - count($arrSplitFiles), count($mixSyncFiles) - count($arrSplitFiles)));
-                        }
-
-                        if (count($mixStepPool6["skipped"]) != 0)
-                        {
-                            $msg .= "<br/>Skipped files " . count($mixStepPool6["skipped"]);
-
-                            foreach ($mixStepPool6["skipped"] as $value)
-                            {
-                                $msg .= "<br/>" . $value;
-                            }
-                        }
-
-                        $this->step--;
-
-                        $this->parseSyncTo($this->saveContent($arrContent));
-                        break;
-
-                    /** --------------------------------------------------------
-                     * Import Files
-                     */
-                    case 2:
-                        $this->objSyncCtoFiles->moveFile($mixSyncFiles);
-
-                        $mixStepPool6["step"] = 3;
-                        $this->Session->set("syncCto_StepPool6", serialize($mixStepPool6));
-
-                        $arrContent[$this->step - 1]["state"] = WORK;
-                        $arrContent[$this->step - 1]["msg"] = "File import - OK. Next Config Import.";
-
-                        $this->step--;
-
-                        break;
-
-                    /** --------------------------------------------------------
-                     * Import Config
-                     */
-                    case 3:
-                        $arrConfig = $this->objSyncCtoCommunicationClient->getClientLocalconfig();
-
-                        $arrConfigBlacklist = $this->objSyncCtoHelper->getBlacklistLocalconfig();
-
-                        foreach ($arrConfig as $key => $value)
-                        {
-                            if (in_array($key, $arrConfigBlacklist))
-                                unset($arrConfig[$key]);
-                        }
-
-                        foreach ($arrConfig as $key => $value)
-                        {
-                            if (in_array($key, $arrLocalConfig))
-                            {
-                                $this->Config->update("\$GLOBALS['TL_CONFIG']['" . $key . "']", $value);
-                            }
-                            else
-                            {
-                                $this->Config->add("\$GLOBALS['TL_CONFIG']['" . $key . "']", $value);
-                            }
-                        }
-
-                        $mixStepPool6["step"] = 4;
-                        $this->Session->set("syncCto_StepPool6", serialize($mixStepPool6));
-
-                        $arrContent[$this->step - 1]["state"] = WORK;
-                        $arrContent[$this->step - 1]["msg"] = "Config import - OK. Next clean up.";
-
-                        $this->step--;
-
-                        break;
-
-                    /** --------------------------------------------------------
-                     * Cleanup
-                     */
-                    case 4:
-                        $this->objSyncCtoCommunicationClient->clearClientTempFolder();
-                        $this->objSyncCtoFiles->purgeTemp();
-                        $this->objSyncCtoCommunicationClient->refererEnable();
-
-                        $msg = "Done. ";
-
-                        if ($mixStepPool6["files_send"] < count($arrSplitFiles))
-                        {
-                            $msg .= vsprintf("Send %s from %s files.", array($mixStepPool6["files_send"] - count($mixStepPool6["skipped"]), count($mixSyncFiles) - count($arrSplitFiles)));
-                        }
-                        else
-                        {
-                            $msg .= vsprintf("Send %s from %s files.", array($mixStepPool6["files_send"] - count($arrSplitFiles) - count($mixStepPool6["skipped"]), count($mixSyncFiles) - count($arrSplitFiles)));
-                        }
-
-                        if (count($mixStepPool6["skipped"]) != 0)
-                        {
-                            $msg .= "<br/><br/>But with errors :<br/><br/><b>Skipped files " . count($mixStepPool6["skipped"]) . "</b><br/>";
-
-                            foreach ($mixStepPool6["skipped"] as $value)
-                            {
-                                $msg .= "<br/>" . $value;
-                            }
-                        }
-
-                        $mixStepPool6["step"] = 5;
-                        $this->Session->set("syncCto_StepPool6", serialize($mixStepPool6));
-
-                        $arrContent[$this->step - 1]["state"] = OK;
-                        $arrContent[$this->step - 1]["msg"] = $msg;
-                        $arrContent[$this->step - 1]["refresh"] = false;
-
-                        $this->step--;
-
-                        break;
-                }
-            }
-            catch (Exception $exc)
-            {
-                print_r($exc);
-                exit();
-
-                $arrContent[$this->step - 1]["state"] = ERROR;
-                $arrContent[$this->step - 1]["error"] = $exc->getMessage();
-                $arrContent[$this->step - 1]["refresh"] = FALSE;
-            }
-        }
-
-        $this->parseSyncTo($this->saveContent($arrContent));
-    }
-
-    /*
-     * End SyncCto Sync. From
-     * -------------------------------------------------------------------------
-     */
-
 
     /* -------------------------------------------------------------------------
      * Start SyncCto Sync. To
      */
 
+    /**
+     * Check client communication
+     */
     private function pageSyncToShowStep1()
     {
         $this->log(vsprintf("Start synchronization client ID %s.", array($this->Input->get("id"))), __CLASS__ . " " . __FUNCTION__, "INFO");
 
         /* ---------------------------------------------------------------------
-         * POST data validate and session save
-         */
-
-        // Check sync. typ
-        if (strlen($this->Input->post('sync_type')) != 0)
-        {
-            if ($this->Input->post('sync_type') == SYNCCTO_FULL || $this->Input->post('sync_type') == SYNCCTO_SMALL)
-            {
-                $this->set("syncCto_Typ", $this->Input->post('sync_type'));
-            }
-            else
-            {
-                $this->parseStartPage($GLOBALS['TL_LANG']['syncCto']['unknown_method']);
-                return;
-            }
-        }
-        else
-        {
-            $this->set("syncCto_Typ", SYNCCTO_SMALL);
-        }
-
-        // Load table lists and merge them
-        if ($this->Input->post("table_list_recommend") != "" || $this->Input->post("table_list_none_recommend") != "")
-        {
-            if ($this->Input->post("table_list_recommend") != "" && $this->Input->post("table_list_none_recommend") != "")
-                $arrSyncTables = array_merge($this->Input->post("table_list_recommend"), $this->Input->post("table_list_none_recommend"));
-            else if ($this->Input->post("table_list_recommend"))
-                $arrSyncTables = $this->Input->post("table_list_recommend");
-            else if ($this->Input->post("table_list_none_recommend"))
-                $arrSyncTables = $this->Input->post("table_list_none_recommend");
-
-            $this->set("syncCto_SyncTables", $arrSyncTables);
-        }
-        else
-        {
-            $this->set("syncCto_SyncTables", FALSE);
-        }
-
-        // Files for backup tl_files       
-        if (is_array($this->Input->post('filelist')) && count($this->Input->post('filelist')) != 0)
-        {
-            $this->set("syncCto_Filelist", $this->Input->post('filelist'));
-        }
-        else
-        {
-            $this->set("syncCto_Filelist", FALSE);
-        }
-
-        $this->set("syncCto_Start", microtime(true));
-
-        /* ---------------------------------------------------------------------
-         * None form data
-         */
-
-
-        /* ---------------------------------------------------------------------
-         * Step Session 
-         */
-
-        // Step 2
-        $this->set("syncCto_StepPool2", FALSE);
-        // Step 3
-        $this->set("syncCto_StepPool3", FALSE);
-        // Step 4
-        $this->set("syncCto_StepPool4", FALSE);
-        // Step 5
-        $this->set("syncCto_StepPool5", FALSE);
-        // Step 6
-        $this->set("syncCto_StepPool6", FALSE);
-
-        /* ---------------------------------------------------------------------
-         * Build page
-         */
-
-        $this->parseSyncTo($this->saveContent(array(), array(
-                    1 => array(
-                        "step" => $this->step,
-                        "state" => WORK,
-                        "msg" => "",
-                        "error" => "",
-                        "refresh" => TRUE,
-                        "desc" => $GLOBALS['TL_LANG']['tl_syncCto_clients_syncTo']['step1_help']
-                    ),
-                ))
-        );
-    }
-
-    /**
-     * Check client communication
-     */
-    private function pageSyncToShowStep2()
-    {
-        /* ---------------------------------------------------------------------
          * Init
          */
-        // Set Timeout
-        set_time_limit(300);
-
         // State save for this step
-        $mixStepPool2 = $this->get("syncCto_StepPool2");
-        if ($mixStepPool2 == FALSE)
-            $mixStepPool2 = array("step" => 1);
+        $mixStepPool = $this->Session->get("syncCto_StepPool1");
+        if ($mixStepPool == FALSE)
+            $mixStepPool = array("step" => 1);
 
         // Load content
-        $arrContent = $this->loadContent();
+        $arrContenData = $this->Session->get("syncCto_Content");
+        $arrContenData["error"] = false;
+        $arrContenData["data"][$this->step]["state"] = $GLOBALS['TL_LANG']['tl_syncCto_steps']['progress'];
 
         /* ---------------------------------------------------------------------
          * Run page
          */
         try
         {
-            switch ($mixStepPool2["step"])
+            switch ($mixStepPool["step"])
             {
                 /**
                  * Show step
                  */
                 case 1:
-                    $mixStepPool2["step"] = 2;
+                    $arrContenData["data"][$this->step]["state"] = $GLOBALS['TL_LANG']['tl_syncCto_steps']['progress'];
+                    $arrContenData["data"][$this->step]["title"] = $GLOBALS['TL_LANG']['tl_syncCto_steps']['step'] . " 1";
+                    $arrContenData["data"][$this->step]["description"] = $GLOBALS['TL_LANG']['tl_syncCto_clients_syncTo']['step1_msg1'];
 
-                    $arrContent[$this->step - 1]["state"] = WORK;
-                    $arrContent[$this->step - 1]["msg"] = $GLOBALS['TL_LANG']['tl_syncCto_clients_syncTo']['step1_msg1'];
-
-                    $this->step--;
-
+                    $arrContenData["step"] = $this->step - 1;
+                    $mixStepPool["step"] = 2;
                     break;
 
                 /**
                  * Referer check deactivate
                  */
                 case 2:
-                    $this->objSyncCtoCommunicationClient->refererDisable();
-
-                    $mixStepPool2["step"] = 3;
-
-                    $arrContent[$this->step - 1]["state"] = WORK;
-                    $arrContent[$this->step - 1]["msg"] = $GLOBALS['TL_LANG']['tl_syncCto_clients_syncTo']['step1_msg1'];
-
-                    $this->step--;
-
-                    break;
-
-                /**
-                 * Check magical number
-                 */
-                case 3:
-                    $intMagicNumber = $this->objSyncCtoCommunicationClient->makeAGame();
-
-                    $mixStepPool2["step"] = 4;
-
-                    $arrContent[$this->step - 1]["state"] = WORK;
-                    $arrContent[$this->step - 1]["msg"] = $GLOBALS['TL_LANG']['tl_syncCto_clients_syncTo']['step1_msg1'];
-
-                    $this->step--;
-
-                    break;
-
-                /**
-                 * Check version
-                 */
-                case 4:
-                    $strVersion = $this->objSyncCtoCommunicationClient->getClientVersion();
-                    if ($strVersion != SYNCCTO_GET_VERSION)
+                    if (!$this->objSyncCtoCommunicationClient->refererDisable())
                     {
-                        $this->log(vsprintf("Not the same version on synchronization client ID %s. Serverversion: %s. Clientversion: %s", array($this->Input->get("id"), SYNCCTO_GET_VERSION, $strVersion)), __CLASS__ . " " . __FUNCTION__, "INFO");
-
-                        $mixStepPool2 = FALSE;
-                        $arrContent[$this->step - 1]["state"] = ERROR;
-                        $arrContent[$this->step - 1]["error"] = $GLOBALS['TL_LANG']['tl_syncCto_clients_syncTo']['step1_msg2'];
-                        $arrContent[$this->step - 1]["refresh"] = false;
+                        $arrContenData["data"][$this->step]["state"] = $GLOBALS['TL_LANG']['tl_syncCto_steps']['error'];
+                        $arrContenData["error"] = true;
+                        $arrContenData["error_msg"] = "Could not deactivate refferenz check.";
 
                         break;
                     }
 
-                    $mixStepPool2["step"] = 5;
-                    $arrContent[$this->step - 1]["state"] = WORK;
-                    $arrContent[$this->step - 1]["msg"] = $GLOBALS['TL_LANG']['tl_syncCto_clients_syncTo']['step1_msg1'];
-                    $this->step--;
+                    $arrContenData["step"] = $this->step - 1;
+                    $mixStepPool["step"] = 3;
+                    break;
 
+
+                /**
+                 * Check version
+                 */
+                case 3:
+                    $strVersion = $this->objSyncCtoCommunicationClient->getVersionSyncCto();
+                    if ($strVersion != $GLOBALS['SYC_VERSION'])
+                    {
+                        $this->log(vsprintf("Not the same version on synchronization client ID %s. Serverversion: %s. Clientversion: %s", array($this->Input->get("id"), $strVersion, $strVersion)), __CLASS__ . " " . __FUNCTION__, "INFO");
+
+                        $arrContenData["data"][$this->step]["state"] = $GLOBALS['TL_LANG']['tl_syncCto_steps']['error'];
+                        $arrContenData["error"] = true;
+                        $arrContenData["error_msg"] = $GLOBALS['TL_LANG']['tl_syncCto_clients_syncTo']['step1_msg2'] . 1;
+
+                        break;
+                    }
+
+                    $arrContenData["step"] = $this->step - 1;
+                    $mixStepPool["step"] = 4;
                     break;
 
                 /**
-                 * Clear client temp folder  
+                 * Clear client and server temp folder  
                  */
-                case 5:
-                    $this->objSyncCtoCommunicationClient->clearClientTempFolder();
-
-                    $mixStepPool2["step"] = 6;
-                    $arrContent[$this->step - 1]["state"] = WORK;
-                    $arrContent[$this->step - 1]["msg"] = $GLOBALS['TL_LANG']['tl_syncCto_clients_syncTo']['step1_msg1'];
-                    $this->step--;
-
-                    break;
-
-                /**
-                 * Clear Temp Folder
-                 */
-                case 6:
+                case 4:
+                    $this->objSyncCtoCommunicationClient->purgeTemp();
                     $this->objSyncCtoFiles->purgeTemp();
 
-                    $mixStepPool2 = FALSE;
-                    $arrContent[$this->step - 1]["state"] = OK;
-                    $arrContent[$this->step - 1]["msg"] = "";
-                    $arrContent[] = array(
-                        "step" => $this->step,
-                        "state" => WORK,
-                        "msg" => "",
-                        "error" => "",
-                        "refresh" => true,
-                        "desc" => $GLOBALS['TL_LANG']['tl_syncCto_clients_syncTo']['step2_help']
-                    );
+                    $arrContenData["data"][$this->step]["state"] = $GLOBALS['TL_LANG']['tl_syncCto_steps']['ok'];
+                    $arrContenData["step"] = $this->step;
+                    $mixStepPool["step"] = 5;
+                    break;
 
+                case 5:
                     break;
             }
         }
         catch (Exception $exc)
-        {            
+        {
             $this->log(vsprintf("Error on synchronization client ID %s", array($this->Input->get("id"))), __CLASS__ . " " . __FUNCTION__, "ERROR");
 
-            $arrContent[$this->step - 1]["state"] = ERROR;
-            $arrContent[$this->step - 1]["error"] = $exc->getMessage();
-            $arrContent[$this->step - 1]["refresh"] = FALSE;
+            $arrContenData["error"] = true;
+            $arrContenData["data"][$this->step]["state"] = $GLOBALS['TL_LANG']['tl_syncCto_steps']['error'];
+            $arrContenData["error_msg"] = $exc->getMessage();
         }
 
-        $this->set("syncCto_StepPool2", $mixStepPool2);
+        $this->Template->goBack = $this->script . $arrContenData["goBack"];
+        $this->Template->data = $arrContenData["data"];
+        $this->Template->step = $arrContenData["step"];
+        $this->Template->error = $arrContenData["error"];
+        $this->Template->error_msg = $arrContenData["error_msg"];
+        $this->Template->refresh = $arrContenData["refresh"];
+        $this->Template->url = $arrContenData["url"];
+        $this->Template->start = $arrContenData["start"];
+        $this->Template->headline = $arrContenData["headline"];
+        $this->Template->information = $arrContenData["information"];
+        $this->Template->finished = $arrContenData["finished"];
 
-        $this->parseSyncTo($this->saveContent($arrContent));
+        $this->Session->set("syncCto_StepPool1", $mixStepPool);
+        $this->Session->set("syncCto_Content", $arrContenData);
     }
 
     /**
      * Build checksumlist and ask client
      */
-    private function pageSyncToShowStep3()
+    private function pageSyncToShowStep2()
     {
         /* ---------------------------------------------------------------------
          * Init
          */
-        // Time out 
-        @set_time_limit(60);
+        // Needed files/information
+        $mixFilelist = $this->Session->get("syncCto_Filelist");
+        $intSyncTyp = $this->Session->get("syncCto_Typ");
 
         // State save for this step
-        $mixStepPool3 = $this->get("syncCto_StepPool3");
-        if ($mixStepPool3 == FALSE)
-            $mixStepPool3 = array("step" => 1);
+        $mixStepPool = $this->Session->get("syncCto_StepPool2");
+        if ($mixStepPool == FALSE)
+            $mixStepPool = array("step" => 1);
 
-        // Needed files/information
-        $mixFilelist = $this->get("syncCto_Filelist");
-        $intSyncTyp = $this->get("syncCto_Typ");
-
-        // Content data for page
-        $arrContent = $this->loadContent();
+        // Load content
+        $arrContenData = $this->Session->get("syncCto_Content");
+        $arrContenData["error"] = false;
+        $arrContenData["data"][$this->step]["state"] = $GLOBALS['TL_LANG']['tl_syncCto_steps']['progress'];
 
         /* ---------------------------------------------------------------------
          * Run page
          */
+
         // Check if there is a filelist
         if ($mixFilelist == FALSE && $intSyncTyp == SYNCCTO_SMALL)
         {
-            $mixStepPool3 = FALSE;
-            $arrContent[$this->step - 1]["state"] = SKIPPED;
-            $arrContent[$this->step - 1]["compare"] = "";
-            $arrContent[] = array(
-                "step" => $this->step,
-                "state" => WORK,
-                "msg" => "",
-                "error" => "",
-                "refresh" => true,
-                "desc" => $GLOBALS['TL_LANG']['tl_syncCto_clients_syncTo']['step3_help']
-            );
+            $mixStepPool = FALSE;
+
+            $arrContenData["data"][$this->step]["state"] = $GLOBALS['TL_LANG']['tl_syncCto_steps']['skipped'];
+            $arrContenData["data"][$this->step]["title"] = $GLOBALS['TL_LANG']['tl_syncCto_steps']['step'] . " 2";
+            $arrContenData["data"][$this->step]["description"] = $GLOBALS['TL_LANG']['tl_syncCto_clients_syncTo']['step3_help'];
+
+            echo "no";
+            exit();
         }
         else
         {
+            echo "yes";
+            exit();
+
             try
             {
-                switch ($mixStepPool3["step"])
+                switch ($mixStepPool["step"])
                 {
                     /**
                      * Build checksum for TL_Files
@@ -1757,11 +403,12 @@ class SyncCtoModuleClient extends BackendModule
                     case 1:
                         if ($mixFilelist != false && is_array($mixFilelist) && ( $intSyncTyp == SYNCCTO_SMALL || $intSyncTyp == SYNCCTO_FULL ))
                         {
-                            $mixStepPool3["tlfiles_checksum"] = $this->objSyncCtoFiles->runTlFilesChecksum(deserialize($mixFilelist));
-                            $mixStepPool3["step"] = 2;
+                            $mixStepPool["tlfiles_checksum"] = $this->objSyncCtoFiles->runTlFilesChecksum(deserialize($mixFilelist));
+                            $mixStepPool["step"] = 2;
 
-                            $arrContent[$this->step - 1]["state"] = WORK;
-                            $arrContent[$this->step - 1]["msg"] = $GLOBALS['TL_LANG']['tl_syncCto_clients_syncTo']['step2_msg2'];
+                            $arrContenData["data"][$this->step]["state"] = $GLOBALS['TL_LANG']['tl_syncCto_steps']['progress'];
+                            $arrContenData["data"][$this->step]["title"] = $GLOBALS['TL_LANG']['tl_syncCto_steps']['step'] . " 2";
+                            $arrContenData["data"][$this->step]["description"] = $GLOBALS['TL_LANG']['tl_syncCto_clients_syncTo']['step3_help'];
 
                             $this->step--;
 
@@ -1769,9 +416,12 @@ class SyncCtoModuleClient extends BackendModule
                         }
                         else
                         {
-                            $mixStepPool3["tlfiles_checksum"] = array();
-                            $mixStepPool3["step"] = 2;
+                            $mixStepPool["tlfiles_checksum"] = array();
+                            $mixStepPool["step"] = 2;
                         }
+
+                        print_r($arrContenData);
+                        exit();
 
                     /**
                      * Build checksum for Conta core
@@ -1786,7 +436,7 @@ class SyncCtoModuleClient extends BackendModule
                             $arrContent[$this->step - 1]["msg"] = $GLOBALS['TL_LANG']['tl_syncCto_clients_syncTo']['step2_msg3'];
 
                             $this->step--;
-                            
+
                             break;
                         }
                         else
@@ -1798,20 +448,20 @@ class SyncCtoModuleClient extends BackendModule
                     /**
                      * Merge both lists and send it to the client
                      */
-                    case 3:                        
+                    case 3:
                         $arrChecksum = array_merge($mixStepPool3["tlfiles_checksum"], $mixStepPool3["core_checksum"]);
-                        
+
                         unset($mixStepPool3["tlfiles_checksum"]);
                         unset($mixStepPool3["core_checksum"]);
                         $mixStepPool3["checksum"] = $arrChecksum;
-                        
+
                         $mixStepPool3["sync_list"] = $this->objSyncCtoCommunicationClient->sendChecksumList($arrChecksum);
-                        
+
                         $mixStepPool3["step"] = 4;
 
                         $arrContent[$this->step - 1]["state"] = WORK;
                         $arrContent[$this->step - 1]["msg"] = $GLOBALS['TL_LANG']['tl_syncCto_clients_syncTo']['step2_msg4'];
-                                                
+
                         $this->step--;
 
                         break;
@@ -2013,16 +663,27 @@ class SyncCtoModuleClient extends BackendModule
             {
                 $this->log(vsprintf("Error on synchronization client ID %s", array($this->Input->get("id"))), __CLASS__ . " " . __FUNCTION__, "ERROR");
 
-                $arrContent[$this->step - 1]["state"] = ERROR;
-                $arrContent[$this->step - 1]["error"] = $exc->getMessage();
-                $arrContent[$this->step - 1]["refresh"] = FALSE;
+                $arrContenData["error"] = true;
+                $arrContenData["data"][$this->step]["state"] = $GLOBALS['TL_LANG']['tl_syncCto_steps']['error'];
+                $arrContenData["error_msg"] = $exc->getMessage();
             }
         }
 
-        $this->set("syncCto_StepPool3", $mixStepPool3);
-        $this->set("syncCto_SyncFiles", $arrSyncFileList);
+        $this->Template->goBack = $this->script . $arrContenData["goBack"];
+        $this->Template->data = $arrContenData["data"];
+        $this->Template->step = $arrContenData["step"];
+        $this->Template->error = $arrContenData["error"];
+        $this->Template->error_msg = $arrContenData["error_msg"];
+        $this->Template->refresh = $arrContenData["refresh"];
+        $this->Template->url = $arrContenData["url"];
+        $this->Template->start = $arrContenData["start"];
+        $this->Template->headline = $arrContenData["headline"];
+        $this->Template->information = $arrContenData["information"];
+        $this->Template->finished = $arrContenData["finished"];
 
-        $this->parseSyncTo($this->saveContent($arrContent));
+        $this->Session->set("syncCto_StepPool2", $mixStepPool);
+        $this->Session->set("syncCto_Content", $arrContenData);
+        $this->Session->set("syncCto_SyncFiles", $arrSyncFileList);
     }
 
     /**
@@ -2129,7 +790,7 @@ class SyncCtoModuleClient extends BackendModule
                         break;
 
                     case 5:
-                        $this->objSyncCtoCommunicationClient->sendFile($GLOBALS['syncCto']['path']['tmp'], $mixStepPool4["zip"]['name'], "", SyncCtoEnum::UPLOAD_SQL_TEMP);
+                        $this->objSyncCtoCommunicationClient->sendFile($GLOBALS['SYC_PATH']['tmp'], $mixStepPool4["zip"]['name'], "", SyncCtoEnum::UPLOAD_SQL_TEMP);
 
                         if ($intStart < (time() - 30))
                         {
@@ -2444,7 +1105,7 @@ class SyncCtoModuleClient extends BackendModule
 
                             // Splitt file
                             $intSplits = $this->objSyncCtoFiles->
-                                    splitFiles($mixSyncFiles[$key]["path"], $GLOBALS['syncCto']['path']['tmp'] . $key, $key, ($mixStepPool5["limit"] / 100 * $mixStepPool5["percent"]));
+                                    splitFiles($mixSyncFiles[$key]["path"], $GLOBALS['SYC_PATH']['tmp'] . $key, $key, ($mixStepPool5["limit"] / 100 * $mixStepPool5["percent"]));
 
                             $mixSyncFiles[$key]["splitcount"] = $intSplits;
                             $mixSyncFiles[$key]["splitname"] = $key;
@@ -2494,7 +1155,7 @@ class SyncCtoModuleClient extends BackendModule
 
                             for ($ii = 0; $ii < $value["splitcount"]; $ii++)
                             {
-                                $this->objSyncCtoCommunicationClient->sendFile($GLOBALS['syncCto']['path']['tmp'] . $key, $value["splitname"] . ".sync" . $ii, "", UPLOAD_SYNC_SPLIT, $value["splitname"]);
+                                $this->objSyncCtoCommunicationClient->sendFile($GLOBALS['SYC_PATH']['tmp'] . $key, $value["splitname"] . ".sync" . $ii, "", UPLOAD_SYNC_SPLIT, $value["splitname"]);
                             }
 
                             $this->objSyncCtoCommunicationClient->buildSingleFile($value["splitname"], $value["splitcount"], $value["path"], $value["checksum"]);
@@ -2769,7 +1430,7 @@ class SyncCtoModuleClient extends BackendModule
                 /** ------------------------------------------------------------
                  * Delete files
                  */
-                case 4:                    
+                case 4:
                     if (count($mixSyncFiles) != 0 && is_array($mixSyncFiles))
                     {
                         $arrDelete = array();
@@ -3005,80 +1666,6 @@ class SyncCtoModuleClient extends BackendModule
      * End SyncCto Sync. To
      * -------------------------------------------------------------------------
      */
-
-    /* -------------------------------------------------------------------------
-     * Helper function
-     */
-
-    private function saveContent($arrContent, $arrNewContent = null)
-    {
-        if ($arrNewContent != null && is_array($arrNewContent))
-        {
-            foreach ($arrNewContent as $key => $value)
-            {
-                $arrContent[$key] = $value;
-            }
-        }
-
-        $this->Session->set("syncCto_Content", serialize($arrContent));
-
-        return $arrContent;
-    }
-
-    private function loadContent()
-    {
-        $arrContent = deserialize($this->Session->get("syncCto_Content"));
-
-        if (!is_array($arrContent))
-            $arrContent = array();
-
-        return $arrContent;
-    }
-
-    /**
-     * Extended the session with typ casting for array, boolean and mix types.
-     * 
-     * @param string $strName
-     * @param mixed $mixVar 
-     */
-    private function set($strName, $mixVar)
-    {
-        if ($mixVar === FALSE)
-            $this->Session->set($strName, $mixVar);
-
-        elseif (is_array($mixVar))
-            $this->Session->set($strName, serialize($mixVar));
-
-        elseif ($mixVar === 0)
-            return (int) 0;
-
-        else
-            $this->Session->set($strName, $mixVar);
-    }
-
-    /**
-     * Extended the session with typ casting for array, boolean and mix types.
-     * 
-     * @param string $strName
-     * @return mixed 
-     */
-    private function get($strName)
-    {
-        $mixVar = $this->Session->get($strName);
-
-        if ($mixVar === FALSE || $mixVar == "b:0;")
-            return FALSE;
-
-        elseif (is_array(deserialize($mixVar)))
-            return deserialize($mixVar);
-
-        elseif ($mixVar === 0)
-            return (int) 0;
-
-        else
-            return $mixVar;
-    }
-
 }
 
 /**

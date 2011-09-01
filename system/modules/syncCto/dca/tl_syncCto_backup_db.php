@@ -1,4 +1,7 @@
-<?php if (!defined('TL_ROOT')) die('You can not access this file directly!');
+<?php
+
+if (!defined('TL_ROOT'))
+    die('You can not access this file directly!');
 
 /**
  * Contao Open Source CMS
@@ -22,45 +25,99 @@
  *
  * PHP version 5
  * @copyright  MEN AT WORK 2011
- * @author     Stefan Heimes <heimes@men-at-work.de>,
- *             MEN AT WORK   <cms@men-at-work.de>
  * @package    syncCto
  * @license    GNU/LGPL
  * @filesource
  */
-
+ 
 $GLOBALS['TL_DCA']['tl_syncCto_backup_db'] = array(
-
     // Config
     'config' => array
         (
-        'dataContainer' => 'File',
-        'closed' => true,        
+        'dataContainer' => 'Memory',
+        'closed' => true,
+        'disableSubmit' => false,
+        'onload_callback' => array(
+            array('tl_syncCto_backup_db', 'onload_callback'),
+        ),
+        'onsubmit_callback' => array(
+            array('tl_syncCto_backup_db', 'onsubmit_callback'),
+        )
     ),
-	
     // Palettes
     'palettes' => array
         (
         'default' => '{table_recommend_legend},table_list_recommend;{table_none_recommend_legend:hide},table_list_none_recommend;'
     ),
-	
     // Fields
     'fields' => array(
         'table_list_recommend' => array
             (
             'label' => &$GLOBALS['TL_LANG']['tl_syncCto_backup_db']['table_list_recommend'],
-            'inputType' => 'checkboxWizard',
-            'eval' => array('multiple' => true),            
-            'options_callback' => array('SyncCtoCallback', 'optioncallTablesRecommend'),
+            'inputType' => 'checkbox',
+            'eval' => array('multiple' => true),
+            'options_callback' => array('SyncCtoCallback', 'databaseTablesRecommended'),
         ),
         'table_list_none_recommend' => array
             (
             'label' => &$GLOBALS['TL_LANG']['tl_syncCto_backup_db']['table_list_none_recommend'],
-            'inputType' => 'checkboxWizard',
-            'eval' => array('multiple' => true),            
-            'options_callback' => array('SyncCtoCallback', 'optioncallTablesNoneRecommend'),
+            'inputType' => 'checkbox',
+            'eval' => array('multiple' => true),
+            'options_callback' => array('SyncCtoCallback', 'databaseTablesNoneRecommended'),
         ),
     )
 );
+
+class tl_syncCto_backup_db extends Backend
+{
+
+    public function onload_callback(DataContainer $dc)
+    {
+        $dc->removeButton('save');
+        $dc->removeButton('saveNclose');
+
+        $arrData = array
+            (
+            'id' => 'start_backup',
+            'formkey' => 'start_backup',
+            'class' => '',
+            'accesskey' => 'g',
+            'value' => specialchars($GLOBALS['TL_LANG']['MSC']['start_backup']),
+            'button_callback' => array('tl_syncCto_backup_db', 'onsubmit_callback')
+        );
+
+        $dc->addButton('start_backup', $arrData);
+    }
+	
+	public function onsubmit_callback(DataContainer $dc)
+    {
+        $arrStepPool = $this->Session->get("SyncCto_DB_StepPool");
+        
+        if(!is_array($arrStepPool))
+            $arrStepPool = array();
+
+        // Check Table list
+        if ($this->Input->post("table_list_recommend") == "" && $this->Input->post("table_list_none_recommend") == "")
+        {
+            $_SESSION["TL_ERROR"] = array("Missing Tables");
+            return;
+        }
+
+        // Merge recommend and none recommend post arrays
+        if ($this->Input->post("table_list_recommend") != "" && $this->Input->post("table_list_none_recommend") != "")
+            $arrTablesBackup = array_merge($this->Input->post("table_list_recommend"), $this->Input->post("table_list_none_recommend"));
+        else if ($this->Input->post("table_list_recommend"))
+            $arrTablesBackup = $this->Input->post("table_list_recommend");
+        else if ($this->Input->post("table_list_none_recommend"))
+            $arrTablesBackup = $this->Input->post("table_list_none_recommend");
+        
+        $arrStepPool["tables"] = $arrTablesBackup;
+        
+        $this->Session->set("SyncCto_DB_StepPool", $arrStepPool);
+        
+        $this->redirect($this->Environment->base . "contao/main.php?do=syncCto_backups&table=tl_syncCto_backup_db&act=start");
+    }
+
+}
 
 ?>

@@ -64,7 +64,7 @@ class CtoCommunication extends Backend
         $this->objCodifyengineBlow = CtoComCodifyengineFactory::getEngine("Blowfish");
         $this->objDebug = CtoComDebug::getInstance();
 
-        $this->arrRpcList = $GLOBALS["CTO_COMMUNICTAION"]["RPC_FUNCTION"];
+        $this->arrRpcList = $GLOBALS["CTOCOM_FUNCTIONS"];
         $this->arrError = array();
     }
 
@@ -225,6 +225,7 @@ class CtoCommunication extends Backend
 
     /**
      * Return Cookies
+     * 
      * @return array
      */
     public function getCookies()
@@ -252,10 +253,10 @@ class CtoCommunication extends Backend
 
         // Check if everything is set
         if ($this->strApiKey == "" || $this->strApiKey == null)
-            throw new Exception("Key not set");
+            throw new Exception("The API Key is not set. Please set first API Key.");
 
         if ($this->strUrl == "" || $this->strUrl == null)
-            throw new Exception("Url not set");
+            throw new Exception("There is no URL set for connection. Please set first the url.");
 
         // Merge Cookie Array
         if ($arrCookies != null && count($arrCookies) != 0)
@@ -275,8 +276,6 @@ class CtoCommunication extends Backend
         {
             $this->strUrl .= "?engine=" . $this->objCodifyengine->getName() . "&act=" . $rpc . "&apikey=" . $strCryptApiKey;
         }
-
-        var_dump($this->strUrl);
 
         // Set Key for codifyengine
         $this->objCodifyengine->setKey($this->strApiKey);
@@ -310,7 +309,7 @@ class CtoCommunication extends Backend
                 else
                 {
                     // Encrypt funktion
-                    $strValue = $this->objCodifyengine->Encrypt($value["value"]);
+                    $strValue = $this->objCodifyengine->Encrypt(serialize(array("data" => $value["value"])));
                     // Set field
                     $objMultipartFormdata->setField($value["name"], $strValue);
                 }
@@ -327,10 +326,12 @@ class CtoCommunication extends Backend
         // Send new request
         $objRequest->send($this->strUrl);
 
+        /* Debug */
         print_r($objRequest->request);
-        echo "\n\n|------|\n\n";
+        echo "<br>|--|<br>";
         print_r($objRequest->response);
-        echo "\n\n|------|\n\n";
+        echo "<br>|--|<br>";
+        echo "<br>|--------------------------------|<br>";
 
         // Debug
         $this->objDebug->addDebug("Request", $objRequest->request);
@@ -340,13 +341,19 @@ class CtoCommunication extends Backend
         if ($objRequest->hasError())
         {
             $this->objDebug->stopMeasurement(__CLASS__, __FUNCTION__);
-            throw new Exception($objRequest->error);
+            throw new Exception("Error by sending request with measages: " . $objRequest->code . " " . $objRequest->error);
         }
 
         if (strlen($objRequest->response) == 0)
         {
             $this->objDebug->stopMeasurement(__CLASS__, __FUNCTION__);
             throw new Exception("We got a blank response from server.");
+        }
+
+        if (preg_match("/.*Fatal error:.*/i", $objRequest->response))
+        {
+            $this->objDebug->stopMeasurement(__CLASS__, __FUNCTION__);
+            throw new Exception("We got a Fatal error on client site. " . $objRequest->response);
         }
 
         if (preg_match("^\<\|\@\|.*\|\@\|\>^i", $objRequest->response) == 0)
@@ -384,7 +391,15 @@ class CtoCommunication extends Backend
         else
         {
             $this->objDebug->stopMeasurement(__CLASS__, __FUNCTION__);
-            throw new Exception("Error");
+
+            $string = vsprintf("There was a error on client site with message: %s. | RPC Call: %s | Class: %s | Function: %s", array(
+                $mixContent["error"][0]["msg"],
+                $mixContent["error"][0]["rpc"],
+                $mixContent["error"][0]["class"],
+                $mixContent["error"][0]["function"],
+                    ));
+
+            throw new Exception($string);
         }
 
         $this->objDebug->stopMeasurement(__CLASS__, __FUNCTION__);
@@ -409,9 +424,9 @@ class CtoCommunication extends Backend
             exit();
         }
 
-        $mixVar = urldecode($this->Input->get("apikey"));
-        $mixVar = $this->objCodifyengineBlow->Decrypt($mixVar);
-        $mixVar = trimsplit("@|@", $mixVar);
+        $mixVar = html_entity_decode($this->Input->get("apikey"));
+        $mixVar = $this->objCodifyengineBlow->Decrypt($this->Input->get("apikey"));
+        $mixVar = trimsplit("@\|@", $mixVar);
         $strApiKey = $mixVar[1];
         $strAction = $mixVar[0];
 
@@ -426,7 +441,7 @@ class CtoCommunication extends Backend
             exit();
         }
 
-        if ($this->Input->get("apikey") != $strApiKey)
+        if ($GLOBALS['TL_CONFIG']['ctoCom_APIKey'] != $strApiKey)
         {
             $this->log(vsprintf("Call from %s with a wrong API Key: %s", array($this->Environment->ip, $this->Input->get("apikey"))), __FUNCTION__ . " | " . __CLASS__, TL_ERROR);
             exit();
@@ -442,7 +457,7 @@ class CtoCommunication extends Backend
             {
                 // Set new an reload key
                 $this->setCodifyengine($this->Input->get("engine"));
-                $this->objCodifyengine->setKey($GLOBALS['TL_CONFIG']['syncCto_seckey']);
+                $this->objCodifyengine->setKey($GLOBALS['TL_CONFIG']['ctoCom_APIKey']);
             }
             // Error by setting new enigne. Send msg in cleartext
             catch (Exception $exc)
@@ -454,7 +469,7 @@ class CtoCommunication extends Backend
         else
         {
             $this->setCodifyengine("Blowfish");
-            $this->objCodifyengine->setKey($GLOBALS['TL_CONFIG']['syncCto_seckey']);
+            $this->objCodifyengine->setKey($GLOBALS['TL_CONFIG']['ctoCom_APIKey']);
         }
 
         /** --------------------------------------------------------------------
@@ -490,8 +505,6 @@ class CtoCommunication extends Backend
             }
             else
             {
-
-
                 $arrParameter = array();
 
                 if ($this->arrRpcList[$mixRPCCall]["parameter"] != FALSE && is_array($this->arrRpcList[$mixRPCCall]["parameter"]))

@@ -41,6 +41,34 @@ $GLOBALS['TL_DCA']['tl_settings']['fields']['ctoCom_APIKey'] = array(
     'inputType' => 'text',
     'eval' => array('tl_class' => 'w50', 'minlength' => 32, 'maxlength' => 64),
     'exclude' => true,
-    'save_callback' => array(array('CtoCommunicationCallback', 'saveCallSecKey')),
+    'save_callback' => array(array('CtoCommunicationSettings', 'saveCallAPIKey')),
 );
+
+class CtoCommunicationSettings extends Backend
+{
+
+    public function __construct()
+    {
+        parent::__construct();
+    }
+
+    /**
+     * Generate the sec key for server
+     * 
+     * @param type $varValue
+     * @param DataContainer $dca
+     * @return type 
+     */
+    public function saveCallAPIKey($varValue, DataContainer $dca)
+    {
+        if ($varValue == "")
+        {
+            $objKey = $this->Database->prepare("SELECT UUID() as uid")->execute();
+            return $objKey->uid;
+        }
+
+        return $varValue;
+    }
+
+}
 ?>
