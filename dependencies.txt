@@ -12,3 +12,5 @@
   * textwizard
   * http://www.contao.org/erweiterungsliste/view/textwizard.html
   */
+
+test
