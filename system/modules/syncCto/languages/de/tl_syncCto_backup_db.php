@@ -33,7 +33,6 @@
 $GLOBALS['TL_LANG']['tl_syncCto_backup_db']['table_recommend_legend'] = "Empfohlene Tabellen";
 $GLOBALS['TL_LANG']['tl_syncCto_backup_db']['table_none_recommend_legend'] = "Nicht empfohlene Tabellen";
 $GLOBALS['TL_LANG']['tl_syncCto_backup_db']['edit'] = 'Ein Backup der Datenbank erstellen';
-$GLOBALS['TL_LANG']['tl_syncCto_backup_db']['back'] = 'Zurück';
 
 /**
  * Fields

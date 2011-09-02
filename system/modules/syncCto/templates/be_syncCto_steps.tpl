@@ -1,5 +1,5 @@
 <div id="tl_buttons">
-<a onclick="Backend.getScrollOffset();" accesskey="b" title="<?php echo $GLOBALS['TL_LANG']['tl_syncCto_steps']['back']; ?>" class="header_back" href="<?php echo $this->goBack; ?>"><?php echo $GLOBALS['TL_LANG']['tl_syncCto_steps']['back']; ?></a>
+<a onclick="Backend.getScrollOffset();" accesskey="b" title="<?php echo $GLOBALS['TL_LANG']['MSC']['backBT']; ?>" class="header_back" href="<?php echo $this->goBack; ?>"><?php echo $GLOBALS['TL_LANG']['tl_syncCto_steps']['back']; ?></a>
 </div>
 
 <h2 class="sub_headline"><?php echo $this->headline; ?></h2>

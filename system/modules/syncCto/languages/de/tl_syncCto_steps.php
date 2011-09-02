@@ -38,6 +38,4 @@ $GLOBALS['TL_LANG']['tl_syncCto_steps']['skipped'] = "Ubersprungen";
 $GLOBALS['TL_LANG']['tl_syncCto_steps']['step'] = "Schritt";
 $GLOBALS['TL_LANG']['tl_syncCto_steps']['complete'] = "Fertig!";
 
-$GLOBALS['TL_LANG']['tl_syncCto_steps']['back'] = "Zurück";
-
 ?>

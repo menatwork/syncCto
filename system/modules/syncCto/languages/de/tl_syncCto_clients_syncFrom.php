@@ -33,7 +33,6 @@
 $GLOBALS['TL_LANG']['tl_syncCto_clients_syncFrom']['sync_legend'] = "Synchronisations-Einstellungen";
 $GLOBALS['TL_LANG']['tl_syncCto_clients_syncFrom']['confirm_db_import_legend'] = "Datenbank-Einstellungen";
 $GLOBALS['TL_LANG']['tl_syncCto_clients_syncFrom']['edit'] = 'Synchronisation des Servers';
-$GLOBALS['TL_LANG']['tl_syncCto_clients_syncFrom']['back'] = 'Zurück';
 
 /**
  * Fields
@@ -44,9 +43,6 @@ $GLOBALS['TL_LANG']['tl_syncCto_clients_syncFrom']['confirm_db_import'] = array(
 /**
  * List
  */
-$GLOBALS['TL_LANG']['tl_syncCto_clients_syncFrom']['step'] = "Schritt";
-$GLOBALS['TL_LANG']['tl_syncCto_clients_syncFrom']['complete'] = "Fertig!";
-
 $GLOBALS['TL_LANG']['tl_syncCto_clients_syncFrom']['step1_help'] = "Server überprüfen.";
 $GLOBALS['TL_LANG']['tl_syncCto_clients_syncFrom']['step1_msg1'] = "Server für die Synchronsisation vorbereiten.";
 $GLOBALS['TL_LANG']['tl_syncCto_clients_syncFrom']['step1_msg2'] = "Versionskonflikt.";

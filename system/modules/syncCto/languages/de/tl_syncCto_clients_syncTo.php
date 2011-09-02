@@ -35,7 +35,6 @@ $GLOBALS['TL_LANG']['tl_syncCto_clients_syncTo']['filelist_legend'] = "Dateien u
 $GLOBALS['TL_LANG']['tl_syncCto_clients_syncTo']['table_recommend_legend'] = "Empfohlene Tabellen";
 $GLOBALS['TL_LANG']['tl_syncCto_clients_syncTo']['table_none_recommend_legend'] = "Nicht empfohlene Tabellen";
 $GLOBALS['TL_LANG']['tl_syncCto_clients_syncTo']['edit'] = 'Synchronisation des Clients';
-$GLOBALS['TL_LANG']['tl_syncCto_clients_syncTo']['back'] = 'Zurück';
 
 /**
  * Fields
@@ -48,9 +47,6 @@ $GLOBALS['TL_LANG']['tl_syncCto_clients_syncTo']['filelist'] = array("Quelldatei
 /**
  * List
  */
-$GLOBALS['TL_LANG']['tl_syncCto_clients_syncTo']['step'] = "Schritt";
-$GLOBALS['TL_LANG']['tl_syncCto_clients_syncTo']['complete'] = "Fertig!";
-
 $GLOBALS['TL_LANG']['tl_syncCto_clients_syncTo']['step1_help'] = "Client überprüfen.";
 $GLOBALS['TL_LANG']['tl_syncCto_clients_syncTo']['step1_msg1'] = "Client für die Synchronisation vorbereiten.";
 $GLOBALS['TL_LANG']['tl_syncCto_clients_syncTo']['step1_msg2'] = "Versionskonflikt.";

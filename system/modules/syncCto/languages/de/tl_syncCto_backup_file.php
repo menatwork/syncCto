@@ -33,7 +33,6 @@
 $GLOBALS['TL_LANG']['tl_syncCto_backup_file']['backup_legend'] = "Backup-Einstellungen";
 $GLOBALS['TL_LANG']['tl_syncCto_backup_file']['filelist_legend'] = "Dateien und Ordner";
 $GLOBALS['TL_LANG']['tl_syncCto_backup_file']['edit'] = 'Ein Backup der Dateien erstellen';
-$GLOBALS['TL_LANG']['tl_syncCto_backup_file']['back'] = 'Zurück';
 
 /**
  * Fields
@@ -51,17 +50,6 @@ $GLOBALS['TL_LANG']['tl_syncCto_backup_file']['option_small'] = 'Persönliche Da
 /**
  * List
  */
-$GLOBALS['TL_LANG']['tl_syncCto_backup_file']['ok'] = "OK";
-$GLOBALS['TL_LANG']['tl_syncCto_backup_file']['progress'] = "In Bearbeitung";
-$GLOBALS['TL_LANG']['tl_syncCto_backup_file']['error'] = "Fehler";
-$GLOBALS['TL_LANG']['tl_syncCto_backup_file']['skipped'] = "Übersprungen";
-
-$GLOBALS['TL_LANG']['tl_syncCto_backup_file']['step1'] = "Schritt 1";
-$GLOBALS['TL_LANG']['tl_syncCto_backup_file']['step2'] = "Schritt 2";
-$GLOBALS['TL_LANG']['tl_syncCto_backup_file']['step3'] = "Schritt 3";
-$GLOBALS['TL_LANG']['tl_syncCto_backup_file']['step4'] = "Schritt 4";
-$GLOBALS['TL_LANG']['tl_syncCto_backup_file']['complete'] = "Fertig!";
-
 $GLOBALS['TL_LANG']['tl_syncCto_backup_file']['step1_help'] = "ZIP-Datei erstellen.";
 $GLOBALS['TL_LANG']['tl_syncCto_backup_file']['step2_help'] = "Contao-Installation sichern.";
 $GLOBALS['TL_LANG']['tl_syncCto_backup_file']['step3_help'] = "tl_files sichern.";

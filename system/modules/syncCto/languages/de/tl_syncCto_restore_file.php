@@ -32,7 +32,6 @@
  */
 $GLOBALS['TL_LANG']['tl_syncCto_restore_file']['filelist_legend'] = "Dateien";
 $GLOBALS['TL_LANG']['tl_syncCto_restore_file']['edit'] = 'Ein Backup der Dateien einspielen';
-$GLOBALS['TL_LANG']['tl_syncCto_restore_file']['back'] = 'Zurück';
 
 /**
  * Fields
@@ -42,10 +41,6 @@ $GLOBALS['TL_LANG']['tl_syncCto_restore_file']['filelist'] = array("Quelldatei",
 /**
  * List
  */
-$GLOBALS['TL_LANG']['tl_syncCto_restore_file']['ok'] = "OK";
-$GLOBALS['TL_LANG']['tl_syncCto_restore_file']['progress'] = "In Bearbeitung";
-$GLOBALS['TL_LANG']['tl_syncCto_restore_file']['error'] = "Fehler";
-
 $GLOBALS['TL_LANG']['tl_syncCto_restore_file']['step1'] = "Schritt 1";
 $GLOBALS['TL_LANG']['tl_syncCto_restore_file']['complete'] = "Fertig!";
 
