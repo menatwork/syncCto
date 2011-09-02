@@ -35,7 +35,7 @@ require_once('../../initialize.php');
 /**
  * Class PurgeLog
  */
-class SyncCtoDeleteDbBackups extends Backend
+class CronDeleteDbBackups extends Backend
 {
 
 	/**
@@ -44,7 +44,7 @@ class SyncCtoDeleteDbBackups extends Backend
 	public function __construct()
 	{
 		parent::__construct();
-	} // __construct
+	}
 	
 	/**
 	 * Implement the commands to run by this batch program
@@ -61,9 +61,9 @@ class SyncCtoDeleteDbBackups extends Backend
                 }
             }
 
-	} // run
+	}
 	
-} // class SyncCtoDeleteDbBackups
+}
 
 /**
  * Instantiate log purger

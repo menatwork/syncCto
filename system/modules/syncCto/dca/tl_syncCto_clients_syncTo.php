@@ -1,6 +1,6 @@
 <?php
 
-if ( !defined('TL_ROOT') )
+if (!defined('TL_ROOT'))
     die('You can not access this file directly!');
 
 /**
@@ -38,7 +38,7 @@ $GLOBALS['TL_DCA']['tl_syncCto_clients_syncTo'] = array(
         'disableSubmit' => false,
         'onload_callback' => array(
             array('tl_syncCto_clients_syncTo', 'onload_callback'),
-			array('tl_syncCto_clients_syncTo', 'checkPermission'),
+            array('tl_syncCto_clients_syncTo', 'checkPermission'),
         ),
         'onsubmit_callback' => array(
             array('tl_syncCto_clients_syncTo', 'onsubmit_callback'),
@@ -88,6 +88,7 @@ $GLOBALS['TL_DCA']['tl_syncCto_clients_syncTo'] = array(
 
 class tl_syncCto_clients_syncTo extends Backend
 {
+
     // Constructor and singelten pattern
     public function __construct()
     {
@@ -97,7 +98,7 @@ class tl_syncCto_clients_syncTo extends Backend
         parent::__construct();
     }
 
-	public function onload_callback(DataContainer $dc)
+    public function onload_callback(DataContainer $dc)
     {
         $dc->removeButton('save');
         $dc->removeButton('saveNclose');
@@ -114,9 +115,86 @@ class tl_syncCto_clients_syncTo extends Backend
 
         $dc->addButton('start_sync', $arrData);
     }
-	
-	public function onsubmit_callback(DataContainer $dc)
+
+    public function onsubmit_callback(DataContainer $dc)
     {
+
+        // Check sync. typ
+        if (strlen($this->Input->post('sync_type')) != 0)
+        {
+            if ($this->Input->post('sync_type') == SYNCCTO_FULL || $this->Input->post('sync_type') == SYNCCTO_SMALL)
+            {
+                $this->Session->set("syncCto_Typ", $this->Input->post('sync_type'));
+            }
+            else
+            {
+                $_SESSION["TL_ERROR"] = array($GLOBALS['TL_LANG']['syncCto']['unknown_method']);
+                $this->redirect("contao/main.php?do=synccto_clients");
+            }
+        }
+        else
+        {
+            $this->Session->set("syncCto_Typ", SYNCCTO_SMALL);
+        }
+
+        // Load table lists and merge them
+        if ($this->Input->post("table_list_recommend") != "" || $this->Input->post("table_list_none_recommend") != "")
+        {
+            if ($this->Input->post("table_list_recommend") != "" && $this->Input->post("table_list_none_recommend") != "")
+                $arrSyncTables = array_merge($this->Input->post("table_list_recommend"), $this->Input->post("table_list_none_recommend"));
+            else if ($this->Input->post("table_list_recommend"))
+                $arrSyncTables = $this->Input->post("table_list_recommend");
+            else if ($this->Input->post("table_list_none_recommend"))
+                $arrSyncTables = $this->Input->post("table_list_none_recommend");
+
+            $this->Session->set("syncCto_SyncTables", $arrSyncTables);
+        }
+        else
+        {
+            $this->Session->set("syncCto_SyncTables", FALSE);
+        }
+
+        // Files for backup tl_files       
+        if (is_array($this->Input->post('filelist')) && count($this->Input->post('filelist')) != 0)
+        {
+            $this->Session->set("syncCto_Filelist", $this->Input->post('filelist'));
+        }
+        else
+        {
+            $this->Session->set("syncCto_Filelist", FALSE);
+        }
+
+        $this->Session->set("syncCto_Start", microtime(true));
+
+        // Step 1
+        $this->Session->set("syncCto_StepPool1", FALSE);
+        // Step 2
+        $this->Session->set("syncCto_StepPool2", FALSE);
+        // Step 3
+        $this->Session->set("syncCto_StepPool3", FALSE);
+        // Step 4
+        $this->Session->set("syncCto_StepPool4", FALSE);
+        // Step 5
+        $this->Session->set("syncCto_StepPool5", FALSE);
+        // Step 6
+        $this->Session->set("syncCto_StepPool6", FALSE);
+
+        $arrContenData = array(
+            "error" => false,
+            "error_msg" => "",
+            "refresh" => true,
+            "finished" => false,
+            "step" => 1,
+            "url" => "contao/main.php?do=synccto_clients&amp;table=tl_syncCto_clients_syncTo&amp;act=start&amp;id=" . (int) $this->Input->get("id"),
+            "goBack" => "contao/main.php?do=synccto_clients",
+            "start" => microtime(true),
+            "headline" => $GLOBALS['TL_LANG']['tl_syncCto_clients_syncTo']['edit'],
+            "information" => "",
+            "data" => array()
+        );
+
+        $this->Session->set("syncCto_Content", $arrContenData);
+
         $this->redirect($this->Environment->base . "contao/main.php?do=synccto_clients&amp;table=tl_syncCto_clients_syncTo&amp;act=start&amp;id=" . $this->Input->get("id"));
     }
 
@@ -129,6 +207,7 @@ class tl_syncCto_clients_syncTo extends Backend
 
         $GLOBALS['TL_DCA']['tl_syncCto_clients_syncTo']['list']['sorting']['root'] = $this->BackendUser->filemounts;
     }
+
 }
 
 ?>

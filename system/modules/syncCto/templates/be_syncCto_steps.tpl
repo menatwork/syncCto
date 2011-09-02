@@ -43,7 +43,7 @@
 
 <?php if ($GLOBALS['TL_CONFIG']['syncCto_debug_filelist'] == true): ?>
 <p class="debug tl_help"><?php echo vsprintf($GLOBALS['TL_LANG']['syncCto']['run_time'], array(number_format(microtime(true) - $this->start, 5))); ?><br />
-Auslastung: <?php echo round(memory_get_peak_usage(true) / 1048576, 4); ?> MBytes</p>
+Auslastung: <?php $this->getReadableSize(memory_get_peak_usage(true), 4); ?></p>
 <?php endif; ?>
 
 <script type="text/javascript">

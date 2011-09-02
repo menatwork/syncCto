@@ -29,13 +29,6 @@ if (!defined('TL_ROOT'))
  * @license    GNU/LGPL
  * @filesource
  */
-/**
- * Defines
- */
-define("OK", 1);
-define("ERROR", 2);
-define("WORK", 3);
-define("SKIPPED", 4);
 
 class SyncCtoModuleBackup extends BackendModule
 {

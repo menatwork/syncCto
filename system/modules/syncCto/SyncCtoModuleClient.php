@@ -91,7 +91,7 @@ class SyncCtoModuleClient extends BackendModule
     {
         // Build Step
         if ($this->Input->get("step") == "" || $this->Input->get("step") == null)
-            $this->step = 0;
+            $this->step = 1;
         else
             $this->step = intval($this->Input->get("step"));
 
@@ -114,85 +114,6 @@ class SyncCtoModuleClient extends BackendModule
         // Do step x
         switch ($this->step)
         {
-            case 0:
-                // Check sync. typ
-                if (strlen($this->Input->post('sync_type')) != 0)
-                {
-                    if ($this->Input->post('sync_type') == SYNCCTO_FULL || $this->Input->post('sync_type') == SYNCCTO_SMALL)
-                    {
-                        $this->Session->set("syncCto_Typ", $this->Input->post('sync_type'));
-                    }
-                    else
-                    {
-                        $_SESSION["TL_ERROR"] = array($GLOBALS['TL_LANG']['syncCto']['unknown_method']);
-                        $this->redirect("contao/main.php?do=synccto_clients");
-                    }
-                }
-                else
-                {
-                    $this->Session->set("syncCto_Typ", SYNCCTO_SMALL);
-                }
-
-                // Load table lists and merge them
-                if ($this->Input->post("table_list_recommend") != "" || $this->Input->post("table_list_none_recommend") != "")
-                {
-                    if ($this->Input->post("table_list_recommend") != "" && $this->Input->post("table_list_none_recommend") != "")
-                        $arrSyncTables = array_merge($this->Input->post("table_list_recommend"), $this->Input->post("table_list_none_recommend"));
-                    else if ($this->Input->post("table_list_recommend"))
-                        $arrSyncTables = $this->Input->post("table_list_recommend");
-                    else if ($this->Input->post("table_list_none_recommend"))
-                        $arrSyncTables = $this->Input->post("table_list_none_recommend");
-
-                    $this->Session->set("syncCto_SyncTables", $arrSyncTables);
-                }
-                else
-                {
-                    $this->Session->set("syncCto_SyncTables", FALSE);
-                }
-
-                // Files for backup tl_files       
-                if (is_array($this->Input->post('filelist')) && count($this->Input->post('filelist')) != 0)
-                {
-                    $this->Session->set("syncCto_Filelist", $this->Input->post('filelist'));
-                }
-                else
-                {
-                    $this->Session->set("syncCto_Filelist", FALSE);
-                }
-
-                $this->Session->set("syncCto_Start", microtime(true));
-
-                // Step 1
-                $this->Session->set("syncCto_StepPool1", FALSE);
-                // Step 2
-                $this->Session->set("syncCto_StepPool2", FALSE);
-                // Step 3
-                $this->Session->set("syncCto_StepPool3", FALSE);
-                // Step 4
-                $this->Session->set("syncCto_StepPool4", FALSE);
-                // Step 5
-                $this->Session->set("syncCto_StepPool5", FALSE);
-                // Step 6
-                $this->Session->set("syncCto_StepPool6", FALSE);
-
-                $arrContenData = array(
-                    "error" => false,
-                    "error_msg" => "",
-                    "refresh" => true,
-                    "finished" => false,
-                    "step" => 1,
-                    "url" => "contao/main.php?do=synccto_clients&amp;table=tl_syncCto_clients_syncTo&amp;act=start&amp;id=" . (int) $this->Input->get("id"),
-                    "goBack" => "contao/main.php?do=synccto_clients",
-                    "start" => microtime(true),
-                    "headline" => $GLOBALS['TL_LANG']['tl_syncCto_clients_syncTo']['edit'],
-                    "information" => "",
-                    "data" => array()
-                );
-
-                $this->Session->set("syncCto_Content", $arrContenData);
-
-                $this->step++;
-
             case 1:
                 $this->Database->prepare("UPDATE `tl_synccto_clients` %s WHERE `tl_synccto_clients`.`id` = ?")
                         ->set(array("syncTo_user" => $this->User->id, "syncTo_tstamp" => time()))

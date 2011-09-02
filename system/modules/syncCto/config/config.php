@@ -105,12 +105,16 @@ $GLOBALS['TL_PERMISSIONS'][] = 'syncCto_tables';
 /**
  * Callback is only used for overview screen
  */
-if ($objInput->get("do") == 'syncCto_backups' && $objInput->get("table") != '' && $objInput->get("act") == '')
+if ($objInput->get("do") == 'syncCto_backups' 
+        && $objInput->get("table") != '' 
+        && ($objInput->get("act") == '' || $objInput->get("act") == 'edit'))
 {
     unset($GLOBALS['BE_MOD']['syncCto']['syncCto_backups']['callback']);
 }
 
-if (!($objInput->get("do") == 'synccto_clients' && ($objInput->get("table") == 'tl_syncCto_clients_syncTo' || $objInput->get("table") == 'tl_syncCto_clients_syncFrom' ) && $objInput->get("act")) != '')
+if (!($objInput->get("do") == 'synccto_clients' 
+        && ($objInput->get("table") == 'tl_syncCto_clients_syncTo' || $objInput->get("table") == 'tl_syncCto_clients_syncFrom' ) 
+        && ($objInput->get("act") == '' || $objInput->get("act") == 'edit')))
 {
     unset($GLOBALS['BE_MOD']['syncCto']['synccto_clients']['callback']);
 }

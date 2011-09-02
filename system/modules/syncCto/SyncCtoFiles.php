@@ -1,7 +1,4 @@
-<?php
-
-if (!defined('TL_ROOT'))
-    die('You cannot access this file directly!');
+<?php if (!defined('TL_ROOT')) die('You cannot access this file directly!');
 
 /**
  * Contao Open Source CMS
@@ -29,18 +26,19 @@ if (!defined('TL_ROOT'))
  * @license    GNU/LGPL
  * @filesource
  */
+
 class SyncCtoFiles extends Backend
 {
     /* -------------------------------------------------------------------------
      * Vars
      */
 
-    //- Singelten pattern --------
+    // Singelten pattern
     protected static $instance = null;
-    //- Vars ---------------------   
+    // Vars
     protected $strSuffixZipName = "File-Backup.zip";
     protected $strTimestampFormat = "Ymd_H-i-s";
-    //- Objects ------------------
+    // Objects 
     protected $objSyncCtoHelper;
 
     /* -------------------------------------------------------------------------
@@ -407,9 +405,6 @@ class SyncCtoFiles extends Backend
         }
 
         unset($objZipWrite);
-
-        // Move Files
-
         unset($arrFileList);
 
         return;

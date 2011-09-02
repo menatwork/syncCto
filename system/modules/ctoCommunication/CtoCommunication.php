@@ -35,16 +35,16 @@ class CtoCommunication extends Backend
      * Vars
      */
 
-    //- Singelten pattern --------
+    // Singelten pattern
     protected static $instance = null;
-    //- Vars ---------------------
+    // Vars
     protected $strUrl;
     protected $strApiKey;
     protected $arrCookies;
     protected $arrRpcList;
     protected $arrError;
     protected $mixOutput;
-    //- Objects ------------------
+    // Objects
     protected $objCodifyengine;
     protected $objCodifyengineBlow;
     protected $objDebug;
@@ -258,12 +258,6 @@ class CtoCommunication extends Backend
         if ($this->strUrl == "" || $this->strUrl == null)
             throw new Exception("There is no URL set for connection. Please set first the url.");
 
-        // Merge Cookie Array
-        if ($arrCookies != null && count($arrCookies) != 0)
-        {
-            $this->arrCookies = array_unique(array_merge($this->arrCookies, $arrCookies));
-        }
-
         // Add Get Parameter
         $strCryptApiKey = $this->objCodifyengineBlow->Encrypt($rpc . "@|@" . $this->strApiKey);
         $strCryptApiKey = urlencode($strCryptApiKey);
@@ -415,9 +409,8 @@ class CtoCommunication extends Backend
         // Start measurement
         $this->objDebug->startMeasurement(__CLASS__, __FUNCTION__, "RPC: " . $this->Input->get("act"));
 
-        /** --------------------------------------------------------------------
-         * API Key - Check
-         */
+        // API Key - Check -----------------------------------------------------
+
         if (strlen($this->Input->get("apikey")) == 0)
         {
             $this->log(vsprintf("Call from %s without a API Key.", $this->Environment->ip), __FUNCTION__ . " | " . __CLASS__, TL_ERROR);
@@ -447,9 +440,8 @@ class CtoCommunication extends Backend
             exit();
         }
 
-        /** --------------------------------------------------------------------
-         * Change the Codifyengine if set
-         */
+        // Change the Codifyengine if set --------------------------------------
+
         if (strlen($this->Input->get("engine")) != 0)
         {
             // Try to change codifyengine
@@ -472,9 +464,8 @@ class CtoCommunication extends Backend
             $this->objCodifyengine->setKey($GLOBALS['TL_CONFIG']['ctoCom_APIKey']);
         }
 
-        /** --------------------------------------------------------------------
-         * Run RPC-Check function
-         */
+        // Run RPC-Check function ----------------------------------------------
+
         $mixRPCCall = $this->Input->get("act");
         // Check if act is set
         if (strlen($mixRPCCall) == 0)
@@ -557,9 +548,7 @@ class CtoCommunication extends Backend
                 return $this->generateOutput();
             }
 
-            /** ----------------------------------------------------------------
-             * Try to execute rpc call
-             */
+
             try
             {
                 $this->objDebug->startMeasurement($this->arrRpcList[$mixRPCCall]["class"], $this->arrRpcList[$mixRPCCall]["function"]);

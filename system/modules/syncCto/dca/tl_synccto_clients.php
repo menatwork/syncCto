@@ -102,7 +102,7 @@ $GLOBALS['TL_DCA']['tl_synccto_clients'] = array(
     ),
     // Palettes
     'palettes' => array(
-        'default' => '{title_legend},title,description;{connection_label},address,path,port,transmission,codifyengine;{user_label},seckey;'
+        'default' => '{title_legend},title,description;{connection_label},address,path,port,codifyengine;{user_label},seckey;'
     ),
     // Fields
     'fields' => array(
@@ -138,7 +138,6 @@ $GLOBALS['TL_DCA']['tl_synccto_clients'] = array(
         'path' => array(
             'label' => &$GLOBALS['TL_LANG']['tl_synccto_clients']['path'],
             'inputType' => 'text',
-            'default' => 'syncCto.php',
             'exclude' => true,
             'eval' => array('mandatory' => true)
         ),
@@ -146,7 +145,7 @@ $GLOBALS['TL_DCA']['tl_synccto_clients'] = array(
             'label' => &$GLOBALS['TL_LANG']['tl_synccto_clients']['codifyengine'],
             'inputType' => 'select',
             'exclude' => true,
-            'options_callback' => array("tl_synccto_clients", "optioncallCodifyengines"),
+            'options_callback' => array("tl_synccto_clients", "callCodifyengines"),
             'eval' => array('mandatory' => true),
         ),
         'seckey' => array(
@@ -287,7 +286,7 @@ class tl_synccto_clients extends Backend
             $GLOBALS['TL_DCA']['tl_synccto_clients']['config'] = array_unique(array_merge(array('closed' => true), $GLOBALS['TL_DCA']['tl_synccto_clients']['config']));
     }
 
-    public function optioncallCodifyengines()
+    public function callCodifyengines()
     {
         $arrReturn = array();
 
