@@ -46,8 +46,8 @@ $GLOBALS['TL_LANG']['tl_syncCto_settings']['folder_blacklist'] = array("Folder b
 $GLOBALS['TL_LANG']['tl_syncCto_settings']['file_blacklist'] = array("File blacklist", "Here you can define which files should be ignored for synchronization.");
 $GLOBALS['TL_LANG']['tl_syncCto_settings']['folder_whitelist'] = array("Whitelist for root folders", "Here you can define which root folder for synchronization should be considered.");
 $GLOBALS['TL_LANG']['tl_syncCto_settings']['local_blacklist'] = array("localconfig.php", "Here you can define which localconfig.php entries should not be synchronized.");
-$GLOBALS['TL_LANG']['tl_syncCto_settings']['table_list'] = array("Not recommended tables", "Here you can define which database tables you do not recommend for the synchronization.");
-$GLOBALS['TL_LANG']['tl_syncCto_settings']['table_hidden'] = array("Hidden tables", "Here you can grant access to one or more database tables for the synchronization.");
+$GLOBALS['TL_LANG']['tl_syncCto_settings']['database_tables'] = array("Not recommended tables", "Here you can define which database tables you do not recommend for the synchronization.");
+$GLOBALS['TL_LANG']['tl_syncCto_settings']['hidden_tables'] = array("Hidden tables", "Here you can grant access to one or more database tables for the synchronization.");
 $GLOBALS['TL_LANG']['tl_syncCto_settings']['seckey'] = array("Encryption key", "The key is used for the encrypted data storage.");
 $GLOBALS['TL_LANG']['tl_syncCto_settings']['debug_mode'] = array("Enable debug mode", "Print information like runtime or synchronized data to the screen.");
 ?>

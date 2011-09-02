@@ -118,7 +118,7 @@ class SyncCtoHelper extends Backend
 
     public function getTablesHidden()
     {
-        $arrLocalconfig = deserialize($GLOBALS['TL_CONFIG']['syncCto_table_hidden']);
+        $arrLocalconfig = deserialize($GLOBALS['TL_CONFIG']['syncCto_hidden_tables']);
         $arrSyncCtoConfig = $GLOBALS['SYC_CONFIG']['table_hidden'];
         return $this->mergerConfigs($arrLocalconfig, $arrSyncCtoConfig);
     }

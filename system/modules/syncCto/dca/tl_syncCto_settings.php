@@ -38,7 +38,7 @@ $GLOBALS['TL_DCA']['tl_syncCto_settings'] = array(
     // Palettes
     'palettes' => array
         (
-        'default' => '{blacklist_legend:hide},syncCto_folder_blacklist,syncCto_file_blacklist;{whitelist_legend:hide},syncCto_folder_whitelist;{local_blacklist_legend},syncCto_local_blacklist;{hidden_tables_legend:hide},syncCto_table_hidden;{tables_legend},syncCto_table_list;{debug_legend},syncCto_debug_mode;'
+        'default' => '{blacklist_legend:hide},syncCto_folder_blacklist,syncCto_file_blacklist;{whitelist_legend:hide},syncCto_folder_whitelist;{local_blacklist_legend},syncCto_local_blacklist;{hidden_tables_legend:hide},syncCto_hidden_tables;{tables_legend},syncCto_database_tables;{debug_legend},syncCto_debug_mode;'
     ),
     // Fields
     'fields' => array(
@@ -71,17 +71,17 @@ $GLOBALS['TL_DCA']['tl_syncCto_settings'] = array(
             'options_callback' => array('SyncCtoCallback', 'localconfigEntries'),
             'load_callback' => array(array('SyncCtoCallback', 'loadcallLocalConfig')),
         ),
-        'syncCto_table_hidden' => array
+        'syncCto_hidden_tables' => array
             (
-            'label' => &$GLOBALS['TL_LANG']['tl_syncCto_settings']['table_hidden'],
+            'label' => &$GLOBALS['TL_LANG']['tl_syncCto_settings']['hidden_tables'],
             'inputType' => 'checkboxWizard',
             'eval' => array('multiple' => true),
             'options_callback' => array('SyncCtoCallback', 'hiddenTables'),
             'load_callback' => array(array('SyncCtoCallback', 'loadcallTableHidden')),
         ),
-        'syncCto_table_list' => array
+        'syncCto_database_tables' => array
             (
-            'label' => &$GLOBALS['TL_LANG']['tl_syncCto_settings']['table_list'],
+            'label' => &$GLOBALS['TL_LANG']['tl_syncCto_settings']['database_tables'],
             'inputType' => 'checkboxWizard',
             'eval' => array('multiple' => true),
             'options_callback' => array('SyncCtoCallback', 'databaseTables'),

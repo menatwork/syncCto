@@ -31,7 +31,7 @@ if (!defined('TL_ROOT'))
  */
 
 /**
- * Cllback Class for SyncCto
+ * Callback Class for SyncCto
  */
 class SyncCtoCallback extends Backend
 {
@@ -83,7 +83,7 @@ class SyncCtoCallback extends Backend
                 $_SESSION["TL_INFO"] = array();
 
             // required extensions
-            $arrRequiredExtensions = array('cron', 'httprequestextended', 'textwizard', '3cframework', 'multicolumnwizard');
+            $arrRequiredExtensions = array('httprequestextended', 'textwizard', '3cframework');
 
             // required files
             $arrRequiredFiles = array('system/drivers/DC_Memory.php');
@@ -344,7 +344,7 @@ class SyncCtoCallback extends Backend
     public function databaseTablesRecommended()
     {
         // SyncCto Blacklist
-        $arrBlacklist = deserialize($GLOBALS['TL_CONFIG']['syncCto_table_list']);
+        $arrBlacklist = deserialize($GLOBALS['TL_CONFIG']['syncCto_database_tables']);
         if (!is_array($arrBlacklist))
         {
             $arrBlacklist = array();
@@ -370,7 +370,7 @@ class SyncCtoCallback extends Backend
 
     public function databaseTablesNoneRecommended()
     {
-        $arrBlacklist = deserialize($GLOBALS['TL_CONFIG']['syncCto_table_list']);
+        $arrBlacklist = deserialize($GLOBALS['TL_CONFIG']['syncCto_database_tables']);
         if (!is_array($arrBlacklist))
         {
             $arrBlacklist = array();
