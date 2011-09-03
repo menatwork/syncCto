@@ -37,8 +37,8 @@ $GLOBALS['TL_LANG']['tl_syncCto_backup_file']['edit'] = 'Ein Backup der Dateien 
 /**
  * Fields
  */
-$GLOBALS['TL_LANG']['tl_syncCto_backup_file']['backupType'] = array("Art des Backups", "Hier können Sie die Art des Backups auswählen.");
-$GLOBALS['TL_LANG']['tl_syncCto_backup_file']['backupName'] = array("Dateiname", "Hier können Sie einen optionalen Namen zur eindeutigen Identifikation eingeben.");
+$GLOBALS['TL_LANG']['tl_syncCto_backup_file']['backup_type'] = array("Art des Backups", "Hier können Sie die Art des Backups auswählen.");
+$GLOBALS['TL_LANG']['tl_syncCto_backup_file']['backup_name'] = array("Dateiname", "Hier können Sie einen optionalen Namen zur eindeutigen Identifikation eingeben.");
 $GLOBALS['TL_LANG']['tl_syncCto_backup_file']['filelist'] = array("Quelldateien", "Bitte wählen Sie eine Datei oder einen Ordner aus der Dateiübersicht.");
 
 /**

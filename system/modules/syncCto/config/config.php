@@ -161,7 +161,7 @@ $GLOBALS['SYC_CONFIG']['local_blacklist'] = array(
     "dbPconnect",
     "dbCharset",
     "dbPort",
-    "syncCto_seckey",
+    "syncCto_apikey",
 );
 
 /**

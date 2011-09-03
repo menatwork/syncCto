@@ -41,8 +41,8 @@ $GLOBALS['TL_LANG']['tl_syncCto_clients_syncTo']['back'] = 'Go back';
  * Fields
  */
 $GLOBALS['TL_LANG']['tl_syncCto_clients_syncTo']['sync_type'] = array("Type of synchronization", "Here you can select the type of synchronization.");
-$GLOBALS['TL_LANG']['tl_syncCto_clients_syncTo']['table_list_recommend'] = array("Recommended tables", "Here you can select the recommended tables for synchronization.");
-$GLOBALS['TL_LANG']['tl_syncCto_clients_syncTo']['table_list_none_recommend'] = array("Not recommended tables", "Here you can select the not recommended tables for synchronization. Use at your own risk.");
+$GLOBALS['TL_LANG']['tl_syncCto_clients_syncTo']['database_tables_recommended'] = array("Recommended tables", "Here you can select the recommended tables for synchronization.");
+$GLOBALS['TL_LANG']['tl_syncCto_clients_syncTo']['database_tables_none_recommended'] = array("Not recommended tables", "Here you can select the not recommended tables for synchronization. Use at your own risk.");
 $GLOBALS['TL_LANG']['tl_syncCto_clients_syncTo']['filelist'] = array("Source files", "Please select a file or folder from the files directory.");
 
 /**

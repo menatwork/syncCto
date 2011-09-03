@@ -11,7 +11,7 @@ CREATE TABLE `tl_synccto_clients` (
     `id` int(10) unsigned NOT NULL auto_increment,    
     `tstamp` int(10) unsigned NOT NULL default '0',
     `title` varchar(64) NOT NULL default '',
-    `seckey` varchar(64) NOT NULL default '',
+    `apikey` varchar(64) NOT NULL default '',
     `description` text NULL,
     `address` text NOT NULL,
     `path` varchar(255) NOT NULL default '',

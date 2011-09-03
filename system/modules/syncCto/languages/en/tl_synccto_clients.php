@@ -53,11 +53,9 @@ $GLOBALS['TL_LANG']['tl_synccto_clients']['user_label'] = 'User data';
 $GLOBALS['TL_LANG']['tl_synccto_clients']['title'] = array('Title', 'Please enter the title of the client.');
 $GLOBALS['TL_LANG']['tl_synccto_clients']['id'] = array('ID', 'Client ID.');
 $GLOBALS['TL_LANG']['tl_synccto_clients']['description'] = array('Description', 'Here you can enter a short description of the client.');
-$GLOBALS['TL_LANG']['tl_synccto_clients']['address'] = array('Address', 'Please enter the complete address to the contao installation.');
-$GLOBALS['TL_LANG']['tl_synccto_clients']['path'] = array('Path', 'Please enter the path to the file synccto.php.');
+$GLOBALS['TL_LANG']['tl_synccto_clients']['address'] = array('Domain', 'Please enter the complete address to the contao installation.');
+$GLOBALS['TL_LANG']['tl_synccto_clients']['path'] = array('Serverpath', 'Please enter the path to the file synccto.php.');
 $GLOBALS['TL_LANG']['tl_synccto_clients']['port'] = array('Port number', 'Please enter the number of the HTTP port. Default is 80.');
-$GLOBALS['TL_LANG']['tl_synccto_clients']['username'] = array('Username', 'Please enter your username.');
-$GLOBALS['TL_LANG']['tl_synccto_clients']['password'] = array('Password', 'Please enter the password of the user.');
-$GLOBALS['TL_LANG']['tl_synccto_clients']['seckey'] = array("Encryption key", "The key is used for the encrypted data storage.");
+$GLOBALS['TL_LANG']['tl_synccto_clients']['apikey'] = array("Encryption key", "The key is used for the encrypted data storage.");
 
 ?>

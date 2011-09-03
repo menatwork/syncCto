@@ -47,20 +47,20 @@ $GLOBALS['TL_DCA']['tl_syncCto_backup_db'] = array(
     // Palettes
     'palettes' => array
         (
-        'default' => '{table_recommend_legend},table_list_recommend;{table_none_recommend_legend:hide},table_list_none_recommend;'
+        'default' => '{table_recommend_legend},database_tables_recommended;{table_none_recommend_legend:hide},database_tables_none_recommended;'
     ),
     // Fields
     'fields' => array(
-        'table_list_recommend' => array
+        'database_tables_recommended' => array
             (
-            'label' => &$GLOBALS['TL_LANG']['tl_syncCto_backup_db']['table_list_recommend'],
+            'label' => &$GLOBALS['TL_LANG']['tl_syncCto_backup_db']['database_tables_recommended'],
             'inputType' => 'checkbox',
             'eval' => array('multiple' => true),
             'options_callback' => array('SyncCtoCallback', 'databaseTablesRecommended'),
         ),
-        'table_list_none_recommend' => array
+        'database_tables_none_recommended' => array
             (
-            'label' => &$GLOBALS['TL_LANG']['tl_syncCto_backup_db']['table_list_none_recommend'],
+            'label' => &$GLOBALS['TL_LANG']['tl_syncCto_backup_db']['database_tables_none_recommended'],
             'inputType' => 'checkbox',
             'eval' => array('multiple' => true),
             'options_callback' => array('SyncCtoCallback', 'databaseTablesNoneRecommended'),
@@ -97,19 +97,19 @@ class tl_syncCto_backup_db extends Backend
             $arrStepPool = array();
 
         // Check Table list
-        if ($this->Input->post("table_list_recommend") == "" && $this->Input->post("table_list_none_recommend") == "")
+        if ($this->Input->post("database_tables_recommended") == "" && $this->Input->post("database_tables_none_recommended") == "")
         {
             $_SESSION["TL_ERROR"] = array("Missing Tables");
             return;
         }
 
         // Merge recommend and none recommend post arrays
-        if ($this->Input->post("table_list_recommend") != "" && $this->Input->post("table_list_none_recommend") != "")
-            $arrTablesBackup = array_merge($this->Input->post("table_list_recommend"), $this->Input->post("table_list_none_recommend"));
-        else if ($this->Input->post("table_list_recommend"))
-            $arrTablesBackup = $this->Input->post("table_list_recommend");
-        else if ($this->Input->post("table_list_none_recommend"))
-            $arrTablesBackup = $this->Input->post("table_list_none_recommend");
+        if ($this->Input->post("database_tables_recommended") != "" && $this->Input->post("database_tables_none_recommended") != "")
+            $arrTablesBackup = array_merge($this->Input->post("database_tables_recommended"), $this->Input->post("database_tables_none_recommended"));
+        else if ($this->Input->post("database_tables_recommended"))
+            $arrTablesBackup = $this->Input->post("database_tables_recommended");
+        else if ($this->Input->post("database_tables_none_recommended"))
+            $arrTablesBackup = $this->Input->post("database_tables_none_recommended");
         
         $arrStepPool["tables"] = $arrTablesBackup;
         

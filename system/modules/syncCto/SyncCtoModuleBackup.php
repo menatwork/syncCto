@@ -208,7 +208,7 @@ class SyncCtoModuleBackup extends BackendModule
 
             case 1:
 //                // Check Table list
-//                if ($this->Input->post("table_list_recommend") == "" && $this->Input->post("table_list_none_recommend") == "")
+//                if ($this->Input->post("database_tables_recommended") == "" && $this->Input->post("database_tables_none_recommended") == "")
 //                {
 //                    $arrContenData["error"] = true;
 //                    $arrContenData["error_msg"] = $GLOBALS['TL_LANG']['syncCto']['no_backup_tables'];
@@ -217,12 +217,12 @@ class SyncCtoModuleBackup extends BackendModule
 //                }
 //
 //                // Merge recommend and none recommend post arrays
-//                if ($this->Input->post("table_list_recommend") != "" && $this->Input->post("table_list_none_recommend") != "")
-//                    $arrTablesBackup = array_merge($this->Input->post("table_list_recommend"), $this->Input->post("table_list_none_recommend"));
-//                else if ($this->Input->post("table_list_recommend"))
-//                    $arrTablesBackup = $this->Input->post("table_list_recommend");
-//                else if ($this->Input->post("table_list_none_recommend"))
-//                    $arrTablesBackup = $this->Input->post("table_list_none_recommend");
+//                if ($this->Input->post("database_tables_recommended") != "" && $this->Input->post("database_tables_none_recommended") != "")
+//                    $arrTablesBackup = array_merge($this->Input->post("database_tables_recommended"), $this->Input->post("database_tables_none_recommended"));
+//                else if ($this->Input->post("database_tables_recommended"))
+//                    $arrTablesBackup = $this->Input->post("database_tables_recommended");
+//                else if ($this->Input->post("database_tables_none_recommended"))
+//                    $arrTablesBackup = $this->Input->post("database_tables_none_recommended");
 //
 //                $arrStepPool["tables"] = $arrTablesBackup;
 
@@ -442,11 +442,11 @@ class SyncCtoModuleBackup extends BackendModule
                 $arrStepPool = array();
 
                 // Check sync. typ
-                if (strlen($this->Input->post('backupType')) != 0)
+                if (strlen($this->Input->post('backup_type')) != 0)
                 {
-                    if ($this->Input->post('backupType') == SYNCCTO_FULL || $this->Input->post('backupType') == SYNCCTO_SMALL)
+                    if ($this->Input->post('backup_type') == SYNCCTO_FULL || $this->Input->post('backup_type') == SYNCCTO_SMALL)
                     {
-                        $arrStepPool["syncCto_Typ"] = $this->Input->post('backupType');
+                        $arrStepPool["syncCto_Typ"] = $this->Input->post('backup_type');
                     }
                     else
                     {
@@ -460,7 +460,7 @@ class SyncCtoModuleBackup extends BackendModule
                     $arrStepPool["syncCto_Typ"] = SYNCCTO_SMALL;
                 }
 
-                $arrStepPool["backupName"] = $this->Input->post('backupName');
+                $arrStepPool["backup_name"] = $this->Input->post('backup_name');
                 $arrStepPool["filelist"] = $this->Input->post('filelist');
 
                 $step = 1;

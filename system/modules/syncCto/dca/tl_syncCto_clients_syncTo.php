@@ -47,7 +47,7 @@ $GLOBALS['TL_DCA']['tl_syncCto_clients_syncTo'] = array(
     // Palettes
     'palettes' => array
         (
-        'default' => '{sync_legend},sync_type;{table_recommend_legend},table_list_recommend;{table_none_recommend_legend},table_list_none_recommend;{filelist_legend},filelist',
+        'default' => '{sync_legend},sync_type;{table_recommend_legend},database_tables_recommended;{table_none_recommend_legend},database_tables_none_recommended;{filelist_legend},filelist',
     ),
     // Fields
     'fields' => array(
@@ -60,17 +60,17 @@ $GLOBALS['TL_DCA']['tl_syncCto_clients_syncTo'] = array(
             'reference' => &$GLOBALS['TL_LANG']['SYC'],
             'options_callback' => array('SyncCtoCallback', 'getSyncType'),
         ),
-        'table_list_recommend' => array
+        'database_tables_recommended' => array
             (
-            'label' => &$GLOBALS['TL_LANG']['tl_syncCto_clients_syncTo']['table_list_recommend'],
+            'label' => &$GLOBALS['TL_LANG']['tl_syncCto_clients_syncTo']['database_tables_recommended'],
             'inputType' => 'checkbox',
             'exclude' => true,
             'eval' => array('multiple' => true),
             'options_callback' => array('SyncCtoCallback', 'databaseTablesRecommended'),
         ),
-        'table_list_none_recommend' => array
+        'database_tables_none_recommended' => array
             (
-            'label' => &$GLOBALS['TL_LANG']['tl_syncCto_clients_syncTo']['table_list_none_recommend'],
+            'label' => &$GLOBALS['TL_LANG']['tl_syncCto_clients_syncTo']['database_tables_none_recommended'],
             'inputType' => 'checkbox',
             'exclude' => true,
             'eval' => array('multiple' => true),
@@ -138,14 +138,14 @@ class tl_syncCto_clients_syncTo extends Backend
         }
 
         // Load table lists and merge them
-        if ($this->Input->post("table_list_recommend") != "" || $this->Input->post("table_list_none_recommend") != "")
+        if ($this->Input->post("database_tables_recommended") != "" || $this->Input->post("database_tables_none_recommended") != "")
         {
-            if ($this->Input->post("table_list_recommend") != "" && $this->Input->post("table_list_none_recommend") != "")
-                $arrSyncTables = array_merge($this->Input->post("table_list_recommend"), $this->Input->post("table_list_none_recommend"));
-            else if ($this->Input->post("table_list_recommend"))
-                $arrSyncTables = $this->Input->post("table_list_recommend");
-            else if ($this->Input->post("table_list_none_recommend"))
-                $arrSyncTables = $this->Input->post("table_list_none_recommend");
+            if ($this->Input->post("database_tables_recommended") != "" && $this->Input->post("database_tables_none_recommended") != "")
+                $arrSyncTables = array_merge($this->Input->post("database_tables_recommended"), $this->Input->post("database_tables_none_recommended"));
+            else if ($this->Input->post("database_tables_recommended"))
+                $arrSyncTables = $this->Input->post("database_tables_recommended");
+            else if ($this->Input->post("database_tables_none_recommended"))
+                $arrSyncTables = $this->Input->post("database_tables_none_recommended");
 
             $this->Session->set("syncCto_SyncTables", $arrSyncTables);
         }

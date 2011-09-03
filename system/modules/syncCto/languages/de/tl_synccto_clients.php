@@ -53,12 +53,10 @@ $GLOBALS['TL_LANG']['tl_synccto_clients']['user_label'] = 'Benutzerdaten';
 $GLOBALS['TL_LANG']['tl_synccto_clients']['title'] = array('Titel', 'Hier können Sie den Titel des Clients eingeben.');
 $GLOBALS['TL_LANG']['tl_synccto_clients']['id'] = array('ID', 'ID des Clients.');
 $GLOBALS['TL_LANG']['tl_synccto_clients']['description'] = array('Beschreibung', 'Hier können Sie eine Kurzbeschreibung des Clients eingeben.');
-$GLOBALS['TL_LANG']['tl_synccto_clients']['address'] = array('Adresse', 'Bitte geben Sie die vollständige Adresse zur Contao Installation ein.');
-$GLOBALS['TL_LANG']['tl_synccto_clients']['path'] = array('Pfad', 'Bitte geben Sie den Pfad zur Datei synccto.php ein.');
+$GLOBALS['TL_LANG']['tl_synccto_clients']['address'] = array('Domain', 'Bitte geben Sie die Domain ein.');
+$GLOBALS['TL_LANG']['tl_synccto_clients']['path'] = array('Serverpfad', 'Bitte geben Sie den Pfad zur Installation ein, falls sich diese in einem Unterordner befindet.');
 $GLOBALS['TL_LANG']['tl_synccto_clients']['port'] = array('Portnummer', 'Bitte geben Sie die Nummer des HTTP-Ports ein. Standard ist 80.');
-$GLOBALS['TL_LANG']['tl_synccto_clients']['username'] = array('Benutzername', 'Bitte geben Sie den Benutzernamen ein.');
-$GLOBALS['TL_LANG']['tl_synccto_clients']['password'] = array('Passwort', 'Bitte geben Sie das Passwort des Benutzers ein.');
-$GLOBALS['TL_LANG']['tl_synccto_clients']['seckey'] = array("Verschlüsselungsschlüssel", "Der Schlüssel wird zur verschlüsselten Datenspeicherung verwendet.");
+$GLOBALS['TL_LANG']['tl_synccto_clients']['apikey'] = array("Verschlüsselungsschlüssel", "Der Schlüssel wird zur verschlüsselten Datenspeicherung verwendet.");
 $GLOBALS['TL_LANG']['tl_synccto_clients']['codifyengine'] = array("Verschlüsselungs-Engine", "Wählen Sie aus, welche Verschlüsselung benutzt werden soll.");
 
 ?>

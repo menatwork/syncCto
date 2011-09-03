@@ -37,8 +37,8 @@ $GLOBALS['TL_LANG']['tl_syncCto_backup_db']['edit'] = 'Ein Backup der Datenbank 
 /**
  * Fields
  */
-$GLOBALS['TL_LANG']['tl_syncCto_backup_db']['table_list_recommend'] = array("Empfohlene Tabellen", "Hier können Sie die empfohlenen Tabellen für das Backup auswählen.");
-$GLOBALS['TL_LANG']['tl_syncCto_backup_db']['table_list_none_recommend'] = array("Nicht empfohlene Tabellen", "Hier können Sie die NICHT empfohlenen Tabellen für das Backup auswählen. Benutzung auf eigene Gefahr.");
+$GLOBALS['TL_LANG']['tl_syncCto_backup_db']['database_tables_recommended'] = array("Empfohlene Tabellen", "Hier können Sie die empfohlenen Tabellen für das Backup auswählen.");
+$GLOBALS['TL_LANG']['tl_syncCto_backup_db']['database_tables_none_recommended'] = array("Nicht empfohlene Tabellen", "Hier können Sie die NICHT empfohlenen Tabellen für das Backup auswählen. Benutzung auf eigene Gefahr.");
 
 /**
  * List

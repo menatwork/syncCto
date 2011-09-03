@@ -38,8 +38,8 @@ $GLOBALS['TL_LANG']['tl_syncCto_backup_file']['back'] = 'Go back';
 /**
  * Fields
  */
-$GLOBALS['TL_LANG']['tl_syncCto_backup_file']['backupType'] = array("Type of backup", "Here you can select the type of backup.");
-$GLOBALS['TL_LANG']['tl_syncCto_backup_file']['backupName'] = array("Filename", "Here you can enter an optional name for identification.");
+$GLOBALS['TL_LANG']['tl_syncCto_backup_file']['backup_type'] = array("Type of backup", "Here you can select the type of backup.");
+$GLOBALS['TL_LANG']['tl_syncCto_backup_file']['backup_name'] = array("Filename", "Here you can enter an optional name for identification.");
 $GLOBALS['TL_LANG']['tl_syncCto_backup_file']['filelist'] = array("Source files", "Please select a file or folder from the files directory.");
 
 /**

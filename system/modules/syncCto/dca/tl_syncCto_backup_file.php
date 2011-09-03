@@ -44,13 +44,13 @@ $GLOBALS['TL_DCA']['tl_syncCto_backup_file'] = array(
     // Palettes
     'palettes' => array
         (
-        'default' => '{backup_legend},backupType,backupName;{filelist_legend},filelist;',
+        'default' => '{backup_legend},backup_type,backup_name;{filelist_legend},filelist;',
     ),
     // Fields
     'fields' => array(
-        'backupType' => array
+        'backup_type' => array
             (
-            'label' => &$GLOBALS['TL_LANG']['tl_syncCto_backup_file']['backupType'],
+            'label' => &$GLOBALS['TL_LANG']['tl_syncCto_backup_file']['backup_type'],
             'inputType' => 'select',
 			'exclude' => true,
             'reference' => &$GLOBALS['TL_LANG']['SYC'],
@@ -63,9 +63,9 @@ $GLOBALS['TL_DCA']['tl_syncCto_backup_file'] = array(
             'inputType' => 'fileTree',
             'eval' => array('fieldType'=>'checkbox', 'files'=>true, 'filesOnly'=>false, 'tl_class'=>'clr'),
         ),
-        'backupName' => array
+        'backup_name' => array
             (
-            'label' => &$GLOBALS['TL_LANG']['tl_syncCto_backup_file']['backupName'],
+            'label' => &$GLOBALS['TL_LANG']['tl_syncCto_backup_file']['backup_name'],
             'inputType' => 'text',
 			'exclude' => true,
             'eval' => array('maxlength' => 32),

@@ -102,7 +102,7 @@ $GLOBALS['TL_DCA']['tl_synccto_clients'] = array(
     ),
     // Palettes
     'palettes' => array(
-        'default' => '{title_legend},title,description;{connection_label},address,path,port,codifyengine;{user_label},seckey;'
+        'default' => '{title_legend},title,description;{connection_label},address,path,port,codifyengine;{user_label},apikey;'
     ),
     // Fields
     'fields' => array(
@@ -148,8 +148,8 @@ $GLOBALS['TL_DCA']['tl_synccto_clients'] = array(
             'options_callback' => array("tl_synccto_clients", "callCodifyengines"),
             'eval' => array('mandatory' => true),
         ),
-        'seckey' => array(
-            'label' => &$GLOBALS['TL_LANG']['tl_synccto_clients']['seckey'],
+        'apikey' => array(
+            'label' => &$GLOBALS['TL_LANG']['tl_synccto_clients']['apikey'],
             'inputType' => 'text',
             'exclude' => true,
             'eval' => array('mandatory' => true, 'maxlength' => 64)

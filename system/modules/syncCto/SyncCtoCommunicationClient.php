@@ -75,7 +75,7 @@ class SyncCtoCommunicationClient extends CtoCommunication
         $strUrl = $objClient->address . ":" . $objClient->port . "/" . $objClient->path . "/ctoCommunication.php";
 
         $this->setClient($strUrl, $objClient->codifyengine);
-        $this->setApiKey($objClient->seckey);
+        $this->setApiKey($objClient->apikey);
     }
 
     /* -------------------------------------------------------------------------
