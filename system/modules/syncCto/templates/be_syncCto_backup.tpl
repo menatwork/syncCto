@@ -2,19 +2,19 @@
 
 <div id="tl_soverview">
 
-<?php if(count($_SESSION["TL_ERROR"]) != 0): ?>
+<?php if(count($_SESSION["TL_ERROR"]) != 0 && $_SESSION["TL_ERROR"] != ""): ?>
 <?php foreach ($_SESSION["TL_ERROR"] as $key => $value):?>
 <p class="tl_error"><?php echo $value; ?></p>
 <?php endforeach; ?>    
 <?php endif; ?>
 
-<?php if(count($_SESSION["TL_INFO"]) != 0): ?>
-<?php foreach ($_SESSION["TL_ERROR"] as $key => $value):?>
+<?php if(count($_SESSION["TL_INFO"]) != 0 && $_SESSION["TL_INFO"] != ""): ?>
+<?php foreach ($_SESSION["TL_INFO"] as $key => $value):?>
 <p class="tl_info"><?php echo $value; ?></p>
 <?php endforeach; ?>    
 <?php endif; ?>
 
-<?php if(count($_SESSION["TL_CONFIRM"]) != 0): ?>
+<?php if(count($_SESSION["TL_CONFIRM"]) != 0 && $_SESSION["TL_CONFIRM"] != ""): ?>
 <?php foreach ($_SESSION["TL_CONFIRM"] as $key => $value):?>
 <p class="tl_confirm"><?php echo $value; ?></p>
 <?php endforeach; ?>    
