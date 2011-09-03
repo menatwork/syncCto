@@ -1,4 +1,7 @@
-<?php if (!defined('TL_ROOT')) die('You cannot access this file directly!');
+<?php
+
+if (!defined('TL_ROOT'))
+    die('You cannot access this file directly!');
 
 /**
  * Contao Open Source CMS
@@ -26,7 +29,6 @@
  * @license    GNU/LGPL
  * @filesource
  */
-
 class SyncCtoFiles extends Backend
 {
     /* -------------------------------------------------------------------------
@@ -312,6 +314,8 @@ class SyncCtoFiles extends Backend
 
         unset($objZipWrite);
         unset($arrFileList);
+
+        return $strFilename;
     }
 
     public function runDumpTlFiles($strZip = "", $arrFileList = null)
@@ -347,6 +351,8 @@ class SyncCtoFiles extends Backend
 
         unset($objZipWrite);
         unset($arrFileList);
+
+        return $strFilename;
     }
 
     public function runDumpCore($strZip = "")
@@ -379,6 +385,8 @@ class SyncCtoFiles extends Backend
 
         unset($objZipWrite);
         unset($arrFileList);
+
+        return $strFilename;
     }
 
     /**

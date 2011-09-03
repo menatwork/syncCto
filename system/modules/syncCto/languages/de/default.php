@@ -47,6 +47,12 @@ $GLOBALS['TL_LANG']['SYC']['option_full'] = array('Contao-Installation', 'Die ko
 /**
  * Errors
  */
+// Backup Errors
+$GLOBALS['TL_LANG']['ERR']['sync_no_tables_select'] = "Es wurden keine Tabellen für ein Backup ausgewählt.";
+$GLOBALS['TL_LANG']['ERR']['sync_no_file_select'] = "Es wurden keine Datei für ein Restore ausgewählt.";
+$GLOBALS['TL_LANG']['ERR']['sync_no_file_found'] = "Konnte die Datei nicht finden: %s .";
+$GLOBALS['TL_LANG']['ERR']['sync_unknown_backup_method'] = "Die gewählte Backup Methode ist nicht bekannt.";
+// END
 $GLOBALS['TL_LANG']['ERR']['cant_open'] = "Datei %s kann nicht geöffnet werden.";
 $GLOBALS['TL_LANG']['ERR']['file_not_exists'] = "Datei %s konnte nicht erstellt werden.";
 $GLOBALS['TL_LANG']['ERR']['zero_tables'] = "Es wurden keine SQL-Tabellen für ein Backup gefunden.";

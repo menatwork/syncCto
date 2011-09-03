@@ -50,10 +50,8 @@ $GLOBALS['TL_LANG']['tl_syncCto_backup_file']['option_small'] = 'Persönliche Da
 /**
  * List
  */
-$GLOBALS['TL_LANG']['tl_syncCto_backup_file']['step1_help'] = "ZIP-Datei erstellen.";
-$GLOBALS['TL_LANG']['tl_syncCto_backup_file']['step2_help'] = "Contao-Installation sichern.";
-$GLOBALS['TL_LANG']['tl_syncCto_backup_file']['step3_help'] = "tl_files sichern.";
-$GLOBALS['TL_LANG']['tl_syncCto_backup_file']['complete_help'] = "Backup erstellt unter";
+$GLOBALS['TL_LANG']['tl_syncCto_backup_file']['step1'] = "Contao-Installation / tl_files sichern.";
+$GLOBALS['TL_LANG']['tl_syncCto_backup_file']['complete'] = "Backup erstellt unter";
 $GLOBALS['TL_LANG']['tl_syncCto_backup_file']['download_backup'] = "Backup herunterladen.";
 
 ?>

@@ -43,8 +43,8 @@ $GLOBALS['TL_LANG']['tl_syncCto_backup_db']['database_tables_none_recommended'] 
 /**
  * List
  */
-$GLOBALS['TL_LANG']['tl_syncCto_backup_db']['step1_help'] = "SQL-Scripte und Inserts für syncCto erstellen.";
-$GLOBALS['TL_LANG']['tl_syncCto_backup_db']['complete_help'] = "Backup erstellt unter";
+$GLOBALS['TL_LANG']['tl_syncCto_backup_db']['step1'] = "SQL-Scripte und Inserts für syncCto erstellen.";
+$GLOBALS['TL_LANG']['tl_syncCto_backup_db']['complete'] = "Backup erstellt unter";
 $GLOBALS['TL_LANG']['tl_syncCto_backup_db']['download_backup'] = "Backup herunterladen.";
 
 ?>

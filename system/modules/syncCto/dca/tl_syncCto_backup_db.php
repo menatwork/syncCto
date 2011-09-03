@@ -29,11 +29,9 @@ if (!defined('TL_ROOT'))
  * @license    GNU/LGPL
  * @filesource
  */
- 
 $GLOBALS['TL_DCA']['tl_syncCto_backup_db'] = array(
     // Config
-    'config' => array
-        (
+    'config' => array(
         'dataContainer' => 'Memory',
         'closed' => true,
         'disableSubmit' => false,
@@ -45,21 +43,18 @@ $GLOBALS['TL_DCA']['tl_syncCto_backup_db'] = array(
         )
     ),
     // Palettes
-    'palettes' => array
-        (
+    'palettes' => array(
         'default' => '{table_recommend_legend},database_tables_recommended;{table_none_recommend_legend:hide},database_tables_none_recommended;'
     ),
     // Fields
     'fields' => array(
-        'database_tables_recommended' => array
-            (
+        'database_tables_recommended' => array(
             'label' => &$GLOBALS['TL_LANG']['tl_syncCto_backup_db']['database_tables_recommended'],
             'inputType' => 'checkbox',
             'eval' => array('multiple' => true),
             'options_callback' => array('SyncCtoCallback', 'databaseTablesRecommended'),
         ),
-        'database_tables_none_recommended' => array
-            (
+        'database_tables_none_recommended' => array(
             'label' => &$GLOBALS['TL_LANG']['tl_syncCto_backup_db']['database_tables_none_recommended'],
             'inputType' => 'checkbox',
             'eval' => array('multiple' => true),
@@ -88,18 +83,18 @@ class tl_syncCto_backup_db extends Backend
 
         $dc->addButton('start_backup', $arrData);
     }
-	
-	public function onsubmit_callback(DataContainer $dc)
+
+    public function onsubmit_callback(DataContainer $dc)
     {
         $arrStepPool = $this->Session->get("SyncCto_DB_StepPool");
-        
-        if(!is_array($arrStepPool))
+
+        if (!is_array($arrStepPool))
             $arrStepPool = array();
 
         // Check Table list
         if ($this->Input->post("database_tables_recommended") == "" && $this->Input->post("database_tables_none_recommended") == "")
         {
-            $_SESSION["TL_ERROR"] = array("Missing Tables");
+            $_SESSION["TL_INFO"] = array($GLOBALS['TL_LANG']['ERR']['sync_no_tables_select']);
             return;
         }
 
@@ -110,11 +105,11 @@ class tl_syncCto_backup_db extends Backend
             $arrTablesBackup = $this->Input->post("database_tables_recommended");
         else if ($this->Input->post("database_tables_none_recommended"))
             $arrTablesBackup = $this->Input->post("database_tables_none_recommended");
-        
+
         $arrStepPool["tables"] = $arrTablesBackup;
-        
+
         $this->Session->set("SyncCto_DB_StepPool", $arrStepPool);
-        
+
         $this->redirect($this->Environment->base . "contao/main.php?do=syncCto_backups&table=tl_syncCto_backup_db&act=start");
     }
 

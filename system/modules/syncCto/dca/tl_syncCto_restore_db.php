@@ -1,4 +1,7 @@
-<?php if (!defined('TL_ROOT')) die('You can not access this file directly!');
+<?php
+
+if (!defined('TL_ROOT'))
+    die('You can not access this file directly!');
 
 /**
  * Contao Open Source CMS
@@ -26,7 +29,6 @@
  * @license    GNU/LGPL
  * @filesource
  */
- 
 $GLOBALS['TL_DCA']['tl_syncCto_restore_db'] = array(
     // Config
     'config' => array
@@ -40,13 +42,12 @@ $GLOBALS['TL_DCA']['tl_syncCto_restore_db'] = array(
         'onsubmit_callback' => array(
             array('tl_syncCto_restore_db', 'onsubmit_callback'),
         )
-    ),	
+    ),
     // Palettes
     'palettes' => array
         (
         'default' => '{filelist_legend},filelist;',
     ),
-	
     // Fields
     'fields' => array(
         'filelist' => array
@@ -54,10 +55,9 @@ $GLOBALS['TL_DCA']['tl_syncCto_restore_db'] = array(
             'label' => &$GLOBALS['TL_LANG']['tl_syncCto_restore_db']['filelist'],
             'exclude' => true,
             'inputType' => 'fileTree',
-            'eval'  => array('files'=>true, 'filesOnly'=>true, 'fieldType'=>'radio', 'path'=>'tl_files/syncCto_backups/database', 'extensions'=>'zip'),
+            'eval' => array('files' => true, 'filesOnly' => true, 'fieldType' => 'radio', 'path' => 'tl_files/syncCto_backups/database', 'extensions' => 'zip'),
         ),
     )
-	
 );
 
 class tl_syncCto_restore_db extends Backend
@@ -80,10 +80,32 @@ class tl_syncCto_restore_db extends Backend
 
         $dc->addButton('restore_backup', $arrData);
     }
-	
-	public function onsubmit_callback(DataContainer $dc)
+
+    public function onsubmit_callback(DataContainer $dc)
     {
-        $this->redirect($this->Environment->base . "contao/main.php?do=syncCto_backups&amp;table=tl_syncCto_backup_file&amp;act=start");
+        $arrStepPool = $this->Session->get("SyncCto_DB_StepPool");
+
+        if (!is_array($arrStepPool))
+            $arrStepPool = array();
+        
+        if ($this->Input->post("filelist") == "")
+        {
+            $_SESSION["TL_INFO"] = array($GLOBALS['TL_LANG']['ERR']['sync_no_file_select']);
+            return;
+        }
+
+        if (!file_exists(TL_ROOT . "/" . $this->Input->post("filelist")))
+        {
+            $_SESSION["TL_ERROR"] = array(vsprintf($GLOBALS['TL_LANG']['ERR']['sync_no_file_found'], $argsarray));
+            return;
+            
+        }
+
+        $arrStepPool["SyncCto_Restore"] = $this->Input->post("filelist");
+
+        $this->Session->set("SyncCto_DB_StepPool", $arrStepPool);
+
+        $this->redirect($this->Environment->base . "contao/main.php?do=syncCto_backups&amp;table=tl_syncCto_restore_db&amp;act=start");
     }
 
 }
