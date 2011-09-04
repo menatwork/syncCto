@@ -12,5 +12,13 @@
   * textwizard
   * http://www.contao.org/erweiterungsliste/view/textwizard.html
   */
-
-test
+  
+ /*
+  * 3cframework
+  * http://www.contao.org/erweiterungsliste/view/3CFramework.html
+  */
+  
+ /*
+  * DC_Memory
+  * http://www.contao.org/erweiterungsliste/view/DC_Memory.html
+  */
