@@ -34,12 +34,19 @@ $GLOBALS['TL_LANG']['tl_syncCto_steps']['ok'] = "OK";
 $GLOBALS['TL_LANG']['tl_syncCto_steps']['progress'] = "In Bearbeitung";
 $GLOBALS['TL_LANG']['tl_syncCto_steps']['error'] = "Fehler";
 $GLOBALS['TL_LANG']['tl_syncCto_steps']['skipped'] = "Übersprungen";
- 
-$GLOBALS['TL_LANG']['tl_syncCto_steps']['step'] = "Schritt";
-$GLOBALS['TL_LANG']['tl_syncCto_steps']['complete'] = "Fertig!";
-
 $GLOBALS['TL_LANG']['tl_syncCto_steps']['unknown_step'] = "Unbekannter Schritt";
 
+/**
+ * Headline
+ */
+$GLOBALS['TL_LANG']['tl_syncCto_steps']['step'] = "Schritt";
+$GLOBALS['TL_LANG']['tl_syncCto_steps']['complete'] = "Fertig!";
+$GLOBALS['TL_LANG']['tl_syncCto_steps']['debug_mode'] = "Debugausgaben";
+
+/**
+ * Debug mode
+ */
 $GLOBALS['TL_LANG']['tl_syncCto_steps']['run_time'] = "Laufzeit: %s Sekunden";
+$GLOBALS['TL_LANG']['tl_syncCto_steps']['memory_limit'] = "Auslastung: %s";
 
 ?>
