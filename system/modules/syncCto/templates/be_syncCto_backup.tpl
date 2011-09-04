@@ -20,7 +20,6 @@
 <?php endforeach; ?>    
 <?php endif; ?>
 
-
 <div id="tl_moverview">
 	<h2><?php echo $GLOBALS['TL_LANG']['tl_syncCto_backup']['title_backup']; ?></h2>
         <div class="tl_module_desc">
