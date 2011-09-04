@@ -362,7 +362,7 @@ class SyncCtoModuleBackup extends BackendModule
 
     protected function parseFileBackupPage()
     {
-        //- Init ---------------------------------------------------------------
+        // Init 
         $this->objTemplateContent = new BackendTemplate('be_syncCto_steps');
         $this->loadLanguageFile("tl_syncCto_backup_file");
 
@@ -401,12 +401,12 @@ class SyncCtoModuleBackup extends BackendModule
             case 2:
                 if ($arrStepPool["syncCto_Typ"] == SYNCCTO_SMALL)
                 {
-                    $arrStepPool["zipname"] = $this->objSyncCtoFiles->runDumpTlFiles("", $arrStepPool["filelist"]);
+                    $arrStepPool["zipname"] = $this->objSyncCtoFiles->runDumpTlFiles($arrStepPool["backup_name"], $arrStepPool["filelist"]);
                 }
 
                 if ($arrStepPool["syncCto_Typ"] == SYNCCTO_FULL)
                 {
-                    $arrStepPool["zipname"] = $this->objSyncCtoFiles->runDumpCore("", $arrStepPool["filelist"]);
+                    $arrStepPool["zipname"] = $this->objSyncCtoFiles->runDump($arrStepPool["backup_name"], $arrStepPool["filelist"]);
                 }
 
                 break;
@@ -418,9 +418,8 @@ class SyncCtoModuleBackup extends BackendModule
                 $arrContenData["data"][2]["title"] = $GLOBALS['TL_LANG']['tl_syncCto_steps']['complete'];
                 $arrContenData["data"][2]["description"] = $GLOBALS['TL_LANG']['tl_syncCto_backup_file']['complete'] . " " . $arrStepPool["zipname"];
                 $arrContenData["data"][2]["html"] = "<p class='tl_help'><br />";
-                $arrContenData["data"][2]["html"] .= "<a onclick='Backend.openWindow(this, 600, 235); return false;' title='In einem neuen Fenster ansehen' href='contao/popup.php?src=tl_files/syncCto_backups/database/" . $arrStepPool["zipname"] . "'>" . $GLOBALS['TL_LANG']['tl_syncCto_backup_file']['download_backup'] . "</a>";
+                $arrContenData["data"][2]["html"] .= "<a onclick='Backend.openWindow(this, 600, 235); return false;' title='In einem neuen Fenster ansehen' href='contao/popup.php?src=tl_files/syncCto_backups/files/" . $arrStepPool["zipname"] . "'>" . $GLOBALS['TL_LANG']['tl_syncCto_backup_file']['download_backup'] . "</a>";
                 $arrContenData["data"][2]["html"] .= "</p>";
-
 
                 $this->Session->set("SyncCto_DB_StepPool", "");
                 break;
@@ -458,69 +457,90 @@ class SyncCtoModuleBackup extends BackendModule
      */
     protected function parseFileRestorePage()
     {
+        $this->objTemplateContent = new BackendTemplate('be_syncCto_steps');
         $this->loadLanguageFile('tl_syncCto_restore_file');
 
         if ($this->Input->get("step") == "" || $this->Input->get("step") == null)
-        {
             $step = 1;
-        }
         else
-        {
             $step = intval($this->Input->get("step"));
-        }
 
-        $this->objTemplateContent = new BackendTemplate('be_syncCto_restore_file');
+        $arrContenData = $this->Session->get("SyncCto_File_Content");
+        $arrStepPool = $this->Session->get("SyncCto_File_StepPool");
 
         switch ($step)
         {
             case 1:
-                if ($this->Input->post("filelist") == "")
-                {
-                    $this->parseStartPage($GLOBALS['TL_LANG']['syncCto']['no_backup_file']);
-                    return;
-                }
+                $arrContenData = array(
+                    "error" => false,
+                    "error_msg" => "",
+                    "refresh" => true,
+                    "finished" => false,
+                    "step" => 1,
+                    "url" => "contao/main.php?do=syncCto_backups&amp;table=tl_syncCto_restore_file&amp;act=start",
+                    "start" => microtime(true),
+                    "headline" => $GLOBALS['TL_LANG']['tl_syncCto_restore_file']['edit'],
+                    "information" => "",
+                    "data" => array()
+                );
 
-                $this->Session->set("SyncCto_Restore", $this->Input->post("filelist"));
+                $arrContenData["data"][1] = array(
+                    "title" => $GLOBALS['TL_LANG']['tl_syncCto_steps']['step'] . " 1",
+                    "description" => $GLOBALS['TL_LANG']['tl_syncCto_restore_file']['step1'],
+                    "state" => $GLOBALS['TL_LANG']['tl_syncCto_steps']['progress']
+                );
 
-                $this->objTemplateContent->step = $step;
-                $this->objTemplateContent->condition = array('1' => WORK);
-                $this->objTemplateContent->refresh = true;
-
-                return;
+                break;
 
             case 2:
-                $strRestoreFile = $this->Session->get("SyncCto_Restore");
-                if ($strRestoreFile == "" || $strRestoreFile == null)
-                {
-                    $this->parseStartPage($GLOBALS['TL_LANG']['syncCto']['session_file_error']);
-                    return;
-                }
-
                 try
                 {
-                    $this->objSyncCtoFiles->runRestore($strRestoreFile);
+                    $this->objSyncCtoFiles->runRestore($arrStepPool["file"]);
                 }
                 catch (Exception $exc)
                 {
-                    $this->objTemplateContent->step = $step - 1;
-                    $this->objTemplateContent->condition = array('1' => ERROR);
-                    $this->objTemplateContent->refresh = false;
-                    $this->objTemplateContent->error = $exc->getMessage();
-                    return;
+                    $arrContenData["error"] = true;
+                    $arrContenData["error_msg"] = $exc->getMessage();
                 }
 
-                $this->objTemplateContent->step = $step + 1;
-                $this->objTemplateContent->condition = array('1' => OK);
-                $this->objTemplateContent->refresh = false;
-                $this->objTemplateContent->file = $strRestoreFile;
-                return;
+                break;
+
+            case 3:
+                $objDate = new Date();
+
+                $arrContenData["data"][1]["state"] = $GLOBALS['TL_LANG']['tl_syncCto_steps']['ok'];
+
+                $arrContenData["finished"] = true;
+                $arrContenData["data"][2]["title"] = $GLOBALS['TL_LANG']['tl_syncCto_steps']['complete'];
+                $arrContenData["data"][2]["description"] = vsprintf($GLOBALS['TL_LANG']['tl_syncCto_restore_file']['complete'], array($arrStepPool["file"], $objDate->time, $objDate->date));
+
+                $this->Session->set("SyncCto_DB_StepPool", "");
+                break;
 
             default:
-                $this->parseStartPage($GLOBALS['TL_LANG']['syncCto']['unknown_backup_step']);
-                return;
+                $arrContenData["error"] = true;
+                $arrContenData["error_msg"] = $GLOBALS['TL_LANG']['tl_syncCto_steps']['unknown_step'];
+                $arrContenData["data"] = array();
+                break;
         }
 
-        $this->parseStartPage($GLOBALS['TL_LANG']['syncCto']['unknown_restore_error']);
+        // Set templatevars and set session
+        $arrContenData["step"] = $step;
+
+        $this->objTemplateContent->goBack = $this->script . "contao/main.php?do=syncCto_backups&amp;table=tl_syncCto_restore_file&amp;act=edit";
+        $this->objTemplateContent->data = $arrContenData["data"];
+        $this->objTemplateContent->step = $arrContenData["step"];
+        $this->objTemplateContent->error = $arrContenData["error"];
+        $this->objTemplateContent->error_msg = $arrContenData["error_msg"];
+        $this->objTemplateContent->refresh = $arrContenData["refresh"];
+        $this->objTemplateContent->url = $arrContenData["url"];
+        $this->objTemplateContent->start = $arrContenData["start"];
+        $this->objTemplateContent->headline = $arrContenData["headline"];
+        $this->objTemplateContent->information = $arrContenData["information"];
+        $this->objTemplateContent->finished = $arrContenData["finished"];
+
+        $this->Session->set("SyncCto_File_Content", $arrContenData);
+        $this->Session->set("SyncCto_File_StepPool", $arrStepPool);
     }
 
 }

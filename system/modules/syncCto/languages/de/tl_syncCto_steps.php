@@ -28,7 +28,7 @@
  */
 
 /**
- * List
+ * Texte
  */
 $GLOBALS['TL_LANG']['tl_syncCto_steps']['ok'] = "OK";
 $GLOBALS['TL_LANG']['tl_syncCto_steps']['progress'] = "In Bearbeitung";
@@ -39,5 +39,7 @@ $GLOBALS['TL_LANG']['tl_syncCto_steps']['step'] = "Schritt";
 $GLOBALS['TL_LANG']['tl_syncCto_steps']['complete'] = "Fertig!";
 
 $GLOBALS['TL_LANG']['tl_syncCto_steps']['unknown_step'] = "Unbekannter Schritt";
+
+$GLOBALS['TL_LANG']['tl_syncCto_steps']['run_time'] = "Laufzeit: %s Sekunden";
 
 ?>

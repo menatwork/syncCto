@@ -1,5 +1,5 @@
 <div id="tl_buttons">
-<a onclick="Backend.getScrollOffset();" accesskey="b" title="<?php echo $GLOBALS['TL_LANG']['MSC']['backBT']; ?>" class="header_back" href="<?php echo $this->goBack; ?>"><?php echo $GLOBALS['TL_LANG']['tl_syncCto_steps']['backBT']; ?></a>
+<a onclick="Backend.getScrollOffset();" accesskey="b" title="<?php echo $GLOBALS['TL_LANG']['MSC']['backBT']; ?>" class="header_back" href="<?php echo $this->goBack; ?>"><?php echo $GLOBALS['TL_LANG']['MSC']['backBT']; ?></a>
 </div>
 
 <h2 class="sub_headline"><?php echo $this->headline; ?></h2>
@@ -13,9 +13,9 @@
 <?php foreach ($this->data as $key => $value) : ?>
 
 <div class="<?php echo ($key == 1) ? "tl_tbox" : "tl_box"; ?> block">
-<h1 id="step<?php echo $key; ?>"><?php echo $value["title"] ?></h1>
+    <h1 id="step<?php echo $key; ?>"><?php echo $value["title"] ?><?php if(strlen($value["state"]) != 0): ?> - <?php echo $value["state"]; ?><?php endif;?></h1>
 <p class="tl_help">
-<?php echo $value["description"]; ?> - <?php echo $value["state"]  ?>
+<?php echo $value["description"]; ?>
 </p>
 
 <?php if (strlen($value["msg"])) : ?>
@@ -41,9 +41,9 @@
 </div>
 <?php endif; ?>
 
-<?php if ($GLOBALS['TL_CONFIG']['syncCto_debug_filelist'] == true): ?>
-<p class="debug tl_help"><?php echo vsprintf($GLOBALS['TL_LANG']['syncCto']['run_time'], array(number_format(microtime(true) - $this->start, 5))); ?><br />
-Auslastung: <?php $this->getReadableSize(memory_get_peak_usage(true), 4); ?></p>
+<?php if ($GLOBALS['TL_CONFIG']['syncCto_debug_mode'] == true): ?>
+<p class="debug tl_help"><?php echo vsprintf($GLOBALS['TL_LANG']['tl_syncCto_steps']['run_time'], array(number_format(microtime(true) - $this->start, 5))); ?><br />
+Auslastung: <?php echo number_format(memory_get_peak_usage(true) / 1024 / 1024, 4); ?> MB</p>
 <?php endif; ?>
 
 <script type="text/javascript">
@@ -54,4 +54,4 @@ window.scrollTo(null, ($('step<?php echo $this->step; ?>').getPosition().y - 20)
 
 </div>
 
-<?php echo $this->showTemplateVars(); ?>
+<?php // echo $this->showTemplateVars(); ?>

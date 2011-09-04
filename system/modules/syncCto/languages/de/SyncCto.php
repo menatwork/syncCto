@@ -39,7 +39,6 @@ $GLOBALS['TL_LANG']['syncCto']['error'] = "Fehler";
 $GLOBALS['TL_LANG']['syncCto']['skipped'] = "Übersprungen";
 $GLOBALS['TL_LANG']['syncCto']['select_all_files'] = "Alle auswählen";
 $GLOBALS['TL_LANG']['syncCto']['sync_info'] = "Bitte schließen Sie während der gesamten Synchronisation nicht das aktuelle Fenster.";
-$GLOBALS['TL_LANG']['syncCto']['run_time'] = "Laufzeit: %s Sekunden";
 
 $GLOBALS['TL_LANG']['syncCto']['size'] = 'Größe aller Dateien:';
 $GLOBALS['TL_LANG']['syncCto']['new_file'] = 'Neu';

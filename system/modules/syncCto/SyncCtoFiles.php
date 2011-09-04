@@ -281,10 +281,7 @@ class SyncCtoFiles extends Backend
         }
         else
         {
-            if (preg_match("/.*\.zip\z/i", $subject) == 0)
-                $strFilename = $strZip . ".zip";
-            else
-                $strFilename = $strZip;
+            $strFilename = standardize(str_replace(array(" "), array("_"), preg_replace("/\.zip\z/i", "", $strZip))) . ".zip";
         }
 
         $strPath = $this->objSyncCtoHelper->buildPathWoTL($GLOBALS['SYC_PATH']['file'], $strFilename);
@@ -295,13 +292,22 @@ class SyncCtoFiles extends Backend
 
         if (is_array($arrTlFiles) == true && count($arrTlFiles) != 0)
         {
+            $arrTempList = array();
+
             foreach ($arrTlFiles as $key => $value)
             {
-                if (!file_exists($this->objSyncCtoHelper->buildPath($value)))
-                    unset($arrTlFiles[$key]);
+                if (is_dir($this->objSyncCtoHelper->buildPath($value)))
+                {
+                    $arrList = $this->recrusiveFileList(array(), $value, true);
+                    $arrTempList = array_merge($arrTempList, $arrList);
+                }
+                else
+                {
+                    $arrTempList[] = $value;
+                }
             }
 
-            $arrFileList = array_merge($arrFileList, $arrTlFiles);
+            $arrFileList = array_merge($arrFileList, $arrTempList);
         }
 
         foreach ($arrFileList as $key => $value)
@@ -326,10 +332,7 @@ class SyncCtoFiles extends Backend
         }
         else
         {
-            if (preg_match("/.*\.zip\z/i", $subject) == 0)
-                $strFilename = $strZip . ".zip";
-            else
-                $strFilename = $strZip;
+            $strFilename = standardize(str_replace(array(" "), array("_"), preg_replace("/\.zip\z/i", "", $strZip))) . ".zip";
         }
 
         $strPath = $this->objSyncCtoHelper->buildPathWoTL($GLOBALS['SYC_PATH']['file'], $strFilename);
@@ -343,8 +346,19 @@ class SyncCtoFiles extends Backend
 
         foreach ($arrFileList as $key => $value)
         {
-            $value = preg_replace("/^\//i", "", $value);
-            $objZipWrite->addFile($value);
+            if (is_dir($this->objSyncCtoHelper->buildPath($value)))
+            {
+                $arrList = $this->recrusiveFileList(array(), $value, true);
+
+                foreach ($arrList as $keySubFiles => $valueSubFiles)
+                {
+                    $objZipWrite->addFile($valueSubFiles);
+                }
+            }
+            else
+            {
+                $objZipWrite->addFile($value);
+            }
         }
 
         $objZipWrite->close();
@@ -363,10 +377,7 @@ class SyncCtoFiles extends Backend
         }
         else
         {
-            if (preg_match("/.*\.zip\z/i", $subject) == 0)
-                $strFilename = $strZip . ".zip";
-            else
-                $strFilename = $strZip;
+            $strFilename = standardize(str_replace(array(" "), array("_"), preg_replace("/\.zip\z/i", "", $strZip))) . ".zip";
         }
 
         $strPath = $this->objSyncCtoHelper->buildPathWoTL($GLOBALS['SYC_PATH']['file'], $strFilename);
@@ -405,7 +416,7 @@ class SyncCtoFiles extends Backend
             if ($objZipRead->getFile($value) != true)
                 throw new Exception("Error by unziping file. File not found in zip archive.");
 
-            $objFile = new File($GLOBALS['SYC_PATH']['tmp'] . $value);
+            $objFile = new File($value);
             $objFile->write($objZipRead->unzip());
             $objFile->close();
 
