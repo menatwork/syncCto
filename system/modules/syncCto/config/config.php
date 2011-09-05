@@ -105,16 +105,16 @@ $GLOBALS['TL_PERMISSIONS'][] = 'syncCto_tables';
 /**
  * Callback is only used for overview screen
  */
-if ($objInput->get("do") == 'syncCto_backups' 
-        && $objInput->get("table") != '' 
+if ($objInput->get("do") == 'syncCto_backups'
+        && $objInput->get("table") != ''
         && ($objInput->get("act") == '' || $objInput->get("act") == 'edit'))
 {
     unset($GLOBALS['BE_MOD']['syncCto']['syncCto_backups']['callback']);
 }
 
-if (!($objInput->get("do") == 'synccto_clients' 
-        && ($objInput->get("table") == 'tl_syncCto_clients_syncTo' || $objInput->get("table") == 'tl_syncCto_clients_syncFrom' ) 
-        && ($objInput->get("act") == '' || $objInput->get("act") == 'edit')))
+if ($objInput->get("do") == 'synccto_clients'
+        && ($objInput->get("table") == 'tl_syncCto_clients_syncTo' || $objInput->get("table") == 'tl_syncCto_clients_syncFrom' || $objInput->get("table") == '' )
+        && ($objInput->get("act") == '' || $objInput->get("act") == 'edit'))
 {
     unset($GLOBALS['BE_MOD']['syncCto']['synccto_clients']['callback']);
 }
@@ -188,7 +188,6 @@ $GLOBALS['SYC_PATH']['debug'] = "tl_files/syncCto_backups/debug/";
 // Timestamp for files
 $GLOBALS['SYC_CONFIG']['format'] = "Ymd_H-i-s";
 
-
 /**
  * CSS
  */
@@ -209,34 +208,48 @@ $GLOBALS["CTOCOM_FUNCTIONS"]["SYNCCTO_VERSION"] = array(
     "class" => "SyncCtoRPCFunctions",
     "function" => "getVersionSyncCto",
     "typ" => "GET",
-    "parameter" => false,
+    "parameter" => FALSE,
 );
 
 $GLOBALS["CTOCOM_FUNCTIONS"]["SYNCCTO_PARAMETER"] = array(
     "class" => "SyncCtoRPCFunctions",
     "function" => "getClientParameter",
     "typ" => "GET",
-    "parameter" => false,
+    "parameter" => FALSE,
 );
 
 $GLOBALS["CTOCOM_FUNCTIONS"]["SYNCCTO_FILEBACKUP"] = array(
     "class" => "SyncCtoFiles",
     "function" => "runDump",
     "typ" => "GET",
-    "parameter" => false,
+    "parameter" => FALSE,
 );
 
-$GLOBALS["CTOCOM_FUNCTIONS"]["SYNCCTO_CHECKSUMCORE"] = array(
+$GLOBALS["CTOCOM_FUNCTIONS"]["SYNCCTO_CHECKSUM_COMPARE"] = array(
+    "class" => "SyncCtoFiles",
+    "function" => "runCecksumCompare",
+    "typ" => "POST",
+    "parameter" => array("checksumlist"),
+);
+
+$GLOBALS["CTOCOM_FUNCTIONS"]["SYNCCTO_CHECKSUM_CORE"] = array(
     "class" => "SyncCtoFiles",
     "function" => "runChecksumCore",
     "typ" => "GET",
-    "parameter" => false,
+    "parameter" => FALSE,
+);
+
+$GLOBALS["CTOCOM_FUNCTIONS"]["SYNCCTO_CHECKSUM_TLFILES"] = array(
+    "class" => "SyncCtoFiles",
+    "function" => "runChecksumTlFiles",
+    "typ" => "POST",
+    "parameter" => array("fileList"),
 );
 
 $GLOBALS["CTOCOM_FUNCTIONS"]["SYNCCTO_PURGETEMP"] = array(
     "class" => "SyncCtoFiles",
     "function" => "purgeTemp",
     "typ" => "GET",
-    "parameter" => false,
+    "parameter" => FALSE,
 );
 ?>

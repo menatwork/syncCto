@@ -94,7 +94,7 @@ $GLOBALS['TL_DCA']['tl_synccto_clients'] = array(
             ),
             'syncTo' => array(
                 'label' => &$GLOBALS['TL_LANG']['tl_synccto_clients']['syncTo'],
-                'href' => '&table=tl_syncCto_clients_syncTo',
+                'href' => '&table=tl_syncCto_clients_syncTo&act=edit',
                 'icon' => 'system/modules/syncCto/html/iconSyncTo.png',
                 'button_callback' => array('tl_synccto_clients', 'checkPermission_client_syncTo'),
             ),

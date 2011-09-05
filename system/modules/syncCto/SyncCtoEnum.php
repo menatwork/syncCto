@@ -44,7 +44,7 @@ class SyncCtoEnum
     //-----------------------------------------
     // Pre installet Codifyengines
     const CODIFY_EMPTY = "Empty";
-    const CODIFY_BLOW = "Blow";
+    const CODIFY_BLOW = "Blowfish";
     const CODIFY_MCRYPT = "Mcrypt";
 }
 ?>

@@ -117,7 +117,6 @@ class SyncCtoFiles extends Backend
                     "state" => SyncCtoEnum::FILESTATE_BOMBASTIC_BIG,
                     "raw" => "file bombastic",
                     "transmission" => SyncCtoEnum::FILETRANS_WAITING,
-                    "path_raw" => standardize($value),
                 );
             }
             else if ($intSize >= $GLOBALS['SYC_SIZE']['limit'])
@@ -129,7 +128,6 @@ class SyncCtoFiles extends Backend
                     "state" => SyncCtoEnum::FILESTATE_TOO_BIG,
                     "raw" => "file big",
                     "transmission" => SyncCtoEnum::FILETRANS_WAITING,
-                    "path_raw" => standardize($value),
                 );
             }
             else
@@ -141,7 +139,6 @@ class SyncCtoFiles extends Backend
                     "state" => SyncCtoEnum::FILESTATE_FILE,
                     "raw" => "file",
                     "transmission" => SyncCtoEnum::FILETRANS_WAITING,
-                    "path_raw" => standardize($value),
                 );
             }
         }
@@ -154,10 +151,35 @@ class SyncCtoFiles extends Backend
      * 
      * @return array 
      */
-    public function runChecksumTlFiles()
+    public function runChecksumTlFiles($arrFileList = null)
     {
-        $arrFileList = $this->recrusiveFileList(array(), "tl_files", true);
-        $arrChecksum = array();
+        // Check if filelit is set or not.
+        if ($arrFileList != null && is_array($arrFileList))
+        {
+            // Create checksumlist with all subfolders and files.
+            $arrTempFilelist = array();
+            foreach ($arrFileList as $key => $value)
+            {
+                // If we have a folder go in an create a checksumlist
+                if(is_dir($this->objSyncCtoHelper->buildPath($value)))
+                {
+                    $arrTempFilelist = array_merge($arrTempFilelist, $this->recrusiveFileList(array(), $value, true));
+                }
+                // Else just add the file
+                else
+                {
+                    $arrTempFilelist[] = $value;
+                }
+            }
+            
+            // Replace current list with new one.
+            $arrFileList = $arrTempFilelist;
+        }
+        else
+        {            
+            $arrFileList = $this->recrusiveFileList(array(), "tl_files", true);
+            $arrChecksum = array();
+        }
 
         foreach ($arrFileList as $key => $value)
         {
@@ -172,7 +194,6 @@ class SyncCtoFiles extends Backend
                     "state" => SyncCtoEnum::FILESTATE_BOMBASTIC_BIG,
                     "raw" => "file bombastic",
                     "transmission" => SyncCtoEnum::FILETRANS_WAITING,
-                    "path_raw" => standardize($value),
                 );
             }
             else if ($intSize >= $GLOBALS['SYC_SIZE']['limit'])
@@ -184,7 +205,6 @@ class SyncCtoFiles extends Backend
                     "state" => SyncCtoEnum::FILESTATE_TOO_BIG,
                     "raw" => "file big",
                     "transmission" => SyncCtoEnum::FILETRANS_WAITING,
-                    "path_raw" => standardize($value),
                 );
             }
             else
@@ -196,7 +216,6 @@ class SyncCtoFiles extends Backend
                     "state" => SyncCtoEnum::FILESTATE_FILE,
                     "raw" => "file",
                     "transmission" => SyncCtoEnum::FILETRANS_WAITING,
-                    "path_raw" => standardize($value),
                 );
             }
         }
@@ -219,21 +238,7 @@ class SyncCtoFiles extends Backend
             {
                 if (md5_file(TL_ROOT . "/" . $value['path']) == $value['checksum'])
                 {
-                    // Only for debug, if needed kill the "continue"
-                    continue;
-
-                    if ($value['state'] == SyncCtoEnum::FILESTATE_TOO_BIG)
-                    {
-                        $arrFileList[$key] = $arrChecksumList[$key];
-                        $arrFileList[$key]["raw"] = "same big";
-                        $arrFileList[$key]["state"] = SyncCtoEnum::FILESTATE_TOO_BIG_SAME;
-                    }
-                    else
-                    {
-                        $arrFileList[$key] = $arrChecksumList[$key];
-                        $arrFileList[$key]["raw"] = "same";
-                        $arrFileList[$key]["state"] = SyncCtoEnum::FILESTATE_SAME;
-                    }
+                    // Do nocthing
                 }
                 else
                 {

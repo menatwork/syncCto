@@ -279,6 +279,9 @@ class CtoCommunication extends Backend
 
         // New Request
         $objRequest = new RequestExtended();
+        $objRequest->acceptgzip = 0;
+        $objRequest->acceptdeflate = 0;
+        
 
         // Which method ? GET or POST
         if ($isGET)
@@ -325,8 +328,9 @@ class CtoCommunication extends Backend
         echo "<br>|--|<br>";
         print_r($objRequest->response);
         echo "<br>|--|<br>";
-        echo "<br>|--------------------------------|<br>";
-
+        echo "<br>|--------------------------------|<br>";         
+        
+        
         // Debug
         $this->objDebug->addDebug("Request", $objRequest->request);
         $this->objDebug->addDebug("Response", $objRequest->response);
@@ -367,14 +371,15 @@ class CtoCommunication extends Backend
         if (preg_match("^a:.*:{.*}^i", $mixContent) == 0)
         {
             $this->objDebug->stopMeasurement(__CLASS__, __FUNCTION__);
-            throw new Exception("Response is not a array. Maybe wrong key or codifyengine.");
+            throw new Exception("1Response is not a array. Maybe wrong key or codifyengine.");
         }
 
         $mixContent = deserialize($mixContent);
+       
         if (is_array($mixContent) == false)
         {
             $this->objDebug->stopMeasurement(__CLASS__, __FUNCTION__);
-            throw new Exception("Response is not a array. Maybe wrong key or codifyengine.");
+            throw new Exception("2Response is not a array. Maybe wrong key or codifyengine.");
         }
 
         if ($mixContent["success"] == 1)
@@ -451,7 +456,7 @@ class CtoCommunication extends Backend
                 $this->setCodifyengine($this->Input->get("engine"));
                 $this->objCodifyengine->setKey($GLOBALS['TL_CONFIG']['ctoCom_APIKey']);
             }
-            // Error by setting new enigne. Send msg in cleartext
+            // Error by setting new enigne.
             catch (Exception $exc)
             {
                 $this->log("Try to load codifyengine for ctoCommunication with error: " . $exc->getMessage(), __FUNCTION__ . " | " . __CLASS__, TL_ERROR);
@@ -633,7 +638,7 @@ class CtoCommunication extends Backend
         $strOutput = $this->objCodifyengine->Encrypt($strOutput);
 
         $this->objDebug->stopMeasurement(__CLASS__, __FUNCTION__);
-
+        
         return "<|@|" . $strOutput . "|@|>";
     }
 

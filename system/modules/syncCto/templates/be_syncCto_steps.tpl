@@ -30,12 +30,12 @@
 <?php endforeach; ?>
 
 <?php if ($this->refresh == true && $this->error == false && $this->finished == false): ?>
-<meta http-equiv="refresh" content="5; URL=<?php echo $this->Environment->base; ?><?php echo $this->url; ?>&amp;step=<?php echo $this->step + 1 ?>" />
+<meta http-equiv="refresh" content="1; URL=<?php echo $this->Environment->base; ?><?php echo $this->url; ?>&amp;step=<?php echo $this->step + 1 ?>" />
 <img style="margin-bottom:20px;" src="system/modules/syncCto/html/ajax-loader.gif" alt="" />
 <?php endif; ?>
 
 <?php if ($this->error) : ?>
-<div class="tl_tbox block">
+<div class="tl_box block">
 <h1><?php echo $GLOBALS['TL_LANG']['tl_syncCto_steps']['error']; ?></h1>
 <p class="tl_help"><?php echo $this->error_msg; ?></p>
 </div>

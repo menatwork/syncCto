@@ -155,6 +155,38 @@ class SyncCtoCommunicationClient extends CtoCommunication
         return $this->runServer("SYNCCTO_PURGETEMP");
     }
 
+    public function runCecksumCompare($arrChecksumList)
+    {
+        $arrData = array(
+            array(
+                "name" => "checksumlist",
+                "value" => $arrChecksumList,
+            ),
+        );
+
+        $this->setCodifyEngine(SyncCtoEnum::CODIFY_EMPTY);
+        return $this->runServer("SYNCCTO_CHECKSUM_COMPARE", $arrData);
+    }
+
+    public function getChecksumTlfiles($fileList = NULL)
+    {
+        $arrData = array(
+            array(
+                "name" => "fileList",
+                "value" => $fileList,
+            ),
+        );
+
+        $this->setCodifyEngine(SyncCtoEnum::CODIFY_EMPTY);
+        return $this->runServer("SYNCCTO_CHECKSUM_TLFILES");
+    }
+
+    public function getChecksumCore()
+    {
+        $this->setCodifyEngine(SyncCtoEnum::CODIFY_EMPTY);
+        return $this->runServer("SYNCCTO_CHECKSUM_CORE");
+    }
+
     /*
      * -------------------------------------------------------------------------
      * -------------------------------------------------------------------------
@@ -164,19 +196,6 @@ class SyncCtoCommunicationClient extends CtoCommunication
      * -------------------------------------------------------------------------
      * -------------------------------------------------------------------------
      */
-
-    public function sendChecksumList($arrChecksumList)
-    {
-        $arrData = array(
-            array(
-                "name" => "RPC_CHECKSUM_CHECK",
-                "value" => $arrChecksumList,
-            ),
-        );
-
-        $this->setCodifyEngine(SyncCtoEnum::CODIFY_EMPTY);
-        return $this->runServer("RPC_CHECKSUM_CHECK", $arrData);
-    }
 
     /**
      * Send a file to the client
@@ -322,18 +341,6 @@ class SyncCtoCommunicationClient extends CtoCommunication
         return $this->runServer("RPC_RUN_SPLITFILE", $arrData);
     }
 
-    public function getChecksumTlfiles()
-    {
-        $this->setCodifyEngine(SyncCtoEnum::CODIFY_EMPTY);
-        return $this->runServer("RPC_CHECKSUM_TLFILES");
-    }
-
-    public function getChecksumCore()
-    {
-        $this->setCodifyEngine(SyncCtoEnum::CODIFY_EMPTY);
-        return $this->runServer("RPC_CHECKSUM_CORE");
-    }
-
     public function getFile($strPath, $strSavePath)
     {
         @set_time_limit(3600);
@@ -394,7 +401,6 @@ class SyncCtoCommunicationClient extends CtoCommunication
                 "value" => $arrTables,
             ),
         );
-
 
         return $this->runServer("RPC_SQL_SCRIPT", $arrData);
     }

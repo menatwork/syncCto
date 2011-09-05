@@ -129,7 +129,7 @@ class tl_syncCto_clients_syncTo extends Backend
             else
             {
                 $_SESSION["TL_ERROR"] = array($GLOBALS['TL_LANG']['syncCto']['unknown_method']);
-                $this->redirect("contao/main.php?do=synccto_clients");
+                return;
             }
         }
         else
