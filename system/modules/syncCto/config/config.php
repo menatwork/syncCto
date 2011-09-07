@@ -114,7 +114,7 @@ if ($objInput->get("do") == 'syncCto_backups'
 
 if ($objInput->get("do") == 'synccto_clients'
         && ($objInput->get("table") == 'tl_syncCto_clients_syncTo' || $objInput->get("table") == 'tl_syncCto_clients_syncFrom' || $objInput->get("table") == '' )
-        && ($objInput->get("act") == '' || $objInput->get("act") == 'edit'))
+        && $objInput->get("act") != 'start')
 {
     unset($GLOBALS['BE_MOD']['syncCto']['synccto_clients']['callback']);
 }

@@ -101,9 +101,9 @@ class SyncCtoFiles extends Backend
      */
     public function runChecksumCore()
     {
-        $arrFileList = $this->recrusiveFileList(array(), "");
+        $arrFileList = $this->recursiveFileList(array(), "");
         $arrChecksum = array();
-
+        
         foreach ($arrFileList as $key => $value)
         {
             $intSize = filesize($this->objSyncCtoHelper->buildPath($value));
@@ -115,7 +115,6 @@ class SyncCtoFiles extends Backend
                     "checksum" => 0,
                     "size" => $intSize,
                     "state" => SyncCtoEnum::FILESTATE_BOMBASTIC_BIG,
-                    "raw" => "file bombastic",
                     "transmission" => SyncCtoEnum::FILETRANS_WAITING,
                 );
             }
@@ -126,7 +125,6 @@ class SyncCtoFiles extends Backend
                     "checksum" => md5_file($this->objSyncCtoHelper->buildPath($value)),
                     "size" => $intSize,
                     "state" => SyncCtoEnum::FILESTATE_TOO_BIG,
-                    "raw" => "file big",
                     "transmission" => SyncCtoEnum::FILETRANS_WAITING,
                 );
             }
@@ -137,7 +135,6 @@ class SyncCtoFiles extends Backend
                     "checksum" => md5_file($this->objSyncCtoHelper->buildPath($value)),
                     "size" => $intSize,
                     "state" => SyncCtoEnum::FILESTATE_FILE,
-                    "raw" => "file",
                     "transmission" => SyncCtoEnum::FILETRANS_WAITING,
                 );
             }
@@ -163,7 +160,7 @@ class SyncCtoFiles extends Backend
                 // If we have a folder go in an create a checksumlist
                 if(is_dir($this->objSyncCtoHelper->buildPath($value)))
                 {
-                    $arrTempFilelist = array_merge($arrTempFilelist, $this->recrusiveFileList(array(), $value, true));
+                    $arrTempFilelist = array_merge($arrTempFilelist, $this->recursiveFileList(array(), $value, true));
                 }
                 // Else just add the file
                 else
@@ -177,7 +174,7 @@ class SyncCtoFiles extends Backend
         }
         else
         {            
-            $arrFileList = $this->recrusiveFileList(array(), "tl_files", true);
+            $arrFileList = $this->recursiveFileList(array(), "tl_files", true);
             $arrChecksum = array();
         }
 
@@ -293,7 +290,7 @@ class SyncCtoFiles extends Backend
 
         $objZipWrite = new ZipWriter($strPath);
 
-        $arrFileList = $this->recrusiveFileList(array(), "", false);
+        $arrFileList = $this->recursiveFileList(array(), "", false);
 
         if (is_array($arrTlFiles) == true && count($arrTlFiles) != 0)
         {
@@ -303,7 +300,7 @@ class SyncCtoFiles extends Backend
             {
                 if (is_dir($this->objSyncCtoHelper->buildPath($value)))
                 {
-                    $arrList = $this->recrusiveFileList(array(), $value, true);
+                    $arrList = $this->recursiveFileList(array(), $value, true);
                     $arrTempList = array_merge($arrTempList, $arrList);
                 }
                 else
@@ -346,14 +343,14 @@ class SyncCtoFiles extends Backend
 
         if ($arrFileList == null)
         {
-            $arrFileList = $this->recrusiveFileList(array(), "tl_files", true);
+            $arrFileList = $this->recursiveFileList(array(), "tl_files", true);
         }
 
         foreach ($arrFileList as $key => $value)
         {
             if (is_dir($this->objSyncCtoHelper->buildPath($value)))
             {
-                $arrList = $this->recrusiveFileList(array(), $value, true);
+                $arrList = $this->recursiveFileList(array(), $value, true);
 
                 foreach ($arrList as $keySubFiles => $valueSubFiles)
                 {
@@ -389,7 +386,7 @@ class SyncCtoFiles extends Backend
 
         $objZipWrite = new ZipWriter($strPath);
 
-        $arrFileList = $this->recrusiveFileList(array(), "", false);
+        $arrFileList = $this->recursiveFileList(array(), "", false);
 
         foreach ($arrFileList as $key => $value)
         {
@@ -438,7 +435,7 @@ class SyncCtoFiles extends Backend
      * Helper functions
      */
 
-    public function recrusiveFileList($arrList, $strPath, $blnTlFiles = false)
+    public function recursiveFileList($arrList, $strPath, $blnTlFiles = false)
     {
         // Load blacklists and whitelists
         $arrFolderBlacklist = $this->objSyncCtoHelper->getBlacklistFolder();
@@ -458,11 +455,11 @@ class SyncCtoFiles extends Backend
         if ($strPath != "")
         {
             // Run through each entry in blacklistfolder
-            foreach ($arrFolderBlacklist as $valueBalck)
+            foreach ($arrFolderBlacklist as $valueBlack)
             {
                 // Search with preg for values
-                $valueBalck = str_replace(array("\\", ".", "^", "?", "*"), array("\\\\", "\\.", "\\^", ".?", ".*"), $valueBalck);
-                if (preg_match("^" . $valueBalck . "^i", $strPath) != 0)
+                $valueBlack = str_replace(array("\\", ".", "^", "?", "*"), array("\\\\", "\\.", "\\^", ".?", ".*"), $valueBlack);
+                if (preg_match("^" . $valueBlack . "^i", $strPath) != 0)
                 {
                     return $arrList;
                 }
@@ -488,11 +485,11 @@ class SyncCtoFiles extends Backend
         if (is_file($strPathTl))
         {
             // Run through each entry in blacklistfile     
-            foreach ($arrFileBlacklist as $valule)
+            foreach ($arrFileBlacklist as $valueBlack)
             {
                 // Search with preg for values
-                $valule = str_replace(array("\\", ".", "^", "?", "*"), array("\\\\", "\\.", "\\^", ".?", ".*"), $valule);
-                if (preg_match("^" . $valule . "^i", $strPath) != 0)
+                $valueBlack = str_replace(array("\\", ".", "^", "?", "*"), array("\\\\", "\\.", "\\^", ".?", ".*"), $valueBlack);
+                if (preg_match("^" . $valueBlack . "^i", $strPath) != 0)
                 {
                     return $arrList;
                 }
@@ -504,26 +501,22 @@ class SyncCtoFiles extends Backend
         else
         {
             // Scann Folder
-            $arrFolder = scandir($strPathTl);
-
+            $arrScan = scan($strPathTl);
+            
             // Rund through each file
-            foreach ($arrFolder as $key => $value)
+            foreach ($arrScan as $key => $valueItem)
             {
-                // Handle open_basedir
-                if ($value == '.' || $value == '..')
-                    continue;
-
                 // Have we a file or ...
-                if (is_file($this->objSyncCtoHelper->buildPath($strPath, $value)))
+                if (is_file($this->objSyncCtoHelper->buildPath($strPath, $valueItem)))
                 {
                     // Check if file is in blacklist    
                     $blnBlack = false;
                     // Run through each entry in blacklistfile           
-                    foreach ($arrFileBlacklist as $valule)
+                    foreach ($arrFileBlacklist as $valueBlack)
                     {
                         // Search with preg for values
-                        $valule = str_replace(array("\\", ".", "^", "?", "*"), array("\\\\", "\\.", "\\^", ".?", ".*"), $valule);
-                        if (preg_match("^" . $valule . "^i", $this->objSyncCtoHelper->buildPathWoTL($strPath, $value)) != 0)
+                        $valueBlack = str_replace(array("\\", ".", "^", "?", "*"), array("\\\\", "\\.", "\\^", ".?", ".*"), $valueBlack);
+                        if (preg_match("^" . $valueBlack . "^i", $this->objSyncCtoHelper->buildPathWoTL($strPath, $valueItem)) != 0)
                         {
                             $blnBlack = true;
                             break;
@@ -535,7 +528,7 @@ class SyncCtoFiles extends Backend
                         continue;
 
                     // Add to list
-                    $arrList[] = $this->objSyncCtoHelper->buildPathWoTL($strPath, $value);
+                    $arrList[] = $this->objSyncCtoHelper->buildPathWoTL($strPath, $valueItem);
                 }
                 // ... a folder
                 else
@@ -546,7 +539,7 @@ class SyncCtoFiles extends Backend
                     {
                         // Search with preg for values
                         $valueWhite = str_replace(array("\\", ".", "^", "?", "*", "/"), array("\\\\", "\\.", "\\^", ".?", ".*", "\/"), $this->objSyncCtoHelper->buildPathWoTL($valueWhite));
-                        if (preg_match("/^" . $valueWhite . ".*/i", $this->objSyncCtoHelper->buildPathWoTL($strPath, $value)) != 0)
+                        if (preg_match("/^" . $valueWhite . ".*/i", $this->objSyncCtoHelper->buildPathWoTL($strPath, $valueItem)) != 0)
                         {
                             $blnWhitelist = true;
                             break;
@@ -557,7 +550,7 @@ class SyncCtoFiles extends Backend
                         continue;
 
                     // Recursive-Call
-                    $arrList = $this->recrusiveFileList($arrList, $this->objSyncCtoHelper->buildPathWoTL($strPath, $value), $blnTlFiles);
+                    $arrList = $this->recursiveFileList($arrList, $this->objSyncCtoHelper->buildPathWoTL($strPath, $valueItem), $blnTlFiles);
                 }
             }
         }

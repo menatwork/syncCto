@@ -56,7 +56,6 @@ class SyncCtoCallback extends Backend
         $this->objSyncCtoHelper = SyncCtoHelper::getInstance();
         //$this->objSyncCtoCodifyengine = SyncCtoCodifyengineFactory::getEngine();
 
-        //$this->loadLanguageFile("SyncCto");
     }
 
     /**
@@ -133,7 +132,7 @@ class SyncCtoCallback extends Backend
 
                 if ($objSyncTime->syncTo_tstamp != "" && $objSyncTime->syncTo_user != "" && $objSyncTime->syncTo_tstamp != '0' && $objSyncTime->syncTo_user != '0')
                 {
-                    $strLastSync = vsprintf($GLOBALS['TL_LANG']['syncCto']['information_last_sync'], array(
+                    $strLastSync = vsprintf($GLOBALS['TL_LANG']['MSC']['information_last_sync'], array(
                         date($GLOBALS['TL_CONFIG']['timeFormat'], $objSyncTime->syncTo_tstamp),
                         date($GLOBALS['TL_CONFIG']['dateFormat'], $objSyncTime->syncTo_tstamp),
                         $objSyncTime->syncTo_user,
@@ -161,7 +160,7 @@ class SyncCtoCallback extends Backend
 
                 if ($objSyncTime->syncFrom_tstamp != "" && $objSyncTime->syncFrom_user != "" && $objSyncTime->syncFrom_tstamp != '0' && $objSyncTime->syncFrom_user != '0')
                 {
-                    $strLastSync = vsprintf($GLOBALS['TL_LANG']['syncCto']['information_last_sync'], array(
+                    $strLastSync = vsprintf($GLOBALS['TL_LANG']['MSC']['information_last_sync'], array(
                         date($GLOBALS['TL_CONFIG']['timeFormat'], $objSyncTime->syncFrom_tstamp),
                         date($GLOBALS['TL_CONFIG']['dateFormat'], $objSyncTime->syncFrom_tstamp),
                         $objSyncTime->syncFrom_user,

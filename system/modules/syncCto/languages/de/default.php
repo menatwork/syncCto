@@ -46,6 +46,28 @@ $GLOBALS['TL_LANG']['SYC']['option_small'] = array('Persönliche Daten', 'Nur au
 $GLOBALS['TL_LANG']['SYC']['option_full'] = array('Contao-Installation', 'Die komplette Contao-Installation, inklusive tl_files wird berücksichtigt.');
 
 /**
+ * Filelist
+ */
+
+$GLOBALS['TL_LANG']['MSC']['select_all_files'] = "Alle auswählen";
+$GLOBALS['TL_LANG']['MSC']['sync_info'] = "Bitte schließen Sie während der gesamten Synchronisation nicht das aktuelle Fenster.";
+
+$GLOBALS['TL_LANG']['MSC']['totalsize'] = 'Größe aller Dateien:';
+$GLOBALS['TL_LANG']['MSC']['new_file'] = 'Neu';
+$GLOBALS['TL_LANG']['MSC']['modified_file'] = 'Verändert';
+$GLOBALS['TL_LANG']['MSC']['unknown_file'] = 'Unbekannt';
+$GLOBALS['TL_LANG']['MSC']['deleted_file'] = 'Gelöscht';
+$GLOBALS['TL_LANG']['MSC']['submit_files'] = 'Alle Dateien transferieren';
+$GLOBALS['TL_LANG']['MSC']['delete_files'] = 'Ausgewählte Dateien entfernen';
+
+$GLOBALS['TL_LANG']['MSC']['big_files'] = 'Datei(en) zum Übertragen.';
+$GLOBALS['TL_LANG']['MSC']['skipped_files'] = 'Folgende Datei(en) sind zu groß um sie zu übertragen.';
+$GLOBALS['TL_LANG']['MSC']['ignored_files'] = 'Folgende( Datei(en) sind zu groß um sie zu bearbeiten.';
+
+$GLOBALS['TL_LANG']['MSC']['information_last_sync'] = 'Die letzte Synchronisierung wurde um %s am %s vom User %s (%s) durchgeführt.';
+
+
+/**
  * Errors
  */
 
@@ -86,13 +108,7 @@ $GLOBALS['TL_LANG']['ERR']['deleted_files_list'] = "Gelöschte Datei(en):";
 $GLOBALS['TL_LANG']['ERR']['checksum_error'] = "Fehler in den Prüfsummen.";
 $GLOBALS['TL_LANG']['ERR']['upload_move_error'] = "Fehler beim Speichern.";
 $GLOBALS['TL_LANG']['ERR']['unknown_response'] = "Unbekannte Antwort.";
-/* DE */$GLOBALS['TL_LANG']['ERR']['rpc_call_missing'] = "Fehlende RPC ID.";
 /* OK */$GLOBALS['TL_LANG']['ERR']['rpc_data_missing'] = "Fehlende Daten für RPC.";
 /* OK */$GLOBALS['TL_LANG']['ERR']['rpc_unknown'] = "Unbekannte RPC Anfrage.";
-/* NE */$GLOBALS['TL_LANG']['ERR']['rpc_unknown_exception'] = "Unbekannter Fehler.";
-/* NE */$GLOBALS['TL_LANG']['ERR']['rpc_missing_starttag'] = "Nicht verwertbare Antwort vom Client erhalten.";
-/* NE */$GLOBALS['TL_LANG']['ERR']['rpc_missing_endtag'] = "Nicht verwertbare Antwort vom Client erhalten.";
-/* NE */$GLOBALS['TL_LANG']['ERR']['rpc_answer_no_array'] = "Atwort vom Client ist kein Array.";
-/* NE */$GLOBALS['TL_LANG']['ERR']['codifyengine_unknown'] = "Konnte die angegebene Verschlüsselungs-Engine nicht finden: %s";
 
 ?>
