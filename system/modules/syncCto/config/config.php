@@ -30,7 +30,7 @@
 $objInput = Input::getInstance();
 
 /**
- * Current syncCto Version
+ * Current syncCto version
  */
 $GLOBALS['SYC_VERSION'] = '2.0.0';
 
@@ -101,18 +101,14 @@ $GLOBALS['TL_PERMISSIONS'][] = 'syncCto_clients_p';
 $GLOBALS['TL_PERMISSIONS'][] = 'syncCto_tables';
 
 /**
- * Callback is only used for overview screen
+ * Callbacks are only used for overview screen
  */
-if ($objInput->get("do") == 'syncCto_backups'
-        && $objInput->get("table") != ''
-        && ($objInput->get("act") == '' || $objInput->get("act") == 'edit'))
+if ($objInput->get("do") == 'syncCto_backups' && $objInput->get("table") != '' && ($objInput->get("act") == '' || $objInput->get("act") == 'edit'))
 {
     unset($GLOBALS['BE_MOD']['syncCto']['syncCto_backups']['callback']);
 }
 
-if ($objInput->get("do") == 'synccto_clients'
-        && ($objInput->get("table") == 'tl_syncCto_clients_syncTo' || $objInput->get("table") == 'tl_syncCto_clients_syncFrom' || $objInput->get("table") == '' )
-        && $objInput->get("act") != 'start')
+if ($objInput->get("do") == 'synccto_clients' && ($objInput->get("table") == 'tl_syncCto_clients_syncTo' || $objInput->get("table") == 'tl_syncCto_clients_syncFrom' || $objInput->get("table") == '' ) && $objInput->get("act") != 'start')
 {
     unset($GLOBALS['BE_MOD']['syncCto']['synccto_clients']['callback']);
 }
@@ -191,12 +187,12 @@ $GLOBALS['SYC_CONFIG']['format'] = "Ymd_H-i-s";
  */
 if (($objInput->get("do") == 'syncCto_check') || ($objInput->get("table") == 'tl_syncCto_clients_syncTo') || ($objInput->get("table") == 'tl_syncCto_clients_syncFrom'))
 {
-    $GLOBALS['TL_CSS'][] = 'system/modules/syncCto/html/syncCto.css';
+    $GLOBALS['TL_CSS'][] = 'system/modules/syncCto/html/css/syncCto.css';
 }
 
 if ((($objInput->get("do") == 'synccto_clients') && $objInput->get("act") == '') && $objInput->get("table") == '')
 {
-    $GLOBALS['TL_JAVASCRIPT'][] = 'system/modules/syncCto/html/syncCto.js';
+    $GLOBALS['TL_JAVASCRIPT'][] = 'system/modules/syncCto/html/js/syncCto.js';
 }
 
 /**

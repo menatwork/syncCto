@@ -76,7 +76,7 @@ class SyncCtoCallback extends Backend
             if (!is_array($_SESSION["TL_INFO"])) $_SESSION["TL_INFO"] = array();
 
             // required extensions
-            $arrRequiredExtensions = array('ctoCommunication, httprequestextended', 'textwizard', '3cframework');
+            $arrRequiredExtensions = array('ctoCommunication', 'httprequestextended', 'textwizard', '3cframework');
 
             // required files
             $arrRequiredFiles = array('system/drivers/DC_Memory.php');
