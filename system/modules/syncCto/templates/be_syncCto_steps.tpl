@@ -58,7 +58,4 @@
 //--><!]]>
 </script>
 
-
 </div>
-
-<?php // echo $this->showTemplateVars(); ?>
