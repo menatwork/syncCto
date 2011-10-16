@@ -1,7 +1,4 @@
-<?php
-
-if (!defined('TL_ROOT'))
-    die('You can not access this file directly!');
+<?php if (!defined('TL_ROOT')) die('You can not access this file directly!');
 
 /**
  * Contao Open Source CMS
@@ -29,6 +26,7 @@ if (!defined('TL_ROOT'))
  * @license    GNU/LGPL
  * @filesource
  */
+
 $GLOBALS['TL_DCA']['tl_synccto_clients'] = array(
     // Config
     'config' => array(
@@ -179,10 +177,9 @@ class tl_synccto_clients extends Backend
         parent::__construct();
     }
 
-    /* -------------------------------------------------------------------------
+    /**
      * Ping client status
      */
-
     public function pingClientStatus($strAction)
     {
         if ($strAction == 'syncCtoPing')
@@ -282,8 +279,7 @@ class tl_synccto_clients extends Backend
 
     public function checkPermissionClientCreate()
     {
-        if (!$this->BackendUser->hasAccess('create', 'syncCto_clients_p'))
-            $GLOBALS['TL_DCA']['tl_synccto_clients']['config'] = array_unique(array_merge(array('closed' => true), $GLOBALS['TL_DCA']['tl_synccto_clients']['config']));
+        if (!$this->BackendUser->hasAccess('create', 'syncCto_clients_p')) $GLOBALS['TL_DCA']['tl_synccto_clients']['config'] = array_unique(array_merge(array('closed' => true), $GLOBALS['TL_DCA']['tl_synccto_clients']['config']));
     }
 
     public function callCodifyengines()

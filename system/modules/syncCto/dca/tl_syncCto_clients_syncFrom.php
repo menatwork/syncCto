@@ -1,7 +1,4 @@
-<?php
-
-if ( !defined('TL_ROOT') )
-    die('You can not access this file directly!');
+<?php if (!defined('TL_ROOT')) die('You can not access this file directly!');
 
 /**
  * Contao Open Source CMS
@@ -29,6 +26,7 @@ if ( !defined('TL_ROOT') )
  * @license    GNU/LGPL
  * @filesource
  */
+
 $GLOBALS['TL_DCA']['tl_syncCto_clients_syncFrom'] = array(
     // Config
     'config' => array
@@ -38,7 +36,6 @@ $GLOBALS['TL_DCA']['tl_syncCto_clients_syncFrom'] = array(
         'disableSubmit' => false,
         'onload_callback' => array(
             array('tl_syncCto_clients_syncFrom', 'onload_callback'),
-			// array('tl_syncCto_clients_syncTo', 'checkPermission'),
         ),
         'onsubmit_callback' => array(
             array('tl_syncCto_clients_syncFrom', 'onsubmit_callback'),
@@ -71,7 +68,8 @@ $GLOBALS['TL_DCA']['tl_syncCto_clients_syncFrom'] = array(
 
 class tl_syncCto_clients_syncFrom extends Backend
 {
-	public function onload_callback(DataContainer $dc)
+
+    public function onload_callback(DataContainer $dc)
     {
         $dc->removeButton('save');
         $dc->removeButton('saveNclose');
@@ -88,11 +86,12 @@ class tl_syncCto_clients_syncFrom extends Backend
 
         $dc->addButton('start_sync', $arrData);
     }
-	
-	public function onsubmit_callback(DataContainer $dc)
+
+    public function onsubmit_callback(DataContainer $dc)
     {
         $this->redirect($this->Environment->base . "contao/main.php?do=synccto_clients&amp;table=tl_syncCto_clients_syncFrom&amp;act=start&amp;id=" . $this->Input->get("id"));
     }
+
 }
 
 ?>

@@ -26,6 +26,7 @@
  * @license    GNU/LGPL
  * @filesource
  */
+
 $GLOBALS['TL_DCA']['tl_syncCto_backup_db'] = array(
     // Config
     'config' => array(
@@ -37,7 +38,13 @@ $GLOBALS['TL_DCA']['tl_syncCto_backup_db'] = array(
         ),
         'onsubmit_callback' => array(
             array('tl_syncCto_backup_db', 'onsubmit_callback'),
-        )
+        ),
+        'dcMemory_show_callback' => array(
+            array('tl_syncCto_backup_db', 'show_all')
+        ),
+        'dcMemory_showAll_callback' => array(
+            array('tl_syncCto_backup_db', 'show_all')
+        ),
     ),
     // Palettes
     'palettes' => array(
@@ -86,7 +93,9 @@ class tl_syncCto_backup_db extends Backend
         $arrStepPool = $this->Session->get("SyncCto_DB_StepPool");
 
         if (!is_array($arrStepPool))
+        {
             $arrStepPool = array();
+        }
 
         // Check Table list
         if ($this->Input->post("database_tables_recommended") == "" && $this->Input->post("database_tables_none_recommended") == "")
@@ -97,17 +106,33 @@ class tl_syncCto_backup_db extends Backend
 
         // Merge recommend and none recommend post arrays
         if ($this->Input->post("database_tables_recommended") != "" && $this->Input->post("database_tables_none_recommended") != "")
+        {
             $arrTablesBackup = array_merge($this->Input->post("database_tables_recommended"), $this->Input->post("database_tables_none_recommended"));
+        }
         else if ($this->Input->post("database_tables_recommended"))
+        {
             $arrTablesBackup = $this->Input->post("database_tables_recommended");
+        }
         else if ($this->Input->post("database_tables_none_recommended"))
+        {
             $arrTablesBackup = $this->Input->post("database_tables_none_recommended");
+        }
 
         $arrStepPool["tables"] = $arrTablesBackup;
 
         $this->Session->set("SyncCto_DB_StepPool", $arrStepPool);
 
         $this->redirect($this->Environment->base . "contao/main.php?do=syncCto_backups&table=tl_syncCto_backup_db&act=start");
+    }
+
+    /**
+     * Change active mode to edit
+     * 
+     * @return string 
+     */
+    public function show_all($dc, $strReturn)
+    {
+        return $strReturn . $dc->edit();
     }
 
 }

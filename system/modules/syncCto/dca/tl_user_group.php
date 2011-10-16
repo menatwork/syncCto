@@ -36,29 +36,29 @@ $GLOBALS['TL_DCA']['tl_user_group']['palettes']['default'] = str_replace('alexf;
  * Add fields to tl_user_group
  */
 $GLOBALS['TL_DCA']['tl_user_group']['fields']['syncCto_clients'] = array
-(
-	'label' => &$GLOBALS['TL_LANG']['tl_user']['syncCto_clients'],
-	'exclude' => true,
-	'inputType' => 'checkbox',
-	'foreignKey' => 'tl_synccto_clients.title',
-	'eval' => array('multiple'=>true)
+    (
+    'label' => &$GLOBALS['TL_LANG']['tl_user']['syncCto_clients'],
+    'exclude' => true,
+    'inputType' => 'checkbox',
+    'foreignKey' => 'tl_synccto_clients.title',
+    'eval' => array('multiple' => true)
 );
 
 $GLOBALS['TL_DCA']['tl_user_group']['fields']['syncCto_clients_p'] = array
-(
-	'label' => &$GLOBALS['TL_LANG']['tl_user']['syncCto_clients_p'],
-	'exclude' => true,
-	'inputType' => 'checkbox',
-	'options' => array('create', 'edit', 'copy', 'delete', 'syncTo', 'syncFrom'),
-	'reference' => &$GLOBALS['TL_LANG']['MSC'],
-	'eval' => array('multiple'=>true)
+    (
+    'label' => &$GLOBALS['TL_LANG']['tl_user']['syncCto_clients_p'],
+    'exclude' => true,
+    'inputType' => 'checkbox',
+    'options' => array('create', 'edit', 'copy', 'delete', 'syncTo', 'syncFrom'),
+    'reference' => &$GLOBALS['TL_LANG']['MSC'],
+    'eval' => array('multiple' => true)
 );
 
 $GLOBALS['TL_DCA']['tl_user_group']['fields']['syncCto_tables'] = array
-(
-	'label' => &$GLOBALS['TL_LANG']['tl_user']['syncCto_tables'],
-	'inputType' => 'checkboxWizard',
-	'exclude' => true,
+    (
+    'label' => &$GLOBALS['TL_LANG']['tl_user']['syncCto_tables'],
+    'inputType' => 'checkboxWizard',
+    'exclude' => true,
     'eval' => array('multiple' => true),
     'options_callback' => array('SyncCtoCallback', 'databaseTables'),
 );

@@ -26,6 +26,7 @@
  * @license    GNU/LGPL
  * @filesource
  */
+
 $GLOBALS['TL_DCA']['tl_syncCto_restore_file'] = array(
     // Config
     'config' => array
@@ -38,7 +39,13 @@ $GLOBALS['TL_DCA']['tl_syncCto_restore_file'] = array(
         ),
         'onsubmit_callback' => array(
             array('tl_syncCto_restore_file', 'onsubmit_callback'),
-        )
+        ),
+        'dcMemory_show_callback' => array(
+            array('tl_syncCto_restore_file', 'show_all')
+        ),
+        'dcMemory_showAll_callback' => array(
+            array('tl_syncCto_restore_file', 'show_all')
+        ),
     ),
     // Palettes
     'palettes' => array
@@ -83,19 +90,31 @@ class tl_syncCto_restore_file extends Backend
         $arrStepPool = $this->Session->get("SyncCto_File_StepPool");
 
         if (!is_array($arrStepPool))
+        {
             $arrStepPool = array();
+        }
 
         if ($this->Input->post("filelist") == "")
         {
             $_SESSION["TL_ERROR"] = array(vsprintf($GLOBALS['TL_LANG']['ERR']['sync_no_file_found'], array($this->Input->post("filelist"))));
             return;
         }
-        
+
         $arrStepPool["file"] = $this->Input->post("filelist");
 
         $this->Session->set("SyncCto_File_StepPool", $arrStepPool);
 
         $this->redirect($this->Environment->base . "contao/main.php?do=syncCto_backups&amp;table=tl_syncCto_restore_file&amp;act=start");
+    }
+
+    /**
+     * Change active mode to edit
+     * 
+     * @return string 
+     */
+    public function show_all($dc, $strReturn)
+    {
+        return $strReturn . $dc->edit();
     }
 
 }

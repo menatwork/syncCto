@@ -32,33 +32,34 @@
  */
 $GLOBALS['TL_DCA']['tl_user']['palettes']['extend'] = str_replace('disable', '{syncCto_legend},syncCto_clients,syncCto_clients_p;{syncCto_tables_legend},syncCto_tables;{account_legend},disable', $GLOBALS['TL_DCA']['tl_user']['palettes']['extend']);
 $GLOBALS['TL_DCA']['tl_user']['palettes']['custom'] = str_replace('disable,', '{syncCto_legend},syncCto_clients,syncCto_clients_p;{syncCto_tables_legend},syncCto_tables;{account_legend},disable', $GLOBALS['TL_DCA']['tl_user']['palettes']['custom']);
+
 /**
  * Add fields to tl_user
  */
 $GLOBALS['TL_DCA']['tl_user']['fields']['syncCto_clients'] = array
-(
-	'label' => &$GLOBALS['TL_LANG']['tl_user']['syncCto_clients'],
-	'exclude' => true,
-	'inputType' => 'checkbox',
-	'foreignKey' => 'tl_synccto_clients.title',
-	'eval' => array('multiple'=>true)
+    (
+    'label' => &$GLOBALS['TL_LANG']['tl_user']['syncCto_clients'],
+    'exclude' => true,
+    'inputType' => 'checkbox',
+    'foreignKey' => 'tl_synccto_clients.title',
+    'eval' => array('multiple' => true)
 );
 
 $GLOBALS['TL_DCA']['tl_user']['fields']['syncCto_clients_p'] = array
-(
-	'label' => &$GLOBALS['TL_LANG']['tl_user']['syncCto_clients_p'],
-	'exclude' => true,
-	'inputType' => 'checkbox',
-	'options' => array('create', 'edit', 'copy', 'delete', 'syncTo', 'syncFrom'),
-	'reference' => &$GLOBALS['TL_LANG']['MSC'],
-	'eval' => array('multiple'=>true)
+    (
+    'label' => &$GLOBALS['TL_LANG']['tl_user']['syncCto_clients_p'],
+    'exclude' => true,
+    'inputType' => 'checkbox',
+    'options' => array('create', 'edit', 'copy', 'delete', 'syncTo', 'syncFrom'),
+    'reference' => &$GLOBALS['TL_LANG']['MSC'],
+    'eval' => array('multiple' => true)
 );
 
 $GLOBALS['TL_DCA']['tl_user']['fields']['syncCto_tables'] = array
-(
-	'label' => &$GLOBALS['TL_LANG']['tl_user']['syncCto_tables'],
-	'inputType' => 'checkboxWizard',
-	'exclude' => true,
+    (
+    'label' => &$GLOBALS['TL_LANG']['tl_user']['syncCto_tables'],
+    'inputType' => 'checkboxWizard',
+    'exclude' => true,
     'eval' => array('multiple' => true),
     'options_callback' => array('SyncCtoCallback', 'databaseTables'),
 );

@@ -1,5 +1,4 @@
-<?php if (!defined('TL_ROOT'))
-    die('You can not access this file directly!');
+<?php if (!defined('TL_ROOT')) die('You can not access this file directly!');
 
 /**
  * Contao Open Source CMS
@@ -27,6 +26,7 @@
  * @license    GNU/LGPL
  * @filesource
  */
+
 $GLOBALS['TL_DCA']['tl_syncCto_settings'] = array(
     // Config
     'config' => array
@@ -46,6 +46,7 @@ $GLOBALS['TL_DCA']['tl_syncCto_settings'] = array(
             (
             'label' => &$GLOBALS['TL_LANG']['tl_syncCto_settings']['folder_blacklist'],
             'inputType' => 'textwizard',
+            'exclude' => true,
             'eval' => array('trailingSlash' => false, 'style' => 'width:420px', 'allowHtml' => false),
             'load_callback' => array(array('SyncCtoCallback', 'loadcallFolderBlacklist')),
         ),
@@ -53,6 +54,7 @@ $GLOBALS['TL_DCA']['tl_syncCto_settings'] = array(
             (
             'label' => &$GLOBALS['TL_LANG']['tl_syncCto_settings']['file_blacklist'],
             'inputType' => 'textwizard',
+            'exclude' => true,
             'eval' => array('trailingSlash' => false, 'style' => 'width:420px', 'allowHtml' => false),
             'load_callback' => array(array('SyncCtoCallback', 'loadcallFileBlacklist')),
         ),
@@ -60,6 +62,7 @@ $GLOBALS['TL_DCA']['tl_syncCto_settings'] = array(
             (
             'label' => &$GLOBALS['TL_LANG']['tl_syncCto_settings']['folder_whitelist'],
             'inputType' => 'textwizard',
+            'exclude' => true,
             'eval' => array('trailingSlash' => false, 'style' => 'width:420px', 'allowHtml' => false),
             'load_callback' => array(array('SyncCtoCallback', 'loadcallFolderWhitelist')),
         ),
@@ -67,6 +70,7 @@ $GLOBALS['TL_DCA']['tl_syncCto_settings'] = array(
             (
             'label' => &$GLOBALS['TL_LANG']['tl_syncCto_settings']['local_blacklist'],
             'inputType' => 'checkboxWizard',
+            'exclude' => true,
             'eval' => array('multiple' => true),
             'options_callback' => array('SyncCtoCallback', 'localconfigEntries'),
             'load_callback' => array(array('SyncCtoCallback', 'loadcallLocalConfig')),
@@ -75,6 +79,7 @@ $GLOBALS['TL_DCA']['tl_syncCto_settings'] = array(
             (
             'label' => &$GLOBALS['TL_LANG']['tl_syncCto_settings']['hidden_tables'],
             'inputType' => 'checkboxWizard',
+            'exclude' => true,
             'eval' => array('multiple' => true),
             'options_callback' => array('SyncCtoCallback', 'hiddenTables'),
             'load_callback' => array(array('SyncCtoCallback', 'loadcallTableHidden')),
@@ -83,6 +88,7 @@ $GLOBALS['TL_DCA']['tl_syncCto_settings'] = array(
             (
             'label' => &$GLOBALS['TL_LANG']['tl_syncCto_settings']['database_tables'],
             'inputType' => 'checkboxWizard',
+            'exclude' => true,
             'eval' => array('multiple' => true),
             'options_callback' => array('SyncCtoCallback', 'databaseTables'),
         ),
@@ -90,7 +96,9 @@ $GLOBALS['TL_DCA']['tl_syncCto_settings'] = array(
             (
             'label' => &$GLOBALS['TL_LANG']['tl_syncCto_settings']['debug_mode'],
             'inputType' => 'checkbox',
+            'exclude' => true,
         ),
     )
 );
+
 ?>
