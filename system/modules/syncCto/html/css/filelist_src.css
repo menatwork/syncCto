@@ -1,0 +1,82 @@
+/* Copyright (c) MEN AT WORK 2011 :: LGPL license */
+
+  #syncCto_filelist {
+	clear:both;
+	width:100%;
+  }
+  
+  #syncCto_filelist th, 
+  #syncCto_filelist td {
+	padding-top:5px;
+	padding-bottom:5px;
+  }
+  
+  #syncCto_filelist th {
+	background-color:#F0F0F0;
+    font-weight:normal;
+    text-align:left;
+  }
+  
+  #syncCto_filelist td {
+	background-color:#F9F9F9;
+  }
+  
+  #syncCto_filelist td.checkbox, 
+  #syncCto_filelist th.checkbox {
+	text-align:center;
+  }
+  
+  #syncCto_filelist .tl_checkbox {
+	margin:0;
+  }
+  
+  #syncCto_filelist td.state {
+	padding-left:9px;
+	background-color:#F0F0F0;
+  }
+  
+  #syncCto_filelist .last {
+	text-align:left;
+	padding-left:9px;
+	padding-right:9px;
+  }
+  
+  #syncCto_filelist .filesize {
+	text-align:right;
+	padding-right:10px;
+  }
+  
+  #syncCto_filelist_form .tl_submit {
+	/* font-size:12px;
+	cursor:pointer;
+	border:1px solid #ebebeb;
+	background-color:#ebebeb;
+	color:#7F7F7F;
+	float:left;
+	-webkit-border-radius:2px;
+	-moz-border-radius:2px;
+	border-radius:2px;
+	display:block;
+	padding:4px 20px;*/
+	margin:5px 15px 15px 0;
+	
+  }
+  
+ /*------------------------------------------------------------------------*/
+  
+  h1.file { 
+	margin-top:20px;
+  }
+  
+  p.info {
+	margin:10px 0 15px;
+  }
+  
+  p.debug{
+	margin-bottom:20px;
+  }
+  
+  ul.fileinfo li {
+	color:#A3A3A3;
+	font-size:10px;
+  }
