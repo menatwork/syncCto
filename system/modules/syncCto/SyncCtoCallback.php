@@ -76,7 +76,7 @@ class SyncCtoCallback extends Backend
             if (!is_array($_SESSION["TL_INFO"])) $_SESSION["TL_INFO"] = array();
 
             // required extensions
-            $arrRequiredExtensions = array('httprequestextended', 'textwizard', '3cframework');
+            $arrRequiredExtensions = array('ctoCommunication, httprequestextended', 'textwizard', '3cframework');
 
             // required files
             $arrRequiredFiles = array('system/drivers/DC_Memory.php');
@@ -285,8 +285,6 @@ class SyncCtoCallback extends Backend
             elseif ($strTrim != '')
             {
                 $arrChunks = array_map('trim', explode('=', $strLine, 2));
-
-
                 $arrData[] = str_replace(array("$", "GLOBALS['TL_CONFIG']['", "']"), array("", "", ""), $arrChunks[0]);
             }
         }
@@ -335,7 +333,7 @@ class SyncCtoCallback extends Backend
 
     public function databaseTablesRecommended()
     {
-        // SyncCto Blacklist
+        // Recommended tables
         $arrBlacklist = deserialize($GLOBALS['TL_CONFIG']['syncCto_database_tables']);
         if (!is_array($arrBlacklist))
         {
@@ -350,8 +348,10 @@ class SyncCtoCallback extends Backend
         {
             if (in_array($value, $arrBlacklist)) continue;
 
-            if (is_array($arrTablesPermission) && !in_array($value, $arrTablesPermission) && $this->BackendUser->isAdmin != true) continue;
-
+            if (is_array($arrTablesPermission) && !in_array($value, $arrTablesPermission) && $this->BackendUser->isAdmin != true)
+            {
+                continue;
+            }
             $arrTables[] = $value;
         }
 
@@ -360,6 +360,7 @@ class SyncCtoCallback extends Backend
 
     public function databaseTablesNoneRecommended()
     {
+        // None recommended tables
         $arrBlacklist = deserialize($GLOBALS['TL_CONFIG']['syncCto_database_tables']);
         if (!is_array($arrBlacklist))
         {
@@ -374,8 +375,10 @@ class SyncCtoCallback extends Backend
         {
             if (!in_array($value, $arrBlacklist)) continue;
 
-            if (is_array($arrTablesPermission) && !in_array($value, $arrTablesPermission) && $this->BackendUser->isAdmin != true) continue;
-
+            if (is_array($arrTablesPermission) && !in_array($value, $arrTablesPermission) && $this->BackendUser->isAdmin != true)
+            {
+                continue;
+            }
             $arrTables[] = $value;
         }
 
