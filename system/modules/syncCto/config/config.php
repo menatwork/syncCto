@@ -183,16 +183,22 @@ $GLOBALS['SYC_PATH']['tmp'] = "system/tmp/";
 $GLOBALS['SYC_CONFIG']['format'] = "Ymd_H-i-s";
 
 /**
- * CSS
+ * CSS & JS Files
  */
-if (($objInput->get("do") == 'syncCto_check') || ($objInput->get("table") == 'tl_syncCto_clients_syncTo') || ($objInput->get("table") == 'tl_syncCto_clients_syncFrom'))
+if ($objInput->get("table") == 'tl_syncCto_clients_syncTo' || $objInput->get("table") == 'tl_syncCto_clients_syncFrom')
 {
-    $GLOBALS['TL_CSS'][] = 'system/modules/syncCto/html/css/syncCto.css';
+    $GLOBALS['TL_CSS'][] = 'system/modules/syncCto/html/css/filelist_src.css';
+	$GLOBALS['TL_JAVASCRIPT'][] = 'system/modules/syncCto/html/js/filelist_src.js';
+}
+
+if (($objInput->get("do") == 'syncCto_check'))
+{
+    $GLOBALS['TL_CSS'][] = 'system/modules/syncCto/html/css/systemcheck_src.css';
 }
 
 if ((($objInput->get("do") == 'synccto_clients') && $objInput->get("act") == '') && $objInput->get("table") == '')
 {
-    $GLOBALS['TL_JAVASCRIPT'][] = 'system/modules/syncCto/html/js/syncCto.js';
+    $GLOBALS['TL_JAVASCRIPT'][] = 'system/modules/syncCto/html/js/ping_src.js';
 }
 
 /**

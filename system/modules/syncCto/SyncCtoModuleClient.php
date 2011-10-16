@@ -592,8 +592,8 @@ class SyncCtoModuleClient extends BackendModule
 
         // Filelist
         $arrSyncFileList = $this->Session->get("syncCto_SyncFiles");
-        var_dump($this->Session->get("syncCto_SyncFiles"));
-        exit();
+        //var_dump($this->Session->get("syncCto_SyncFiles"));
+        //exit();
 
 
         // Load content

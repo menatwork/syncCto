@@ -13,7 +13,7 @@
     <?php foreach ($this->data as $key => $value) : ?>
 
         <div class="<?php echo ($key == 1) ? "tl_tbox" : "tl_box"; ?> block">
-            <h1 id="step<?php echo $key; ?>"><?php echo $value["title"] ?><?php if (strlen($value["state"]) != 0): ?> - <?php echo $value["state"]; ?><?php endif; ?></h1>
+            <h1 id="step<?php echo $key; ?>"><?php echo $value["title"] ?><?php if (strlen($value["state"]) != 0): ?> – <?php echo $value["state"]; ?><?php endif; ?></h1>
             <p class="tl_help">
                 <?php echo $value["description"]; ?>
             </p>
@@ -50,8 +50,7 @@
             </p>
         </div>
     <?php endif; ?>
-
-
+	
     <script type="text/javascript">
         <!--//--><![CDATA[//><!--
         /* window.scrollTo(null, ($('step<?php echo $this->step; ?>').getPosition().y - 20));*/ 
