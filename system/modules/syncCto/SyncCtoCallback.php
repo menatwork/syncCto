@@ -1,7 +1,4 @@
-<?php
-
-if (!defined('TL_ROOT'))
-    die('You cannot access this file directly!');
+<?php if (!defined('TL_ROOT')) die('You cannot access this file directly!');
 
 /**
  * Contao Open Source CMS
@@ -55,7 +52,6 @@ class SyncCtoCallback extends Backend
         // Import SyncCto classes
         $this->objSyncCtoHelper = SyncCtoHelper::getInstance();
         //$this->objSyncCtoCodifyengine = SyncCtoCodifyengineFactory::getEngine();
-
     }
 
     /**
@@ -64,8 +60,7 @@ class SyncCtoCallback extends Backend
      */
     public static function getInstance()
     {
-        if (self::$instance == null)
-            self::$instance = new SyncCtoCallback();
+        if (self::$instance == null) self::$instance = new SyncCtoCallback();
 
         return self::$instance;
     }
@@ -78,8 +73,7 @@ class SyncCtoCallback extends Backend
     {
         if ($strTemplate == 'be_main')
         {
-            if (!is_array($_SESSION["TL_INFO"]))
-                $_SESSION["TL_INFO"] = array();
+            if (!is_array($_SESSION["TL_INFO"])) $_SESSION["TL_INFO"] = array();
 
             // required extensions
             $arrRequiredExtensions = array('httprequestextended', 'textwizard', '3cframework');
@@ -183,27 +177,27 @@ class SyncCtoCallback extends Backend
      * Load call backs for syncCto settings
      */
 
-    public function loadcallLocalConfig($strValue)
+    public function loadBlacklistLocalconfig($strValue)
     {
         return $this->objSyncCtoHelper->getBlacklistLocalconfig();
     }
 
-    public function loadcallFolderBlacklist($strValue)
+    public function loadBlacklistFolder($strValue)
     {
         return $this->objSyncCtoHelper->getBlacklistFolder();
     }
 
-    public function loadcallFileBlacklist($strValue)
+    public function loadBlacklistFile($strValue)
     {
         return $this->objSyncCtoHelper->getBlacklistFile();
     }
 
-    public function loadcallFolderWhitelist($strValue)
+    public function loadWhitelistFolder($strValue)
     {
         return $this->objSyncCtoHelper->getWhitelistFolder();
     }
 
-    public function loadcallTableHidden($strValue)
+    public function loadTablesHidden($strValue)
     {
         return $this->objSyncCtoHelper->getTablesHidden();
     }
@@ -331,8 +325,7 @@ class SyncCtoCallback extends Backend
         foreach ($this->Database->listTables() as $key => $value)
         {
             // Check if table is a hidden one.
-            if (in_array($value, $arrTablesHidden))
-                continue;
+            if (in_array($value, $arrTablesHidden)) continue;
 
             $arrTables[] = $value;
         }
@@ -355,11 +348,9 @@ class SyncCtoCallback extends Backend
 
         foreach ($this->databaseTables() as $key => $value)
         {
-            if (in_array($value, $arrBlacklist))
-                continue;
+            if (in_array($value, $arrBlacklist)) continue;
 
-            if (is_array($arrTablesPermission) && !in_array($value, $arrTablesPermission) && $this->BackendUser->isAdmin != true)
-                continue;
+            if (is_array($arrTablesPermission) && !in_array($value, $arrTablesPermission) && $this->BackendUser->isAdmin != true) continue;
 
             $arrTables[] = $value;
         }
@@ -381,18 +372,16 @@ class SyncCtoCallback extends Backend
 
         foreach ($this->databaseTables() as $key => $value)
         {
-            if (!in_array($value, $arrBlacklist))
-                continue;
+            if (!in_array($value, $arrBlacklist)) continue;
 
-            if (is_array($arrTablesPermission) && !in_array($value, $arrTablesPermission) && $this->BackendUser->isAdmin != true)
-                continue;
+            if (is_array($arrTablesPermission) && !in_array($value, $arrTablesPermission) && $this->BackendUser->isAdmin != true) continue;
 
             $arrTables[] = $value;
         }
 
         return $arrTables;
     }
-    
+
 }
 
 ?>

@@ -47,24 +47,24 @@ $GLOBALS['TL_DCA']['tl_syncCto_settings'] = array(
             'label' => &$GLOBALS['TL_LANG']['tl_syncCto_settings']['folder_blacklist'],
             'inputType' => 'textwizard',
             'exclude' => true,
-            'eval' => array('trailingSlash' => false, 'style' => 'width:420px', 'allowHtml' => false),
-            'load_callback' => array(array('SyncCtoCallback', 'loadcallFolderBlacklist')),
+            'eval' => array('trailingSlash' => false, 'style' => 'width:595px', 'allowHtml' => false),
+            'load_callback' => array(array('SyncCtoCallback', 'loadBlacklistFolder')),
         ),
         'syncCto_file_blacklist' => array
             (
             'label' => &$GLOBALS['TL_LANG']['tl_syncCto_settings']['file_blacklist'],
             'inputType' => 'textwizard',
             'exclude' => true,
-            'eval' => array('trailingSlash' => false, 'style' => 'width:420px', 'allowHtml' => false),
-            'load_callback' => array(array('SyncCtoCallback', 'loadcallFileBlacklist')),
+            'eval' => array('trailingSlash' => false, 'style' => 'width:595px', 'allowHtml' => false),
+            'load_callback' => array(array('SyncCtoCallback', 'loadBlacklistFile')),
         ),
         'syncCto_folder_whitelist' => array
             (
             'label' => &$GLOBALS['TL_LANG']['tl_syncCto_settings']['folder_whitelist'],
             'inputType' => 'textwizard',
             'exclude' => true,
-            'eval' => array('trailingSlash' => false, 'style' => 'width:420px', 'allowHtml' => false),
-            'load_callback' => array(array('SyncCtoCallback', 'loadcallFolderWhitelist')),
+            'eval' => array('trailingSlash' => false, 'style' => 'width:595px', 'allowHtml' => false),
+            'load_callback' => array(array('SyncCtoCallback', 'loadWhitelistFolder')),
         ),
         'syncCto_local_blacklist' => array
             (
@@ -73,7 +73,7 @@ $GLOBALS['TL_DCA']['tl_syncCto_settings'] = array(
             'exclude' => true,
             'eval' => array('multiple' => true),
             'options_callback' => array('SyncCtoCallback', 'localconfigEntries'),
-            'load_callback' => array(array('SyncCtoCallback', 'loadcallLocalConfig')),
+            'load_callback' => array(array('SyncCtoCallback', 'loadBlacklistLocalconfig')),
         ),
         'syncCto_hidden_tables' => array
             (
@@ -82,7 +82,7 @@ $GLOBALS['TL_DCA']['tl_syncCto_settings'] = array(
             'exclude' => true,
             'eval' => array('multiple' => true),
             'options_callback' => array('SyncCtoCallback', 'hiddenTables'),
-            'load_callback' => array(array('SyncCtoCallback', 'loadcallTableHidden')),
+            'load_callback' => array(array('SyncCtoCallback', 'loadTablesHidden')),
         ),
         'syncCto_database_tables' => array
             (

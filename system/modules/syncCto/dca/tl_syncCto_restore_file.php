@@ -59,7 +59,7 @@ $GLOBALS['TL_DCA']['tl_syncCto_restore_file'] = array(
             'label' => &$GLOBALS['TL_LANG']['tl_syncCto_restore_file']['filelist'],
             'exclude' => true,
             'inputType' => 'fileTree',
-            'eval' => array('files' => true, 'filesOnly' => true, 'fieldType' => 'radio', 'path' => 'tl_files/syncCto_backups/files', 'extensions' => 'rar,zip'),
+            'eval' => array('files' => true, 'filesOnly' => true, 'fieldType' => 'radio', 'path' => $GLOBALS['TL_CONFIG']['uploadPath'] . '/syncCto_backups/files', 'extensions' => 'rar,zip'),
         ),
     )
 );

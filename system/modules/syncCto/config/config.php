@@ -1,5 +1,4 @@
-<?php
-if (!defined('TL_ROOT')) die('You can not access this file directly!');
+<?php if (!defined('TL_ROOT')) die('You can not access this file directly!');
 
 /**
  * Contao Open Source CMS
@@ -138,29 +137,28 @@ $GLOBALS['SYC_CONFIG']['folder_blacklist'] = array(
     'system/tmp*',
     'system/htm*',
     'system/logs*',
-    'tl_files/syncCto_backups*',
+    '*/syncCto_backups*',
 );
 
 // Files only Sync.
 $GLOBALS['SYC_CONFIG']['file_blacklist'] = array(
-    "*.htaccess",
-    "system/config/localconfig.php",
+    '*.htaccess',
+    '*/localconfig.php',
 );
 
 // Folders
 $GLOBALS['SYC_CONFIG']['local_blacklist'] = array(
-    "websitePath",
-    "installPassword",
-    "encryptionKey",
-    "dbDriver",
-    "dbHost",
-    "dbUser",
-    "dbPass",
-    "dbDatabase",
-    "dbPconnect",
-    "dbCharset",
-    "dbPort",
-    "syncCto_apikey",
+    'websitePath',
+    'installPassword',
+    'encryptionKey',
+    'dbDriver',
+    'dbHost',
+    'dbUser',
+    'dbPass',
+    'dbDatabase',
+    'dbPconnect',
+    'dbCharset',
+    'dbPort',
 );
 
 /**
@@ -179,10 +177,10 @@ $GLOBALS['SYC_CONFIG']['folder_whitelist'] = array(
  * Global configuration
  */
 // Folder path configuration
-$GLOBALS['SYC_PATH']['db'] = "tl_files/syncCto_backups/database/";
+$GLOBALS['SYC_PATH']['db'] = $GLOBALS['TL_CONFIG']['uploadPath'] . '/syncCto_backups/database/';
+$GLOBALS['SYC_PATH']['file'] = $GLOBALS['TL_CONFIG']['uploadPath'] . '/syncCto_backups/files/';
+$GLOBALS['SYC_PATH']['debug'] = $GLOBALS['TL_CONFIG']['uploadPath'] . '/syncCto_backups/debug/';
 $GLOBALS['SYC_PATH']['tmp'] = "system/tmp/";
-$GLOBALS['SYC_PATH']['file'] = "tl_files/syncCto_backups/files/";
-$GLOBALS['SYC_PATH']['debug'] = "tl_files/syncCto_backups/debug/";
 
 // Timestamp for files
 $GLOBALS['SYC_CONFIG']['format'] = "Ymd_H-i-s";
@@ -251,4 +249,5 @@ $GLOBALS["CTOCOM_FUNCTIONS"]["SYNCCTO_PURGETEMP"] = array(
     "typ" => "GET",
     "parameter" => FALSE,
 );
+
 ?>

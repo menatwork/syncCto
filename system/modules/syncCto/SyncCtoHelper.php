@@ -1,7 +1,4 @@
-<?php
-
-if (!defined('TL_ROOT'))
-    die('You cannot access this file directly!');
+<?php if (!defined('TL_ROOT')) die('You cannot access this file directly!');
 
 /**
  * Contao Open Source CMS
@@ -51,7 +48,9 @@ class SyncCtoHelper extends Backend
     public static function getInstance()
     {
         if (self::$instance == null)
+        {
             self::$instance = new SyncCtoHelper();
+        }
 
         return self::$instance;
     }
@@ -66,11 +65,9 @@ class SyncCtoHelper extends Backend
         {
             foreach ($arrLocalconfig as $value)
             {
-                if (in_array($value, $arrSyncCtoConfig))
-                    continue;
+                if (in_array($value, $arrSyncCtoConfig)) continue;
 
-                if ($value == "")
-                    continue;
+                if ($value == "") continue;
 
                 $arrSyncCtoConfig[] = $value;
             }
@@ -126,7 +123,9 @@ class SyncCtoHelper extends Backend
     public function loadConfig($intTyp = 1)
     {
         if ($intTyp != SyncCtoEnum::LOADCONFIG_KEYS_ONLY && $intTyp != SyncCtoEnum::LOADCONFIG_KEY_VALUE)
+        {
             throw new Exception("Unknow typ for " . __CLASS__ . " in function " . __FUNCTION__);
+        }
 
         // Read the local configuration file
         $strMode = 'top';
@@ -189,8 +188,7 @@ class SyncCtoHelper extends Backend
     {
         $arrPath = func_get_args();
 
-        if (count($arrPath) == 0 || $arrPath == null || $arrPath == "")
-            return TL_ROOT;
+        if (count($arrPath) == 0 || $arrPath == null || $arrPath == "") return TL_ROOT;
 
         $strVar = "";
 
@@ -201,8 +199,7 @@ class SyncCtoHelper extends Backend
 
             foreach ($itPath as $itFolder)
             {
-                if ($itFolder == "" || $itFolder == "." || $itFolder == "..")
-                    continue;
+                if ($itFolder == "" || $itFolder == "." || $itFolder == "..") continue;
 
                 $strVar .= "/" . $itFolder;
             }
@@ -215,8 +212,7 @@ class SyncCtoHelper extends Backend
     {
         $arrPath = func_get_args();
 
-        if (count($arrPath) == 0 || $arrPath == null || $arrPath == "")
-            return "";
+        if (count($arrPath) == 0 || $arrPath == null || $arrPath == "") return "";
 
         $strVar = "";
 
@@ -227,8 +223,7 @@ class SyncCtoHelper extends Backend
 
             foreach ($itPath as $itFolder)
             {
-                if ($itFolder == "" || $itFolder == "." || $itFolder == "..")
-                    continue;
+                if ($itFolder == "" || $itFolder == "." || $itFolder == "..") continue;
 
                 $strVar .= "/" . $itFolder;
             }
@@ -250,13 +245,17 @@ class SyncCtoHelper extends Backend
     public function setSession($strName, $mixVar)
     {
         if (is_array($mixVar))
+        {
             $this->Session->set($strName, serialize($mixVar));
-
+        }
         elseif ($mixVar === 0)
+        {
             return (int) 0;
-
+        }
         else
+        {
             $this->Session->set($strName, $mixVar);
+        }
     }
 
     /**
@@ -270,19 +269,25 @@ class SyncCtoHelper extends Backend
         $mixVar = $this->Session->get($strName);
 
         if ($mixVar === FALSE || $mixVar == "b:0;")
+        {
             return FALSE;
-
+        }
         else if ($mixVar === TRUE || $mixVar == "b:1;")
+        {
             return TRUE;
-
+        }
         elseif (is_array(deserialize($mixVar)))
+        {
             return deserialize($mixVar);
-
+        }
         elseif ($mixVar === 0)
+        {
             return (int) 0;
-
+        }
         else
+        {
             return $mixVar;
+        }
     }
 
 }
