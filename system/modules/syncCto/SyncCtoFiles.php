@@ -148,7 +148,7 @@ class SyncCtoFiles extends Backend
      * 
      * @return array 
      */
-    public function runChecksumTlFiles($arrFileList = null)
+    public function runChecksumFiles($arrFileList = null)
     {
         // Check if filelit is set or not.
         if ($arrFileList != null && is_array($arrFileList))

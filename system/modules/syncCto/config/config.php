@@ -240,9 +240,9 @@ $GLOBALS["CTOCOM_FUNCTIONS"]["SYNCCTO_CHECKSUM_CORE"] = array(
     "parameter" => FALSE,
 );
 
-$GLOBALS["CTOCOM_FUNCTIONS"]["SYNCCTO_CHECKSUM_TLFILES"] = array(
+$GLOBALS["CTOCOM_FUNCTIONS"]["SYNCCTO_CHECKSUM_FILES"] = array(
     "class" => "SyncCtoFiles",
-    "function" => "runChecksumTlFiles",
+    "function" => "runChecksumFiles",
     "typ" => "POST",
     "parameter" => array("fileList"),
 );

@@ -1,7 +1,4 @@
-<?php
-
-if (!defined('TL_ROOT'))
-    die('You cannot access this file directly!');
+<?php if (!defined('TL_ROOT')) die('You cannot access this file directly!');
 
 /**
  * Contao Open Source CMS
@@ -29,6 +26,7 @@ if (!defined('TL_ROOT'))
  * @license    GNU/LGPL
  * @filesource
  */
+
 class SyncCtoModuleClient extends BackendModule
 {
 
@@ -55,9 +53,6 @@ class SyncCtoModuleClient extends BackendModule
         $this->objSyncCtoCallback = SyncCtoCallback::getInstance();
         $this->objSyncCtoCommunicationClient = SyncCtoCommunicationClient::getInstance();
         $this->objSyncCtoHelper = SyncCtoHelper::getInstance();
-
-        // Load language
-        $this->loadLanguageFile('SyncCto');
     }
 
     /* -------------------------------------------------------------------------
@@ -96,13 +91,16 @@ class SyncCtoModuleClient extends BackendModule
     {
         // Build Step
         if ($this->Input->get("step") == "" || $this->Input->get("step") == null)
+        {
             $this->step = 1;
+        }
         else
+        {
             $this->step = intval($this->Input->get("step"));
+        }
 
         // Load language and template
         $this->loadLanguageFile('tl_syncCto_clients_syncTo');
-        $this->loadLanguageFile('syncCto');
         $this->loadLanguageFile('tl_syncCto_steps');
 
         // Set client for communication
@@ -171,7 +169,9 @@ class SyncCtoModuleClient extends BackendModule
         // State save for this step
         $mixStepPool = $this->Session->get("syncCto_StepPool1");
         if ($mixStepPool == FALSE)
+        {
             $mixStepPool = array("step" => 1);
+        }
 
         // Load content
         $arrContenData = $this->Session->get("syncCto_Content");
@@ -299,7 +299,9 @@ class SyncCtoModuleClient extends BackendModule
         // State save for this step
         $mixStepPool = $this->Session->get("syncCto_StepPool2");
         if ($mixStepPool == FALSE)
+        {
             $mixStepPool = array("step" => 1);
+        }
 
         // Load content
         $arrContenData = $this->Session->get("syncCto_Content");
@@ -338,13 +340,13 @@ class SyncCtoModuleClient extends BackendModule
                     case 1:
                         if ($mixFilelist != false && is_array($mixFilelist) && ( $intSyncTyp == SYNCCTO_SMALL || $intSyncTyp == SYNCCTO_FULL ))
                         {
-                            $mixStepPool["tlfiles_checksum"] = $this->objSyncCtoFiles->runChecksumTlFiles($mixFilelist);
+                            $mixStepPool["tl_files_checksum"] = $this->objSyncCtoFiles->runChecksumFiles($mixFilelist);
                             $mixStepPool["step"] = 2;
                             break;
                         }
                         else
                         {
-                            $mixStepPool["tlfiles_checksum"] = array();
+                            $mixStepPool["tl_files_checksum"] = array();
                             $mixStepPool["step"] = 2;
                             break;
                         }
@@ -366,9 +368,9 @@ class SyncCtoModuleClient extends BackendModule
 
                     // Merge both lists and send it to the client
                     case 3:
-                        $arrChecksum = array_merge($mixStepPool["tlfiles_checksum"], $mixStepPool["core_checksum"]);
+                        $arrChecksum = array_merge($mixStepPool["tl_files_checksum"], $mixStepPool["core_checksum"]);
 
-                        unset($mixStepPool["tlfiles_checksum"]);
+                        unset($mixStepPool["tl_files_checksum"]);
                         unset($mixStepPool["core_checksum"]);
 
                         $mixStepPool["checksum"] = $arrChecksum;
@@ -588,14 +590,14 @@ class SyncCtoModuleClient extends BackendModule
         // State save for this step
         $mixStepPool = $this->Session->get("syncCto_StepPool3");
         if ($mixStepPool == FALSE)
+        {
             $mixStepPool = array("step" => 1);
+        }
 
         // Filelist
         $arrSyncFileList = $this->Session->get("syncCto_SyncFiles");
         //var_dump($this->Session->get("syncCto_SyncFiles"));
         //exit();
-
-
         // Load content
         $arrContenData = $this->Session->get("syncCto_Content");
         $arrContenData["error"] = false;
@@ -642,16 +644,11 @@ class SyncCtoModuleClient extends BackendModule
                         $intLimit = min($intClientUploadLimit, $intClientMemoryLimit, $intClientPostLimit, $intLocalMemoryLimit);
 
                         // Limit
-                        if ($intLimit > 1000000000)
-                            $intPercent = 40;
-                        else if ($intLimit > 500000000)
-                            $intPercent = 40;
-                        else if ($intLimit > 100000000)
-                            $intPercent = 50;
-                        else if ($intLimit > 50000000)
-                            $intPercent = 60;
-                        else
-                            $intPercent = 70;
+                        if ($intLimit > 1000000000) $intPercent = 40;
+                        else if ($intLimit > 500000000) $intPercent = 40;
+                        else if ($intLimit > 100000000) $intPercent = 50;
+                        else if ($intLimit > 50000000) $intPercent = 60;
+                        else $intPercent = 70;
 
                         $intLimit = $intLimit / 100 * $intPercent;
 
@@ -691,8 +688,7 @@ class SyncCtoModuleClient extends BackendModule
 
                         foreach ($mixSyncFiles as $key => $value)
                         {
-                            if ($value["split"] == true)
-                                $intCountSplit++;
+                            if ($value["split"] == true) $intCountSplit++;
                         }
 
                         // Skip page if no big file is found
@@ -741,8 +737,7 @@ class SyncCtoModuleClient extends BackendModule
 
                             foreach ($mixSyncFiles as $key => $value)
                             {
-                                if ($value["split"] == true)
-                                    $intCountSplit++;
+                                if ($value["split"] == true) $intCountSplit++;
                             }
 
                             if ($intCountSplit == 0)
@@ -805,11 +800,9 @@ class SyncCtoModuleClient extends BackendModule
                     case 3:
                         foreach ($mixSyncFiles as $key => $value)
                         {
-                            if ($value["split"] != true)
-                                continue;
+                            if ($value["split"] != true) continue;
 
-                            if ($mixSyncFiles["split"] != 0 && $mixSyncFiles["splitname"] != "")
-                                continue;
+                            if ($mixSyncFiles["split"] != 0 && $mixSyncFiles["splitname"] != "") continue;
 
                             // Splitt file
                             $intSplits = $this->objSyncCtoFiles->
@@ -847,19 +840,16 @@ class SyncCtoModuleClient extends BackendModule
                     case 4:
                         foreach ($mixSyncFiles as $key => $value)
                         {
-                            if ($value["split"] != true)
-                                continue;
+                            if ($value["split"] != true) continue;
 
-                            if ($value["transmission"] == SyncCtoEnum::FILETRANS_SEND)
-                                continue;
+                            if ($value["transmission"] == SyncCtoEnum::FILETRANS_SEND) continue;
 
                             if ($value["state"] == SyncCtoEnum::FILESTATE_TOO_BIG_DELETE ||
                                     $value["state"] == SyncCtoEnum::FILESTATE_TOO_BIG_MISSING ||
                                     $value["state"] == SyncCtoEnum::FILESTATE_TOO_BIG_NEED ||
                                     $value["state"] == SyncCtoEnum::FILESTATE_TOO_BIG_SAME ||
                                     $value["state"] == SyncCtoEnum::FILESTATE_BOMBASTIC_BIG ||
-                                    $value["state"] == SyncCtoEnum::FILESTATE_DELETE)
-                                continue;
+                                    $value["state"] == SyncCtoEnum::FILESTATE_DELETE) continue;
 
                             for ($ii = 0; $ii < $value["splitcount"]; $ii++)
                             {
@@ -893,11 +883,9 @@ class SyncCtoModuleClient extends BackendModule
 
                             foreach ($mixSyncFiles as $key => $value)
                             {
-                                if ($value["split"] == true)
-                                    $intCountSplitTotal++;
+                                if ($value["split"] == true) $intCountSplitTotal++;
 
-                                if ($value["split"] == true && $value["transmission"] == SyncCtoEnum::FILETRANS_SEND)
-                                    $intCountSplitSend++;
+                                if ($value["split"] == true && $value["transmission"] == SyncCtoEnum::FILETRANS_SEND) $intCountSplitSend++;
                             }
 
                             $arrContent[$this->step - 1]["state"] = OK;
@@ -961,8 +949,7 @@ class SyncCtoModuleClient extends BackendModule
 
         // State save for this step
         $mixStepPool4 = $this->get("syncCto_StepPool4");
-        if ($mixStepPool4 == FALSE)
-            $mixStepPool4 = array("step" => 1);
+        if ($mixStepPool4 == FALSE) $mixStepPool4 = array("step" => 1);
 
         $mixSyncTable = $this->get("syncCto_SyncTables");
 
@@ -1112,8 +1099,7 @@ class SyncCtoModuleClient extends BackendModule
 
         // State save for this step
         $mixStepPool6 = $this->get("syncCto_StepPool6");
-        if ($mixStepPool6 == FALSE)
-            $mixStepPool6 = array("step" => 1);
+        if ($mixStepPool6 == FALSE) $mixStepPool6 = array("step" => 1);
 
         // Load sync filelist
         $mixSyncFiles = $this->get("syncCto_SyncFiles");
@@ -1218,8 +1204,7 @@ class SyncCtoModuleClient extends BackendModule
                             continue;
                         }
 
-                        if ($value["state"] == SyncCtoEnum::FILESTATE_DELETE)
-                            continue;
+                        if ($value["state"] == SyncCtoEnum::FILESTATE_DELETE) continue;
 
                         try
                         {
@@ -1408,8 +1393,7 @@ class SyncCtoModuleClient extends BackendModule
 
                         foreach ($mixSyncFiles as $key => $value)
                         {
-                            if ($value["transmission"] != SyncCtoEnum::FILETRANS_SKIPPED)
-                                continue;
+                            if ($value["transmission"] != SyncCtoEnum::FILETRANS_SKIPPED) continue;
 
                             $arrSort[$value["skipreason"]][] = $value["path"];
                         }
@@ -1449,11 +1433,9 @@ class SyncCtoModuleClient extends BackendModule
 
                             foreach ($mixSyncFiles as $key => $value)
                             {
-                                if ($value["transmission"] != SyncCtoEnum::FILETRANS_SEND)
-                                    continue;
+                                if ($value["transmission"] != SyncCtoEnum::FILETRANS_SEND) continue;
 
-                                if ($value["state"] == SyncCtoEnum::FILESTATE_DELETE)
-                                    continue;
+                                if ($value["state"] == SyncCtoEnum::FILESTATE_DELETE) continue;
 
                                 $compare .= "<li>";
                                 $compare .= htmlentities($value["path"]);
@@ -1473,11 +1455,9 @@ class SyncCtoModuleClient extends BackendModule
 
                             foreach ($mixSyncFiles as $key => $value)
                             {
-                                if ($value["transmission"] != SyncCtoEnum::FILETRANS_SEND)
-                                    continue;
+                                if ($value["transmission"] != SyncCtoEnum::FILETRANS_SEND) continue;
 
-                                if ($value["state"] != SyncCtoEnum::FILESTATE_DELETE)
-                                    continue;
+                                if ($value["state"] != SyncCtoEnum::FILESTATE_DELETE) continue;
 
                                 $compare .= "<li>";
                                 $compare .= htmlentities($value["path"]);
@@ -1501,8 +1481,7 @@ class SyncCtoModuleClient extends BackendModule
 
                             foreach ($mixSyncFiles as $key => $value)
                             {
-                                if ($value["transmission"] != SyncCtoEnum::FILETRANS_WAITING)
-                                    continue;
+                                if ($value["transmission"] != SyncCtoEnum::FILETRANS_WAITING) continue;
 
                                 $compare .= "<li>";
                                 $compare .= htmlentities($value["path"]);
@@ -1549,8 +1528,7 @@ class SyncCtoModuleClient extends BackendModule
  */
 function syncCtoModelClientCMP($a, $b)
 {
-    if ($a["state"] == $b["state"])
-        return 0;
+    if ($a["state"] == $b["state"]) return 0;
 
     return ($a["state"] < $b["state"]) ? -1 : 1;
 }

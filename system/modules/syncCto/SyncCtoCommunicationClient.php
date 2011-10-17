@@ -168,7 +168,7 @@ class SyncCtoCommunicationClient extends CtoCommunication
         return $this->runServer("SYNCCTO_CHECKSUM_COMPARE", $arrData);
     }
 
-    public function getChecksumTlfiles($fileList = NULL)
+    public function getChecksumFiles($fileList = NULL)
     {
         $arrData = array(
             array(
@@ -178,7 +178,7 @@ class SyncCtoCommunicationClient extends CtoCommunication
         );
 
         $this->setCodifyEngine(SyncCtoEnum::CODIFY_EMPTY);
-        return $this->runServer("SYNCCTO_CHECKSUM_TLFILES");
+        return $this->runServer("SYNCCTO_CHECKSUM_FILES");
     }
 
     public function getChecksumCore()
