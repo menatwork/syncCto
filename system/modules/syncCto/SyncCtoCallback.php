@@ -232,19 +232,16 @@ class SyncCtoCallback extends Backend
             {
                 continue;
             }
-
             if ($strTrim == '### INSTALL SCRIPT START ###')
             {
                 $strMode = 'data';
                 continue;
             }
-
             if ($strTrim == '### INSTALL SCRIPT STOP ###')
             {
                 $strMode = 'bottom';
                 continue;
             }
-
             if ($strMode == 'top')
             {
                 $this->strTop .= $strLine;
