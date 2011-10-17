@@ -233,7 +233,7 @@ class SyncCtoModuleBackup extends BackendModule
                 $arrContenData["data"][2]["title"] = $GLOBALS['TL_LANG']['tl_syncCto_steps']['complete'];
                 $arrContenData["data"][2]["description"] = $GLOBALS['TL_LANG']['tl_syncCto_backup_db']['complete'] . " " . $arrStepPool["zipname"];
                 $arrContenData["data"][2]["html"] = "<p class='tl_help'><br />";
-                $arrContenData["data"][2]["html"] .= "<a onclick='Backend.openWindow(this, 600, 235); return false;' title='In einem neuen Fenster ansehen' href='contao/popup.php?src=tl_files/syncCto_backups/database/" . $arrStepPool["zipname"] . "'>" . $GLOBALS['TL_LANG']['tl_syncCto_backup_db']['download_backup'] . "</a>";
+                $arrContenData["data"][2]["html"] .= "<a onclick='Backend.openWindow(this, 600, 235); return false;' title='In einem neuen Fenster ansehen' href='contao/popup.php?src=" . $GLOBALS['TL_CONFIG']['uploadPath'] . "/syncCto_backups/database/" . $arrStepPool["zipname"] . "'>" . $GLOBALS['TL_LANG']['tl_syncCto_backup_db']['download_backup'] . "</a>";
                 $arrContenData["data"][2]["html"] .= "</p>";
 
                 $this->Session->set("SyncCto_DB_StepPool", "");
@@ -418,7 +418,7 @@ class SyncCtoModuleBackup extends BackendModule
                 $arrContenData["data"][2]["title"] = $GLOBALS['TL_LANG']['tl_syncCto_steps']['complete'];
                 $arrContenData["data"][2]["description"] = $GLOBALS['TL_LANG']['tl_syncCto_backup_file']['complete'] . " " . $arrStepPool["zipname"];
                 $arrContenData["data"][2]["html"] = "<p class='tl_help'><br />";
-                $arrContenData["data"][2]["html"] .= "<a onclick='Backend.openWindow(this, 600, 235); return false;' title='In einem neuen Fenster ansehen' href='contao/popup.php?src=tl_files/syncCto_backups/files/" . $arrStepPool["zipname"] . "'>" . $GLOBALS['TL_LANG']['tl_syncCto_backup_file']['download_backup'] . "</a>";
+                $arrContenData["data"][2]["html"] .= "<a onclick='Backend.openWindow(this, 600, 235); return false;' title='In einem neuen Fenster ansehen' href='contao/popup.php?src=" . $GLOBALS['TL_CONFIG']['uploadPath'] . "/syncCto_backups/files/" . $arrStepPool["zipname"] . "'>" . $GLOBALS['TL_LANG']['tl_syncCto_backup_file']['download_backup'] . "</a>";
                 $arrContenData["data"][2]["html"] .= "</p>";
 
                 $this->Session->set("SyncCto_DB_StepPool", "");
