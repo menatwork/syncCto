@@ -2,14 +2,25 @@
 
 window.addEvent("domready",function(){
 	
-	$each($$('th.checkbox input[type=checkbox]'), function(item){
-		item.addEvents({
-                click: function(){
-                    console.log(item.getProperty('onclick'));
+    $$('input[name=delete]').set('disabled', true);
+        
+    $each($$('.checkbox input[type=checkbox]'), function(item){
+        item.addEvents({
+            click: function(){
+                var blnFound = ($$('.checkbox input[type=checkbox]:checked').length != 0) ? true : false;
+                if (blnFound == true){
+                    $$('input[name=transfer]').set('disabled', true);
+                    $$('input[name=delete]').set('disabled', false);
+                } else {
+                    $$('input[name=delete]').set('disabled', true);
+                    $$('input[name=transfer]').set('disabled', false);
                 }
-            });	
+                
+            }
+        });	
 		
-	});
+    });
 
-	$$('input[name=delete]').set('disabled', true);
+   var myHtmlTable = new HtmlTable($('syncCto_filelist'), {sortable: true, sortIndex: 3, sortReverse: true});
+
 });

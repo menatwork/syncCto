@@ -49,7 +49,7 @@ $GLOBALS['TL_LANG']['SYC']['option_full'] = array('Contao-Installation', 'Die ko
  * Filelist
  */
 
-$GLOBALS['TL_LANG']['MSC']['select_all_files'] = "Alle auswählen";
+$GLOBALS['TL_LANG']['MSC']['select_all_files'] = "Alle Dateien auswählen";
 $GLOBALS['TL_LANG']['MSC']['sync_info'] = "Bitte schließen Sie während der gesamten Synchronisation nicht das aktuelle Fenster.";
 
 $GLOBALS['TL_LANG']['MSC']['totalsize'] = 'Größe aller Dateien:';
@@ -57,7 +57,7 @@ $GLOBALS['TL_LANG']['MSC']['new_file'] = 'Neu';
 $GLOBALS['TL_LANG']['MSC']['modified_file'] = 'Verändert';
 $GLOBALS['TL_LANG']['MSC']['unknown_file'] = 'Unbekannt';
 $GLOBALS['TL_LANG']['MSC']['deleted_file'] = 'Gelöscht';
-$GLOBALS['TL_LANG']['MSC']['submit_files'] = 'Alle Dateien transferieren';
+$GLOBALS['TL_LANG']['MSC']['submit_files'] = 'Dateien transferieren';
 $GLOBALS['TL_LANG']['MSC']['delete_files'] = 'Ausgewählte Dateien entfernen';
 
 $GLOBALS['TL_LANG']['MSC']['big_files'] = 'Datei(en) zum Übertragen.';

@@ -1,4 +1,5 @@
-<?php if (!defined('TL_ROOT')) die('You can not access this file directly!');
+<?php
+if (!defined('TL_ROOT')) die('You can not access this file directly!');
 
 /**
  * Contao Open Source CMS
@@ -26,7 +27,6 @@
  * @license    GNU/LGPL 
  * @filesource
  */
-
 $objInput = Input::getInstance();
 
 /**
@@ -188,10 +188,11 @@ $GLOBALS['SYC_CONFIG']['format'] = "Ymd_H-i-s";
 if ($objInput->get("table") == 'tl_syncCto_clients_syncTo' || $objInput->get("table") == 'tl_syncCto_clients_syncFrom')
 {
     $GLOBALS['TL_CSS'][] = 'system/modules/syncCto/html/css/filelist_src.css';
-	$GLOBALS['TL_JAVASCRIPT'][] = 'system/modules/syncCto/html/js/filelist_src.js';
+    $GLOBALS['TL_JAVASCRIPT'][] = 'system/modules/syncCto/html/js/htmltable.js';
+    $GLOBALS['TL_JAVASCRIPT'][] = 'system/modules/syncCto/html/js/filelist_src.js';
 }
 
-if (($objInput->get("do") == 'syncCto_check'))
+if ($objInput->get("do") == 'syncCto_check')
 {
     $GLOBALS['TL_CSS'][] = 'system/modules/syncCto/html/css/systemcheck_src.css';
 }
@@ -252,5 +253,4 @@ $GLOBALS["CTOCOM_FUNCTIONS"]["SYNCCTO_PURGETEMP"] = array(
     "typ" => "GET",
     "parameter" => FALSE,
 );
-
 ?>

@@ -17,7 +17,7 @@ window.addEvent("domready",function(){
                 onSuccess:function(responseTree,responseElements,response,js){
 
                     if(response=='true'){
-                        item.setProperty('src','system/modules/syncCto/html/missing.png');
+                        item.setProperty('src','system/modules/syncCto/html/js/images/missing.png');
                         var req2=new Request.HTML({
                             method:'post',
                             url:window.location.href,
@@ -30,16 +30,16 @@ window.addEvent("domready",function(){
                             evalResponse:false,
                             onSuccess:function(responseTree,responseElements,response,js){
                                 if(response=='true'){
-                                    item.setProperty('src','system/modules/syncCto/html/online.png');
+                                    item.setProperty('src','system/modules/syncCto/html/js/images/online.png');
                                 }
                             }
                         }).send();
                     }else{
-                        item.setProperty('src','system/modules/syncCto/html/offline.png');
+                        item.setProperty('src','system/modules/syncCto/html/js/images/offline.png');
                     }
                 },
                 onFailure:function(responseTree,responseElements,response,js){
-                    item.setProperty('src','system/modules/syncCto/html/offline.png');
+                    item.setProperty('src','system/modules/syncCto/html/js/images/offline.png');
                 }
             }).send();
         } catch (exception) {

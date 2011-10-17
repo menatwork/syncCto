@@ -14,13 +14,20 @@
             <col width="35" />
             <col width="*" />
         </colgroup>
-		<thead>
-            <tr>
-                <th colspan="2">&nbsp;</th>
-                <th class="checkbox"><input class="tl_checkbox" onclick="Backend.toggleCheckboxGroup(this, 'syncCto_filelist')" type="checkbox" /></th>
-                <th class="last"><?php echo $GLOBALS['TL_LANG']['MSC']['select_all_files']; ?></th>
+        <thead>
+           
+            <tr class="head">
+                <th class="state">Status</th>
+                <th class="filesize">Dateigröße</th>
+                <th class="checkbox">&nbsp;</th>
+                <th class="last">Datei</th>
             </tr>
-		</thead>
+            <tr>
+                <td colspan="2">&nbsp;</td>
+                <td class="checkbox"><input class="tl_checkbox" onclick="Backend.toggleCheckboxGroup(this, 'syncCto_filelist')" type="checkbox" /></td>
+                <td class="last"><?php echo $GLOBALS['TL_LANG']['MSC']['select_all_files']; ?></td>
+            </tr>
+        </thead>
         <tbody>
             <?php foreach ($this->filelist as $key => $file): ?>
                 <?php if ($i == 0 && $this->compare_complex == true): $i = 1; ?>
