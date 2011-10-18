@@ -179,9 +179,6 @@ $GLOBALS['SYC_PATH']['file'] = $GLOBALS['TL_CONFIG']['uploadPath'] . '/syncCto_b
 $GLOBALS['SYC_PATH']['debug'] = $GLOBALS['TL_CONFIG']['uploadPath'] . '/syncCto_backups/debug/';
 $GLOBALS['SYC_PATH']['tmp'] = "system/tmp/";
 
-// Timestamp for files
-$GLOBALS['SYC_CONFIG']['format'] = "Ymd_H-i-s";
-
 /**
  * CSS & JS Files
  */
