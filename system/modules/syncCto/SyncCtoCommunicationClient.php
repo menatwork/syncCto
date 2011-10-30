@@ -29,11 +29,17 @@ if (!defined('TL_ROOT'))
  * @license    GNU/LGPL
  * @filesource
  */
+
+/**
+ * Communication Class
+ */
 class SyncCtoCommunicationClient extends CtoCommunication
 {
 
+    // Vars --------------------------------------------------------------------,
+    // Singelton Pattern
     protected static $instance = null;
-    //-------
+    // Objects
     protected $objSyncCtoFiles;
     protected $objSyncCtoHelper;
 
@@ -168,7 +174,7 @@ class SyncCtoCommunicationClient extends CtoCommunication
         return $this->runServer("SYNCCTO_CHECKSUM_COMPARE", $arrData);
     }
 
-    public function getChecksumFiles($fileList = NULL)
+    public function getChecksumTlfiles($fileList = NULL)
     {
         $arrData = array(
             array(
@@ -178,7 +184,7 @@ class SyncCtoCommunicationClient extends CtoCommunication
         );
 
         $this->setCodifyEngine(SyncCtoEnum::CODIFY_EMPTY);
-        return $this->runServer("SYNCCTO_CHECKSUM_FILES");
+        return $this->runServer("SYNCCTO_CHECKSUM_TLFILES");
     }
 
     public function getChecksumCore()
@@ -186,16 +192,6 @@ class SyncCtoCommunicationClient extends CtoCommunication
         $this->setCodifyEngine(SyncCtoEnum::CODIFY_EMPTY);
         return $this->runServer("SYNCCTO_CHECKSUM_CORE");
     }
-
-    /*
-     * -------------------------------------------------------------------------
-     * -------------------------------------------------------------------------
-     * 
-     * ALT
-     * 
-     * -------------------------------------------------------------------------
-     * -------------------------------------------------------------------------
-     */
 
     /**
      * Send a file to the client
@@ -208,18 +204,8 @@ class SyncCtoCommunicationClient extends CtoCommunication
         // 5 min. time out.
         @set_time_limit(3600);
 
-        // Build folder path
-        $mixFolder = explode("/", $strFolder);
-        $strFolder = "";
-        foreach ($mixFolder as $value)
-        {
-            if ($value == "")
-                continue;
-
-            $strFolder .= "/" . $value;
-        }
-
-        $strFilePath = TL_ROOT . $strFolder . "/" . $strFile;
+        //Build path
+        $strFilePath = $this->objSyncCtoHelper->buildPath($strFolder, $strFile);
 
         // Check file exsist
         if (!file_exists($strFilePath) || !is_file($strFilePath))
@@ -232,29 +218,18 @@ class SyncCtoCommunicationClient extends CtoCommunication
         // Contenttyp
         $strMime = "application/octet-stream";
 
-        // Read file
-        $fh = fopen($strFilePath, 'rb') or die('Can´t open ' . $this->myfilepfad);
-
-        if ($fh === FALSE)
-            throw new Exception("Error by reading file.");
-
-        while (!feof($fh))
-        {
-            $content .= fread($fh, 10);
-        }
-
         $arrData = array(
             array(
                 "name" => $strMD5,
-                "filename" => basename($strFilePath),
-                "value" => $content,
+                "filename" => $strFile,
+                "filepath" => $strFilePath,
                 "mime" => $strMime,
             ),
             array(
                 "name" => "metafiles",
                 "value" => array(
                     $strMD5 => array(
-                        "folder" => $strFolder,
+                        "folder" => $this->objSyncCtoHelper->buildPathWoTL($strFolder),
                         "file" => $strFile,
                         "MD5" => $strMD5,
                         "splitname" => $strSplitname,
@@ -264,57 +239,43 @@ class SyncCtoCommunicationClient extends CtoCommunication
             ),
         );
 
-        fclose($fh);
-
-        unset($fh);
-        unset($content);
-
-        return $this->runServer("RPC_FILE", $arrData);
+        return $this->runServer("SYNCCTO_SEND_FILE", $arrData);
     }
 
-    public function startSQLImport($filename)
-    {
-        $arrData = array(
-            array(
-                "name" => "RPC_RUN_SQL",
-                "value" => $filename,
-            ),
-        );
-
-        return $this->runServer("RPC_RUN_SQL", $arrData);
-    }
-
+    /**
+     * Import Files from Tempfolder.
+     * 
+     * @param array $arrFilelist
+     * @return array 
+     */
     public function startFileImport($arrFilelist)
     {
         $arrData = array(
             array(
-                "name" => "RPC_RUN_FILE",
+                "name" => "filelist",
                 "value" => $arrFilelist,
             ),
         );
 
-        return $this->runServer("RPC_RUN_FILE", $arrData);
+        return $this->runServer("SYNCCTO_IMPORT_FILE", $arrData);
     }
 
-    public function startLocalConfigImport()
+    /**
+     * Delete Files.
+     * 
+     * @param array $arrFilelist
+     * @return array 
+     */
+    public function deleteFiles($arrFilelist)
     {
-        $arrConfigBlacklist = $this->objSyncCtoHelper->getBlacklistLocalconfig();
-        $arrConfig = $this->objSyncCtoHelper->loadConfig(SyncCtoEnum::LOADCONFIG_KEY_VALUE);
-
-        foreach ($arrConfig as $key => $value)
-        {
-            if (in_array($key, $arrConfigBlacklist))
-                unset($arrConfig[$key]);
-        }
-
         $arrData = array(
             array(
-                "name" => "RPC_RUN_LOCALCONFIG",
-                "value" => $arrConfig,
-            ),
+                "name" => "filelist",
+                "value" => $arrFilelist,
+            )
         );
 
-        return $this->runServer(RPC_RUN_LOCALCONFIG, $arrData);
+        return $this->runServer("SYNCCTO_DELETE_FILE", $arrData);
     }
 
     public function buildSingleFile($strSplitname, $intSplitcount, $strMovepath, $strMD5)
@@ -338,8 +299,59 @@ class SyncCtoCommunicationClient extends CtoCommunication
             ),
         );
 
-        return $this->runServer("RPC_RUN_SPLITFILE", $arrData);
+        return $this->runServer("SYNCCTO_REBUILD_SPLITFILE", $arrData);
     }
+
+    /* -------------------------------------------------------------------------
+     * Database Operations
+     */
+
+    public function startSQLImport($filename)
+    {
+        $arrData = array(
+            array(
+                "name" => "filepath",
+                "value" => $filename,
+            ),
+        );
+
+        return $this->runServer("SYNCCTO_IMPORT_DATABASE", $arrData);
+    }
+
+    /* -------------------------------------------------------------------------
+     * Config Operations
+     */
+
+    public function startLocalConfigImport()
+    {
+        $arrConfigBlacklist = $this->objSyncCtoHelper->getBlacklistLocalconfig();
+        $arrConfig = $this->objSyncCtoHelper->loadConfig(SyncCtoEnum::LOADCONFIG_KEY_VALUE);
+
+        foreach ($arrConfig as $key => $value)
+        {
+            if (in_array($key, $arrConfigBlacklist))
+                unset($arrConfig[$key]);
+        }
+
+        $arrData = array(
+            array(
+                "name" => "configlist",
+                "value" => $arrConfig,
+            ),
+        );
+
+        return $this->runServer("SYNCCTO_IMPORT_CONFIG", $arrData);
+    }
+
+    /*
+     * -------------------------------------------------------------------------
+     * -------------------------------------------------------------------------
+     * 
+     * ALT
+     * 
+     * -------------------------------------------------------------------------
+     * -------------------------------------------------------------------------
+     */
 
     public function getFile($strPath, $strSavePath)
     {
@@ -382,100 +394,6 @@ class SyncCtoCommunicationClient extends CtoCommunication
             throw new Exception("MD5 Hash Error.");
 
         return true;
-    }
-
-    public function runClientSQLZip()
-    {
-        return $this->runServer("RPC_SQL_ZIP");
-    }
-
-    public function runClientSQLScript($strName, $arrTables)
-    {
-        $arrData = array(
-            array(
-                "name" => "name",
-                "value" => $strName,
-            ),
-            array(
-                "name" => "tables",
-                "value" => $arrTables,
-            ),
-        );
-
-        return $this->runServer("RPC_SQL_SCRIPT", $arrData);
-    }
-
-    public function runClientSQLSyncscript($strName, $arrTables)
-    {
-        $arrData = array(
-            array(
-                "name" => "name",
-                "value" => $strName,
-            ),
-            array(
-                "name" => "tables",
-                "value" => $arrTables,
-            ),
-        );
-
-        return $this->runServer("RPC_SQL_SYNCSCRIPT", $arrData);
-    }
-
-    public function runClientSQLCheck($strName)
-    {
-        $arrData = array(
-            array(
-                "name" => "name",
-                "value" => $strName,
-            ),
-            array(
-                "name" => "tables",
-                "value" => $arrTables,
-            ),
-        );
-
-        return $this->runServer("RPC_SQL_CHECK", $arrData);
-    }
-
-    public function runClientFileSplit($strSrcFile, $strDesFolder, $strDesFile, $intSizeLimit)
-    {
-        $arrData = array(
-            array(
-                "name" => "srcfile",
-                "value" => $strSrcFile,
-            ),
-            array(
-                "name" => "desfolder",
-                "value" => $strDesFolder,
-            ),
-            array(
-                "name" => "desfile",
-                "value" => $strDesFile,
-            ),
-            array(
-                "name" => "size",
-                "value" => $intSizeLimit,
-            ),
-        );
-
-        return $this->runServer("RPC_FILE_SPLIT", $arrData);
-    }
-
-    public function getClientLocalconfig()
-    {
-        return $this->runServer("RPC_CONFIG_LOAD");
-    }
-
-    public function deleteFiles($arrFilelist)
-    {
-        $arrData = array(
-            array(
-                "name" => "list",
-                "value" => $arrFilelist,
-            )
-        );
-
-        return $this->runServer("RPC_FILE_DELETE", $arrData);
     }
 
 }

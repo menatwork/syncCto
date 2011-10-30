@@ -1,5 +1,7 @@
 <?php
-if (!defined('TL_ROOT')) die('You can not access this file directly!');
+
+if (!defined('TL_ROOT'))
+    die('You can not access this file directly!');
 
 /**
  * Contao Open Source CMS
@@ -114,9 +116,9 @@ if ($objInput->get("do") == 'synccto_clients' && ($objInput->get("table") == 'tl
 }
 
 // Size limit for files in bytes, will be checked
-$GLOBALS['SYC_SIZE']['limit'] = 104857600;
+$GLOBALS['SYC_SIZE']['limit'] = 838860800;
 // Size limit for files in bytes, completely ignored
-$GLOBALS['SYC_SIZE']['limit_ignore'] = 209715200;
+$GLOBALS['SYC_SIZE']['limit_ignore'] = 1073741824;
 
 /**
  * Blacklists
@@ -179,29 +181,26 @@ $GLOBALS['SYC_PATH']['file'] = $GLOBALS['TL_CONFIG']['uploadPath'] . '/syncCto_b
 $GLOBALS['SYC_PATH']['debug'] = $GLOBALS['TL_CONFIG']['uploadPath'] . '/syncCto_backups/debug/';
 $GLOBALS['SYC_PATH']['tmp'] = "system/tmp/";
 
-/**
- * CSS & JS Files
- */
-if ($objInput->get("table") == 'tl_syncCto_clients_syncTo' || $objInput->get("table") == 'tl_syncCto_clients_syncFrom')
-{
-    $GLOBALS['TL_CSS'][] = 'system/modules/syncCto/html/css/filelist_src.css';
-    $GLOBALS['TL_JAVASCRIPT'][] = 'system/modules/syncCto/html/js/htmltable.js';
-    $GLOBALS['TL_JAVASCRIPT'][] = 'system/modules/syncCto/html/js/filelist_src.js';
-}
+// Timestamp for files
+$GLOBALS['SYC_CONFIG']['format'] = "Ymd_H-i-s";
 
-if ($objInput->get("do") == 'syncCto_check')
+/**
+ * CSS
+ */
+if (($objInput->get("do") == 'syncCto_check') || ($objInput->get("table") == 'tl_syncCto_clients_syncTo') || ($objInput->get("table") == 'tl_syncCto_clients_syncFrom'))
 {
-    $GLOBALS['TL_CSS'][] = 'system/modules/syncCto/html/css/systemcheck_src.css';
+    $GLOBALS['TL_CSS'][] = 'system/modules/syncCto/html/css/syncCto.css';
 }
 
 if ((($objInput->get("do") == 'synccto_clients') && $objInput->get("act") == '') && $objInput->get("table") == '')
 {
-    $GLOBALS['TL_JAVASCRIPT'][] = 'system/modules/syncCto/html/js/ping_src.js';
+    $GLOBALS['TL_JAVASCRIPT'][] = 'system/modules/syncCto/html/js/syncCto.js';
 }
 
 /**
  * CtoCommunication RPC Calls
  */
+// Get SyncCto Version 
 $GLOBALS["CTOCOM_FUNCTIONS"]["SYNCCTO_VERSION"] = array(
     "class" => "SyncCtoRPCFunctions",
     "function" => "getVersionSyncCto",
@@ -209,6 +208,7 @@ $GLOBALS["CTOCOM_FUNCTIONS"]["SYNCCTO_VERSION"] = array(
     "parameter" => FALSE,
 );
 
+// Get a list of parameter
 $GLOBALS["CTOCOM_FUNCTIONS"]["SYNCCTO_PARAMETER"] = array(
     "class" => "SyncCtoRPCFunctions",
     "function" => "getClientParameter",
@@ -216,6 +216,7 @@ $GLOBALS["CTOCOM_FUNCTIONS"]["SYNCCTO_PARAMETER"] = array(
     "parameter" => FALSE,
 );
 
+// Run a file packup
 $GLOBALS["CTOCOM_FUNCTIONS"]["SYNCCTO_FILEBACKUP"] = array(
     "class" => "SyncCtoFiles",
     "function" => "runDump",
@@ -223,6 +224,7 @@ $GLOBALS["CTOCOM_FUNCTIONS"]["SYNCCTO_FILEBACKUP"] = array(
     "parameter" => FALSE,
 );
 
+// Compare 2 filelists
 $GLOBALS["CTOCOM_FUNCTIONS"]["SYNCCTO_CHECKSUM_COMPARE"] = array(
     "class" => "SyncCtoFiles",
     "function" => "runCecksumCompare",
@@ -230,6 +232,7 @@ $GLOBALS["CTOCOM_FUNCTIONS"]["SYNCCTO_CHECKSUM_COMPARE"] = array(
     "parameter" => array("checksumlist"),
 );
 
+// Get Filelist of contao core
 $GLOBALS["CTOCOM_FUNCTIONS"]["SYNCCTO_CHECKSUM_CORE"] = array(
     "class" => "SyncCtoFiles",
     "function" => "runChecksumCore",
@@ -237,17 +240,67 @@ $GLOBALS["CTOCOM_FUNCTIONS"]["SYNCCTO_CHECKSUM_CORE"] = array(
     "parameter" => FALSE,
 );
 
-$GLOBALS["CTOCOM_FUNCTIONS"]["SYNCCTO_CHECKSUM_FILES"] = array(
+// Get Filelist of tlfile
+$GLOBALS["CTOCOM_FUNCTIONS"]["SYNCCTO_CHECKSUM_TLFILES"] = array(
     "class" => "SyncCtoFiles",
-    "function" => "runChecksumFiles",
+    "function" => "runChecksumTlFiles",
     "typ" => "POST",
     "parameter" => array("fileList"),
 );
 
+// Clear Temp folder
 $GLOBALS["CTOCOM_FUNCTIONS"]["SYNCCTO_PURGETEMP"] = array(
     "class" => "SyncCtoFiles",
     "function" => "purgeTemp",
     "typ" => "GET",
     "parameter" => FALSE,
+);
+
+// Rebuild a split file
+$GLOBALS["CTOCOM_FUNCTIONS"]["SYNCCTO_REBUILD_SPLITFILE"] = array(
+    "class" => "SyncCtoFiles",
+    "function" => "rebuildSplitFiles",
+    "typ" => "POST",
+    "parameter" => array("splitname", "splitcount", "movepath", "md5"),
+);
+
+// Send a file
+$GLOBALS["CTOCOM_FUNCTIONS"]["SYNCCTO_SEND_FILE"] = array(
+    "class" => "SyncCtoFiles",
+    "function" => "saveFile",
+    "typ" => "POST",
+    "parameter" => array("metafiles"),
+);
+
+// Import a SQL Zip file into database
+$GLOBALS["CTOCOM_FUNCTIONS"]["SYNCCTO_IMPORT_DATABASE"] = array(
+    "class" => "SyncCtoDatabase",
+    "function" => "runRestore",
+    "typ" => "POST",
+    "parameter" => array("filepath"),
+);
+
+// Import files into contao file system
+$GLOBALS["CTOCOM_FUNCTIONS"]["SYNCCTO_IMPORT_FILE"] = array(
+    "class" => "SyncCtoFiles",
+    "function" => "moveTempFile",
+    "typ" => "POST",
+    "parameter" => array("filelist"),
+);
+
+// Delete a files on a list
+$GLOBALS["CTOCOM_FUNCTIONS"]["SYNCCTO_DELETE_FILE"] = array(
+    "class" => "SyncCtoFiles",
+    "function" => "deleteFiles",
+    "typ" => "POST",
+    "parameter" => array("filelist"),
+);
+
+// Import config
+$GLOBALS["CTOCOM_FUNCTIONS"]["SYNCCTO_IMPORT_CONFIG"] = array(
+    "class" => "SyncCtoRPCFunctions",
+    "function" => "importConfig",
+    "typ" => "POST",
+    "parameter" => array("configlist"),
 );
 ?>

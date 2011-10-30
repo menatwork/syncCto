@@ -184,7 +184,7 @@ class SyncCtoHelper extends Backend
         return $arrData;
     }
 
-    public function buildPath()
+   public function buildPath()
     {
         $arrPath = func_get_args();
 
@@ -194,7 +194,7 @@ class SyncCtoHelper extends Backend
 
         foreach ($arrPath as $itPath)
         {
-            $itPath = str_replace(TL_ROOT, "", $itPath);
+            $itPath = str_replace(array(TL_ROOT, "\\"), array("", "/"), $itPath);
             $itPath = explode("/", $itPath);
 
             foreach ($itPath as $itFolder)
@@ -218,7 +218,7 @@ class SyncCtoHelper extends Backend
 
         foreach ($arrPath as $itPath)
         {
-            $itPath = str_replace(TL_ROOT, "", $itPath);
+            $itPath = str_replace(array(TL_ROOT, "\\"), array("", "/"), $itPath);
             $itPath = explode("/", $itPath);
 
             foreach ($itPath as $itFolder)
@@ -228,7 +228,7 @@ class SyncCtoHelper extends Backend
                 $strVar .= "/" . $itFolder;
             }
         }
-
+        
         return preg_replace("/^\//i", "", $strVar);
     }
 

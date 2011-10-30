@@ -1,5 +1,4 @@
-<?php
-if (!defined('TL_ROOT')) die('You cannot access this file directly!');
+<?php if (!defined('TL_ROOT')) die('You cannot access this file directly!');
 
 /**
  * Contao Open Source CMS
@@ -27,7 +26,7 @@ if (!defined('TL_ROOT')) die('You cannot access this file directly!');
  * @license    GNU/LGPL
  * @filesource
  */
-
+ 
 // Workaround for missing posix_getpwuid function
 if (!function_exists('posix_getpwuid'))
 {
@@ -52,7 +51,7 @@ class SyncCtoModuleCheck extends BackendModule
      * Template variables
      */
     protected $strTemplate = 'be_syncCto_check';
-
+	
     /**
      * Initialize variables
      */
@@ -176,7 +175,7 @@ class SyncCtoModuleCheck extends BackendModule
         $return .= '<td class="value">' . $post_max_size . '</td>';
         $return .= '<td>' . $GLOBALS['TL_LANG']['syncCto_check']['pms'][1] . '</td>';
         $return .= '</tr>';
-
+		
         // Maximum input time
         $max_input_time = ini_get('max_input_time');
         $ok = ($max_input_time == '-1' || (intval($max_input_time) >= 60));
@@ -186,7 +185,7 @@ class SyncCtoModuleCheck extends BackendModule
         $return .= '<td class="value">' . $max_input_time . '</td>';
         $return .= '<td>' . $GLOBALS['TL_LANG']['syncCto_check']['mit'][1] . '</td>';
         $return .= '</tr>';
-
+		
         // Default socket timeout
         $default_socket_timeout = ini_get('default_socket_timeout');
         $ok = (intval($default_socket_timeout) >= 32);
@@ -196,7 +195,7 @@ class SyncCtoModuleCheck extends BackendModule
         $return .= '<td class="value">' . $default_socket_timeout . '</td>';
         $return .= '<td>' . $GLOBALS['TL_LANG']['syncCto_check']['dst'][1] . '</td>';
         $return .= '</tr>';
-
+		
         // fsockopen
         $fsockopen = function_exists(fsockopen);
         $ok = ($fsockopen == true);
@@ -206,7 +205,7 @@ class SyncCtoModuleCheck extends BackendModule
         $return .= '<td class="value">' . ($fsockopen ? $GLOBALS['TL_LANG']['syncCto_check']['on'] : $GLOBALS['TL_LANG']['syncCto_check']['off']) . '</td>';
         $return .= '<td>' . $GLOBALS['TL_LANG']['syncCto_check']['fsocket'][1] . '</td>';
         $return .= '</tr>';
-
+		
         // url_fopen
         $allow_url_fopen = ini_get('allow_url_fopen');
         $ok = ($allow_url_fopen == 1 || $allow_url_fopen == 'On');
@@ -226,7 +225,7 @@ class SyncCtoModuleCheck extends BackendModule
         $return .= '<td class="value">' . ($zip_archive ? $GLOBALS['TL_LANG']['syncCto_check']['on'] : $GLOBALS['TL_LANG']['syncCto_check']['off']) . '</td>';
         $return .= '<td>' . $GLOBALS['TL_LANG']['syncCto_check']['zip_archive'][1] . '</td>';
         $return .= '</tr>';
-
+		
         $return .= '</table>';
         return $return;
     }

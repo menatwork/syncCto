@@ -43,41 +43,4 @@ $GLOBALS['TL_LANG']['tl_syncCto_clients_syncTo']['sync_type'] = array("Art der S
 $GLOBALS['TL_LANG']['tl_syncCto_clients_syncTo']['database_tables_recommended'] = array("Empfohlene Tabellen", "Hier können Sie die empfohlenen Tabellen für die Synchronisation auswählen.");
 $GLOBALS['TL_LANG']['tl_syncCto_clients_syncTo']['database_tables_none_recommended'] = array("Nicht empfohlene Tabellen", "Hier können die NICHT empfohlenen Tabellen für das Backup ausgewählt werden. Benutzung auf eigene Gefahr.");
 $GLOBALS['TL_LANG']['tl_syncCto_clients_syncTo']['filelist'] = array("Quelldateien", "Bitte wählen Sie eine Datei oder einen Ordner aus der Dateiübersicht.");
-
-/**
- * List
- */
-$GLOBALS['TL_LANG']['tl_syncCto_clients_syncTo']['step1_help'] = "Client überprüfen.";
-$GLOBALS['TL_LANG']['tl_syncCto_clients_syncTo']['step1_msg1'] = "Client für die Synchronisation vorbereiten.";
-$GLOBALS['TL_LANG']['tl_syncCto_clients_syncTo']['step1_msg2'] = "Versionskonflikt.";
-
-$GLOBALS['TL_LANG']['tl_syncCto_clients_syncTo']['step2_help'] = "MD5-Checkliste überprüfen und transferieren.";
-$GLOBALS['TL_LANG']['tl_syncCto_clients_syncTo']['step2_msg1'] = "Es wurden %s neue, %s veränderte, %s gelöschte und %s nicht zustellbare Datei(en) gefunden.";
-$GLOBALS['TL_LANG']['tl_syncCto_clients_syncTo']['step2_msg2'] = "tl_files überprüfen.";
-$GLOBALS['TL_LANG']['tl_syncCto_clients_syncTo']['step2_msg3'] = "Contao-Installation überprüfen.";
-$GLOBALS['TL_LANG']['tl_syncCto_clients_syncTo']['step2_msg4'] = "Dateien erfolgreich überprüft. Lade Vergleichsliste.";
-
-$GLOBALS['TL_LANG']['tl_syncCto_clients_syncTo']['step3_help'] = "SQL-Scripte erstellen und transferieren.";
-$GLOBALS['TL_LANG']['tl_syncCto_clients_syncTo']['step3_msg1'] = "SQL-Scripte importieren.";
-$GLOBALS['TL_LANG']['tl_syncCto_clients_syncTo']['step3_msg2'] = "ZIP-Datei mit SQL-Scripten erstellen.";
-$GLOBALS['TL_LANG']['tl_syncCto_clients_syncTo']['step3_msg3'] = "SQL-Backup erstellen.";
-$GLOBALS['TL_LANG']['tl_syncCto_clients_syncTo']['step3_msg4'] = "ZIP-Datei überprüfen.";
-$GLOBALS['TL_LANG']['tl_syncCto_clients_syncTo']['step3_msg5'] = "ZIP-Datei transferieren.";
-$GLOBALS['TL_LANG']['tl_syncCto_clients_syncTo']['step3_msg6'] = "Datei %s erfolgreich zum Client transferiert und importiert.";
-
-$GLOBALS['TL_LANG']['tl_syncCto_clients_syncTo']['step4_help'] = "Große Dateien synchronisieren.";
-$GLOBALS['TL_LANG']['tl_syncCto_clients_syncTo']['step4_msg1'] = "Große Dateien suchen.";
-$GLOBALS['TL_LANG']['tl_syncCto_clients_syncTo']['step4_msg2'] = "Große Dateien transferieren.";
-$GLOBALS['TL_LANG']['tl_syncCto_clients_syncTo']['step4_msg3'] = "%s von %s großen Datei(en) transferiert.";
-
-$GLOBALS['TL_LANG']['tl_syncCto_clients_syncTo']['step5_help'] = "Dateien synchronisieren.";
-$GLOBALS['TL_LANG']['tl_syncCto_clients_syncTo']['step5_msg1'] = "Dateien transferieren.";
-$GLOBALS['TL_LANG']['tl_syncCto_clients_syncTo']['step5_msg2'] = "Upload nicht erfolgreich. Funktion in der php.ini ist deaktiviert.";
-$GLOBALS['TL_LANG']['tl_syncCto_clients_syncTo']['step5_msg3'] = "%s von %s Datei(en) synchronisiert.";
-$GLOBALS['TL_LANG']['tl_syncCto_clients_syncTo']['step5_msg4'] = " Datei(en) übersprungen.";
-$GLOBALS['TL_LANG']['tl_syncCto_clients_syncTo']['step5_msg5'] = "Dateien importieren.";
-$GLOBALS['TL_LANG']['tl_syncCto_clients_syncTo']['step5_msg6'] = " Datei(en) übertragen.";
-
-$GLOBALS['TL_LANG']['tl_syncCto_clients_syncTo']['complete_help'] = "Client erfolgreich synchronisiert.";
-
 ?>

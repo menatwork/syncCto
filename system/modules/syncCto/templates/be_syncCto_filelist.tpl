@@ -1,10 +1,10 @@
-<h1 class="file"><strong><?php echo $GLOBALS['TL_LANG']['MSC']['totalsize']; ?></strong> ~ <?php echo $this->getReadableSize($this->totalsize); ?></h1>
+<h1 class="file"><strong><?php echo $GLOBALS['TL_LANG']['MSC']['totalsize']; ?></strong>~ <?php echo $this->getReadableSize($this->totalsize); ?></h1>
 
 <form id="syncCto_filelist_form" action="<?php echo $this->Environment->base; ?>contao/main.php?do=synccto_clients&amp;table=tl_syncCto_clients_sync<?php echo $this->direction; ?>&amp;act=start&amp;step=<?php echo $this->step; ?>&amp;id=<?php echo $this->id; ?>" method="post">
 
     <div class="submit_container">
-        <input class="tl_submit" name="transfer" type="submit" value="<?php echo $GLOBALS['TL_LANG']['MSC']['submit_files']; ?>" />
-        <input class="tl_submit" name="delete" type="submit" value="<?php echo $GLOBALS['TL_LANG']['MSC']['delete_files']; ?>" />
+        <input class="syncCto_filelist_submit" name="transfer" type="submit" value="<?php echo $GLOBALS['TL_LANG']['MSC']['submit_files']; ?>" />
+        <input class="syncCto_filelist_submit" name="delete" type="submit" value="<?php echo $GLOBALS['TL_LANG']['MSC']['delete_files']; ?>" />
     </div>
 
     <table id="syncCto_filelist">
@@ -14,26 +14,17 @@
             <col width="35" />
             <col width="*" />
         </colgroup>
-        <thead>
-           
-            <tr class="head">
-                <th class="state">Status</th>
-                <th class="filesize">Dateigröße</th>
-                <th class="checkbox">&nbsp;</th>
-                <th class="last">Datei</th>
-            </tr>
+        <tbody>
             <tr>
                 <td colspan="2">&nbsp;</td>
                 <td class="checkbox"><input class="tl_checkbox" onclick="Backend.toggleCheckboxGroup(this, 'syncCto_filelist')" type="checkbox" /></td>
                 <td class="last"><?php echo $GLOBALS['TL_LANG']['MSC']['select_all_files']; ?></td>
             </tr>
-        </thead>
-        <tbody>
             <?php foreach ($this->filelist as $key => $file): ?>
                 <?php if ($i == 0 && $this->compare_complex == true): $i = 1; ?>
                     <tr>
                         <td colspan="4" class="headline">
-                            Da fehlt noch was!
+                            <?php echo $GLOBALS['TL_LANG']['MSC']['big_files']; ?>
                         </td>
                     </tr>
                 <?php elseif (($file["state"] >= SyncCtoEnum::FILESTATE_TOO_BIG || $file["state"] >= SyncCtoEnum::FILESTATE_TOO_BIG_DELETE || $file["state"] >= SyncCtoEnum::FILESTATE_TOO_BIG_MISSING || $file["state"] >= SyncCtoEnum::FILESTATE_TOO_BIG_NEED) && $i == 1 && $this->compare_complex == true): $i = 2; ?>

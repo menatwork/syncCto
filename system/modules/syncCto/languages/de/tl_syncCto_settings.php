@@ -36,6 +36,7 @@ $GLOBALS['TL_LANG']['tl_syncCto_settings']['local_blacklist_legend'] = "Blacklis
 $GLOBALS['TL_LANG']['tl_syncCto_settings']['whitelist_legend'] = "Whitelist für Root-Ordner";
 $GLOBALS['TL_LANG']['tl_syncCto_settings']['hidden_tables_legend'] = "Versteckte Tabellen";
 $GLOBALS['TL_LANG']['tl_syncCto_settings']['tables_legend'] = "Nicht empfohlene Tabellen";
+$GLOBALS['TL_LANG']['tl_syncCto_settings']['security_legend'] = "Verschlüsselung";
 $GLOBALS['TL_LANG']['tl_syncCto_settings']['debug_legend'] = "Debugmodus";
 
 /**

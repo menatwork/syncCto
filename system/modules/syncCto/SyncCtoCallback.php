@@ -24,7 +24,7 @@
  * @copyright  MEN AT WORK 2011
  * @package    syncCto
  * @license    GNU/LGPL
- * @filesource
+ * @filesource  
  */
 
 /**
@@ -174,6 +174,35 @@ class SyncCtoCallback extends Backend
     }
 
     /* -------------------------------------------------------------------------
+     * Load call backs for syncCto settings
+     */
+
+    public function loadBlacklistLocalconfig($strValue)
+    {
+        return $this->objSyncCtoHelper->getBlacklistLocalconfig();
+    }
+
+    public function loadBlacklistFolder($strValue)
+    {
+        return $this->objSyncCtoHelper->getBlacklistFolder();
+    }
+
+    public function loadBlacklistFile($strValue)
+    {
+        return $this->objSyncCtoHelper->getBlacklistFile();
+    }
+
+    public function loadWhitelistFolder($strValue)
+    {
+        return $this->objSyncCtoHelper->getWhitelistFolder();
+    }
+
+    public function loadTablesHidden($strValue)
+    {
+        return $this->objSyncCtoHelper->getTablesHidden();
+    }
+
+    /* -------------------------------------------------------------------------
      * Return all sync types as array
      */
 
@@ -232,16 +261,19 @@ class SyncCtoCallback extends Backend
             {
                 continue;
             }
+
             if ($strTrim == '### INSTALL SCRIPT START ###')
             {
                 $strMode = 'data';
                 continue;
             }
+
             if ($strTrim == '### INSTALL SCRIPT STOP ###')
             {
                 $strMode = 'bottom';
                 continue;
             }
+
             if ($strMode == 'top')
             {
                 $this->strTop .= $strLine;

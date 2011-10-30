@@ -45,10 +45,12 @@ class SyncCtoDatabase extends Backend
     protected $strFilenameInsert = "DB-Backup_ins.txt";
     protected $strFilenameSQL = "DB-Backup.sql";
     protected $strTimestampFormat = "Ymd_H-i-s";
+    //- Objects ------------------
+    protected $objSyncCtoHelper;
 
     /**
      * -= Config =-
-     * List of default values for ignore
+     * List of default ignore values
      * @var array 
      */
     protected $arrDefaultValueFunctionIgnore = array(
@@ -86,8 +88,9 @@ class SyncCtoDatabase extends Backend
     protected function __construct()
     {
         parent::__construct();
-        //$this->loadLanguageFile('SyncCtoController');
+        
         $this->arrBackupTables = array();
+        $this->objSyncCtoHelper = SyncCtoHelper::getInstance();
     }
 
     /**
@@ -177,7 +180,7 @@ class SyncCtoDatabase extends Backend
      * @param bool $booTempFolder Schould the tmp folde used instead of backupfolder
      * @return null 
      */
-    public function runDump($arrTables, $booTemplFolder)
+    public function runDump($arrTables, $booTempFolder)
     {
         if (is_array($arrTables) && is_array($this->arrBackupTables))
         {
@@ -191,7 +194,7 @@ class SyncCtoDatabase extends Backend
 
         $strFilename = date($this->strTimestampFormat) . "_" . $this->strSuffixZipName;
 
-        if ($booTemplFolder)
+        if ($booTempFolder)
             $strPath = $GLOBALS['SYC_PATH']['tmp'];
         else
             $strPath = $GLOBALS['SYC_PATH']['db'];
@@ -219,7 +222,7 @@ class SyncCtoDatabase extends Backend
      */
     public function runRestore($strRestoreFile)
     {
-        $objZipRead = new ZipReader($strRestoreFile);
+        $objZipRead = new ZipReader($this->objSyncCtoHelper->buildPathWoTL($strRestoreFile));
 
         if (!$objZipRead->getFile($this->strFilenameInsert))
             throw new Exception("Could not load Insert SQL File. Maybe damaged?");

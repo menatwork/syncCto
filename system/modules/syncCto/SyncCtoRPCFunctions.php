@@ -78,7 +78,7 @@ class SyncCtoRPCFunctions extends Backend
      */
     public function getClientParameter()
     {
-        return array            (
+        return array(
             'max_execution_time' => ini_get('max_execution_time'),
             'memory_limit' => ini_get('memory_limit'),
             'file_uploads' => ini_get('file_uploads'),
@@ -87,146 +87,11 @@ class SyncCtoRPCFunctions extends Backend
         );
     }
 
-    /*
-     * -------------------------------------------------------------------------
-     * -------------------------------------------------------------------------
-     * 
-     * ALT
-     * 
-     * -------------------------------------------------------------------------
-     * -------------------------------------------------------------------------
-     */
-
     /* -------------------------------------------------------------------------
-     * RPC Functions - KA 
+     * Config Operations
      */
 
-    public function rpc_file($arrMetafiles)
-    {
-        $arrMetafiles = deserialize($arrMetafiles);
-
-        if (!is_array($arrMetafiles))
-            throw new Exception("Missing metafiles in array check.");
-
-        $arrResponse = array();
-
-        foreach ($_FILES as $key => $value)
-        {
-            $strFolder = $arrMetafiles[$key]["folder"];
-            $mixFolder = explode("/", $strFolder);
-            $strFile = $arrMetafiles[$key]["file"];
-            $strMD5 = $arrMetafiles[$key]["MD5"];
-
-            switch ($arrMetafiles[$key]["typ"])
-            {
-                case SyncCtoEnum::UPLOAD_TEMP:
-                    $strSaveFolder = TL_ROOT . $GLOBALS['SYC_PATH']['tmp'] . $strFolder;
-                    $strSaveFile = TL_ROOT . $GLOBALS['SYC_PATH']['tmp'] . $strFolder . "/" . $strFile;
-                    break;
-
-                case SyncCtoEnum::UPLOAD_SYNC_TEMP:
-                    $strSaveFolder = TL_ROOT . $GLOBALS['SYC_PATH']['tmp'] . "sync/" . $strFolder;
-                    $strSaveFile = TL_ROOT . $GLOBALS['SYC_PATH']['tmp'] . "sync/" . $strFolder . "/" . $strFile;
-                    array_unshift($mixFolder, "sync");
-                    break;
-
-                case SyncCtoEnum::UPLOAD_SQL_TEMP:
-                    $strSaveFolder = TL_ROOT . $GLOBALS['SYC_PATH']['tmp'] . "sql/";
-                    $strSaveFile = TL_ROOT . $GLOBALS['SYC_PATH']['tmp'] . "sql/" . $strFile;
-                    $mixFolder = array("sql");
-                    break;
-
-                case SyncCtoEnum::UPLOAD_SYNC_SPLIT:
-                    $strSaveFolder = TL_ROOT . $GLOBALS['SYC_PATH']['tmp'] . $arrMetafiles[$key]["splitname"] . "/";
-                    $strSaveFile = TL_ROOT . $GLOBALS['SYC_PATH']['tmp'] . $arrMetafiles[$key]["splitname"] . "/" . $strFile;
-                    $mixFolder = array($arrMetafiles[$key]["splitname"]);
-                    break;
-
-                default:
-                    throw new Exception("Unknown Path for file.");
-                    break;
-            }
-
-            $strPartFolder = "";
-            foreach ($mixFolder as $folderpart)
-            {
-                $strPartFolder .= "/" . $folderpart;
-
-                if (!file_exists(TL_ROOT . $GLOBALS['SYC_PATH']['tmp'] . $strPartFolder))
-                    mkdir(TL_ROOT . $GLOBALS['SYC_PATH']['tmp'] . $strPartFolder);
-            }
-
-            if (move_uploaded_file($value["tmp_name"], $strSaveFile) === FALSE)
-            {
-                $arrResponse[$key] = "Error move file.";
-            }
-            else if ($key != md5_file($strSaveFile))
-            {
-                $arrResponse[$key] = $GLOBALS['TL_LANG']['syncCto']['checksum_error'];
-            }
-            else
-            {
-                $arrResponse[$key] = "Saving " . $arrMetafiles[$key]["file"];
-            }
-        }
-
-        return $arrResponse;
-    }
-
-    public function rpc_run_sql($filename)
-    {
-        if (!file_exists(TL_ROOT . $GLOBALS['SYC_PATH']['tmp'] . "sql/" . $filename))
-        {
-            $this->arrError[] = "Unknow or missing file. Path: " . TL_ROOT . $GLOBALS['SYC_PATH']['tmp'] . "sql/";
-            return;
-        }
-
-        $arrZip = $this->objSyncCtoDatabase->runCreateZip();
-        sleep(1);
-        $this->objSyncCtoDatabase->runDumpSQL($this->Database->listTables(), $arrZip["name"]);
-        sleep(1);
-        $this->objSyncCtoDatabase->runDumpInsert($this->Database->listTables(), $arrZip["name"]);
-
-        $this->objSyncCtoDatabase->runCheckZip("sql/" . $filename, false, true);
-        $this->objSyncCtoDatabase->runRestore($GLOBALS['SYC_PATH']['tmp'] . "sql/" . $filename);
-
-        return true;
-    }
-
-    public function rpc_run_file($arrFilelist)
-    {
-
-        foreach ($arrFilelist as $key => $value)
-        {
-            if (!file_exists(TL_ROOT . $GLOBALS['SYC_PATH']['tmp'] . "sync/" . $value["path"]))
-            {
-                $arrFilelist[$key]["saved"] = false;
-                continue;
-            }
-
-            $arrFolderPart = explode("/", $value["path"]);
-            array_pop($arrFolderPart);
-            $strVar = "";
-
-            foreach ($arrFolderPart as $itFolder)
-            {
-                $strVar .= "/" . $itFolder;
-
-                if (!file_exists(TL_ROOT . $strVar))
-                    mkdir(TL_ROOT . $strVar);
-            }
-
-            if (copy(TL_ROOT . $GLOBALS['SYC_PATH']['tmp'] . "sync/" . $value["path"], TL_ROOT . "/" . $value["path"]) == false)
-            {
-                $arrFilelist[$key]["transmission"] = SyncCtoEnum::FILETRANS_SKIPPED;
-                $arrFilelist[$key]["skipreason"] = "File copy error";
-            }
-        }
-
-        return $arrFilelist;
-    }
-
-    public function rpc_run_localconfig($arrConfig)
+    public function importConfig($arrConfig)
     {
         $arrLocalConfig = $this->objSyncCtoHelper->loadConfig(SyncCtoEnum::LOADCONFIG_KEYS_ONLY);
 
@@ -245,64 +110,19 @@ class SyncCtoRPCFunctions extends Backend
         return true;
     }
 
-    public function rpc_run_splitfile($strSplitname, $intSplitcount, $strMovepath, $strMD5)
-    {
-        @set_time_limit(3600);
+    /*
+     * -------------------------------------------------------------------------
+     * -------------------------------------------------------------------------
+     * 
+     * ALT
+     * 
+     * -------------------------------------------------------------------------
+     * -------------------------------------------------------------------------
+     */
 
-        $strSavePath = $GLOBALS['SYC_PATH']['tmp'] . "sync/" . $strMovepath;
-
-        if (file_exists(TL_ROOT . $strSavePath))
-        {
-            $strVar = TL_ROOT . $strSavePath;
-            unset($strVar);
-        }
-
-        $arrSavePathPart = explode("/", $strSavePath);
-        array_pop($arrSavePathPart);
-        $strVar = "";
-
-        foreach ($arrSavePathPart as $itFolder)
-        {
-            $strVar .= "/" . $itFolder;
-
-            if (!file_exists(TL_ROOT . $strVar))
-                mkdir(TL_ROOT . $strVar);
-        }
-
-        $strSavePath = TL_ROOT . $strSavePath;
-
-        for ($i = 0; $i < $intSplitcount; $i++)
-        {
-            $strReadFile = TL_ROOT . $GLOBALS['SYC_PATH']['tmp'] . $strSplitname . "/" . $strSplitname . ".sync" . $i;
-
-            if (!file_exists($strReadFile))
-            {
-                $this->arrError[] = "Missing part file " . $strSplitname . ".sync" . $i;
-                return;
-            }
-
-            $fpPartFile = fopen($strReadFile, 'r');
-            $fpWholeFile = fopen($strSavePath, 'a+');
-
-            while (feof($fpPartFile) !== TRUE)
-            {
-                fwrite($fpWholeFile, fread($fpPartFile, 1024));
-            }
-
-            fclose($fpPartFile);
-            fclose($fpWholeFile);
-
-            sleep(1);
-        }
-
-        if (md5_file($strSavePath) != $strMD5)
-        {
-            $this->arrError[] = "MD5 Check error";
-            return;
-        }
-
-        return true;
-    }
+    /* -------------------------------------------------------------------------
+     * RPC Functions - KA 
+     */
 
     public function rpc_file_get($strPath)
     {
@@ -338,76 +158,6 @@ class SyncCtoRPCFunctions extends Backend
 
         return true;
     }
-
-    public function rpc_sql_zip()
-    {
-        $arrZip = $this->objSyncCtoDatabase->runCreateZip(true);
-        return $arrZip;
-    }
-
-    public function rpc_sql_script($strZipname, $arrTables)
-    {
-        $this->objSyncCtoDatabase->runDumpSQL($arrTables, $strZipname, TRUE);
-        return true;
-    }
-
-    public function rpc_sql_syncscript($strZipname, $arrTables)
-    {
-        $this->objSyncCtoDatabase->runDumpInsert($arrTables, $strZipname, TRUE);
-        return true;
-    }
-
-    public function rpc_sql_check($strZipname)
-    {
-        $this->objSyncCtoDatabase->runCheckZip($strZipname, FALSE, TRUE);
-        return true;
-    }
-
-    public function rpc_file_split($strSrcFile, $strDesFolder, $strDesFile, $intSizeLimit)
-    {
-        $intCount = $this->objSyncCtoFiles->splitFiles($strSrcFile, $strDesFolder, $strDesFile, $intSizeLimit);
-        return $intCount;
-    }
-
-    public function rpc_config_load()
-    {
-        $arrConfigBlacklist = $this->objSyncCtoHelper->getBlacklistLocalconfig();
-        $arrConfig = $this->objSyncCtoHelper->loadConfig(SyncCtoEnum::LOADCONFIG_KEY_VALUE);
-
-        foreach ($arrConfig as $key => $value)
-        {
-            if (in_array($key, $arrConfigBlacklist))
-                unset($arrConfig[$key]);
-        }
-
-        return $arrConfig;
-    }
-
-    /* -------------------------------------------------------------------------
-     * Security Function
-     */
-
-    public function rpc_file_delete($arrFileList)
-    {
-        if (count($arrFileList) != 0)
-        {
-            foreach ($arrFileList as $key => $value)
-            {
-                if (@unlink($this->objSyncCtoFiles->buildPath($value['path'])))
-                {
-                    $arrFileList[$key]['transmission'] = SyncCtoEnum::FILETRANS_SEND;
-                }
-                else
-                {
-                    $arrFileList[$key]['transmission'] = SyncCtoEnum::FILETRANS_SKIPPED;
-                    $arrFileList[$key]["skipreason"] = "Error by deleting file";
-                }
-            }
-        }
-
-        return $arrFileList;
-    }
-
 }
 
 ?>

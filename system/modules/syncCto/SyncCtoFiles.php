@@ -103,12 +103,22 @@ class SyncCtoFiles extends Backend
     {
         $arrFileList = $this->recursiveFileList(array(), "");
         $arrChecksum = array();
-        
+
         foreach ($arrFileList as $key => $value)
         {
             $intSize = filesize($this->objSyncCtoHelper->buildPath($value));
 
-            if ($intSize >= $GLOBALS['SYC_SIZE']['limit_ignore'])
+            if ($intSize < 0 && $intSize != 0)
+            {
+                $arrChecksum[md5($value)] = array(
+                    "path" => $value,
+                    "checksum" => 0,
+                    "size" => 0,
+                    "state" => SyncCtoEnum::FILESTATE_BOMBASTIC_BIG,
+                    "transmission" => SyncCtoEnum::FILETRANS_WAITING,
+                );
+            }
+            else if ($intSize >= $GLOBALS['SYC_SIZE']['limit_ignore'])
             {
                 $arrChecksum[md5($value)] = array(
                     "path" => $value,
@@ -148,7 +158,7 @@ class SyncCtoFiles extends Backend
      * 
      * @return array 
      */
-    public function runChecksumFiles($arrFileList = null)
+    public function runChecksumTlFiles($arrFileList = null)
     {
         // Check if filelit is set or not.
         if ($arrFileList != null && is_array($arrFileList))
@@ -158,7 +168,7 @@ class SyncCtoFiles extends Backend
             foreach ($arrFileList as $key => $value)
             {
                 // If we have a folder go in an create a checksumlist
-                if(is_dir($this->objSyncCtoHelper->buildPath($value)))
+                if (is_dir($this->objSyncCtoHelper->buildPath($value)))
                 {
                     $arrTempFilelist = array_merge($arrTempFilelist, $this->recursiveFileList(array(), $value, true));
                 }
@@ -168,12 +178,12 @@ class SyncCtoFiles extends Backend
                     $arrTempFilelist[] = $value;
                 }
             }
-            
+
             // Replace current list with new one.
             $arrFileList = $arrTempFilelist;
         }
         else
-        {            
+        {
             $arrFileList = $this->recursiveFileList(array(), "tl_files", true);
             $arrChecksum = array();
         }
@@ -182,7 +192,17 @@ class SyncCtoFiles extends Backend
         {
             $intSize = filesize($this->objSyncCtoHelper->buildPath($value));
 
-            if ($intSize >= $GLOBALS['SYC_SIZE']['limit_ignore'])
+            if ($intSize < 0 && $intSize != 0)
+            {
+                $arrChecksum[md5($value)] = array(
+                    "path" => $value,
+                    "checksum" => 0,
+                    "size" => 0,
+                    "state" => SyncCtoEnum::FILESTATE_BOMBASTIC_BIG,
+                    "transmission" => SyncCtoEnum::FILETRANS_WAITING,
+                );
+            }
+            else if ($intSize >= $GLOBALS['SYC_SIZE']['limit_ignore'])
             {
                 $arrChecksum[md5($value)] = array(
                     "path" => $value,
@@ -502,7 +522,7 @@ class SyncCtoFiles extends Backend
         {
             // Scann Folder
             $arrScan = scan($strPathTl);
-            
+
             // Rund through each file
             foreach ($arrScan as $key => $valueItem)
             {
@@ -589,61 +609,9 @@ class SyncCtoFiles extends Backend
         $objFolder->clear();
     }
 
-    /*
-     * ------------------------------------------------------------------------
-     * ------------------------------------------------------------------------
-     * ALT
-     * ------------------------------------------------------------------------
-     * ------------------------------------------------------------------------
-     */
-
-
-
     /* -------------------------------------------------------------------------
      * File Operations 
      */
-
-    /**
-     * Verschiebt eine Datei aus den Temp Ordner zu ihren eigentlichen Platz.
-     * Dient dafür die übertragenen Dateien der Sync. zu verschieben.
-     * 
-     * @param array $arrFileList Liste von Dateien im aufbau array ( [array("path" => [Interne Adresse start bei TL_ROOT])] )
-     * @return array  
-     */
-    public function moveFile($arrFileList)
-    {
-        return $this->moveTempFile($arrFileList);
-    }
-
-    public function moveTempFile($arrFileList)
-    {
-        foreach ($arrFilelist as $key => $value)
-        {
-            if (!file_exists($this->buildPath($GLOBALS['SYC_PATH']['tmp'], "sync", $value["path"])))
-            {
-                $arrFilelist[$key]["saved"] = false;
-                $arrFilelist[$key]["error"] = "missing file";
-                continue;
-            }
-
-            $arrFolderPart = explode("/", $value["path"]);
-            array_pop($arrFolderPart);
-            $strVar = "";
-
-            foreach ($arrFolderPart as $itFolder)
-            {
-                $strVar .= "/" . $itFolder;
-
-                if (!file_exists(TL_ROOT . $strVar))
-                    mkdir(TL_ROOT . $strVar);
-            }
-
-            if (copy(TL_ROOT . $GLOBALS['SYC_PATH']['tmp'] . "sync/" . $value["path"], TL_ROOT . "/" . $value["path"]) == false)
-                $arrFilelist[$key]["error"] = "file copy error Src:" . $this->buildPath($GLOBALS['SYC_PATH']['tmp'], "sync", $value["path"]) . " | Des: " . $this->buildPath($value["path"]);
-        }
-
-        return $arrFileList;
-    }
 
     /**
      *
@@ -656,15 +624,19 @@ class SyncCtoFiles extends Backend
     {
         @set_time_limit(3600);
 
-        $strSrcFile = TL_ROOT . "/" . $strSrcFile;
-        $strDesPath = TL_ROOT . $strDesFolder . "/";
+        $strSrcFile = $this->objSyncCtoHelper->buildPath($strSrcFile);
+        $strDesPath = $this->objSyncCtoHelper->buildPath($strDesFolder);
+
 
         if (!file_exists($strSrcFile))
             throw new Exception("File not exsist");
 
-        @mkdir($strDesPath);
+        $objFolder = new Folder($this->objSyncCtoHelper->buildPathWoTL($strDesPath));
+        $objFile = new File($this->objSyncCtoHelper->buildPathWoTL($strSrcFile));
 
-        $intFilesize = filesize($strSrcFile);
+        if ($objFile->filesize < 0)
+            throw new Exception("Int overload, try a 64Bit PHP Version.");
+
         $booRun = true;
         $i = 0;
         for ($i; $booRun; $i++)
@@ -672,7 +644,7 @@ class SyncCtoFiles extends Backend
             $fp = fopen($strSrcFile, "rb");
 
             if ($fp === false)
-                throw new Exception("Could nt open file");
+                throw new Exception("Could not open file");
 
             if (fseek($fp, $i * $intSizeLimit, SEEK_SET) === -1)
                 throw new Exception("Fseek error");
@@ -685,7 +657,7 @@ class SyncCtoFiles extends Backend
 
             $data = fread($fp, $intSizeLimit);
 
-            $handle = fopen($strDesPath . $strDesFile . ".sync" . $i, "w");
+            $handle = fopen($this->objSyncCtoHelper->buildPath($strDesPath, $strDesFile . ".sync" . $i), "w");
             fwrite($handle, $data);
             fclose($handle);
 
@@ -695,13 +667,194 @@ class SyncCtoFiles extends Backend
             unset($data);
             unset($fp);
 
-            if (( ( $i + 1 ) * $intSizeLimit) > $intFilesize)
+            if (( ( $i + 1 ) * $intSizeLimit) > $objFile->filesize)
                 $booRun = false;
-
-            sleep(1);
         }
 
         return $i;
+    }
+
+    public function rebuildSplitFiles($strSplitname, $intSplitcount, $strMovepath, $strMD5)
+    {
+        @set_time_limit(3600);
+
+        // Build savepath
+        $strSavePath = $this->objSyncCtoHelper->buildPath($GLOBALS['SYC_PATH']['tmp'], "sync", $strMovepath);
+
+        // Create Folder
+        $objFolder = new Folder($this->objSyncCtoHelper->buildPathWoTL(dirname($strSavePath)));
+
+        // Run for each part file
+        for ($i = 0; $i < $intSplitcount; $i++)
+        {
+            // Build path for part file
+            $strReadFile = $this->objSyncCtoHelper->buildPath($GLOBALS['SYC_PATH']['tmp'], $strSplitname, $strSplitname . ".sync" . $i);
+
+            // Check if file exists
+            if (!file_exists($strReadFile))
+            {
+                throw new Exception("Missing part file " . $strSplitname . ".sync" . $i);
+            }
+
+            // Create new file objects
+            $objFilePart = new File($this->objSyncCtoHelper->buildPathWoTL($strReadFile));
+            $objFileWhole = new File($this->objSyncCtoHelper->buildPathWoTL($strSavePath));
+
+            // Write part file to man file
+            $objFileWhole->append($objFilePart->getContent());
+
+            // Close objects
+            $objFilePart->close();
+            $objFileWhole->close();
+
+            // Free up memory
+            unset($objFilePart);
+            unset($objFileWhole);
+
+            // wait
+            sleep(1);
+        }
+
+        // Check MD5 Checksum
+        if (md5_file($strSavePath) != $strMD5)
+        {
+            throw new Exception("MD5 Checksum error");
+        }
+
+        return true;
+    }
+
+    public function moveTempFile($arrFileList)
+    {
+        foreach ($arrFileList as $key => $value)
+        {
+            if (!file_exists($this->objSyncCtoHelper->buildPath($GLOBALS['SYC_PATH']['tmp'], "sync", $value["path"])))
+            {
+                $arrFileList[$key]["saved"] = false;
+                $arrFileList[$key]["error"] = "Missing file in tempfolder.";
+                continue;
+            }
+
+            $strFolderPath = dirname($this->objSyncCtoHelper->buildPathWoTL($value["path"]));
+
+            if ($strFolderPath != ".")
+            {
+                $objFolder = new Folder($strFolderPath);
+                unset($objFolder);
+            }
+
+            $strFileSource = $this->objSyncCtoHelper->buildPath($GLOBALS['SYC_PATH']['tmp'], "sync", $value["path"]);
+            $strFileDestination = $this->objSyncCtoHelper->buildPath($value["path"]);
+
+            if (copy($strFileSource, $strFileDestination) == false)
+            {
+                $arrFileList[$key]["saved"] = false;
+                $arrFileList[$key]["error"] = "file copy error Src:" . $strFileSource . " | Des: " . $strFileDestination;
+            }
+            else
+            {
+                $arrFileList[$key]["saved"] = true;
+            }
+        }
+
+        return $arrFileList;
+    }
+
+    public function deleteFiles($arrFileList)
+    {
+        if (count($arrFileList) != 0)
+        {
+            foreach ($arrFileList as $key => $value)
+            {
+                try
+                {
+                    $objFiel = new File($this->objSyncCtoHelper->buildPathWoTL($value['path']));
+
+                    if ($objFiel->delete())
+                    {
+                        $arrFileList[$key]['transmission'] = SyncCtoEnum::FILETRANS_SEND;
+                    }
+                    else
+                    {
+                        $arrFileList[$key]['transmission'] = SyncCtoEnum::FILETRANS_SKIPPED;
+                        $arrFileList[$key]["skipreason"] = "Error by deleting file";
+                    }
+
+                    $objFiel->close();
+                }
+                catch (Exception $exc)
+                {
+                    $arrFileList[$key]['transmission'] = SyncCtoEnum::FILETRANS_SKIPPED;
+                    $arrFileList[$key]["skipreason"] = $exc->getMessage();
+                }
+            }
+        }
+
+        return $arrFileList;
+    }
+
+    /**
+     * Recive a file and move it to the right folder.
+     * 
+     * @param type $arrMetafiles
+     * @return string 
+     */
+    public function saveFile($arrMetafiles)
+    {
+        if (!is_array($arrMetafiles))
+            throw new Exception("Missing metafiles in array check.");
+
+        $arrResponse = array();
+
+        foreach ($_FILES as $key => $value)
+        {
+            if (!key_exists($key, $arrMetafiles))
+                throw new Exception("Could not find metafiles for the file $key");
+
+            $strFolder = $arrMetafiles[$key]["folder"];
+            $strFile = $arrMetafiles[$key]["file"];
+            $strMD5 = $arrMetafiles[$key]["MD5"];
+
+            switch ($arrMetafiles[$key]["typ"])
+            {
+                case SyncCtoEnum::UPLOAD_TEMP:
+                    $strSaveFile = $this->objSyncCtoHelper->buildPath($GLOBALS['SYC_PATH']['tmp'], $strFolder, $strFile);
+                    break;
+
+                case SyncCtoEnum::UPLOAD_SYNC_TEMP:
+                    $strSaveFile = $this->objSyncCtoHelper->buildPath($GLOBALS['SYC_PATH']['tmp'], "sync", $strFolder, $strFile);
+                    break;
+
+                case SyncCtoEnum::UPLOAD_SQL_TEMP:
+                    $strSaveFile = $this->objSyncCtoHelper->buildPath($GLOBALS['SYC_PATH']['tmp'], "sql", $strFile);
+                    break;
+
+                case SyncCtoEnum::UPLOAD_SYNC_SPLIT:
+                    $strSaveFile = $this->objSyncCtoHelper->buildPath($GLOBALS['SYC_PATH']['tmp'], $arrMetafiles[$key]["splitname"], $strFile);
+                    break;
+
+                default:
+                    throw new Exception("Unknown Path for file.");
+                    break;
+            }
+
+            $objFolder = new Folder($this->objSyncCtoHelper->buildPathWoTL(dirname($strSaveFile)));
+
+            if (move_uploaded_file($value["tmp_name"], $strSaveFile) === FALSE)
+            {
+                throw new Exception("Error by moving tempfile to destination folder. Src: " . $value["tmp_name"] . " | Des: " . $strSaveFile);
+            }
+            else if ($key != md5_file($strSaveFile))
+            {
+                throw new Exception($GLOBALS['TL_LANG']['syncCto']['checksum_error']);
+            }
+            else
+            {
+                $arrResponse[$key] = "Saving " . $arrMetafiles[$key]["file"];
+            }
+        }
+
+        return $arrResponse;
     }
 
 }

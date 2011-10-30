@@ -13,7 +13,7 @@
     <?php foreach ($this->data as $key => $value) : ?>
 
         <div class="<?php echo ($key == 1) ? "tl_tbox" : "tl_box"; ?> block">
-            <h1 id="step<?php echo $key; ?>"><?php echo $value["title"] ?><?php if (strlen($value["state"]) != 0): ?> – <?php echo $value["state"]; ?><?php endif; ?></h1>
+            <h1 id="step<?php echo $key; ?>"><?php echo $value["title"] ?><?php if (strlen($value["state"]) != 0): ?> - <?php echo $value["state"]; ?><?php endif; ?></h1>
             <p class="tl_help">
                 <?php echo $value["description"]; ?>
             </p>
@@ -30,7 +30,7 @@
     <?php endforeach; ?>
 
     <?php if ($this->refresh == true && $this->error == false && $this->finished == false): ?>
-        <meta http-equiv="refresh" content="2; URL=<?php echo $this->Environment->base; ?><?php echo $this->url; ?>&amp;step=<?php echo $this->step + 1 ?>" />
+        <meta http-equiv="refresh" content="2; URL=<?php echo $this->Environment->base; ?><?php echo $this->url; ?>&amp;step=<?php echo $this->step?>" />
         <img style="margin-bottom:20px;" src="system/modules/syncCto/html/ajax-loader.gif" alt="" />
     <?php endif; ?>
 
@@ -50,7 +50,8 @@
             </p>
         </div>
     <?php endif; ?>
-	
+
+
     <script type="text/javascript">
         <!--//--><![CDATA[//><!--
         /* window.scrollTo(null, ($('step<?php echo $this->step; ?>').getPosition().y - 20));*/ 

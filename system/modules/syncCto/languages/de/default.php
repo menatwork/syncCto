@@ -27,10 +27,10 @@
  * @filesource
  */
 
-
-/**
+/** ----------------------------------------------------------------------------
  * Back end modules
  */
+
 $GLOBALS['TL_LANG']['MSC']['edit'] = 'Bearbeiten';
 $GLOBALS['TL_LANG']['MSC']['copy'] = 'Duplizieren';
 $GLOBALS['TL_LANG']['MSC']['syncTo'] = 'Client synchronisieren';
@@ -45,29 +45,7 @@ $GLOBALS['TL_LANG']['SYC']['backup'] = 'Backup-Kategorie';
 $GLOBALS['TL_LANG']['SYC']['option_small'] = array('Persönliche Daten', 'Nur ausgewählte Dateien und Ordner innerhalb tl_files werden berücksichtigt.');
 $GLOBALS['TL_LANG']['SYC']['option_full'] = array('Contao-Installation', 'Die komplette Contao-Installation, inklusive tl_files wird berücksichtigt.');
 
-/**
- * Filelist
- */
-
-$GLOBALS['TL_LANG']['MSC']['select_all_files'] = "Alle Dateien auswählen";
-$GLOBALS['TL_LANG']['MSC']['sync_info'] = "Bitte schließen Sie während der gesamten Synchronisation nicht das aktuelle Fenster.";
-
-$GLOBALS['TL_LANG']['MSC']['totalsize'] = 'Größe aller Dateien:';
-$GLOBALS['TL_LANG']['MSC']['new_file'] = 'Neu';
-$GLOBALS['TL_LANG']['MSC']['modified_file'] = 'Verändert';
-$GLOBALS['TL_LANG']['MSC']['unknown_file'] = 'Unbekannt';
-$GLOBALS['TL_LANG']['MSC']['deleted_file'] = 'Gelöscht';
-$GLOBALS['TL_LANG']['MSC']['submit_files'] = 'Dateien transferieren';
-$GLOBALS['TL_LANG']['MSC']['delete_files'] = 'Ausgewählte Dateien entfernen';
-
-$GLOBALS['TL_LANG']['MSC']['big_files'] = 'Datei(en) zum Übertragen.';
-$GLOBALS['TL_LANG']['MSC']['skipped_files'] = 'Folgende Datei(en) sind zu groß um sie zu übertragen.';
-$GLOBALS['TL_LANG']['MSC']['ignored_files'] = 'Folgende( Datei(en) sind zu groß um sie zu bearbeiten.';
-
-$GLOBALS['TL_LANG']['MSC']['information_last_sync'] = 'Die letzte Synchronisierung wurde um %s am %s vom User %s (%s) durchgeführt.';
-
-
-/**
+/** ----------------------------------------------------------------------------
  * Errors
  */
 
@@ -75,9 +53,6 @@ $GLOBALS['TL_LANG']['ERR']['sync_no_tables_select'] = "Es wurde(n) keine Tabell(
 $GLOBALS['TL_LANG']['ERR']['sync_no_file_select'] = "Es wurde(n) keine Datei(en) ausgewählt.";
 $GLOBALS['TL_LANG']['ERR']['sync_no_file_found'] = "Die Datei %s konnte nicht gefunden werden.";
 $GLOBALS['TL_LANG']['ERR']['sync_unknown_backup_method'] = "Die gewählte Backup Methode ist nicht bekannt.";
-
-
-
 $GLOBALS['TL_LANG']['ERR']['cant_open'] = "Datei %s kann nicht geöffnet werden.";
 $GLOBALS['TL_LANG']['ERR']['file_not_exists'] = "Datei %s konnte nicht erstellt werden.";
 $GLOBALS['TL_LANG']['ERR']['zero_tables'] = "Es wurden keine SQL-Tabellen für ein Backup gefunden.";
@@ -111,4 +86,106 @@ $GLOBALS['TL_LANG']['ERR']['unknown_response'] = "Unbekannte Antwort.";
 /* OK */$GLOBALS['TL_LANG']['ERR']['rpc_data_missing'] = "Fehlende Daten für RPC.";
 /* OK */$GLOBALS['TL_LANG']['ERR']['rpc_unknown'] = "Unbekannte RPC Anfrage.";
 
+/** ----------------------------------------------------------------------------
+ * Filelist
+ */
+
+$GLOBALS['TL_LANG']['MSC']['select_all_files'] = "Alle auswählen";
+$GLOBALS['TL_LANG']['MSC']['sync_info'] = "Bitte schließen Sie während der gesamten Synchronisation nicht das aktuelle Fenster.";
+
+$GLOBALS['TL_LANG']['MSC']['totalsize'] = 'Größe aller Dateien:';
+$GLOBALS['TL_LANG']['MSC']['new_file'] = 'Neu';
+$GLOBALS['TL_LANG']['MSC']['modified_file'] = 'Verändert';
+$GLOBALS['TL_LANG']['MSC']['unknown_file'] = 'Unbekannt';
+$GLOBALS['TL_LANG']['MSC']['deleted_file'] = 'Gelöscht';
+$GLOBALS['TL_LANG']['MSC']['submit_files'] = 'Alle Dateien transferieren';
+$GLOBALS['TL_LANG']['MSC']['delete_files'] = 'Ausgewählte Dateien entfernen';
+
+$GLOBALS['TL_LANG']['MSC']['big_files'] = 'Datei(en) zum Übertragen.';
+$GLOBALS['TL_LANG']['MSC']['skipped_files'] = 'Folgende Datei(en) sind zu groß um sie zu übertragen.';
+$GLOBALS['TL_LANG']['MSC']['ignored_files'] = 'Folgende Datei(en) sind zu groß um sie zu bearbeiten.';
+
+$GLOBALS['TL_LANG']['MSC']['information_last_sync'] = 'Die letzte Synchronisierung wurde um %s am %s vom User %s (%s) durchgeführt.';
+
+/** ----------------------------------------------------------------------------
+ * Steps
+ */
+
+/**
+ * Texte
+ */
+$GLOBALS['TL_LANG']['tl_syncCto_steps']['ok'] = "OK";
+$GLOBALS['TL_LANG']['tl_syncCto_steps']['progress'] = "In Bearbeitung";
+$GLOBALS['TL_LANG']['tl_syncCto_steps']['error'] = "Fehler";
+$GLOBALS['TL_LANG']['tl_syncCto_steps']['skipped'] = "Übersprungen";
+$GLOBALS['TL_LANG']['tl_syncCto_steps']['unknown_step'] = "Unbekannter Schritt";
+
+/**
+ * Headline
+ */
+$GLOBALS['TL_LANG']['tl_syncCto_steps']['step'] = "Schritt";
+$GLOBALS['TL_LANG']['tl_syncCto_steps']['complete'] = "Fertig!";
+$GLOBALS['TL_LANG']['tl_syncCto_steps']['debug_mode'] = "Debugausgaben";
+
+/**
+ * Debug mode
+ */
+$GLOBALS['TL_LANG']['tl_syncCto_steps']['run_time'] = "Laufzeit: %s Sekunden";
+$GLOBALS['TL_LANG']['tl_syncCto_steps']['memory_limit'] = "Auslastung: %s";
+
+/** ----------------------------------------------------------------------------
+ * SyncTo & SyncFrom language arrays
+ */
+
+/**
+ * Errors
+ */
+$GLOBALS['TL_LANG']['tl_syncCto_sync']['error']['call_directly'] = "Versuchen Sie nicht die Synchronisation direkt aufzurufen.";
+$GLOBALS['TL_LANG']['tl_syncCto_sync']['error']['client_set'] = "Konnte nicht Client setzten.";
+// Step 1
+$GLOBALS['TL_LANG']['tl_syncCto_sync']['error_step_1']['referer'] = "Konnte die Referer-Überprüfung auf Client Seite nicht deaktivieren.";
+$GLOBALS['TL_LANG']['tl_syncCto_sync']['error_step_1']['version'] = "Versionskonflikt. Server: %s Client: %s";
+// Step 3
+$GLOBALS['TL_LANG']['tl_syncCto_sync']['error_step_3']['upload_ini'] = "Upload nicht erfolgreich. Funktion ist in der php.ini deaktiviert.";
+$GLOBALS['TL_LANG']['tl_syncCto_sync']['error_step_3']['rebuild'] = "Fehler beim zusammenbauen der Dateien auf der Clientseite. Pfad: %s";
+// Step 4
+$GLOBALS['TL_LANG']['tl_syncCto_sync']['error_step_4']['send'] = "Fehler beim senden der SQL Datei.";
+// Step 5
+$GLOBALS['TL_LANG']['tl_syncCto_sync']['error_step_5']['upload_ini'] = "Upload nicht erfolgreich. Funktion ist in der php.ini deaktiviert.";
+
+/**
+ * List
+ */
+// Step 1
+$GLOBALS['TL_LANG']['tl_syncCto_sync']["step_1"]['description_1'] = "Client vorbereitung.";
+$GLOBALS['TL_LANG']['tl_syncCto_sync']["step_1"]['description_2'] = "Temporäre Ordner leeren.";
+$GLOBALS['TL_LANG']['tl_syncCto_sync']["step_1"]['description_3'] = "Client vorbereitung";
+// Step 2
+$GLOBALS['TL_LANG']['tl_syncCto_sync']["step_2"]['description_1'] = "Datenabgleich. Vergleichsliste erstellen.";
+$GLOBALS['TL_LANG']['tl_syncCto_sync']["step_2"]['description_2'] = "Vergleichsliste zum Client schicken.";
+$GLOBALS['TL_LANG']['tl_syncCto_sync']["step_2"]['description_3'] = "Nach löschbaren Dateien suchen.";
+$GLOBALS['TL_LANG']['tl_syncCto_sync']["step_2"]['description_4'] = "Aufbereitung der Datenlisten.";
+$GLOBALS['TL_LANG']['tl_syncCto_sync']["step_2"]['description_5'] = "Vergleichslisten";
+$GLOBALS['TL_LANG']['tl_syncCto_sync']["step_2"]['description_6'] = "Es wurden %s neue, %s veränderte, %s gelöschte und %s nicht zustellbare Datei(en) gefunden.";
+// Step 3
+$GLOBALS['TL_LANG']['tl_syncCto_sync']["step_3"]['description_1'] = "Große Dateien synchronisieren.";
+$GLOBALS['TL_LANG']['tl_syncCto_sync']["step_3"]['description_2'] = "Große Dateien transferieren.";
+$GLOBALS['TL_LANG']['tl_syncCto_sync']["step_3"]['description_3'] = "%s von %s großen Datei(en) zerteilt.";
+$GLOBALS['TL_LANG']['tl_syncCto_sync']["step_3"]['description_4'] = "%s von %s großen Datei(en) gesendet.";
+$GLOBALS['TL_LANG']['tl_syncCto_sync']["step_3"]['description_5'] = "Große Dateien zusammenbauen.";
+$GLOBALS['TL_LANG']['tl_syncCto_sync']["step_3"]['description_6'] = "%s von %s großen Datei(en) zusammenbauen.";
+// Step 4
+$GLOBALS['TL_LANG']['tl_syncCto_sync']["step_4"]['description_1'] = "SQL-Scripte erstellen.";
+$GLOBALS['TL_LANG']['tl_syncCto_sync']["step_4"]['description_2'] = "SQL-Scripte senden.";
+$GLOBALS['TL_LANG']['tl_syncCto_sync']["step_4"]['description_3'] = "SQL-Scripte importieren.";
+$GLOBALS['TL_LANG']['tl_syncCto_sync']["step_4"]['description_4'] = "SQL-Scripte import.";
+// Step 5
+$GLOBALS['TL_LANG']['tl_syncCto_sync']["step_5"]['description_1'] = "Dateien synchronisieren.";
+$GLOBALS['TL_LANG']['tl_syncCto_sync']["step_5"]['description_2'] = "%s von %s Datei(en) synchronisiert.";
+$GLOBALS['TL_LANG']['tl_syncCto_sync']["step_5"]['description_3'] = "Dateien importieren.";
+$GLOBALS['TL_LANG']['tl_syncCto_sync']["step_5"]['description_4'] = "Dateien löschen.";
+$GLOBALS['TL_LANG']['tl_syncCto_sync']["step_5"]['description_5'] = "Konfigurations Importieren.";
+$GLOBALS['TL_LANG']['tl_syncCto_sync']["step_5"]['description_6'] = "Dateien synchronisieren.";
+$GLOBALS['TL_LANG']['tl_syncCto_sync']["step_5"]['description_7'] = "%s von %s Datei(en) übertragen.";
+$GLOBALS['TL_LANG']['tl_syncCto_sync']["step_5"]['description_8'] = " Datei(en) übersprungen.";
 ?>
