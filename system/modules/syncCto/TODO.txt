@@ -1,4 +1,3 @@
-- Optimierung der ENUM Klasse (Bakup/Backup, Header)
 - Statistikfunktion
 - HTML5 Templates
 - Request Token Unterstützung
@@ -7,3 +6,10 @@
 - Dateigrößenanzeige bei großen Files (N.A.)
 - loadLocalconfigEntries vereinfachen
 - syncFrom
+- Prüfung aller Templates und anlegen der Sprachdateien
+
+
+
+ERLEDIGT:
+
+- Optimierung der ENUM Klasse (Bakup/Backup, Header)
