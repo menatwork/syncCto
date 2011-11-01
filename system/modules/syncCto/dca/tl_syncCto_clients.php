@@ -27,7 +27,7 @@
  * @filesource
  */
 
-$GLOBALS['TL_DCA']['tl_synccto_clients'] = array(
+$GLOBALS['TL_DCA']['tl_syncCto_clients'] = array(
     // Config
     'config' => array(
         'dataContainer' => 'Table',
