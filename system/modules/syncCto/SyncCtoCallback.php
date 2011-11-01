@@ -1,7 +1,4 @@
-<?php
-
-if (!defined('TL_ROOT'))
-    die('You cannot access this file directly!');
+<?php if (!defined('TL_ROOT')) die('You cannot access this file directly!');
 
 /**
  * Contao Open Source CMS
@@ -361,19 +358,6 @@ class SyncCtoCallback extends Backend
         return $arrTables;
     }
 
-    /**
-     * Ping client status
-     */
-    public function pingClientStatus($strAction)
-    {        
-        if ($strAction == 'syncCtoPing')
-        {
-            $objRequest = new Request();
-            $objRequest->send($this->Input->post('hostIP'));
-            echo ($objRequest->code == '200') ? "true" : "false";
-            exit();
-        }
-    }
 }
 
 ?>

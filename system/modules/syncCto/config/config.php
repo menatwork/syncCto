@@ -89,7 +89,7 @@ $GLOBALS['SYC_SYNC'] = array_merge_recursive(array(
 /**
  * Hooks
  */
-$GLOBALS['TL_HOOKS']['executePreActions'][] = array('SyncCtoCallback', 'pingClientStatus');
+$GLOBALS['TL_HOOKS']['executePreActions'][] = array('tl_synccto_clients', 'pingClientStatus');
 $GLOBALS['TL_HOOKS']['parseBackendTemplate'][] = array('SyncCtoCallback', 'checkExtensions');
 
 /**
@@ -107,7 +107,7 @@ if ($objInput->get("do") == 'syncCto_backups' && $objInput->get("table") != '' &
     unset($GLOBALS['BE_MOD']['syncCto']['syncCto_backups']['callback']);
 }
 
-if ($objInput->get("do") == 'synccto_clients' && ($objInput->get("table") == 'tl_syncCto_clients_syncTo' || $objInput->get("table") == 'tl_syncCto_clients_syncFrom' || $objInput->get("table") == '' ) && $objInput->get("act") != 'start')
+if ($objInput->get("do") == 'syncCto_clients' && ($objInput->get("table") == 'tl_syncCto_clients_syncTo' || $objInput->get("table") == 'tl_syncCto_clients_syncFrom' || $objInput->get("table") == '' ) && $objInput->get("act") != 'start')
 {
     unset($GLOBALS['BE_MOD']['syncCto']['synccto_clients']['callback']);
 }
@@ -178,13 +178,10 @@ $GLOBALS['SYC_PATH']['file'] = $GLOBALS['TL_CONFIG']['uploadPath'] . '/syncCto_b
 $GLOBALS['SYC_PATH']['debug'] = $GLOBALS['TL_CONFIG']['uploadPath'] . '/syncCto_backups/debug/';
 $GLOBALS['SYC_PATH']['tmp'] = "system/tmp/";
 
-// Timestamp for files
-$GLOBALS['SYC_CONFIG']['format'] = "Ymd_H-i-s";
-
 /**
  * CSS
  */
-if (($objInput->get("do") == 'syncCto_check') || ($objInput->get("table") == 'tl_syncCto_clients_syncTo') || ($objInput->get("table") == 'tl_syncCto_clients_syncFrom'))
+if (($objInput->get("table") == 'tl_syncCto_clients_syncTo') || ($objInput->get("table") == 'tl_syncCto_clients_syncFrom'))
 {
     $GLOBALS['TL_CSS'][] = 'system/modules/syncCto/html/css/filelist_src.css';
     $GLOBALS['TL_JAVASCRIPT'][] = 'system/modules/syncCto/html/js/htmltable.js';
@@ -194,6 +191,11 @@ if (($objInput->get("do") == 'syncCto_check') || ($objInput->get("table") == 'tl
 if ((($objInput->get("do") == 'synccto_clients') && $objInput->get("act") == '') && $objInput->get("table") == '')
 {
     $GLOBALS['TL_JAVASCRIPT'][] = 'system/modules/syncCto/html/js/ping_src.js';
+}
+
+if ($objInput->get("do") == 'syncCto_check')
+{
+	$GLOBALS['TL_CSS'][] = 'system/modules/syncCto/html/css/systemcheck_src.css';
 }
 
 /**

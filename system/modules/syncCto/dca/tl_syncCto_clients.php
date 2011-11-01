@@ -27,7 +27,7 @@
  * @filesource
  */
 
-$GLOBALS['TL_DCA']['tl_syncCto_clients'] = array(
+$GLOBALS['TL_DCA']['tl_synccto_clients'] = array(
     // Config
     'config' => array(
         'dataContainer' => 'Table',
@@ -165,7 +165,7 @@ if (!function_exists("mdecrypt_generic"))
     $GLOBALS['TL_DCA']['tl_syncCto_clients']['fields']['password']['save_callback'] = array(array("SyncCtoCallback", "savecallUserPassword"));
 }
 
-class tl_syncCto_clients extends Backend
+class tl_synccto_clients extends Backend
 {
 
     // Constructor and singelten pattern
@@ -268,6 +268,9 @@ class tl_syncCto_clients extends Backend
         if (!$this->BackendUser->hasAccess('create', 'syncCto_clients_p')) $GLOBALS['TL_DCA']['tl_synccto_clients']['config'] = array_unique(array_merge(array('closed' => true), $GLOBALS['TL_DCA']['tl_synccto_clients']['config']));
     }
 
+    /**
+     * Call ctoCommunication engines
+     */
     public function callCodifyengines()
     {
         $arrReturn = array();
@@ -280,6 +283,21 @@ class tl_syncCto_clients extends Backend
         asort($arrReturn);
 
         return $arrReturn;
+    }
+	
+
+    /**
+     * Ping client status
+     */
+    public function pingClientStatus($strAction)
+    {        
+        if ($strAction == 'syncCtoPing')
+        {
+            $objRequest = new Request();
+            $objRequest->send($this->Input->post('hostIP'));
+            echo ($objRequest->code == '200') ? "true" : "false";
+            exit();
+        }
     }
 
 }
