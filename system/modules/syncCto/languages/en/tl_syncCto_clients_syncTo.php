@@ -57,7 +57,7 @@ $GLOBALS['TL_LANG']['tl_syncCto_clients_syncTo']['step1_msg2'] = "Not the same s
 
 $GLOBALS['TL_LANG']['tl_syncCto_clients_syncTo']['step2_help'] = "Checking and transferring MD5 list.";
 $GLOBALS['TL_LANG']['tl_syncCto_clients_syncTo']['step2_msg1'] = "%s new, %s modified, %s deleted and %s not deliverable file(s) are found.";
-$GLOBALS['TL_LANG']['tl_syncCto_clients_syncTo']['step2_msg2'] = "Checking tl_files.";
+$GLOBALS['TL_LANG']['tl_syncCto_clients_syncTo']['step2_msg2'] = "Checking files.";
 $GLOBALS['TL_LANG']['tl_syncCto_clients_syncTo']['step2_msg3'] = "Checking contao installation.";
 $GLOBALS['TL_LANG']['tl_syncCto_clients_syncTo']['step2_msg4'] = "Files successfully verified. Loading compare list.";
 

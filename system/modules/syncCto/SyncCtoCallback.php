@@ -1,4 +1,7 @@
-<?php if (!defined('TL_ROOT')) die('You cannot access this file directly!');
+<?php
+
+if (!defined('TL_ROOT'))
+    die('You cannot access this file directly!');
 
 /**
  * Contao Open Source CMS
@@ -60,7 +63,8 @@ class SyncCtoCallback extends Backend
      */
     public static function getInstance()
     {
-        if (self::$instance == null) self::$instance = new SyncCtoCallback();
+        if (self::$instance == null)
+            self::$instance = new SyncCtoCallback();
 
         return self::$instance;
     }
@@ -73,7 +77,8 @@ class SyncCtoCallback extends Backend
     {
         if ($strTemplate == 'be_main')
         {
-            if (!is_array($_SESSION["TL_INFO"])) $_SESSION["TL_INFO"] = array();
+            if (!is_array($_SESSION["TL_INFO"]))
+                $_SESSION["TL_INFO"] = array();
 
             // required extensions
             $arrRequiredExtensions = array('ctoCommunication', 'httprequestextended', 'textwizard', '3cframework');
@@ -174,35 +179,6 @@ class SyncCtoCallback extends Backend
     }
 
     /* -------------------------------------------------------------------------
-     * Load call backs for syncCto settings
-     */
-
-    public function loadBlacklistLocalconfig($strValue)
-    {
-        return $this->objSyncCtoHelper->getBlacklistLocalconfig();
-    }
-
-    public function loadBlacklistFolder($strValue)
-    {
-        return $this->objSyncCtoHelper->getBlacklistFolder();
-    }
-
-    public function loadBlacklistFile($strValue)
-    {
-        return $this->objSyncCtoHelper->getBlacklistFile();
-    }
-
-    public function loadWhitelistFolder($strValue)
-    {
-        return $this->objSyncCtoHelper->getWhitelistFolder();
-    }
-
-    public function loadTablesHidden($strValue)
-    {
-        return $this->objSyncCtoHelper->getTablesHidden();
-    }
-
-    /* -------------------------------------------------------------------------
      * Return all sync types as array
      */
 
@@ -261,19 +237,16 @@ class SyncCtoCallback extends Backend
             {
                 continue;
             }
-
             if ($strTrim == '### INSTALL SCRIPT START ###')
             {
                 $strMode = 'data';
                 continue;
             }
-
             if ($strTrim == '### INSTALL SCRIPT STOP ###')
             {
                 $strMode = 'bottom';
                 continue;
             }
-
             if ($strMode == 'top')
             {
                 $this->strTop .= $strLine;
@@ -323,7 +296,8 @@ class SyncCtoCallback extends Backend
         foreach ($this->Database->listTables() as $key => $value)
         {
             // Check if table is a hidden one.
-            if (in_array($value, $arrTablesHidden)) continue;
+            if (in_array($value, $arrTablesHidden))
+                continue;
 
             $arrTables[] = $value;
         }
@@ -346,7 +320,8 @@ class SyncCtoCallback extends Backend
 
         foreach ($this->databaseTables() as $key => $value)
         {
-            if (in_array($value, $arrBlacklist)) continue;
+            if (in_array($value, $arrBlacklist))
+                continue;
 
             if (is_array($arrTablesPermission) && !in_array($value, $arrTablesPermission) && $this->BackendUser->isAdmin != true)
             {
@@ -373,7 +348,8 @@ class SyncCtoCallback extends Backend
 
         foreach ($this->databaseTables() as $key => $value)
         {
-            if (!in_array($value, $arrBlacklist)) continue;
+            if (!in_array($value, $arrBlacklist))
+                continue;
 
             if (is_array($arrTablesPermission) && !in_array($value, $arrTablesPermission) && $this->BackendUser->isAdmin != true)
             {
@@ -385,6 +361,19 @@ class SyncCtoCallback extends Backend
         return $arrTables;
     }
 
+    /**
+     * Ping client status
+     */
+    public function pingClientStatus($strAction)
+    {        
+        if ($strAction == 'syncCtoPing')
+        {
+            $objRequest = new Request();
+            $objRequest->send($this->Input->post('hostIP'));
+            echo ($objRequest->code == '200') ? "true" : "false";
+            exit();
+        }
+    }
 }
 
 ?>

@@ -21,6 +21,6 @@ window.addEvent("domready",function(){
 		
     });
 
-   var myHtmlTable = new HtmlTable($('syncCto_filelist'), {sortable: true, sortIndex: 3, sortReverse: true});
+   var myHtmlTable = new HtmlTable('syncCto_filelist', {sortable: true, sortIndex: 3, sortReverse: true});
 
 });

@@ -192,12 +192,13 @@ class SyncCtoModuleBackup extends BackendModule
                     "error_msg" => "",
                     "refresh" => true,
                     "finished" => false,
-                    "step" => 1,
+                    "step" => 2,
                     "url" => "contao/main.php?do=syncCto_backups&amp;table=tl_syncCto_backup_db&amp;act=start",
                     "start" => microtime(true),
                     "headline" => $GLOBALS['TL_LANG']['tl_syncCto_backup_db']['edit'],
                     "information" => "",
-                    "data" => array()
+                    "data" => array(),
+                    "goBack" => "contao/main.php?do=syncCto_backups&table=tl_syncCto_backup_db"
                 );
 
                 $arrContenData["data"][1] = array(
@@ -213,6 +214,9 @@ class SyncCtoModuleBackup extends BackendModule
                 try
                 {
                     $arrStepPool["zipname"] = $this->objSyncCtoDatabase->runDump($arrStepPool["tables"], false);
+
+                    $arrContenData["step"]++;
+                    break;
                 }
                 catch (Exception $exc)
                 {
@@ -223,8 +227,6 @@ class SyncCtoModuleBackup extends BackendModule
                     break;
                 }
 
-                break;
-
             // Show last page
             case 3:
                 $arrContenData["data"][1]["state"] = $GLOBALS['TL_LANG']['tl_syncCto_steps']['ok'];
@@ -233,7 +235,7 @@ class SyncCtoModuleBackup extends BackendModule
                 $arrContenData["data"][2]["title"] = $GLOBALS['TL_LANG']['tl_syncCto_steps']['complete'];
                 $arrContenData["data"][2]["description"] = $GLOBALS['TL_LANG']['tl_syncCto_backup_db']['complete'] . " " . $arrStepPool["zipname"];
                 $arrContenData["data"][2]["html"] = "<p class='tl_help'><br />";
-                $arrContenData["data"][2]["html"] .= "<a onclick='Backend.openWindow(this, 600, 235); return false;' title='In einem neuen Fenster ansehen' href='contao/popup.php?src=tl_files/syncCto_backups/database/" . $arrStepPool["zipname"] . "'>" . $GLOBALS['TL_LANG']['tl_syncCto_backup_db']['download_backup'] . "</a>";
+                $arrContenData["data"][2]["html"] .= "<a onclick='Backend.openWindow(this, 600, 235); return false;' title='In einem neuen Fenster ansehen' href='contao/popup.php?src=" . $GLOBALS['TL_CONFIG']['uploadPath'] . "/syncCto_backups/database/" . $arrStepPool["zipname"] . "'>" . $GLOBALS['TL_LANG']['tl_syncCto_backup_db']['download_backup'] . "</a>";
                 $arrContenData["data"][2]["html"] .= "</p>";
 
                 $this->Session->set("SyncCto_DB_StepPool", "");
@@ -247,10 +249,7 @@ class SyncCtoModuleBackup extends BackendModule
                 break;
         }
 
-        // Set templatevars and set session
-        $arrContenData["step"] = $step;
-
-        $this->objTemplateContent->goBack = $this->script . "contao/main.php?do=syncCto_backups&amp;table=tl_syncCto_backup_db&amp;act=edit";
+        // Set templatevars and set session$this->objTemplateContent->goBack = $this->script . "contao/main.php?do=syncCto_backups&amp;table=tl_syncCto_backup_db&amp;act=edit";
         $this->objTemplateContent->data = $arrContenData["data"];
         $this->objTemplateContent->step = $arrContenData["step"];
         $this->objTemplateContent->error = $arrContenData["error"];
@@ -261,6 +260,7 @@ class SyncCtoModuleBackup extends BackendModule
         $this->objTemplateContent->headline = $arrContenData["headline"];
         $this->objTemplateContent->information = $arrContenData["information"];
         $this->objTemplateContent->finished = $arrContenData["finished"];
+        $this->objTemplateContent->goBack = $arrContenData["goBack"];
 
         $this->Session->set("SyncCto_DB_Content", $arrContenData);
         $this->Session->set("SyncCto_DB_StepPool", $arrStepPool);
@@ -293,12 +293,13 @@ class SyncCtoModuleBackup extends BackendModule
                     "error_msg" => "",
                     "refresh" => true,
                     "finished" => false,
-                    "step" => 1,
+                    "step" => 2,
                     "url" => "contao/main.php?do=syncCto_backups&amp;table=tl_syncCto_restore_db&amp;act=start",
                     "start" => microtime(true),
                     "headline" => $GLOBALS['TL_LANG']['tl_syncCto_restore_db']['edit'],
                     "information" => "",
-                    "data" => array()
+                    "data" => array(),
+                    "goBack" => "contao/main.php?do=syncCto_backups&table=tl_syncCto_restore_db"
                 );
 
                 $arrContenData["data"][1] = array(
@@ -313,6 +314,9 @@ class SyncCtoModuleBackup extends BackendModule
                 try
                 {
                     $this->objSyncCtoDatabase->runRestore($arrStepPool["SyncCto_Restore"]);
+
+                    $arrContenData["step"]++;
+                    break;
                 }
                 catch (Exception $exc)
                 {
@@ -321,8 +325,6 @@ class SyncCtoModuleBackup extends BackendModule
 
                     break;
                 }
-
-                break;
 
             case 3:
                 $arrContenData["data"][1]["state"] = $GLOBALS['TL_LANG']['tl_syncCto_steps']['ok'];
@@ -342,8 +344,6 @@ class SyncCtoModuleBackup extends BackendModule
         }
 
         // Set templatevars and set session
-        $arrContenData["step"] = $step;
-
         $this->objTemplateContent->goBack = $this->script . "contao/main.php?do=syncCto_backups&amp;table=tl_syncCto_restore_db&amp;act=edit";
         $this->objTemplateContent->data = $arrContenData["data"];
         $this->objTemplateContent->step = $arrContenData["step"];
@@ -355,6 +355,7 @@ class SyncCtoModuleBackup extends BackendModule
         $this->objTemplateContent->headline = $arrContenData["headline"];
         $this->objTemplateContent->information = $arrContenData["information"];
         $this->objTemplateContent->finished = $arrContenData["finished"];
+        $this->objTemplateContent->goBack = $arrContenData["goBack"];
 
         $this->Session->set("SyncCto_DB_Content", $arrContenData);
         $this->Session->set("SyncCto_DB_StepPool", $arrStepPool);
@@ -382,12 +383,13 @@ class SyncCtoModuleBackup extends BackendModule
                     "error_msg" => "",
                     "refresh" => true,
                     "finished" => false,
-                    "step" => 1,
+                    "step" => 2,
                     "url" => "contao/main.php?do=syncCto_backups&amp;table=tl_syncCto_backup_file&amp;act=start",
                     "start" => microtime(true),
                     "headline" => $GLOBALS['TL_LANG']['tl_syncCto_backup_file']['edit'],
                     "information" => "",
-                    "data" => array()
+                    "data" => array(),
+                    "goBack" => "contao/main.php?do=syncCto_backups&table=tl_syncCto_backup_file"
                 );
 
                 $arrContenData["data"][1] = array(
@@ -409,6 +411,7 @@ class SyncCtoModuleBackup extends BackendModule
                     $arrStepPool["zipname"] = $this->objSyncCtoFiles->runDump($arrStepPool["backup_name"], $arrStepPool["filelist"]);
                 }
 
+                $arrContenData["step"]++;
                 break;
 
             case 3:
@@ -418,7 +421,7 @@ class SyncCtoModuleBackup extends BackendModule
                 $arrContenData["data"][2]["title"] = $GLOBALS['TL_LANG']['tl_syncCto_steps']['complete'];
                 $arrContenData["data"][2]["description"] = $GLOBALS['TL_LANG']['tl_syncCto_backup_file']['complete'] . " " . $arrStepPool["zipname"];
                 $arrContenData["data"][2]["html"] = "<p class='tl_help'><br />";
-                $arrContenData["data"][2]["html"] .= "<a onclick='Backend.openWindow(this, 600, 235); return false;' title='In einem neuen Fenster ansehen' href='contao/popup.php?src=tl_files/syncCto_backups/files/" . $arrStepPool["zipname"] . "'>" . $GLOBALS['TL_LANG']['tl_syncCto_backup_file']['download_backup'] . "</a>";
+                $arrContenData["data"][2]["html"] .= "<a onclick='Backend.openWindow(this, 600, 235); return false;' title='In einem neuen Fenster ansehen' href='contao/popup.php?src=" . $GLOBALS['TL_CONFIG']['uploadPath'] . "/syncCto_backups/files/" . $arrStepPool["zipname"] . "'>" . $GLOBALS['TL_LANG']['tl_syncCto_backup_file']['download_backup'] . "</a>";
                 $arrContenData["data"][2]["html"] .= "</p>";
 
                 $this->Session->set("SyncCto_DB_StepPool", "");
@@ -432,8 +435,6 @@ class SyncCtoModuleBackup extends BackendModule
         }
 
         // Set templatevars and set session
-        $arrContenData["step"] = $step;
-
         $this->objTemplateContent->goBack = $this->script . "contao/main.php?do=syncCto_backups&amp;table=tl_syncCto_backup_file&amp;act=edit";
         $this->objTemplateContent->data = $arrContenData["data"];
         $this->objTemplateContent->step = $arrContenData["step"];
@@ -445,6 +446,7 @@ class SyncCtoModuleBackup extends BackendModule
         $this->objTemplateContent->headline = $arrContenData["headline"];
         $this->objTemplateContent->information = $arrContenData["information"];
         $this->objTemplateContent->finished = $arrContenData["finished"];
+        $this->objTemplateContent->goBack = $arrContenData["goBack"];
 
         $this->Session->set("SyncCto_File_Content", $arrContenData);
         $this->Session->set("SyncCto_File_StepPool", $arrStepPool);
@@ -476,12 +478,13 @@ class SyncCtoModuleBackup extends BackendModule
                     "error_msg" => "",
                     "refresh" => true,
                     "finished" => false,
-                    "step" => 1,
+                    "step" => 2,
                     "url" => "contao/main.php?do=syncCto_backups&amp;table=tl_syncCto_restore_file&amp;act=start",
                     "start" => microtime(true),
                     "headline" => $GLOBALS['TL_LANG']['tl_syncCto_restore_file']['edit'],
                     "information" => "",
-                    "data" => array()
+                    "data" => array(),
+                    "goBack" => "contao/main.php?do=syncCto_backups&table=tl_syncCto_restore_file"
                 );
 
                 $arrContenData["data"][1] = array(
@@ -496,14 +499,16 @@ class SyncCtoModuleBackup extends BackendModule
                 try
                 {
                     $this->objSyncCtoFiles->runRestore($arrStepPool["file"]);
+
+                    $arrContenData["step"]++;
+                    break;
                 }
                 catch (Exception $exc)
                 {
                     $arrContenData["error"] = true;
                     $arrContenData["error_msg"] = $exc->getMessage();
+                    break;
                 }
-
-                break;
 
             case 3:
                 $objDate = new Date();
@@ -525,8 +530,6 @@ class SyncCtoModuleBackup extends BackendModule
         }
 
         // Set templatevars and set session
-        $arrContenData["step"] = $step;
-
         $this->objTemplateContent->goBack = $this->script . "contao/main.php?do=syncCto_backups&amp;table=tl_syncCto_restore_file&amp;act=edit";
         $this->objTemplateContent->data = $arrContenData["data"];
         $this->objTemplateContent->step = $arrContenData["step"];
@@ -538,6 +541,7 @@ class SyncCtoModuleBackup extends BackendModule
         $this->objTemplateContent->headline = $arrContenData["headline"];
         $this->objTemplateContent->information = $arrContenData["information"];
         $this->objTemplateContent->finished = $arrContenData["finished"];
+        $this->objTemplateContent->goBack = $arrContenData["goBack"];
 
         $this->Session->set("SyncCto_File_Content", $arrContenData);
         $this->Session->set("SyncCto_File_StepPool", $arrStepPool);

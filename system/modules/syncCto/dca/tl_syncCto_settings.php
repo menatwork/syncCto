@@ -1,4 +1,7 @@
-<?php if (!defined('TL_ROOT')) die('You can not access this file directly!');
+<?php
+
+if (!defined('TL_ROOT'))
+    die('You can not access this file directly!');
 
 /**
  * Contao Open Source CMS
@@ -26,7 +29,6 @@
  * @license    GNU/LGPL
  * @filesource
  */
-
 $GLOBALS['TL_DCA']['tl_syncCto_settings'] = array(
     // Config
     'config' => array
@@ -48,7 +50,7 @@ $GLOBALS['TL_DCA']['tl_syncCto_settings'] = array(
             'inputType' => 'textwizard',
             'exclude' => true,
             'eval' => array('trailingSlash' => false, 'style' => 'width:595px', 'allowHtml' => false),
-            'load_callback' => array(array('SyncCtoCallback', 'loadBlacklistFolder')),
+            'load_callback' => array(array('tl_syncCto_settings', 'loadBlacklistFolder')),
         ),
         'syncCto_file_blacklist' => array
             (
@@ -56,7 +58,7 @@ $GLOBALS['TL_DCA']['tl_syncCto_settings'] = array(
             'inputType' => 'textwizard',
             'exclude' => true,
             'eval' => array('trailingSlash' => false, 'style' => 'width:595px', 'allowHtml' => false),
-            'load_callback' => array(array('SyncCtoCallback', 'loadBlacklistFile')),
+            'load_callback' => array(array('tl_syncCto_settings', 'loadBlacklistFile')),
         ),
         'syncCto_folder_whitelist' => array
             (
@@ -64,7 +66,7 @@ $GLOBALS['TL_DCA']['tl_syncCto_settings'] = array(
             'inputType' => 'textwizard',
             'exclude' => true,
             'eval' => array('trailingSlash' => false, 'style' => 'width:595px', 'allowHtml' => false),
-            'load_callback' => array(array('SyncCtoCallback', 'loadWhitelistFolder')),
+            'load_callback' => array(array('tl_syncCto_settings', 'loadWhitelistFolder')),
         ),
         'syncCto_local_blacklist' => array
             (
@@ -73,7 +75,7 @@ $GLOBALS['TL_DCA']['tl_syncCto_settings'] = array(
             'exclude' => true,
             'eval' => array('multiple' => true),
             'options_callback' => array('SyncCtoCallback', 'localconfigEntries'),
-            'load_callback' => array(array('SyncCtoCallback', 'loadBlacklistLocalconfig')),
+            'load_callback' => array(array('tl_syncCto_settings', 'loadBlacklistLocalconfig')),
         ),
         'syncCto_hidden_tables' => array
             (
@@ -82,7 +84,7 @@ $GLOBALS['TL_DCA']['tl_syncCto_settings'] = array(
             'exclude' => true,
             'eval' => array('multiple' => true),
             'options_callback' => array('SyncCtoCallback', 'hiddenTables'),
-            'load_callback' => array(array('SyncCtoCallback', 'loadTablesHidden')),
+            'load_callback' => array(array('tl_syncCto_settings', 'loadTablesHidden')),
         ),
         'syncCto_database_tables' => array
             (
@@ -100,5 +102,50 @@ $GLOBALS['TL_DCA']['tl_syncCto_settings'] = array(
         ),
     )
 );
+
+class tl_syncCto_settings extends Backend
+{
+
+    protected $objSyncCtoHelper;
+    protected static $instance = null;
+
+    public function __construct()
+    {
+        parent::__construct();
+
+        // Import SyncCto classes
+        $this->objSyncCtoHelper = SyncCtoHelper::getInstance();
+    }
+
+    /* -------------------------------------------------------------------------
+     * Load call backs for syncCto settings
+     */
+
+    public function loadBlacklistLocalconfig($strValue)
+    {
+        return $this->objSyncCtoHelper->getBlacklistLocalconfig();
+    }
+
+    public function loadBlacklistFolder($strValue)
+    {
+        return $this->objSyncCtoHelper->getBlacklistFolder();
+    }
+
+    public function loadBlacklistFile($strValue)
+    {
+        return $this->objSyncCtoHelper->getBlacklistFile();
+    }
+
+    public function loadWhitelistFolder($strValue)
+    {
+        return $this->objSyncCtoHelper->getWhitelistFolder();
+    }
+
+    public function loadTablesHidden($strValue)
+    {
+        return $this->objSyncCtoHelper->getTablesHidden();
+    }
+
+}
 
 ?>

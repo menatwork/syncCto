@@ -1,4 +1,7 @@
-<?php if (!defined('TL_ROOT')) die('You cannot access this file directly!');
+<?php
+
+if (!defined('TL_ROOT'))
+    die('You cannot access this file directly!');
 
 /**
  * Contao Open Source CMS
@@ -88,7 +91,7 @@ class SyncCtoDatabase extends Backend
     protected function __construct()
     {
         parent::__construct();
-        
+
         $this->arrBackupTables = array();
         $this->objSyncCtoHelper = SyncCtoHelper::getInstance();
     }
@@ -189,7 +192,7 @@ class SyncCtoDatabase extends Backend
 
         if (!is_array($this->arrBackupTables) || $this->arrBackupTables == null || count($this->arrBackupTables) == 0)
         {
-            throw new Exception("Now tables found for backup.");
+            throw new Exception("No tables found for backup.");
         }
 
         $strFilename = date($this->strTimestampFormat) . "_" . $this->strSuffixZipName;
@@ -253,12 +256,12 @@ class SyncCtoDatabase extends Backend
                 {
                     foreach ($table['values'] as $value)
                     {
-                        $arrSQL = $this->buildSQLInsert("synccto_temp_" . $table['name'], $table['keys'], $value, true);
-                        call_user_func_array(array($this->Database->prepare($arrSQL["body"]), "execute"), $arrSQL["value"]);
+                        $strSQL = $this->buildSQLInsert("synccto_temp_" . $table['name'], $table['keys'], $value, true);
+                        $this->Database->prepare($strSQL)->execute();
                     }
                 }
             }
-            
+
             // Rename temp tables
             foreach ($arrRestoreTables as $key => $value)
             {
@@ -305,66 +308,106 @@ class SyncCtoDatabase extends Backend
             // Liste der Felder lesen
             $fields = $this->Database->listFields($table);
 
+            // Indicies
+            $arrIndexes = $this->Database->prepare("SHOW INDEX FROM `$table`")->execute()->fetchAllAssoc();
 
             foreach ($fields as $field)
             {
-                $name = $field['name'];
-                $field['name'] = '`' . $field['name'] . '`';
+                if ($field["type"] == "index")
+                {
+                    if ($field["name"] == "PRIMARY")
+                    {
+                        $return[$table]['TABLE_CREATE_DEFINITIONS'][$field["name"]] = "PRIMARY KEY (`" . implode("`,`", $field["index_fields"]) . "`)";
+                    }
+                    else if ($field["index"] == "UNIQUE")
+                    {
+                        foreach ($field["index_fields"] as $keyField => $valueField)
+                        {
+                            foreach ($arrIndexes as $keyIndexe => $valueIndexe)
+                            {
+                                if ($valueIndexe["Column_name"] == $valueField)
+                                {
+                                    $strTyp = $valueIndexe["Index_type"];
+                                    $arrReturn[] = "`$valueField` (" . $valueIndexe["Sub_part"] . ")";
 
-                // Field type
-                if (strlen($field['length']))
-                {
-                    $field['type'] .= '(' . $field['length'] . (strlen($field['precision']) ? ',' . $field['precision'] : '') . ')';
+                                    break;
+                                }
+                            }
+                        }
+                    }
+                    else if ($field["index"] == "KEY")
+                    {
+                        $strTyp;
+                        $arrReturn = array();
 
-                    unset($field['length']);
-                    unset($field['precision']);
-                }
+                        foreach ($field["index_fields"] as $keyField => $valueField)
+                        {
+                            foreach ($arrIndexes as $keyIndexe => $valueIndexe)
+                            {
+                                if ($valueIndexe["Column_name"] == $valueField)
+                                {
+                                    $strTyp = $valueIndexe["Index_type"];
+                                    $arrReturn[] = "`$valueField`";
 
-                // Default values
-                if (in_array(strtolower($field['type']), $this->arrDefaultValueTypIgnore) || stristr($field['extra'], 'auto_increment'))
-                {
-                    unset($field['default']);
-                }
-                else if (strtolower($field['default']) == 'null')
-                {
-                    $field['default'] = "default NULL";
-                }
-                else if (is_null($field['default']))
-                {
-                    $field['default'] = "";
-                }
-                else if (in_array(strtoupper($field['default']), $this->arrDefaultValueFunctionIgnore))
-                {
-                    $field['default'] = "default " . $field['default'];
+                                    break;
+                                }
+                            }
+                        }
+
+                        switch ($strTyp)
+                        {
+                            case "FULLTEXT":
+                                $return[$table]['TABLE_CREATE_DEFINITIONS'][$field["name"]] = "FULLTEXT KEY `" . $field['name'] . "` (" . implode(",", $arrReturn) . ")";
+                                break;
+
+                            default:
+                                $return[$table]['TABLE_CREATE_DEFINITIONS'][$field["name"]] = "KEY `" . $field['name'] . "` (" . implode(",", $arrReturn) . ")";
+                                break;
+                        }
+                    }
+
+                    continue;
                 }
                 else
                 {
-                    $field['default'] = "default '" . $field['default'] . "'";
-                }
-
-                // Indices
-                if (strlen($field['index']))
-                {
-                    switch ($field['index'])
-                    {
-                        case 'PRIMARY': $return[$table]['TABLE_CREATE_DEFINITIONS'][$name] = 'PRIMARY KEY  (`' . $name . '`)';
-                            break;
-
-                        case 'UNIQUE': $return[$table]['TABLE_CREATE_DEFINITIONS'][$name] = 'UNIQUE KEY `' . $name . '` (`' . $name . '`)';
-                            break;
-
-                        case 'FULLTEXT': $return[$table]['TABLE_CREATE_DEFINITIONS'][$name] = 'FULLTEXT KEY `' . $name . '` (`' . $name . '`)';
-                            break;
-
-                        default: if ((strpos(' ' . $field['type'], 'text') || strpos(' ' . $field['type'], 'char')) && ($field['null'] == 'NULL')) // Fulltext-Search bei text-Fields
-                                $return[$table]['TABLE_CREATE_DEFINITIONS'][$name] = 'FULLTEXT KEY `' . $name . '` (`' . $name . '`)';
-                            else
-                                $return[$table]['TABLE_CREATE_DEFINITIONS'][$name] = 'KEY `' . $name . '` (`' . $name . '`)';
-                            break;
-                    }
                     unset($field['index']);
+
+                    $name = $field['name'];
+                    $field['name'] = '`' . $field['name'] . '`';
+
+                    // Field type
+                    if (strlen($field['length']))
+                    {
+                        $field['type'] .= '(' . $field['length'] . (strlen($field['precision']) ? ',' . $field['precision'] : '') . ')';
+
+                        unset($field['length']);
+                        unset($field['precision']);
+                    }
+
+                    // Default values
+                    if (in_array(strtolower($field['type']), $this->arrDefaultValueTypIgnore) || stristr($field['extra'], 'auto_increment'))
+                    {
+                        unset($field['default']);
+                    }
+                    else if (strtolower($field['default']) == 'null')
+                    {
+                        $field['default'] = "default NULL";
+                    }
+                    else if (is_null($field['default']))
+                    {
+                        $field['default'] = "";
+                    }
+                    else if (in_array(strtoupper($field['default']), $this->arrDefaultValueFunctionIgnore))
+                    {
+                        $field['default'] = "default " . $field['default'];
+                    }
+                    else
+                    {
+                        $field['default'] = "default '" . $field['default'] . "'";
+                    }
+
+                    $return[$table]['TABLE_FIELDS'][$name] = trim(implode(' ', $field));
                 }
-                $return[$table]['TABLE_FIELDS'][$name] = trim(implode(' ', $field));
             }
         }
 
@@ -408,6 +451,11 @@ class SyncCtoDatabase extends Backend
 
             foreach ($fields as $key => $value)
             {
+                if ($value["type"] == "index")
+                {
+                    continue;
+                }
+
                 $arrReturn[$table]['keys'][] = $value['name'];
             }
 
@@ -448,7 +496,8 @@ class SyncCtoDatabase extends Backend
                                     $arrReturn[$table]['values'][$ii][$fields[$i]['name']] = "0x" . bin2hex($field_data);
                                     break;
                                 }
-                            default: $arrReturn[$table]['values'][$ii][$fields[$i]['name']] = " '" . str_replace(array("\\", "'", "\r", "\n"), array("\\\\", "\\'", "\\r", "\\n"), $field_data) . "'";
+                            default:
+                                $arrReturn[$table]['values'][$ii][$fields[$i]['name']] = " '" . str_replace(array("\\", "'", "\r", "\n"), array("\\\\", "\\'", "\\r", "\\n"), $field_data) . "'";
                                 break;
                         }
                     }
@@ -463,7 +512,7 @@ class SyncCtoDatabase extends Backend
                 $ii++;
             }
         }
-
+        
         return $arrReturn;
     }
 
@@ -498,30 +547,20 @@ class SyncCtoDatabase extends Backend
      */
     private function buildSQLInsert($strTable, $arrKeys, $arrData, $booPrepare = false)
     {
-        $strBody = "INSERT IGNORE INTO " . $strTable . " (";
-        $strBody .= implode(", ", $arrKeys);
-        $strBody .= ") VALUES ( ";
+        $strBody = "INSERT IGNORE INTO " . $strTable . " (`";
+        $strBody .= implode("`, `", $arrKeys);
+        $strBody .= "`) VALUES ( ";
 
         $arrValues = array();
         for ($i = 0; $i < count($arrData); $i++)
         {
             if ($booPrepare)
             {
-                $arrValues[$i] = trim(str_replace("'", "", $arrData[$arrKeys[$i]]));
-                $strBody .= "?";
+                $strBody .= $arrData[$arrKeys[$i]];
             }
             else
             {
-                $values = trim(str_replace("'", "", $arrData[$arrKeys[$i]]));
-
-                if ($values == "NULL")
-                {
-                    $strBody .= $values;
-                }
-                else
-                {
-                    $strBody .= "'" . $values . "'";
-                }
+                $strBody .= $arrData[$arrKeys[$i]];
             }
 
             if ($i < count($arrData) - 1)
@@ -532,7 +571,7 @@ class SyncCtoDatabase extends Backend
 
         if ($booPrepare)
         {
-            return array("body" => $strBody, "value" => $arrValues);
+            return $strBody;
         }
         else
         {
@@ -615,7 +654,7 @@ class SyncCtoDatabase extends Backend
                     foreach ($table['values'] as $value)
                     {
                         $string .= $this->buildSQLInsert($table['name'], $table['keys'], $value, false);
-                        $string .= "\r\n";
+                        $string .= ";\r\n";
                     }
 
                     $string .= "\r\n";

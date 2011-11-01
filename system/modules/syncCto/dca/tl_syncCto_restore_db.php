@@ -68,7 +68,7 @@ class tl_syncCto_restore_db extends Backend
 {
 
     public function onload_callback(DataContainer $dc)
-    {
+    {        
         $dc->removeButton('save');
         $dc->removeButton('saveNclose');
 

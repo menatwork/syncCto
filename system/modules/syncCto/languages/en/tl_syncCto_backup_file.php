@@ -64,7 +64,7 @@ $GLOBALS['TL_LANG']['tl_syncCto_backup_file']['complete'] = "Done!";
 
 $GLOBALS['TL_LANG']['tl_syncCto_backup_file']['step1_help'] = "Create zip file.";
 $GLOBALS['TL_LANG']['tl_syncCto_backup_file']['step2_help'] = "Save contao installation.";
-$GLOBALS['TL_LANG']['tl_syncCto_backup_file']['step3_help'] = "Save tl_files.";
+$GLOBALS['TL_LANG']['tl_syncCto_backup_file']['step3_help'] = "Save files.";
 $GLOBALS['TL_LANG']['tl_syncCto_backup_file']['complete_help'] = "Create file backup";
 $GLOBALS['TL_LANG']['tl_syncCto_backup_file']['download_backup'] = "Download file backup.";
 

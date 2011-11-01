@@ -46,8 +46,8 @@ $GLOBALS['TL_DCA']['tl_synccto_clients'] = array(
             'panelLayout' => 'filter;search,limit',
         ),
         'label' => array(
-            'fields' => array('title', 'id', 'address'),
-            'format' => '<img class="ping" src="system/modules/syncCto/html/empty.png" alt="" /> %s <span style="color: #aaaaaa; padding-left: 3px;">(' . $GLOBALS['TL_LANG']['tl_synccto_clients']['id'][0] . ': %s, ' . $GLOBALS['TL_LANG']['tl_synccto_clients']['address'][0] . ': <span>%s</span>)</span>',
+            'fields' => array('title', 'id', 'address', 'port', 'path'),
+            'format' => '<img class="ping" src="system/modules/syncCto/html/js/images/empty.png" alt="" /> %s <span style="color: #aaaaaa; padding-left: 3px;">(' . $GLOBALS['TL_LANG']['tl_synccto_clients']['id'][0] . ': %s, ' . $GLOBALS['TL_LANG']['tl_synccto_clients']['address'][0] . ': <span>%s:%s/%s</span>)</span>',
         ),
         'global_operations' => array(
             'all' => array(
@@ -105,20 +105,20 @@ $GLOBALS['TL_DCA']['tl_synccto_clients'] = array(
     // Fields
     'fields' => array(
         'title' => array(
-            'label' => &$GLOBALS['TL_LANG']['tl_synccto_clients']['title'],
+            'label' => &$GLOBALS['TL_LANG']['tl_syncCto_clients']['title'],
             'inputType' => 'text',
             'search' => true,
             'exclude' => true,
             'eval' => array('mandatory' => true, 'maxlength' => 64)
         ),
         'description' => array(
-            'label' => &$GLOBALS['TL_LANG']['tl_synccto_clients']['description'],
+            'label' => &$GLOBALS['TL_LANG']['tl_syncCto_clients']['description'],
             'exclude' => true,
             'inputType' => 'textarea',
             'eval' => array('style' => 'height:80px')
         ),
         'address' => array(
-            'label' => &$GLOBALS['TL_LANG']['tl_synccto_clients']['address'],
+            'label' => &$GLOBALS['TL_LANG']['tl_syncCto_clients']['address'],
             'inputType' => 'text',
             'default' => 'http://',
             'search' => true,
@@ -126,7 +126,7 @@ $GLOBALS['TL_DCA']['tl_synccto_clients'] = array(
             'eval' => array('trailingSlash' => false, 'mandatory' => true)
         ),
         'port' => array(
-            'label' => &$GLOBALS['TL_LANG']['tl_synccto_clients']['port'],
+            'label' => &$GLOBALS['TL_LANG']['tl_syncCto_clients']['port'],
             'inputType' => 'text',
             'search' => true,
             'default' => '80',
@@ -134,20 +134,20 @@ $GLOBALS['TL_DCA']['tl_synccto_clients'] = array(
             'eval' => array('mandatory' => true)
         ),
         'path' => array(
-            'label' => &$GLOBALS['TL_LANG']['tl_synccto_clients']['path'],
+            'label' => &$GLOBALS['TL_LANG']['tl_syncCto_clients']['path'],
             'inputType' => 'text',
             'exclude' => true,
             'eval' => array('mandatory' => true)
         ),
         'codifyengine' => array(
-            'label' => &$GLOBALS['TL_LANG']['tl_synccto_clients']['codifyengine'],
+            'label' => &$GLOBALS['TL_LANG']['tl_syncCto_clients']['codifyengine'],
             'inputType' => 'select',
             'exclude' => true,
             'options_callback' => array("tl_synccto_clients", "callCodifyengines"),
             'eval' => array('mandatory' => true),
         ),
         'apikey' => array(
-            'label' => &$GLOBALS['TL_LANG']['tl_synccto_clients']['apikey'],
+            'label' => &$GLOBALS['TL_LANG']['tl_syncCto_clients']['apikey'],
             'inputType' => 'text',
             'exclude' => true,
             'eval' => array('mandatory' => true, 'maxlength' => 64)
@@ -160,12 +160,12 @@ $GLOBALS['TL_DCA']['tl_synccto_clients'] = array(
  */
 if (!function_exists("mdecrypt_generic"))
 {
-    unset($GLOBALS['TL_DCA']['tl_synccto_clients']['fields']['password']['eval']['encrypt']);
-    $GLOBALS['TL_DCA']['tl_synccto_clients']['fields']['password']['load_callback'] = array(array("SyncCtoCallback", "loadcallUserPassword"));
-    $GLOBALS['TL_DCA']['tl_synccto_clients']['fields']['password']['save_callback'] = array(array("SyncCtoCallback", "savecallUserPassword"));
+    unset($GLOBALS['TL_DCA']['tl_syncCto_clients']['fields']['password']['eval']['encrypt']);
+    $GLOBALS['TL_DCA']['tl_syncCto_clients']['fields']['password']['load_callback'] = array(array("SyncCtoCallback", "loadcallUserPassword"));
+    $GLOBALS['TL_DCA']['tl_syncCto_clients']['fields']['password']['save_callback'] = array(array("SyncCtoCallback", "savecallUserPassword"));
 }
 
-class tl_synccto_clients extends Backend
+class tl_syncCto_clients extends Backend
 {
 
     // Constructor and singelten pattern
@@ -175,20 +175,6 @@ class tl_synccto_clients extends Backend
         $this->BackendUser = BackendUser::getInstance();
 
         parent::__construct();
-    }
-
-    /**
-     * Ping client status
-     */
-    public function pingClientStatus($strAction)
-    {
-        if ($strAction == 'syncCtoPing')
-        {
-            $objRequest = new Request();
-            $objRequest->send($this->Input->post('hostIP'));
-            echo ($objRequest->code == '200') ? "true" : "false";
-            exit();
-        }
     }
 
     /**

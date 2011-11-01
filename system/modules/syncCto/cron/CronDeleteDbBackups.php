@@ -1,4 +1,7 @@
-<?php if (!defined('TL_ROOT')) die('You can not access this file directly!');
+<?php
+
+if (!defined('TL_ROOT'))
+    die('You can not access this file directly!');
 /**
  * Contao Open Source CMS
  * Copyright (C) 2005-2010 Leo Feyer
@@ -25,7 +28,6 @@
  * @license    GNU/LGPL
  * @filesource
  */
-
 /**
  * Initialize the system
  */
@@ -37,32 +39,34 @@ require_once('../../initialize.php');
  */
 class CronDeleteDbBackups extends Backend
 {
+    /**
+     * Initialize the controller
+     */
+    public function __construct()
+    {
+        parent::__construct();
+    }
 
-	/**
-	 * Initialize the controller
-	 */
-	public function __construct()
-	{
-		parent::__construct();
-	}
-	
-	/**
-	 * Implement the commands to run by this batch program
-	 */
-	public function run()
-	{
-            $this->import('Files');
-            $files = scan(TL_ROOT.'/tl_files/syncCto_backups/database');
-            foreach ($files as $file)
+    /**
+     * Implement the commands to run by this batch program
+     */
+    public function run()
+    {
+
+        $this->import('Files');
+
+        $files = scan(TL_ROOT . $GLOBALS['TL_CONFIG']['uploadPath'] . '/syncCto_backups/database');
+        foreach ($files as $file)
+        {
+            $f = new File($GLOBALS['TL_CONFIG']['uploadPath'] . '/syncCto_backups/database/' . $file);
+
+            if (strtolower($f->__get('extension')) == "zip")
             {
-                $f = new File('tl_files/syncCto_backups/database/'.$file);
-                if (strtolower($f->__get('extension')) == "zip"){
-                    $f->delete();
-                }
+                $f->delete();
             }
+        }
+    }
 
-	}
-	
 }
 
 /**
@@ -70,5 +74,4 @@ class CronDeleteDbBackups extends Backend
  */
 $objDeleteDatabaseBackups = new SyncCtoDeleteDbBackups();
 $objDeleteDatabaseBackups->run();
-
 ?>

@@ -1,7 +1,4 @@
-<?php
-
-if (!defined('TL_ROOT'))
-    die('You cannot access this file directly!');
+<?php if (!defined('TL_ROOT')) die('You cannot access this file directly!');
 
 /**
  * Contao Open Source CMS
@@ -29,6 +26,10 @@ if (!defined('TL_ROOT'))
  * @license    GNU/LGPL
  * @filesource
  */
+
+/**
+ * Class for file operations
+ */
 class SyncCtoFiles extends Backend
 {
     /* -------------------------------------------------------------------------
@@ -53,6 +54,8 @@ class SyncCtoFiles extends Backend
 
         // My Class
         $this->objSyncCtoHelper = SyncCtoHelper::getInstance();
+        
+        set_time_limit(0);
     }
 
     /**
@@ -154,11 +157,11 @@ class SyncCtoFiles extends Backend
     }
 
     /**
-     * Create a checksum list from contao tl_files.
+     * Create a checksum list from contao files.
      * 
      * @return array 
      */
-    public function runChecksumTlFiles($arrFileList = null)
+    public function runChecksumFiles($arrFileList = null)
     {
         // Check if filelit is set or not.
         if ($arrFileList != null && is_array($arrFileList))
@@ -184,7 +187,7 @@ class SyncCtoFiles extends Backend
         }
         else
         {
-            $arrFileList = $this->recursiveFileList(array(), "tl_files", true);
+            $arrFileList = $this->recursiveFileList(array(), $GLOBALS['TL_CONFIG']['uploadPath'], true);
             $arrChecksum = array();
         }
 
@@ -363,7 +366,7 @@ class SyncCtoFiles extends Backend
 
         if ($arrFileList == null)
         {
-            $arrFileList = $this->recursiveFileList(array(), "tl_files", true);
+            $arrFileList = $this->recursiveFileList(array(), $GLOBALS['TL_CONFIG']['uploadPath'], true);
         }
 
         foreach ($arrFileList as $key => $value)
@@ -464,7 +467,7 @@ class SyncCtoFiles extends Backend
 
         if ($blnTlFiles)
         {
-            $arrFolderWhiteList[] = "tl_files";
+            $arrFolderWhiteList[] = $GLOBALS['TL_CONFIG']['uploadPath'];
         }
 
         // Build path with and without TL_ROOT

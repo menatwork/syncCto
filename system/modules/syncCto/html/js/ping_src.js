@@ -2,7 +2,7 @@
 
 window.addEvent("domready",function(){
     $$('img.ping').each(function(item){
-        var url=item.getSiblings('span').getElement('span').getProperty('html')+'GPL.txt';
+        var url=item.getSiblings('span').getElement('span').getProperty('html').toString();
         try {
             var req=new Request.HTML({
                 method:'post',

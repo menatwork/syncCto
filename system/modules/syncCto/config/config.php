@@ -1,7 +1,4 @@
-<?php
-
-if (!defined('TL_ROOT'))
-    die('You can not access this file directly!');
+<?php if (!defined('TL_ROOT')) die('You can not access this file directly!');
 
 /**
  * Contao Open Source CMS
@@ -92,7 +89,7 @@ $GLOBALS['SYC_SYNC'] = array_merge_recursive(array(
 /**
  * Hooks
  */
-$GLOBALS['TL_HOOKS']['executePreActions'][] = array('tl_synccto_clients', 'pingClientStatus');
+$GLOBALS['TL_HOOKS']['executePreActions'][] = array('SyncCtoCallback', 'pingClientStatus');
 $GLOBALS['TL_HOOKS']['parseBackendTemplate'][] = array('SyncCtoCallback', 'checkExtensions');
 
 /**
@@ -189,12 +186,14 @@ $GLOBALS['SYC_CONFIG']['format'] = "Ymd_H-i-s";
  */
 if (($objInput->get("do") == 'syncCto_check') || ($objInput->get("table") == 'tl_syncCto_clients_syncTo') || ($objInput->get("table") == 'tl_syncCto_clients_syncFrom'))
 {
-    $GLOBALS['TL_CSS'][] = 'system/modules/syncCto/html/css/syncCto.css';
+    $GLOBALS['TL_CSS'][] = 'system/modules/syncCto/html/css/filelist_src.css';
+    $GLOBALS['TL_JAVASCRIPT'][] = 'system/modules/syncCto/html/js/htmltable.js';
+    $GLOBALS['TL_JAVASCRIPT'][] = 'system/modules/syncCto/html/js/filelist_src.js';
 }
 
 if ((($objInput->get("do") == 'synccto_clients') && $objInput->get("act") == '') && $objInput->get("table") == '')
 {
-    $GLOBALS['TL_JAVASCRIPT'][] = 'system/modules/syncCto/html/js/syncCto.js';
+    $GLOBALS['TL_JAVASCRIPT'][] = 'system/modules/syncCto/html/js/ping_src.js';
 }
 
 /**
@@ -241,9 +240,9 @@ $GLOBALS["CTOCOM_FUNCTIONS"]["SYNCCTO_CHECKSUM_CORE"] = array(
 );
 
 // Get Filelist of tlfile
-$GLOBALS["CTOCOM_FUNCTIONS"]["SYNCCTO_CHECKSUM_TLFILES"] = array(
+$GLOBALS["CTOCOM_FUNCTIONS"]["SYNCCTO_CHECKSUM_FILES"] = array(
     "class" => "SyncCtoFiles",
-    "function" => "runChecksumTlFiles",
+    "function" => "runChecksumFiles",
     "typ" => "POST",
     "parameter" => array("fileList"),
 );

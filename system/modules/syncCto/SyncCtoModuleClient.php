@@ -72,6 +72,9 @@ class SyncCtoModuleClient extends BackendModule
         $this->objSyncCtoCallback = SyncCtoCallback::getInstance();
         $this->objSyncCtoCommunicationClient = SyncCtoCommunicationClient::getInstance();
         $this->objSyncCtoHelper = SyncCtoHelper::getInstance();
+        
+        // Load Language 
+        $this->loadLanguageFile("tl_syncCto_step");
     }
 
     /**
@@ -110,6 +113,7 @@ class SyncCtoModuleClient extends BackendModule
      */
     private function pageSyncTo()
     {
+
         // Build Step
         if ($this->Input->get("step") == "" || $this->Input->get("step") == null)
         {
@@ -403,7 +407,7 @@ class SyncCtoModuleClient extends BackendModule
                 switch ($mixStepPool["step"])
                 {
                     /**
-                     * Build checksum list for 'tl_files'
+                     * Build checksum list for 'files'
                      */
                     case 1:
                         if ($mixFilelist != false && is_array($mixFilelist) && ( $intSyncTyp == SYNCCTO_SMALL || $intSyncTyp == SYNCCTO_FULL ))
@@ -415,7 +419,7 @@ class SyncCtoModuleClient extends BackendModule
                             }
 
                             // Write filelist to file
-                            $this->arrListFile = $this->objSyncCtoFiles->runChecksumTlFiles($mixFilelist);
+                            $this->arrListFile = $this->objSyncCtoFiles->runChecksumFiles($mixFilelist);
                             $mixStepPool["step"] = 2;
                         }
                         else
@@ -669,7 +673,7 @@ class SyncCtoModuleClient extends BackendModule
         $arrContenData["data"][3]["state"] = $GLOBALS['TL_LANG']['tl_syncCto_steps']['progress'];
 
         // Check if there is any file for upload
-        if (count($this->arrListCompare) == 0)
+        if (count($this->arrListCompare) == 0 || !is_array($this->arrListCompare))
         {
             $arrContenData["data"][3]["state"] = $GLOBALS['TL_LANG']['tl_syncCto_steps']['skipped'];
 
@@ -815,12 +819,12 @@ class SyncCtoModuleClient extends BackendModule
                             if ($intCountSplit == 0)
                             {
                                 $arrContenData["data"][3]["state"] = $GLOBALS['TL_LANG']['tl_syncCto_steps']['skipped'];
-                                $arrContenData["data"][3]["html"] = "";                                
+                                $arrContenData["data"][3]["html"] = "";
 
                                 $arrContenData["data"][4]["state"] = $GLOBALS['TL_LANG']['tl_syncCto_steps']['progress'];
                                 $arrContenData["data"][4]["title"] = $GLOBALS['TL_LANG']['tl_syncCto_steps']['step'] . " 4";
                                 $arrContenData["data"][4]["description"] = $GLOBALS['TL_LANG']['tl_syncCto_sync']["step_4"]['description_1'];
-                                
+
                                 $arrContenData["refresh"] = true;
 
                                 $this->intStep++;
@@ -1034,10 +1038,6 @@ class SyncCtoModuleClient extends BackendModule
                         {
                             $arrContenData["data"][3]["state"] = $GLOBALS['TL_LANG']['tl_syncCto_steps']['ok'];
 
-                            $arrContenData["data"][4]["state"] = $GLOBALS['TL_LANG']['tl_syncCto_steps']['progress'];
-                            $arrContenData["data"][4]["title"] = $GLOBALS['TL_LANG']['tl_syncCto_steps']['step'] . " 4";
-                            $arrContenData["data"][4]["description"] = $GLOBALS['TL_LANG']['tl_syncCto_sync']["step_4"]['description_1'];
-
                             $this->intStep++;
                             $mixStepPool == FALSE;
                         }
@@ -1088,6 +1088,12 @@ class SyncCtoModuleClient extends BackendModule
         // Load content
         $arrContenData = $this->Session->get("syncCto_Content");
 
+        // Start by Step 1
+        if ($arrContenData["error"] == true)
+        {
+            $mixStepPool["step"] = 1;
+        }
+
         // Set content back to normale mode
         $arrContenData["error"] = false;
         $arrContenData["error_msg"] = "";
@@ -1120,19 +1126,28 @@ class SyncCtoModuleClient extends BackendModule
 
                 switch ($mixStepPool["step"])
                 {
+
+                    /**
+                     * Init
+                     */
+                    case 1:
+                        $arrContenData["data"][4]["description"] = $GLOBALS['TL_LANG']['tl_syncCto_sync']["step_4"]['description_1'];
+                        $mixStepPool["step"] = 2;
+                        break;
+
                     /**
                      * Build SQL Zip File
                      */
-                    case 1:
+                    case 2:
                         $mixStepPool["zipname"] = $this->objSyncCtoDatabase->runDump($arrTables, true);
                         $arrContenData["data"][4]["description"] = $GLOBALS['TL_LANG']['tl_syncCto_sync']["step_4"]['description_2'];
-                        $mixStepPool["step"] = 2;
+                        $mixStepPool["step"] = 3;
                         break;
 
                     /**
                      * Send file to client
                      */
-                    case 2:
+                    case 3:
                         $arrResponse = $this->objSyncCtoCommunicationClient->sendFile($GLOBALS['SYC_PATH']['tmp'], $mixStepPool["zipname"], "", SyncCtoEnum::UPLOAD_SQL_TEMP);
 
                         // Check if the file was send and saved.
@@ -1145,13 +1160,13 @@ class SyncCtoModuleClient extends BackendModule
                         }
 
                         $arrContenData["data"][4]["description"] = $GLOBALS['TL_LANG']['tl_syncCto_sync']["step_4"]['description_3'];
-                        $mixStepPool["step"] = 3;
+                        $mixStepPool["step"] = 4;
                         break;
 
                     /**
                      * Import on client side
                      */
-                    case 3:
+                    case 4:
                         $this->objSyncCtoCommunicationClient->startSQLImport($this->objSyncCtoHelper->buildPathWoTL($GLOBALS['SYC_PATH']['tmp'], "sql", $mixStepPool["zipname"]));
 
                         $arrContenData["data"][4]["state"] = $GLOBALS['TL_LANG']['tl_syncCto_steps']['ok'];
@@ -1217,7 +1232,7 @@ class SyncCtoModuleClient extends BackendModule
         $arrTables = $this->Session->get("syncCto_SyncTables");
 
         // Count files
-        if (count($this->arrListCompare) != 0 && $this->arrListCompare != false)
+        if (count($this->arrListCompare) != 0 && $this->arrListCompare != false && is_array($this->arrListCompare))
         {
             $intSkippCount = 0;
             $intSendCount = 0;
@@ -1247,9 +1262,9 @@ class SyncCtoModuleClient extends BackendModule
          */
 
         // Check if there is any file for upload
-        if (count($this->arrListCompare) == 0)
+        if (count($this->arrListCompare) == 0 || !is_array($this->arrListCompare) && $mixStepPool["step"] == 1)
         {
-            $mixStepPool["step"] = 4;
+            $mixStepPool["step"] = 5;
         }
 
         try
@@ -1323,13 +1338,13 @@ class SyncCtoModuleClient extends BackendModule
 
                         $intCountTransfer++;
 
-                        if ($intCountTransfer == 100 || $intStart < (time() - 30))
+                        if ($intCountTransfer == 201 || $intStart < (time() - 30))
                         {
                             break;
                         }
                     }
 
-                    if ($intStart < (time() - 30))
+                    if ($intWaitCount != 0)
                     {
                         $mixStepPool["step"] = 2;
                         $arrContenData["data"][5]["description"] = vsprintf($GLOBALS['TL_LANG']['tl_syncCto_sync']["step_5"]['description_2'], array($intSendCount, count($this->arrListCompare)));
@@ -1346,7 +1361,7 @@ class SyncCtoModuleClient extends BackendModule
                  * Import Files
                  */
                 case 3:
-                    if (count($this->arrListCompare) != 0)
+                    if (count($this->arrListCompare) != 0 && is_array($this->arrListCompare))
                     {
                         $arrImport = array();
 
@@ -1432,22 +1447,24 @@ class SyncCtoModuleClient extends BackendModule
                  * Show information
                  */
                 case 7:
-                    if ($intSyncTyp == SYNCCTO_SMALL && ( count($this->arrListCompare) == 0 || $this->arrListCompare == FALSE ))
+                    if ($intSyncTyp == SYNCCTO_SMALL && ( (count($this->arrListCompare) == 0 || $this->arrListCompare == FALSE) && !is_array($this->arrListCompare)))
                     {
                         $mixStepPool["step"] = 7;
 
                         $arrContenData["data"][5]["html"] = "";
                         $arrContenData["data"][5]["state"] = $GLOBALS['TL_LANG']['tl_syncCto_steps']['skipped'];
+                        $arrContenData["data"][5]["description"] = "";
                         $arrContenData["finished"] = true;
 
                         break;
                     }
-                    else if (count($this->arrListCompare) == 0 || $this->arrListCompare == FALSE)
+                    else if (count($this->arrListCompare) == 0 || $this->arrListCompare == FALSE || !is_array($this->arrListCompare))
                     {
                         $mixStepPool["step"] = 7;
 
                         $arrContenData["data"][5]["html"] = "";
                         $arrContenData["data"][5]["state"] = $GLOBALS['TL_LANG']['tl_syncCto_steps']['ok'];
+                        $arrContenData["data"][5]["description"] = "";
                         $arrContenData["finished"] = true;
 
                         break;
