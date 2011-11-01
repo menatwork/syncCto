@@ -1,0 +1,9 @@
+- Optimierung der ENUM Klasse (Bakup/Backup, Header)
+- Statistikfunktion
+- HTML5 Templates
+- Request Token Unterstützung
+- Callback Klasse killen
+- MD5 Problem bei großen Files
+- Dateigrößenanzeige bei großen Files (N.A.)
+- loadLocalconfigEntries vereinfachen
+- syncFrom
