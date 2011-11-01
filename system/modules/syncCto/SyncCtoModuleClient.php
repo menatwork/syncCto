@@ -1,7 +1,4 @@
-<?php
-
-if (!defined('TL_ROOT'))
-    die('You cannot access this file directly!');
+<?php if (!defined('TL_ROOT')) die('You cannot access this file directly!');
 
 /**
  * Contao Open Source CMS
@@ -72,7 +69,7 @@ class SyncCtoModuleClient extends BackendModule
         $this->objSyncCtoCallback = SyncCtoCallback::getInstance();
         $this->objSyncCtoCommunicationClient = SyncCtoCommunicationClient::getInstance();
         $this->objSyncCtoHelper = SyncCtoHelper::getInstance();
-        
+
         // Load Language 
         $this->loadLanguageFile("tl_syncCto_step");
     }
@@ -1237,6 +1234,7 @@ class SyncCtoModuleClient extends BackendModule
             $intSkippCount = 0;
             $intSendCount = 0;
             $intWaitCount = 0;
+            $intDelCount = 0;
 
             foreach ($this->arrListCompare as $value)
             {
@@ -1253,6 +1251,11 @@ class SyncCtoModuleClient extends BackendModule
                     case SyncCtoEnum::FILETRANS_WAITING:
                         $intWaitCount++;
                         break;
+                }
+                
+                if($value["state"] == SyncCtoEnum::FILESTATE_DELETE)
+                {
+                    $intDelCount++;
                 }
             }
         }
@@ -1326,7 +1329,7 @@ class SyncCtoModuleClient extends BackendModule
                         }
 
                         try
-                        {
+                        {                            
                             $this->objSyncCtoCommunicationClient->sendFile(dirname($this->objSyncCtoHelper->buildPath($value["path"])), basename($value["path"]), $value["checksum"], SyncCtoEnum::UPLOAD_SYNC_TEMP);
                             $this->arrListCompare[$key]["transmission"] = SyncCtoEnum::FILETRANS_SEND;
                         }
@@ -1343,8 +1346,8 @@ class SyncCtoModuleClient extends BackendModule
                             break;
                         }
                     }
-
-                    if ($intWaitCount != 0)
+                    
+                    if ($intWaitCount - $intDelCount > 0)
                     {
                         $mixStepPool["step"] = 2;
                         $arrContenData["data"][5]["description"] = vsprintf($GLOBALS['TL_LANG']['tl_syncCto_sync']["step_5"]['description_2'], array($intSendCount, count($this->arrListCompare)));

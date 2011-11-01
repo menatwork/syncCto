@@ -231,62 +231,18 @@ class SyncCtoHelper extends Backend
         
         return preg_replace("/^\//i", "", $strVar);
     }
-
-    /* -------------------------------------------------------------------------
-     * Ext. Session
-     */
-
+    
     /**
-     * Extended the session with typ casting for array, boolean and mix types.
-     * 
-     * @param string $strName
-     * @param mixed $mixVar 
+     * Ping client status
      */
-    public function setSession($strName, $mixVar)
-    {
-        if (is_array($mixVar))
+    public function pingClientStatus($strAction)
+    {        
+        if ($strAction == 'syncCtoPing')
         {
-            $this->Session->set($strName, serialize($mixVar));
-        }
-        elseif ($mixVar === 0)
-        {
-            return (int) 0;
-        }
-        else
-        {
-            $this->Session->set($strName, $mixVar);
-        }
-    }
-
-    /**
-     * Extended the session with typ casting for array, boolean and mix types.
-     * 
-     * @param string $strName
-     * @return mixed 
-     */
-    public function getSession($strName)
-    {
-        $mixVar = $this->Session->get($strName);
-
-        if ($mixVar === FALSE || $mixVar == "b:0;")
-        {
-            return FALSE;
-        }
-        else if ($mixVar === TRUE || $mixVar == "b:1;")
-        {
-            return TRUE;
-        }
-        elseif (is_array(deserialize($mixVar)))
-        {
-            return deserialize($mixVar);
-        }
-        elseif ($mixVar === 0)
-        {
-            return (int) 0;
-        }
-        else
-        {
-            return $mixVar;
+            $objRequest = new Request();
+            $objRequest->send($this->Input->post('hostIP'));
+            echo ($objRequest->code == '200') ? "true" : "false";
+            exit();
         }
     }
 

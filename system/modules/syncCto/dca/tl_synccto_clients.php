@@ -47,11 +47,11 @@ $GLOBALS['TL_DCA']['tl_synccto_clients'] = array(
         ),
         'label' => array(
             'fields' => array('title', 'id', 'address', 'port', 'path'),
-            'format' => '<img class="ping" src="system/modules/syncCto/html/js/images/empty.png" alt="" /> %s <span style="color: #aaaaaa; padding-left: 3px;">(' . $GLOBALS['TL_LANG']['tl_synccto_clients']['id'][0] . ': %s, ' . $GLOBALS['TL_LANG']['tl_synccto_clients']['address'][0] . ': <span>%s:%s/%s</span>)</span>',
+            'format' => '<img class="ping" src="system/modules/syncCto/html/js/images/empty.png" alt="" /> %s <span style="color: #aaaaaa; padding-left: 3px;">(' . $GLOBALS['TL_LANG']['tl_syncCto_clients']['id'][0] . ': %s, ' . $GLOBALS['TL_LANG']['tl_syncCto_clients']['address'][0] . ': <span>%s:%s/%s</span>)</span>',
         ),
         'global_operations' => array(
             'all' => array(
-                'label' => &$GLOBALS['TL_LANG']['tl_synccto_clients']['all'],
+                'label' => &$GLOBALS['TL_LANG']['tl_syncCto_clients']['all'],
                 'href' => 'act=select',
                 'class' => 'header_edit_all',
                 'attributes' => 'onclick="Backend.getScrollOffset();"'
@@ -59,39 +59,39 @@ $GLOBALS['TL_DCA']['tl_synccto_clients'] = array(
         ),
         'operations' => array(
             'edit' => array(
-                'label' => &$GLOBALS['TL_LANG']['tl_synccto_clients']['edit'],
+                'label' => &$GLOBALS['TL_LANG']['tl_syncCto_clients']['edit'],
                 'href' => 'act=edit',
                 'icon' => 'edit.gif',
                 'button_callback' => array('tl_synccto_clients', 'checkPermission_client_edit'),
             ),
             'copy' => array(
-                'label' => &$GLOBALS['TL_LANG']['tl_synccto_clients']['copy'],
+                'label' => &$GLOBALS['TL_LANG']['tl_syncCto_clients']['copy'],
                 'href' => 'act=copy',
                 'icon' => 'copy.gif',
                 'button_callback' => array('tl_synccto_clients', 'checkPermission_client_copy'),
             ),
             'delete' => array(
-                'label' => &$GLOBALS['TL_LANG']['tl_synccto_clients']['delete'],
+                'label' => &$GLOBALS['TL_LANG']['tl_syncCto_clients']['delete'],
                 'href' => 'act=delete',
                 'icon' => 'delete.gif',
                 'attributes' => 'onclick="if (!confirm(\'' . $GLOBALS['TL_LANG']['MSC']['deleteConfirm'] . '\')) return false; Backend.getScrollOffset();"',
                 'button_callback' => array('tl_synccto_clients', 'checkPermission_client_delete'),
             ),
             'show' => array(
-                'label' => &$GLOBALS['TL_LANG']['tl_synccto_clients']['show'],
+                'label' => &$GLOBALS['TL_LANG']['tl_syncCto_clients']['show'],
                 'href' => 'act=show',
                 'icon' => 'show.gif',
                 'button_callback' => array('tl_synccto_clients', 'checkPermission_client_show'),
             ),
             'syncFrom' => array(
-                'label' => &$GLOBALS['TL_LANG']['tl_synccto_clients']['syncFrom'],
+                'label' => &$GLOBALS['TL_LANG']['tl_syncCto_clients']['syncFrom'],
                 'href' => 'table=tl_syncCto_clients_syncFrom',
                 'icon' => 'system/modules/syncCto/html/iconSyncFrom.png',
-                'attributes' => 'onclick="if (!confirm(\'' . $GLOBALS['TL_LANG']['tl_synccto_clients']['syncFromConfirm'] . '\')) return false; Backend.getScrollOffset();"',
+                'attributes' => 'onclick="if (!confirm(\'' . $GLOBALS['TL_LANG']['tl_syncCto_clients']['syncFromConfirm'] . '\')) return false; Backend.getScrollOffset();"',
                 'button_callback' => array('tl_synccto_clients', 'checkPermission_client_syncFrom'),
             ),
             'syncTo' => array(
-                'label' => &$GLOBALS['TL_LANG']['tl_synccto_clients']['syncTo'],
+                'label' => &$GLOBALS['TL_LANG']['tl_syncCto_clients']['syncTo'],
                 'href' => '&table=tl_syncCto_clients_syncTo&act=edit',
                 'icon' => 'system/modules/syncCto/html/iconSyncTo.png',
                 'button_callback' => array('tl_synccto_clients', 'checkPermission_client_syncTo'),
@@ -284,22 +284,6 @@ class tl_synccto_clients extends Backend
 
         return $arrReturn;
     }
-	
-
-    /**
-     * Ping client status
-     */
-    public function pingClientStatus($strAction)
-    {        
-        if ($strAction == 'syncCtoPing')
-        {
-            $objRequest = new Request();
-            $objRequest->send($this->Input->post('hostIP'));
-            echo ($objRequest->code == '200') ? "true" : "false";
-            exit();
-        }
-    }
-
 }
 
 ?>

@@ -30,33 +30,33 @@
 /**
  * List operation
  */
-$GLOBALS['TL_LANG']['tl_synccto_clients']['new'] = array('Neuer Client');
-$GLOBALS['TL_LANG']['tl_synccto_clients']['all'] = array('Mehrere bearbeiten');
-$GLOBALS['TL_LANG']['tl_synccto_clients']['edit'] = array('Client bearbeiten', 'Client ID %s bearbeiten');
-$GLOBALS['TL_LANG']['tl_synccto_clients']['copy'] = array('Client duplizieren', 'Client ID %s duplizieren');
-$GLOBALS['TL_LANG']['tl_synccto_clients']['delete'] = array('Client löschen', 'Client ID %s löschen');
-$GLOBALS['TL_LANG']['tl_synccto_clients']['show'] = array('Clientdetails', 'Details des Clients ID %s anzeigen');
-$GLOBALS['TL_LANG']['tl_synccto_clients']['syncTo'] = array('Client synchronisieren', 'Client ID %s synchronisieren');
-$GLOBALS['TL_LANG']['tl_synccto_clients']['syncFrom'] = array('Server synchronisieren', 'Server synchronisieren');
-$GLOBALS['TL_LANG']['tl_synccto_clients']['syncFromConfirm'] = 'Soll der Server wirklich synchronisiert werden?';
+$GLOBALS['TL_LANG']['tl_syncCto_clients']['new'] = array('Neuer Client');
+$GLOBALS['TL_LANG']['tl_syncCto_clients']['all'] = array('Mehrere bearbeiten');
+$GLOBALS['TL_LANG']['tl_syncCto_clients']['edit'] = array('Client bearbeiten', 'Client ID %s bearbeiten');
+$GLOBALS['TL_LANG']['tl_syncCto_clients']['copy'] = array('Client duplizieren', 'Client ID %s duplizieren');
+$GLOBALS['TL_LANG']['tl_syncCto_clients']['delete'] = array('Client löschen', 'Client ID %s löschen');
+$GLOBALS['TL_LANG']['tl_syncCto_clients']['show'] = array('Clientdetails', 'Details des Clients ID %s anzeigen');
+$GLOBALS['TL_LANG']['tl_syncCto_clients']['syncTo'] = array('Client synchronisieren', 'Client ID %s synchronisieren');
+$GLOBALS['TL_LANG']['tl_syncCto_clients']['syncFrom'] = array('Server synchronisieren', 'Server synchronisieren');
+$GLOBALS['TL_LANG']['tl_syncCto_clients']['syncFromConfirm'] = 'Soll der Server wirklich synchronisiert werden?';
 
 /**
  * Legends
  */
-$GLOBALS['TL_LANG']['tl_synccto_clients']['title_legend'] = 'Client-Beschreibung';
-$GLOBALS['TL_LANG']['tl_synccto_clients']['connection_label'] = 'Verbindungs-Einstellungen';
-$GLOBALS['TL_LANG']['tl_synccto_clients']['user_label'] = 'Benutzerdaten';
+$GLOBALS['TL_LANG']['tl_syncCto_clients']['title_legend'] = 'Client-Beschreibung';
+$GLOBALS['TL_LANG']['tl_syncCto_clients']['connection_label'] = 'Verbindungs-Einstellungen';
+$GLOBALS['TL_LANG']['tl_syncCto_clients']['user_label'] = 'Benutzerdaten';
 
 /**
  * Fields
  */
-$GLOBALS['TL_LANG']['tl_synccto_clients']['title'] = array('Titel', 'Hier können Sie den Titel des Clients eingeben.');
-$GLOBALS['TL_LANG']['tl_synccto_clients']['id'] = array('ID', 'ID des Clients.');
-$GLOBALS['TL_LANG']['tl_synccto_clients']['description'] = array('Beschreibung', 'Hier können Sie eine Kurzbeschreibung des Clients eingeben.');
-$GLOBALS['TL_LANG']['tl_synccto_clients']['address'] = array('Domain', 'Bitte geben Sie die Domain ein.');
-$GLOBALS['TL_LANG']['tl_synccto_clients']['path'] = array('Serverpfad', 'Bitte geben Sie den Pfad zur Installation ein, falls sich diese in einem Unterordner befindet.');
-$GLOBALS['TL_LANG']['tl_synccto_clients']['port'] = array('Portnummer', 'Bitte geben Sie die Nummer des HTTP-Ports ein. Standard ist 80.');
-$GLOBALS['TL_LANG']['tl_synccto_clients']['apikey'] = array("Verschlüsselungsschlüssel", "Der Schlüssel wird zur verschlüsselten Datenspeicherung verwendet.");
-$GLOBALS['TL_LANG']['tl_synccto_clients']['codifyengine'] = array("Verschlüsselungs-Engine", "Wählen Sie bitte die Verschlüsselungs-Engine aus.");
+$GLOBALS['TL_LANG']['tl_syncCto_clients']['title'] = array('Titel', 'Hier können Sie den Titel des Clients eingeben.');
+$GLOBALS['TL_LANG']['tl_syncCto_clients']['id'] = array('ID', 'ID des Clients.');
+$GLOBALS['TL_LANG']['tl_syncCto_clients']['description'] = array('Beschreibung', 'Hier können Sie eine Kurzbeschreibung des Clients eingeben.');
+$GLOBALS['TL_LANG']['tl_syncCto_clients']['address'] = array('Domain', 'Bitte geben Sie die Domain ein.');
+$GLOBALS['TL_LANG']['tl_syncCto_clients']['path'] = array('Serverpfad', 'Bitte geben Sie den Pfad zur Installation ein, falls sich diese in einem Unterordner befindet.');
+$GLOBALS['TL_LANG']['tl_syncCto_clients']['port'] = array('Portnummer', 'Bitte geben Sie die Nummer des HTTP-Ports ein. Standard ist 80.');
+$GLOBALS['TL_LANG']['tl_syncCto_clients']['apikey'] = array("Verschlüsselungsschlüssel", "Der Schlüssel wird zur verschlüsselten Datenspeicherung verwendet.");
+$GLOBALS['TL_LANG']['tl_syncCto_clients']['codifyengine'] = array("Verschlüsselungs-Engine", "Wählen Sie bitte die Verschlüsselungs-Engine aus.");
 
 ?>

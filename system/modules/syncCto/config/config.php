@@ -89,7 +89,7 @@ $GLOBALS['SYC_SYNC'] = array_merge_recursive(array(
 /**
  * Hooks
  */
-$GLOBALS['TL_HOOKS']['executePreActions'][] = array('tl_synccto_clients', 'pingClientStatus');
+$GLOBALS['TL_HOOKS']['executePreActions'][] = array('SyncCtoHelper', 'pingClientStatus');
 $GLOBALS['TL_HOOKS']['parseBackendTemplate'][] = array('SyncCtoCallback', 'checkExtensions');
 
 /**
