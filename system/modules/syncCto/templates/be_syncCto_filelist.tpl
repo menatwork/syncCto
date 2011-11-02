@@ -1,4 +1,4 @@
-<h1 class="file"><strong><?php echo $GLOBALS['TL_LANG']['MSC']['totalsize']; ?></strong>~ <?php echo $this->getReadableSize($this->totalsize); ?></h1>
+<h1 class="file"><strong><?php echo $GLOBALS['TL_LANG']['MSC']['totalsize']; ?></strong> ~ <?php echo $this->getReadableSize($this->totalsize); ?></h1>
 
 <form id="syncCto_filelist_form" action="<?php echo $this->Environment->base; ?>contao/main.php?do=synccto_clients&amp;table=tl_syncCto_clients_sync<?php echo $this->direction; ?>&amp;act=start&amp;step=<?php echo $this->step; ?>&amp;id=<?php echo $this->id; ?>" method="post">
 
@@ -16,10 +16,10 @@
         </colgroup>
         <thead>
             <tr class="head">
-                <th class="state">Status</th>
-                <th class="filesize">Dateigröße</th>
+                <th class="state"><?php echo $GLOBALS['TL_LANG']['MSC']['state']; ?></th>
+                <th class="filesize"><?php echo $GLOBALS['TL_LANG']['MSC']['filesize']; ?></th>
                 <th class="checkbox">&nbsp;</th>
-                <th class="last">Datei</th>
+                <th class="last"><?php echo $GLOBALS['TL_LANG']['MSC']['file']; ?></th>
             </tr>
             <td colspan="2">&nbsp;</td>
                 <td class="checkbox"><input class="tl_checkbox" onclick="Backend.toggleCheckboxGroup(this, 'syncCto_filelist')" type="checkbox" /></td>

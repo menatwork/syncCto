@@ -76,7 +76,7 @@ class SyncCtoModuleBackup extends BackendModule
                             break;
 
                         default:
-                            $this->parseStartPage($GLOBALS['TL_LANG']['syncCto']['unknown_function']);
+                            $this->parseStartPage($GLOBALS['TL_LANG']['ERR']['unknown_function']);
                             break;
                     }
                     break;
@@ -90,7 +90,7 @@ class SyncCtoModuleBackup extends BackendModule
                             break;
 
                         default:
-                            $this->parseStartPage($GLOBALS['TL_LANG']['syncCto']['unknown_function']);
+                            $this->parseStartPage($GLOBALS['TL_LANG']['ERR']['unknown_function']);
                             break;
                     }
                     break;
@@ -104,7 +104,7 @@ class SyncCtoModuleBackup extends BackendModule
                             break;
 
                         default:
-                            $this->parseStartPage($GLOBALS['TL_LANG']['syncCto']['unknown_function']);
+                            $this->parseStartPage($GLOBALS['TL_LANG']['ERR']['unknown_function']);
                             break;
                     }
                     break;
@@ -118,13 +118,13 @@ class SyncCtoModuleBackup extends BackendModule
                             break;
 
                         default:
-                            $this->parseStartPage($GLOBALS['TL_LANG']['syncCto']['unknown_function']);
+                            $this->parseStartPage($GLOBALS['TL_LANG']['ERR']['unknown_function']);
                             break;
                     }
                     break;
 
                 default:
-                    $this->parseStartPage($GLOBALS['TL_LANG']['syncCto']['unknown_tables']);
+                    $this->parseStartPage($GLOBALS['TL_LANG']['ERR']['unknown_tables']);
                     break;
             }
         }
@@ -200,9 +200,9 @@ class SyncCtoModuleBackup extends BackendModule
                 );
 
                 $arrContenData["data"][1] = array(
-                    "title" => $GLOBALS['TL_LANG']['tl_syncCto_steps']['step'] . " 1",
+                    "title" => $GLOBALS['TL_LANG']['MSC']['step'] . " 1",
                     "description" => $GLOBALS['TL_LANG']['tl_syncCto_backup_db']['step1'],
-                    "state" => $GLOBALS['TL_LANG']['tl_syncCto_steps']['progress']
+                    "state" => $GLOBALS['TL_LANG']['MSC']['progress']
                 );
 
                 break;
@@ -220,17 +220,17 @@ class SyncCtoModuleBackup extends BackendModule
                 {
                     $arrContenData["error"] = true;
                     $arrContenData["error_msg"] = $exc->getMessage();
-                    $arrContenData["data"][1]["state"] = $GLOBALS['TL_LANG']['tl_syncCto_steps']['error'];
+                    $arrContenData["data"][1]["state"] = $GLOBALS['TL_LANG']['MSC']['error'];
 
                     break;
                 }
 
             // Show last page
             case 3:
-                $arrContenData["data"][1]["state"] = $GLOBALS['TL_LANG']['tl_syncCto_steps']['ok'];
+                $arrContenData["data"][1]["state"] = $GLOBALS['TL_LANG']['MSC']['ok'];
 
                 $arrContenData["finished"] = true;
-                $arrContenData["data"][2]["title"] = $GLOBALS['TL_LANG']['tl_syncCto_steps']['complete'];
+                $arrContenData["data"][2]["title"] = $GLOBALS['TL_LANG']['MSC']['complete'];
                 $arrContenData["data"][2]["description"] = $GLOBALS['TL_LANG']['tl_syncCto_backup_db']['complete'] . " " . $arrStepPool["zipname"];
                 $arrContenData["data"][2]["html"] = "<p class='tl_help'><br />";
                 $arrContenData["data"][2]["html"] .= "<a onclick='Backend.openWindow(this, 600, 235); return false;' title='In einem neuen Fenster ansehen' href='contao/popup.php?src=" . $GLOBALS['TL_CONFIG']['uploadPath'] . "/syncCto_backups/database/" . $arrStepPool["zipname"] . "'>" . $GLOBALS['TL_LANG']['tl_syncCto_backup_db']['download_backup'] . "</a>";
@@ -242,7 +242,7 @@ class SyncCtoModuleBackup extends BackendModule
             // Deafult action
             default:
                 $arrContenData["error"] = true;
-                $arrContenData["error_msg"] = $GLOBALS['TL_LANG']['tl_syncCto_steps']['unknown_step'];
+                $arrContenData["error_msg"] = $GLOBALS['TL_LANG']['MSC']['unknown_step'];
                 $arrContenData["data"] = array();
                 break;
         }
@@ -301,9 +301,9 @@ class SyncCtoModuleBackup extends BackendModule
                 );
 
                 $arrContenData["data"][1] = array(
-                    "title" => $GLOBALS['TL_LANG']['tl_syncCto_steps']['step'] . " 1",
+                    "title" => $GLOBALS['TL_LANG']['MSC']['step'] . " 1",
                     "description" => $GLOBALS['TL_LANG']['tl_syncCto_restore_db']['step1'],
-                    "state" => $GLOBALS['TL_LANG']['tl_syncCto_steps']['progress']
+                    "state" => $GLOBALS['TL_LANG']['MSC']['progress']
                 );
 
                 break;
@@ -325,10 +325,10 @@ class SyncCtoModuleBackup extends BackendModule
                 }
 
             case 3:
-                $arrContenData["data"][1]["state"] = $GLOBALS['TL_LANG']['tl_syncCto_steps']['ok'];
+                $arrContenData["data"][1]["state"] = $GLOBALS['TL_LANG']['MSC']['ok'];
 
                 $arrContenData["finished"] = true;
-                $arrContenData["data"][2]["title"] = $GLOBALS['TL_LANG']['tl_syncCto_steps']['complete'];
+                $arrContenData["data"][2]["title"] = $GLOBALS['TL_LANG']['MSC']['complete'];
                 $arrContenData["data"][2]["description"] = $GLOBALS['TL_LANG']['tl_syncCto_restore_db']['complete'];
 
                 $this->Session->set("SyncCto_DB_StepPool", "");
@@ -336,7 +336,7 @@ class SyncCtoModuleBackup extends BackendModule
 
             default:
                 $arrContenData["error"] = true;
-                $arrContenData["error_msg"] = $GLOBALS['TL_LANG']['tl_syncCto_steps']['unknown_step'];
+                $arrContenData["error_msg"] = $GLOBALS['TL_LANG']['MSC']['unknown_step'];
                 $arrContenData["data"] = array();
                 break;
         }
@@ -391,9 +391,9 @@ class SyncCtoModuleBackup extends BackendModule
                 );
 
                 $arrContenData["data"][1] = array(
-                    "title" => $GLOBALS['TL_LANG']['tl_syncCto_steps']['step'] . " 1",
+                    "title" => $GLOBALS['TL_LANG']['MSC']['step'] . " 1",
                     "description" => $GLOBALS['TL_LANG']['tl_syncCto_backup_file']['step1'],
-                    "state" => $GLOBALS['TL_LANG']['tl_syncCto_steps']['progress']
+                    "state" => $GLOBALS['TL_LANG']['MSC']['progress']
                 );
 
                 break;
@@ -413,10 +413,10 @@ class SyncCtoModuleBackup extends BackendModule
                 break;
 
             case 3:
-                $arrContenData["data"][1]["state"] = $GLOBALS['TL_LANG']['tl_syncCto_steps']['ok'];
+                $arrContenData["data"][1]["state"] = $GLOBALS['TL_LANG']['MSC']['ok'];
 
                 $arrContenData["finished"] = true;
-                $arrContenData["data"][2]["title"] = $GLOBALS['TL_LANG']['tl_syncCto_steps']['complete'];
+                $arrContenData["data"][2]["title"] = $GLOBALS['TL_LANG']['MSC']['complete'];
                 $arrContenData["data"][2]["description"] = $GLOBALS['TL_LANG']['tl_syncCto_backup_file']['complete'] . " " . $arrStepPool["zipname"];
                 $arrContenData["data"][2]["html"] = "<p class='tl_help'><br />";
                 $arrContenData["data"][2]["html"] .= "<a onclick='Backend.openWindow(this, 600, 235); return false;' title='In einem neuen Fenster ansehen' href='contao/popup.php?src=" . $GLOBALS['TL_CONFIG']['uploadPath'] . "/syncCto_backups/files/" . $arrStepPool["zipname"] . "'>" . $GLOBALS['TL_LANG']['tl_syncCto_backup_file']['download_backup'] . "</a>";
@@ -427,7 +427,7 @@ class SyncCtoModuleBackup extends BackendModule
 
             default:
                 $arrContenData["error"] = true;
-                $arrContenData["error_msg"] = $GLOBALS['TL_LANG']['tl_syncCto_steps']['unknown_step'];
+                $arrContenData["error_msg"] = $GLOBALS['TL_LANG']['MSC']['unknown_step'];
                 $arrContenData["data"] = array();
                 break;
         }
@@ -486,9 +486,9 @@ class SyncCtoModuleBackup extends BackendModule
                 );
 
                 $arrContenData["data"][1] = array(
-                    "title" => $GLOBALS['TL_LANG']['tl_syncCto_steps']['step'] . " 1",
+                    "title" => $GLOBALS['TL_LANG']['MSC']['step'] . " 1",
                     "description" => $GLOBALS['TL_LANG']['tl_syncCto_restore_file']['step1'],
-                    "state" => $GLOBALS['TL_LANG']['tl_syncCto_steps']['progress']
+                    "state" => $GLOBALS['TL_LANG']['MSC']['progress']
                 );
 
                 break;
@@ -511,10 +511,10 @@ class SyncCtoModuleBackup extends BackendModule
             case 3:
                 $objDate = new Date();
 
-                $arrContenData["data"][1]["state"] = $GLOBALS['TL_LANG']['tl_syncCto_steps']['ok'];
+                $arrContenData["data"][1]["state"] = $GLOBALS['TL_LANG']['MSC']['ok'];
 
                 $arrContenData["finished"] = true;
-                $arrContenData["data"][2]["title"] = $GLOBALS['TL_LANG']['tl_syncCto_steps']['complete'];
+                $arrContenData["data"][2]["title"] = $GLOBALS['TL_LANG']['MSC']['complete'];
                 $arrContenData["data"][2]["description"] = vsprintf($GLOBALS['TL_LANG']['tl_syncCto_restore_file']['complete'], array($arrStepPool["file"], $objDate->time, $objDate->date));
 
                 $this->Session->set("SyncCto_DB_StepPool", "");
@@ -522,7 +522,7 @@ class SyncCtoModuleBackup extends BackendModule
 
             default:
                 $arrContenData["error"] = true;
-                $arrContenData["error_msg"] = $GLOBALS['TL_LANG']['tl_syncCto_steps']['unknown_step'];
+                $arrContenData["error_msg"] = $GLOBALS['TL_LANG']['MSC']['unknown_step'];
                 $arrContenData["data"] = array();
                 break;
         }

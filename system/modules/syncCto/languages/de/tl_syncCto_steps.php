@@ -27,50 +27,10 @@
  * @filesource
  */
 
-/** ----------------------------------------------------------------------------
- * Steps
- */
-
-/**
- * Texte
- */
-$GLOBALS['TL_LANG']['tl_syncCto_steps']['ok'] = "OK";
-$GLOBALS['TL_LANG']['tl_syncCto_steps']['progress'] = "In Bearbeitung";
-$GLOBALS['TL_LANG']['tl_syncCto_steps']['error'] = "Fehler";
-$GLOBALS['TL_LANG']['tl_syncCto_steps']['skipped'] = "Übersprungen";
-$GLOBALS['TL_LANG']['tl_syncCto_steps']['unknown_step'] = "Unbekannter Schritt";
-
-/**
- * Headline
- */
-$GLOBALS['TL_LANG']['tl_syncCto_steps']['step'] = "Schritt";
-$GLOBALS['TL_LANG']['tl_syncCto_steps']['complete'] = "Fertig!";
-$GLOBALS['TL_LANG']['tl_syncCto_steps']['debug_mode'] = "Debugausgaben";
-
-/**
- * Debug mode
- */
-$GLOBALS['TL_LANG']['tl_syncCto_steps']['run_time'] = "Laufzeit: %s Sekunden";
-$GLOBALS['TL_LANG']['tl_syncCto_steps']['memory_limit'] = "Auslastung: %s";
-
-/** ----------------------------------------------------------------------------
- * SyncTo & SyncFrom language arrays
- */
-
-/**
- * Errors
- */
-$GLOBALS['TL_LANG']['tl_syncCto_sync']['error']['call_directly'] = "Versuchen Sie nicht die Synchronisation direkt aufzurufen.";
-$GLOBALS['TL_LANG']['tl_syncCto_sync']['error']['client_set'] = "Kommunikation zwischen Server und Client fehlgeschlagen";
-$GLOBALS['TL_LANG']['tl_syncCto_sync']['error']['referer'] = "Konnte die Referrer-Überprüfung des Clients nicht deaktivieren.";
-$GLOBALS['TL_LANG']['tl_syncCto_sync']['error']['version'] = "Versionskonflikt. Server: %s Client: %s";
-$GLOBALS['TL_LANG']['tl_syncCto_sync']['error']['upload_ini'] = "Upload nicht erfolgreich. Funktion ist in der php.ini deaktiviert.";
-$GLOBALS['TL_LANG']['tl_syncCto_sync']['error']['rebuild'] = "Fehler beim Zusammenbau der Dateien. Pfad: %s";
-$GLOBALS['TL_LANG']['tl_syncCto_sync']['error']['send'] = "Fehler beim Versand der Datei(en).";
-
 /**
  * List
  */
+
 // Step 1
 $GLOBALS['TL_LANG']['tl_syncCto_sync']["step_1"]['description_1'] = "Vorbereitung des Clients.";
 $GLOBALS['TL_LANG']['tl_syncCto_sync']["step_1"]['description_2'] = "Temporäre Ordner leeren.";

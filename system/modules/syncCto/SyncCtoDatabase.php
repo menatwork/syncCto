@@ -47,7 +47,7 @@ class SyncCtoDatabase extends Backend
     protected $strFilenameTable = "DB-Backup_tbl.txt";
     protected $strFilenameInsert = "DB-Backup_ins.txt";
     protected $strFilenameSQL = "DB-Backup.sql";
-    protected $strTimestampFormat = "Ymd_H-i-s";
+    protected $strTimestampFormat;
     //- Objects ------------------
     protected $objSyncCtoHelper;
 
@@ -94,6 +94,8 @@ class SyncCtoDatabase extends Backend
 
         $this->arrBackupTables = array();
         $this->objSyncCtoHelper = SyncCtoHelper::getInstance();
+        
+        $this->strTimestampFormat = standardize($GLOBALS['TL_CONFIG']['datimFormat']); 
     }
 
     /**
@@ -295,7 +297,7 @@ class SyncCtoDatabase extends Backend
 
         // Check if a table is selected
         if (!count($tables))
-            throw new Exception($GLOBALS['TL_LANG']['syncCto']['zero_tables']);
+            throw new Exception($GLOBALS['TL_LANG']['ERR']['zero_tables']);
 
         $return = array();
 
@@ -437,7 +439,7 @@ class SyncCtoDatabase extends Backend
         $tables = $this->Database->listTables();
 
         if (!count($tables))
-            throw new Exception($GLOBALS['TL_LANG']['syncCto']['zero_tables']);
+            throw new Exception($GLOBALS['TL_LANG']['ERR']['zero_tables']);
 
         $arrReturn = array();
 

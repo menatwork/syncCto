@@ -70,7 +70,7 @@ class SyncCtoModuleClient extends BackendModule
         $this->objSyncCtoHelper = SyncCtoHelper::getInstance();
 
         // Load Language 
-        $this->loadLanguageFile("tl_syncCto_step");
+        $this->loadLanguageFile("tl_syncCto_steps");
     }
 
     /**
@@ -80,7 +80,7 @@ class SyncCtoModuleClient extends BackendModule
     {
         if ($this->Input->get("act") != "start")
         {
-            $_SESSION["TL_ERROR"] = array($GLOBALS['TL_LANG']['tl_syncCto_sync']['error']['call_directly']);
+            $_SESSION["TL_ERROR"] = array($GLOBALS['TL_LANG']['ERR']['call_directly']);
             $this->redirect("contao/main.php?do=synccto_clients");
         }
 
@@ -127,7 +127,7 @@ class SyncCtoModuleClient extends BackendModule
         }
         catch (Exception $exc)
         {
-            $_SESSION["TL_ERROR"] = array($GLOBALS['TL_LANG']['tl_syncCto_sync']['error']['client_set']);
+            $_SESSION["TL_ERROR"] = array($GLOBALS['TL_LANG']['ERR']['client_set']);
             $this->redirect("contao/main.php?do=synccto_clients");
         }
 
@@ -244,7 +244,7 @@ class SyncCtoModuleClient extends BackendModule
         // Set content back to normale mode
         $arrContenData["error"] = false;
         $arrContenData["error_msg"] = "";
-        $arrContenData["data"][1]["state"] = $GLOBALS['TL_LANG']['tl_syncCto_steps']['progress'];
+        $arrContenData["data"][1]["state"] = $GLOBALS['TL_LANG']['MSC']['progress'];
 
         /* ---------------------------------------------------------------------
          * Run page
@@ -258,9 +258,9 @@ class SyncCtoModuleClient extends BackendModule
                  * Show step
                  */
                 case 1:
-                    $arrContenData["data"][1]["title"] = $GLOBALS['TL_LANG']['tl_syncCto_steps']['step'] . " 1";
+                    $arrContenData["data"][1]["title"] = $GLOBALS['TL_LANG']['MSC']['step'] . " 1";
                     $arrContenData["data"][1]["description"] = $GLOBALS['TL_LANG']['tl_syncCto_sync']["step_1"]['description_1'];
-                    $arrContenData["data"][1]["state"] = $GLOBALS['TL_LANG']['tl_syncCto_steps']['progress'];
+                    $arrContenData["data"][1]["state"] = $GLOBALS['TL_LANG']['MSC']['progress'];
 
                     $mixStepPool["step"] = 2;
                     break;
@@ -271,7 +271,7 @@ class SyncCtoModuleClient extends BackendModule
                 case 2:
                     if (!$this->objSyncCtoCommunicationClient->refererDisable())
                     {
-                        $arrContenData["data"][1]["state"] = $GLOBALS['TL_LANG']['tl_syncCto_steps']['error'];
+                        $arrContenData["data"][1]["state"] = $GLOBALS['TL_LANG']['MSC']['error'];
                         $arrContenData["error"] = true;
                         $arrContenData["error_msg"] = $GLOBALS['TL_LANG']['tl_syncCto_sync']['error_step_1']['referer'];
 
@@ -291,7 +291,7 @@ class SyncCtoModuleClient extends BackendModule
                     {
                         $this->log(vsprintf("Not the same version on synchronization client ID %s. Serverversion: %s. Clientversion: %s", array($this->Input->get("id"), $GLOBALS['SYC_VERSION'], $strVersion)), __CLASS__ . " " . __FUNCTION__, "INFO");
 
-                        $arrContenData["data"][1]["state"] = $GLOBALS['TL_LANG']['tl_syncCto_steps']['error'];
+                        $arrContenData["data"][1]["state"] = $GLOBALS['TL_LANG']['MSC']['error'];
                         $arrContenData["error"] = true;
                         $arrContenData["error_msg"] = vsprintf($GLOBALS['TL_LANG']['tl_syncCto_sync']['error_step_1']['version'], array($GLOBALS['SYC_VERSION'], $strVersion));
 
@@ -311,12 +311,12 @@ class SyncCtoModuleClient extends BackendModule
                     $this->objSyncCtoFiles->purgeTemp();
 
                     // Current step is okay.
-                    $arrContenData["data"][1]["state"] = $GLOBALS['TL_LANG']['tl_syncCto_steps']['ok'];
+                    $arrContenData["data"][1]["state"] = $GLOBALS['TL_LANG']['MSC']['ok'];
                     $arrContenData["data"][1]["description"] = $GLOBALS['TL_LANG']['tl_syncCto_sync']["step_1"]['description_1'];
 
                     // Create next step.
-                    $arrContenData["data"][2]["state"] = $GLOBALS['TL_LANG']['tl_syncCto_steps']['progress'];
-                    $arrContenData["data"][2]["title"] = $GLOBALS['TL_LANG']['tl_syncCto_steps']['step'] . " 2";
+                    $arrContenData["data"][2]["state"] = $GLOBALS['TL_LANG']['MSC']['progress'];
+                    $arrContenData["data"][2]["title"] = $GLOBALS['TL_LANG']['MSC']['step'] . " 2";
                     $arrContenData["data"][2]["description"] = $GLOBALS['TL_LANG']['tl_syncCto_sync']["step_2"]['description_1'];
 
                     $mixStepPool = FALSE;
@@ -331,7 +331,7 @@ class SyncCtoModuleClient extends BackendModule
             $this->log(vsprintf("Error on synchronization client ID %s", array($this->Input->get("id"))), __CLASS__ . " " . __FUNCTION__, "ERROR");
 
             $arrContenData["error"] = true;
-            $arrContenData["data"][1]["state"] = $GLOBALS['TL_LANG']['tl_syncCto_steps']['error'];
+            $arrContenData["data"][1]["state"] = $GLOBALS['TL_LANG']['MSC']['error'];
             $arrContenData["error_msg"] = $exc->getMessage();
         }
 
@@ -375,7 +375,7 @@ class SyncCtoModuleClient extends BackendModule
         // Set content back to normale mode
         $arrContenData["error"] = false;
         $arrContenData["error_msg"] = "";
-        $arrContenData["data"][2]["state"] = $GLOBALS['TL_LANG']['tl_syncCto_steps']['progress'];
+        $arrContenData["data"][2]["state"] = $GLOBALS['TL_LANG']['MSC']['progress'];
 
         /* ---------------------------------------------------------------------
          * Run page
@@ -387,11 +387,11 @@ class SyncCtoModuleClient extends BackendModule
             $mixStepPool = FALSE;
 
             // Set current step informations
-            $arrContenData["data"][2]["state"] = $GLOBALS['TL_LANG']['tl_syncCto_steps']['skipped'];
+            $arrContenData["data"][2]["state"] = $GLOBALS['TL_LANG']['MSC']['skipped'];
 
             // Set next step information
-            $arrContenData["data"][3]["state"] = $GLOBALS['TL_LANG']['tl_syncCto_steps']['progress'];
-            $arrContenData["data"][3]["title"] = $GLOBALS['TL_LANG']['tl_syncCto_steps']['step'] . " 3";
+            $arrContenData["data"][3]["state"] = $GLOBALS['TL_LANG']['MSC']['progress'];
+            $arrContenData["data"][3]["title"] = $GLOBALS['TL_LANG']['MSC']['step'] . " 3";
             $arrContenData["data"][3]["description"] = $GLOBALS['TL_LANG']['tl_syncCto_sync']["step_3"]['description_1'];
 
             $this->intStep++;
@@ -529,14 +529,14 @@ class SyncCtoModuleClient extends BackendModule
                         else if (key_exists("transfer", $arrDel))
                         {
                             // Set current step informations
-                            $arrContenData["data"][2]["state"] = $GLOBALS['TL_LANG']['tl_syncCto_steps']['ok'];
+                            $arrContenData["data"][2]["state"] = $GLOBALS['TL_LANG']['MSC']['ok'];
                             $arrContenData["data"][2]["description"] = $GLOBALS['TL_LANG']['tl_syncCto_sync']["step_2"]['description_1'];
                             $arrContenData["data"][2]["html"] = "";
                             $arrContenData["refresh"] = true;
 
                             // Set next step information
-                            $arrContenData["data"][3]["state"] = $GLOBALS['TL_LANG']['tl_syncCto_steps']['progress'];
-                            $arrContenData["data"][3]["title"] = $GLOBALS['TL_LANG']['tl_syncCto_steps']['step'] . " 3";
+                            $arrContenData["data"][3]["state"] = $GLOBALS['TL_LANG']['MSC']['progress'];
+                            $arrContenData["data"][3]["title"] = $GLOBALS['TL_LANG']['MSC']['step'] . " 3";
                             $arrContenData["data"][3]["description"] = $GLOBALS['TL_LANG']['tl_syncCto_sync']["step_3"]['description_1'];
 
                             $this->intStep++;
@@ -589,14 +589,14 @@ class SyncCtoModuleClient extends BackendModule
                         if ($intCountMissing == 0 && $intCountNeed == 0 && $intCountIgnored == 0 && $intCountDelete == 0)
                         {
                             // Set current step informations
-                            $arrContenData["data"][2]["state"] = $GLOBALS['TL_LANG']['tl_syncCto_steps']['skipped'];
+                            $arrContenData["data"][2]["state"] = $GLOBALS['TL_LANG']['MSC']['skipped'];
                             $arrContenData["data"][2]["description"] = $GLOBALS['TL_LANG']['tl_syncCto_sync']["step_2"]['description_1'];
                             $arrContenData["data"][2]["html"] = "";
                             $arrContenData["refresh"] = true;
 
                             // Set next step information
-                            $arrContenData["data"][3]["state"] = $GLOBALS['TL_LANG']['tl_syncCto_steps']['progress'];
-                            $arrContenData["data"][3]["title"] = $GLOBALS['TL_LANG']['tl_syncCto_steps']['step'] . " 3";
+                            $arrContenData["data"][3]["state"] = $GLOBALS['TL_LANG']['MSC']['progress'];
+                            $arrContenData["data"][3]["title"] = $GLOBALS['TL_LANG']['MSC']['step'] . " 3";
                             $arrContenData["data"][3]["description"] = $GLOBALS['TL_LANG']['tl_syncCto_sync']["step_3"]['description_1'];
 
                             $mixStepPool = false;
@@ -628,7 +628,7 @@ class SyncCtoModuleClient extends BackendModule
                 $this->log(vsprintf("Error on synchronization client ID %s", array($this->Input->get("id"))), __CLASS__ . " " . __FUNCTION__, "ERROR");
 
                 $arrContenData["error"] = true;
-                $arrContenData["data"][2]["state"] = $GLOBALS['TL_LANG']['tl_syncCto_steps']['error'];
+                $arrContenData["data"][2]["state"] = $GLOBALS['TL_LANG']['MSC']['error'];
                 $arrContenData["error_msg"] = $exc->getMessage();
             }
         }
@@ -665,15 +665,15 @@ class SyncCtoModuleClient extends BackendModule
         // Set content back to normale mode
         $arrContenData["error"] = false;
         $arrContenData["error_msg"] = "";
-        $arrContenData["data"][3]["state"] = $GLOBALS['TL_LANG']['tl_syncCto_steps']['progress'];
+        $arrContenData["data"][3]["state"] = $GLOBALS['TL_LANG']['MSC']['progress'];
 
         // Check if there is any file for upload
         if (count($this->arrListCompare) == 0 || !is_array($this->arrListCompare))
         {
-            $arrContenData["data"][3]["state"] = $GLOBALS['TL_LANG']['tl_syncCto_steps']['skipped'];
+            $arrContenData["data"][3]["state"] = $GLOBALS['TL_LANG']['MSC']['skipped'];
 
-            $arrContenData["data"][4]["state"] = $GLOBALS['TL_LANG']['tl_syncCto_steps']['progress'];
-            $arrContenData["data"][4]["title"] = $GLOBALS['TL_LANG']['tl_syncCto_steps']['step'] . " 4";
+            $arrContenData["data"][4]["state"] = $GLOBALS['TL_LANG']['MSC']['progress'];
+            $arrContenData["data"][4]["title"] = $GLOBALS['TL_LANG']['MSC']['step'] . " 4";
             $arrContenData["data"][4]["description"] = $GLOBALS['TL_LANG']['tl_syncCto_sync']["step_4"]['description_1'];
 
             $this->intStep++;
@@ -697,7 +697,7 @@ class SyncCtoModuleClient extends BackendModule
                         // Check if everthing is okay
                         if ($arrClientParameter['file_uploads'] != 1)
                         {
-                            $arrContenData["data"][3]["state"] = $GLOBALS['TL_LANG']['tl_syncCto_steps']['error'];
+                            $arrContenData["data"][3]["state"] = $GLOBALS['TL_LANG']['MSC']['error'];
                             $arrContenData["error"] = true;
                             $arrContenData["error_msg"] = $GLOBALS['TL_LANG']['tl_syncCto_sync']['error_step_3']['upload_ini'];
 
@@ -761,11 +761,11 @@ class SyncCtoModuleClient extends BackendModule
                         // Skip page if no big file is found
                         if ($intCountSplit == 0)
                         {
-                            $arrContenData["data"][3]["state"] = $GLOBALS['TL_LANG']['tl_syncCto_steps']['skipped'];
+                            $arrContenData["data"][3]["state"] = $GLOBALS['TL_LANG']['MSC']['skipped'];
                             $arrContenData["data"][3]["html"] = "";
 
-                            $arrContenData["data"][4]["state"] = $GLOBALS['TL_LANG']['tl_syncCto_steps']['progress'];
-                            $arrContenData["data"][4]["title"] = $GLOBALS['TL_LANG']['tl_syncCto_steps']['step'] . " 4";
+                            $arrContenData["data"][4]["state"] = $GLOBALS['TL_LANG']['MSC']['progress'];
+                            $arrContenData["data"][4]["title"] = $GLOBALS['TL_LANG']['MSC']['step'] . " 4";
                             $arrContenData["data"][4]["description"] = $GLOBALS['TL_LANG']['tl_syncCto_sync']["step_4"]['description_1'];
 
                             $this->intStep++;
@@ -813,11 +813,11 @@ class SyncCtoModuleClient extends BackendModule
 
                             if ($intCountSplit == 0)
                             {
-                                $arrContenData["data"][3]["state"] = $GLOBALS['TL_LANG']['tl_syncCto_steps']['skipped'];
+                                $arrContenData["data"][3]["state"] = $GLOBALS['TL_LANG']['MSC']['skipped'];
                                 $arrContenData["data"][3]["html"] = "";
 
-                                $arrContenData["data"][4]["state"] = $GLOBALS['TL_LANG']['tl_syncCto_steps']['progress'];
-                                $arrContenData["data"][4]["title"] = $GLOBALS['TL_LANG']['tl_syncCto_steps']['step'] . " 4";
+                                $arrContenData["data"][4]["state"] = $GLOBALS['TL_LANG']['MSC']['progress'];
+                                $arrContenData["data"][4]["title"] = $GLOBALS['TL_LANG']['MSC']['step'] . " 4";
                                 $arrContenData["data"][4]["description"] = $GLOBALS['TL_LANG']['tl_syncCto_sync']["step_4"]['description_1'];
 
                                 $arrContenData["refresh"] = true;
@@ -1032,7 +1032,7 @@ class SyncCtoModuleClient extends BackendModule
                         else
                         {
                             $arrContenData["data"][3]["description"] = $GLOBALS['TL_LANG']['tl_syncCto_sync']["step_3"]['description_1'];
-                            $arrContenData["data"][3]["state"] = $GLOBALS['TL_LANG']['tl_syncCto_steps']['ok'];
+                            $arrContenData["data"][3]["state"] = $GLOBALS['TL_LANG']['MSC']['ok'];
 
                             $this->intStep++;
                             $mixStepPool == FALSE;
@@ -1046,7 +1046,7 @@ class SyncCtoModuleClient extends BackendModule
                 $this->log(vsprintf("Error on synchronization client ID %s", array($this->Input->get("id"))), __CLASS__ . " " . __FUNCTION__, "ERROR");
 
                 $arrContenData["error"] = true;
-                $arrContenData["data"][3]["state"] = $GLOBALS['TL_LANG']['tl_syncCto_steps']['error'];
+                $arrContenData["data"][3]["state"] = $GLOBALS['TL_LANG']['MSC']['error'];
                 $arrContenData["error_msg"] = $exc->getMessage();
             }
         }
@@ -1093,7 +1093,7 @@ class SyncCtoModuleClient extends BackendModule
         // Set content back to normale mode
         $arrContenData["error"] = false;
         $arrContenData["error_msg"] = "";
-        $arrContenData["data"][4]["state"] = $GLOBALS['TL_LANG']['tl_syncCto_steps']['progress'];
+        $arrContenData["data"][4]["state"] = $GLOBALS['TL_LANG']['MSC']['progress'];
 
 
         $arrTables = $this->Session->get("syncCto_SyncTables");
@@ -1105,10 +1105,10 @@ class SyncCtoModuleClient extends BackendModule
         // Check if there is a tablelist
         if (count($arrTables) == 0 || $arrTables == FALSE)
         {
-            $arrContenData["data"][4]["state"] = $GLOBALS['TL_LANG']['tl_syncCto_steps']['skipped'];
+            $arrContenData["data"][4]["state"] = $GLOBALS['TL_LANG']['MSC']['skipped'];
 
-            $arrContenData["data"][5]["state"] = $GLOBALS['TL_LANG']['tl_syncCto_steps']['progress'];
-            $arrContenData["data"][5]["title"] = $GLOBALS['TL_LANG']['tl_syncCto_steps']['step'] . " 5";
+            $arrContenData["data"][5]["state"] = $GLOBALS['TL_LANG']['MSC']['progress'];
+            $arrContenData["data"][5]["title"] = $GLOBALS['TL_LANG']['MSC']['step'] . " 5";
             $arrContenData["data"][5]["description"] = $GLOBALS['TL_LANG']['tl_syncCto_sync']["step_5"]['description_1'];
 
             $this->intStep++;
@@ -1165,11 +1165,11 @@ class SyncCtoModuleClient extends BackendModule
                     case 4:
                         $this->objSyncCtoCommunicationClient->startSQLImport($this->objSyncCtoHelper->buildPathWoTL($GLOBALS['SYC_PATH']['tmp'], "sql", $mixStepPool["zipname"]));
 
-                        $arrContenData["data"][4]["state"] = $GLOBALS['TL_LANG']['tl_syncCto_steps']['ok'];
+                        $arrContenData["data"][4]["state"] = $GLOBALS['TL_LANG']['MSC']['ok'];
                         $arrContenData["data"][4]["description"] = $GLOBALS['TL_LANG']['tl_syncCto_sync']["step_4"]['description_4'];
 
-                        $arrContenData["data"][5]["state"] = $GLOBALS['TL_LANG']['tl_syncCto_steps']['progress'];
-                        $arrContenData["data"][5]["title"] = $GLOBALS['TL_LANG']['tl_syncCto_steps']['step'] . " 5";
+                        $arrContenData["data"][5]["state"] = $GLOBALS['TL_LANG']['MSC']['progress'];
+                        $arrContenData["data"][5]["title"] = $GLOBALS['TL_LANG']['MSC']['step'] . " 5";
                         $arrContenData["data"][5]["description"] = $GLOBALS['TL_LANG']['tl_syncCto_sync']["step_5"]['description_1'];
 
                         $this->intStep++;
@@ -1183,7 +1183,7 @@ class SyncCtoModuleClient extends BackendModule
                 $this->log(vsprintf("Error on synchronization client ID %s", array($this->Input->get("id"))), __CLASS__ . " " . __FUNCTION__, "ERROR");
 
                 $arrContenData["error"] = true;
-                $arrContenData["data"][4]["state"] = $GLOBALS['TL_LANG']['tl_syncCto_steps']['error'];
+                $arrContenData["data"][4]["state"] = $GLOBALS['TL_LANG']['MSC']['error'];
                 $arrContenData["error_msg"] = $exc->getMessage();
             }
         }
@@ -1221,7 +1221,7 @@ class SyncCtoModuleClient extends BackendModule
         // Load content
         $arrContenData = $this->Session->get("syncCto_Content");
         $arrContenData["error"] = false;
-        $arrContenData["data"][5]["state"] = $GLOBALS['TL_LANG']['tl_syncCto_steps']['progress'];
+        $arrContenData["data"][5]["state"] = $GLOBALS['TL_LANG']['MSC']['progress'];
 
         // Needed files/information        
         $intSyncTyp = $this->Session->get("syncCto_Typ");
@@ -1287,7 +1287,7 @@ class SyncCtoModuleClient extends BackendModule
                     {
                         $arrContenData["error"] = true;
                         $arrContenData["error_msg"] = $GLOBALS['TL_LANG']['tl_syncCto_sync']['error_step_5']['upload_ini'];
-                        $arrContenData["data"][5]["state"] = $GLOBALS['TL_LANG']['tl_syncCto_steps']['error'];
+                        $arrContenData["data"][5]["state"] = $GLOBALS['TL_LANG']['MSC']['error'];
 
                         break;
                     }
@@ -1321,7 +1321,7 @@ class SyncCtoModuleClient extends BackendModule
                                 || $value["state"] == SyncCtoEnum::FILESTATE_TOO_BIG_MISSING
                                 || $value["state"] == SyncCtoEnum::FILESTATE_BOMBASTIC_BIG)
                         {
-                            $this->arrListCompare[$key]["skipreason"] = $GLOBALS['TL_LANG']['syncCto']['maximum_filesize'];
+                            $this->arrListCompare[$key]["skipreason"] = $GLOBALS['TL_LANG']['ERR']['maximum_filesize'];
                             $this->arrListCompare[$key]["transmission"] = SyncCtoEnum::FILETRANS_SKIPPED;
 
                             continue;
@@ -1453,7 +1453,7 @@ class SyncCtoModuleClient extends BackendModule
                         $mixStepPool["step"] = 7;
 
                         $arrContenData["data"][5]["html"] = "";
-                        $arrContenData["data"][5]["state"] = $GLOBALS['TL_LANG']['tl_syncCto_steps']['skipped'];
+                        $arrContenData["data"][5]["state"] = $GLOBALS['TL_LANG']['MSC']['skipped'];
                         $arrContenData["data"][5]["description"] = "";
                         $arrContenData["finished"] = true;
 
@@ -1464,7 +1464,7 @@ class SyncCtoModuleClient extends BackendModule
                         $mixStepPool["step"] = 7;
 
                         $arrContenData["data"][5]["html"] = "";
-                        $arrContenData["data"][5]["state"] = $GLOBALS['TL_LANG']['tl_syncCto_steps']['ok'];
+                        $arrContenData["data"][5]["state"] = $GLOBALS['TL_LANG']['MSC']['ok'];
                         $arrContenData["data"][5]["description"] = "";
                         $arrContenData["finished"] = true;
 
@@ -1475,7 +1475,7 @@ class SyncCtoModuleClient extends BackendModule
                         $mixStepPool["step"] = 7;
 
                         $arrContenData["data"][5]["description"] = vsprintf($GLOBALS['TL_LANG']['tl_syncCto_sync']["step_5"]['description_2'], array($intSendCount, count($this->arrListCompare)));
-                        $arrContenData["data"][5]["state"] = $GLOBALS['TL_LANG']['tl_syncCto_steps']['ok'];
+                        $arrContenData["data"][5]["state"] = $GLOBALS['TL_LANG']['MSC']['ok'];
                         $arrContenData["finished"] = true;
                     }
 
@@ -1602,7 +1602,7 @@ class SyncCtoModuleClient extends BackendModule
             $this->log(vsprintf("Error on synchronization client ID %s", array($this->Input->get("id"))), __CLASS__ . " " . __FUNCTION__, "ERROR");
 
             $arrContenData["error"] = true;
-            $arrContenData["data"][5]["state"] = $GLOBALS['TL_LANG']['tl_syncCto_steps']['error'];
+            $arrContenData["data"][5]["state"] = $GLOBALS['TL_LANG']['MSC']['error'];
             $arrContenData["error_msg"] = $exc->getMessage();
         }
 

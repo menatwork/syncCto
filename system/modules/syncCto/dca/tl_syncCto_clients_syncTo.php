@@ -1,7 +1,4 @@
-<?php
-
-if (!defined('TL_ROOT'))
-    die('You can not access this file directly!');
+<?php if (!defined('TL_ROOT')) die('You can not access this file directly!');
 
 /**
  * Contao Open Source CMS
@@ -29,6 +26,7 @@ if (!defined('TL_ROOT'))
  * @license    GNU/LGPL
  * @filesource
  */
+
 $GLOBALS['TL_DCA']['tl_syncCto_clients_syncTo'] = array(
     // Config
     'config' => array
@@ -128,7 +126,7 @@ class tl_syncCto_clients_syncTo extends Backend
             }
             else
             {
-                $_SESSION["TL_ERROR"] = array($GLOBALS['TL_LANG']['syncCto']['unknown_method']);
+                $_SESSION["TL_ERROR"] = array($GLOBALS['TL_LANG']['ERR']['unknown_method']);
                 return;
             }
         }
@@ -141,11 +139,17 @@ class tl_syncCto_clients_syncTo extends Backend
         if ($this->Input->post("database_tables_recommended") != "" || $this->Input->post("database_tables_none_recommended") != "")
         {
             if ($this->Input->post("database_tables_recommended") != "" && $this->Input->post("database_tables_none_recommended") != "")
+            {
                 $arrSyncTables = array_merge($this->Input->post("database_tables_recommended"), $this->Input->post("database_tables_none_recommended"));
+            }
             else if ($this->Input->post("database_tables_recommended"))
+            {
                 $arrSyncTables = $this->Input->post("database_tables_recommended");
+            }
             else if ($this->Input->post("database_tables_none_recommended"))
+            {
                 $arrSyncTables = $this->Input->post("database_tables_none_recommended");
+            }
 
             $this->Session->set("syncCto_SyncTables", $arrSyncTables);
         }

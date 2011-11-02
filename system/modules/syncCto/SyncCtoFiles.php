@@ -851,7 +851,7 @@ class SyncCtoFiles extends Backend
             }
             else if ($key != md5_file($strSaveFile))
             {
-                throw new Exception($GLOBALS['TL_LANG']['syncCto']['checksum_error']);
+                throw new Exception($GLOBALS['TL_LANG']['ERR']['checksum_error']);
             }
             else
             {
