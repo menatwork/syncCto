@@ -1,4 +1,3 @@
-- Statistikfunktion
 - MD5 Problem bei großen Files
 - Dateigrößenanzeige bei großen Files (N.A.)
 - localconfigEntries vereinfachen

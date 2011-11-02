@@ -1,7 +1,4 @@
-<?php
-
-if (!defined('TL_ROOT'))
-    die('You cannot access this file directly!');
+<?php if (!defined('TL_ROOT')) die('You cannot access this file directly!');
 
 /**
  * Contao Open Source CMS
@@ -29,7 +26,6 @@ if (!defined('TL_ROOT'))
  * @license    GNU/LGPL
  * @filesource
  */
-include_once 'SyncCtoSimpleHtmlDom.php';
 
 class SyncCtoMeasurement extends Backend
 {
@@ -60,12 +56,14 @@ class SyncCtoMeasurement extends Backend
     public function __destruct()
     {
         if ($GLOBALS['TL_CONFIG']['syncCto_measurement_log'] != true)
+        {
             return;
+        }
 
         $intTime = time();
-        
+
         $strFilepath = $this->objSyncCtoFiles->buildPath($GLOBALS['SYC_PATH']['debug'], "measurement.txt");
-        
+
         $this->fileHand = fopen($strFilepath, "a+");
 
         if ($this->arrOutput != "")
@@ -75,7 +73,9 @@ class SyncCtoMeasurement extends Backend
             fwrite($this->fileHand, "\n>>\n\n");
 
             foreach (array_reverse($this->arrOutput) as $key => $value)
+            {
                 fwrite($this->fileHand, $value);
+            }
 
             fwrite($this->fileHand, "\n>>");
             fwrite($this->fileHand, "\n>>|-- Close Measurement Core at " . date("H:i:s d.m.Y", $intTime));
@@ -92,7 +92,9 @@ class SyncCtoMeasurement extends Backend
     public static function getInstance()
     {
         if (self::$instance == null)
+        {
             self::$instance = new SyncCtoMeasurement();
+        }
 
         return self::$instance;
     }
@@ -108,17 +110,27 @@ class SyncCtoMeasurement extends Backend
     //--------------------------------------------------------------------------
 
     public function startMeasurement($strClass, $strFunction, $strInformation = "")
-    {        
+    {
         if ($GLOBALS['TL_CONFIG']['syncCto_measurement_log'] != true)
+        {
             return;
+        }
 
         if (count($this->arrOnlyClass) != 0)
+        {
             if (in_array($strClass, $this->arrOnlyClass))
+            {
                 return;
+            }
+        }
 
         if (count($this->arrOnlyFunctions) != 0)
+        {
             if (in_array($strFunction, $this->arrOnlyFunctions))
+            {
                 return;
+            }
+        }
 
         $this->arrInformation[$strClass . "|" . $strFunction] = array(
             "class" => $strClass,
@@ -134,18 +146,28 @@ class SyncCtoMeasurement extends Backend
     public function stopMeasurement($strClass, $strFunction)
     {
         if ($GLOBALS['TL_CONFIG']['syncCto_measurement_log'] != true)
+        {
             return;
+        }
 
         $floStop = microtime(true);
         $floTime = $floStop - $this->arrInformation[$strClass . "|" . $strFunction]["start"];
 
         if (count($this->arrOnlyClass) != 0)
+        {
             if (in_array($strClass, $this->arrOnlyClass))
+            {
                 return;
+            }
+        }
 
         if (count($this->arrOnlyFunctions) != 0)
+        {
             if (in_array($strFunction, $this->arrOnlyFunctions))
+            {
                 return;
+            }
+        }
 
         $this->arrInformation[$strClass . "|" . $strFunction] = array_merge($this->arrInformation[$strClass . "|" . $strFunction], array("stop" => $floStop, "time" => $floTime, "mem_end" => memory_get_usage(true), "mem_peak" => memory_get_peak_usage(true)));
 
@@ -153,7 +175,6 @@ class SyncCtoMeasurement extends Backend
         unset($this->arrInformation[$strClass . "|" . $strFunction]);
     }
 
-    //--------------------------------------------------------------------------
 }
 
 ?>
