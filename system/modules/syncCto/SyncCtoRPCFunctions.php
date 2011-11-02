@@ -93,7 +93,7 @@ class SyncCtoRPCFunctions extends Backend
 
     public function importConfig($arrConfig)
     {
-        $arrLocalConfig = $this->objSyncCtoHelper->loadConfig(SyncCtoEnum::LOADCONFIG_KEYS_ONLY);
+        $arrLocalConfig = $this->objSyncCtoHelper->loadConfigs(SyncCtoEnum::LOADCONFIG_KEYS_ONLY);
 
         foreach ($arrConfig as $key => $value)
         {

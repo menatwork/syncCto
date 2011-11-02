@@ -54,9 +54,9 @@ class SyncCtoFiles extends Backend
 
         // My Class
         $this->objSyncCtoHelper = SyncCtoHelper::getInstance();
-        
-        $this->strTimestampFormat = standardize($GLOBALS['TL_CONFIG']['datimFormat']);        
-        
+
+        $this->strTimestampFormat = standardize($GLOBALS['TL_CONFIG']['datimFormat']);
+
         set_time_limit(0);
     }
 
@@ -65,8 +65,7 @@ class SyncCtoFiles extends Backend
      */
     public static function getInstance()
     {
-        if (self::$instance == null)
-            self::$instance = new SyncCtoFiles();
+        if (self::$instance == null) self::$instance = new SyncCtoFiles();
 
         return self::$instance;
     }
@@ -351,7 +350,7 @@ class SyncCtoFiles extends Backend
         return $strFilename;
     }
 
-    public function runDumpTlFiles($strZip = "", $arrFileList = null)
+    public function runDumpFiles($strZip = "", $arrFileList = null)
     {
         if ($strZip == "")
         {
@@ -440,8 +439,7 @@ class SyncCtoFiles extends Backend
 
         foreach ($arrFileList as $key => $value)
         {
-            if ($objZipRead->getFile($value) != true)
-                throw new Exception("Error by unziping file. File not found in zip archive.");
+            if ($objZipRead->getFile($value) != true) throw new Exception("Error by unziping file. File not found in zip archive.");
 
             $objFile = new File($value);
             $objFile->write($objZipRead->unzip());
@@ -502,8 +500,7 @@ class SyncCtoFiles extends Backend
                 }
             }
 
-            if (!$blnWhite)
-                return $arrList;
+            if (!$blnWhite) return $arrList;
         }
 
         // Is the given string a file
@@ -549,8 +546,7 @@ class SyncCtoFiles extends Backend
                     }
 
                     // Skip if file is in blacklist
-                    if ($blnBlack)
-                        continue;
+                    if ($blnBlack) continue;
 
                     // Add to list
                     $arrList[] = $this->objSyncCtoHelper->buildPathWoTL($strPath, $valueItem);
@@ -571,8 +567,7 @@ class SyncCtoFiles extends Backend
                         }
                     }
 
-                    if (!$blnWhitelist)
-                        continue;
+                    if (!$blnWhitelist) continue;
 
                     // Recursive-Call
                     $arrList = $this->recursiveFileList($arrList, $this->objSyncCtoHelper->buildPathWoTL($strPath, $valueItem), $blnTlFiles);
@@ -605,10 +600,8 @@ class SyncCtoFiles extends Backend
      */
     public function purgeTemp($strFolder = null)
     {
-        if ($strFolder == null || $strFolder == "")
-            $strPath = $this->objSyncCtoHelper->buildPathWoTL($GLOBALS['SYC_PATH']['tmp']);
-        else
-            $strPath = $this->objSyncCtoHelper->buildPathWoTL($GLOBALS['SYC_PATH']['tmp'], $strFolder);
+        if ($strFolder == null || $strFolder == "") $strPath = $this->objSyncCtoHelper->buildPathWoTL($GLOBALS['SYC_PATH']['tmp']);
+        else $strPath = $this->objSyncCtoHelper->buildPathWoTL($GLOBALS['SYC_PATH']['tmp'], $strFolder);
 
         $objFolder = new Folder($strPath);
         $objFolder->clear();
@@ -633,14 +626,12 @@ class SyncCtoFiles extends Backend
         $strDesPath = $this->objSyncCtoHelper->buildPath($strDesFolder);
 
 
-        if (!file_exists($strSrcFile))
-            throw new Exception("File not exsist");
+        if (!file_exists($strSrcFile)) throw new Exception("File not exsist");
 
         $objFolder = new Folder($this->objSyncCtoHelper->buildPathWoTL($strDesPath));
         $objFile = new File($this->objSyncCtoHelper->buildPathWoTL($strSrcFile));
 
-        if ($objFile->filesize < 0)
-            throw new Exception("Int overload, try a 64Bit PHP Version.");
+        if ($objFile->filesize < 0) throw new Exception("Int overload, try a 64Bit PHP Version.");
 
         $booRun = true;
         $i = 0;
@@ -648,11 +639,9 @@ class SyncCtoFiles extends Backend
         {
             $fp = fopen($strSrcFile, "rb");
 
-            if ($fp === false)
-                throw new Exception("Could not open file");
+            if ($fp === false) throw new Exception("Could not open file");
 
-            if (fseek($fp, $i * $intSizeLimit, SEEK_SET) === -1)
-                throw new Exception("Fseek error");
+            if (fseek($fp, $i * $intSizeLimit, SEEK_SET) === -1) throw new Exception("Fseek error");
 
             if (feof($fp) === TRUE)
             {
@@ -672,8 +661,7 @@ class SyncCtoFiles extends Backend
             unset($data);
             unset($fp);
 
-            if (( ( $i + 1 ) * $intSizeLimit) > $objFile->filesize)
-                $booRun = false;
+            if (( ( $i + 1 ) * $intSizeLimit) > $objFile->filesize) $booRun = false;
         }
 
         return $i;
@@ -804,17 +792,18 @@ class SyncCtoFiles extends Backend
      * @param type $arrMetafiles
      * @return string 
      */
-    public function saveFile($arrMetafiles)
+    public function saveFiles($arrMetafiles)
     {
         if (!is_array($arrMetafiles))
+        {
             throw new Exception("Missing metafiles in array check.");
+        }
 
         $arrResponse = array();
 
         foreach ($_FILES as $key => $value)
         {
-            if (!key_exists($key, $arrMetafiles))
-                throw new Exception("Could not find metafiles for the file $key");
+            if (!key_exists($key, $arrMetafiles)) throw new Exception("Could not find metafiles for the file $key");
 
             $strFolder = $arrMetafiles[$key]["folder"];
             $strFile = $arrMetafiles[$key]["file"];

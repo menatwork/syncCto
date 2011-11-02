@@ -1,13 +1,6 @@
 - Statistikfunktion
-- HTML5 Templates
-- Request Token Unterstützung
 - MD5 Problem bei großen Files
 - Dateigrößenanzeige bei großen Files (N.A.)
-- loadLocalconfigEntries vereinfachen
+- localconfigEntries vereinfachen
 - syncFrom
-- Prüfung aller Templates und anlegen der Sprachdateien
-
-ERLEDIGT:
-
-- Optimierung der ENUM Klasse (Bakup/Backup, Header)
-- Callback Klasse killen
+- Optimierung der buildPath Funktion

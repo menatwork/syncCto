@@ -268,7 +268,7 @@ $GLOBALS["CTOCOM_FUNCTIONS"]["SYNCCTO_REBUILD_SPLITFILE"] = array(
 // Send a file
 $GLOBALS["CTOCOM_FUNCTIONS"]["SYNCCTO_SEND_FILE"] = array(
     "class" => "SyncCtoFiles",
-    "function" => "saveFile",
+    "function" => "saveFiles",
     "typ" => "POST",
     "parameter" => array("metafiles"),
 );

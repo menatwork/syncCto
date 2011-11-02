@@ -59,7 +59,7 @@ class SyncCtoHelper extends Backend
      * Configuration merge functions
      */
 
-    private function mergerConfigs($arrLocalconfig, $arrSyncCtoConfig)
+    private function mergeConfigs($arrLocalconfig, $arrSyncCtoConfig)
     {
         if (is_array($arrLocalconfig) && is_array($arrSyncCtoConfig))
         {
@@ -91,38 +91,38 @@ class SyncCtoHelper extends Backend
     {
         $arrLocalconfig = deserialize($GLOBALS['TL_CONFIG']['syncCto_folder_blacklist']);
         $arrSyncCtoConfig = $GLOBALS['SYC_CONFIG']['folder_blacklist'];
-        return $this->mergerConfigs($arrLocalconfig, $arrSyncCtoConfig);
+        return $this->mergeConfigs($arrLocalconfig, $arrSyncCtoConfig);
     }
 
     public function getWhitelistFolder()
     {
         $arrLocalconfig = deserialize($GLOBALS['TL_CONFIG']['syncCto_folder_whitelist']);
         $arrSyncCtoConfig = $GLOBALS['SYC_CONFIG']['folder_whitelist'];
-        return $this->mergerConfigs($arrLocalconfig, $arrSyncCtoConfig);
+        return $this->mergeConfigs($arrLocalconfig, $arrSyncCtoConfig);
     }
 
     public function getBlacklistFile()
     {
         $arrLocalconfig = deserialize($GLOBALS['TL_CONFIG']['syncCto_file_blacklist']);
         $arrSyncCtoConfig = $GLOBALS['SYC_CONFIG']['file_blacklist'];
-        return $this->mergerConfigs($arrLocalconfig, $arrSyncCtoConfig);
+        return $this->mergeConfigs($arrLocalconfig, $arrSyncCtoConfig);
     }
 
     public function getBlacklistLocalconfig()
     {
         $arrLocalconfig = deserialize($GLOBALS['TL_CONFIG']['syncCto_local_blacklist']);
         $arrSyncCtoConfig = $GLOBALS['SYC_CONFIG']['local_blacklist'];
-        return $this->mergerConfigs($arrLocalconfig, $arrSyncCtoConfig);
+        return $this->mergeConfigs($arrLocalconfig, $arrSyncCtoConfig);
     }
 
     public function getTablesHidden()
     {
         $arrLocalconfig = deserialize($GLOBALS['TL_CONFIG']['syncCto_hidden_tables']);
         $arrSyncCtoConfig = $GLOBALS['SYC_CONFIG']['table_hidden'];
-        return $this->mergerConfigs($arrLocalconfig, $arrSyncCtoConfig);
+        return $this->mergeConfigs($arrLocalconfig, $arrSyncCtoConfig);
     }
 
-    public function loadConfig($intTyp = 1)
+    public function loadConfigs($intTyp = 1)
     {
         if ($intTyp != SyncCtoEnum::LOADCONFIG_KEYS_ONLY && $intTyp != SyncCtoEnum::LOADCONFIG_KEY_VALUE)
         {
@@ -396,57 +396,6 @@ class SyncCtoHelper extends Backend
         }
 
         return $groups;
-    }
-
-    /* -------------------------------------------------------------------------
-     * Load options for list
-     */
-
-    public function localconfigEntries()
-    {
-        // Read the local configuration file
-        $strMode = 'top';
-        $resFile = fopen(TL_ROOT . '/system/config/localconfig.php', 'rb');
-
-        $arrData = array();
-
-        while (!feof($resFile))
-        {
-            $strLine = fgets($resFile);
-            $strTrim = trim($strLine);
-
-            if ($strTrim == '?>')
-            {
-                continue;
-            }
-            if ($strTrim == '### INSTALL SCRIPT START ###')
-            {
-                $strMode = 'data';
-                continue;
-            }
-            if ($strTrim == '### INSTALL SCRIPT STOP ###')
-            {
-                $strMode = 'bottom';
-                continue;
-            }
-            if ($strMode == 'top')
-            {
-                $this->strTop .= $strLine;
-            }
-            elseif ($strMode == 'bottom')
-            {
-                $this->strBottom .= $strLine;
-            }
-            elseif ($strTrim != '')
-            {
-                $arrChunks = array_map('trim', explode('=', $strLine, 2));
-                $arrData[] = str_replace(array("$", "GLOBALS['TL_CONFIG']['", "']"), array("", "", ""), $arrChunks[0]);
-            }
-        }
-
-        fclose($resFile);
-
-        return $arrData;
     }
 
     /**

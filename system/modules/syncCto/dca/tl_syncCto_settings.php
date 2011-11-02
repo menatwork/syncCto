@@ -1,7 +1,4 @@
-<?php
-
-if (!defined('TL_ROOT'))
-    die('You can not access this file directly!');
+<?php if (!defined('TL_ROOT')) die('You can not access this file directly!');
 
 /**
  * Contao Open Source CMS
@@ -29,6 +26,7 @@ if (!defined('TL_ROOT'))
  * @license    GNU/LGPL
  * @filesource
  */
+
 $GLOBALS['TL_DCA']['tl_syncCto_settings'] = array(
     // Config
     'config' => array
@@ -74,7 +72,7 @@ $GLOBALS['TL_DCA']['tl_syncCto_settings'] = array(
             'inputType' => 'checkboxWizard',
             'exclude' => true,
             'eval' => array('multiple' => true),
-            'options_callback' => array('SyncCtoHelper', 'localconfigEntries'),
+            'options_callback' => array('tl_syncCto_settings', 'localconfigEntries'),
             'load_callback' => array(array('tl_syncCto_settings', 'loadBlacklistLocalconfig')),
         ),
         'syncCto_hidden_tables' => array
@@ -144,6 +142,57 @@ class tl_syncCto_settings extends Backend
     public function loadTablesHidden($strValue)
     {
         return $this->objSyncCtoHelper->getTablesHidden();
+    }
+
+    /* -------------------------------------------------------------------------
+     * Load options for list
+     */
+
+    public function localconfigEntries()
+    {
+        // Read the local configuration file
+        $strMode = 'top';
+        $resFile = fopen(TL_ROOT . '/system/config/localconfig.php', 'rb');
+
+        $arrData = array();
+
+        while (!feof($resFile))
+        {
+            $strLine = fgets($resFile);
+            $strTrim = trim($strLine);
+
+            if ($strTrim == '?>')
+            {
+                continue;
+            }
+            if ($strTrim == '### INSTALL SCRIPT START ###')
+            {
+                $strMode = 'data';
+                continue;
+            }
+            if ($strTrim == '### INSTALL SCRIPT STOP ###')
+            {
+                $strMode = 'bottom';
+                continue;
+            }
+            if ($strMode == 'top')
+            {
+                $this->strTop .= $strLine;
+            }
+            elseif ($strMode == 'bottom')
+            {
+                $this->strBottom .= $strLine;
+            }
+            elseif ($strTrim != '')
+            {
+                $arrChunks = array_map('trim', explode('=', $strLine, 2));
+                $arrData[] = str_replace(array("$", "GLOBALS['TL_CONFIG']['", "']"), array("", "", ""), $arrChunks[0]);
+            }
+        }
+
+        fclose($resFile);
+
+        return $arrData;
     }
 
 }

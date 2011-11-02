@@ -322,7 +322,7 @@ class SyncCtoCommunicationClient extends CtoCommunication
     public function startLocalConfigImport()
     {
         $arrConfigBlacklist = $this->objSyncCtoHelper->getBlacklistLocalconfig();
-        $arrConfig = $this->objSyncCtoHelper->loadConfig(SyncCtoEnum::LOADCONFIG_KEY_VALUE);
+        $arrConfig = $this->objSyncCtoHelper->loadConfigs(SyncCtoEnum::LOADCONFIG_KEY_VALUE);
 
         foreach ($arrConfig as $key => $value)
         {

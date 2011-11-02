@@ -401,7 +401,7 @@ class SyncCtoModuleBackup extends BackendModule
             case 2:
                 if ($arrStepPool["syncCto_Typ"] == SYNCCTO_SMALL)
                 {
-                    $arrStepPool["zipname"] = $this->objSyncCtoFiles->runDumpTlFiles($arrStepPool["backup_name"], $arrStepPool["filelist"]);
+                    $arrStepPool["zipname"] = $this->objSyncCtoFiles->runDumpFiles($arrStepPool["backup_name"], $arrStepPool["filelist"]);
                 }
 
                 if ($arrStepPool["syncCto_Typ"] == SYNCCTO_FULL)
