@@ -58,7 +58,7 @@ $GLOBALS['TL_DCA']['tl_syncCto_clients_syncTo'] = array(
             'exclude' => true,
             'eval' => array('helpwizard' => true),
             'reference' => &$GLOBALS['TL_LANG']['SYC'],
-            'options_callback' => array('SyncCtoCallback', 'getSyncType'),
+            'options_callback' => array('SyncCtoHelper', 'getSyncType'),
         ),
         'database_tables_recommended' => array
             (
@@ -66,7 +66,7 @@ $GLOBALS['TL_DCA']['tl_syncCto_clients_syncTo'] = array(
             'inputType' => 'checkbox',
             'exclude' => true,
             'eval' => array('multiple' => true),
-            'options_callback' => array('SyncCtoCallback', 'databaseTablesRecommended'),
+            'options_callback' => array('SyncCtoHelper', 'databaseTablesRecommended'),
         ),
         'database_tables_none_recommended' => array
             (
@@ -74,7 +74,7 @@ $GLOBALS['TL_DCA']['tl_syncCto_clients_syncTo'] = array(
             'inputType' => 'checkbox',
             'exclude' => true,
             'eval' => array('multiple' => true),
-            'options_callback' => array('SyncCtoCallback', 'databaseTablesNoneRecommended'),
+            'options_callback' => array('SyncCtoHelper', 'databaseTablesNoneRecommended'),
         ),
         'filelist' => array
             (

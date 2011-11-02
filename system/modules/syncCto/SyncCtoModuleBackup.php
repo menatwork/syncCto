@@ -38,7 +38,6 @@ class SyncCtoModuleBackup extends BackendModule
     // Helper Class
     protected $objSyncCtoDatabase;
     protected $objSyncCtoFiles;
-    protected $objSyncCtoCallback;
 
     function __construct(DataContainer $objDc = null)
     {
@@ -47,7 +46,6 @@ class SyncCtoModuleBackup extends BackendModule
 
         $this->objSyncCtoDatabase = SyncCtoDatabase::getInstance();
         $this->objSyncCtoFiles = SyncCtoFiles::getInstance();
-        $this->objSyncCtoCallback = SyncCtoCallback::getInstance();
 
         $this->loadLanguageFile('tl_syncCto_backup');
         $this->loadLanguageFile('tl_syncCto_steps');

@@ -61,7 +61,7 @@ $GLOBALS['TL_DCA']['tl_user']['fields']['syncCto_tables'] = array
     'inputType' => 'checkboxWizard',
     'exclude' => true,
     'eval' => array('multiple' => true),
-    'options_callback' => array('SyncCtoCallback', 'databaseTables'),
+    'options_callback' => array('SyncCtoHelper', 'databaseTables'),
 );
 
 ?>

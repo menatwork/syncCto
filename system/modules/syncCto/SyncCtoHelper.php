@@ -26,7 +26,7 @@
  * @license    GNU/LGPL
  * @filesource
  */
-
+ 
 class SyncCtoHelper extends Backend
 {
 
@@ -65,9 +65,11 @@ class SyncCtoHelper extends Backend
         {
             foreach ($arrLocalconfig as $value)
             {
-                if (in_array($value, $arrSyncCtoConfig)) continue;
+                if (in_array($value, $arrSyncCtoConfig))
+                    continue;
 
-                if ($value == "") continue;
+                if ($value == "")
+                    continue;
 
                 $arrSyncCtoConfig[] = $value;
             }
@@ -184,11 +186,12 @@ class SyncCtoHelper extends Backend
         return $arrData;
     }
 
-   public function buildPath()
+    public function buildPath()
     {
         $arrPath = func_get_args();
 
-        if (count($arrPath) == 0 || $arrPath == null || $arrPath == "") return TL_ROOT;
+        if (count($arrPath) == 0 || $arrPath == null || $arrPath == "")
+            return TL_ROOT;
 
         $strVar = "";
 
@@ -199,7 +202,8 @@ class SyncCtoHelper extends Backend
 
             foreach ($itPath as $itFolder)
             {
-                if ($itFolder == "" || $itFolder == "." || $itFolder == "..") continue;
+                if ($itFolder == "" || $itFolder == "." || $itFolder == "..")
+                    continue;
 
                 $strVar .= "/" . $itFolder;
             }
@@ -212,7 +216,8 @@ class SyncCtoHelper extends Backend
     {
         $arrPath = func_get_args();
 
-        if (count($arrPath) == 0 || $arrPath == null || $arrPath == "") return "";
+        if (count($arrPath) == 0 || $arrPath == null || $arrPath == "")
+            return "";
 
         $strVar = "";
 
@@ -223,20 +228,21 @@ class SyncCtoHelper extends Backend
 
             foreach ($itPath as $itFolder)
             {
-                if ($itFolder == "" || $itFolder == "." || $itFolder == "..") continue;
+                if ($itFolder == "" || $itFolder == "." || $itFolder == "..")
+                    continue;
 
                 $strVar .= "/" . $itFolder;
             }
         }
-        
+
         return preg_replace("/^\//i", "", $strVar);
     }
-    
+
     /**
      * Ping client status
      */
     public function pingClientStatus($strAction)
-    {        
+    {
         if ($strAction == 'syncCtoPing')
         {
             $objRequest = new Request();
@@ -244,6 +250,297 @@ class SyncCtoHelper extends Backend
             echo ($objRequest->code == '200') ? "true" : "false";
             exit();
         }
+    }
+
+    public function checkExtensions($strContent, $strTemplate)
+    {
+        if ($strTemplate == 'be_main')
+        {
+            if (!is_array($_SESSION["TL_INFO"]))
+                $_SESSION["TL_INFO"] = array();
+
+            // required extensions
+            $arrRequiredExtensions = array('ctoCommunication', 'httprequestextended', 'textwizard', '3cframework');
+
+            // required files
+            $arrRequiredFiles = array('system/drivers/DC_Memory.php');
+
+            // check for required extensions
+            foreach ($arrRequiredExtensions as $val)
+            {
+                if (!in_array($val, $this->Config->getActiveModules()))
+                {
+                    $_SESSION["TL_INFO"] = array_merge($_SESSION["TL_INFO"], array($val => 'Please install the required extension <strong>' . $val . '</strong>'));
+                }
+                else
+                {
+                    if (is_array($_SESSION["TL_INFO"]) && key_exists($val, $_SESSION["TL_INFO"]))
+                    {
+                        unset($_SESSION["TL_INFO"][$val]);
+                    }
+                }
+            }
+
+            // check for required files
+            foreach ($arrRequiredFiles as $val)
+            {
+                if (!file_exists(TL_ROOT . '/' . $val))
+                {
+                    $_SESSION["TL_INFO"] = array_merge($_SESSION["TL_INFO"], array($val => 'Please install the required file <strong>' . $val . '</strong>'));
+                }
+                else
+                {
+                    if (is_array($_SESSION["TL_INFO"]) && key_exists($val, $_SESSION["TL_INFO"]))
+                    {
+                        unset($_SESSION["TL_INFO"][$val]);
+                    }
+                }
+            }
+
+            // Last syncTo with time and user information
+            if ($this->Input->get("do") == "synccto_clients" && $this->Input->get("table") == "tl_syncCto_clients_syncTo")
+            {
+                $objSyncTime = $this->Database->prepare("SELECT cl.syncTo_tstamp as syncTo_tstamp, user.name as syncTo_user, user.username as syncTo_alias
+                                            FROM tl_synccto_clients as cl 
+                                            INNER JOIN tl_user as user
+                                            ON cl.syncTo_user = user.id
+                                            WHERE cl.id = ?")
+                        ->limit(1)
+                        ->execute($this->Input->get("id"));
+
+                if ($objSyncTime->syncTo_tstamp != "" && $objSyncTime->syncTo_user != "" && $objSyncTime->syncTo_tstamp != '0' && $objSyncTime->syncTo_user != '0')
+                {
+                    $strLastSync = vsprintf($GLOBALS['TL_LANG']['MSC']['information_last_sync'], array(
+                        date($GLOBALS['TL_CONFIG']['timeFormat'], $objSyncTime->syncTo_tstamp),
+                        date($GLOBALS['TL_CONFIG']['dateFormat'], $objSyncTime->syncTo_tstamp),
+                        $objSyncTime->syncTo_user,
+                        $objSyncTime->syncTo_alias)
+                    );
+
+                    $_SESSION["TL_INFO"] = array_merge($_SESSION["TL_INFO"], array("lastSyncTo" => $strLastSync));
+                }
+            }
+            else
+            {
+                unset($_SESSION["TL_INFO"]["lastSyncTo"]);
+            }
+
+            // Last syncFrom with time and user information
+            if ($this->Input->get("do") == "synccto_clients" && $this->Input->get("table") == "tl_syncCto_clients_syncFrom")
+            {
+                $objSyncTime = $this->Database->prepare("SELECT cl.syncFrom_tstamp as syncFrom_tstamp, user.name as syncFrom_user
+                          FROM tl_synccto_clients as cl
+                          INNER JOIN tl_user as user
+                          ON cl.syncFrom_user = user.id
+                          WHERE cl.id = ?")
+                        ->limit(1)
+                        ->execute($this->Input->get("id"));
+
+                if ($objSyncTime->syncFrom_tstamp != "" && $objSyncTime->syncFrom_user != "" && $objSyncTime->syncFrom_tstamp != '0' && $objSyncTime->syncFrom_user != '0')
+                {
+                    $strLastSync = vsprintf($GLOBALS['TL_LANG']['MSC']['information_last_sync'], array(
+                        date($GLOBALS['TL_CONFIG']['timeFormat'], $objSyncTime->syncFrom_tstamp),
+                        date($GLOBALS['TL_CONFIG']['dateFormat'], $objSyncTime->syncFrom_tstamp),
+                        $objSyncTime->syncFrom_user,
+                        $objSyncTime->syncTo_alias)
+                    );
+
+                    $_SESSION["TL_INFO"] = array_merge($_SESSION["TL_INFO"], array("lastSyncFrom" => $strLastSync));
+                }
+            }
+            else
+            {
+                unset($_SESSION["TL_INFO"]["lastSyncFrom"]);
+            }
+        }
+
+        return $strContent;
+    }
+
+    //- ---------------------------------------------------------------------- -
+
+
+    /* -------------------------------------------------------------------------
+     * Return all sync types as array
+     */
+
+    public function getSyncType()
+    {
+        $groups = array();
+
+        foreach ($GLOBALS['SYC_SYNC'] as $key => $value)
+        {
+            foreach ($value as $key2 => $value2)
+            {
+                $groups[$key][$value2] = $key2;
+            }
+        }
+
+        return $groups;
+    }
+
+    /* -------------------------------------------------------------------------
+     * Return all backup types as array
+     */
+
+    public function getBackupType()
+    {
+        $groups = array();
+
+        foreach ($GLOBALS['SYC_BACKUP'] as $key => $value)
+        {
+            foreach ($value as $key2 => $value2)
+            {
+                $groups[$key][$value2] = $key2;
+            }
+        }
+
+        return $groups;
+    }
+
+    /* -------------------------------------------------------------------------
+     * Load options for list
+     */
+
+    public function localconfigEntries()
+    {
+        // Read the local configuration file
+        $strMode = 'top';
+        $resFile = fopen(TL_ROOT . '/system/config/localconfig.php', 'rb');
+
+        $arrData = array();
+
+        while (!feof($resFile))
+        {
+            $strLine = fgets($resFile);
+            $strTrim = trim($strLine);
+
+            if ($strTrim == '?>')
+            {
+                continue;
+            }
+            if ($strTrim == '### INSTALL SCRIPT START ###')
+            {
+                $strMode = 'data';
+                continue;
+            }
+            if ($strTrim == '### INSTALL SCRIPT STOP ###')
+            {
+                $strMode = 'bottom';
+                continue;
+            }
+            if ($strMode == 'top')
+            {
+                $this->strTop .= $strLine;
+            }
+            elseif ($strMode == 'bottom')
+            {
+                $this->strBottom .= $strLine;
+            }
+            elseif ($strTrim != '')
+            {
+                $arrChunks = array_map('trim', explode('=', $strLine, 2));
+                $arrData[] = str_replace(array("$", "GLOBALS['TL_CONFIG']['", "']"), array("", "", ""), $arrChunks[0]);
+            }
+        }
+
+        fclose($resFile);
+
+        return $arrData;
+    }
+
+    /**
+     * Returns a whole list of all tables in the database
+     * @return array 
+     */
+    public function hiddenTables()
+    {
+        $arrTables = array();
+
+        foreach ($this->Database->listTables() as $key => $value)
+        {
+            $arrTables[] = $value;
+        }
+
+        return $arrTables;
+    }
+
+    /**
+     * Returns a list without the hidden tables.
+     * 
+     * @return array 
+     */
+    public function databaseTables()
+    {
+        $arrTables = array();
+        $arrTablesHidden = $this->getTablesHidden();
+
+        foreach ($this->Database->listTables() as $key => $value)
+        {
+            // Check if table is a hidden one.
+            if (in_array($value, $arrTablesHidden))
+                continue;
+
+            $arrTables[] = $value;
+        }
+
+        return $arrTables;
+    }
+
+    public function databaseTablesRecommended()
+    {
+        // Recommended tables
+        $arrBlacklist = deserialize($GLOBALS['TL_CONFIG']['syncCto_database_tables']);
+        if (!is_array($arrBlacklist))
+        {
+            $arrBlacklist = array();
+        }
+
+        $arrTablesPermission = $this->BackendUser->syncCto_tables;
+
+        $arrTables = array();
+
+        foreach ($this->databaseTables() as $key => $value)
+        {
+            if (in_array($value, $arrBlacklist))
+                continue;
+
+            if (is_array($arrTablesPermission) && !in_array($value, $arrTablesPermission) && $this->BackendUser->isAdmin != true)
+            {
+                continue;
+            }
+            $arrTables[] = $value;
+        }
+
+        return $arrTables;
+    }
+
+    public function databaseTablesNoneRecommended()
+    {
+        // None recommended tables
+        $arrBlacklist = deserialize($GLOBALS['TL_CONFIG']['syncCto_database_tables']);
+        if (!is_array($arrBlacklist))
+        {
+            $arrBlacklist = array();
+        }
+
+        $arrTablesPermission = $this->BackendUser->syncCto_tables;
+
+        $arrTables = array();
+
+        foreach ($this->databaseTables() as $key => $value)
+        {
+            if (!in_array($value, $arrBlacklist))
+                continue;
+
+            if (is_array($arrTablesPermission) && !in_array($value, $arrTablesPermission) && $this->BackendUser->isAdmin != true)
+            {
+                continue;
+            }
+            $arrTables[] = $value;
+        }
+
+        return $arrTables;
     }
 
 }

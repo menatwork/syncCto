@@ -60,7 +60,7 @@ $GLOBALS['TL_DCA']['tl_syncCto_backup_file'] = array(
             'inputType' => 'select',
             'exclude' => true,
             'reference' => &$GLOBALS['TL_LANG']['SYC'],
-            'options_callback' => array('SyncCtoCallback', 'getBackupType'),
+            'options_callback' => array('SyncCtoHelper', 'getBackupType'),
         ),
         'filelist' => array
             (

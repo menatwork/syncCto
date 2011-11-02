@@ -55,7 +55,7 @@ $GLOBALS['TL_DCA']['tl_syncCto_clients_syncFrom'] = array(
             'exclude' => true,
             'eval' => array('helpwizard' => true),
             'reference' => &$GLOBALS['TL_LANG']['SYC'],
-            'options_callback' => array('SyncCtoCallback', 'getSyncType'),
+            'options_callback' => array('SyncCtoHelper', 'getSyncType'),
         ),
         'confirm_db_import' => array
             (

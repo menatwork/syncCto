@@ -74,7 +74,7 @@ $GLOBALS['TL_DCA']['tl_syncCto_settings'] = array(
             'inputType' => 'checkboxWizard',
             'exclude' => true,
             'eval' => array('multiple' => true),
-            'options_callback' => array('SyncCtoCallback', 'localconfigEntries'),
+            'options_callback' => array('SyncCtoHelper', 'localconfigEntries'),
             'load_callback' => array(array('tl_syncCto_settings', 'loadBlacklistLocalconfig')),
         ),
         'syncCto_hidden_tables' => array
@@ -83,7 +83,7 @@ $GLOBALS['TL_DCA']['tl_syncCto_settings'] = array(
             'inputType' => 'checkboxWizard',
             'exclude' => true,
             'eval' => array('multiple' => true),
-            'options_callback' => array('SyncCtoCallback', 'hiddenTables'),
+            'options_callback' => array('SyncCtoHelper', 'hiddenTables'),
             'load_callback' => array(array('tl_syncCto_settings', 'loadTablesHidden')),
         ),
         'syncCto_database_tables' => array
@@ -92,7 +92,7 @@ $GLOBALS['TL_DCA']['tl_syncCto_settings'] = array(
             'inputType' => 'checkboxWizard',
             'exclude' => true,
             'eval' => array('multiple' => true),
-            'options_callback' => array('SyncCtoCallback', 'databaseTables'),
+            'options_callback' => array('SyncCtoHelper', 'databaseTables'),
         ),
         'syncCto_debug_mode' => array
             (

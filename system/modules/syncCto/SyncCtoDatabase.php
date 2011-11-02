@@ -217,7 +217,7 @@ class SyncCtoDatabase extends Backend
     }
 
     /**
-     * Restore database-bakup from zip
+     * Restore database-backup from zip
      * 
      * @param string $strRestoreFile Path to file like system/backup/backup.zip
      * @param bool $booTruncate 

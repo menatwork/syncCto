@@ -155,16 +155,6 @@ $GLOBALS['TL_DCA']['tl_synccto_clients'] = array(
     )
 );
 
-/**
- * Callback and fallback if function mdecrypt not exists   
- */
-if (!function_exists("mdecrypt_generic"))
-{
-    unset($GLOBALS['TL_DCA']['tl_syncCto_clients']['fields']['password']['eval']['encrypt']);
-    $GLOBALS['TL_DCA']['tl_syncCto_clients']['fields']['password']['load_callback'] = array(array("SyncCtoCallback", "loadcallUserPassword"));
-    $GLOBALS['TL_DCA']['tl_syncCto_clients']['fields']['password']['save_callback'] = array(array("SyncCtoCallback", "savecallUserPassword"));
-}
-
 class tl_synccto_clients extends Backend
 {
 

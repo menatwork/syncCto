@@ -65,8 +65,7 @@ class SyncCtoModuleClient extends BackendModule
 
         // Load Helper
         $this->objSyncCtoDatabase = SyncCtoDatabase::getInstance();
-        $this->objSyncCtoFiles = SyncCtoFiles::getInstance();
-        $this->objSyncCtoCallback = SyncCtoCallback::getInstance();
+        $this->objSyncCtoFiles = SyncCtoFiles::getInstance();        
         $this->objSyncCtoCommunicationClient = SyncCtoCommunicationClient::getInstance();
         $this->objSyncCtoHelper = SyncCtoHelper::getInstance();
 
@@ -313,7 +312,7 @@ class SyncCtoModuleClient extends BackendModule
 
                     // Current step is okay.
                     $arrContenData["data"][1]["state"] = $GLOBALS['TL_LANG']['tl_syncCto_steps']['ok'];
-                    $arrContenData["data"][1]["description"] = $GLOBALS['TL_LANG']['tl_syncCto_sync']["step_1"]['description_3'];
+                    $arrContenData["data"][1]["description"] = $GLOBALS['TL_LANG']['tl_syncCto_sync']["step_1"]['description_1'];
 
                     // Create next step.
                     $arrContenData["data"][2]["state"] = $GLOBALS['TL_LANG']['tl_syncCto_steps']['progress'];
@@ -439,8 +438,7 @@ class SyncCtoModuleClient extends BackendModule
                         {
                             $this->arrListFile = array_merge($this->arrListFile, array());
                         }
-
-                        $arrContenData["data"][2]["description"] = $GLOBALS['TL_LANG']['tl_syncCto_sync']["step_2"]['description_2'];
+                        
                         $mixStepPool["step"] = 3;
 
                         break;
@@ -451,7 +449,7 @@ class SyncCtoModuleClient extends BackendModule
                     case 3:
                         $this->arrListCompare = $this->objSyncCtoCommunicationClient->runCecksumCompare($this->arrListFile);
 
-                        $arrContenData["data"][2]["description"] = $GLOBALS['TL_LANG']['tl_syncCto_sync']["step_2"]['description_3'];
+                        $arrContenData["data"][2]["description"] = $GLOBALS['TL_LANG']['tl_syncCto_sync']["step_2"]['description_2'];
                         $mixStepPool["step"] = 4;
 
                         break;
@@ -474,7 +472,7 @@ class SyncCtoModuleClient extends BackendModule
 
                         unset($arrChecksumClient);
 
-                        $arrContenData["data"][2]["description"] = $GLOBALS['TL_LANG']['tl_syncCto_sync']["step_2"]['description_4'];
+                        $arrContenData["data"][2]["description"] = $GLOBALS['TL_LANG']['tl_syncCto_sync']["step_2"]['description_3'];
                         $mixStepPool["step"] = 5;
 
                         break;
@@ -532,7 +530,7 @@ class SyncCtoModuleClient extends BackendModule
                         {
                             // Set current step informations
                             $arrContenData["data"][2]["state"] = $GLOBALS['TL_LANG']['tl_syncCto_steps']['ok'];
-                            $arrContenData["data"][2]["description"] = $GLOBALS['TL_LANG']['tl_syncCto_sync']["step_2"]['description_4'];
+                            $arrContenData["data"][2]["description"] = $GLOBALS['TL_LANG']['tl_syncCto_sync']["step_2"]['description_1'];
                             $arrContenData["data"][2]["html"] = "";
                             $arrContenData["refresh"] = true;
 
@@ -592,7 +590,7 @@ class SyncCtoModuleClient extends BackendModule
                         {
                             // Set current step informations
                             $arrContenData["data"][2]["state"] = $GLOBALS['TL_LANG']['tl_syncCto_steps']['skipped'];
-                            $arrContenData["data"][2]["description"] = $GLOBALS['TL_LANG']['tl_syncCto_sync']["step_2"]['description_4'];
+                            $arrContenData["data"][2]["description"] = $GLOBALS['TL_LANG']['tl_syncCto_sync']["step_2"]['description_1'];
                             $arrContenData["data"][2]["html"] = "";
                             $arrContenData["refresh"] = true;
 
@@ -616,7 +614,7 @@ class SyncCtoModuleClient extends BackendModule
                         $objTemp->compare_complex = false;
 
                         // Build content                       
-                        $arrContenData["data"][2]["description"] = vsprintf($GLOBALS['TL_LANG']['tl_syncCto_sync']["step_2"]['description_6'], array($intCountMissing, $intCountNeed, $intCountDelete, $intCountIgnored));
+                        $arrContenData["data"][2]["description"] = vsprintf($GLOBALS['TL_LANG']['tl_syncCto_sync']["step_2"]['description_4'], array($intCountMissing, $intCountNeed, $intCountDelete, $intCountIgnored));
                         $arrContenData["data"][2]["html"] = $objTemp->parse();
                         $arrContenData["refresh"] = false;
 
@@ -798,7 +796,7 @@ class SyncCtoModuleClient extends BackendModule
                             {
                                 $mixStepPool["step"] = 3;
 
-                                $arrContenData["data"][3]["description"] = vsprintf($GLOBALS['TL_LANG']['tl_syncCto_sync']["step_3"]['description_3'], array(0, $intCountSplit));
+                                $arrContenData["data"][3]["description"] = vsprintf($GLOBALS['TL_LANG']['tl_syncCto_sync']["step_3"]['description_2'], array(0, $intCountSplit));
                                 $arrContenData["data"][3]["html"] = "";
                                 $arrContenData["refresh"] = true;
 
@@ -913,12 +911,12 @@ class SyncCtoModuleClient extends BackendModule
                         if ($intCount != $intCountSplit)
                         {
                             $mixStepPool["step"] = 3;
-                            $arrContenData["data"][3]["description"] = vsprintf($GLOBALS['TL_LANG']['tl_syncCto_sync']["step_3"]['description_3'], array($intCount, $intCountSplit));
+                            $arrContenData["data"][3]["description"] = vsprintf($GLOBALS['TL_LANG']['tl_syncCto_sync']["step_3"]['description_2'], array($intCount, $intCountSplit));
                         }
                         else
                         {
                             $mixStepPool["step"] = 4;
-                            $arrContenData["data"][3]["description"] = vsprintf($GLOBALS['TL_LANG']['tl_syncCto_sync']["step_3"]['description_3'], array($intCount, $intCountSplit));
+                            $arrContenData["data"][3]["description"] = vsprintf($GLOBALS['TL_LANG']['tl_syncCto_sync']["step_3"]['description_2'], array($intCount, $intCountSplit));
                         }
 
                         break;
@@ -971,12 +969,12 @@ class SyncCtoModuleClient extends BackendModule
                         if ($intCount != $intCountSplit)
                         {
                             $mixStepPool["step"] = 4;
-                            $arrContenData["data"][3]["description"] = vsprintf($GLOBALS['TL_LANG']['tl_syncCto_sync']["step_3"]['description_4'], array($intCount, $intCountSplit));
+                            $arrContenData["data"][3]["description"] = vsprintf($GLOBALS['TL_LANG']['tl_syncCto_sync']["step_3"]['description_2'], array($intCount, $intCountSplit));
                         }
                         else
                         {
                             $mixStepPool["step"] = 5;
-                            $arrContenData["data"][3]["description"] = $GLOBALS['TL_LANG']['tl_syncCto_sync']["step_3"]['description_5'];
+                            $arrContenData["data"][3]["description"] = $GLOBALS['TL_LANG']['tl_syncCto_sync']["step_3"]['description_3'];
                         }
 
                         break;
@@ -1029,10 +1027,11 @@ class SyncCtoModuleClient extends BackendModule
                         if ($intCount != $intCountSplit)
                         {
                             $mixStepPool["step"] = 5;
-                            $arrContenData["data"][3]["description"] = vsprintf($GLOBALS['TL_LANG']['tl_syncCto_sync']["step_3"]['description_6'], array($intCount, $intCountSplit));
+                            $arrContenData["data"][3]["description"] = vsprintf($GLOBALS['TL_LANG']['tl_syncCto_sync']["step_3"]['description_4'], array($intCount, $intCountSplit));
                         }
                         else
                         {
+                            $arrContenData["data"][3]["description"] = $GLOBALS['TL_LANG']['tl_syncCto_sync']["step_3"]['description_1'];
                             $arrContenData["data"][3]["state"] = $GLOBALS['TL_LANG']['tl_syncCto_steps']['ok'];
 
                             $this->intStep++;
@@ -1355,7 +1354,7 @@ class SyncCtoModuleClient extends BackendModule
                     else
                     {
                         $mixStepPool["step"] = 3;
-                        $arrContenData["data"][5]["description"] = $GLOBALS['TL_LANG']['tl_syncCto_sync']["step_5"]['description_3'];
+                        $arrContenData["data"][5]["description"] = $GLOBALS['TL_LANG']['tl_syncCto_sync']["step_5"]['description_1'];
                     }
 
                     break;
@@ -1386,8 +1385,7 @@ class SyncCtoModuleClient extends BackendModule
                             }
                         }
                     }
-
-                    $arrContenData["data"][5]["description"] = $GLOBALS['TL_LANG']['tl_syncCto_sync']["step_5"]['description_4'];
+                   
                     $mixStepPool["step"] = 4;
                     break;
 
@@ -1418,7 +1416,7 @@ class SyncCtoModuleClient extends BackendModule
                         }
                     }
 
-                    $arrContenData["data"][5]["description"] = $GLOBALS['TL_LANG']['tl_syncCto_sync']["step_5"]['description_5'];
+                    $arrContenData["data"][5]["description"] = $GLOBALS['TL_LANG']['tl_syncCto_sync']["step_5"]['description_3'];
                     $mixStepPool["step"] = 5;
                     break;
 
@@ -1434,7 +1432,7 @@ class SyncCtoModuleClient extends BackendModule
                         break;
                     }
 
-                    $arrContenData["data"][5]["description"] = $GLOBALS['TL_LANG']['tl_syncCto_sync']["step_5"]['description_6'];
+                    $arrContenData["data"][5]["description"] = $GLOBALS['TL_LANG']['tl_syncCto_sync']["step_5"]['description_1'];
 
                 /** ------------------------------------------------------------
                  * Cleanup
@@ -1476,14 +1474,14 @@ class SyncCtoModuleClient extends BackendModule
                     {
                         $mixStepPool["step"] = 7;
 
-                        $arrContenData["data"][5]["description"] = vsprintf($GLOBALS['TL_LANG']['tl_syncCto_sync']["step_5"]['description_7'], array($intSendCount, count($this->arrListCompare)));
+                        $arrContenData["data"][5]["description"] = vsprintf($GLOBALS['TL_LANG']['tl_syncCto_sync']["step_5"]['description_2'], array($intSendCount, count($this->arrListCompare)));
                         $arrContenData["data"][5]["state"] = $GLOBALS['TL_LANG']['tl_syncCto_steps']['ok'];
                         $arrContenData["finished"] = true;
                     }
 
                     if ($intSkippCount != 0)
                     {
-                        $compare .= '<br /><p class="tl_help">' . $intSkippCount . $GLOBALS['TL_LANG']['tl_syncCto_sync']["step_5"]['description_8'] . '</p>';
+                        $compare .= '<br /><p class="tl_help">' . $intSkippCount . $GLOBALS['TL_LANG']['tl_syncCto_sync']["step_5"]['description_4'] . '</p>';
 
                         $arrSort = array();
 
@@ -1518,7 +1516,7 @@ class SyncCtoModuleClient extends BackendModule
                         {
                             // Send Part
 
-                            $compare .= '<br /><p class="tl_help">' . $intSendCount . $GLOBALS['TL_LANG']['tl_syncCto_clients_syncTo']['step5_msg6'] . '</p>';
+                            $compare .= '<br /><p class="tl_help">' . $intSendCount . $GLOBALS['TL_LANG']['tl_syncCto_sync']["step_5"]['description_5'] . '</p>';
 
                             $arrSort = array();
 
@@ -1570,7 +1568,7 @@ class SyncCtoModuleClient extends BackendModule
 
                             // Not sended, still waiting
 
-                            $compare .= '<br /><p class="tl_help">' . $intWaitCount . $GLOBALS['TL_LANG']['tl_syncCto_clients_syncTo']['step5_msg6'] . '</p>';
+                            $compare .= '<br /><p class="tl_help">' . $intWaitCount . $GLOBALS['TL_LANG']['tl_syncCto_sync']["step_5"]['description_6'] . '</p>';
 
                             $arrSort = array();
 

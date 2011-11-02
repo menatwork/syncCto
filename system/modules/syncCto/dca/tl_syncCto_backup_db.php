@@ -56,13 +56,13 @@ $GLOBALS['TL_DCA']['tl_syncCto_backup_db'] = array(
             'label' => &$GLOBALS['TL_LANG']['tl_syncCto_backup_db']['database_tables_recommended'],
             'inputType' => 'checkbox',
             'eval' => array('multiple' => true),
-            'options_callback' => array('SyncCtoCallback', 'databaseTablesRecommended'),
+            'options_callback' => array('SyncCtoHelper', 'databaseTablesRecommended'),
         ),
         'database_tables_none_recommended' => array(
             'label' => &$GLOBALS['TL_LANG']['tl_syncCto_backup_db']['database_tables_none_recommended'],
             'inputType' => 'checkbox',
             'eval' => array('multiple' => true),
-            'options_callback' => array('SyncCtoCallback', 'databaseTablesNoneRecommended'),
+            'options_callback' => array('SyncCtoHelper', 'databaseTablesNoneRecommended'),
         ),
     )
 );

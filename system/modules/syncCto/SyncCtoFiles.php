@@ -40,7 +40,7 @@ class SyncCtoFiles extends Backend
     protected static $instance = null;
     // Vars
     protected $strSuffixZipName = "File-Backup.zip";
-    protected $strTimestampFormat = "Ymd_H-i-s";
+    protected $strTimestampFormat;
     // Objects 
     protected $objSyncCtoHelper;
 
@@ -54,6 +54,8 @@ class SyncCtoFiles extends Backend
 
         // My Class
         $this->objSyncCtoHelper = SyncCtoHelper::getInstance();
+        
+        $this->strTimestampFormat = standardize($GLOBALS['TL_CONFIG']['datimFormat']);        
         
         set_time_limit(0);
     }

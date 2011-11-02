@@ -98,5 +98,7 @@ $GLOBALS['TL_LANG']['tl_syncCto_sync']["step_5"]['description_1'] = "Dateien ver
 $GLOBALS['TL_LANG']['tl_syncCto_sync']["step_5"]['description_2'] = "%s von %s Datei(en) transferiert.";
 $GLOBALS['TL_LANG']['tl_syncCto_sync']["step_5"]['description_3'] = "Konfigurationsdateien importieren.";
 $GLOBALS['TL_LANG']['tl_syncCto_sync']["step_5"]['description_4'] = " Datei(en) übersprungen.";
+$GLOBALS['TL_LANG']['tl_syncCto_sync']["step_5"]['description_5'] = " Datei(en) gesendet.";
+$GLOBALS['TL_LANG']['tl_syncCto_sync']["step_5"]['description_6'] = " Datei(en) wartend.";
 
 ?>
