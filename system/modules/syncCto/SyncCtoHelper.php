@@ -26,7 +26,7 @@
  * @license    GNU/LGPL
  * @filesource
  */
- 
+
 class SyncCtoHelper extends Backend
 {
 
@@ -42,8 +42,8 @@ class SyncCtoHelper extends Backend
     }
 
     /**
-     *
-     * @return SyncCtoHelper 
+     * Returns the SyncCtoHelper
+     * @return SyncCtoHelper
      */
     public static function getInstance()
     {
@@ -55,21 +55,21 @@ class SyncCtoHelper extends Backend
         return self::$instance;
     }
 
-    /* -------------------------------------------------------------------------
+    /**
      * Configuration merge functions
+     * @param array $arrLocalconfig
+     * @param array $arrSyncCtoConfig
+     * @return array
      */
-
     private function mergeConfigs($arrLocalconfig, $arrSyncCtoConfig)
     {
         if (is_array($arrLocalconfig) && is_array($arrSyncCtoConfig))
         {
             foreach ($arrLocalconfig as $value)
             {
-                if (in_array($value, $arrSyncCtoConfig))
-                    continue;
+                if (in_array($value, $arrSyncCtoConfig)) continue;
 
-                if ($value == "")
-                    continue;
+                if ($value == "") continue;
 
                 $arrSyncCtoConfig[] = $value;
             }
@@ -86,7 +86,7 @@ class SyncCtoHelper extends Backend
         }
     }
 
-    //Configuration Merge Part 
+    // Configuration Merge Part 
     public function getBlacklistFolder()
     {
         $arrLocalconfig = deserialize($GLOBALS['TL_CONFIG']['syncCto_folder_blacklist']);
@@ -122,6 +122,11 @@ class SyncCtoHelper extends Backend
         return $this->mergeConfigs($arrLocalconfig, $arrSyncCtoConfig);
     }
 
+    /**
+     * Get localconfig entries
+     * @param int $intTyp
+     * @return string
+     */
     public function loadConfigs($intTyp = 1)
     {
         if ($intTyp != SyncCtoEnum::LOADCONFIG_KEYS_ONLY && $intTyp != SyncCtoEnum::LOADCONFIG_KEY_VALUE)
@@ -185,13 +190,19 @@ class SyncCtoHelper extends Backend
 
         return $arrData;
     }
-    
+
+    /**
+     * Standardize path for folder
+     * @return string the normalized path as String
+     */
     public function standardizePath()
     {
         $arrPath = func_get_args();
 
         if (count($arrPath) == 0 || $arrPath == null || $arrPath == "")
+        {
             return "";
+        }
 
         $strVar = "";
 
@@ -203,7 +214,9 @@ class SyncCtoHelper extends Backend
             foreach ($itPath as $itFolder)
             {
                 if ($itFolder == "" || $itFolder == "." || $itFolder == "..")
+                {
                     continue;
+                }
 
                 $strVar .= "/" . $itFolder;
             }
@@ -213,7 +226,8 @@ class SyncCtoHelper extends Backend
     }
 
     /**
-     * Ping client status
+     * Ping the current client status
+     * @param string $strAction 
      */
     public function pingClientStatus($strAction)
     {
@@ -226,18 +240,33 @@ class SyncCtoHelper extends Backend
         }
     }
 
+    /**
+     * Check the required extensions and files for syncCto
+     * @param string $strContent
+     * @param string $strTemplate
+     * @return string
+     */
     public function checkExtensions($strContent, $strTemplate)
     {
         if ($strTemplate == 'be_main')
         {
             if (!is_array($_SESSION["TL_INFO"]))
+            {
                 $_SESSION["TL_INFO"] = array();
+            }
 
             // required extensions
-            $arrRequiredExtensions = array('ctoCommunication', 'httprequestextended', 'textwizard', '3cframework');
+            $arrRequiredExtensions = array(
+                'ctoCommunication',
+                'httprequestextended',
+                'textwizard',
+                '3cframework'
+            );
 
             // required files
-            $arrRequiredFiles = array('system/drivers/DC_Memory.php');
+            $arrRequiredFiles = array(
+                'system/drivers/DC_Memory.php'
+            );
 
             // check for required extensions
             foreach ($arrRequiredExtensions as $val)
@@ -269,6 +298,25 @@ class SyncCtoHelper extends Backend
                         unset($_SESSION["TL_INFO"][$val]);
                     }
                 }
+            }
+        }
+
+        return $strContent;
+    }
+
+    /**
+     * Show the last user sync
+     * @param string $strContent
+     * @param string $strTemplate
+     * @return string
+     */
+    public function showLastSync($strContent, $strTemplate)
+    {
+        if ($strTemplate == 'be_main')
+        {
+            if (!is_array($_SESSION["TL_INFO"]))
+            {
+                $_SESSION["TL_INFO"] = array();
             }
 
             // Last syncTo with time and user information
@@ -331,13 +379,10 @@ class SyncCtoHelper extends Backend
         return $strContent;
     }
 
-    //- ---------------------------------------------------------------------- -
-
-
-    /* -------------------------------------------------------------------------
+    /**
      * Return all sync types as array
+     * @return array 
      */
-
     public function getSyncType()
     {
         $groups = array();
@@ -353,10 +398,10 @@ class SyncCtoHelper extends Backend
         return $groups;
     }
 
-    /* -------------------------------------------------------------------------
+    /**
      * Return all backup types as array
+     * @return array 
      */
-
     public function getBackupType()
     {
         $groups = array();
@@ -389,8 +434,7 @@ class SyncCtoHelper extends Backend
     }
 
     /**
-     * Returns a list without the hidden tables.
-     * 
+     * Returns a list without the hidden tables
      * @return array 
      */
     public function databaseTables()
@@ -401,8 +445,7 @@ class SyncCtoHelper extends Backend
         foreach ($this->Database->listTables() as $key => $value)
         {
             // Check if table is a hidden one.
-            if (in_array($value, $arrTablesHidden))
-                continue;
+            if (in_array($value, $arrTablesHidden)) continue;
 
             $arrTables[] = $value;
         }
@@ -410,6 +453,10 @@ class SyncCtoHelper extends Backend
         return $arrTables;
     }
 
+    /**
+     * Returns a list with recommended database tables
+     * @return array 
+     */
     public function databaseTablesRecommended()
     {
         // Recommended tables
@@ -425,8 +472,7 @@ class SyncCtoHelper extends Backend
 
         foreach ($this->databaseTables() as $key => $value)
         {
-            if (in_array($value, $arrBlacklist))
-                continue;
+            if (in_array($value, $arrBlacklist)) continue;
 
             if (is_array($arrTablesPermission) && !in_array($value, $arrTablesPermission) && $this->BackendUser->isAdmin != true)
             {
@@ -438,6 +484,10 @@ class SyncCtoHelper extends Backend
         return $arrTables;
     }
 
+    /**
+     * Returns a list with none recommended database tables
+     * @return array 
+     */
     public function databaseTablesNoneRecommended()
     {
         // None recommended tables
@@ -453,8 +503,7 @@ class SyncCtoHelper extends Backend
 
         foreach ($this->databaseTables() as $key => $value)
         {
-            if (!in_array($value, $arrBlacklist))
-                continue;
+            if (!in_array($value, $arrBlacklist)) continue;
 
             if (is_array($arrTablesPermission) && !in_array($value, $arrTablesPermission) && $this->BackendUser->isAdmin != true)
             {
