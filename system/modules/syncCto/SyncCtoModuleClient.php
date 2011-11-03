@@ -462,7 +462,7 @@ class SyncCtoModuleClient extends BackendModule
 
                         foreach ($arrChecksumClient as $keyItem => $valueItem)
                         {
-                            if (!file_exists($this->objSyncCtoHelper->buildPath($valueItem["path"])))
+                            if (!file_exists(TL_ROOT . "/" . $valueItem["path"]))
                             {
                                 $this->arrListCompare[$keyItem] = $valueItem;
                                 $this->arrListCompare[$keyItem]["state"] = SyncCtoEnum::FILESTATE_DELETE;
@@ -1163,7 +1163,7 @@ class SyncCtoModuleClient extends BackendModule
                      * Import on client side
                      */
                     case 4:
-                        $this->objSyncCtoCommunicationClient->startSQLImport($this->objSyncCtoHelper->buildPathWoTL($GLOBALS['SYC_PATH']['tmp'], "sql", $mixStepPool["zipname"]));
+                        $this->objSyncCtoCommunicationClient->startSQLImport($this->objSyncCtoHelper->standardizePath($GLOBALS['SYC_PATH']['tmp'], "sql", $mixStepPool["zipname"]));
 
                         $arrContenData["data"][4]["state"] = $GLOBALS['TL_LANG']['MSC']['ok'];
                         $arrContenData["data"][4]["description"] = $GLOBALS['TL_LANG']['tl_syncCto_sync']["step_4"]['description_4'];
@@ -1272,7 +1272,7 @@ class SyncCtoModuleClient extends BackendModule
         try
         {
             $intStart = time();
-
+            
             switch ($mixStepPool["step"])
             {
                 /** ------------------------------------------------------------
@@ -1328,8 +1328,8 @@ class SyncCtoModuleClient extends BackendModule
                         }
 
                         try
-                        {                            
-                            $this->objSyncCtoCommunicationClient->sendFile(dirname($this->objSyncCtoHelper->buildPath($value["path"])), basename($value["path"]), $value["checksum"], SyncCtoEnum::UPLOAD_SYNC_TEMP);
+                        {    
+                            $this->objSyncCtoCommunicationClient->sendFile(dirname($value["path"]), basename($value["path"]), $value["checksum"], SyncCtoEnum::UPLOAD_SYNC_TEMP);
                             $this->arrListCompare[$key]["transmission"] = SyncCtoEnum::FILETRANS_SEND;
                         }
                         catch (Exception $exc)
@@ -1425,11 +1425,9 @@ class SyncCtoModuleClient extends BackendModule
                  */
                 case 5:
                     if ($intSyncTyp == SYNCCTO_FULL)
-                    {
-                        $this->objSyncCtoCommunicationClient->startLocalConfigImport();
-
-                        $mixStepPool["step"] = 6;
-                        break;
+                    {                        
+                        $this->objSyncCtoCommunicationClient->startLocalConfigImport();                        
+                        $mixStepPool["step"] = 6;                      
                     }
 
                     $arrContenData["data"][5]["description"] = $GLOBALS['TL_LANG']['tl_syncCto_sync']["step_5"]['description_1'];

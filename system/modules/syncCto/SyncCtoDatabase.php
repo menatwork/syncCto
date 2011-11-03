@@ -227,7 +227,7 @@ class SyncCtoDatabase extends Backend
      */
     public function runRestore($strRestoreFile)
     {
-        $objZipRead = new ZipReader($this->objSyncCtoHelper->buildPathWoTL($strRestoreFile));
+        $objZipRead = new ZipReader($strRestoreFile);
 
         if (!$objZipRead->getFile($this->strFilenameInsert))
             throw new Exception("Could not load Insert SQL File. Maybe damaged?");

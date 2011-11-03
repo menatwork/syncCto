@@ -48,6 +48,9 @@ class SyncCtoFiles extends Backend
      * Core
      */
 
+    /**
+     * Constructor
+     */
     public function __construct()
     {
         parent::__construct();
@@ -65,7 +68,8 @@ class SyncCtoFiles extends Backend
      */
     public static function getInstance()
     {
-        if (self::$instance == null) self::$instance = new SyncCtoFiles();
+        if (self::$instance == null)
+            self::$instance = new SyncCtoFiles();
 
         return self::$instance;
     }
@@ -74,21 +78,41 @@ class SyncCtoFiles extends Backend
      * Getter / Setter - Functions
      */
 
+    /**
+     * Retrun zipname
+     * 
+     * @return string
+     */
     public function getSuffixZipName()
     {
         return $this->strSuffixZipName;
     }
 
+    /**
+     * Set Zipname
+     * 
+     * @param string $strSuffixZipName 
+     */
     public function setSuffixZipName($strSuffixZipName)
     {
         $this->strSuffixZipName = $strSuffixZipName;
     }
 
+    /**
+     * Get timestamp format.
+     * 
+     * @return string 
+     */
     public function getTimestampFormat()
     {
         return $this->strTimestampFormat;
     }
 
+    /**
+     * Set timestamp format
+     * 
+     * @param type $strTimestampFormat 
+     */
     public function setTimestampFormat($strTimestampFormat)
     {
         $this->strTimestampFormat = $strTimestampFormat;
@@ -110,7 +134,7 @@ class SyncCtoFiles extends Backend
 
         foreach ($arrFileList as $key => $value)
         {
-            $intSize = filesize($this->objSyncCtoHelper->buildPath($value));
+            $intSize = filesize(TL_ROOT . "/" . $value);
 
             if ($intSize < 0 && $intSize != 0)
             {
@@ -136,7 +160,7 @@ class SyncCtoFiles extends Backend
             {
                 $arrChecksum[md5($value)] = array(
                     "path" => $value,
-                    "checksum" => md5_file($this->objSyncCtoHelper->buildPath($value)),
+                    "checksum" => md5_file(TL_ROOT . "/" . $value),
                     "size" => $intSize,
                     "state" => SyncCtoEnum::FILESTATE_TOO_BIG,
                     "transmission" => SyncCtoEnum::FILETRANS_WAITING,
@@ -146,7 +170,7 @@ class SyncCtoFiles extends Backend
             {
                 $arrChecksum[md5($value)] = array(
                     "path" => $value,
-                    "checksum" => md5_file($this->objSyncCtoHelper->buildPath($value)),
+                    "checksum" => md5_file(TL_ROOT . "/" . $value),
                     "size" => $intSize,
                     "state" => SyncCtoEnum::FILESTATE_FILE,
                     "transmission" => SyncCtoEnum::FILETRANS_WAITING,
@@ -172,7 +196,7 @@ class SyncCtoFiles extends Backend
             foreach ($arrFileList as $key => $value)
             {
                 // If we have a folder go in an create a checksumlist
-                if (is_dir($this->objSyncCtoHelper->buildPath($value)))
+                if (is_dir(TL_ROOT . "/" . $value))
                 {
                     $arrTempFilelist = array_merge($arrTempFilelist, $this->recursiveFileList(array(), $value, true));
                 }
@@ -194,7 +218,7 @@ class SyncCtoFiles extends Backend
 
         foreach ($arrFileList as $key => $value)
         {
-            $intSize = filesize($this->objSyncCtoHelper->buildPath($value));
+            $intSize = filesize(TL_ROOT . "/" . $value);
 
             if ($intSize < 0 && $intSize != 0)
             {
@@ -221,7 +245,7 @@ class SyncCtoFiles extends Backend
             {
                 $arrChecksum[md5($value)] = array(
                     "path" => $value,
-                    "checksum" => md5_file($this->objSyncCtoHelper->buildPath($value)),
+                    "checksum" => md5_file(TL_ROOT . "/" . $value),
                     "size" => $intSize,
                     "state" => SyncCtoEnum::FILESTATE_TOO_BIG,
                     "raw" => "file big",
@@ -232,7 +256,7 @@ class SyncCtoFiles extends Backend
             {
                 $arrChecksum[md5($value)] = array(
                     "path" => $value,
-                    "checksum" => md5_file($this->objSyncCtoHelper->buildPath($value)),
+                    "checksum" => md5_file(TL_ROOT . "/" . $value),
                     "size" => $intSize,
                     "state" => SyncCtoEnum::FILESTATE_FILE,
                     "raw" => "file",
@@ -310,7 +334,7 @@ class SyncCtoFiles extends Backend
             $strFilename = standardize(str_replace(array(" "), array("_"), preg_replace("/\.zip\z/i", "", $strZip))) . ".zip";
         }
 
-        $strPath = $this->objSyncCtoHelper->buildPathWoTL($GLOBALS['SYC_PATH']['file'], $strFilename);
+        $strPath = $this->objSyncCtoHelper->standardizePath($GLOBALS['SYC_PATH']['file'], $strFilename);
 
         $objZipWrite = new ZipWriter($strPath);
 
@@ -322,7 +346,7 @@ class SyncCtoFiles extends Backend
 
             foreach ($arrTlFiles as $key => $value)
             {
-                if (is_dir($this->objSyncCtoHelper->buildPath($value)))
+                if (is_dir(TL_ROOT . "/" . $value))
                 {
                     $arrList = $this->recursiveFileList(array(), $value, true);
                     $arrTempList = array_merge($arrTempList, $arrList);
@@ -361,7 +385,7 @@ class SyncCtoFiles extends Backend
             $strFilename = standardize(str_replace(array(" "), array("_"), preg_replace("/\.zip\z/i", "", $strZip))) . ".zip";
         }
 
-        $strPath = $this->objSyncCtoHelper->buildPathWoTL($GLOBALS['SYC_PATH']['file'], $strFilename);
+        $strPath = $this->objSyncCtoHelper->standardizePath($GLOBALS['SYC_PATH']['file'], $strFilename);
 
         $objZipWrite = new ZipWriter($strPath);
 
@@ -372,7 +396,7 @@ class SyncCtoFiles extends Backend
 
         foreach ($arrFileList as $key => $value)
         {
-            if (is_dir($this->objSyncCtoHelper->buildPath($value)))
+            if (is_dir(TL_ROOT . "/" . $value))
             {
                 $arrList = $this->recursiveFileList(array(), $value, true);
 
@@ -406,7 +430,7 @@ class SyncCtoFiles extends Backend
             $strFilename = standardize(str_replace(array(" "), array("_"), preg_replace("/\.zip\z/i", "", $strZip))) . ".zip";
         }
 
-        $strPath = $this->objSyncCtoHelper->buildPathWoTL($GLOBALS['SYC_PATH']['file'], $strFilename);
+        $strPath = $this->objSyncCtoHelper->standardizePath($GLOBALS['SYC_PATH']['file'], $strFilename);
 
         $objZipWrite = new ZipWriter($strPath);
 
@@ -439,7 +463,8 @@ class SyncCtoFiles extends Backend
 
         foreach ($arrFileList as $key => $value)
         {
-            if ($objZipRead->getFile($value) != true) throw new Exception("Error by unziping file. File not found in zip archive.");
+            if ($objZipRead->getFile($value) != true)
+                throw new Exception("Error by unziping file. File not found in zip archive.");
 
             $objFile = new File($value);
             $objFile->write($objZipRead->unzip());
@@ -470,10 +495,6 @@ class SyncCtoFiles extends Backend
             $arrFolderWhiteList[] = $GLOBALS['TL_CONFIG']['uploadPath'];
         }
 
-        // Build path with and without TL_ROOT
-        $strPath = $this->objSyncCtoHelper->buildPathWoTL($strPath);
-        $strPathTl = $this->objSyncCtoHelper->buildPath($strPath);
-
         // Check if the current path is on blacklist
         if ($strPath != "")
         {
@@ -493,18 +514,19 @@ class SyncCtoFiles extends Backend
             foreach ($arrFolderWhiteList as $valueWhite)
             {
                 // Search with preg for values
-                $valueWhite = str_replace(array("\\", ".", "^", "?", "*", "/"), array("\\\\", "\\.", "\\^", ".?", ".*", "\/"), $this->objSyncCtoHelper->buildPathWoTL($valueWhite));
+                $valueWhite = str_replace(array("\\", ".", "^", "?", "*", "/"), array("\\\\", "\\.", "\\^", ".?", ".*", "\/"), $this->objSyncCtoHelper->standardizePath($valueWhite));
                 if (preg_match("/^" . $valueWhite . ".*/i", $strPath) != 0)
                 {
                     $blnWhite = true;
                 }
             }
 
-            if (!$blnWhite) return $arrList;
+            if (!$blnWhite)
+                return $arrList;
         }
 
         // Is the given string a file
-        if (is_file($strPathTl))
+        if (is_file(TL_ROOT . "/" . $strPath))
         {
             // Run through each entry in blacklistfile     
             foreach ($arrFileBlacklist as $valueBlack)
@@ -517,19 +539,19 @@ class SyncCtoFiles extends Backend
                 }
             }
 
-            $arrList[] = $strPathTl;
+            $arrList[] = TL_ROOT . "/" . $strPath;
         }
         // Is the given string a folder
         else
         {
             // Scann Folder
-            $arrScan = scan($strPathTl);
+            $arrScan = scan(TL_ROOT . "/" . $strPath);
 
             // Rund through each file
             foreach ($arrScan as $key => $valueItem)
             {
                 // Have we a file or ...
-                if (is_file($this->objSyncCtoHelper->buildPath($strPath, $valueItem)))
+                if (is_file(TL_ROOT . "/" . $strPath . "/" . $valueItem))
                 {
                     // Check if file is in blacklist    
                     $blnBlack = false;
@@ -538,7 +560,7 @@ class SyncCtoFiles extends Backend
                     {
                         // Search with preg for values
                         $valueBlack = str_replace(array("\\", ".", "^", "?", "*"), array("\\\\", "\\.", "\\^", ".?", ".*"), $valueBlack);
-                        if (preg_match("^" . $valueBlack . "^i", $this->objSyncCtoHelper->buildPathWoTL($strPath, $valueItem)) != 0)
+                        if (preg_match("^" . $valueBlack . "^i", $strPath . "/" . $valueItem) != 0)
                         {
                             $blnBlack = true;
                             break;
@@ -546,10 +568,11 @@ class SyncCtoFiles extends Backend
                     }
 
                     // Skip if file is in blacklist
-                    if ($blnBlack) continue;
+                    if ($blnBlack)
+                        continue;
 
                     // Add to list
-                    $arrList[] = $this->objSyncCtoHelper->buildPathWoTL($strPath, $valueItem);
+                    $arrList[] = $strPath . "/" . $valueItem;
                 }
                 // ... a folder
                 else
@@ -559,18 +582,19 @@ class SyncCtoFiles extends Backend
                     foreach ($arrFolderWhiteList as $valueWhite)
                     {
                         // Search with preg for values
-                        $valueWhite = str_replace(array("\\", ".", "^", "?", "*", "/"), array("\\\\", "\\.", "\\^", ".?", ".*", "\/"), $this->objSyncCtoHelper->buildPathWoTL($valueWhite));
-                        if (preg_match("/^" . $valueWhite . ".*/i", $this->objSyncCtoHelper->buildPathWoTL($strPath, $valueItem)) != 0)
+                        $valueWhite = str_replace(array("\\", ".", "^", "?", "*", "/"), array("\\\\", "\\.", "\\^", ".?", ".*", "\/"), $this->objSyncCtoHelper->standardizePath($valueWhite));
+                        if (preg_match("/^" . $valueWhite . ".*/i", $strPath . "/" . $valueItem) != 0)
                         {
                             $blnWhitelist = true;
                             break;
                         }
                     }
 
-                    if (!$blnWhitelist) continue;
+                    if (!$blnWhitelist)
+                        continue;
 
                     // Recursive-Call
-                    $arrList = $this->recursiveFileList($arrList, $this->objSyncCtoHelper->buildPathWoTL($strPath, $valueItem), $blnTlFiles);
+                    $arrList = $this->recursiveFileList($arrList, $strPath . "/" . $valueItem, $blnTlFiles);
                 }
             }
         }
@@ -588,9 +612,9 @@ class SyncCtoFiles extends Backend
      */
     public function checkSyncCtoFolders()
     {
-        $objFile = new Folder($this->objSyncCtoHelper->buildPathWoTL($GLOBALS['SYC_PATH']['db']));
-        $objFile = new Folder($this->objSyncCtoHelper->buildPathWoTL($GLOBALS['SYC_PATH']['tmp']));
-        $objFile = new Folder($this->objSyncCtoHelper->buildPathWoTL($GLOBALS['SYC_PATH']['file']));
+        $objFile = new Folder($this->objSyncCtoHelper->standardizePath($GLOBALS['SYC_PATH']['db']));
+        $objFile = new Folder($this->objSyncCtoHelper->standardizePath($GLOBALS['SYC_PATH']['tmp']));
+        $objFile = new Folder($this->objSyncCtoHelper->standardizePath($GLOBALS['SYC_PATH']['file']));
     }
 
     /**
@@ -600,8 +624,10 @@ class SyncCtoFiles extends Backend
      */
     public function purgeTemp($strFolder = null)
     {
-        if ($strFolder == null || $strFolder == "") $strPath = $this->objSyncCtoHelper->buildPathWoTL($GLOBALS['SYC_PATH']['tmp']);
-        else $strPath = $this->objSyncCtoHelper->buildPathWoTL($GLOBALS['SYC_PATH']['tmp'], $strFolder);
+        if ($strFolder == null || $strFolder == "")
+            $strPath = $this->objSyncCtoHelper->standardizePath($GLOBALS['SYC_PATH']['tmp']);
+        else
+            $strPath = $this->objSyncCtoHelper->standardizePath($GLOBALS['SYC_PATH']['tmp'], $strFolder);
 
         $objFolder = new Folder($strPath);
         $objFolder->clear();
@@ -622,26 +648,26 @@ class SyncCtoFiles extends Backend
     {
         @set_time_limit(3600);
 
-        $strSrcFile = $this->objSyncCtoHelper->buildPath($strSrcFile);
-        $strDesPath = $this->objSyncCtoHelper->buildPath($strDesFolder);
+        if (!file_exists($strSrcFile))
+            throw new Exception("File not exsist");
 
+        $objFolder = new Folder($strDesPath);
+        $objFile = new File($strSrcFile);
 
-        if (!file_exists($strSrcFile)) throw new Exception("File not exsist");
-
-        $objFolder = new Folder($this->objSyncCtoHelper->buildPathWoTL($strDesPath));
-        $objFile = new File($this->objSyncCtoHelper->buildPathWoTL($strSrcFile));
-
-        if ($objFile->filesize < 0) throw new Exception("Int overload, try a 64Bit PHP Version.");
+        if ($objFile->filesize < 0)
+            throw new Exception("Int overload, try a 64Bit PHP Version.");
 
         $booRun = true;
         $i = 0;
         for ($i; $booRun; $i++)
         {
-            $fp = fopen($strSrcFile, "rb");
+            $fp = fopen(TL_ROOT . "/" . $strSrcFile, "rb");
 
-            if ($fp === false) throw new Exception("Could not open file");
+            if ($fp === false)
+                throw new Exception("Could not open file");
 
-            if (fseek($fp, $i * $intSizeLimit, SEEK_SET) === -1) throw new Exception("Fseek error");
+            if (fseek($fp, $i * $intSizeLimit, SEEK_SET) === -1)
+                throw new Exception("Fseek error");
 
             if (feof($fp) === TRUE)
             {
@@ -651,7 +677,7 @@ class SyncCtoFiles extends Backend
 
             $data = fread($fp, $intSizeLimit);
 
-            $handle = fopen($this->objSyncCtoHelper->buildPath($strDesPath, $strDesFile . ".sync" . $i), "w");
+            $handle = fopen(TL_ROOT . "/" . $this->objSyncCtoHelper->standardizePath($strDesPath, $strDesFile . ".sync" . $i), "w");
             fwrite($handle, $data);
             fclose($handle);
 
@@ -661,7 +687,8 @@ class SyncCtoFiles extends Backend
             unset($data);
             unset($fp);
 
-            if (( ( $i + 1 ) * $intSizeLimit) > $objFile->filesize) $booRun = false;
+            if (( ( $i + 1 ) * $intSizeLimit) > $objFile->filesize)
+                $booRun = false;
         }
 
         return $i;
@@ -672,16 +699,16 @@ class SyncCtoFiles extends Backend
         @set_time_limit(3600);
 
         // Build savepath
-        $strSavePath = $this->objSyncCtoHelper->buildPath($GLOBALS['SYC_PATH']['tmp'], "sync", $strMovepath);
+        $strSavePath = $this->objSyncCtoHelper->standardizePath($GLOBALS['SYC_PATH']['tmp'], "sync", $strMovepath);
 
         // Create Folder
-        $objFolder = new Folder($this->objSyncCtoHelper->buildPathWoTL(dirname($strSavePath)));
+        $objFolder = new Folder(dirname(TL_ROOT . "/" . $strSavePath));
 
         // Run for each part file
         for ($i = 0; $i < $intSplitcount; $i++)
         {
             // Build path for part file
-            $strReadFile = $this->objSyncCtoHelper->buildPath($GLOBALS['SYC_PATH']['tmp'], $strSplitname, $strSplitname . ".sync" . $i);
+            $strReadFile = $this->objSyncCtoHelper->standardizePath($GLOBALS['SYC_PATH']['tmp'], $strSplitname, $strSplitname . ".sync" . $i);
 
             // Check if file exists
             if (!file_exists($strReadFile))
@@ -690,8 +717,8 @@ class SyncCtoFiles extends Backend
             }
 
             // Create new file objects
-            $objFilePart = new File($this->objSyncCtoHelper->buildPathWoTL($strReadFile));
-            $objFileWhole = new File($this->objSyncCtoHelper->buildPathWoTL($strSavePath));
+            $objFilePart = new File($strReadFile);
+            $objFileWhole = new File($strSavePath);
 
             // Write part file to man file
             $objFileWhole->append($objFilePart->getContent());
@@ -709,7 +736,7 @@ class SyncCtoFiles extends Backend
         }
 
         // Check MD5 Checksum
-        if (md5_file($strSavePath) != $strMD5)
+        if (md5_file(TL_ROOT . "/" . $strSavePath) != $strMD5)
         {
             throw new Exception("MD5 Checksum error");
         }
@@ -721,14 +748,14 @@ class SyncCtoFiles extends Backend
     {
         foreach ($arrFileList as $key => $value)
         {
-            if (!file_exists($this->objSyncCtoHelper->buildPath($GLOBALS['SYC_PATH']['tmp'], "sync", $value["path"])))
+            if (!file_exists(TL_ROOT . "/" . $this->objSyncCtoHelper->standardizePath($GLOBALS['SYC_PATH']['tmp'], "sync", $value["path"])))
             {
                 $arrFileList[$key]["saved"] = false;
                 $arrFileList[$key]["error"] = "Missing file in tempfolder.";
                 continue;
             }
 
-            $strFolderPath = dirname($this->objSyncCtoHelper->buildPathWoTL($value["path"]));
+            $strFolderPath = dirname($value["path"]);
 
             if ($strFolderPath != ".")
             {
@@ -736,10 +763,10 @@ class SyncCtoFiles extends Backend
                 unset($objFolder);
             }
 
-            $strFileSource = $this->objSyncCtoHelper->buildPath($GLOBALS['SYC_PATH']['tmp'], "sync", $value["path"]);
-            $strFileDestination = $this->objSyncCtoHelper->buildPath($value["path"]);
+            $strFileSource = $this->objSyncCtoHelper->standardizePath($GLOBALS['SYC_PATH']['tmp'], "sync", $value["path"]);
+            $strFileDestination = $this->objSyncCtoHelper->standardizePath($value["path"]);
 
-            if (copy($strFileSource, $strFileDestination) == false)
+            if (copy(TL_ROOT . "/" . $strFileSource, TL_ROOT . "/" . $strFileDestination) == false)
             {
                 $arrFileList[$key]["saved"] = false;
                 $arrFileList[$key]["error"] = "file copy error Src:" . $strFileSource . " | Des: " . $strFileDestination;
@@ -761,7 +788,7 @@ class SyncCtoFiles extends Backend
             {
                 try
                 {
-                    $objFiel = new File($this->objSyncCtoHelper->buildPathWoTL($value['path']));
+                    $objFiel = new File($value['path']);
 
                     if ($objFiel->delete())
                     {
@@ -803,7 +830,8 @@ class SyncCtoFiles extends Backend
 
         foreach ($_FILES as $key => $value)
         {
-            if (!key_exists($key, $arrMetafiles)) throw new Exception("Could not find metafiles for the file $key");
+            if (!key_exists($key, $arrMetafiles))
+                throw new Exception("Could not find metafiles for the file $key");
 
             $strFolder = $arrMetafiles[$key]["folder"];
             $strFile = $arrMetafiles[$key]["file"];
@@ -812,19 +840,19 @@ class SyncCtoFiles extends Backend
             switch ($arrMetafiles[$key]["typ"])
             {
                 case SyncCtoEnum::UPLOAD_TEMP:
-                    $strSaveFile = $this->objSyncCtoHelper->buildPath($GLOBALS['SYC_PATH']['tmp'], $strFolder, $strFile);
+                    $strSaveFile = $this->objSyncCtoHelper->standardizePath($GLOBALS['SYC_PATH']['tmp'], $strFolder, $strFile);
                     break;
 
                 case SyncCtoEnum::UPLOAD_SYNC_TEMP:
-                    $strSaveFile = $this->objSyncCtoHelper->buildPath($GLOBALS['SYC_PATH']['tmp'], "sync", $strFolder, $strFile);
+                    $strSaveFile = $this->objSyncCtoHelper->standardizePath($GLOBALS['SYC_PATH']['tmp'], "sync", $strFolder, $strFile);
                     break;
 
                 case SyncCtoEnum::UPLOAD_SQL_TEMP:
-                    $strSaveFile = $this->objSyncCtoHelper->buildPath($GLOBALS['SYC_PATH']['tmp'], "sql", $strFile);
+                    $strSaveFile = $this->objSyncCtoHelper->standardizePath($GLOBALS['SYC_PATH']['tmp'], "sql", $strFile);
                     break;
 
                 case SyncCtoEnum::UPLOAD_SYNC_SPLIT:
-                    $strSaveFile = $this->objSyncCtoHelper->buildPath($GLOBALS['SYC_PATH']['tmp'], $arrMetafiles[$key]["splitname"], $strFile);
+                    $strSaveFile = $this->objSyncCtoHelper->standardizePath($GLOBALS['SYC_PATH']['tmp'], $arrMetafiles[$key]["splitname"], $strFile);
                     break;
 
                 default:
@@ -832,13 +860,13 @@ class SyncCtoFiles extends Backend
                     break;
             }
 
-            $objFolder = new Folder($this->objSyncCtoHelper->buildPathWoTL(dirname($strSaveFile)));
+            $objFolder = new Folder(dirname($strSaveFile));
 
-            if (move_uploaded_file($value["tmp_name"], $strSaveFile) === FALSE)
+            if (move_uploaded_file($value["tmp_name"], TL_ROOT . "/" . $strSaveFile) === FALSE)
             {
-                throw new Exception("Error by moving tempfile to destination folder. Src: " . $value["tmp_name"] . " | Des: " . $strSaveFile);
+                throw new Exception("Error by moving tempfile to destination folder. Src: " . $value["tmp_name"] . " | Des: " . TL_ROOT . "/" . $strSaveFile);
             }
-            else if ($key != md5_file($strSaveFile))
+            else if ($key != md5_file(TL_ROOT . "/" . $strSaveFile))
             {
                 throw new Exception($GLOBALS['TL_LANG']['ERR']['checksum_error']);
             }

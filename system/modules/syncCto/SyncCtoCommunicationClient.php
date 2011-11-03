@@ -198,19 +198,23 @@ class SyncCtoCommunicationClient extends CtoCommunication
      */
     public function sendFile($strFolder, $strFile, $strMD5 = "", $intTyp = 1, $strSplitname = "")
     {
+        
+        
         // 5 min. time out.
         @set_time_limit(3600);
 
         //Build path
-        $strFilePath = $this->objSyncCtoHelper->buildPath($strFolder, $strFile);
-
+        $strFilePath = $this->objSyncCtoHelper->standardizePath($strFolder, $strFile);
+        
         // Check file exsist
-        if (!file_exists($strFilePath) || !is_file($strFilePath))
-            throw new Exception("Given file doesn't exists or is not a file. Path: " . $strFilePath);
-
+        if (!file_exists(TL_ROOT . "/" . $strFilePath) || !is_file(TL_ROOT . "/" . $strFilePath))
+        {
+            throw new Exception("Given file doesn't exists or is not a file. Path: " . TL_ROOT . "/" . $strFilePath);
+        }
+        
         // MD5 file hash
         if ($strMD5 == "")
-            $strMD5 = md5_file($strFilePath);
+            $strMD5 = md5_file(TL_ROOT . "/" . $strFilePath);
 
         // Contenttyp
         $strMime = "application/octet-stream";
@@ -219,14 +223,14 @@ class SyncCtoCommunicationClient extends CtoCommunication
             array(
                 "name" => $strMD5,
                 "filename" => $strFile,
-                "filepath" => $strFilePath,
+                "filepath" => TL_ROOT . "/" . $strFilePath,
                 "mime" => $strMime,
             ),
             array(
                 "name" => "metafiles",
                 "value" => array(
                     $strMD5 => array(
-                        "folder" => $this->objSyncCtoHelper->buildPathWoTL($strFolder),
+                        "folder" => $strFolder,
                         "file" => $strFile,
                         "MD5" => $strMD5,
                         "splitname" => $strSplitname,

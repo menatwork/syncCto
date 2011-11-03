@@ -185,34 +185,8 @@ class SyncCtoHelper extends Backend
 
         return $arrData;
     }
-
-    public function buildPath()
-    {
-        $arrPath = func_get_args();
-
-        if (count($arrPath) == 0 || $arrPath == null || $arrPath == "")
-            return TL_ROOT;
-
-        $strVar = "";
-
-        foreach ($arrPath as $itPath)
-        {
-            $itPath = str_replace(array(TL_ROOT, "\\"), array("", "/"), $itPath);
-            $itPath = explode("/", $itPath);
-
-            foreach ($itPath as $itFolder)
-            {
-                if ($itFolder == "" || $itFolder == "." || $itFolder == "..")
-                    continue;
-
-                $strVar .= "/" . $itFolder;
-            }
-        }
-
-        return TL_ROOT . $strVar;
-    }
-
-    public function buildPathWoTL()
+    
+    public function standardizePath()
     {
         $arrPath = func_get_args();
 
