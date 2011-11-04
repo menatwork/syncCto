@@ -582,8 +582,8 @@ class SyncCtoFiles extends Backend
                     foreach ($arrFolderWhiteList as $valueWhite)
                     {
                         // Search with preg for values
-                        $valueWhite = str_replace(array("\\", ".", "^", "?", "*", "/"), array("\\\\", "\\.", "\\^", ".?", ".*", "\/"), $this->objSyncCtoHelper->standardizePath($valueWhite));
-                        if (preg_match("/^" . $valueWhite . ".*/i", $strPath . "/" . $valueItem) != 0)
+                        $valueWhite = str_replace(array("\\", ".", "^", "?", "*", "/"), array("\\\\", "\\.", "\\^", ".?", ".*", "\/"), $valueWhite);
+                        if (preg_match("/^" . $valueWhite . ".*/i", $this->objSyncCtoHelper->standardizePath($strPath . "/" . $valueItem)) != 0)
                         {
                             $blnWhitelist = true;
                             break;
@@ -591,10 +591,12 @@ class SyncCtoFiles extends Backend
                     }
 
                     if (!$blnWhitelist)
+                    {
                         continue;
-
+                    }
+                    
                     // Recursive-Call
-                    $arrList = $this->recursiveFileList($arrList, $strPath . "/" . $valueItem, $blnTlFiles);
+                    $arrList = $this->recursiveFileList($arrList, $this->objSyncCtoHelper->standardizePath($strPath . "/" . $valueItem), $blnTlFiles);
                 }
             }
         }
@@ -826,6 +828,11 @@ class SyncCtoFiles extends Backend
             throw new Exception("Missing metafiles in array check.");
         }
 
+        if (count($_FILES) == 0)
+        {
+            throw new Exception("Missing file/s.");
+        }
+
         $arrResponse = array();
 
         foreach ($_FILES as $key => $value)
@@ -868,7 +875,7 @@ class SyncCtoFiles extends Backend
             }
             else if ($key != md5_file(TL_ROOT . "/" . $strSaveFile))
             {
-                throw new Exception($GLOBALS['TL_LANG']['ERR']['checksum_error']);
+                throw new Exception("Checksum error.");
             }
             else
             {

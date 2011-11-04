@@ -75,7 +75,17 @@ class SyncCtoCommunicationClient extends CtoCommunication
         if ($objClient->numRows == 0)
             throw new Exception("Unknown Client.");
 
-        $strUrl = $objClient->address . ":" . $objClient->port . "/" . $objClient->path . "/ctoCommunication.php";
+        $objClient->path = preg_replace("/\/\z/i", "", $objClient->path);
+        $objClient->path = preg_replace("/ctoCommunication.php\z/i", "", $objClient->path);
+
+        if ($objClient->path == "")
+        {
+            $strUrl = $objClient->address . ":" . $objClient->port . "/ctoCommunication.php";
+        }
+        else
+        {
+            $strUrl = $objClient->address . ":" . $objClient->port . "/" . $objClient->path . "/ctoCommunication.php";
+        }
 
         $this->setClient($strUrl, $objClient->codifyengine);
         $this->setApiKey($objClient->apikey);
@@ -198,20 +208,18 @@ class SyncCtoCommunicationClient extends CtoCommunication
      */
     public function sendFile($strFolder, $strFile, $strMD5 = "", $intTyp = 1, $strSplitname = "")
     {
-        
-        
         // 5 min. time out.
         @set_time_limit(3600);
 
         //Build path
         $strFilePath = $this->objSyncCtoHelper->standardizePath($strFolder, $strFile);
-        
+
         // Check file exsist
         if (!file_exists(TL_ROOT . "/" . $strFilePath) || !is_file(TL_ROOT . "/" . $strFilePath))
         {
             throw new Exception("Given file doesn't exists or is not a file. Path: " . TL_ROOT . "/" . $strFilePath);
         }
-        
+
         // MD5 file hash
         if ($strMD5 == "")
             $strMD5 = md5_file(TL_ROOT . "/" . $strFilePath);

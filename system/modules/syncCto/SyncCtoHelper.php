@@ -229,13 +229,71 @@ class SyncCtoHelper extends Backend
      * Ping the current client status
      * @param string $strAction 
      */
+
+    /**
+     * Ping client status
+     */
     public function pingClientStatus($strAction)
     {
         if ($strAction == 'syncCtoPing')
         {
-            $objRequest = new Request();
-            $objRequest->send($this->Input->post('hostIP'));
-            echo ($objRequest->code == '200') ? "true" : "false";
+            if (strlen($this->Input->post('clientID')) != 0 && is_numeric($this->Input->post('clientID')))
+            {
+                try
+                {
+                    // Load Client from database
+                    $objClient = $this->Database->prepare("SELECT * FROM tl_synccto_clients WHERE id = %s")
+                            ->limit(1)
+                            ->execute((int) $this->Input->post('clientID'));
+
+                    // Check if a client was loaded
+                    if ($objClient->numRows == 0)
+                        throw new Exception("Unknown Client.");
+
+                    // Clean link
+                    $objClient->path = preg_replace("/\/\z/i", "", $objClient->path);
+                    $objClient->path = preg_replace("/ctoCommunication.php\z/i", "", $objClient->path);
+
+                    // Build link
+                    $strServer = $objClient->address . ":" . $objClient->port;
+
+                    if ($objClient->path == "")
+                    {
+
+                        $strUrl = $objClient->address . ":" . $objClient->port . "/ctoCommunication.php";
+                    }
+                    else
+                    {
+                        $strUrl = $objClient->address . ":" . $objClient->port . "/" . $objClient->path . "/ctoCommunication.php";
+                    }
+
+                    $intReturn = 0;
+
+                    // Test Server
+                    $objRequest = new RequestExtendedCached();
+
+                    // Check Server
+                    $objRequest->send($strServer);
+                    if ($objRequest->code == '200')
+                        $intReturn = $intReturn + 1;
+
+                    // Check page
+                    $objRequest->send($strUrl);
+                    if ($objRequest->code == '200')
+                        $intReturn = $intReturn + 2;
+
+                    echo $intReturn;
+                }
+                catch (Exception $exc)
+                {
+                    echo "false";
+                }
+            }
+            else
+            {
+                echo "false";
+            }
+
             exit();
         }
     }

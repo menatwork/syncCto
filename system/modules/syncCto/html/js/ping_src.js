@@ -2,7 +2,7 @@
 
 window.addEvent("domready",function(){
     $$('img.ping').each(function(item){
-        var url=item.getSiblings('span').getElement('span').getProperty('html').toString();
+        var clientID=item.getSiblings('span').getChildren('span.client-id')[0].getProperty("text").toString();        
         try {
             var req=new Request.HTML({
                 method:'post',
@@ -10,32 +10,17 @@ window.addEvent("domready",function(){
                 data: {
                     "isAjax"    : 1,
                     "action"    : "syncCtoPing",
-                    "hostIP"   	: url
+                    "clientID"  : clientID
                 },
                 evalScripts:false,
                 evalResponse:false,
-                onSuccess:function(responseTree,responseElements,response,js){
-
-                    if(response=='true'){
-                        item.setProperty('src','system/modules/syncCto/html/js/images/missing.png');
-                        var req2=new Request.HTML({
-                            method:'post',
-                            url:window.location.href,
-                            data: {
-                                "isAjax"    : 1,
-                                "action"    : "syncCtoPing",
-                                "hostIP"    : url.replace(/GPL.txt/g,"syncCto.php")
-                            },
-                            evalScripts:false,
-                            evalResponse:false,
-                            onSuccess:function(responseTree,responseElements,response,js){
-                                if(response=='true'){
-                                    item.setProperty('src','system/modules/syncCto/html/js/images/online.png');
-                                }
-                            }
-                        }).send();
-                    }else{
-                        item.setProperty('src','system/modules/syncCto/html/js/images/offline.png');
+                onSuccess:function(responseTree,responseElements,response,js){                    
+                    if(response=='0' || response=='false'){
+                        tem.setProperty('src','system/modules/syncCto/html/js/images/offline.png');         
+                    }else if(response=='1'){   
+                       item.setProperty('src','system/modules/syncCto/html/js/images/missing.png');   
+                    }else if(response=='2' || response=='3'){   
+                        item.setProperty('src','system/modules/syncCto/html/js/images/online.png');
                     }
                 },
                 onFailure:function(responseTree,responseElements,response,js){

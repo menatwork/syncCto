@@ -65,7 +65,7 @@ class SyncCtoModuleClient extends BackendModule
 
         // Load Helper
         $this->objSyncCtoDatabase = SyncCtoDatabase::getInstance();
-        $this->objSyncCtoFiles = SyncCtoFiles::getInstance();        
+        $this->objSyncCtoFiles = SyncCtoFiles::getInstance();
         $this->objSyncCtoCommunicationClient = SyncCtoCommunicationClient::getInstance();
         $this->objSyncCtoHelper = SyncCtoHelper::getInstance();
 
@@ -438,7 +438,7 @@ class SyncCtoModuleClient extends BackendModule
                         {
                             $this->arrListFile = array_merge($this->arrListFile, array());
                         }
-                        
+
                         $mixStepPool["step"] = 3;
 
                         break;
@@ -1145,14 +1145,11 @@ class SyncCtoModuleClient extends BackendModule
                      */
                     case 3:
                         $arrResponse = $this->objSyncCtoCommunicationClient->sendFile($GLOBALS['SYC_PATH']['tmp'], $mixStepPool["zipname"], "", SyncCtoEnum::UPLOAD_SQL_TEMP);
-
+                        
                         // Check if the file was send and saved.
                         if (!is_array($arrResponse) || count($arrResponse) == 0)
                         {
-                            $arrContenData["error"] = true;
-                            $arrContenData["error_msg"] = $exc->getMessage();
-
-                            break;
+                            throw new Exception("Empty file list from client. Maybe file send was not complet.");
                         }
 
                         $arrContenData["data"][4]["description"] = $GLOBALS['TL_LANG']['tl_syncCto_sync']["step_4"]['description_3'];
@@ -1251,8 +1248,8 @@ class SyncCtoModuleClient extends BackendModule
                         $intWaitCount++;
                         break;
                 }
-                
-                if($value["state"] == SyncCtoEnum::FILESTATE_DELETE)
+
+                if ($value["state"] == SyncCtoEnum::FILESTATE_DELETE)
                 {
                     $intDelCount++;
                 }
@@ -1272,7 +1269,7 @@ class SyncCtoModuleClient extends BackendModule
         try
         {
             $intStart = time();
-            
+
             switch ($mixStepPool["step"])
             {
                 /** ------------------------------------------------------------
@@ -1328,7 +1325,7 @@ class SyncCtoModuleClient extends BackendModule
                         }
 
                         try
-                        {    
+                        {
                             $this->objSyncCtoCommunicationClient->sendFile(dirname($value["path"]), basename($value["path"]), $value["checksum"], SyncCtoEnum::UPLOAD_SYNC_TEMP);
                             $this->arrListCompare[$key]["transmission"] = SyncCtoEnum::FILETRANS_SEND;
                         }
@@ -1345,7 +1342,7 @@ class SyncCtoModuleClient extends BackendModule
                             break;
                         }
                     }
-                    
+
                     if ($intWaitCount - $intDelCount > 0)
                     {
                         $mixStepPool["step"] = 2;
@@ -1385,7 +1382,7 @@ class SyncCtoModuleClient extends BackendModule
                             }
                         }
                     }
-                   
+
                     $mixStepPool["step"] = 4;
                     break;
 
@@ -1425,9 +1422,9 @@ class SyncCtoModuleClient extends BackendModule
                  */
                 case 5:
                     if ($intSyncTyp == SYNCCTO_FULL)
-                    {                        
-                        $this->objSyncCtoCommunicationClient->startLocalConfigImport();                        
-                        $mixStepPool["step"] = 6;                      
+                    {
+                        $this->objSyncCtoCommunicationClient->startLocalConfigImport();
+                        $mixStepPool["step"] = 6;
                     }
 
                     $arrContenData["data"][5]["description"] = $GLOBALS['TL_LANG']['tl_syncCto_sync']["step_5"]['description_1'];
