@@ -54,13 +54,10 @@ $GLOBALS['BE_MOD'] = array_merge(
             'icon' => 'system/modules/syncCto/html/iconBackups.png',
             'callback' => 'SyncCtoModuleBackup',
         ),
-        'syncCto_stats' => array(
-            // 'tables' => array('tl_syncCto_settings'),
-            'icon' => 'system/modules/syncCto/html/iconStats.png'
-        ),
         'syncCto_check' => array(
             'icon' => 'system/modules/syncCto/html/iconCheck.png',
             'callback' => 'SyncCtoModuleCheck',
+			'stylesheet' => 'system/modules/syncCto/html/css/systemcheck_src.css',
         )
     )
         ), array_slice($GLOBALS['BE_MOD'], $i)
@@ -111,6 +108,21 @@ if ($objInput->get("do") == 'syncCto_backups' && $objInput->get("table") != '' &
 if ($objInput->get("do") == 'synccto_clients' && ($objInput->get("table") == 'tl_syncCto_clients_syncTo' || $objInput->get("table") == 'tl_syncCto_clients_syncFrom' || $objInput->get("table") == '' ) && $objInput->get("act") != 'start')
 {
     unset($GLOBALS['BE_MOD']['syncCto']['synccto_clients']['callback']);
+}
+
+/**
+ * CSS
+ */
+if (($objInput->get("table") == 'tl_syncCto_clients_syncTo') || ($objInput->get("table") == 'tl_syncCto_clients_syncFrom'))
+{
+    $GLOBALS['TL_CSS'][] = 'system/modules/syncCto/html/css/filelist_src.css';
+    $GLOBALS['TL_JAVASCRIPT'][] = 'system/modules/syncCto/html/js/htmltable.js';
+    $GLOBALS['TL_JAVASCRIPT'][] = 'system/modules/syncCto/html/js/filelist_src.js';
+}
+
+if ((($objInput->get("do") == 'synccto_clients') && $objInput->get("act") == '') && $objInput->get("table") == '')
+{
+    $GLOBALS['TL_JAVASCRIPT'][] = 'system/modules/syncCto/html/js/ping_src.js';
 }
 
 // Size limit for files in bytes, will be checked
@@ -178,26 +190,6 @@ $GLOBALS['SYC_PATH']['db'] = $GLOBALS['TL_CONFIG']['uploadPath'] . '/syncCto_bac
 $GLOBALS['SYC_PATH']['file'] = $GLOBALS['TL_CONFIG']['uploadPath'] . '/syncCto_backups/files/';
 $GLOBALS['SYC_PATH']['debug'] = $GLOBALS['TL_CONFIG']['uploadPath'] . '/syncCto_backups/debug/';
 $GLOBALS['SYC_PATH']['tmp'] = "system/tmp/";
-
-/**
- * CSS
- */
-if (($objInput->get("table") == 'tl_syncCto_clients_syncTo') || ($objInput->get("table") == 'tl_syncCto_clients_syncFrom'))
-{
-    $GLOBALS['TL_CSS'][] = 'system/modules/syncCto/html/css/filelist_src.css';
-    $GLOBALS['TL_JAVASCRIPT'][] = 'system/modules/syncCto/html/js/htmltable.js';
-    $GLOBALS['TL_JAVASCRIPT'][] = 'system/modules/syncCto/html/js/filelist_src.js';
-}
-
-if ((($objInput->get("do") == 'synccto_clients') && $objInput->get("act") == '') && $objInput->get("table") == '')
-{
-    $GLOBALS['TL_JAVASCRIPT'][] = 'system/modules/syncCto/html/js/ping_src.js';
-}
-
-if ($objInput->get("do") == 'syncCto_check')
-{
-	$GLOBALS['TL_CSS'][] = 'system/modules/syncCto/html/css/systemcheck_src.css';
-}
 
 /**
  * CtoCommunication RPC Calls

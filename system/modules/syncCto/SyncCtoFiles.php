@@ -69,7 +69,9 @@ class SyncCtoFiles extends Backend
     public static function getInstance()
     {
         if (self::$instance == null)
+        {
             self::$instance = new SyncCtoFiles();
+        }
 
         return self::$instance;
     }

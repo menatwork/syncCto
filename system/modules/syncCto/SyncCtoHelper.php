@@ -248,7 +248,9 @@ class SyncCtoHelper extends Backend
 
                     // Check if a client was loaded
                     if ($objClient->numRows == 0)
+                    {
                         throw new Exception("Unknown Client.");
+                    }
 
                     // Clean link
                     $objClient->path = preg_replace("/\/\z/i", "", $objClient->path);
@@ -275,12 +277,16 @@ class SyncCtoHelper extends Backend
                     // Check Server
                     $objRequest->send($strServer);
                     if ($objRequest->code == '200')
+                    {
                         $intReturn = $intReturn + 1;
+                    }
 
                     // Check page
                     $objRequest->send($strUrl);
                     if ($objRequest->code == '200')
+                    {
                         $intReturn = $intReturn + 2;
+                    }
 
                     echo $intReturn;
                 }
