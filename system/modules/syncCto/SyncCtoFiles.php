@@ -131,19 +131,22 @@ class SyncCtoFiles extends Backend
      */
     public function runChecksumCore()
     {
+        // Build filelist
         $arrFileList = $this->recursiveFileList(array(), "");
         $arrChecksum = array();
 
+        // Check each file
         foreach ($arrFileList as $key => $value)
         {
+            // Get filesize
             $intSize = filesize(TL_ROOT . "/" . $value);
-
+            
             if ($intSize < 0 && $intSize != 0)
             {
                 $arrChecksum[md5($value)] = array(
                     "path" => $value,
                     "checksum" => 0,
-                    "size" => 0,
+                    "size" => -1,
                     "state" => SyncCtoEnum::FILESTATE_BOMBASTIC_BIG,
                     "transmission" => SyncCtoEnum::FILETRANS_WAITING,
                 );
@@ -218,16 +221,18 @@ class SyncCtoFiles extends Backend
             $arrChecksum = array();
         }
 
+        // Check each file
         foreach ($arrFileList as $key => $value)
         {
+            // Get filesize
             $intSize = filesize(TL_ROOT . "/" . $value);
-
+            
             if ($intSize < 0 && $intSize != 0)
             {
                 $arrChecksum[md5($value)] = array(
                     "path" => $value,
                     "checksum" => 0,
-                    "size" => 0,
+                    "size" => -1,
                     "state" => SyncCtoEnum::FILESTATE_BOMBASTIC_BIG,
                     "transmission" => SyncCtoEnum::FILETRANS_WAITING,
                 );

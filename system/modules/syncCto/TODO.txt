@@ -1,3 +1,2 @@
-- MD5 Problem bei großen Files
-- Dateigrößenanzeige bei großen Files (N.A.)
+﻿- MD5 Problem bei großen Files
 - syncFrom

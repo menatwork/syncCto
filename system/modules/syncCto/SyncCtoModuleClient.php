@@ -576,8 +576,11 @@ class SyncCtoModuleClient extends BackendModule
                                     $intCountIgnored++;
                                     break;
                             }
-
-                            $intTotalSize += $value["size"];
+                            
+                            if($value["size"] != -1)
+                            {
+                                $intTotalSize += $value["size"];
+                            }
                         }
 
                         $mixStepPool["missing"] = $intCountMissing;

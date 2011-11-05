@@ -89,6 +89,13 @@ class SyncCtoCommunicationClient extends CtoCommunication
 
         $this->setClient($strUrl, $objClient->codifyengine);
         $this->setApiKey($objClient->apikey);
+        
+        // Set debug modus for ctoCom.
+        if($GLOBALS['TL_CONFIG']['syncCto_debug_mode'] == true)
+        {
+            $this->activateDebug = true;
+            $this->activateMeasurement = true;
+        }
     }
 
     /* -------------------------------------------------------------------------
