@@ -94,8 +94,8 @@ class SyncCtoDatabase extends Backend
 
         $this->arrBackupTables = array();
         $this->objSyncCtoHelper = SyncCtoHelper::getInstance();
-        
-        $this->strTimestampFormat = standardize($GLOBALS['TL_CONFIG']['datimFormat']); 
+
+        $this->strTimestampFormat = standardize($GLOBALS['TL_CONFIG']['datimFormat']);
     }
 
     /**
@@ -313,103 +313,130 @@ class SyncCtoDatabase extends Backend
             // Indicies
             $arrIndexes = $this->Database->prepare("SHOW INDEX FROM `$table`")->execute()->fetchAllAssoc();
 
+
+
             foreach ($fields as $field)
             {
-                if ($field["type"] == "index")
+                if (version_compare(VERSION, '2.10', '<'))
                 {
-                    if ($field["name"] == "PRIMARY")
+                    // Indices
+                    if (strlen($field['index']))
                     {
-                        $return[$table]['TABLE_CREATE_DEFINITIONS'][$field["name"]] = "PRIMARY KEY (`" . implode("`,`", $field["index_fields"]) . "`)";
-                    }
-                    else if ($field["index"] == "UNIQUE")
-                    {
-                        foreach ($field["index_fields"] as $keyField => $valueField)
+                        switch ($field['index'])
                         {
-                            foreach ($arrIndexes as $keyIndexe => $valueIndexe)
-                            {
-                                if ($valueIndexe["Column_name"] == $valueField)
-                                {
-                                    $strTyp = $valueIndexe["Index_type"];
-                                    $arrReturn[] = "`$valueField` (" . $valueIndexe["Sub_part"] . ")";
-
-                                    break;
-                                }
-                            }
-                        }
-                    }
-                    else if ($field["index"] == "KEY")
-                    {
-                        $strTyp;
-                        $arrReturn = array();
-
-                        foreach ($field["index_fields"] as $keyField => $valueField)
-                        {
-                            foreach ($arrIndexes as $keyIndexe => $valueIndexe)
-                            {
-                                if ($valueIndexe["Column_name"] == $valueField)
-                                {
-                                    $strTyp = $valueIndexe["Index_type"];
-                                    $arrReturn[] = "`$valueField`";
-
-                                    break;
-                                }
-                            }
-                        }
-
-                        switch ($strTyp)
-                        {
-                            case "FULLTEXT":
-                                $return[$table]['TABLE_CREATE_DEFINITIONS'][$field["name"]] = "FULLTEXT KEY `" . $field['name'] . "` (" . implode(",", $arrReturn) . ")";
+                            case 'PRIMARY': $return[$table]['TABLE_CREATE_DEFINITIONS'][$field["name"]] = 'PRIMARY KEY  (`' . $field["name"] . '`)';
                                 break;
 
-                            default:
-                                $return[$table]['TABLE_CREATE_DEFINITIONS'][$field["name"]] = "KEY `" . $field['name'] . "` (" . implode(",", $arrReturn) . ")";
+                            case 'UNIQUE': $return[$table]['TABLE_CREATE_DEFINITIONS'][$field["name"]] = 'UNIQUE KEY `' . $field["name"] . '` (`' . $field["name"] . '`)';
+                                break;
+
+                            case 'FULLTEXT': $return[$table]['TABLE_CREATE_DEFINITIONS'][$field["name"]] = 'FULLTEXT KEY `' . $field["name"] . '` (`' . $field["name"] . '`)';
+                                break;
+
+                            default: if ((strpos(' ' . $field['type'], 'text') || strpos(' ' . $field['type'], 'char')) && ($field['null'] == 'NULL')) // Fulltext-Search bei text-Fields
+                                    $return[$table]['TABLE_CREATE_DEFINITIONS'][$field["name"]] = 'FULLTEXT KEY `' . $field["name"] . '` (`' . $field["name"] . '`)';
+                                else
+                                    $return[$table]['TABLE_CREATE_DEFINITIONS'][$field["name"]] = 'KEY `' . $field["name"] . '` (`' . $field["name"] . '`)';
                                 break;
                         }
                     }
-
-                    continue;
                 }
                 else
                 {
-                    unset($field['index']);
+                    if ($field["type"] == "index")
+                    {
+                        if ($field["name"] == "PRIMARY")
+                        {
+                            $return[$table]['TABLE_CREATE_DEFINITIONS'][$field["name"]] = "PRIMARY KEY (`" . implode("`,`", $field["index_fields"]) . "`)";
+                        }
+                        else if ($field["index"] == "UNIQUE")
+                        {
+                            foreach ($field["index_fields"] as $keyField => $valueField)
+                            {
+                                foreach ($arrIndexes as $keyIndexe => $valueIndexe)
+                                {
+                                    if ($valueIndexe["Column_name"] == $valueField)
+                                    {
+                                        $strTyp = $valueIndexe["Index_type"];
+                                        $arrReturn[] = "`$valueField` (" . $valueIndexe["Sub_part"] . ")";
 
-                    $name = $field['name'];
-                    $field['name'] = '`' . $field['name'] . '`';
+                                        break;
+                                    }
+                                }
+                            }
+                        }
+                        else if ($field["index"] == "KEY")
+                        {
+                            $strTyp;
+                            $arrReturn = array();
 
-                    // Field type
-                    if (strlen($field['length']))
-                    {
-                        $field['type'] .= '(' . $field['length'] . (strlen($field['precision']) ? ',' . $field['precision'] : '') . ')';
+                            foreach ($field["index_fields"] as $keyField => $valueField)
+                            {
+                                foreach ($arrIndexes as $keyIndexe => $valueIndexe)
+                                {
+                                    if ($valueIndexe["Column_name"] == $valueField)
+                                    {
+                                        $strTyp = $valueIndexe["Index_type"];
+                                        $arrReturn[] = "`$valueField`";
 
-                        unset($field['length']);
-                        unset($field['precision']);
-                    }
+                                        break;
+                                    }
+                                }
+                            }
 
-                    // Default values
-                    if (in_array(strtolower($field['type']), $this->arrDefaultValueTypIgnore) || stristr($field['extra'], 'auto_increment'))
-                    {
-                        unset($field['default']);
-                    }
-                    else if (strtolower($field['default']) == 'null')
-                    {
-                        $field['default'] = "default NULL";
-                    }
-                    else if (is_null($field['default']))
-                    {
-                        $field['default'] = "";
-                    }
-                    else if (in_array(strtoupper($field['default']), $this->arrDefaultValueFunctionIgnore))
-                    {
-                        $field['default'] = "default " . $field['default'];
-                    }
-                    else
-                    {
-                        $field['default'] = "default '" . $field['default'] . "'";
-                    }
+                            switch ($strTyp)
+                            {
+                                case "FULLTEXT":
+                                    $return[$table]['TABLE_CREATE_DEFINITIONS'][$field["name"]] = "FULLTEXT KEY `" . $field['name'] . "` (" . implode(",", $arrReturn) . ")";
+                                    break;
 
-                    $return[$table]['TABLE_FIELDS'][$name] = trim(implode(' ', $field));
+                                default:
+                                    $return[$table]['TABLE_CREATE_DEFINITIONS'][$field["name"]] = "KEY `" . $field['name'] . "` (" . implode(",", $arrReturn) . ")";
+                                    break;
+                            }
+                        }
+
+                        continue;
+                    }
                 }
+
+                unset($field['index']);
+
+                $name = $field['name'];
+                $field['name'] = '`' . $field['name'] . '`';
+
+                // Field type
+                if (strlen($field['length']))
+                {
+                    $field['type'] .= '(' . $field['length'] . (strlen($field['precision']) ? ',' . $field['precision'] : '') . ')';
+
+                    unset($field['length']);
+                    unset($field['precision']);
+                }
+
+                // Default values
+                if (in_array(strtolower($field['type']), $this->arrDefaultValueTypIgnore) || stristr($field['extra'], 'auto_increment'))
+                {
+                    unset($field['default']);
+                }
+                else if (strtolower($field['default']) == 'null')
+                {
+                    $field['default'] = "default NULL";
+                }
+                else if (is_null($field['default']))
+                {
+                    $field['default'] = "";
+                }
+                else if (in_array(strtoupper($field['default']), $this->arrDefaultValueFunctionIgnore))
+                {
+                    $field['default'] = "default " . $field['default'];
+                }
+                else
+                {
+                    $field['default'] = "default '" . $field['default'] . "'";
+                }
+
+                $return[$table]['TABLE_FIELDS'][$name] = trim(implode(' ', $field));
             }
         }
 
@@ -417,7 +444,6 @@ class SyncCtoDatabase extends Backend
         $objStatus = $this->Database->prepare("SHOW TABLE STATUS")->execute();
         while ($zeile = $objStatus->fetchAssoc())
         {
-
             if (!in_array($zeile['Name'], $this->arrBackupTables))
                 continue;
 
@@ -514,7 +540,7 @@ class SyncCtoDatabase extends Backend
                 $ii++;
             }
         }
-        
+
         return $arrReturn;
     }
 
