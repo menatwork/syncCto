@@ -26,18 +26,24 @@
  * @license    GNU/LGPL
  * @filesource
  */
-
 class SyncCtoHelper extends Backend
 {
+    /* -------------------------------------------------------------------------
+     * Vars
+     */
 
     // instance
     protected static $instance = null;
-    //-----
     protected $BackendUser;
+
+    /* -------------------------------------------------------------------------
+     * Core
+     */
 
     protected function __construct()
     {
         $this->BackendUser = BackendUser::getInstance();
+
         parent::__construct();
     }
 
@@ -55,8 +61,13 @@ class SyncCtoHelper extends Backend
         return self::$instance;
     }
 
+    /* -------------------------------------------------------------------------
+     * Config
+     */
+
     /**
      * Configuration merge functions
+     * 
      * @param array $arrLocalconfig
      * @param array $arrSyncCtoConfig
      * @return array
@@ -67,9 +78,11 @@ class SyncCtoHelper extends Backend
         {
             foreach ($arrLocalconfig as $value)
             {
-                if (in_array($value, $arrSyncCtoConfig)) continue;
+                if (in_array($value, $arrSyncCtoConfig))
+                    continue;
 
-                if ($value == "") continue;
+                if ($value == "")
+                    continue;
 
                 $arrSyncCtoConfig[] = $value;
             }
@@ -86,44 +99,9 @@ class SyncCtoHelper extends Backend
         }
     }
 
-    // Configuration Merge Part 
-    public function getBlacklistFolder()
-    {
-        $arrLocalconfig = deserialize($GLOBALS['TL_CONFIG']['syncCto_folder_blacklist']);
-        $arrSyncCtoConfig = $GLOBALS['SYC_CONFIG']['folder_blacklist'];
-        return $this->mergeConfigs($arrLocalconfig, $arrSyncCtoConfig);
-    }
-
-    public function getWhitelistFolder()
-    {
-        $arrLocalconfig = deserialize($GLOBALS['TL_CONFIG']['syncCto_folder_whitelist']);
-        $arrSyncCtoConfig = $GLOBALS['SYC_CONFIG']['folder_whitelist'];
-        return $this->mergeConfigs($arrLocalconfig, $arrSyncCtoConfig);
-    }
-
-    public function getBlacklistFile()
-    {
-        $arrLocalconfig = deserialize($GLOBALS['TL_CONFIG']['syncCto_file_blacklist']);
-        $arrSyncCtoConfig = $GLOBALS['SYC_CONFIG']['file_blacklist'];
-        return $this->mergeConfigs($arrLocalconfig, $arrSyncCtoConfig);
-    }
-
-    public function getBlacklistLocalconfig()
-    {
-        $arrLocalconfig = deserialize($GLOBALS['TL_CONFIG']['syncCto_local_blacklist']);
-        $arrSyncCtoConfig = $GLOBALS['SYC_CONFIG']['local_blacklist'];
-        return $this->mergeConfigs($arrLocalconfig, $arrSyncCtoConfig);
-    }
-
-    public function getTablesHidden()
-    {
-        $arrLocalconfig = deserialize($GLOBALS['TL_CONFIG']['syncCto_hidden_tables']);
-        $arrSyncCtoConfig = $GLOBALS['SYC_CONFIG']['table_hidden'];
-        return $this->mergeConfigs($arrLocalconfig, $arrSyncCtoConfig);
-    }
-
     /**
      * Get localconfig entries
+     * 
      * @param int $intTyp
      * @return string
      */
@@ -191,6 +169,46 @@ class SyncCtoHelper extends Backend
         return $arrData;
     }
 
+    /* -------------------------------------------------------------------------
+     * Black and White lists
+     */
+
+    // Configuration Merge Part 
+    public function getBlacklistFolder()
+    {
+        $arrLocalconfig = deserialize($GLOBALS['TL_CONFIG']['syncCto_folder_blacklist']);
+        $arrSyncCtoConfig = $GLOBALS['SYC_CONFIG']['folder_blacklist'];
+        return $this->mergeConfigs($arrLocalconfig, $arrSyncCtoConfig);
+    }
+
+    public function getWhitelistFolder()
+    {
+        $arrLocalconfig = deserialize($GLOBALS['TL_CONFIG']['syncCto_folder_whitelist']);
+        $arrSyncCtoConfig = $GLOBALS['SYC_CONFIG']['folder_whitelist'];
+        return $this->mergeConfigs($arrLocalconfig, $arrSyncCtoConfig);
+    }
+
+    public function getBlacklistFile()
+    {
+        $arrLocalconfig = deserialize($GLOBALS['TL_CONFIG']['syncCto_file_blacklist']);
+        $arrSyncCtoConfig = $GLOBALS['SYC_CONFIG']['file_blacklist'];
+        return $this->mergeConfigs($arrLocalconfig, $arrSyncCtoConfig);
+    }
+
+    public function getBlacklistLocalconfig()
+    {
+        $arrLocalconfig = deserialize($GLOBALS['TL_CONFIG']['syncCto_local_blacklist']);
+        $arrSyncCtoConfig = $GLOBALS['SYC_CONFIG']['local_blacklist'];
+        return $this->mergeConfigs($arrLocalconfig, $arrSyncCtoConfig);
+    }
+
+    public function getTablesHidden()
+    {
+        $arrLocalconfig = deserialize($GLOBALS['TL_CONFIG']['syncCto_hidden_tables']);
+        $arrSyncCtoConfig = $GLOBALS['SYC_CONFIG']['table_hidden'];
+        return $this->mergeConfigs($arrLocalconfig, $arrSyncCtoConfig);
+    }
+
     /**
      * Standardize path for folder
      * @return string the normalized path as String
@@ -229,10 +247,6 @@ class SyncCtoHelper extends Backend
      * Ping the current client status
      * @param string $strAction 
      */
-
-    /**
-     * Ping client status
-     */
     public function pingClientStatus($strAction)
     {
         if ($strAction == 'syncCtoPing')
@@ -249,7 +263,8 @@ class SyncCtoHelper extends Backend
                     // Check if a client was loaded
                     if ($objClient->numRows == 0)
                     {
-                        throw new Exception("Unknown Client.");
+                        echo "false";
+                        exit();
                     }
 
                     // Clean link
@@ -270,8 +285,7 @@ class SyncCtoHelper extends Backend
                     }
 
                     $intReturn = 0;
-
-                    // Test Server
+                    
                     $objRequest = new RequestExtendedCached();
 
                     // Check Server
@@ -509,7 +523,8 @@ class SyncCtoHelper extends Backend
         foreach ($this->Database->listTables() as $key => $value)
         {
             // Check if table is a hidden one.
-            if (in_array($value, $arrTablesHidden)) continue;
+            if (in_array($value, $arrTablesHidden))
+                continue;
 
             $arrTables[] = $value;
         }
@@ -536,7 +551,8 @@ class SyncCtoHelper extends Backend
 
         foreach ($this->databaseTables() as $key => $value)
         {
-            if (in_array($value, $arrBlacklist)) continue;
+            if (in_array($value, $arrBlacklist))
+                continue;
 
             if (is_array($arrTablesPermission) && !in_array($value, $arrTablesPermission) && $this->BackendUser->isAdmin != true)
             {
@@ -567,7 +583,8 @@ class SyncCtoHelper extends Backend
 
         foreach ($this->databaseTables() as $key => $value)
         {
-            if (!in_array($value, $arrBlacklist)) continue;
+            if (!in_array($value, $arrBlacklist))
+                continue;
 
             if (is_array($arrTablesPermission) && !in_array($value, $arrTablesPermission) && $this->BackendUser->isAdmin != true)
             {

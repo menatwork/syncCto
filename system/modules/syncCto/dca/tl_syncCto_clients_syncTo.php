@@ -126,7 +126,7 @@ class tl_syncCto_clients_syncTo extends Backend
             }
             else
             {
-                $_SESSION["TL_ERROR"] = array($GLOBALS['TL_LANG']['ERR']['unknown_method']);
+                $_SESSION["TL_ERROR"][] = $GLOBALS['TL_LANG']['ERR']['unknown_function'];
                 return;
             }
         }

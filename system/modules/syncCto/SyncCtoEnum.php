@@ -27,6 +27,9 @@
  * @filesource
  */
  
+/**
+ * Enum class with constants
+ */
 class SyncCtoEnum
 {
     //-----------------------------------------
@@ -78,6 +81,5 @@ class SyncCtoEnum
     // Pre installed Codifyengines
     const CODIFY_EMPTY = "Empty";
     const CODIFY_BLOW = "Blowfish";
-    const CODIFY_MCRYPT = "Mcrypt";
-	
+    const CODIFY_MCRYPT = "Mcrypt";	
 }

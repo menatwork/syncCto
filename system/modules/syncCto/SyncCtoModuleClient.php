@@ -1,3 +1,5 @@
+<?php
+
 <?php if (!defined('TL_ROOT')) die('You cannot access this file directly!');
 
 /**
@@ -287,13 +289,27 @@ class SyncCtoModuleClient extends BackendModule
                  */
                 case 3:
                     $strVersion = $this->objSyncCtoCommunicationClient->getVersionSyncCto();
-                    if ($strVersion != $GLOBALS['SYC_VERSION'])
+
+                    if (!version_compare($strVersion, $GLOBALS['SYC_VERSION'], "="))
                     {
-                        $this->log(vsprintf("Not the same version on synchronization client ID %s. Serverversion: %s. Clientversion: %s", array($this->Input->get("id"), $GLOBALS['SYC_VERSION'], $strVersion)), __CLASS__ . " " . __FUNCTION__, "INFO");
+                        $this->log(vsprintf("Not the same version from syncCto on synchronization client ID %s. Serverversion: %s. Clientversion: %s", array($this->Input->get("id"), $GLOBALS['SYC_VERSION'], $strVersion)), __CLASS__ . " " . __FUNCTION__, "INFO");
 
                         $arrContenData["data"][1]["state"] = $GLOBALS['TL_LANG']['MSC']['error'];
                         $arrContenData["error"] = true;
-                        $arrContenData["error_msg"] = vsprintf($GLOBALS['TL_LANG']['tl_syncCto_sync']['error_step_1']['version'], array($GLOBALS['SYC_VERSION'], $strVersion));
+                        $arrContenData["error_msg"] = vsprintf($GLOBALS['TL_LANG']['ERR']['version'], array("syncCto", $GLOBALS['SYC_VERSION'], $strVersion));
+
+                        break;
+                    }
+
+                    $strVersion = $this->objSyncCtoCommunicationClient->getVersionContao();
+
+                    if (!version_compare($strVersion, VERSION, "="))
+                    {
+                        $this->log(vsprintf("Not the same version from contao on synchronization client ID %s. Serverversion: %s. Clientversion: %s", array($this->Input->get("id"), $GLOBALS['SYC_VERSION'], $strVersion)), __CLASS__ . " " . __FUNCTION__, "INFO");
+
+                        $arrContenData["data"][1]["state"] = $GLOBALS['TL_LANG']['MSC']['error'];
+                        $arrContenData["error"] = true;
+                        $arrContenData["error_msg"] = vsprintf($GLOBALS['TL_LANG']['ERR']['version'], array("Contao", VERSION, $strVersion));
 
                         break;
                     }
@@ -458,19 +474,26 @@ class SyncCtoModuleClient extends BackendModule
                      * Check for deleted files
                      */
                     case 4:
-                        $arrChecksumClient = (array) $this->objSyncCtoCommunicationClient->getChecksumCore();
-
-                        foreach ($arrChecksumClient as $keyItem => $valueItem)
+                        if ($intSyncTyp == SYNCCTO_FULL)
                         {
-                            if (!file_exists(TL_ROOT . "/" . $valueItem["path"]))
-                            {
-                                $this->arrListCompare[$keyItem] = $valueItem;
-                                $this->arrListCompare[$keyItem]["state"] = SyncCtoEnum::FILESTATE_DELETE;
-                                $this->arrListCompare[$keyItem]["css"] = "deleted";
-                            }
-                        }
+                            $arrChecksumClient = (array) $this->objSyncCtoCommunicationClient->getChecksumCore();
 
-                        unset($arrChecksumClient);
+                            foreach ($arrChecksumClient as $keyItem => $valueItem)
+                            {
+                                if (!file_exists(TL_ROOT . "/" . $valueItem["path"]))
+                                {
+                                    $this->arrListCompare[$keyItem] = $valueItem;
+                                    $this->arrListCompare[$keyItem]["state"] = SyncCtoEnum::FILESTATE_DELETE;
+                                    $this->arrListCompare[$keyItem]["css"] = "deleted";
+                                }
+                            }
+
+                            unset($arrChecksumClient);
+                        }
+                        else
+                        {
+                            // Check for del files
+                        }
 
                         $arrContenData["data"][2]["description"] = $GLOBALS['TL_LANG']['tl_syncCto_sync']["step_2"]['description_3'];
                         $mixStepPool["step"] = 5;
@@ -576,8 +599,8 @@ class SyncCtoModuleClient extends BackendModule
                                     $intCountIgnored++;
                                     break;
                             }
-                            
-                            if($value["size"] != -1)
+
+                            if ($value["size"] != -1)
                             {
                                 $intTotalSize += $value["size"];
                             }
@@ -989,7 +1012,9 @@ class SyncCtoModuleClient extends BackendModule
                         foreach ($this->arrListCompare as $key => $value)
                         {
                             if ($value["split"] == true)
+                            {
                                 $intCountSplit++;
+                            }
                         }
 
                         foreach ($this->arrListCompare as $key => $value)
@@ -1011,6 +1036,7 @@ class SyncCtoModuleClient extends BackendModule
 
                             if ($value["transmission"] == SyncCtoEnum::FILETRANS_SEND)
                             {
+                                $intCount++;
                                 continue;
                             }
 
@@ -1034,8 +1060,12 @@ class SyncCtoModuleClient extends BackendModule
                         }
                         else
                         {
-                            $arrContenData["data"][3]["description"] = $GLOBALS['TL_LANG']['tl_syncCto_sync']["step_3"]['description_1'];
                             $arrContenData["data"][3]["state"] = $GLOBALS['TL_LANG']['MSC']['ok'];
+                            $arrContenData["data"][3]["description"] = vsprintf($GLOBALS['TL_LANG']['tl_syncCto_sync']["step_3"]['description_4'], array($intCount, $intCountSplit));
+
+                            $arrContenData["data"][4]["state"] = $GLOBALS['TL_LANG']['MSC']['progress'];
+                            $arrContenData["data"][4]["title"] = $GLOBALS['TL_LANG']['MSC']['step'] . " 4";
+                            $arrContenData["data"][4]["description"] = $GLOBALS['TL_LANG']['tl_syncCto_sync']["step_4"]['description_1'];
 
                             $this->intStep++;
                             $mixStepPool == FALSE;
@@ -1148,7 +1178,7 @@ class SyncCtoModuleClient extends BackendModule
                      */
                     case 3:
                         $arrResponse = $this->objSyncCtoCommunicationClient->sendFile($GLOBALS['SYC_PATH']['tmp'], $mixStepPool["zipname"], "", SyncCtoEnum::UPLOAD_SQL_TEMP);
-                        
+
                         // Check if the file was send and saved.
                         if (!is_array($arrResponse) || count($arrResponse) == 0)
                         {

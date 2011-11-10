@@ -50,7 +50,6 @@ class SyncCtoDatabase extends Backend
     protected $strTimestampFormat;
     //- Objects ------------------
     protected $objSyncCtoHelper;
-
     /**
      * -= Config =-
      * List of default ignore values
@@ -60,7 +59,6 @@ class SyncCtoDatabase extends Backend
         "NOW",
         "CURRENT_TIMESTAMP",
     );
-
     /**
      * -= Config =-
      * List of default ignore values
@@ -297,7 +295,9 @@ class SyncCtoDatabase extends Backend
 
         // Check if a table is selected
         if (!count($tables))
-            throw new Exception($GLOBALS['TL_LANG']['ERR']['zero_tables']);
+        {
+            throw new Exception($GLOBALS['TL_LANG']['ERR']['missing_tables_selection']);
+        }
 
         $return = array();
 
@@ -307,33 +307,35 @@ class SyncCtoDatabase extends Backend
             if (!in_array($table, $this->arrBackupTables))
                 continue;
 
-            // Liste der Felder lesen
+            // Get list of fields
             $fields = $this->Database->listFields($table);
 
-            // Indicies
+            // Get list of indicies
             $arrIndexes = $this->Database->prepare("SHOW INDEX FROM `$table`")->execute()->fetchAllAssoc();
-
-
 
             foreach ($fields as $field)
             {
                 if (version_compare(VERSION, '2.10', '<'))
                 {
                     // Indices
-                    if (strlen($field['index']))
+                    if (strlen($field['index']) != 0)
                     {
                         switch ($field['index'])
                         {
-                            case 'PRIMARY': $return[$table]['TABLE_CREATE_DEFINITIONS'][$field["name"]] = 'PRIMARY KEY  (`' . $field["name"] . '`)';
+                            case 'PRIMARY':
+                                $return[$table]['TABLE_CREATE_DEFINITIONS'][$field["name"]] = 'PRIMARY KEY  (`' . $field["name"] . '`)';
                                 break;
 
-                            case 'UNIQUE': $return[$table]['TABLE_CREATE_DEFINITIONS'][$field["name"]] = 'UNIQUE KEY `' . $field["name"] . '` (`' . $field["name"] . '`)';
+                            case 'UNIQUE':
+                                $return[$table]['TABLE_CREATE_DEFINITIONS'][$field["name"]] = 'UNIQUE KEY `' . $field["name"] . '` (`' . $field["name"] . '`)';
                                 break;
 
-                            case 'FULLTEXT': $return[$table]['TABLE_CREATE_DEFINITIONS'][$field["name"]] = 'FULLTEXT KEY `' . $field["name"] . '` (`' . $field["name"] . '`)';
+                            case 'FULLTEXT':
+                                $return[$table]['TABLE_CREATE_DEFINITIONS'][$field["name"]] = 'FULLTEXT KEY `' . $field["name"] . '` (`' . $field["name"] . '`)';
                                 break;
 
-                            default: if ((strpos(' ' . $field['type'], 'text') || strpos(' ' . $field['type'], 'char')) && ($field['null'] == 'NULL')) // Fulltext-Search bei text-Fields
+                            default:
+                                if ((strpos(' ' . $field['type'], 'text') || strpos(' ' . $field['type'], 'char')) && ($field['null'] == 'NULL')) // Fulltext-Search bei text-Fields
                                     $return[$table]['TABLE_CREATE_DEFINITIONS'][$field["name"]] = 'FULLTEXT KEY `' . $field["name"] . '` (`' . $field["name"] . '`)';
                                 else
                                     $return[$table]['TABLE_CREATE_DEFINITIONS'][$field["name"]] = 'KEY `' . $field["name"] . '` (`' . $field["name"] . '`)';
@@ -465,7 +467,9 @@ class SyncCtoDatabase extends Backend
         $tables = $this->Database->listTables();
 
         if (!count($tables))
-            throw new Exception($GLOBALS['TL_LANG']['ERR']['zero_tables']);
+        {
+            throw new Exception($GLOBALS['TL_LANG']['ERR']['missing_tables_selection']);
+        }
 
         $arrReturn = array();
 

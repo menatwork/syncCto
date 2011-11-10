@@ -30,25 +30,31 @@
                 </tr>
             </thead>
             <tbody>            
-                <?php foreach ($this->filelist as $key => $file): ?>
-                    <?php if ($i == 0 && $this->compare_complex == true): $i = 1; ?>
+                <?php foreach ($this->filelist as $key => $file): ?> 
+                    <?php if ($i == 0 && $this->compare_complex == true ): $i = 1; ?>
+                        <!-- 
                         <tr>
                             <td colspan="4" class="headline">
                                 <?php echo $GLOBALS['TL_LANG']['MSC']['big_files']; ?>
                             </td>
                         </tr>
+                        -->
                     <?php elseif (($file["state"] >= SyncCtoEnum::FILESTATE_TOO_BIG || $file["state"] >= SyncCtoEnum::FILESTATE_TOO_BIG_DELETE || $file["state"] >= SyncCtoEnum::FILESTATE_TOO_BIG_MISSING || $file["state"] >= SyncCtoEnum::FILESTATE_TOO_BIG_NEED) && $i == 1 && $this->compare_complex == true): $i = 2; ?>
+                        <!-- 
                         <tr>
                             <td colspan="4" class="headline">
                                 <?php echo $GLOBALS['TL_LANG']['MSC']['skipped_files']; ?>
                             </td>
                         </tr>
+                        -->
                     <?php elseif (($file["state"] >= SyncCtoEnum::FILESTATE_BOMBASTIC_BIG) && $i == 2 && $this->compare_complex == true): $i = 3; ?>            
+                        <!-- 
                         <tr>
                             <td colspan="4" class="headline">
                                 <?php echo $GLOBALS['TL_LANG']['MSC']['ignored_files']; ?>
                             </td>
                         </tr>
+                        -->
                     <?php endif; ?>
                     <tr>
                         <td class="state <?php echo $file["css"]; ?>"><?php echo $GLOBALS['TL_LANG']['MSC'][$file["css"] . '_file']; ?></td>

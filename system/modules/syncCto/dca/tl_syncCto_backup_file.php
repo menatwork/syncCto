@@ -118,7 +118,7 @@ class tl_syncCto_backup_file extends Backend
             }
             else
             {
-                $_SESSION["TL_ERROR"] = array($GLOBALS['TL_LANG']['ERR']['sync_unknown_backup_method']);
+                $_SESSION["TL_ERROR"][] = $GLOBALS['TL_LANG']['ERR']['unknown_backup_method'];
                 return;
             }
         }

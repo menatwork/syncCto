@@ -1,7 +1,4 @@
-<?php
-
-if (!defined('TL_ROOT'))
-    die('You cannot access this file directly!');
+<?php if (!defined('TL_ROOT')) die('You cannot access this file directly!');
 
 /**
  * Contao Open Source CMS
@@ -31,7 +28,10 @@ if (!defined('TL_ROOT'))
  */
 class SyncCtoRPCFunctions extends Backend
 {
-
+    /* -------------------------------------------------------------------------
+     * Vars
+     */
+    
     protected $objSyncCtoFiles;
     protected $objSyncCtoHelper;
     protected $objSyncCtoDatabase;
@@ -40,6 +40,10 @@ class SyncCtoRPCFunctions extends Backend
     protected $Encryption;
     protected $Config;
 
+    /* -------------------------------------------------------------------------
+     * Core
+     */
+    
     /**
      * Constructor
      */
@@ -114,7 +118,7 @@ class SyncCtoRPCFunctions extends Backend
      * -------------------------------------------------------------------------
      * -------------------------------------------------------------------------
      * 
-     * ALT
+     * OLD
      * 
      * -------------------------------------------------------------------------
      * -------------------------------------------------------------------------

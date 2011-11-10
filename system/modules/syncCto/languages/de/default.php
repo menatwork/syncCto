@@ -89,48 +89,32 @@ $GLOBALS['TL_LANG']['MSC']['memory_limit'] = "Auslastung: %s";
 /**
  * Errors
  */
-$GLOBALS['TL_LANG']['ERR']['sync_no_tables_select'] = "Es wurde(n) keine Tabell(en) ausgewählt.";
-$GLOBALS['TL_LANG']['ERR']['sync_no_file_select'] = "Es wurde(n) keine Datei(en) ausgewählt.";
-$GLOBALS['TL_LANG']['ERR']['sync_no_file_found'] = "Die Datei %s konnte nicht gefunden werden.";
-$GLOBALS['TL_LANG']['ERR']['sync_unknown_backup_method'] = "Die gewählte Backup Methode ist nicht bekannt.";
-$GLOBALS['TL_LANG']['ERR']['cant_open'] = "Datei %s kann nicht geöffnet werden.";
-$GLOBALS['TL_LANG']['ERR']['file_not_exists'] = "Datei %s konnte nicht erstellt werden.";
-$GLOBALS['TL_LANG']['ERR']['zero_tables'] = "Es wurden keine SQL-Tabellen für ein Backup gefunden.";
-$GLOBALS['TL_LANG']['ERR']['table_dmg'] = "Die Datei für die SQL-Tabellen ist beschädigt.";
-$GLOBALS['TL_LANG']['ERR']['insert_dmg'] = "Die Datei für den SQL-Inhalt ist beschädigt.";
-$GLOBALS['TL_LANG']['ERR']['missing_table_file'] = "Die Datei für die SQL-Tabellen fehlt.";
-$GLOBALS['TL_LANG']['ERR']['missing_insert_file'] = "Die Datei für die SQL-Inhalte fehlt.";
-$GLOBALS['TL_LANG']['ERR']['reading_table_file'] = "Die SQL-Tabellen konnten nicht gelesen werden.";
-$GLOBALS['TL_LANG']['ERR']['reading_insert_file'] = "Die SQL-Inhalte konnten nicht gelesen werden.";
-$GLOBALS['TL_LANG']['ERR']['unknown_error'] = "Unbekannter Fehler.";
-$GLOBALS['TL_LANG']['ERR']['unknown_function'] = "Unbekannte Funktion.";
-$GLOBALS['TL_LANG']['ERR']['unknown_method'] = "Unbekannte Methode.";
-$GLOBALS['TL_LANG']['ERR']['unknown_table'] = "Unbekannte Tabelle.";
-$GLOBALS['TL_LANG']['ERR']['no_backup_tables'] = "Keine Tabellen für das Backup ausgewählt.";
-$GLOBALS['TL_LANG']['ERR']['no_backup_file'] = "Keine Backupdatei ausgewählt.";
-$GLOBALS['TL_LANG']['ERR']['session_file_error'] = "Die Dateiliste konnte nicht aus der Session wiederhergestellt werden.";
-$GLOBALS['TL_LANG']['ERR']['restore_session_tables'] = "Die Tabellen konnten nicht aus der Session wiederhergestellt werden.";
-$GLOBALS['TL_LANG']['ERR']['restore_session_zip_id'] = "Die ZIP-ID konnte nicht aus der Session wiederhergestellt werden.";
-$GLOBALS['TL_LANG']['ERR']['restore_session_zip_name'] = "Der ZIP-Name konnte nicht aus der Session wiederhergestellt werden.";
-$GLOBALS['TL_LANG']['ERR']['unknown_backup_step'] = "Unbekannter Schritt im Backup-Prozess.";
-$GLOBALS['TL_LANG']['ERR']['unknown_backup_error'] = "Unbekannter Fehler im Backup-Prozess.";
-$GLOBALS['TL_LANG']['ERR']['unknown_restore_error'] = "Unbekannter Fehler im Wiederherstellungsprozess.";
-$GLOBALS['TL_LANG']['ERR']['maximum_filesize'] = "Zu große Datei(en):";
-$GLOBALS['TL_LANG']['ERR']['uploaded_files_list'] = "Übertragene Datei(en):";
-$GLOBALS['TL_LANG']['ERR']['deleted_files_list'] = "Gelöschte Datei(en):";
-/* OK */$GLOBALS['TL_LANG']['ERR']['rpc_maximum_calls'] = "Maximale Versuche für Übertragung erreicht. Versuchen Sie es späer nocheinmal.";
-/* OK */$GLOBALS['TL_LANG']['ERR']['rpc_maximum_logins'] = "Maximale Versuche für Anmeldung erreicht.";
-$GLOBALS['TL_LANG']['ERR']['checksum_error'] = "Fehler in den Prüfsummen.";
-$GLOBALS['TL_LANG']['ERR']['upload_move_error'] = "Fehler beim Speichern.";
-$GLOBALS['TL_LANG']['ERR']['unknown_response'] = "Unbekannte Antwort.";
-/* OK */$GLOBALS['TL_LANG']['ERR']['rpc_data_missing'] = "Fehlende Daten für RPC.";
-/* OK */$GLOBALS['TL_LANG']['ERR']['rpc_unknown'] = "Unbekannte RPC Anfrage.";
+// File
+$GLOBALS['TL_LANG']['ERR']['missing_file_selection']        = "Es wurde(n) keine Datei(en) ausgewählt.";
+$GLOBALS['TL_LANG']['ERR']['missing_file_information']      = "Es fehlt entweder eine Datei oder die Information zu einer Datei.";
+$GLOBALS['TL_LANG']['ERR']['unknown_file']                  = "Die Datei %s konnte nicht gefunden werden.";
+$GLOBALS['TL_LANG']['ERR']['unknown_file_in_zip']           = "Die Datei %s konnte nicht in der ZIP Datei gefunden werden.";
+$GLOBALS['TL_LANG']['ERR']['unknown_path']                  = "Unbekannter Pfad.";
+$GLOBALS['TL_LANG']['ERR']['cant_open']                     = "Datei %s kann nicht geöffnet werden.";
+$GLOBALS['TL_LANG']['ERR']['checksum_error']                = "Fehler in den Prüfsummen.";
+$GLOBALS['TL_LANG']['ERR']['cant_move_file']                = "Fehler beim verschieben der Datei %s nach %s.";
+$GLOBALS['TL_LANG']['ERR']['cant_delete_file']              = "Fehler beim löschen der Datei.";
+// Database
+$GLOBALS['TL_LANG']['ERR']['missing_tables_selection']      = "Es wurde(n) keine Tabell(en) ausgewählt.";
+// Functions
+$GLOBALS['TL_LANG']['ERR']['unknown_backup_method']         = "Die gewählte Backup Methode ist nicht bekannt.";
+$GLOBALS['TL_LANG']['ERR']['unknown_function']              = "Unbekannte Funktion oder Methode.";
+$GLOBALS['TL_LANG']['ERR']['64Bit_error']                   = "Zahlen überlauf. Versuchen Sie bitte einen 64Bit Version von PHP.";
+// Client
+$GLOBALS['TL_LANG']['ERR']['maximum_filesize']              = "Zu große Datei(en):";
+$GLOBALS['TL_LANG']['ERR']['call_directly']                 = "Versuchen Sie nicht die Synchronisation direkt aufzurufen.";
+$GLOBALS['TL_LANG']['ERR']['client_set']                    = "Kommunikation zwischen Server und Client fehlgeschlagen";
+$GLOBALS['TL_LANG']['ERR']['unknown_client']                = "Unbekannter Client.";
 
-
-/* NEW */ $GLOBALS['TL_LANG']['ERR']['call_directly'] = "Versuchen Sie nicht die Synchronisation direkt aufzurufen.";
-/* NEW */ $GLOBALS['TL_LANG']['ERR']['client_set'] = "Kommunikation zwischen Server und Client fehlgeschlagen";
+// ----- CHECK TO DO -----------------------------------------------------------
+ 
 /* NEW */ $GLOBALS['TL_LANG']['ERR']['referer'] = "Konnte die Referrer-Überprüfung des Clients nicht deaktivieren.";
-/* NEW */ $GLOBALS['TL_LANG']['ERR']['version'] = "Versionskonflikt. Server: %s Client: %s";
+/* NEW */ $GLOBALS['TL_LANG']['ERR']['version'] = "Versionskonflikt %s. Server: %s Client: %s";
 /* NEW */ $GLOBALS['TL_LANG']['ERR']['upload_ini'] = "Upload nicht erfolgreich. Funktion ist in der php.ini deaktiviert.";
 /* NEW */ $GLOBALS['TL_LANG']['ERR']['rebuild'] = "Fehler beim Zusammenbau der Dateien. Pfad: %s";
 /* NEW */ $GLOBALS['TL_LANG']['ERR']['send'] = "Fehler beim Versand der Datei(en).";

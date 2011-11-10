@@ -30,7 +30,7 @@
 /**
  * List operation
  */
-$GLOBALS['TL_LANG']['tl_syncCto_clients']['new'] = array('Neuer Client');
+$GLOBALS['TL_LANG']['tl_synccto_clients']['new'] = array('Neuer Client', 'Neuer Client');
 $GLOBALS['TL_LANG']['tl_syncCto_clients']['all'] = array('Mehrere bearbeiten');
 $GLOBALS['TL_LANG']['tl_syncCto_clients']['edit'] = array('Client bearbeiten', 'Client ID %s bearbeiten');
 $GLOBALS['TL_LANG']['tl_syncCto_clients']['copy'] = array('Client duplizieren', 'Client ID %s duplizieren');

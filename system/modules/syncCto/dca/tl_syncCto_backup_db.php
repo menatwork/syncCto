@@ -100,7 +100,7 @@ class tl_syncCto_backup_db extends Backend
         // Check Table list
         if ($this->Input->post("database_tables_recommended") == "" && $this->Input->post("database_tables_none_recommended") == "")
         {
-            $_SESSION["TL_INFO"] = array($GLOBALS['TL_LANG']['ERR']['sync_no_tables_select']);
+            $_SESSION["TL_INFO"][] = $GLOBALS['TL_LANG']['ERR']['missing_tables_selection'];
             return;
         }
 

@@ -96,7 +96,7 @@ class tl_syncCto_restore_file extends Backend
 
         if ($this->Input->post("filelist") == "")
         {
-            $_SESSION["TL_ERROR"] = array(vsprintf($GLOBALS['TL_LANG']['ERR']['sync_no_file_found'], array($this->Input->post("filelist"))));
+            $_SESSION["TL_ERROR"] = array(vsprintf($GLOBALS['TL_LANG']['ERR']['unknown_file'] , array($this->Input->post("filelist"))));
             return;
         }
 

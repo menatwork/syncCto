@@ -29,16 +29,24 @@
 
 /**
  * Communication Class
+ * 
+ * Extends CtoCommunication witch special RPC- Requests.
  */
 class SyncCtoCommunicationClient extends CtoCommunication
 {
+    /* -------------------------------------------------------------------------
+     * Vars
+     */
 
-    // Vars --------------------------------------------------------------------,
     // Singelton Pattern
     protected static $instance = null;
     // Objects
     protected $objSyncCtoFiles;
     protected $objSyncCtoHelper;
+
+    /* -------------------------------------------------------------------------
+     * Core
+     */
 
     /**
      * Constructor
@@ -47,6 +55,7 @@ class SyncCtoCommunicationClient extends CtoCommunication
     {
         parent::__construct();
 
+        // Objects
         $this->objSyncCtoFiles = SyncCtoFiles::getInstance();
         $this->objSyncCtoHelper = SyncCtoHelper::getInstance();
     }
@@ -59,11 +68,19 @@ class SyncCtoCommunicationClient extends CtoCommunication
     public static function getInstance()
     {
         if (self::$instance == null)
+        {
             self::$instance = new SyncCtoCommunicationClient();
+        }
 
         return self::$instance;
     }
 
+    /**
+     * Set cleitn by id
+     * 
+     * @param int $id 
+     * @throws Exception
+     */
     public function setClientBy($id)
     {
         // Load Client from database
@@ -73,11 +90,15 @@ class SyncCtoCommunicationClient extends CtoCommunication
 
         // Check if a client was loaded
         if ($objClient->numRows == 0)
-            throw new Exception("Unknown Client.");
+        {
+            throw new Exception($GLOBALS['TL_LANG']['ERR']['unknown_client']);
+        }
 
+        // Clean url
         $objClient->path = preg_replace("/\/\z/i", "", $objClient->path);
         $objClient->path = preg_replace("/ctoCommunication.php\z/i", "", $objClient->path);
 
+        // Build path
         if ($objClient->path == "")
         {
             $strUrl = $objClient->address . ":" . $objClient->port . "/ctoCommunication.php";
@@ -89,9 +110,9 @@ class SyncCtoCommunicationClient extends CtoCommunication
 
         $this->setClient($strUrl, $objClient->codifyengine);
         $this->setApiKey($objClient->apikey);
-        
+
         // Set debug modus for ctoCom.
-        if($GLOBALS['TL_CONFIG']['syncCto_debug_mode'] == true)
+        if ($GLOBALS['TL_CONFIG']['syncCto_debug_mode'] == true)
         {
             $this->activateDebug = true;
             $this->activateMeasurement = true;
@@ -170,11 +191,22 @@ class SyncCtoCommunicationClient extends CtoCommunication
      * File Operations
      */
 
+    /**
+     * Clear tempfolder
+     * 
+     * @return type 
+     */
     public function purgeTemp()
     {
         return $this->runServer("SYNCCTO_PURGETEMP");
     }
 
+    /**
+     * Compare a filelist with the filesystem
+     * 
+     * @param array $arrChecksumList
+     * @return array 
+     */
     public function runCecksumCompare($arrChecksumList)
     {
         $arrData = array(
@@ -188,29 +220,44 @@ class SyncCtoCommunicationClient extends CtoCommunication
         return $this->runServer("SYNCCTO_CHECKSUM_COMPARE", $arrData);
     }
 
-    public function getChecksumTlfiles($fileList = NULL)
+    /**
+     * Get a list with fileinformations from files
+     * 
+     * @param a $fileList
+     * @return type 
+     */
+    public function getChecksumFiles($arrFileList = NULL)
     {
         $arrData = array(
             array(
                 "name" => "fileList",
-                "value" => $fileList,
+                "value" => $arrFileList,
             ),
         );
 
+        // Set no codify engine
         $this->setCodifyEngine(SyncCtoEnum::CODIFY_EMPTY);
+        
         return $this->runServer("SYNCCTO_CHECKSUM_FILES");
     }
 
+    /**
+     * Get a list with files from contao core
+     * 
+     * @return type 
+     */
     public function getChecksumCore()
     {
+        // Set no codify engine
         $this->setCodifyEngine(SyncCtoEnum::CODIFY_EMPTY);
+        
         return $this->runServer("SYNCCTO_CHECKSUM_CORE");
     }
 
     /**
      * Send a file to the client
      *
-     * @param string $strFile File + pacht. Start from TL_ROOT. ".." will be killed :)
+     * @param string $strFile File + path. Start from TL_ROOT.
      * @return bool [true|false]
      */
     public function sendFile($strFolder, $strFile, $strMD5 = "", $intTyp = 1, $strSplitname = "")
@@ -224,16 +271,19 @@ class SyncCtoCommunicationClient extends CtoCommunication
         // Check file exsist
         if (!file_exists(TL_ROOT . "/" . $strFilePath) || !is_file(TL_ROOT . "/" . $strFilePath))
         {
-            throw new Exception("Given file doesn't exists or is not a file. Path: " . TL_ROOT . "/" . $strFilePath);
+            throw new Exception(vsprintf($GLOBALS['TL_LANG']['ERR']['unknown_file'], array($strFilePath)));
         }
 
         // MD5 file hash
         if ($strMD5 == "")
+        {
             $strMD5 = md5_file(TL_ROOT . "/" . $strFilePath);
+        }
 
         // Contenttyp
         $strMime = "application/octet-stream";
 
+        // Build array with informations
         $arrData = array(
             array(
                 "name" => $strMD5,
@@ -294,6 +344,15 @@ class SyncCtoCommunicationClient extends CtoCommunication
         return $this->runServer("SYNCCTO_DELETE_FILE", $arrData);
     }
 
+    /**
+     * Build splitfiles back to one big file
+     * 
+     * @param type $strSplitname
+     * @param type $intSplitcount
+     * @param type $strMovepath
+     * @param type $strMD5
+     * @return type 
+     */
     public function buildSingleFile($strSplitname, $intSplitcount, $strMovepath, $strMD5)
     {
         $arrData = array(
@@ -322,6 +381,12 @@ class SyncCtoCommunicationClient extends CtoCommunication
      * Database Operations
      */
 
+    /**
+     * Import a SQL Zip
+     * 
+     * @param type $filename
+     * @return type 
+     */
     public function startSQLImport($filename)
     {
         $arrData = array(
@@ -338,11 +403,19 @@ class SyncCtoCommunicationClient extends CtoCommunication
      * Config Operations
      */
 
+    /**
+     * Import loaclconfig
+     * 
+     * @return type 
+     */
     public function startLocalConfigImport()
     {
+        // Load blacklist for localconfig
         $arrConfigBlacklist = $this->objSyncCtoHelper->getBlacklistLocalconfig();
+        // Load localconfig
         $arrConfig = $this->objSyncCtoHelper->loadConfigs(SyncCtoEnum::LOADCONFIG_KEY_VALUE);
 
+        // Kick blacklist entries
         foreach ($arrConfig as $key => $value)
         {
             if (in_array($key, $arrConfigBlacklist))
@@ -363,12 +436,19 @@ class SyncCtoCommunicationClient extends CtoCommunication
      * -------------------------------------------------------------------------
      * -------------------------------------------------------------------------
      * 
-     * ALT
+     * OLD
      * 
      * -------------------------------------------------------------------------
      * -------------------------------------------------------------------------
      */
 
+    /**
+     * Get a file
+     * 
+     * @param type $strPath
+     * @param string $strSavePath
+     * @return type 
+     */
     public function getFile($strPath, $strSavePath)
     {
         @set_time_limit(3600);

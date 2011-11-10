@@ -30,7 +30,7 @@
 /**
  * Class for file operations
  */
-class SyncCtoFiles extends Backend
+class SyncCtoFiles extends System
 {
     /* -------------------------------------------------------------------------
      * Vars
@@ -43,6 +43,7 @@ class SyncCtoFiles extends Backend
     protected $strTimestampFormat;
     // Objects 
     protected $objSyncCtoHelper;
+    protected $objFiles;
 
     /* -------------------------------------------------------------------------
      * Core
@@ -55,12 +56,23 @@ class SyncCtoFiles extends Backend
     {
         parent::__construct();
 
-        // My Class
+        // Init
         $this->objSyncCtoHelper = SyncCtoHelper::getInstance();
-
+        $this->objFiles = Files::getInstance();
         $this->strTimestampFormat = standardize($GLOBALS['TL_CONFIG']['datimFormat']);
+        // Load language
+        $this->loadLanguageFile("default");
 
-        set_time_limit(0);
+        // Set runtime to endless
+        set_time_limit(3600);
+    }
+
+    /**
+     * @return SyncCtoFiles 
+     */
+    public function __clone()
+    {
+        return self::$instance;
     }
 
     /**
@@ -140,7 +152,7 @@ class SyncCtoFiles extends Backend
         {
             // Get filesize
             $intSize = filesize(TL_ROOT . "/" . $value);
-            
+
             if ($intSize < 0 && $intSize != 0)
             {
                 $arrChecksum[md5($value)] = array(
@@ -226,7 +238,7 @@ class SyncCtoFiles extends Backend
         {
             // Get filesize
             $intSize = filesize(TL_ROOT . "/" . $value);
-            
+
             if ($intSize < 0 && $intSize != 0)
             {
                 $arrChecksum[md5($value)] = array(
@@ -275,6 +287,12 @@ class SyncCtoFiles extends Backend
         return $arrChecksum;
     }
 
+    /**
+     * Check a filelist with the current filesystem.
+     * 
+     * @param array $arrChecksumList
+     * @return array 
+     */
     public function runCecksumCompare($arrChecksumList)
     {
         $arrFileList = array();
@@ -330,6 +348,13 @@ class SyncCtoFiles extends Backend
 
     // Dump Functions ----------------------------------------------------------
 
+    /**
+     * Make a backup from a filelist.
+     * 
+     * @param string $strZip
+     * @param array $arrTlFiles
+     * @return string Filename 
+     */
     public function runDump($strZip = "", $arrTlFiles = null)
     {
         if ($strZip == "")
@@ -381,6 +406,13 @@ class SyncCtoFiles extends Backend
         return $strFilename;
     }
 
+    /**
+     * Make a backup from files
+     * 
+     * @param string $strZip
+     * @param array $arrFileList
+     * @return string Filename
+     */
     public function runDumpFiles($strZip = "", $arrFileList = null)
     {
         if ($strZip == "")
@@ -426,6 +458,12 @@ class SyncCtoFiles extends Backend
         return $strFilename;
     }
 
+    /**
+     * Make a bakup from contao core
+     * 
+     * @param string $strZip
+     * @return string Filename
+     */
     public function runDumpCore($strZip = "")
     {
         if ($strZip == "")
@@ -458,9 +496,10 @@ class SyncCtoFiles extends Backend
     }
 
     /**
-     * ToDo
-     * @param type $strRestoreFile
-     * @return type 
+     * Unzip files
+     * 
+     * @param string $strRestoreFile
+     * @return void 
      */
     public function runRestore($strRestoreFile)
     {
@@ -471,7 +510,9 @@ class SyncCtoFiles extends Backend
         foreach ($arrFileList as $key => $value)
         {
             if ($objZipRead->getFile($value) != true)
-                throw new Exception("Error by unziping file. File not found in zip archive.");
+            {
+                throw new Exception(vsprintf($GLOBALS['TL_LANG']['ERR']['unknown_file_in_zip'], $value));
+            }
 
             $objFile = new File($value);
             $objFile->write($objZipRead->unzip());
@@ -601,7 +642,7 @@ class SyncCtoFiles extends Backend
                     {
                         continue;
                     }
-                    
+
                     // Recursive-Call
                     $arrList = $this->recursiveFileList($arrList, $this->objSyncCtoHelper->standardizePath($strPath . "/" . $valueItem), $blnTlFiles);
                 }
@@ -634,9 +675,13 @@ class SyncCtoFiles extends Backend
     public function purgeTemp($strFolder = null)
     {
         if ($strFolder == null || $strFolder == "")
+        {
             $strPath = $this->objSyncCtoHelper->standardizePath($GLOBALS['SYC_PATH']['tmp']);
+        }
         else
+        {
             $strPath = $this->objSyncCtoHelper->standardizePath($GLOBALS['SYC_PATH']['tmp'], $strFolder);
+        }
 
         $objFolder = new Folder($strPath);
         $objFolder->clear();
@@ -657,14 +702,18 @@ class SyncCtoFiles extends Backend
     {
         @set_time_limit(3600);
 
-        if (!file_exists($strSrcFile))
-            throw new Exception("File not exsist");
+        if (!file_exists(TL_ROOT . "/" . $strSrcFile))
+        {
+            throw new Exception(vsprintf($GLOBALS['TL_LANG']['ERR']['unknown_file'], array($strSrcFile)));
+        }
 
-        $objFolder = new Folder($strDesPath);
+        $objFolder = new Folder($strDesFolder);
         $objFile = new File($strSrcFile);
 
         if ($objFile->filesize < 0)
-            throw new Exception("Int overload, try a 64Bit PHP Version.");
+        {
+            throw new Exception($GLOBALS['TL_LANG']['ERR']['64Bit_error']);
+        }
 
         $booRun = true;
         $i = 0;
@@ -672,11 +721,15 @@ class SyncCtoFiles extends Backend
         {
             $fp = fopen(TL_ROOT . "/" . $strSrcFile, "rb");
 
-            if ($fp === false)
-                throw new Exception("Could not open file");
+            if ($fp === FALSE)
+            {
+                throw new Exception(vsprintf($GLOBALS['TL_LANG']['ERR']['cant_open'], array($strSrcFile)));
+            }
 
             if (fseek($fp, $i * $intSizeLimit, SEEK_SET) === -1)
-                throw new Exception("Fseek error");
+            {
+                throw new Exception(vsprintf($GLOBALS['TL_LANG']['ERR']['cant_open'], array($strSrcFile)));
+            }
 
             if (feof($fp) === TRUE)
             {
@@ -685,19 +738,20 @@ class SyncCtoFiles extends Backend
             }
 
             $data = fread($fp, $intSizeLimit);
-
-            $handle = fopen(TL_ROOT . "/" . $this->objSyncCtoHelper->standardizePath($strDesPath, $strDesFile . ".sync" . $i), "w");
-            fwrite($handle, $data);
-            fclose($handle);
-
             fclose($fp);
-
-            unset($handle);
-            unset($data);
             unset($fp);
 
+            $objFileWrite = new File($this->objSyncCtoHelper->standardizePath($strDesFolder, $strDesFile . ".sync" . $i));
+            $objFileWrite->write($data);
+            $objFileWrite->close();
+
+            unset($objFileWrite);
+            unset($data);
+
             if (( ( $i + 1 ) * $intSizeLimit) > $objFile->filesize)
+            {
                 $booRun = false;
+            }
         }
 
         return $i;
@@ -705,13 +759,11 @@ class SyncCtoFiles extends Backend
 
     public function rebuildSplitFiles($strSplitname, $intSplitcount, $strMovepath, $strMD5)
     {
-        @set_time_limit(3600);
-
         // Build savepath
         $strSavePath = $this->objSyncCtoHelper->standardizePath($GLOBALS['SYC_PATH']['tmp'], "sync", $strMovepath);
 
         // Create Folder
-        $objFolder = new Folder(dirname(TL_ROOT . "/" . $strSavePath));
+        $objFolder = new Folder(dirname($strSavePath));
 
         // Run for each part file
         for ($i = 0; $i < $intSplitcount; $i++)
@@ -722,23 +774,24 @@ class SyncCtoFiles extends Backend
             // Check if file exists
             if (!file_exists($strReadFile))
             {
-                throw new Exception("Missing part file " . $strSplitname . ".sync" . $i);
+                throw new Exception(vsprintf($GLOBALS['TL_LANG']['ERR']['unknown_file'], array($strSplitname . ".sync" . $i)));
             }
 
             // Create new file objects
             $objFilePart = new File($strReadFile);
-            $objFileWhole = new File($strSavePath);
+            $hanFileWhole = fopen(TL_ROOT . "/" . $strSavePath, "a+");
+           
 
-            // Write part file to man file
-            $objFileWhole->append($objFilePart->getContent());
+            // Write part file to main file
+            fwrite($hanFileWhole, $objFilePart->getContent());
 
             // Close objects
             $objFilePart->close();
-            $objFileWhole->close();
+            fclose($hanFileWhole);
 
             // Free up memory
             unset($objFilePart);
-            unset($objFileWhole);
+            unset($hanFileWhole);
 
             // wait
             sleep(1);
@@ -747,7 +800,7 @@ class SyncCtoFiles extends Backend
         // Check MD5 Checksum
         if (md5_file(TL_ROOT . "/" . $strSavePath) != $strMD5)
         {
-            throw new Exception("MD5 Checksum error");
+            throw new Exception($GLOBALS['TL_LANG']['ERR']['checksum_error']);
         }
 
         return true;
@@ -760,7 +813,7 @@ class SyncCtoFiles extends Backend
             if (!file_exists(TL_ROOT . "/" . $this->objSyncCtoHelper->standardizePath($GLOBALS['SYC_PATH']['tmp'], "sync", $value["path"])))
             {
                 $arrFileList[$key]["saved"] = false;
-                $arrFileList[$key]["error"] = "Missing file in tempfolder.";
+                $arrFileList[$key]["error"] = vsprintf($GLOBALS['TL_LANG']['ERR']['unknown_file'], array($this->objSyncCtoHelper->standardizePath($GLOBALS['SYC_PATH']['tmp'], "sync", $value["path"])));
                 continue;
             }
 
@@ -775,10 +828,10 @@ class SyncCtoFiles extends Backend
             $strFileSource = $this->objSyncCtoHelper->standardizePath($GLOBALS['SYC_PATH']['tmp'], "sync", $value["path"]);
             $strFileDestination = $this->objSyncCtoHelper->standardizePath($value["path"]);
 
-            if (copy(TL_ROOT . "/" . $strFileSource, TL_ROOT . "/" . $strFileDestination) == false)
+            if ($this->objFiles->copy($strFileSource, $strFileDestination) == false)
             {
                 $arrFileList[$key]["saved"] = false;
-                $arrFileList[$key]["error"] = "file copy error Src:" . $strFileSource . " | Des: " . $strFileDestination;
+                $arrFileList[$key]["error"] = vsprintf($GLOBALS['TL_LANG']['ERR']['cant_move_file'], array($strFileSource, $strFileDestination));
             }
             else
             {
@@ -797,19 +850,15 @@ class SyncCtoFiles extends Backend
             {
                 try
                 {
-                    $objFiel = new File($value['path']);
-
-                    if ($objFiel->delete())
+                    if ($this->objFiles->delete($value['path']))
                     {
                         $arrFileList[$key]['transmission'] = SyncCtoEnum::FILETRANS_SEND;
                     }
                     else
                     {
                         $arrFileList[$key]['transmission'] = SyncCtoEnum::FILETRANS_SKIPPED;
-                        $arrFileList[$key]["skipreason"] = "Error by deleting file";
+                        $arrFileList[$key]["skipreason"] = $GLOBALS['TL_LANG']['ERR']['cant_delete_file'];
                     }
-
-                    $objFiel->close();
                 }
                 catch (Exception $exc)
                 {
@@ -830,14 +879,9 @@ class SyncCtoFiles extends Backend
      */
     public function saveFiles($arrMetafiles)
     {
-        if (!is_array($arrMetafiles))
+        if (!is_array($arrMetafiles) || count($_FILES) == 0)
         {
-            throw new Exception("Missing metafiles in array check.");
-        }
-
-        if (count($_FILES) == 0)
-        {
-            throw new Exception("Missing file/s.");
+            throw new Exception($GLOBALS['TL_LANG']['ERR']['missing_file_information']);
         }
 
         $arrResponse = array();
@@ -845,7 +889,9 @@ class SyncCtoFiles extends Backend
         foreach ($_FILES as $key => $value)
         {
             if (!key_exists($key, $arrMetafiles))
-                throw new Exception("Could not find metafiles for the file $key");
+            {
+                throw new Exception($GLOBALS['TL_LANG']['ERR']['missing_file_information']);
+            }
 
             $strFolder = $arrMetafiles[$key]["folder"];
             $strFile = $arrMetafiles[$key]["file"];
@@ -870,19 +916,19 @@ class SyncCtoFiles extends Backend
                     break;
 
                 default:
-                    throw new Exception("Unknown Path for file.");
+                    throw new Exception($GLOBALS['TL_LANG']['ERR']['unknown_path']);
                     break;
             }
 
             $objFolder = new Folder(dirname($strSaveFile));
 
-            if (move_uploaded_file($value["tmp_name"], TL_ROOT . "/" . $strSaveFile) === FALSE)
+            if ($this->objFiles->move_uploaded_file($value["tmp_name"], $strSaveFile) === FALSE)
             {
-                throw new Exception("Error by moving tempfile to destination folder. Src: " . $value["tmp_name"] . " | Des: " . TL_ROOT . "/" . $strSaveFile);
+                throw new Exception(vsprintf($GLOBALS['TL_LANG']['ERR']['cant_move_file'], array($value["tmp_name"], $strSaveFile)));
             }
             else if ($key != md5_file(TL_ROOT . "/" . $strSaveFile))
             {
-                throw new Exception("Checksum error.");
+                throw new Exception($GLOBALS['TL_LANG']['ERR']['checksum_error'] );
             }
             else
             {
