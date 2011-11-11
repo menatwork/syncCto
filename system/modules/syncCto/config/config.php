@@ -57,7 +57,7 @@ $GLOBALS['BE_MOD'] = array_merge(
         'syncCto_check' => array(
             'icon' => 'system/modules/syncCto/html/iconCheck.png',
             'callback' => 'SyncCtoModuleCheck',
-			'stylesheet' => 'system/modules/syncCto/html/css/systemcheck_src.css',
+            'stylesheet' => 'system/modules/syncCto/html/css/systemcheck_src.css',
         )
     )
         ), array_slice($GLOBALS['BE_MOD'], $i)
@@ -105,7 +105,7 @@ if ($objInput->get("do") == 'syncCto_backups' && $objInput->get("table") != '' &
     unset($GLOBALS['BE_MOD']['syncCto']['syncCto_backups']['callback']);
 }
 
-if ($objInput->get("do") == 'synccto_clients' && ($objInput->get("table") == 'tl_syncCto_clients_syncTo' || $objInput->get("table") == 'tl_syncCto_clients_syncFrom' || $objInput->get("table") == '' ) && $objInput->get("act") != 'start')
+if ($objInput->get("do") == 'synccto_clients' && ($objInput->get("table") == 'tl_syncCto_clients_syncTo' || $objInput->get("table") == 'tl_syncCto_clients_syncFrom' || $objInput->get("table") == '' ))
 {
     unset($GLOBALS['BE_MOD']['syncCto']['synccto_clients']['callback']);
 }
@@ -234,7 +234,7 @@ $GLOBALS["CTOCOM_FUNCTIONS"]["SYNCCTO_CHECKSUM_CORE"] = array(
     "parameter" => FALSE,
 );
 
-// Get Filelist of tlfile
+// Get Filelist of file
 $GLOBALS["CTOCOM_FUNCTIONS"]["SYNCCTO_CHECKSUM_FILES"] = array(
     "class" => "SyncCtoFiles",
     "function" => "runChecksumFiles",
@@ -296,5 +296,13 @@ $GLOBALS["CTOCOM_FUNCTIONS"]["SYNCCTO_IMPORT_CONFIG"] = array(
     "function" => "importConfig",
     "typ" => "POST",
     "parameter" => array("configlist"),
+);
+
+// Check for deleted files
+$GLOBALS["CTOCOM_FUNCTIONS"]["SYNCCTO_CHECK_DELETE_FILE"] = array(
+    "class" => "SyncCtoFiles",
+    "function" => "checkDeleteFiles",
+    "typ" => "POST",
+    "parameter" => array("filelist"),
 );
 ?>

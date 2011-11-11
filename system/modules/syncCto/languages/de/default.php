@@ -79,6 +79,7 @@ $GLOBALS['TL_LANG']['MSC']['big_files'] = 'Datei(en) zum Übertragen.';
 $GLOBALS['TL_LANG']['MSC']['skipped_files'] = 'Folgende Datei(en) sind zu groß um sie zu übertragen.';
 $GLOBALS['TL_LANG']['MSC']['ignored_files'] = 'Folgende Datei(en) sind zu groß um sie zu bearbeiten.';
 $GLOBALS['TL_LANG']['MSC']['information_last_sync'] = 'Die letzte Synchronisierung wurde um %s am %s vom User %s (%s) durchgeführt.';
+$GLOBALS['TL_LANG']['MSC']['skipped_files'] = " Datei(en) übersprungen.";
 
 /**
  * Debug mode
@@ -114,9 +115,9 @@ $GLOBALS['TL_LANG']['ERR']['unknown_client']                = "Unbekannter Clien
 // ----- CHECK TO DO -----------------------------------------------------------
  
 /* NEW */ $GLOBALS['TL_LANG']['ERR']['referer'] = "Konnte die Referrer-Überprüfung des Clients nicht deaktivieren.";
-/* NEW */ $GLOBALS['TL_LANG']['ERR']['version'] = "Versionskonflikt %s. Server: %s Client: %s";
+/* NEW */ $GLOBALS['TL_LANG']['ERR']['version'] = "Versionskonflikt in %s. <br />Server: %s <br />Client: %s";
 /* NEW */ $GLOBALS['TL_LANG']['ERR']['upload_ini'] = "Upload nicht erfolgreich. Funktion ist in der php.ini deaktiviert.";
-/* NEW */ $GLOBALS['TL_LANG']['ERR']['rebuild'] = "Fehler beim Zusammenbau der Dateien. Pfad: %s";
+/* NEW */ $GLOBALS['TL_LANG']['ERR']['rebuild'] = "Fehler beim Zusammenbau der Datei(en). Pfad: %s";
 /* NEW */ $GLOBALS['TL_LANG']['ERR']['send'] = "Fehler beim Versand der Datei(en).";
 
 ?>

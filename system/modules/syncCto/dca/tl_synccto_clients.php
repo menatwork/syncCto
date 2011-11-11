@@ -46,8 +46,8 @@ $GLOBALS['TL_DCA']['tl_synccto_clients'] = array(
             'panelLayout' => 'filter;search,limit',
         ),
         'label' => array(
-            'fields' => array('title', 'id', 'address', 'id'),
-            'format' => '<img class="ping" src="system/modules/syncCto/html/js/images/empty.png" alt="" /> %s <span style="color: #aaaaaa; padding-left: 3px;">(' . $GLOBALS['TL_LANG']['tl_syncCto_clients']['id'][0] . ': %s, ' . $GLOBALS['TL_LANG']['tl_syncCto_clients']['address'][0] . ': <span>%s</span><span class="client-id invisible">%s</span>)</span>',
+            'fields' => array('title', 'id', 'address', 'path', 'id'),
+            'format' => '<img class="ping" src="system/modules/syncCto/html/js/images/empty.png" alt="" /> %s <span style="color: #aaaaaa; padding-left: 3px;">(' . $GLOBALS['TL_LANG']['tl_syncCto_clients']['id'][0] . ': %s, ' . $GLOBALS['TL_LANG']['tl_syncCto_clients']['address'][0] . ': <span>%s/%s/</span><span class="client-id invisible">%s</span>)</span>',
         ),
         'global_operations' => array(
             'all' => array(
@@ -85,7 +85,7 @@ $GLOBALS['TL_DCA']['tl_synccto_clients'] = array(
             ),
             'syncFrom' => array(
                 'label' => &$GLOBALS['TL_LANG']['tl_syncCto_clients']['syncFrom'],
-                'href' => 'table=tl_syncCto_clients_syncFrom',
+                'href' => '&table=tl_syncCto_clients_syncFrom&act=edit',
                 'icon' => 'system/modules/syncCto/html/iconSyncFrom.png',
                 'attributes' => 'onclick="if (!confirm(\'' . $GLOBALS['TL_LANG']['tl_syncCto_clients']['syncFromConfirm'] . '\')) return false; Backend.getScrollOffset();"',
                 'button_callback' => array('tl_synccto_clients', 'checkPermission_client_syncFrom'),

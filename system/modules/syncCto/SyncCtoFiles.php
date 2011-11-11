@@ -62,8 +62,7 @@ class SyncCtoFiles extends System
         $this->strTimestampFormat = standardize($GLOBALS['TL_CONFIG']['datimFormat']);
         // Load language
         $this->loadLanguageFile("default");
-
-        // Set runtime to endless
+        // Set runtime to 5 minutes
         set_time_limit(3600);
     }
 
@@ -345,6 +344,28 @@ class SyncCtoFiles extends System
 
         return $arrFileList;
     }
+    
+    /**
+     * Check for deleted files with a filelist from an other system
+     * 
+     * @param array $arrFilelist 
+     */
+    public function checkDeleteFiles($arrFilelist)
+    {
+        $arrReturn = array();
+        
+        foreach ($arrFilelist as $keyItem => $valueItem)
+        {
+            if (!file_exists(TL_ROOT . "/" . $valueItem["path"]))
+            {
+                $arrReturn[$keyItem] = $valueItem;
+                $arrReturn[$keyItem]["state"] = SyncCtoEnum::FILESTATE_DELETE;
+                $arrReturn[$keyItem]["css"] = "deleted";
+            }
+        }
+        
+        return $arrReturn;
+    }
 
     // Dump Functions ----------------------------------------------------------
 
@@ -392,10 +413,20 @@ class SyncCtoFiles extends System
             $arrFileList = array_merge($arrFileList, $arrTempList);
         }
 
+        $arrSkipped = array();
+
         foreach ($arrFileList as $key => $value)
         {
             $value = preg_replace("/^\//i", "", $value);
-            $objZipWrite->addFile($value);
+
+            try
+            {
+                $objZipWrite->addFile($value);
+            }
+            catch (Exception $exc)
+            {
+                $arrSkipped[] = $value;
+            }
         }
 
         $objZipWrite->close();
@@ -403,7 +434,7 @@ class SyncCtoFiles extends System
         unset($objZipWrite);
         unset($arrFileList);
 
-        return $strFilename;
+        return array("name" => $strFilename, "skipped" => $arrSkipped);
     }
 
     /**
@@ -433,6 +464,8 @@ class SyncCtoFiles extends System
             $arrFileList = $this->recursiveFileList(array(), $GLOBALS['TL_CONFIG']['uploadPath'], true);
         }
 
+        $arrSkipped = array();
+
         foreach ($arrFileList as $key => $value)
         {
             if (is_dir(TL_ROOT . "/" . $value))
@@ -441,12 +474,26 @@ class SyncCtoFiles extends System
 
                 foreach ($arrList as $keySubFiles => $valueSubFiles)
                 {
-                    $objZipWrite->addFile($valueSubFiles);
+                    try
+                    {
+                        $objZipWrite->addFile($valueSubFiles);
+                    }
+                    catch (Exception $exc)
+                    {
+                        $arrSkipped[] = $value;
+                    }
                 }
             }
             else
             {
-                $objZipWrite->addFile($value);
+                try
+                {
+                    $objZipWrite->addFile($value);
+                }
+                catch (Exception $exc)
+                {
+                    $arrSkipped[] = $value;
+                }
             }
         }
 
@@ -455,7 +502,7 @@ class SyncCtoFiles extends System
         unset($objZipWrite);
         unset($arrFileList);
 
-        return $strFilename;
+        return array("name" => $strFilename, "skipped" => $arrSkipped);
     }
 
     /**
@@ -481,10 +528,19 @@ class SyncCtoFiles extends System
 
         $arrFileList = $this->recursiveFileList(array(), "", false);
 
+        $arrSkipped = array();
+
         foreach ($arrFileList as $key => $value)
         {
-            $value = preg_replace("/^\//i", "", $value);
-            $objZipWrite->addFile($value);
+            try
+            {
+                $value = preg_replace("/^\//i", "", $value);
+                $objZipWrite->addFile($value);
+            }
+            catch (Exception $exc)
+            {
+                $arrSkipped[] = $value;
+            }
         }
 
         $objZipWrite->close();
@@ -492,7 +548,7 @@ class SyncCtoFiles extends System
         unset($objZipWrite);
         unset($arrFileList);
 
-        return $strFilename;
+        return array("name" => $strFilename, "skipped" => $arrSkipped);
     }
 
     /**
@@ -780,7 +836,7 @@ class SyncCtoFiles extends System
             // Create new file objects
             $objFilePart = new File($strReadFile);
             $hanFileWhole = fopen(TL_ROOT . "/" . $strSavePath, "a+");
-           
+
 
             // Write part file to main file
             fwrite($hanFileWhole, $objFilePart->getContent());
@@ -928,7 +984,7 @@ class SyncCtoFiles extends System
             }
             else if ($key != md5_file(TL_ROOT . "/" . $strSaveFile))
             {
-                throw new Exception($GLOBALS['TL_LANG']['ERR']['checksum_error'] );
+                throw new Exception($GLOBALS['TL_LANG']['ERR']['checksum_error']);
             }
             else
             {

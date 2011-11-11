@@ -54,7 +54,7 @@
 
     <script type="text/javascript">
         <!--//--><![CDATA[//><!--
-        /* window.scrollTo(null, ($('step<?php echo $this->step; ?>').getPosition().y - 20));*/ 
+        window.scrollTo(null, ($('step<?php echo $this->step; ?>').getPosition().y - 40));
         //--><!]]>
     </script>
 

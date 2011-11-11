@@ -253,6 +253,27 @@ class SyncCtoCommunicationClient extends CtoCommunication
         
         return $this->runServer("SYNCCTO_CHECKSUM_CORE");
     }
+    
+    /**
+     * Check for delted files
+     * 
+     * @param array $arrFilelist
+     * @return array 
+     */
+    public function checkDeleteFiles($arrFilelist)
+    {
+         $arrData = array(
+            array(
+                "name" => "filelist",
+                "value" => $arrFilelist,
+            ),
+        );
+
+        // Set no codify engine
+        $this->setCodifyEngine(SyncCtoEnum::CODIFY_EMPTY);
+        
+        return $this->runServer("SYNCCTO_CHECK_DELETE_FILE");
+    }
 
     /**
      * Send a file to the client
