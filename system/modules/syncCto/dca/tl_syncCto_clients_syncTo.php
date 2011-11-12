@@ -84,18 +84,27 @@ $GLOBALS['TL_DCA']['tl_syncCto_clients_syncTo'] = array(
     )
 );
 
+/**
+ * Class for syncTo configurations
+ */
 class tl_syncCto_clients_syncTo extends Backend
 {
-
-    // Constructor and singelten pattern
+    
+    /**
+     * Constructor
+     */
     public function __construct()
     {
-        // Import Contao classes
         $this->BackendUser = BackendUser::getInstance();
 
         parent::__construct();
     }
 
+    /**
+     * Set new and remove old buttons
+     * 
+     * @param DataContainer $dc 
+     */
     public function onload_callback(DataContainer $dc)
     {
         $dc->removeButton('save');
@@ -114,6 +123,12 @@ class tl_syncCto_clients_syncTo extends Backend
         $dc->addButton('start_sync', $arrData);
     }
 
+    /**
+     * Handle syncTo configurations
+     * 
+     * @param DataContainer $dc
+     * @return array 
+     */
     public function onsubmit_callback(DataContainer $dc)
     {
 
@@ -170,17 +185,11 @@ class tl_syncCto_clients_syncTo extends Backend
 
         $this->Session->set("syncCto_Start", microtime(true));
 
-        // Step 1
         $this->Session->set("syncCto_StepPool1", FALSE);
-        // Step 2
         $this->Session->set("syncCto_StepPool2", FALSE);
-        // Step 3
         $this->Session->set("syncCto_StepPool3", FALSE);
-        // Step 4
         $this->Session->set("syncCto_StepPool4", FALSE);
-        // Step 5
         $this->Session->set("syncCto_StepPool5", FALSE);
-        // Step 6
         $this->Session->set("syncCto_StepPool6", FALSE);
 
         $arrContenData = array(
@@ -202,6 +211,11 @@ class tl_syncCto_clients_syncTo extends Backend
         $this->redirect($this->Environment->base . "contao/main.php?do=synccto_clients&amp;table=tl_syncCto_clients_syncTo&amp;act=start&amp;id=" . $this->Input->get("id"));
     }
 
+    /**
+     * Check user permission
+     * 
+     * @return string
+     */
     public function checkPermission()
     {
         if ($this->BackendUser->isAdmin)

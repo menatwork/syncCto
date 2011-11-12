@@ -7,6 +7,10 @@
 -- *                                                      *
 -- ********************************************************
  
+--
+-- Table `tl_synccto_clients`
+--
+
 CREATE TABLE `tl_synccto_clients` (
     `id` int(10) unsigned NOT NULL auto_increment,    
     `tstamp` int(10) unsigned NOT NULL default '0',

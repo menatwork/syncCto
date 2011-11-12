@@ -40,6 +40,9 @@ class SyncCtoHelper extends Backend
      * Core
      */
 
+    /**
+     * Constructor
+     */
     protected function __construct()
     {
         $this->BackendUser = BackendUser::getInstance();
@@ -170,10 +173,8 @@ class SyncCtoHelper extends Backend
     }
 
     /* -------------------------------------------------------------------------
-     * Black and White lists
+     * Black and Whitelists
      */
-
-    // Configuration Merge Part 
     public function getBlacklistFolder()
     {
         $arrLocalconfig = deserialize($GLOBALS['TL_CONFIG']['syncCto_folder_blacklist']);
@@ -211,6 +212,7 @@ class SyncCtoHelper extends Backend
 
     /**
      * Standardize path for folder
+     * 
      * @return string the normalized path as String
      */
     public function standardizePath()
@@ -245,6 +247,7 @@ class SyncCtoHelper extends Backend
 
     /**
      * Ping the current client status
+     * 
      * @param string $strAction 
      */
     public function pingClientStatus($strAction)
@@ -320,6 +323,7 @@ class SyncCtoHelper extends Backend
 
     /**
      * Check the required extensions and files for syncCto
+     * 
      * @param string $strContent
      * @param string $strTemplate
      * @return string
@@ -384,6 +388,7 @@ class SyncCtoHelper extends Backend
 
     /**
      * Show the last user sync
+     * 
      * @param string $strContent
      * @param string $strTemplate
      * @return string
@@ -459,6 +464,7 @@ class SyncCtoHelper extends Backend
 
     /**
      * Return all sync types as array
+     * 
      * @return array 
      */
     public function getSyncType()
@@ -478,6 +484,7 @@ class SyncCtoHelper extends Backend
 
     /**
      * Return all backup types as array
+     * 
      * @return array 
      */
     public function getBackupType()
@@ -497,6 +504,7 @@ class SyncCtoHelper extends Backend
 
     /**
      * Returns a whole list of all tables in the database
+     * 
      * @return array 
      */
     public function hiddenTables()
@@ -513,6 +521,7 @@ class SyncCtoHelper extends Backend
 
     /**
      * Returns a list without the hidden tables
+     * 
      * @return array 
      */
     public function databaseTables()
@@ -524,7 +533,9 @@ class SyncCtoHelper extends Backend
         {
             // Check if table is a hidden one.
             if (in_array($value, $arrTablesHidden))
+            {
                 continue;
+            }
 
             $arrTables[] = $value;
         }
@@ -534,6 +545,7 @@ class SyncCtoHelper extends Backend
 
     /**
      * Returns a list with recommended database tables
+     * 
      * @return array 
      */
     public function databaseTablesRecommended()
@@ -552,7 +564,9 @@ class SyncCtoHelper extends Backend
         foreach ($this->databaseTables() as $key => $value)
         {
             if (in_array($value, $arrBlacklist))
+            {
                 continue;
+            }
 
             if (is_array($arrTablesPermission) && !in_array($value, $arrTablesPermission) && $this->BackendUser->isAdmin != true)
             {
@@ -566,6 +580,7 @@ class SyncCtoHelper extends Backend
 
     /**
      * Returns a list with none recommended database tables
+     * 
      * @return array 
      */
     public function databaseTablesNoneRecommended()
@@ -584,7 +599,9 @@ class SyncCtoHelper extends Backend
         foreach ($this->databaseTables() as $key => $value)
         {
             if (!in_array($value, $arrBlacklist))
+            {
                 continue;
+            }
 
             if (is_array($arrTablesPermission) && !in_array($value, $arrTablesPermission) && $this->BackendUser->isAdmin != true)
             {

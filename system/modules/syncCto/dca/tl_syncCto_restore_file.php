@@ -64,9 +64,17 @@ $GLOBALS['TL_DCA']['tl_syncCto_restore_file'] = array(
     )
 );
 
+/**
+ * Class for restore files
+ */
 class tl_syncCto_restore_file extends Backend
 {
 
+    /**
+     * Set new and remove old buttons
+     * 
+     * @param DataContainer $dc 
+     */
     public function onload_callback(DataContainer $dc)
     {
         $dc->removeButton('save');
@@ -85,6 +93,12 @@ class tl_syncCto_restore_file extends Backend
         $dc->addButton('restore_backup', $arrData);
     }
 
+    /**
+     * Handle restore files configurations
+     * 
+     * @param DataContainer $dc
+     * @return array
+     */
     public function onsubmit_callback(DataContainer $dc)
     {
         $arrStepPool = $this->Session->get("SyncCto_File_StepPool");

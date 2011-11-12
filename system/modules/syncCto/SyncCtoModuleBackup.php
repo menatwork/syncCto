@@ -1,7 +1,4 @@
-<?php
-
-if (!defined('TL_ROOT'))
-    die('You cannot access this file directly!');
+<?php if (!defined('TL_ROOT')) die('You cannot access this file directly!');
 
 /**
  * Contao Open Source CMS
@@ -29,6 +26,10 @@ if (!defined('TL_ROOT'))
  * @license    GNU/LGPL
  * @filesource
  */
+
+/**
+ * Class for backup functions
+ */
 class SyncCtoModuleBackup extends BackendModule
 {
 
@@ -39,6 +40,15 @@ class SyncCtoModuleBackup extends BackendModule
     protected $objSyncCtoDatabase;
     protected $objSyncCtoFiles;
 
+    /* -------------------------------------------------------------------------
+     * Core
+     */
+
+    /**
+     * Constructor
+     * 
+     * @param DataContainer $objDc 
+     */
     function __construct(DataContainer $objDc = null)
     {
         $this->import('BackendUser', 'User');
@@ -51,18 +61,12 @@ class SyncCtoModuleBackup extends BackendModule
         $this->loadLanguageFile('tl_syncCto_steps');
     }
 
-    /* -------------------------------------------------------------------------
-     * Core Functions
-     */
-
     /**
      * Generate page
      */
     protected function compile()
     {
-        if ($this->Input->get("do") == "syncCto_backups"
-                && strlen($this->Input->get("act")) != 0
-                && strlen($this->Input->get("table")) != 0)
+        if ($this->Input->get("do") == "syncCto_backups" && strlen($this->Input->get("act")) != 0 && strlen($this->Input->get("table")) != 0)
         {
             // Which table is in use
             switch ($this->Input->get("table"))
@@ -139,7 +143,7 @@ class SyncCtoModuleBackup extends BackendModule
     /**
      * Show main page of syncCto backup.
      * 
-     * @param string $message - Error msg.
+     * @param string $message
      */
     protected function parseStartPage($message = null)
     {
@@ -158,13 +162,11 @@ class SyncCtoModuleBackup extends BackendModule
     }
 
     /* -------------------------------------------------------------------------
-     * Functions for 'Backup' and 'Restore'
+     * Functions for Backup and Restore
      */
 
     /**
-     * Datenbank Backup
-     *
-     * @return <type>
+     * Backup database
      */
     protected function parseDbBackupPage()
     {
@@ -173,9 +175,13 @@ class SyncCtoModuleBackup extends BackendModule
         $this->loadLanguageFile("tl_syncCto_backup_db");
 
         if ($this->Input->get("step") == "" || $this->Input->get("step") == null)
+        {
             $step = 1;
+        }
         else
+        {
             $step = intval($this->Input->get("step"));
+        }
 
         $arrContenData = $this->Session->get("SyncCto_DB_Content");
         $arrStepPool = $this->Session->get("SyncCto_DB_StepPool");
@@ -265,9 +271,7 @@ class SyncCtoModuleBackup extends BackendModule
     }
 
     /**
-     * Datenbank wiederherstellen
-     *
-     * @return <type>
+     * Restore database
      */
     protected function parseDbRestorePage()
     {
@@ -276,9 +280,13 @@ class SyncCtoModuleBackup extends BackendModule
         $this->loadLanguageFile("tl_syncCto_restore_db");
 
         if ($this->Input->get("step") == "" || $this->Input->get("step") == null)
+        {
             $step = 1;
+        }
         else
+        {
             $step = intval($this->Input->get("step"));
+        }
 
         $arrContenData = $this->Session->get("SyncCto_DB_Content");
         $arrStepPool = $this->Session->get("SyncCto_DB_StepPool");
@@ -366,9 +374,13 @@ class SyncCtoModuleBackup extends BackendModule
         $this->loadLanguageFile("tl_syncCto_backup_file");
 
         if ($this->Input->get("step") == "" || $this->Input->get("step") == null)
+        {
             $step = 1;
+        }
         else
+        {
             $step = intval($this->Input->get("step"));
+        }
 
         $arrContenData = $this->Session->get("SyncCto_File_Content");
         $arrStepPool = $this->Session->get("SyncCto_File_StepPool");
@@ -467,20 +479,19 @@ class SyncCtoModuleBackup extends BackendModule
         $this->Session->set("SyncCto_File_StepPool", $arrStepPool);
     }
 
-    /**
-     * Datenbank wiederherstellen
-     *
-     * @return <type>
-     */
     protected function parseFileRestorePage()
     {
         $this->objTemplateContent = new BackendTemplate('be_syncCto_steps');
         $this->loadLanguageFile('tl_syncCto_restore_file');
 
         if ($this->Input->get("step") == "" || $this->Input->get("step") == null)
+        {
             $step = 1;
+        }
         else
+        {
             $step = intval($this->Input->get("step"));
+        }
 
         $arrContenData = $this->Session->get("SyncCto_File_Content");
         $arrStepPool = $this->Session->get("SyncCto_File_StepPool");

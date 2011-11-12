@@ -155,20 +155,24 @@ $GLOBALS['TL_DCA']['tl_synccto_clients'] = array(
     )
 );
 
+/**
+ * Class for syncCto clients
+ */
 class tl_synccto_clients extends Backend
 {
 
-    // Constructor and singelten pattern
+    /**
+     * Constructor
+     */
     public function __construct()
     {
-        // Import Contao classes
         $this->BackendUser = BackendUser::getInstance();
 
         parent::__construct();
     }
 
     /**
-     * User for permissioncheck from operation callbacks.
+     * User for permission check from operation callbacks
      * 
      * @param string $name Name of function
      * @param array $arguments Arguments
@@ -186,7 +190,7 @@ class tl_synccto_clients extends Backend
     }
 
     /**
-     * Permisson check for the client overview page.
+     * Permisson check for the client overview page
      * 
      * @param type $row
      * @param type $href
@@ -255,7 +259,10 @@ class tl_synccto_clients extends Backend
 
     public function checkPermissionClientCreate()
     {
-        if (!$this->BackendUser->hasAccess('create', 'syncCto_clients_p')) $GLOBALS['TL_DCA']['tl_synccto_clients']['config'] = array_unique(array_merge(array('closed' => true), $GLOBALS['TL_DCA']['tl_synccto_clients']['config']));
+        if (!$this->BackendUser->hasAccess('create', 'syncCto_clients_p'))
+        {
+            $GLOBALS['TL_DCA']['tl_synccto_clients']['config'] = array_unique(array_merge(array('closed' => true), $GLOBALS['TL_DCA']['tl_synccto_clients']['config']));
+        }
     }
 
     /**

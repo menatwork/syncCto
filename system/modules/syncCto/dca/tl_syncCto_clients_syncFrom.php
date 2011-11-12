@@ -84,17 +84,27 @@ $GLOBALS['TL_DCA']['tl_syncCto_clients_syncFrom'] = array(
     )
 );
 
+/**
+ * Class for syncFrom configurations
+ */
 class tl_syncCto_clients_syncFrom extends Backend
 {
-    // Constructor and singelten pattern
+
+    /**
+     * Constructor
+     */
     public function __construct()
     {
-        // Import Contao classes
         $this->BackendUser = BackendUser::getInstance();
 
         parent::__construct();
     }
 
+    /**
+     * Set new and remove old buttons
+     * 
+     * @param DataContainer $dc 
+     */
     public function onload_callback(DataContainer $dc)
     {
         $dc->removeButton('save');
@@ -113,6 +123,12 @@ class tl_syncCto_clients_syncFrom extends Backend
         $dc->addButton('start_sync', $arrData);
     }
 
+    /**
+     * Handle syncFrom configurations
+     * 
+     * @param DataContainer $dc
+     * @return array 
+     */
     public function onsubmit_callback(DataContainer $dc)
     {
         // Check sync. typ

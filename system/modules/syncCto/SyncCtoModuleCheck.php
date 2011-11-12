@@ -39,10 +39,7 @@ if (!function_exists('posix_getpwuid'))
 }
 
 /**
- * Class Contao_SystemCheck
- *
- * Check a Contao installation for missing and old files.
- * @package    Library
+ * Class for systemcheck
  */
 class SyncCtoModuleCheck extends BackendModule
 {
@@ -62,7 +59,9 @@ class SyncCtoModuleCheck extends BackendModule
     protected $filePermissions = array();
 
     /**
-     * Check the operating system
+     * Constructor
+     * 
+     * @param DataContainer $objDc 
      */
     public function __construct(DataContainer $objDCA = null)
     {
@@ -80,6 +79,7 @@ class SyncCtoModuleCheck extends BackendModule
 
     /**
      * Return true if the Safe Mode Hack is required
+     * 
      * @return boolean
      */
     public function requiresSafeModeHack()
@@ -89,6 +89,7 @@ class SyncCtoModuleCheck extends BackendModule
 
     /**
      * Check all PHP extensions and return the result as string
+     * 
      * @return string
      */
     public function checkPhpConfiguration()

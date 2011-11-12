@@ -1,7 +1,4 @@
-<?php
-
-if (!defined('TL_ROOT'))
-    die('You cannot access this file directly!');
+<?php if (!defined('TL_ROOT')) die('You cannot access this file directly!');
 
 /**
  * Contao Open Source CMS
@@ -31,7 +28,7 @@ if (!defined('TL_ROOT'))
  */
 
 /**
- * Module for sync function
+ * Class for client interaction
  */
 class SyncCtoModuleClient extends BackendModule
 {
@@ -46,6 +43,7 @@ class SyncCtoModuleClient extends BackendModule
     protected $arrListCompare;
     protected $intStep;
     protected $intClientID;
+    
     // Helper Class
     protected $objSyncCtoCommunicationClient;
     protected $objSyncCtoDatabase;
@@ -113,7 +111,7 @@ class SyncCtoModuleClient extends BackendModule
      */
 
     /**
-     * Setup for page syncto
+     * Setup for page syncTo
      */
     private function pageSyncTo()
     {
@@ -227,7 +225,7 @@ class SyncCtoModuleClient extends BackendModule
     }
 
     /**
-     * Setup for page syncfrom
+     * Setup for page syncFrom
      */
     private function pageSyncFrom()
     {
@@ -326,7 +324,7 @@ class SyncCtoModuleClient extends BackendModule
     }
 
     /* -------------------------------------------------------------------------
-     * Start SyncCto Sync. To
+     * Start SyncCto syncTo
      */
 
     /**
@@ -343,7 +341,9 @@ class SyncCtoModuleClient extends BackendModule
         // State save for this step
         $mixStepPool = $this->Session->get("syncCto_StepPool1");
         if ($mixStepPool == FALSE)
+        {
             $mixStepPool = array("step" => 1);
+        }
 
         // Load content
         $arrContenData = $this->Session->get("syncCto_Content");
@@ -473,7 +473,7 @@ class SyncCtoModuleClient extends BackendModule
     }
 
     /**
-     * Build checksumlist and ask client
+     * Build checksum list and ask client
      */
     private function pageSyncToShowStep2()
     {
@@ -488,7 +488,9 @@ class SyncCtoModuleClient extends BackendModule
         // State save for this step
         $mixStepPool = $this->Session->get("syncCto_StepPool2");
         if ($mixStepPool == FALSE)
+        {
             $mixStepPool = array("step" => 1);
+        }
 
         // Load content
         $arrContenData = $this->Session->get("syncCto_Content");
@@ -781,7 +783,9 @@ class SyncCtoModuleClient extends BackendModule
         // State save for this step
         $mixStepPool = $this->Session->get("syncCto_StepPool3");
         if ($mixStepPool == FALSE)
+        {
             $mixStepPool = array("step" => 1);
+        }
 
         // Load content
         $arrContenData = $this->Session->get("syncCto_Content");
@@ -838,13 +842,21 @@ class SyncCtoModuleClient extends BackendModule
 
                         // Limit
                         if ($intLimit > 1073741824) // 1GB
+                        {
                             $intPercent = 10;
+                        }
                         else if ($intLimit > 524288000) // 500MB
+                        {    
                             $intPercent = 20;
+                        }
                         else if ($intLimit > 209715200) // 200MB
+                        {
                             $intPercent = 50;
+                        }
                         else
+                        {
                             $intPercent = 70;
+                        }
 
                         $intLimit = $intLimit / 100 * $intPercent;
 
@@ -932,7 +944,9 @@ class SyncCtoModuleClient extends BackendModule
                             foreach ($this->arrListCompare as $key => $value)
                             {
                                 if ($value["split"] == true)
+                                {
                                     $intCountSplit++;
+                                }
                             }
 
                             if ($intCountSplit == 0)
@@ -1003,7 +1017,9 @@ class SyncCtoModuleClient extends BackendModule
                         foreach ($this->arrListCompare as $key => $value)
                         {
                             if ($value["split"] == true)
+                            {
                                 $intCountSplit++;
+                            }
                         }
 
                         foreach ($this->arrListCompare as $key => $value)
@@ -1199,7 +1215,7 @@ class SyncCtoModuleClient extends BackendModule
     }
 
     /**
-     * Build SQL Zip and Send it to client
+     * Build SQL zip and send it to the client
      */
     private function pageSyncToShowStep4()
     {
@@ -1749,12 +1765,12 @@ class SyncCtoModuleClient extends BackendModule
     }
 
     /*
-     * End SyncCto Sync. To
+     * End syncTo
      * -------------------------------------------------------------------------
      */
 
     /* -------------------------------------------------------------------------
-     * Start SyncCto Sync. From
+     * Start syncFrom
      */
 
     /**
@@ -1771,7 +1787,9 @@ class SyncCtoModuleClient extends BackendModule
         // State save for this step
         $mixStepPool = $this->Session->get("syncCto_StepPool1");
         if ($mixStepPool == FALSE)
+        {
             $mixStepPool = array("step" => 1);
+        }
 
         // Load content
         $arrContenData = $this->Session->get("syncCto_Content");
@@ -1901,7 +1919,7 @@ class SyncCtoModuleClient extends BackendModule
     }
 
     /**
-     * Build checksumlist and ask client
+     * Build checksum list and ask client
      */
     private function pageSyncFromShowStep2()
     {
@@ -1916,7 +1934,9 @@ class SyncCtoModuleClient extends BackendModule
         // State save for this step
         $mixStepPool = $this->Session->get("syncCto_StepPool2");
         if ($mixStepPool == FALSE)
+        {
             $mixStepPool = array("step" => 1);
+        }
 
         // Load content
         $arrContenData = $this->Session->get("syncCto_Content");
@@ -2210,7 +2230,9 @@ class SyncCtoModuleClient extends BackendModule
 function syncCtoModelClientCMP($a, $b)
 {
     if ($a["state"] == $b["state"])
+    {
         return 0;
+    }
 
     return ($a["state"] < $b["state"]) ? -1 : 1;
 }

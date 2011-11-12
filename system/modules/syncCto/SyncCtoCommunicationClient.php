@@ -30,7 +30,7 @@
 /**
  * Communication Class
  * 
- * Extends CtoCommunication witch special RPC- Requests.
+ * Extends CtoCommunication witch special RPC-Requests
  */
 class SyncCtoCommunicationClient extends CtoCommunication
 {
@@ -76,7 +76,7 @@ class SyncCtoCommunicationClient extends CtoCommunication
     }
 
     /**
-     * Set cleitn by id
+     * Set client by id
      * 
      * @param int $id 
      * @throws Exception
@@ -124,7 +124,7 @@ class SyncCtoCommunicationClient extends CtoCommunication
      */
 
     /**
-     * Disable the refferer check on the client
+     * Disable the referrer check on the client
      * 
      * @return boolean 
      */
@@ -255,7 +255,7 @@ class SyncCtoCommunicationClient extends CtoCommunication
     }
     
     /**
-     * Check for delted files
+     * Check for deleted files
      * 
      * @param array $arrFilelist
      * @return array 
@@ -330,7 +330,7 @@ class SyncCtoCommunicationClient extends CtoCommunication
     }
 
     /**
-     * Import Files from Tempfolder.
+     * Import files from tempfolder
      * 
      * @param array $arrFilelist
      * @return array 
@@ -348,7 +348,7 @@ class SyncCtoCommunicationClient extends CtoCommunication
     }
 
     /**
-     * Delete Files.
+     * Delete files
      * 
      * @param array $arrFilelist
      * @return array 
@@ -403,7 +403,7 @@ class SyncCtoCommunicationClient extends CtoCommunication
      */
 
     /**
-     * Import a SQL Zip
+     * Import a SQL zip
      * 
      * @param type $filename
      * @return type 
@@ -425,7 +425,7 @@ class SyncCtoCommunicationClient extends CtoCommunication
      */
 
     /**
-     * Import loaclconfig
+     * Import localconfig
      * 
      * @return type 
      */

@@ -101,56 +101,88 @@ $GLOBALS['TL_DCA']['tl_syncCto_settings'] = array(
     )
 );
 
+/**
+ * Class for syncCto settings
+ */
 class tl_syncCto_settings extends Backend
 {
 
     protected $objSyncCtoHelper;
     protected static $instance = null;
 
+    /**
+     * Constructor
+     */
     public function __construct()
     {
         parent::__construct();
 
-        // Import SyncCto classes
         $this->objSyncCtoHelper = SyncCtoHelper::getInstance();
     }
 
-    /* -------------------------------------------------------------------------
-     * Load call backs for syncCto settings
+    /**
+     * Load localconfig entries
+     * 
+     * @return array 
      */
-
+    public function localconfigEntries()
+    {      
+        return $this->objSyncCtoHelper->loadConfigs(SyncCtoEnum::LOADCONFIG_KEYS_ONLY);
+    }
+    
+    /**
+     * Load blacklist localconfig entries
+     * 
+     * @param string $strValue
+     * @return array 
+     */
     public function loadBlacklistLocalconfig($strValue)
     {
         return $this->objSyncCtoHelper->getBlacklistLocalconfig();
     }
 
+    /**
+     * Load blacklist folder
+     * 
+     * @param string $strValue
+     * @return array 
+     */
     public function loadBlacklistFolder($strValue)
     {
         return $this->objSyncCtoHelper->getBlacklistFolder();
     }
 
+    /**
+     * Load blacklist files
+     * 
+     * @param string $strValue
+     * @return array
+     */
     public function loadBlacklistFile($strValue)
     {
         return $this->objSyncCtoHelper->getBlacklistFile();
     }
 
+    /**
+     * Load whitelist folder
+     * 
+     * @param string $strValue
+     * @return array 
+     */
     public function loadWhitelistFolder($strValue)
     {
         return $this->objSyncCtoHelper->getWhitelistFolder();
     }
 
+    /** 
+     * Load hidden tables
+     * 
+     * @param string $strValue
+     * @return array
+     */
     public function loadTablesHidden($strValue)
     {
         return $this->objSyncCtoHelper->getTablesHidden();
-    }
-
-    /* -------------------------------------------------------------------------
-     * Load options for list
-     */
-
-    public function localconfigEntries()
-    {      
-        return $this->objSyncCtoHelper->loadConfigs(SyncCtoEnum::LOADCONFIG_KEYS_ONLY);
     }
 
 }

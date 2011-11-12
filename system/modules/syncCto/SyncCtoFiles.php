@@ -92,7 +92,7 @@ class SyncCtoFiles extends System
      */
 
     /**
-     * Retrun zipname
+     * Return zipname
      * 
      * @return string
      */
@@ -102,7 +102,7 @@ class SyncCtoFiles extends System
     }
 
     /**
-     * Set Zipname
+     * Set zipname
      * 
      * @param string $strSuffixZipName 
      */
@@ -112,7 +112,7 @@ class SyncCtoFiles extends System
     }
 
     /**
-     * Get timestamp format.
+     * Get timestamp format
      * 
      * @return string 
      */
@@ -136,7 +136,7 @@ class SyncCtoFiles extends System
      */
 
     /**
-     * Create a checksum list from contao core.
+     * Create a checksum list from contao core
      * 
      * @return array 
      */
@@ -198,7 +198,7 @@ class SyncCtoFiles extends System
     }
 
     /**
-     * Create a checksum list from contao files.
+     * Create a checksum list from contao files
      * 
      * @return array 
      */
@@ -287,7 +287,7 @@ class SyncCtoFiles extends System
     }
 
     /**
-     * Check a filelist with the current filesystem.
+     * Check a filelist with the current filesystem
      * 
      * @param array $arrChecksumList
      * @return array 
@@ -367,13 +367,15 @@ class SyncCtoFiles extends System
         return $arrReturn;
     }
 
-    // Dump Functions ----------------------------------------------------------
-
+    /* -------------------------------------------------------------------------
+     * Dump Functions
+     */
+    
     /**
-     * Make a backup from a filelist.
+     * Make a backup from a filelist
      * 
      * @param string $strZip
-     * @param array $arrTlFiles
+     * @param array $arrFileList
      * @return string Filename 
      */
     public function runDump($strZip = "", $arrTlFiles = null)
@@ -506,7 +508,7 @@ class SyncCtoFiles extends System
     }
 
     /**
-     * Make a bakup from contao core
+     * Make a backup from contao core
      * 
      * @param string $strZip
      * @return string Filename
@@ -626,7 +628,9 @@ class SyncCtoFiles extends System
             }
 
             if (!$blnWhite)
+            {
                 return $arrList;
+            }
         }
 
         // Is the given string a file
@@ -673,7 +677,9 @@ class SyncCtoFiles extends System
 
                     // Skip if file is in blacklist
                     if ($blnBlack)
+                    {
                         continue;
+                    }
 
                     // Add to list
                     $arrList[] = $strPath . "/" . $valueItem;
@@ -748,11 +754,13 @@ class SyncCtoFiles extends System
      */
 
     /**
-     *
+     * Split files function
+     * 
      * @param type $strSrcFile File start at TL_ROOT exp. system/foo/foo.php
      * @param type $strDesFolder Folder for split files, start at TL_ROOT , exp. system/temp/
      * @param type $strDesFile Name of file without extension. Example: Foo or MyFile
      * @param type $intSizeLimit Split Size in Bytes
+     * @return int 
      */
     public function splitFiles($strSrcFile, $strDesFolder, $strDesFile, $intSizeLimit)
     {
@@ -813,6 +821,15 @@ class SyncCtoFiles extends System
         return $i;
     }
 
+    /**
+     * Rebuild split files
+     * 
+     * @param type $strSplitname
+     * @param type $intSplitcount
+     * @param type $strMovepath
+     * @param type $strMD5
+     * @return type 
+     */
     public function rebuildSplitFiles($strSplitname, $intSplitcount, $strMovepath, $strMD5)
     {
         // Build savepath
@@ -836,7 +853,6 @@ class SyncCtoFiles extends System
             // Create new file objects
             $objFilePart = new File($strReadFile);
             $hanFileWhole = fopen(TL_ROOT . "/" . $strSavePath, "a+");
-
 
             // Write part file to main file
             fwrite($hanFileWhole, $objFilePart->getContent());
@@ -862,6 +878,12 @@ class SyncCtoFiles extends System
         return true;
     }
 
+    /**
+     * Move temp files
+     * 
+     * @param type $arrFileList
+     * @return boolean 
+     */
     public function moveTempFile($arrFileList)
     {
         foreach ($arrFileList as $key => $value)
@@ -898,6 +920,12 @@ class SyncCtoFiles extends System
         return $arrFileList;
     }
 
+    /**
+     * Delete files
+     * 
+     * @param type $arrFileList
+     * @return type 
+     */
     public function deleteFiles($arrFileList)
     {
         if (count($arrFileList) != 0)
@@ -928,7 +956,7 @@ class SyncCtoFiles extends System
     }
 
     /**
-     * Recive a file and move it to the right folder.
+     * Receive a file and move it to the right folder.
      * 
      * @param type $arrMetafiles
      * @return string 

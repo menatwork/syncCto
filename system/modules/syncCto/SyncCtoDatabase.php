@@ -1,7 +1,4 @@
-<?php
-
-if (!defined('TL_ROOT'))
-    die('You cannot access this file directly!');
+<?php if (!defined('TL_ROOT')) die('You cannot access this file directly!');
 
 /**
  * Contao Open Source CMS
@@ -50,18 +47,20 @@ class SyncCtoDatabase extends Backend
     protected $strTimestampFormat;
     //- Objects ------------------
     protected $objSyncCtoHelper;
+    
     /**
-     * -= Config =-
      * List of default ignore values
-     * @var array 
+     * 
+     * @var array
      */
     protected $arrDefaultValueFunctionIgnore = array(
         "NOW",
         "CURRENT_TIMESTAMP",
     );
+    
     /**
-     * -= Config =-
      * List of default ignore values
+     * 
      * @var array 
      */
     protected $arrDefaultValueTypIgnore = array(
@@ -84,7 +83,6 @@ class SyncCtoDatabase extends Backend
 
     /**
      * Constructor
-     * Load language
      */
     protected function __construct()
     {
@@ -98,6 +96,7 @@ class SyncCtoDatabase extends Backend
 
     /**
      * Get instance of SyncCtoDatabase
+     * 
      * @return SyncCtoDatabase 
      */
     public static function getInstance()
@@ -108,6 +107,12 @@ class SyncCtoDatabase extends Backend
         return self::$instance;
     }
 
+    /**
+     * Setter
+     * 
+     * @param string $name
+     * @param string $value 
+     */
     public function __set($name, $value)
     {
         switch ($name)
@@ -144,6 +149,12 @@ class SyncCtoDatabase extends Backend
         }
     }
 
+    /**
+     * Getter
+     * 
+     * @param string $name
+     * @return string 
+     */
     public function __get($name)
     {
         switch ($name)
@@ -198,9 +209,13 @@ class SyncCtoDatabase extends Backend
         $strFilename = date($this->strTimestampFormat) . "_" . $this->strSuffixZipName;
 
         if ($booTempFolder)
+        {
             $strPath = $GLOBALS['SYC_PATH']['tmp'];
+        }
         else
+        {
             $strPath = $GLOBALS['SYC_PATH']['db'];
+        }
 
         $objZipWrite = new ZipWriter($strPath . $strFilename);
 
@@ -228,17 +243,23 @@ class SyncCtoDatabase extends Backend
         $objZipRead = new ZipReader($strRestoreFile);
 
         if (!$objZipRead->getFile($this->strFilenameInsert))
-            throw new Exception("Could not load Insert SQL File. Maybe damaged?");
+        {
+            throw new Exception("Could not load SQL file inserts. Maybe damaged?");
+        }
 
         $arrInsert = deserialize($objZipRead->unzip());
 
         if (!$objZipRead->getFile($this->strFilenameTable))
-            throw new Exception("Could not load Table SQL File. Maybe damaged?");
+        {
+            throw new Exception("Could not load SQL file table. Maybe damaged?");
+        }
 
         $arrRestoreTables = deserialize($objZipRead->unzip());
 
         if (!is_array($arrInsert) || !is_array($arrRestoreTables))
-            throw new Exception("Could not load SQL Files. Maybe damaged?");
+        {
+            throw new Exception("Could not load SQL files. Maybe damaged?");
+        }
 
         try
         {
@@ -272,7 +293,9 @@ class SyncCtoDatabase extends Backend
         catch (Exception $exc)
         {
             foreach ($arrRestoreTables as $key => $value)
+            {
                 $this->Database->prepare("DROP TABLE IF EXISTS " . "synccto_temp_" . $key)->execute();
+            }
 
             throw $exc;
         }
@@ -285,7 +308,7 @@ class SyncCtoDatabase extends Backend
      */
 
     /**
-     * Build a array with the structer of the database
+     * Build a array with the structur of the database
      * 
      * @return array 
      */
@@ -305,7 +328,9 @@ class SyncCtoDatabase extends Backend
         {
             // Check if table is in blacklist
             if (!in_array($table, $this->arrBackupTables))
+            {
                 continue;
+            }
 
             // Get list of fields
             $fields = $this->Database->listFields($table);
@@ -335,10 +360,14 @@ class SyncCtoDatabase extends Backend
                                 break;
 
                             default:
-                                if ((strpos(' ' . $field['type'], 'text') || strpos(' ' . $field['type'], 'char')) && ($field['null'] == 'NULL')) // Fulltext-Search bei text-Fields
+                                if ((strpos(' ' . $field['type'], 'text') || strpos(' ' . $field['type'], 'char')) && ($field['null'] == 'NULL'))
+                                {
                                     $return[$table]['TABLE_CREATE_DEFINITIONS'][$field["name"]] = 'FULLTEXT KEY `' . $field["name"] . '` (`' . $field["name"] . '`)';
+                                }
                                 else
+                                {
                                     $return[$table]['TABLE_CREATE_DEFINITIONS'][$field["name"]] = 'KEY `' . $field["name"] . '` (`' . $field["name"] . '`)';
+                                }
                                 break;
                         }
                     }
@@ -476,7 +505,9 @@ class SyncCtoDatabase extends Backend
         foreach ($tables as $table)
         {
             if (!in_array($table, $this->arrBackupTables))
+            {
                 continue;
+            }
 
             $objData = $this->Database->prepare("SELECT * FROM $table")->execute();
             $fields = $this->Database->listFields($table);
@@ -570,7 +601,7 @@ class SyncCtoDatabase extends Backend
     }
 
     /**
-     * Build a sql statemant for "INSERT IGNORE INTO"
+     * Build a sql statement for "INSERT IGNORE INTO"
      * 
      * @param type $strTable Table name
      * @param type $arrKeys Columnames
@@ -623,21 +654,23 @@ class SyncCtoDatabase extends Backend
      */
     private function buildFileSQLTables($arrTables)
     {
-        $heute = date("Y-m-d");
-        $uhrzeit = date("H:i:s");
+        $today = date("Y-m-d");
+        $time = date("H:i:s");
 
         $string .= "-- syncCto SQL Dump\r\n";
         $string .= "-- Version " . SyncCtoGetVersion . "\r\n";
         $string .= "-- http://men-at-work.de\r\n";
         $string .= "-- \r\n";
-        $string .= "-- Time stamp       : $heute at $uhrzeit\r\n";
+        $string .= "-- Time stamp       : $today at $time\r\n";
         $string .= "\r\n";
         $string .= "SET SQL_MODE=\"NO_AUTO_VALUE_ON_ZERO\";\r\n";
         $string .= "\r\n";
         $string .= "-- --------------------------------------------------------\r\n";
 
         if (count($arrTables) == 0)
+        {
             $string .= "-- No tables found in database.";
+        }
         else
         {
             foreach (array_keys($arrTables) as $table)
@@ -651,7 +684,9 @@ class SyncCtoDatabase extends Backend
                 $string .= "CREATE TABLE `" . $table . "` (\n  " . implode(",\n  ", $arrTables[$table]['TABLE_FIELDS']) . (count($arrTables[$table]['TABLE_CREATE_DEFINITIONS']) ? ',' : '') . "\n";
 
                 if (is_Array($arrTables[$table]['TABLE_CREATE_DEFINITIONS']))
+                {
                     $string .= "  " . implode(",\n  ", $arrTables[$table]['TABLE_CREATE_DEFINITIONS']) . "\n";
+                }
 
                 $string .= ")" . $arrTables[$table]['TABLE_OPTIONS'] . ";\r\n\r\n";
 
@@ -671,7 +706,9 @@ class SyncCtoDatabase extends Backend
     private function buildFileSQLInsert($arrData)
     {
         if (count($arrData) == 0)
+        {
             $string .= "-- No tables found in database.\r\n";
+        }
         else
         {
             foreach ($arrData as $table)

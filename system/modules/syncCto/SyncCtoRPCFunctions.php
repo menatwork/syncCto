@@ -26,6 +26,7 @@
  * @license    GNU/LGPL
  * @filesource
  */
+
 class SyncCtoRPCFunctions extends Backend
 {
     /* -------------------------------------------------------------------------
@@ -71,6 +72,8 @@ class SyncCtoRPCFunctions extends Backend
 
     /**
      * Send the version number of this syncCto
+     * 
+     * @return string
      */
     public function getVersionSyncCto()
     {
@@ -79,6 +82,8 @@ class SyncCtoRPCFunctions extends Backend
 
     /**
      * Send informations about this php instalation
+     * 
+     * @return array
      */
     public function getClientParameter()
     {
@@ -91,10 +96,12 @@ class SyncCtoRPCFunctions extends Backend
         );
     }
 
-    /* -------------------------------------------------------------------------
-     * Config Operations
+    /**
+     * Import configuration entries
+     *
+     * @param array $arrConfig
+     * @return array 
      */
-
     public function importConfig($arrConfig)
     {
         $arrLocalConfig = $this->objSyncCtoHelper->loadConfigs(SyncCtoEnum::LOADCONFIG_KEYS_ONLY);

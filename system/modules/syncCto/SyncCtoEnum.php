@@ -32,8 +32,10 @@
  */
 class SyncCtoEnum
 {
-    //-----------------------------------------
-    // FileState
+
+    /**
+     * FileState
+     */
     const FILESTATE_FILE = 0;    
     const FILESTATE_MISSING = 1;
     const FILESTATE_SAME = 2;
@@ -45,40 +47,46 @@ class SyncCtoEnum
     const FILESTATE_TOO_BIG_NEED = 13;
     const FILESTATE_TOO_BIG_DELETE = 14;    
     const FILESTATE_BOMBASTIC_BIG = 99;
-	
-    //-----------------------------------------
-    // File Transmission
+    
+    /**
+     * File Transmission
+     */
     const FILETRANS_SEND = 1;
     const FILETRANS_SKIPPED = 2;
     const FILETRANS_WAITING = 3;
-	
-    //-----------------------------------------
-    // Upload Folder
+
+    /**
+     * Upload Folder
+     */
     const UPLOAD_TEMP = 1;
     const UPLOAD_SQL_TEMP = 2;
     const UPLOAD_SYNC_TEMP = 3;
     const UPLOAD_SYNC_SPLIT = 4;
-	
-    //-----------------------------------------
-    // Base Folder
+
+    /**
+     * Base Folder
+     */
     const FOLDER_TEMP = 1;
     const FOLDER_DB_BACKUP = 2;
     const FOLDER_FILE_BACKUP = 3;
-	
-    //-----------------------------------------
-    // Localconfig state
+
+    /**
+     * Localconfig state
+     */
     const LOADCONFIG_KEYS_ONLY = 1;
     const LOADCONFIG_KEY_VALUE = 2;
-	
-    //-----------------------------------------
-    // Page State
+
+    /**
+     * Page State
+     */
     const WORK_OK = 1;
     const WORK_ERROR = 2;
     const WORK_WORK = 3;
     const WORK_SKIPPED = 4;
-	
-    //-----------------------------------------
-    // Pre installed Codifyengines
+
+    /**
+     * Pre installed Codifyengines
+     */
     const CODIFY_EMPTY = "Empty";
     const CODIFY_BLOW = "Blowfish";
     const CODIFY_MCRYPT = "Mcrypt";	

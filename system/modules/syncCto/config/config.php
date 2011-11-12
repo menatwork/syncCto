@@ -26,6 +26,7 @@
  * @license    GNU/LGPL 
  * @filesource
  */
+
 $objInput = Input::getInstance();
 
 /**
@@ -173,7 +174,6 @@ $GLOBALS['SYC_CONFIG']['local_blacklist'] = array(
 /**
  * Whitelist
  */
-// Folders
 $GLOBALS['SYC_CONFIG']['folder_whitelist'] = array(
     'contao',
     'plugins',
@@ -185,7 +185,6 @@ $GLOBALS['SYC_CONFIG']['folder_whitelist'] = array(
 /**
  * Global configuration
  */
-// Folder path configuration
 $GLOBALS['SYC_PATH']['db'] = $GLOBALS['TL_CONFIG']['uploadPath'] . '/syncCto_backups/database/';
 $GLOBALS['SYC_PATH']['file'] = $GLOBALS['TL_CONFIG']['uploadPath'] . '/syncCto_backups/files/';
 $GLOBALS['SYC_PATH']['debug'] = $GLOBALS['TL_CONFIG']['uploadPath'] . '/syncCto_backups/debug/';
@@ -194,6 +193,7 @@ $GLOBALS['SYC_PATH']['tmp'] = "system/tmp/";
 /**
  * CtoCommunication RPC Calls
  */
+
 // Get SyncCto Version 
 $GLOBALS["CTOCOM_FUNCTIONS"]["SYNCCTO_VERSION"] = array(
     "class" => "SyncCtoRPCFunctions",
@@ -305,4 +305,5 @@ $GLOBALS["CTOCOM_FUNCTIONS"]["SYNCCTO_CHECK_DELETE_FILE"] = array(
     "typ" => "POST",
     "parameter" => array("filelist"),
 );
+
 ?>

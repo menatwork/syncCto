@@ -25,6 +25,7 @@
  * @license    GNU/LGPL
  * @filesource
  */
+
 /**
  * Initialize the system
  */
