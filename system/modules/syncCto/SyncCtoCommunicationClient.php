@@ -117,6 +117,13 @@ class SyncCtoCommunicationClient extends CtoCommunication
             $this->activateDebug = true;
             $this->activateMeasurement = true;
         }
+        
+        return array(
+            "title" => $objClient->title,
+            "address" => $objClient->address,
+            "path" => $objClient->path,
+            "port" => $objClient->port
+        );
     }
 
     /* -------------------------------------------------------------------------
@@ -335,7 +342,7 @@ class SyncCtoCommunicationClient extends CtoCommunication
      * @param array $arrFilelist
      * @return array 
      */
-    public function startFileImport($arrFilelist)
+    public function runFileImport($arrFilelist)
     {
         $arrData = array(
             array(
@@ -408,7 +415,7 @@ class SyncCtoCommunicationClient extends CtoCommunication
      * @param type $filename
      * @return type 
      */
-    public function startSQLImport($filename)
+    public function runSQLImport($filename)
     {
         $arrData = array(
             array(
@@ -418,6 +425,32 @@ class SyncCtoCommunicationClient extends CtoCommunication
         );
 
         return $this->runServer("SYNCCTO_IMPORT_DATABASE", $arrData);
+    }
+    
+    public function runDatabaseDump($arrTables, $booTempFolder)
+    {
+         $arrData = array(
+            array(
+                "name" => "tables",
+                "value" => $arrTables,
+            ),
+            array(
+                "name" => "tempfolder",
+                "value" => $booTempFolder,
+            ),
+        );
+         
+        return $this->runServer("SYNCCTO_RUN_DUMP", $arrData);
+    }
+    
+     /**
+     * Returns a list without the hidden tables
+     * 
+     * @return array 
+     */
+    public function getDatabaseTables()
+    {
+        return $this->runServer("CTO_DATABASE_LISTTABLES");
     }
 
     /* -------------------------------------------------------------------------
@@ -429,7 +462,7 @@ class SyncCtoCommunicationClient extends CtoCommunication
      * 
      * @return type 
      */
-    public function startLocalConfigImport()
+    public function runLocalConfigImport()
     {
         // Load blacklist for localconfig
         $arrConfigBlacklist = $this->objSyncCtoHelper->getBlacklistLocalconfig();

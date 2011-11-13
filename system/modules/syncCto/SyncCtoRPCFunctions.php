@@ -121,54 +121,7 @@ class SyncCtoRPCFunctions extends Backend
         return true;
     }
 
-    /*
-     * -------------------------------------------------------------------------
-     * -------------------------------------------------------------------------
-     * 
-     * OLD
-     * 
-     * -------------------------------------------------------------------------
-     * -------------------------------------------------------------------------
-     */
-
-    /* -------------------------------------------------------------------------
-     * RPC Functions - KA 
-     */
-
-    public function rpc_file_get($strPath)
-    {
-        $strFilePath = TL_ROOT . $strPath;
-
-        if (!file_exists($strFilePath))
-        {
-            $this->arrError[] = "Can not find " . $strFilePath;
-            return;
-        }
-
-        // Read file
-        $fh = fopen($strFilePath, 'rb');
-
-        if ($fh === FALSE)
-        {
-            $this->arrError[] = "Error by reading file " . $strFilePath;
-            return;
-        }
-
-        while (!feof($fh))
-        {
-            $content .= fread($fh, 512);
-        }
-
-        fclose($fh);
-        unset($fh);
-
-        $this->mixOutput["RPC_FILE_GET"] = $content;
-        $this->mixOutput["md5"] = md5_file($strFilePath);
-
-        unset($content);
-
-        return true;
-    }
+    
 }
 
 ?>

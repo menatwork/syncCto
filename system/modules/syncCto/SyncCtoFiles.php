@@ -1,4 +1,5 @@
 <?php if (!defined('TL_ROOT')) die('You cannot access this file directly!');
+    die('You cannot access this file directly!');
 
 /**
  * Contao Open Source CMS
@@ -344,7 +345,7 @@ class SyncCtoFiles extends System
 
         return $arrFileList;
     }
-    
+
     /**
      * Check for deleted files with a filelist from an other system
      * 
@@ -353,7 +354,7 @@ class SyncCtoFiles extends System
     public function checkDeleteFiles($arrFilelist)
     {
         $arrReturn = array();
-        
+
         foreach ($arrFilelist as $keyItem => $valueItem)
         {
             if (!file_exists(TL_ROOT . "/" . $valueItem["path"]))
@@ -363,14 +364,14 @@ class SyncCtoFiles extends System
                 $arrReturn[$keyItem]["css"] = "deleted";
             }
         }
-        
+
         return $arrReturn;
     }
 
     /* -------------------------------------------------------------------------
      * Dump Functions
      */
-    
+
     /**
      * Make a backup from a filelist
      * 
@@ -1023,6 +1024,19 @@ class SyncCtoFiles extends System
         return $arrResponse;
     }
 
-}
+    public function getFile($strPath)
+    {
+        if (!file_exists(TL_ROOT . "/" . $strPath))
+        {
+            throw new Exception("Could not find file.");
+        }
+        
+        $objFile = new File($strPath);
+        $strContent = $objFile->getContent();
+        $objFile->close();
+        
+        return array("md5" => md5_file(TL_ROOT . "/" . $strPath), "content" => $strContent);
+    }
 
+}
 ?>

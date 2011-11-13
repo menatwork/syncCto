@@ -45,7 +45,7 @@ $GLOBALS['TL_DCA']['tl_syncCto_clients_syncFrom'] = array(
     // Palettes
     'palettes' => array
         (
-        'default' => '{sync_legend},sync_type;{table_recommend_legend},database_tables_recommended;{table_none_recommend_legend},database_tables_none_recommended;{filelist_legend},filelist',
+        'default' => '{sync_legend},sync_type;{table_legend},database_tables;{filelist_legend},filelist',
     ),
     // Fields
     'fields' => array(
@@ -58,21 +58,13 @@ $GLOBALS['TL_DCA']['tl_syncCto_clients_syncFrom'] = array(
             'reference' => &$GLOBALS['TL_LANG']['SYC'],
             'options_callback' => array('SyncCtoHelper', 'getSyncType'),
         ),
-        'database_tables_recommended' => array
+        'database_tables' => array
             (
             'label' => &$GLOBALS['TL_LANG']['tl_syncCto_clients_syncFrom']['database_tables_recommended'],
             'inputType' => 'checkbox',
             'exclude' => true,
             'eval' => array('multiple' => true),
-            'options_callback' => array('SyncCtoHelper', 'databaseTablesRecommended'),
-        ),
-        'database_tables_none_recommended' => array
-            (
-            'label' => &$GLOBALS['TL_LANG']['tl_syncCto_clients_syncFrom']['database_tables_none_recommended'],
-            'inputType' => 'checkbox',
-            'exclude' => true,
-            'eval' => array('multiple' => true),
-            'options_callback' => array('SyncCtoHelper', 'databaseTablesNoneRecommended'),
+            'options_callback' => array('SyncCtoHelper', 'getDatabaseTablesClient'),
         ),
         'filelist' => array
             (

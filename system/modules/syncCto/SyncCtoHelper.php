@@ -26,6 +26,10 @@
  * @license    GNU/LGPL
  * @filesource
  */
+
+/**
+ * Helper class for syncCto. Callbackfunction, small global helper function.
+ */
 class SyncCtoHelper extends Backend
 {
     /* -------------------------------------------------------------------------
@@ -175,6 +179,7 @@ class SyncCtoHelper extends Backend
     /* -------------------------------------------------------------------------
      * Black and Whitelists
      */
+
     public function getBlacklistFolder()
     {
         $arrLocalconfig = deserialize($GLOBALS['TL_CONFIG']['syncCto_folder_blacklist']);
@@ -288,7 +293,7 @@ class SyncCtoHelper extends Backend
                     }
 
                     $intReturn = 0;
-                    
+
                     $objRequest = new RequestExtendedCached();
 
                     // Check Server
@@ -545,8 +550,8 @@ class SyncCtoHelper extends Backend
 
     /**
      * Returns a list with recommended database tables
-     * 
-     * @return array 
+     *
+     * @return array
      */
     public function databaseTablesRecommended()
     {
@@ -580,8 +585,8 @@ class SyncCtoHelper extends Backend
 
     /**
      * Returns a list with none recommended database tables
-     * 
-     * @return array 
+     *
+     * @return array
      */
     public function databaseTablesNoneRecommended()
     {
@@ -613,6 +618,27 @@ class SyncCtoHelper extends Backend
         return $arrTables;
     }
 
+    /**
+     * Returns a list with recommended database tables
+     * 
+     * @return array 
+     */
+    public function getDatabaseTablesClient()
+    {
+        // Build communication class
+        $objSyncCtoCommunicationClient = new SyncCtoCommunicationClient();
+        $objSyncCtoCommunicationClient->setClientBy($this->Input->get("id"));
+
+        try
+        {
+            return $objSyncCtoCommunicationClient->getDatabaseTables();
+        }
+        catch (Exception $exc)
+        {
+            $_SESSION["TL_ERROR"][]= $exc->getMessage();
+            return array();
+        }
+    }
 }
 
 ?>

@@ -106,7 +106,7 @@ if ($objInput->get("do") == 'syncCto_backups' && $objInput->get("table") != '' &
     unset($GLOBALS['BE_MOD']['syncCto']['syncCto_backups']['callback']);
 }
 
-if ($objInput->get("do") == 'synccto_clients' && ($objInput->get("table") == 'tl_syncCto_clients_syncTo' || $objInput->get("table") == 'tl_syncCto_clients_syncFrom' || $objInput->get("table") == '' ))
+if ($objInput->get("do") == 'synccto_clients' && $objInput->get("act") != 'start' && ($objInput->get("table") == 'tl_syncCto_clients_syncTo' || $objInput->get("table") == 'tl_syncCto_clients_syncFrom' || $objInput->get("table") == '' ))
 {
     unset($GLOBALS['BE_MOD']['syncCto']['synccto_clients']['callback']);
 }
@@ -266,6 +266,14 @@ $GLOBALS["CTOCOM_FUNCTIONS"]["SYNCCTO_SEND_FILE"] = array(
     "parameter" => array("metafiles"),
 );
 
+// Get a file
+$GLOBALS["CTOCOM_FUNCTIONS"]["SYNCCTO_GET_FILE"] = array(
+    "class" => "SyncCtoFiles",
+    "function" => "getFiles",
+    "typ" => "POST",
+    "parameter" => array("path"),
+);
+
 // Import a SQL Zip file into database
 $GLOBALS["CTOCOM_FUNCTIONS"]["SYNCCTO_IMPORT_DATABASE"] = array(
     "class" => "SyncCtoDatabase",
@@ -304,6 +312,22 @@ $GLOBALS["CTOCOM_FUNCTIONS"]["SYNCCTO_CHECK_DELETE_FILE"] = array(
     "function" => "checkDeleteFiles",
     "typ" => "POST",
     "parameter" => array("filelist"),
+);
+
+// Load all Tables from database
+$GLOBALS["CTOCOM_FUNCTIONS"]["CTO_DATABASE_LISTTABLES"] = array(
+    "class" => "Database",
+    "function" => "listTables",
+    "typ" => "POST",
+    "parameter" => false,
+);
+
+// Run Dump
+$GLOBALS["CTOCOM_FUNCTIONS"]["SYNCCTO_RUN_DUMP"] = array(
+    "class" => "SyncCtoDatabase",
+    "function" => "runDump",
+    "typ" => "POST",
+    "parameter" => array("tables", "tempfolder"),
 );
 
 ?>
