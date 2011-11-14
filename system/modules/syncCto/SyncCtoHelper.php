@@ -344,23 +344,23 @@ class SyncCtoHelper extends Backend
 
             // required extensions
             $arrRequiredExtensions = array(
-                'ctoCommunication',
-                'httprequestextended',
-                'textwizard',
-                '3cframework'
+                'ctoCommunication' => 'ctoCommunication',
+                'httprequestextended' => 'httprequestextended',
+                'textwizard' => 'textwizard',
+                '3CFramework' => '3cframework'
             );
 
             // required files
             $arrRequiredFiles = array(
-                'system/drivers/DC_Memory.php'
+                'DC_Memory' => 'system/drivers/DC_Memory.php'
             );
 
             // check for required extensions
-            foreach ($arrRequiredExtensions as $val)
+            foreach ($arrRequiredExtensions as  $key => $val)
             {
                 if (!in_array($val, $this->Config->getActiveModules()))
                 {
-                    $_SESSION["TL_INFO"] = array_merge($_SESSION["TL_INFO"], array($val => 'Please install the required extension <strong>' . $val . '</strong>'));
+                    $_SESSION["TL_INFO"] = array_merge($_SESSION["TL_INFO"], array($val => 'Please install the required extension <strong>' . $key . '</strong>'));
                 }
                 else
                 {
@@ -372,11 +372,11 @@ class SyncCtoHelper extends Backend
             }
 
             // check for required files
-            foreach ($arrRequiredFiles as $val)
+            foreach ($arrRequiredFiles as $key => $val)
             {
                 if (!file_exists(TL_ROOT . '/' . $val))
                 {
-                    $_SESSION["TL_INFO"] = array_merge($_SESSION["TL_INFO"], array($val => 'Please install the required file <strong>' . $val . '</strong>'));
+                    $_SESSION["TL_INFO"] = array_merge($_SESSION["TL_INFO"], array($val => 'Please install the required file <strong>' . $key . '</strong>'));
                 }
                 else
                 {
