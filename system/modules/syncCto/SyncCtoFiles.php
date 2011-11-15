@@ -52,7 +52,7 @@ class SyncCtoFiles extends System
     /**
      * Constructor
      */
-    public function __construct()
+    protected function __construct()
     {
         parent::__construct();
 
@@ -60,8 +60,7 @@ class SyncCtoFiles extends System
         $this->objSyncCtoHelper = SyncCtoHelper::getInstance();
         $this->objFiles = Files::getInstance();
         $this->strTimestampFormat = standardize($GLOBALS['TL_CONFIG']['datimFormat']);
-        // Load language
-        $this->loadLanguageFile("default");
+
         // Set runtime to 5 minutes
         set_time_limit(3600);
     }
