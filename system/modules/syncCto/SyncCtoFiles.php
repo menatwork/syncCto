@@ -1026,7 +1026,7 @@ class SyncCtoFiles extends System
     {
         if (!file_exists(TL_ROOT . "/" . $strPath))
         {
-            throw new Exception("Could not find file.");
+            throw new Exception(vsprintf($GLOBALS['TL_LANG']['ERR']['unknown_file'] , array($strPath)));
         }
         
         $objFile = new File($strPath);

@@ -269,7 +269,7 @@ $GLOBALS["CTOCOM_FUNCTIONS"]["SYNCCTO_SEND_FILE"] = array(
 // Get a file
 $GLOBALS["CTOCOM_FUNCTIONS"]["SYNCCTO_GET_FILE"] = array(
     "class" => "SyncCtoFiles",
-    "function" => "getFiles",
+    "function" => "getFile",
     "typ" => "POST",
     "parameter" => array("path"),
 );
@@ -328,6 +328,14 @@ $GLOBALS["CTOCOM_FUNCTIONS"]["SYNCCTO_RUN_DUMP"] = array(
     "function" => "runDump",
     "typ" => "POST",
     "parameter" => array("tables", "tempfolder"),
+);
+
+// Get folder path list
+$GLOBALS["CTOCOM_FUNCTIONS"]["SYNCCTO_GET_PATHLIST"] = array(
+    "class" => "SyncCtoRPCFunctions",
+    "function" => "getPathList",
+    "typ" => "POST",
+    "parameter" => array("name"),
 );
 
 ?>

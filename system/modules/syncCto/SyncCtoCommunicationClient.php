@@ -404,6 +404,55 @@ class SyncCtoCommunicationClient extends CtoCommunication
 
         return $this->runServer("SYNCCTO_REBUILD_SPLITFILE", $arrData);
     }
+    
+    /**
+     * Get a file
+     * 
+     * @param type $strPath
+     * @param string $strSavePath
+     * @return type 
+     */
+    public function getFile($strPath, $strSavePath)
+    {
+        $arrData = array(
+            array(
+                "name" => "path",
+                "value" => $strPath,
+            ),
+        );
+
+        $arrResult = $this->runServer("SYNCCTO_GET_FILE", $arrData);
+            
+        $objFile = new File($strSavePath);
+        $objFile->write($arrResult["content"]);
+        $objFile->close();
+        
+        if(md5_file(TL_ROOT . "/" . $strSavePath) != $arrResult["md5"])
+        {
+            throw new Exception($GLOBALS['TL_LANG']['ERR']['checksum_error']);
+        }
+        
+        return $strSavePath;
+    }
+    
+    /**
+     * Get a list or a string with path information from 
+     * syncCto.
+     * 
+     * @param string $strName
+     * @return mixed 
+     */
+    public function getPathList($strName)
+    {
+         $arrData = array(
+            array(
+                "name" => "name",
+                "value" => $strName,
+            ),
+        );
+        
+        return $this->runServer("SYNCCTO_GET_PATHLIST", $arrData);
+    }
 
     /* -------------------------------------------------------------------------
      * Database Operations
@@ -485,67 +534,6 @@ class SyncCtoCommunicationClient extends CtoCommunication
 
         return $this->runServer("SYNCCTO_IMPORT_CONFIG", $arrData);
     }
-
-    /*
-     * -------------------------------------------------------------------------
-     * -------------------------------------------------------------------------
-     * 
-     * OLD
-     * 
-     * -------------------------------------------------------------------------
-     * -------------------------------------------------------------------------
-     */
-
-    /**
-     * Get a file
-     * 
-     * @param type $strPath
-     * @param string $strSavePath
-     * @return type 
-     */
-    public function getFile($strPath, $strSavePath)
-    {
-        @set_time_limit(3600);
-
-        $arrData = array(
-            array(
-                "name" => "path",
-                "value" => $strPath,
-            ),
-        );
-
-        $result = $this->runServer("RPC_FILE_GET", $arrData);
-
-        if (file_exists(TL_ROOT . $strSavePath))
-        {
-            $strVar = TL_ROOT . $strSavePath;
-            unset($strVar);
-        }
-
-        $arrSavePathPart = explode("/", $strSavePath);
-        array_pop($arrSavePathPart);
-        $strVar = "";
-
-        foreach ($arrSavePathPart as $itFolder)
-        {
-            $strVar .= "/" . $itFolder;
-
-            if (!file_exists(TL_ROOT . $strVar))
-                mkdir(TL_ROOT . $strVar);
-        }
-
-        $strSavePath = TL_ROOT . $strSavePath;
-
-        $fpFile = fopen($strSavePath, 'a+');
-        fwrite($fpFile, $result[RPC_FILE_GET]);
-        fclose($fpFile);
-
-        if (md5_file($strSavePath) != $result["md5"])
-            throw new Exception("MD5 Hash Error.");
-
-        return true;
-    }
-
 }
 
 ?>

@@ -625,7 +625,7 @@ class SyncCtoHelper extends Backend
     public function getDatabaseTablesClient()
     {
         // Build communication class
-        $objSyncCtoCommunicationClient = new SyncCtoCommunicationClient();
+        $objSyncCtoCommunicationClient = SyncCtoCommunicationClient::getInstance();
         $objSyncCtoCommunicationClient->setClientBy($this->Input->get("id"));
 
         try

@@ -141,21 +141,10 @@ class tl_syncCto_clients_syncFrom extends Backend
             $this->Session->set("syncCto_Typ", SYNCCTO_SMALL);
         }
 
-        // Load table lists and merge them
-        if ($this->Input->post("database_tables_recommended") != "" || $this->Input->post("database_tables_none_recommended") != "")
+        // Load table lists
+        if ($this->Input->post("database_tables") != "")
         {
-            if ($this->Input->post("database_tables_recommended") != "" && $this->Input->post("database_tables_none_recommended") != "")
-            {
-                $arrSyncTables = array_merge($this->Input->post("database_tables_recommended"), $this->Input->post("database_tables_none_recommended"));
-            }
-            else if ($this->Input->post("database_tables_recommended"))
-            {
-                $arrSyncTables = $this->Input->post("database_tables_recommended");
-            }
-            else if ($this->Input->post("database_tables_none_recommended"))
-            {
-                $arrSyncTables = $this->Input->post("database_tables_none_recommended");
-            }
+            $arrSyncTables = $this->Input->post("database_tables");
 
             $this->Session->set("syncCto_SyncTables", $arrSyncTables);
         }

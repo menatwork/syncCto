@@ -2724,6 +2724,7 @@ class SyncCtoModuleClient extends BackendModule
                      */
                     case 2:                        
                         $mixStepPool["zipname"] = $this->objSyncCtoCommunicationClient->runDatabaseDump($arrTables, true);
+                                                
                         $arrContenData["data"][4]["description"] = $GLOBALS['TL_LANG']['tl_syncCto_sync']["step_4"]['description_2'];
                         $mixStepPool["step"] = 3;
                         break;
@@ -2732,13 +2733,16 @@ class SyncCtoModuleClient extends BackendModule
                      * Send file to client
                      */
                     case 3:
-                        $arrResponse = $this->objSyncCtoCommunicationClient->sendFile($GLOBALS['SYC_PATH']['tmp'], $mixStepPool["zipname"], "", SyncCtoEnum::UPLOAD_SQL_TEMP);
-
+                        $strTempFPath = $this->objSyncCtoCommunicationClient->getPathList("tmp");
+                        $arrResponse = $this->objSyncCtoCommunicationClient->getFile($this->objSyncCtoHelper->standardizePath($strTempFPath, $mixStepPool["zipname"]), $this->objSyncCtoHelper->standardizePath($GLOBALS['SYC_PATH']['tmp'], "sql", $mixStepPool["zipname"]));
+                                                
                         // Check if the file was send and saved.
-                        if (!is_array($arrResponse) || count($arrResponse) == 0)
+                        if (empty ($arrResponse))
                         {
                             throw new Exception("Empty file list from client. Maybe file send was not complet.");
                         }
+                        
+                        $mixStepPool["zipname"] = $arrResponse;
 
                         $arrContenData["data"][4]["description"] = $GLOBALS['TL_LANG']['tl_syncCto_sync']["step_4"]['description_3'];
                         $mixStepPool["step"] = 4;
@@ -2748,8 +2752,8 @@ class SyncCtoModuleClient extends BackendModule
                      * Import on client side
                      */
                     case 4:
-                        $this->objSyncCtoCommunicationClient->runSQLImport($this->objSyncCtoHelper->standardizePath($GLOBALS['SYC_PATH']['tmp'], "sql", $mixStepPool["zipname"]));
-
+                        $this->objSyncCtoDatabase->runRestore($mixStepPool["zipname"]);
+                        
                         $arrContenData["data"][4]["state"] = $GLOBALS['TL_LANG']['MSC']['ok'];
                         $arrContenData["data"][4]["description"] = $GLOBALS['TL_LANG']['tl_syncCto_sync']["step_4"]['description_4'];
 

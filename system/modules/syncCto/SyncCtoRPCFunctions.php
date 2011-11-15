@@ -120,6 +120,35 @@ class SyncCtoRPCFunctions extends Backend
 
         return true;
     }
+    
+    
+    public function getPathList($strName = null)
+    {
+        if($strName == null)
+        {
+            return array(
+                'db' => $GLOBALS['SYC_PATH']['db'],
+                'file' => $GLOBALS['SYC_PATH']['file'],
+                'debug' => $GLOBALS['SYC_PATH']['debug'],
+                'tmp' =>$GLOBALS['SYC_PATH']['tmp']
+            );
+        }
+        else
+        {
+            switch ($strName)
+            {
+                case 'db':
+                case 'file':
+                case 'debug':
+                case 'tmp':
+                    return $GLOBALS['SYC_PATH'][$strName];
+
+                default:
+                    throw new Exception("Unknown field");
+                    break;
+            }
+        }
+    }
 
     
 }
