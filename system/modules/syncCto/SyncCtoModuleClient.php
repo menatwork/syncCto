@@ -59,7 +59,7 @@ class SyncCtoModuleClient extends BackendModule
      * 
      * @param DataContainer $objDc 
      */
-    protected function __construct(DataContainer $objDc = null)
+    public function __construct(DataContainer $objDc = null)
     {
         parent::__construct($objDc);
 

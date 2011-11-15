@@ -63,7 +63,7 @@ class SyncCtoModuleCheck extends BackendModule
      * 
      * @param DataContainer $objDc 
      */
-    protected function __construct(DataContainer $objDCA = null)
+    public function __construct(DataContainer $objDCA = null)
     {
         parent::__construct($objDCA);
         $this->loadLanguageFile('tl_syncCto_check');

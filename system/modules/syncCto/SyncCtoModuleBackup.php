@@ -49,7 +49,7 @@ class SyncCtoModuleBackup extends BackendModule
      * 
      * @param DataContainer $objDc 
      */
-    protected function __construct(DataContainer $objDc = null)
+    public function __construct(DataContainer $objDc = null)
     {
         $this->import('BackendUser', 'User');
         parent::__construct($objDc);

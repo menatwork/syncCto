@@ -114,8 +114,8 @@ class SyncCtoCommunicationClient extends CtoCommunication
         // Set debug modus for ctoCom.
         if ($GLOBALS['TL_CONFIG']['syncCto_debug_mode'] == true)
         {
-            $this->activateDebug = true;
-            $this->activateMeasurement = true;
+            $this->setDebug(true);
+            $this->setMeasurement(true);
         }
         
         return array(

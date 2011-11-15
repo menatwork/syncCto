@@ -48,7 +48,7 @@ class SyncCtoRPCFunctions extends Backend
     /**
      * Constructor
      */
-    protected function __construct()
+    public function __construct()
     {
         $this->BackendUser = BackendUser::getInstance();
 
