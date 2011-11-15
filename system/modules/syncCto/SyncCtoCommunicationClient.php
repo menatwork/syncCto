@@ -105,7 +105,7 @@ class SyncCtoCommunicationClient extends CtoCommunication
         }
         else
         {
-            $strUrl = $objClient->address . ":" . $objClient->port . "/" . $objClient->path . "/ctoCommunication.php";
+            $strUrl = $objClient->address . ":" . $objClient->port . $objClient->path . "/ctoCommunication.php";
         }
 
         $this->setClient($strUrl, $objClient->codifyengine);
@@ -135,9 +135,9 @@ class SyncCtoCommunicationClient extends CtoCommunication
      * 
      * @return boolean 
      */
-    public function refererDisable()
+    public function referrerDisable()
     {
-        return $this->runServer("CTOCOM_REFERER_DISABLE");
+        return $this->runServer("CTOCOM_REFERRER_DISABLE");
     }
 
     /**
@@ -145,9 +145,9 @@ class SyncCtoCommunicationClient extends CtoCommunication
      * 
      * @return boolean 
      */
-    public function refererEnable()
+    public function referrerEnable()
     {
-        return $this->runServer("CTOCOM_REFERER_ENABLE");
+        return $this->runServer("CTOCOM_REFERRER_ENABLE");
     }
 
     /* -------------------------------------------------------------------------

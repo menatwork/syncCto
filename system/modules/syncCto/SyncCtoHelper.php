@@ -345,7 +345,6 @@ class SyncCtoHelper extends Backend
             // required extensions
             $arrRequiredExtensions = array(
                 'ctoCommunication' => 'ctoCommunication',
-                'httprequestextended' => 'httprequestextended',
                 'textwizard' => 'textwizard',
                 '3CFramework' => '3cframework'
             );
@@ -376,7 +375,7 @@ class SyncCtoHelper extends Backend
             {
                 if (!file_exists(TL_ROOT . '/' . $val))
                 {
-                    $_SESSION["TL_INFO"] = array_merge($_SESSION["TL_INFO"], array($val => 'Please install the required file <strong>' . $key . '</strong>'));
+                    $_SESSION["TL_INFO"] = array_merge($_SESSION["TL_INFO"], array($val => 'Please install the required file/extension <strong>' . $key . '</strong>'));
                 }
                 else
                 {

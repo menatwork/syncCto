@@ -378,7 +378,7 @@ class SyncCtoModuleClient extends BackendModule
                  * Referer check deactivate
                  */
                 case 2:
-                    if (!$this->objSyncCtoCommunicationClient->refererDisable())
+                    if (!$this->objSyncCtoCommunicationClient->referrerDisable())
                     {
                         $arrContenData["data"][1]["state"] = $GLOBALS['TL_LANG']['MSC']['error'];
                         $arrContenData["error"] = true;
@@ -1584,7 +1584,7 @@ class SyncCtoModuleClient extends BackendModule
                 case 6:
                     $this->objSyncCtoCommunicationClient->purgeTemp();
                     $this->objSyncCtoFiles->purgeTemp();
-                    $this->objSyncCtoCommunicationClient->refererEnable();
+                    $this->objSyncCtoCommunicationClient->referrerEnable();
 
                     $this->log(vsprintf("Successfully finishing of synchronization client ID %s.", array($this->Input->get("id"))), __CLASS__ . " " . __FUNCTION__, "INFO");
 
@@ -1598,7 +1598,7 @@ class SyncCtoModuleClient extends BackendModule
 
                         $arrContenData["data"][5]["html"] = "";
                         $arrContenData["data"][5]["state"] = $GLOBALS['TL_LANG']['MSC']['skipped'];
-                        $arrContenData["data"][5]["description"] = "";
+                        $arrContenData["data"][5]["description"] = $GLOBALS['TL_LANG']['tl_syncCto_sync']["step_5"]['description_1'];
                         $arrContenData["finished"] = true;
 
                         break;
@@ -1609,7 +1609,7 @@ class SyncCtoModuleClient extends BackendModule
 
                         $arrContenData["data"][5]["html"] = "";
                         $arrContenData["data"][5]["state"] = $GLOBALS['TL_LANG']['MSC']['ok'];
-                        $arrContenData["data"][5]["description"] = "";
+                        $arrContenData["data"][5]["description"] = $GLOBALS['TL_LANG']['tl_syncCto_sync']["step_5"]['description_1'];
                         $arrContenData["finished"] = true;
 
                         break;
@@ -1824,7 +1824,7 @@ class SyncCtoModuleClient extends BackendModule
                  * Referer check deactivate
                  */
                 case 2:
-                    if (!$this->objSyncCtoCommunicationClient->refererDisable())
+                    if (!$this->objSyncCtoCommunicationClient->referrerDisable())
                     {
                         $arrContenData["data"][1]["state"] = $GLOBALS['TL_LANG']['MSC']['error'];
                         $arrContenData["error"] = true;

@@ -47,7 +47,7 @@ $GLOBALS['TL_DCA']['tl_synccto_clients'] = array(
         ),
         'label' => array(
             'fields' => array('title', 'id', 'address', 'path', 'id'),
-            'format' => '<img class="ping" src="system/modules/syncCto/html/js/images/empty.png" alt="" /> %s <span style="color: #aaaaaa; padding-left: 3px;">(' . $GLOBALS['TL_LANG']['tl_syncCto_clients']['id'][0] . ': %s, ' . $GLOBALS['TL_LANG']['tl_syncCto_clients']['address'][0] . ': <span>%s/%s/</span><span class="client-id invisible">%s</span>)</span>',
+            'format' => '<img class="ping" src="system/modules/syncCto/html/js/images/empty.png" alt="" /> %s <span style="color: #aaaaaa; padding-left: 3px;">(' . $GLOBALS['TL_LANG']['tl_syncCto_clients']['id'][0] . ': %s, ' . $GLOBALS['TL_LANG']['tl_syncCto_clients']['address'][0] . ': <span>%s%s</span><span class="client-id invisible">%s</span>)</span>',
         ),
         'global_operations' => array(
             'all' => array(
@@ -137,7 +137,10 @@ $GLOBALS['TL_DCA']['tl_synccto_clients'] = array(
             'label' => &$GLOBALS['TL_LANG']['tl_syncCto_clients']['path'],
             'inputType' => 'text',
             'exclude' => true,
-            'eval' => array('mandatory' => true)
+            'eval' => array('trailingSlash' => false),
+            'save_callback' => array(
+                array('tl_synccto_clients','checkFirstSlash')
+            )
         ),
         'codifyengine' => array(
             'label' => &$GLOBALS['TL_LANG']['tl_syncCto_clients']['codifyengine'],
@@ -280,6 +283,25 @@ class tl_synccto_clients extends Backend
         asort($arrReturn);
 
         return $arrReturn;
+    }
+    
+    public function checkFirstSlash($strValue, DataContainer $dc)
+    {
+        if (empty($strValue))
+        {
+            return "";
+        }
+        else
+        {
+            if (preg_match("/^\//", $strValue))
+            {
+                return $strValue;
+            }
+            else
+            {
+                return "/" . $strValue;
+            }
+        }
     }
 }
 
