@@ -34,7 +34,7 @@ $GLOBALS['TL_LANG']['tl_syncCto_clients_syncFrom']['sync_legend'] = "Synchronisa
 $GLOBALS['TL_LANG']['tl_syncCto_clients_syncFrom']['filelist_legend'] = "Dateien und Ordner";
 $GLOBALS['TL_LANG']['tl_syncCto_clients_syncFrom']['table_recommend_legend'] = "Empfohlene Tabellen";
 $GLOBALS['TL_LANG']['tl_syncCto_clients_syncFrom']['table_none_recommend_legend'] = "Nicht empfohlene Tabellen";
-$GLOBALS['TL_LANG']['tl_syncCto_clients_syncFrom']['edit'] = 'Synchronisation des Clients';
+$GLOBALS['TL_LANG']['tl_syncCto_clients_syncFrom']['edit'] = 'Synchronisation des Servers';
 
 /**
  * Fields
