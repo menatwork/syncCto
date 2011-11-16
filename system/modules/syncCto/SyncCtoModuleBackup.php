@@ -238,8 +238,16 @@ class SyncCtoModuleBackup extends BackendModule
                 $arrContenData["finished"] = true;
                 $arrContenData["data"][2]["title"] = $GLOBALS['TL_LANG']['MSC']['complete'];
                 $arrContenData["data"][2]["description"] = $GLOBALS['TL_LANG']['tl_syncCto_backup_db']['complete'] . " " . $arrStepPool["zipname"];
+
                 $arrContenData["data"][2]["html"] = "<p class='tl_help'><br />";
-                $arrContenData["data"][2]["html"] .= "<a onclick='Backend.openWindow(this, 600, 235); return false;' title='In einem neuen Fenster ansehen' href='contao/popup.php?src=" . $GLOBALS['TL_CONFIG']['uploadPath'] . "/syncCto_backups/database/" . $arrStepPool["zipname"] . "'>" . $GLOBALS['TL_LANG']['tl_syncCto_backup_db']['download_backup'] . "</a>";
+                if (version_compare(VERSION, "2.10", "<"))
+                {
+                    $arrContenData["data"][2]["html"] .= "<a onclick='Backend.openWindow(this, 600, 235); return false;' title='In einem neuen Fenster ansehen' href='contao/popup.php?src=" . $GLOBALS['TL_CONFIG']['uploadPath'] . "/syncCto_backups/database/" . $arrStepPool["zipname"] . "'>" . $GLOBALS['TL_LANG']['tl_syncCto_backup_db']['download_backup'] . "</a>";
+                }
+                else
+                {
+                    $arrContenData["data"][2]["html"] .= "<a rel='lightbox[details 600 300]' title='In einem neuen Fenster ansehen' href='contao/popup.php?src=" . base64_encode($GLOBALS['TL_CONFIG']['uploadPath'] . "/syncCto_backups/database/" . $arrStepPool["zipname"]) . "'>" . $GLOBALS['TL_LANG']['tl_syncCto_backup_db']['download_backup'] . "</a>";
+                }
                 $arrContenData["data"][2]["html"] .= "</p>";
 
                 $this->Session->set("SyncCto_DB_StepPool", "");
@@ -434,21 +442,30 @@ class SyncCtoModuleBackup extends BackendModule
                 $arrContenData["finished"] = true;
                 $arrContenData["data"][2]["title"] = $GLOBALS['TL_LANG']['MSC']['complete'];
                 $arrContenData["data"][2]["description"] = $GLOBALS['TL_LANG']['tl_syncCto_backup_file']['complete'] . " " . $arrStepPool["zipname"];
-                $arrContenData["data"][2]["html"] = "<p class='tl_help'><br />";
-                $arrContenData["data"][2]["html"] .= "<a onclick='Backend.openWindow(this, 600, 235); return false;' title='In einem neuen Fenster ansehen' href='contao/popup.php?src=" . $GLOBALS['TL_CONFIG']['uploadPath'] . "/syncCto_backups/files/" . $arrStepPool["zipname"] . "'>" . $GLOBALS['TL_LANG']['tl_syncCto_backup_file']['download_backup'] . "</a>";
-                $arrContenData["data"][2]["html"] .= "</p>";
                 
+                $arrContenData["data"][2]["html"] = "<p class='tl_help'><br />";
+                if (version_compare(VERSION, "2.10", "<"))
+                {
+                    $arrContenData["data"][2]["html"] .= "<a onclick='Backend.openWindow(this, 600, 235); return false;' title='In einem neuen Fenster ansehen' href='contao/popup.php?src=" . $GLOBALS['TL_CONFIG']['uploadPath'] . "/syncCto_backups/files/" . $arrStepPool["zipname"] . "'>" . $GLOBALS['TL_LANG']['tl_syncCto_backup_file']['download_backup'] . "</a>";
+                }
+                else
+                {
+                    $arrContenData["data"][2]["html"] .= "<a rel='lightbox[details 600 300]' title='In einem neuen Fenster ansehen' href='contao/popup.php?src=" . base64_encode($GLOBALS['TL_CONFIG']['uploadPath'] . "/syncCto_backups/files/" . $arrStepPool["zipname"]) . "'>" . $GLOBALS['TL_LANG']['tl_syncCto_backup_file']['download_backup'] . "</a>";
+                }
+                $arrContenData["data"][2]["html"] .= "</p>";
+
                 if (count($arrStepPool["skippedfiles"]) != 0)
                 {
-                    $strHTML = '<br /><p class="tl_help">' . count($arrStepPool["skippedfiles"]) . $GLOBALS['TL_LANG']['MSC']['skipped_files'] . '</p>';
-                    $compare .= '<ul class="fileinfo">';
-                    foreach ($arrStepPool["skippedfiles"] as $key => $value)
-                    {                       
-                            $compare .= "<li>" . $value . "</li>";                       
+                    $strList = '<br /><p class="tl_help">' . count($arrStepPool["skippedfiles"]) . $GLOBALS['TL_LANG']['MSC']['skipped_files'] . '</p>';
+
+                    $strList .= '<ul class="fileinfo">';
+                    foreach ($arrStepPool["skippedfiles"] as $value)
+                    {
+                        $strList .= "<li>" . $value . "</li>";
                     }
-                    $compare .= "</ul>";
-                    
-                    $arrContenData["data"][2]["html"] .= $compare;
+                    $strList .= "</ul>";
+
+                    $arrContenData["data"][2]["html"] .= $strList;
                 }
 
                 $this->Session->set("SyncCto_DB_StepPool", "");

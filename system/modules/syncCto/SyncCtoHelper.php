@@ -285,11 +285,11 @@ class SyncCtoHelper extends Backend
                     if ($objClient->path == "")
                     {
 
-                        $strUrl = $objClient->address . ":" . $objClient->port . "/ctoCommunication.php";
+                        $strUrl = $objClient->address . ":" . $objClient->port . "/ctoCommunication.php?act=ping";
                     }
                     else
                     {
-                        $strUrl = $objClient->address . ":" . $objClient->port . "/" . $objClient->path . "/ctoCommunication.php";
+                        $strUrl = $objClient->address . ":" . $objClient->port . "/" . $objClient->path . "/ctoCommunication.php?act=ping";
                     }
 
                     $intReturn = 0;
@@ -638,6 +638,30 @@ class SyncCtoHelper extends Backend
             return array();
         }
     }
+    
+    /**
+     * Cleaup a array and decode html entities
+     * 
+     * @param array $mixValue
+     * @return array 
+     */
+    public function cleanUp($mixValue)
+    {
+        if (is_array($mixValue))
+        {
+            foreach ($mixValue as $key => $value)
+            {
+                $mixValue[$key] = $this->cleanUp($value);
+            }
+        }
+        else
+        {
+            $mixValue = html_entity_decode($mixValue);
+        }
+
+        return $mixValue;
+    }
+    
 }
 
 ?>

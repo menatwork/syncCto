@@ -176,7 +176,7 @@ class tl_syncCto_clients_syncTo extends Backend
         // Files for backup siles       
         if (is_array($this->Input->post('filelist')) && count($this->Input->post('filelist')) != 0)
         {
-            $this->Session->set("syncCto_Filelist", $this->Input->post('filelist'));
+            $this->Session->set("syncCto_Filelist", $this->Input->post('filelist', true));
         }
         else
         {

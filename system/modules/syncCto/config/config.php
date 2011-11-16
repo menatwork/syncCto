@@ -114,14 +114,14 @@ if ($objInput->get("do") == 'synccto_clients' && $objInput->get("act") != 'start
 /**
  * CSS
  */
-if (($objInput->get("table") == 'tl_syncCto_clients_syncTo') || ($objInput->get("table") == 'tl_syncCto_clients_syncFrom'))
+if (($objInput->get("table") == 'tl_syncCto_clients_syncTo' || $objInput->get("table") == 'tl_syncCto_clients_syncFrom') && TL_MODE == 'BE' )
 {
     $GLOBALS['TL_CSS'][] = 'system/modules/syncCto/html/css/filelist_src.css';
     $GLOBALS['TL_JAVASCRIPT'][] = 'system/modules/syncCto/html/js/htmltable.js';
     $GLOBALS['TL_JAVASCRIPT'][] = 'system/modules/syncCto/html/js/filelist_src.js';
 }
 
-if ((($objInput->get("do") == 'synccto_clients') && $objInput->get("act") == '') && $objInput->get("table") == '')
+if ((($objInput->get("do") == 'synccto_clients') && $objInput->get("act") == '') && $objInput->get("table") == '' && TL_MODE == 'BE')
 {
     $GLOBALS['TL_JAVASCRIPT'][] = 'system/modules/syncCto/html/js/ping_src.js';
 }
@@ -311,7 +311,7 @@ $GLOBALS["CTOCOM_FUNCTIONS"]["SYNCCTO_CHECK_DELETE_FILE"] = array(
     "class" => "SyncCtoFiles",
     "function" => "checkDeleteFiles",
     "typ" => "POST",
-    "parameter" => array("filelist"),
+    "parameter" => array("fileList"),
 );
 
 // Load all Tables from database

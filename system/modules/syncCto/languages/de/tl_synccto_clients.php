@@ -43,9 +43,9 @@ $GLOBALS['TL_LANG']['tl_syncCto_clients']['syncFromConfirm'] = 'Soll der Server 
 /**
  * Legends
  */
-$GLOBALS['TL_LANG']['tl_syncCto_clients']['title_legend'] = 'Client-Beschreibung';
-$GLOBALS['TL_LANG']['tl_syncCto_clients']['connection_label'] = 'Verbindungs-Einstellungen';
-$GLOBALS['TL_LANG']['tl_syncCto_clients']['user_label'] = 'Benutzerdaten';
+$GLOBALS['TL_LANG']['tl_synccto_clients']['title_legend'] = 'Client-Beschreibung';
+$GLOBALS['TL_LANG']['tl_synccto_clients']['connection_legend'] = 'Verbindungs-Einstellungen';
+$GLOBALS['TL_LANG']['tl_synccto_clients']['apikey_legend'] = 'Verschlüsselung';
 
 /**
  * Fields
@@ -56,7 +56,7 @@ $GLOBALS['TL_LANG']['tl_syncCto_clients']['description'] = array('Beschreibung',
 $GLOBALS['TL_LANG']['tl_syncCto_clients']['address'] = array('Domain', 'Bitte geben Sie die Domain ein.');
 $GLOBALS['TL_LANG']['tl_syncCto_clients']['path'] = array('Serverpfad', 'Bitte geben Sie den Pfad zur Installation ein, falls sich diese in einem Unterordner befindet.');
 $GLOBALS['TL_LANG']['tl_syncCto_clients']['port'] = array('Portnummer', 'Bitte geben Sie die Nummer des HTTP-Ports ein. Standard ist 80.');
-$GLOBALS['TL_LANG']['tl_syncCto_clients']['apikey'] = array("Verschlüsselungsschlüssel", "Der Schlüssel wird zur verschlüsselten Datenspeicherung verwendet.");
+$GLOBALS['TL_LANG']['tl_syncCto_clients']['apikey'] = array('ctoCommunication API Key', 'Dieser Schlüssel sichert die Kommunikation zwischen den Contao-Installationen ab.');
 $GLOBALS['TL_LANG']['tl_syncCto_clients']['codifyengine'] = array("Verschlüsselungs-Engine", "Wählen Sie bitte die Verschlüsselungs-Engine aus.");
 
 ?>

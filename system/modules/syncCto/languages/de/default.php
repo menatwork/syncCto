@@ -90,7 +90,6 @@ $GLOBALS['TL_LANG']['MSC']['memory_limit'] = "Auslastung: %s";
 /**
  * Errors
  */
-// File
 $GLOBALS['TL_LANG']['ERR']['missing_file_selection']        = "Es wurde(n) keine Datei(en) ausgewählt.";
 $GLOBALS['TL_LANG']['ERR']['missing_file_information']      = "Es fehlt entweder eine Datei oder die Information zu einer Datei.";
 $GLOBALS['TL_LANG']['ERR']['unknown_file']                  = "Die Datei %s konnte nicht gefunden werden.";
@@ -100,24 +99,25 @@ $GLOBALS['TL_LANG']['ERR']['cant_open']                     = "Datei %s kann nic
 $GLOBALS['TL_LANG']['ERR']['checksum_error']                = "Fehler in den Prüfsummen.";
 $GLOBALS['TL_LANG']['ERR']['cant_move_file']                = "Fehler beim verschieben der Datei %s nach %s.";
 $GLOBALS['TL_LANG']['ERR']['cant_delete_file']              = "Fehler beim löschen der Datei.";
+
 // Database
 $GLOBALS['TL_LANG']['ERR']['missing_tables_selection']      = "Es wurde(n) keine Tabell(en) ausgewählt.";
+
 // Functions
 $GLOBALS['TL_LANG']['ERR']['unknown_backup_method']         = "Die gewählte Backup Methode ist nicht bekannt.";
 $GLOBALS['TL_LANG']['ERR']['unknown_function']              = "Unbekannte Funktion oder Methode.";
 $GLOBALS['TL_LANG']['ERR']['64Bit_error']                   = "Zahlen überlauf. Versuchen Sie bitte einen 64Bit Version von PHP.";
+
 // Client
 $GLOBALS['TL_LANG']['ERR']['maximum_filesize']              = "Zu große Datei(en):";
 $GLOBALS['TL_LANG']['ERR']['call_directly']                 = "Versuchen Sie nicht die Synchronisation direkt aufzurufen.";
 $GLOBALS['TL_LANG']['ERR']['client_set']                    = "Kommunikation zwischen Server und Client fehlgeschlagen";
 $GLOBALS['TL_LANG']['ERR']['unknown_client']                = "Unbekannter Client.";
 
-// ----- CHECK TO DO -----------------------------------------------------------
- 
-/* NEW */ $GLOBALS['TL_LANG']['ERR']['referer'] = "Konnte die Referrer-Überprüfung des Clients nicht deaktivieren.";
-/* NEW */ $GLOBALS['TL_LANG']['ERR']['version'] = "Versionskonflikt in %s. <br />Server: %s <br />Client: %s";
-/* NEW */ $GLOBALS['TL_LANG']['ERR']['upload_ini'] = "Upload nicht erfolgreich. Funktion ist in der php.ini deaktiviert.";
-/* NEW */ $GLOBALS['TL_LANG']['ERR']['rebuild'] = "Fehler beim Zusammenbau der Datei(en). Pfad: %s";
-/* NEW */ $GLOBALS['TL_LANG']['ERR']['send'] = "Fehler beim Versand der Datei(en).";
+$GLOBALS['TL_LANG']['ERR']['referer']                       = "Konnte die Referrer-Überprüfung des Clients nicht deaktivieren.";
+$GLOBALS['TL_LANG']['ERR']['version']                       = "Versionskonflikt in %s. <br />Server: %s <br />Client: %s";
+$GLOBALS['TL_LANG']['ERR']['upload_ini']                    = "Upload nicht erfolgreich. Funktion ist in der php.ini deaktiviert.";
+$GLOBALS['TL_LANG']['ERR']['rebuild']                       = "Fehler beim Zusammenbau der Datei(en). Pfad: %s";
+$GLOBALS['TL_LANG']['ERR']['send']                          = "Fehler beim Versand der Datei(en).";
 
 ?>

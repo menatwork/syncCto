@@ -141,9 +141,9 @@ class tl_syncCto_backup_file extends Backend
             $arrStepPool["syncCto_Typ"] = SYNCCTO_SMALL;
         }
 
-        $arrStepPool["backup_name"] = $this->Input->post('backup_name');
-        $arrStepPool["filelist"] = $this->Input->post('filelist');
-
+        $arrStepPool["backup_name"] = $this->Input->post('backup_name', true);
+        $arrStepPool["filelist"] = $this->Input->post('filelist', true);
+        
         $this->Session->set("SyncCto_File_StepPool", $arrStepPool);
 
         $this->redirect($this->Environment->base . "contao/main.php?do=syncCto_backups&amp;table=tl_syncCto_backup_file&amp;act=start");

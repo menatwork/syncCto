@@ -116,6 +116,9 @@ class SyncCtoCommunicationClient extends CtoCommunication
         {
             $this->setDebug(true);
             $this->setMeasurement(true);
+            
+            $this->setFileDebug($this->objSyncCtoHelper->standardizePath($GLOBALS['SYC_PATH']['debug'], "CtoComDebug.txt"));
+            $this->setFileMeasurement($this->objSyncCtoHelper->standardizePath($GLOBALS['SYC_PATH']['debug'], "CtoComMeasurement.txt"));
         }
         
         return array(
@@ -245,7 +248,7 @@ class SyncCtoCommunicationClient extends CtoCommunication
         // Set no codify engine
         $this->setCodifyEngine(SyncCtoEnum::CODIFY_EMPTY);
         
-        return $this->runServer("SYNCCTO_CHECKSUM_FILES");
+        return $this->runServer("SYNCCTO_CHECKSUM_FILES", $arrData);
     }
 
     /**
@@ -271,7 +274,7 @@ class SyncCtoCommunicationClient extends CtoCommunication
     {
          $arrData = array(
             array(
-                "name" => "filelist",
+                "name" => "fileList",
                 "value" => $arrFilelist,
             ),
         );
@@ -279,7 +282,7 @@ class SyncCtoCommunicationClient extends CtoCommunication
         // Set no codify engine
         $this->setCodifyEngine(SyncCtoEnum::CODIFY_EMPTY);
         
-        return $this->runServer("SYNCCTO_CHECK_DELETE_FILE");
+        return $this->runServer("SYNCCTO_CHECK_DELETE_FILE", $arrData);
     }
 
     /**

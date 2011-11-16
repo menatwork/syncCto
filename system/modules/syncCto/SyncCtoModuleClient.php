@@ -2026,11 +2026,11 @@ class SyncCtoModuleClient extends BackendModule
                         switch ($intSyncTyp)
                         {
                             case SYNCCTO_FULL:
-                                $arrChecksumClient = (array) $this->objSyncCtoCommunicationClient->getChecksumCore();
+                                $arrChecksumClient = (array) $this->objSyncCtoFiles->runChecksumCore();
                                 $this->arrListCompare = array_merge($this->arrListCompare, $this->objSyncCtoCommunicationClient->checkDeleteFiles($arrChecksumClient));
 
                             case SYNCCTO_SMALL:
-                                $arrChecksumClient = (array) $this->objSyncCtoCommunicationClient->getChecksumFiles();
+                                $arrChecksumClient = (array) $this->objSyncCtoFiles->runChecksumFiles();
                                 $this->arrListCompare = array_merge($this->arrListCompare, $this->objSyncCtoFiles->checkDeleteFiles($arrChecksumClient));
 
                             default:
@@ -2733,8 +2733,8 @@ class SyncCtoModuleClient extends BackendModule
                      * Send file to client
                      */
                     case 3:
-                        $strTempFPath = $this->objSyncCtoCommunicationClient->getPathList("tmp");
-                        $arrResponse = $this->objSyncCtoCommunicationClient->getFile($this->objSyncCtoHelper->standardizePath($strTempFPath, $mixStepPool["zipname"]), $this->objSyncCtoHelper->standardizePath($GLOBALS['SYC_PATH']['tmp'], "sql", $mixStepPool["zipname"]));
+                        $strTempPath = $this->objSyncCtoCommunicationClient->getPathList("tmp");
+                        $arrResponse = $this->objSyncCtoCommunicationClient->getFile($this->objSyncCtoHelper->standardizePath($strTempPath, $mixStepPool["zipname"]), $this->objSyncCtoHelper->standardizePath($GLOBALS['SYC_PATH']['tmp'], "sql", $mixStepPool["zipname"]));
                                                 
                         // Check if the file was send and saved.
                         if (empty ($arrResponse))

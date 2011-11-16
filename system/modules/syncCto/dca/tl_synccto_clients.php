@@ -100,16 +100,23 @@ $GLOBALS['TL_DCA']['tl_synccto_clients'] = array(
     ),
     // Palettes
     'palettes' => array(
-        'default' => '{title_legend},title,description;{connection_label},address,path,port,codifyengine;{user_label},apikey;'
+        'default' => '{apikey_legend},apikey;{title_legend},title,description;{connection_legend},address,path,port,codifyengine;'
     ),
     // Fields
     'fields' => array(
+        'apikey' => array(
+            'label' => &$GLOBALS['TL_LANG']['tl_syncCto_clients']['apikey'],
+            'explanation' => 'apiKey',
+            'inputType' => 'text',
+            'exclude' => true,
+            'eval' => array('helpwizard' => true, 'mandatory' => true, 'maxlength' => '64', 'tl_class'=>'long')
+        ),
         'title' => array(
             'label' => &$GLOBALS['TL_LANG']['tl_syncCto_clients']['title'],
             'inputType' => 'text',
             'search' => true,
             'exclude' => true,
-            'eval' => array('mandatory' => true, 'maxlength' => 64)
+            'eval' => array('mandatory' => true, 'maxlength' => '64', 'tl_class'=>'long')
         ),
         'description' => array(
             'label' => &$GLOBALS['TL_LANG']['tl_syncCto_clients']['description'],
@@ -123,7 +130,16 @@ $GLOBALS['TL_DCA']['tl_synccto_clients'] = array(
             'default' => 'http://',
             'search' => true,
             'exclude' => true,
-            'eval' => array('trailingSlash' => false, 'mandatory' => true)
+            'eval' => array('trailingSlash' => false, 'mandatory' => true, 'tl_class'=>'w50')
+        ),
+        'path' => array(
+            'label' => &$GLOBALS['TL_LANG']['tl_syncCto_clients']['path'],
+            'inputType' => 'text',
+            'exclude' => true,
+            'eval' => array('trailingSlash' => false, 'tl_class'=>'w50'),
+            'save_callback' => array(
+                array('tl_synccto_clients','checkFirstSlash')
+            )
         ),
         'port' => array(
             'label' => &$GLOBALS['TL_LANG']['tl_syncCto_clients']['port'],
@@ -131,29 +147,15 @@ $GLOBALS['TL_DCA']['tl_synccto_clients'] = array(
             'search' => true,
             'default' => '80',
             'exclude' => true,
-            'eval' => array('mandatory' => true)
-        ),
-        'path' => array(
-            'label' => &$GLOBALS['TL_LANG']['tl_syncCto_clients']['path'],
-            'inputType' => 'text',
-            'exclude' => true,
-            'eval' => array('trailingSlash' => false),
-            'save_callback' => array(
-                array('tl_synccto_clients','checkFirstSlash')
-            )
+            'eval' => array('mandatory' => true, 'tl_class'=>'w50')
         ),
         'codifyengine' => array(
             'label' => &$GLOBALS['TL_LANG']['tl_syncCto_clients']['codifyengine'],
             'inputType' => 'select',
+            'explanation' => 'security',
             'exclude' => true,
             'options_callback' => array("tl_synccto_clients", "callCodifyengines"),
-            'eval' => array('mandatory' => true),
-        ),
-        'apikey' => array(
-            'label' => &$GLOBALS['TL_LANG']['tl_syncCto_clients']['apikey'],
-            'inputType' => 'text',
-            'exclude' => true,
-            'eval' => array('mandatory' => true, 'maxlength' => 64)
+            'eval' => array('mandatory' => true, 'tl_class'=>'w50', 'helpwizard' => true),
         ),
     )
 );
@@ -184,6 +186,11 @@ class tl_synccto_clients extends Backend
     public function __call($name, $arguments)
     {
         $arrSplitName = explode("_", $name);
+        
+        if(count($arrSplitName) != 3)
+        {
+            return FALSE;
+        }
 
         //checkPermission_clients_edit
         if ($arrSplitName[0] == 'checkPermission' && $arrSplitName[1] == "client")
@@ -193,7 +200,7 @@ class tl_synccto_clients extends Backend
     }
 
     /**
-     * Permisson check for the client overview page
+     * Permission check for the client overview page
      * 
      * @param type $row
      * @param type $href
@@ -260,6 +267,9 @@ class tl_synccto_clients extends Backend
         }
     }
 
+    /**
+     * Check user permissions on every client
+     */
     public function checkPermissionClientCreate()
     {
         if (!$this->BackendUser->hasAccess('create', 'syncCto_clients_p'))
@@ -285,6 +295,13 @@ class tl_synccto_clients extends Backend
         return $arrReturn;
     }
     
+    /**
+     * Check and delete the first slash
+     * 
+     * @param string $strValue
+     * @param DataContainer $dc
+     * @return string 
+     */
     public function checkFirstSlash($strValue, DataContainer $dc)
     {
         if (empty($strValue))

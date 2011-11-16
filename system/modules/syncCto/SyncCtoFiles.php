@@ -1022,6 +1022,12 @@ class SyncCtoFiles extends System
         return $arrResponse;
     }
 
+    /**
+     * Send a file as serelizard array
+     * 
+     * @param string $strPath
+     * @return array
+     */
     public function getFile($strPath)
     {
         if (!file_exists(TL_ROOT . "/" . $strPath))
