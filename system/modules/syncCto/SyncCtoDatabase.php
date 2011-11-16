@@ -40,6 +40,7 @@ class SyncCtoDatabase extends Backend
     protected static $instance = null;
     //- Vars ---------------------
     protected $arrBackupTables;
+    protected $arrHiddenTables;
     protected $strSuffixZipName = "DB-Backup.zip";
     protected $strFilenameTable = "DB-Backup_tbl.txt";
     protected $strFilenameInsert = "DB-Backup_ins.txt";
@@ -89,6 +90,12 @@ class SyncCtoDatabase extends Backend
         parent::__construct();
 
         $this->arrBackupTables = array();
+        $this->arrHiddenTables = deserialize($GLOBALS['SYC_CONFIG']['table_hidden']);
+        if (!is_array($this->arrHiddenTables))
+        {
+            $this->arrHiddenTables = array();
+        }
+        
         $this->objSyncCtoHelper = SyncCtoHelper::getInstance();
 
         $this->strTimestampFormat = standardize($GLOBALS['TL_CONFIG']['datimFormat']);
@@ -323,7 +330,7 @@ class SyncCtoDatabase extends Backend
         }
 
         $return = array();
-
+        
         foreach ($tables as $table)
         {
             // Check if table is in blacklist
@@ -505,6 +512,11 @@ class SyncCtoDatabase extends Backend
         foreach ($tables as $table)
         {
             if (!in_array($table, $this->arrBackupTables))
+            {
+                continue;
+            }
+            
+            if (in_array($table, $this->arrHiddenTables))
             {
                 continue;
             }

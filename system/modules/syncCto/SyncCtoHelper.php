@@ -616,6 +616,48 @@ class SyncCtoHelper extends Backend
 
         return $arrTables;
     }
+    
+    /**
+     * Returns a list with none recommended database tables
+     *
+     * @return array
+     */
+    public function databaseTablesNoneRecommendedWithHidden()
+    {
+        // None recommended tables
+        $arrBlacklist = deserialize($GLOBALS['TL_CONFIG']['syncCto_database_tables']);
+        if (!is_array($arrBlacklist))
+        {
+            $arrBlacklist = array();
+        }
+        
+        $arrHiddenlist = deserialize($GLOBALS['SYC_CONFIG']['table_hidden']);
+        if (!is_array($arrHiddenlist))
+        {
+            $arrHiddenlist = array();
+        }
+
+        $arrTablesPermission = $this->BackendUser->syncCto_tables;
+
+        $arrTables = array();
+
+        foreach ($this->Database->listTables() as $key => $value)
+        {
+            if (!in_array($value, $arrBlacklist) && !in_array($value, $arrHiddenlist))
+            {
+                continue;
+            }
+
+            if (is_array($arrTablesPermission) && !in_array($value, $arrTablesPermission) && $this->BackendUser->isAdmin != true)
+            {
+                continue;
+            }
+            
+            $arrTables[] = $value;
+        }
+
+        return $arrTables;
+    }
 
     /**
      * Returns a list with recommended database tables

@@ -590,7 +590,7 @@ class SyncCtoModuleClient extends BackendModule
                                 $this->arrListCompare = array_merge($this->arrListCompare, $this->objSyncCtoFiles->checkDeleteFiles($arrChecksumClient));
 
                             case SYNCCTO_SMALL:
-                                $arrChecksumClient = (array) $this->objSyncCtoCommunicationClient->getChecksumCore();
+                                $arrChecksumClient = (array) $this->objSyncCtoCommunicationClient->getChecksumFiles();
                                 $this->arrListCompare = array_merge($this->arrListCompare, $this->objSyncCtoFiles->checkDeleteFiles($arrChecksumClient));
 
                             default:
