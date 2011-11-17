@@ -1044,7 +1044,7 @@ class SyncCtoFiles extends System
         }
         
         $objFile = new File($strPath);
-        $strContent = $objFile->getContent();
+        $strContent = base64_encode($objFile->getContent());
         $objFile->close();
         
         return array("md5" => md5_file(TL_ROOT . "/" . $strPath), "content" => $strContent);

@@ -427,7 +427,7 @@ class SyncCtoCommunicationClient extends CtoCommunication
         $arrResult = $this->runServer("SYNCCTO_GET_FILE", $arrData);
             
         $objFile = new File($strSavePath);
-        $objFile->write($arrResult["content"]);
+        $objFile->write(base64_decode($arrResult["content"]));
         $objFile->close();
         
         if(md5_file(TL_ROOT . "/" . $strSavePath) != $arrResult["md5"])
