@@ -101,12 +101,12 @@ $GLOBALS['TL_PERMISSIONS'][] = 'syncCto_tables';
 /**
  * Callbacks are only used for overview screen
  */
-if ($objInput->get("do") == 'syncCto_backups' && $objInput->get("table") != '' && ($objInput->get("act") == '' || $objInput->get("act") == 'edit'))
+if ($objInput->get("do") == 'syncCto_backups' && $objInput->get("table") != '' && ($objInput->get("act") == '' || $objInput->get("act") == 'edit') && TL_MODE == 'BE')
 {
     unset($GLOBALS['BE_MOD']['syncCto']['syncCto_backups']['callback']);
 }
 
-if ($objInput->get("do") == 'synccto_clients' && $objInput->get("act") != 'start' && ($objInput->get("table") == 'tl_syncCto_clients_syncTo' || $objInput->get("table") == 'tl_syncCto_clients_syncFrom' || $objInput->get("table") == '' ))
+if ($objInput->get("do") == 'synccto_clients' && $objInput->get("act") != 'start' && ($objInput->get("table") == 'tl_syncCto_clients_syncTo' || $objInput->get("table") == 'tl_syncCto_clients_syncFrom' || $objInput->get("table") == '' ) && TL_MODE == 'BE')
 {
     unset($GLOBALS['BE_MOD']['syncCto']['synccto_clients']['callback']);
 }
@@ -143,9 +143,10 @@ $GLOBALS['SYC_CONFIG']['table_hidden'] = array(
 
 // Folders
 $GLOBALS['SYC_CONFIG']['folder_blacklist'] = array(
-    'system/tmp*',
-    'system/htm*',
-    'system/logs*',
+    'system/html*',
+	'system/logs*',
+	'system/scripts*',
+	'system/tmp*',
     '*/syncCto_backups*',
 );
 
