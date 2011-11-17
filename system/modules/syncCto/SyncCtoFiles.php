@@ -651,10 +651,10 @@ class SyncCtoFiles extends System
         // Is the given string a folder
         else
         {
-            // Scann Folder
+            // Scan Folder
             $arrScan = scan(TL_ROOT . "/" . $strPath);
 
-            // Rund through each file
+            // Run through each file
             foreach ($arrScan as $key => $valueItem)
             {
                 // Have we a file or ...
@@ -679,9 +679,17 @@ class SyncCtoFiles extends System
                     {
                         continue;
                     }
-
-                    // Add to list
-                    $arrList[] = $strPath . "/" . $valueItem;
+                    
+                    if(empty ($strPath))
+                    {
+                        // Add to list
+                        $arrList[] = $valueItem;
+                    }
+                    else
+                    {
+                        // Add to list
+                        $arrList[] = $strPath . "/" . $valueItem;
+                    }
                 }
                 // ... a folder
                 else
