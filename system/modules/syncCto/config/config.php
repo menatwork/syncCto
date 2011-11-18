@@ -114,7 +114,7 @@ if ($objInput->get("do") == 'synccto_clients' && $objInput->get("act") != 'start
 /**
  * CSS
  */
-if (($objInput->get("table") == 'tl_syncCto_clients_syncTo' || $objInput->get("table") == 'tl_syncCto_clients_syncFrom') && TL_MODE == 'BE' )
+if (($objInput->get("table") == 'tl_syncCto_clients_syncTo' || $objInput->get("table") == 'tl_syncCto_clients_syncFrom') && TL_MODE == 'BE')
 {
     $GLOBALS['TL_CSS'][] = 'system/modules/syncCto/html/css/filelist_src.css';
     $GLOBALS['TL_JAVASCRIPT'][] = 'system/modules/syncCto/html/js/htmltable.js';
@@ -144,9 +144,9 @@ $GLOBALS['SYC_CONFIG']['table_hidden'] = array(
 // Folders
 $GLOBALS['SYC_CONFIG']['folder_blacklist'] = array(
     'system/html*',
-	'system/logs*',
-	'system/scripts*',
-	'system/tmp*',
+    'system/logs*',
+    'system/scripts*',
+    'system/tmp*',
     '*/syncCto_backups*',
 );
 
@@ -194,7 +194,6 @@ $GLOBALS['SYC_PATH']['tmp'] = "system/tmp/";
 /**
  * CtoCommunication RPC Calls
  */
-
 // Get SyncCto Version 
 $GLOBALS["CTOCOM_FUNCTIONS"]["SYNCCTO_VERSION"] = array(
     "class" => "SyncCtoRPCFunctions",
@@ -301,10 +300,18 @@ $GLOBALS["CTOCOM_FUNCTIONS"]["SYNCCTO_DELETE_FILE"] = array(
 
 // Import config
 $GLOBALS["CTOCOM_FUNCTIONS"]["SYNCCTO_IMPORT_CONFIG"] = array(
-    "class" => "SyncCtoRPCFunctions",
+    "class" => "SyncCtoHelper",
     "function" => "importConfig",
     "typ" => "POST",
     "parameter" => array("configlist"),
+);
+
+// Get config
+$GLOBALS["CTOCOM_FUNCTIONS"]["SYNCCTO_GET_CONFIG"] = array(
+    "class" => "SyncCtoRPCFunctions",
+    "function" => "getLocalConfig",
+    "typ" => "POST",
+    "parameter" => array("ConfigBlacklist"),
 );
 
 // Check for deleted files
@@ -338,5 +345,4 @@ $GLOBALS["CTOCOM_FUNCTIONS"]["SYNCCTO_GET_PATHLIST"] = array(
     "typ" => "POST",
     "parameter" => array("name"),
 );
-
 ?>

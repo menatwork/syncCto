@@ -60,5 +60,8 @@ $GLOBALS['TL_LANG']['tl_syncCto_sync']["step_5"]['description_3'] = "Konfigurati
 $GLOBALS['TL_LANG']['tl_syncCto_sync']["step_5"]['description_4'] = " Datei(en) übersprungen.";
 $GLOBALS['TL_LANG']['tl_syncCto_sync']["step_5"]['description_5'] = " Datei(en) gesendet.";
 $GLOBALS['TL_LANG']['tl_syncCto_sync']["step_5"]['description_6'] = " Datei(en) wartend.";
+$GLOBALS['TL_LANG']['tl_syncCto_sync']["step_5"]['description_7'] = "Liste der übertragenden Dateien:";
+$GLOBALS['TL_LANG']['tl_syncCto_sync']["step_5"]['description_8'] = "Liste der gelöschten Dateien:";
+$GLOBALS['TL_LANG']['tl_syncCto_sync']["step_5"]['description_9'] = "Liste der fehlerhaften Dateien:";
 
 ?>

@@ -537,6 +537,19 @@ class SyncCtoCommunicationClient extends CtoCommunication
 
         return $this->runServer("SYNCCTO_IMPORT_CONFIG", $arrData);
     }
+    
+    public function getLocalConfig()
+    {
+        $arrData = array(
+            array(
+                "name" => "ConfigBlacklist",
+                "value" => $this->objSyncCtoHelper->getBlacklistLocalconfig(),
+            ),
+        );
+
+
+        return $this->runServer("SYNCCTO_GET_CONFIG", $arrData);
+    }
 }
 
 ?>

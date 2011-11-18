@@ -9,6 +9,7 @@
   #syncCto_filelist td {
 	padding-top:5px;
 	padding-bottom:5px;
+	border:1px solid #fff;
   }
   
   #syncCto_filelist th, 

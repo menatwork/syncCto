@@ -95,33 +95,34 @@ class SyncCtoRPCFunctions extends Backend
             'post_max_size' => ini_get('post_max_size')
         );
     }
-
+    
     /**
-     * Import configuration entries
-     *
-     * @param array $arrConfig
+     * Return localconfig
+     * 
+     * @param array $arrConfigBlacklist Blacklist entries for localconfig
      * @return array 
      */
-    public function importConfig($arrConfig)
+    public function getLocalConfig($arrConfigBlacklist)
     {
-        $arrLocalConfig = $this->objSyncCtoHelper->loadConfigs(SyncCtoEnum::LOADCONFIG_KEYS_ONLY);
+        // Load localconfig
+        $arrConfig = $this->objSyncCtoHelper->loadConfigs(SyncCtoEnum::LOADCONFIG_KEY_VALUE);
 
+        // Kick blacklist entries
         foreach ($arrConfig as $key => $value)
         {
-            if (in_array($key, $arrLocalConfig))
-            {
-                $this->Config->update("\$GLOBALS['TL_CONFIG']['" . $key . "']", $value);
-            }
-            else
-            {
-                $this->Config->add("\$GLOBALS['TL_CONFIG']['" . $key . "']", $value);
-            }
+            if (in_array($key, $arrConfigBlacklist))
+                unset($arrConfig[$key]);
         }
 
-        return true;
+        return $arrConfig;
     }
-    
-    
+
+    /**
+     * Return a list of all syncCto path or a special path.
+     * 
+     * @param stirng $strName - Null or the name of a path like db,file,debug,tmp
+     * @return [array|string]
+     */
     public function getPathList($strName = null)
     {
         if($strName == null)

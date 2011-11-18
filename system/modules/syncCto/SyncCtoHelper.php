@@ -680,30 +680,32 @@ class SyncCtoHelper extends Backend
             return array();
         }
     }
-    
+
     /**
-     * Cleaup a array and decode html entities
-     * 
-     * @param array $mixValue
+     * Import configuration entries
+     *
+     * @param array $arrConfig
      * @return array 
      */
-    public function cleanUp($mixValue)
+    public function importConfig($arrConfig)
     {
-        if (is_array($mixValue))
+        $arrLocalConfig = $this->loadConfigs(SyncCtoEnum::LOADCONFIG_KEYS_ONLY);
+
+        foreach ($arrConfig as $key => $value)
         {
-            foreach ($mixValue as $key => $value)
+            if (in_array($key, $arrLocalConfig))
             {
-                $mixValue[$key] = $this->cleanUp($value);
+                $this->Config->update("\$GLOBALS['TL_CONFIG']['" . $key . "']", $value);
+            }
+            else
+            {
+                $this->Config->add("\$GLOBALS['TL_CONFIG']['" . $key . "']", $value);
             }
         }
-        else
-        {
-            $mixValue = html_entity_decode($mixValue);
-        }
 
-        return $mixValue;
+        return true;
     }
-    
+
 }
 
 ?>

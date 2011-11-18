@@ -852,7 +852,7 @@ class SyncCtoFiles extends System
             $strReadFile = $this->objSyncCtoHelper->standardizePath($GLOBALS['SYC_PATH']['tmp'], $strSplitname, $strSplitname . ".sync" . $i);
 
             // Check if file exists
-            if (!file_exists($strReadFile))
+            if (!file_exists(TL_ROOT . "/" . $strReadFile))
             {
                 throw new Exception(vsprintf($GLOBALS['TL_LANG']['ERR']['unknown_file'], array($strSplitname . ".sync" . $i)));
             }

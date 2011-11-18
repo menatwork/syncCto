@@ -854,15 +854,15 @@ class SyncCtoModuleClient extends BackendModule
                         }
                         else if ($intLimit > 524288000) // 500MB
                         {
-                            $intPercent = 20;
+                            $intPercent = 10;
                         }
                         else if ($intLimit > 209715200) // 200MB
                         {
-                            $intPercent = 50;
+                            $intPercent = 10;
                         }
                         else
                         {
-                            $intPercent = 70;
+                            $intPercent = 30;
                         }
 
                         $intLimit = $intLimit / 100 * $intPercent;
@@ -1097,17 +1097,33 @@ class SyncCtoModuleClient extends BackendModule
                             {
                                 continue;
                             }
-
-                            if ($value["split"] == $value["split_transfer"])
+                            
+                            if (!empty ($value["split_transfer"]) && $value["splitcount"] == $value["split_transfer"])
                             {
                                 $intCount++;
                                 continue;
                             }
-
-                            for ($ii = 0; $ii < $value["splitcount"]; $ii++)
+                            
+                            if(empty ($value["split_transfer"]))
                             {
+                                $value["split_transfer"] = 0;
+                            }
+
+                            for ($ii = $value["split_transfer"]; $ii < $value["splitcount"]; $ii++)
+                            {
+                                // Max limit for file send, 10 minutes
+                                set_time_limit(7200);
+                                
+                                // Send file to client
                                 $arrResponse = $this->objSyncCtoCommunicationClient->sendFile($GLOBALS['SYC_PATH']['tmp'] . $key, $value["splitname"] . ".sync" . $ii, "", SyncCtoEnum::UPLOAD_SYNC_SPLIT, $value["splitname"]);
+                                                                
                                 $this->arrListCompare[$key]["split_transfer"] = $ii + 1;
+                                
+                                // check time limit 30 secs
+                                if($intStar + 30 < time())
+                                {
+                                    break;
+                                }
                             }
 
                             break;
@@ -1484,6 +1500,10 @@ class SyncCtoModuleClient extends BackendModule
 
                         try
                         {
+                            // Max limit for file send, 10 minutes
+                            set_time_limit(7200);
+
+                            // Send files
                             $this->objSyncCtoCommunicationClient->sendFile(dirname($value["path"]), basename($value["path"]), $value["checksum"], SyncCtoEnum::UPLOAD_SYNC_TEMP);
                             $this->arrListCompare[$key]["transmission"] = SyncCtoEnum::FILETRANS_SEND;
                         }
@@ -1663,7 +1683,7 @@ class SyncCtoModuleClient extends BackendModule
                     }
 
                     // Show filelist only in debug mode
-                    if ($GLOBALS['TL_CONFIG']['syncCto_debug_filelist'] == true)
+                    if ($GLOBALS['TL_CONFIG']['syncCto_debug_mode'] == true)
                     {
                         if (count($this->arrListCompare) != 0 && is_array($this->arrListCompare))
                         {
@@ -1676,7 +1696,7 @@ class SyncCtoModuleClient extends BackendModule
                             $compare .= '<ul class="fileinfo">';
 
                             $compare .= "<li>";
-                            $compare .= '<strong>' . $GLOBALS['TL_LANG']['syncCto']['uploaded_files_list'] . '</strong>';
+                            $compare .= '<strong>' . $GLOBALS['TL_LANG']['tl_syncCto_sync']["step_5"]['description_7'] . '</strong>';
                             $compare .= "<ul>";
 
                             foreach ($this->arrListCompare as $key => $value)
@@ -1700,7 +1720,7 @@ class SyncCtoModuleClient extends BackendModule
                             $compare .= '<ul class="fileinfo">';
 
                             $compare .= "<li>";
-                            $compare .= '<strong>' . $GLOBALS['TL_LANG']['syncCto']['deleted_files_list'] . '</strong>';
+                            $compare .= '<strong>' . $GLOBALS['TL_LANG']['tl_syncCto_sync']["step_5"]['description_8'] . '</strong>';
                             $compare .= "<ul>";
 
                             foreach ($this->arrListCompare as $key => $value)
@@ -1728,7 +1748,7 @@ class SyncCtoModuleClient extends BackendModule
                             $compare .= '<ul class="fileinfo">';
 
                             $compare .= "<li>";
-                            $compare .= '<strong>' . $GLOBALS['TL_LANG']['syncCto']['uploaded_files'] . '</strong>';
+                            $compare .= '<strong>' . $GLOBALS['TL_LANG']['tl_syncCto_sync']["step_5"]['description_9'] . '</strong>';
                             $compare .= "<ul>";
 
                             foreach ($this->arrListCompare as $key => $value)
@@ -2282,15 +2302,15 @@ class SyncCtoModuleClient extends BackendModule
                         }
                         else if ($intLimit > 524288000) // 500MB
                         {
-                            $intPercent = 20;
+                            $intPercent = 10;
                         }
                         else if ($intLimit > 209715200) // 200MB
                         {
-                            $intPercent = 50;
+                            $intPercent = 20;
                         }
                         else
                         {
-                            $intPercent = 70;
+                            $intPercent = 30;
                         }
 
                         $intLimit = $intLimit / 100 * $intPercent;
@@ -2954,8 +2974,6 @@ class SyncCtoModuleClient extends BackendModule
                  * Delete files
                  */
                 case 3:
-                    
-                    
                     if (count($this->arrListCompare) != 0 && is_array($this->arrListCompare))
                     {
                         $arrDelete = array();
@@ -2987,11 +3005,14 @@ class SyncCtoModuleClient extends BackendModule
                  * Import Config
                  */
                 case 4:
-                    echo "import config";
-                    exit();
                     if ($intSyncTyp == SYNCCTO_FULL)
                     {
-                        $this->objSyncCtoCommunicationClient->runLocalConfigImport();
+                        $arrLocalconfig = $this->objSyncCtoCommunicationClient->getLocalConfig();
+                        if(count($arrLocalconfig) != 0)
+                        {
+                            $this->objSyncCtoHelper->importConfig($arrLocalconfig);
+                        }
+                        
                         $mixStepPool["step"] = 6;
                     }
 
@@ -3073,7 +3094,7 @@ class SyncCtoModuleClient extends BackendModule
                     }
 
                     // Show filelist only in debug mode
-                    if ($GLOBALS['TL_CONFIG']['syncCto_debug_filelist'] == true)
+                    if ($GLOBALS['TL_CONFIG']['syncCto_debug_mode'] == true)
                     {
                         if (count($this->arrListCompare) != 0 && is_array($this->arrListCompare))
                         {
@@ -3086,7 +3107,7 @@ class SyncCtoModuleClient extends BackendModule
                             $compare .= '<ul class="fileinfo">';
 
                             $compare .= "<li>";
-                            $compare .= '<strong>' . $GLOBALS['TL_LANG']['syncCto']['uploaded_files_list'] . '</strong>';
+                            $compare .= '<strong>' . $GLOBALS['TL_LANG']['tl_syncCto_sync']["step_5"]['description_7'] . '</strong>';
                             $compare .= "<ul>";
 
                             foreach ($this->arrListCompare as $key => $value)
@@ -3110,7 +3131,7 @@ class SyncCtoModuleClient extends BackendModule
                             $compare .= '<ul class="fileinfo">';
 
                             $compare .= "<li>";
-                            $compare .= '<strong>' . $GLOBALS['TL_LANG']['syncCto']['deleted_files_list'] . '</strong>';
+                            $compare .= '<strong>' . $GLOBALS['TL_LANG']['tl_syncCto_sync']["step_5"]['description_8'] . '</strong>';
                             $compare .= "<ul>";
 
                             foreach ($this->arrListCompare as $key => $value)
@@ -3138,7 +3159,7 @@ class SyncCtoModuleClient extends BackendModule
                             $compare .= '<ul class="fileinfo">';
 
                             $compare .= "<li>";
-                            $compare .= '<strong>' . $GLOBALS['TL_LANG']['syncCto']['uploaded_files'] . '</strong>';
+                            $compare .= '<strong>' . $GLOBALS['TL_LANG']['tl_syncCto_sync']["step_5"]['description_9'] . '</strong>';
                             $compare .= "<ul>";
 
                             foreach ($this->arrListCompare as $key => $value)
