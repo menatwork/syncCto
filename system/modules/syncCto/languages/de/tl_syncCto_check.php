@@ -30,29 +30,29 @@
 /**
  * Headline
  */
-$GLOBALS['TL_LANG']['tl_syncCto_check']['check'] = "Systemcheck";
-$GLOBALS['TL_LANG']['tl_syncCto_check']['configuration'] = "PHP Konfiguration";
+$GLOBALS['TL_LANG']['tl_syncCto_check']['check']            = "Systemcheck";
+$GLOBALS['TL_LANG']['tl_syncCto_check']['configuration']    = "PHP Konfiguration";
  
 /**
  * Table
  */
-$GLOBALS['TL_LANG']['tl_syncCto_check']['parameter'] = "Parameter";
-$GLOBALS['TL_LANG']['tl_syncCto_check']['value'] = "Wert";
-$GLOBALS['TL_LANG']['tl_syncCto_check']['description'] = "Beschreibung";
-$GLOBALS['TL_LANG']['tl_syncCto_check']['on'] = "An";
-$GLOBALS['TL_LANG']['tl_syncCto_check']['off'] = "Aus";
-$GLOBALS['TL_LANG']['tl_syncCto_check']['safemode'] = array("Safe mode", "Die empfohlene Einstellung ist Aus.");
-$GLOBALS['TL_LANG']['tl_syncCto_check']['met'] = array("Maximum execution time", "Die empfohlene Einstellung ist 30 oder höher.");
-$GLOBALS['TL_LANG']['tl_syncCto_check']['memory_limit'] = array("Memory limit", "Die empfohlene Einstellung ist 128M oder höher.");
+$GLOBALS['TL_LANG']['tl_syncCto_check']['parameter']        = "Parameter";
+$GLOBALS['TL_LANG']['tl_syncCto_check']['value']            = "Wert";
+$GLOBALS['TL_LANG']['tl_syncCto_check']['description']      = "Beschreibung";
+$GLOBALS['TL_LANG']['tl_syncCto_check']['on']               = "An";
+$GLOBALS['TL_LANG']['tl_syncCto_check']['off']              = "Aus";
+$GLOBALS['TL_LANG']['tl_syncCto_check']['safemode']         = array("Safe mode", "Die empfohlene Einstellung ist Aus.");
+$GLOBALS['TL_LANG']['tl_syncCto_check']['met']              = array("Maximum execution time", "Die empfohlene Einstellung ist 30 oder höher.");
+$GLOBALS['TL_LANG']['tl_syncCto_check']['memory_limit']     = array("Memory limit", "Die empfohlene Einstellung ist 128M oder höher.");
 $GLOBALS['TL_LANG']['tl_syncCto_check']['register_globals'] = array("Register globals", "Die empfohlene Einstellung ist Aus.");
-$GLOBALS['TL_LANG']['tl_syncCto_check']['file_uploads'] = array("File uploads", "Die empfohlene Einstellung ist An.");
-$GLOBALS['TL_LANG']['tl_syncCto_check']['umf'] = array("Upload maximum filesize", "Die empfohlene Einstellung ist 8M oder höher.");
-$GLOBALS['TL_LANG']['tl_syncCto_check']['pms'] = array("Post maximum size", "Die empfohlene Einstellung ist 8M oder höher.");
-$GLOBALS['TL_LANG']['tl_syncCto_check']['mit'] = array("Maximum input time", "Die empfohlene Einstellung ist -1, 60 oder höher.");
-$GLOBALS['TL_LANG']['tl_syncCto_check']['dst'] = array("Default socket timeout", "Die empfohlene Einstellung ist 30 oder höher.");
-$GLOBALS['TL_LANG']['tl_syncCto_check']['fsocket'] = array("Fsockopen", "Die empfohlene Einstellung ist An.");
-$GLOBALS['TL_LANG']['tl_syncCto_check']['fopen'] = array("Fopen", "Die empfohlene Einstellung ist An.");
-$GLOBALS['TL_LANG']['tl_syncCto_check']['zip_archive'] = array("ZipArchive", "Die empfohlene Einstellung ist An.");
+$GLOBALS['TL_LANG']['tl_syncCto_check']['file_uploads']     = array("File uploads", "Die empfohlene Einstellung ist An.");
+$GLOBALS['TL_LANG']['tl_syncCto_check']['umf']              = array("Upload maximum filesize", "Die empfohlene Einstellung ist 8M oder höher.");
+$GLOBALS['TL_LANG']['tl_syncCto_check']['pms']              = array("Post maximum size", "Die empfohlene Einstellung ist 8M oder höher.");
+$GLOBALS['TL_LANG']['tl_syncCto_check']['mit']              = array("Maximum input time", "Die empfohlene Einstellung ist -1, 60 oder höher.");
+$GLOBALS['TL_LANG']['tl_syncCto_check']['dst']              = array("Default socket timeout", "Die empfohlene Einstellung ist 30 oder höher.");
+$GLOBALS['TL_LANG']['tl_syncCto_check']['fsocket']          = array("Fsockopen", "Die empfohlene Einstellung ist An.");
+$GLOBALS['TL_LANG']['tl_syncCto_check']['fopen']            = array("Fopen", "Die empfohlene Einstellung ist An.");
+$GLOBALS['TL_LANG']['tl_syncCto_check']['zip_archive']      = array("ZipArchive", "Die empfohlene Einstellung ist An.");
 
 /**
  * Text

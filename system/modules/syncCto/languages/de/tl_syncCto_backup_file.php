@@ -30,16 +30,16 @@
 /**
  * Legends
  */
-$GLOBALS['TL_LANG']['tl_syncCto_backup_file']['backup_legend'] = "Backup-Einstellungen";
-$GLOBALS['TL_LANG']['tl_syncCto_backup_file']['filelist_legend'] = "Dateien und Ordner";
-$GLOBALS['TL_LANG']['tl_syncCto_backup_file']['edit'] = 'Ein Backup der Dateien erstellen';
+$GLOBALS['TL_LANG']['tl_syncCto_backup_file']['backup_legend']                  = "Backup-Einstellungen";
+$GLOBALS['TL_LANG']['tl_syncCto_backup_file']['filelist_legend']                = "Dateien und Ordner";
+$GLOBALS['TL_LANG']['tl_syncCto_backup_file']['edit']                           = 'Ein Backup der Dateien erstellen';
 
 /**
  * Fields
  */
-$GLOBALS['TL_LANG']['tl_syncCto_backup_file']['backup_type'] = array("Art des Backups", "Hier können Sie die Art des Backups auswählen.");
-$GLOBALS['TL_LANG']['tl_syncCto_backup_file']['backup_name'] = array("Dateiname", "Hier können Sie einen optionalen Namen zur eindeutigen Identifikation eingeben.");
-$GLOBALS['TL_LANG']['tl_syncCto_backup_file']['filelist'] = array("Quelldateien", "Bitte wählen Sie eine Datei oder einen Ordner aus der Dateiübersicht.");
+$GLOBALS['TL_LANG']['tl_syncCto_backup_file']['backup_type']                    = array("Art des Backups", "Hier können Sie die Art des Backups auswählen.");
+$GLOBALS['TL_LANG']['tl_syncCto_backup_file']['backup_name']                    = array("Dateiname", "Hier können Sie einen optionalen Namen zur eindeutigen Identifikation eingeben.");
+$GLOBALS['TL_LANG']['tl_syncCto_backup_file']['filelist']                       = array("Quelldateien", "Bitte wählen Sie eine Datei oder einen Ordner aus der Dateiübersicht.");
 
 /**
  * Options
