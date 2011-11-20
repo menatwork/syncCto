@@ -1656,7 +1656,7 @@ class SyncCtoModuleClient extends BackendModule
                         $mixStepPool["step"] = 7;
 
                         $arrContenData["data"][5]["html"] = "";
-                        $arrContenData["data"][5]["state"] = $GLOBALS['TL_LANG']['MSC']['ok'];
+                        $arrContenData["data"][5]["state"] = $GLOBALS['TL_LANG']['MSC']['skipped'];
                         $arrContenData["data"][5]["description"] = $GLOBALS['TL_LANG']['tl_syncCto_sync']["step_5"]['description_1'];
                         $arrContenData["finished"] = true;
 
@@ -2893,7 +2893,7 @@ class SyncCtoModuleClient extends BackendModule
         try
         {
             $intStart = time();
-
+            
             switch ($mixStepPool["step"])
             {
                 /** ------------------------------------------------------------
@@ -3051,6 +3051,8 @@ class SyncCtoModuleClient extends BackendModule
                  * Show information
                  */
                 case 7:
+                    echo 7;
+                    
                     if ($intSyncTyp == SYNCCTO_SMALL && ( (count($this->arrListCompare) == 0 || $this->arrListCompare == FALSE) && !is_array($this->arrListCompare)))
                     {
                         $mixStepPool["step"] = 7;
@@ -3062,12 +3064,12 @@ class SyncCtoModuleClient extends BackendModule
 
                         break;
                     }
-                    else if (count($this->arrListCompare) == 0 || $this->arrListCompare == FALSE || !is_array($this->arrListCompare))
+                    else if ($intSyncTyp == SYNCCTO_FULL && count($this->arrListCompare) == 0 || $this->arrListCompare == FALSE || !is_array($this->arrListCompare))
                     {
                         $mixStepPool["step"] = 7;
 
                         $arrContenData["data"][5]["html"] = "";
-                        $arrContenData["data"][5]["state"] = $GLOBALS['TL_LANG']['MSC']['ok'];
+                        $arrContenData["data"][5]["state"] = $GLOBALS['TL_LANG']['MSC']['skipped'];
                         $arrContenData["data"][5]["description"] = $GLOBALS['TL_LANG']['tl_syncCto_sync']["step_5"]['description_1'];
                         $arrContenData["finished"] = true;
 
