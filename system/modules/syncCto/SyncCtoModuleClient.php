@@ -591,26 +591,45 @@ class SyncCtoModuleClient extends BackendModule
                         switch ($intSyncTyp)
                         {
                             case SYNCCTO_FULL:
-                                $arrChecksumClient = (array) $this->objSyncCtoCommunicationClient->getChecksumCore();
-                                $this->arrListCompare = array_merge($this->arrListCompare, $this->objSyncCtoFiles->checkDeleteFiles($arrChecksumClient));
+                                $arrChecksumClient = $this->objSyncCtoCommunicationClient->getChecksumCore();
+                                $this->arrListCompare = array_merge($this->arrListCompare, $this->objSyncCtoFiles->checkDeleteFiles($arrChecksumClient));                                
 
                             case SYNCCTO_SMALL:
-                                $arrChecksumClient = (array) $this->objSyncCtoCommunicationClient->getChecksumFiles();
+                                $arrChecksumClient = $this->objSyncCtoCommunicationClient->getChecksumFiles();
                                 $this->arrListCompare = array_merge($this->arrListCompare, $this->objSyncCtoFiles->checkDeleteFiles($arrChecksumClient));
 
                             default:
                                 break;
                         }
+                        
+                        $mixStepPool["step"] = 5;
+
+                        break;
+                    
+                    case 5:
+                        switch ($intSyncTyp)
+                        {
+                            case SYNCCTO_FULL:
+                                $arrChecksumClient = $this->objSyncCtoCommunicationClient->getChecksumFolder();
+                                $this->arrListCompare = array_merge($this->arrListCompare, $this->objSyncCtoFiles->checkDeleteFiles($arrChecksumClient)); 
+                               
+                            case SYNCCTO_SMALL:
+                                $arrChecksumClient = $this->objSyncCtoCommunicationClient->getChecksumFolder(true);
+                                $this->arrListCompare = array_merge($this->arrListCompare, $this->objSyncCtoFiles->checkDeleteFiles($arrChecksumClient));
+                                
+                            default:
+                                break;
+                        }
 
                         $arrContenData["data"][2]["description"] = $GLOBALS['TL_LANG']['tl_syncCto_sync']["step_2"]['description_3'];
-                        $mixStepPool["step"] = 5;
+                        $mixStepPool["step"] = 6;
 
                         break;
 
                     /**
                      * Set CSS
                      */
-                    case 5:
+                    case 6:
                         foreach ($this->arrListCompare as $key => $value)
                         {
                             switch ($value["state"])
@@ -639,13 +658,13 @@ class SyncCtoModuleClient extends BackendModule
                             }
                         }
 
-                        $mixStepPool["step"] = 6;
+                        $mixStepPool["step"] = 7;
                         break;
 
                     /**
                      * Show list with files and count
                      */
-                    case 6:
+                    case 7:
                         // Del and submit Function
                         $arrDel = $_POST;
 
@@ -751,7 +770,7 @@ class SyncCtoModuleClient extends BackendModule
                         $arrContenData["data"][2]["html"] = $objTemp->parse();
                         $arrContenData["refresh"] = false;
 
-                        $mixStepPool["step"] = 6;
+                        $mixStepPool["step"] = 7;
 
                         break;
                 }

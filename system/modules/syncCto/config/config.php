@@ -242,6 +242,15 @@ $GLOBALS["CTOCOM_FUNCTIONS"]["SYNCCTO_CHECKSUM_FILES"] = array(
     "parameter" => array("fileList"),
 );
 
+// Get Filelist of file
+$GLOBALS["CTOCOM_FUNCTIONS"]["SYNCCTO_CHECKSUM_FOLDERS"] = array(
+    "class" => "SyncCtoFiles",
+    "function" => "runChecksumFolders",
+    "typ" => "POST",
+    "parameter" => array("files"),
+);
+
+
 // Clear Temp folder
 $GLOBALS["CTOCOM_FUNCTIONS"]["SYNCCTO_PURGETEMP"] = array(
     "class" => "SyncCtoFiles",

@@ -60,6 +60,9 @@ class SyncCtoFiles extends System
         $this->objSyncCtoHelper = SyncCtoHelper::getInstance();
         $this->objFiles = Files::getInstance();
         $this->strTimestampFormat = standardize($GLOBALS['TL_CONFIG']['datimFormat']);
+        
+        // language 
+        $this->loadLanguageFile("default");
 
         // Set runtime to 5 minutes
         set_time_limit(3600);
@@ -133,6 +136,37 @@ class SyncCtoFiles extends System
     /* -------------------------------------------------------------------------
      * Checksum Functions
      */
+    
+    /**
+     * Create a checksum list from contao core folders
+     * 
+     * @return array 
+     */
+    public function runChecksumFolders($booFiles = false)
+    {
+        // Build filelist
+        $arrFolderList = $this->recursiveFolderList(array(), "", $booFiles);
+        $arrChecksum = array();
+
+        // Check each file
+        foreach ($arrFolderList as $key => $value)
+        {
+            if ($value == "")
+            {
+                continue;
+            }
+
+            $arrChecksum[md5($value)] = array(
+                "path" => $value,
+                "checksum" => 0,
+                "size" => 0,
+                "state" => SyncCtoEnum::FILESTATE_FILE,
+                "transmission" => SyncCtoEnum::FILETRANS_WAITING,
+            );
+        }
+
+        return $arrChecksum;
+    }
 
     /**
      * Create a checksum list from contao core
@@ -721,6 +755,112 @@ class SyncCtoFiles extends System
         // Return list
         return $arrList;
     }
+    
+     /* -------------------------------------------------------------------------
+     * Helper functions
+     */
+
+    public function recursiveFolderList($arrList, $strPath, $blnTlFiles = false)
+    {
+        // Load blacklists and whitelists
+        $arrFolderBlacklist = $this->objSyncCtoHelper->getBlacklistFolder();
+        $arrFolderWhiteList = $this->objSyncCtoHelper->getWhitelistFolder();
+
+        if ($blnTlFiles)
+        {
+            $arrFolderWhiteList[] = $GLOBALS['TL_CONFIG']['uploadPath'];
+
+            if (empty($strPath))
+            {
+                $strPath = $GLOBALS['TL_CONFIG']['uploadPath'];
+            }
+        }
+
+        // Check if the current path is on blacklist
+        if ($strPath != "")
+        {
+            // Run through each entry in blacklistfolder
+            foreach ($arrFolderBlacklist as $valueBlack)
+            {
+                // Search with preg for values
+                $valueBlack = str_replace(array("\\", ".", "^", "?", "*"), array("\\\\", "\\.", "\\^", ".?", ".*"), $valueBlack);
+                if (preg_match("^" . $valueBlack . "^i", $strPath) != 0)
+                {
+                    return $arrList;
+                }
+            }
+
+            // Run through each entry in whitelistfolder
+            $blnWhite = false;
+            foreach ($arrFolderWhiteList as $valueWhite)
+            {
+                // Search with preg for values
+                $valueWhite = str_replace(array("\\", ".", "^", "?", "*", "/"), array("\\\\", "\\.", "\\^", ".?", ".*", "\/"), $this->objSyncCtoHelper->standardizePath($valueWhite));
+                if (preg_match("/^" . $valueWhite . ".*/i", $strPath) != 0)
+                {
+                    $blnWhite = true;
+                }
+            }
+
+            if (!$blnWhite)
+            {
+                return $arrList;
+            }
+        }
+        
+        
+
+        // Is the given string a file
+        if (is_file(TL_ROOT . "/" . $strPath))
+        {
+            // Do nothing            
+        }
+        // Is the given string a folder
+        else
+        {
+            $arrList[] = $strPath;
+
+            // Scan Folder
+            $arrScan = scan(TL_ROOT . "/" . $strPath);
+
+            // Run through each file
+            foreach ($arrScan as $key => $valueItem)
+            {
+                // Have we a file or ...
+                if (is_file(TL_ROOT . "/" . $strPath . "/" . $valueItem))
+                {
+                    // Do nothing
+                }
+                // ... a folder
+                else
+                {
+                    // Check if folder is in whitelist    
+                    $blnWhitelist = false;
+                    foreach ($arrFolderWhiteList as $valueWhite)
+                    {
+                        // Search with preg for values
+                        $valueWhite = str_replace(array("\\", ".", "^", "?", "*", "/"), array("\\\\", "\\.", "\\^", ".?", ".*", "\/"), $valueWhite);
+                        if (preg_match("/^" . $valueWhite . ".*/i", $this->objSyncCtoHelper->standardizePath($strPath . "/" . $valueItem)) != 0)
+                        {
+                            $blnWhitelist = true;
+                            break;
+                        }
+                    }
+
+                    if (!$blnWhitelist)
+                    {
+                        continue;
+                    }
+
+                    // Recursive-Call
+                    $arrList = $this->recursiveFolderList($arrList, $this->objSyncCtoHelper->standardizePath($strPath . "/" . $valueItem), $blnTlFiles);
+                }
+            }
+        }
+
+        // Return list
+        return $arrList;
+    }
 
     /* -------------------------------------------------------------------------
      * Folder Operations 
@@ -939,22 +1079,40 @@ class SyncCtoFiles extends System
         {
             foreach ($arrFileList as $key => $value)
             {
-                try
+
+                if (is_file(TL_ROOT . "/" . $value['path']))
                 {
-                    if ($this->objFiles->delete($value['path']))
+                    try
                     {
-                        $arrFileList[$key]['transmission'] = SyncCtoEnum::FILETRANS_SEND;
+                        if ($this->objFiles->delete($value['path']))
+                        {
+                            $arrFileList[$key]['transmission'] = SyncCtoEnum::FILETRANS_SEND;
+                        }
+                        else
+                        {
+                            $arrFileList[$key]['transmission'] = SyncCtoEnum::FILETRANS_SKIPPED;
+                            $arrFileList[$key]["skipreason"] = $GLOBALS['TL_LANG']['ERR']['cant_delete_file'];
+                            
+                        }
                     }
-                    else
+                    catch (Exception $exc)
                     {
                         $arrFileList[$key]['transmission'] = SyncCtoEnum::FILETRANS_SKIPPED;
-                        $arrFileList[$key]["skipreason"] = $GLOBALS['TL_LANG']['ERR']['cant_delete_file'];
+                        $arrFileList[$key]["skipreason"] = $exc->getMessage();
                     }
                 }
-                catch (Exception $exc)
+                else
                 {
-                    $arrFileList[$key]['transmission'] = SyncCtoEnum::FILETRANS_SKIPPED;
-                    $arrFileList[$key]["skipreason"] = $exc->getMessage();
+                    try
+                    {
+                        $this->objFiles->rrdir($value['path']);
+                        $arrFileList[$key]['transmission'] = SyncCtoEnum::FILETRANS_SEND;
+                    }
+                    catch (Exception $exc)
+                    {
+                        $arrFileList[$key]['transmission'] = SyncCtoEnum::FILETRANS_SKIPPED;
+                        $arrFileList[$key]["skipreason"] = $exc->getMessage();
+                    }
                 }
             }
         }

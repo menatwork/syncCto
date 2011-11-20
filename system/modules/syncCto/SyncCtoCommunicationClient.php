@@ -265,6 +265,26 @@ class SyncCtoCommunicationClient extends CtoCommunication
     }
     
     /**
+     * Get a list with folder from contao core/files
+     * 
+     * @return type 
+     */
+    public function getChecksumFolder($booFiles = false)
+    {
+        $arrData = array(
+            array(
+                "name" => "files",
+                "value" => $booFiles,
+            ),
+        );
+
+        // Set no codify engine
+        $this->setCodifyEngine(SyncCtoEnum::CODIFY_EMPTY);
+
+        return $this->runServer("SYNCCTO_CHECKSUM_FOLDERS", $arrData);
+    }
+
+    /**
      * Check for deleted files
      * 
      * @param array $arrFilelist
