@@ -128,12 +128,12 @@ class SyncCtoModuleCheck extends BackendModule
         $return .= '</tr>';
 
         // Memory limit
-        $memory_limit = ini_get('memory_limit');
-        $ok = (intval($memory_limit) >= 128);
+        $memory_limit = $this->getSize(ini_get('memory_limit'));
+        $ok = (intval($memory_limit) >= 128000000);
         $return .= '<tr class="' . ($ok ? 'ok' : 'warning') . '">';
         $return .= '<td>' . $GLOBALS['TL_LANG']['tl_syncCto_check']['memory_limit'][0] . '</td>';
         $return .= '<td class="dot">' . ($ok ? '&nbsp;' : '•') . '</td>';
-        $return .= '<td class="value">' . $memory_limit . '</td>';
+        $return .= '<td class="value">' . $this->getReadableSize($memory_limit) . '</td>';
         $return .= '<td>' . $GLOBALS['TL_LANG']['tl_syncCto_check']['memory_limit'][1] . '</td>';
         $return .= '</tr>';
 
@@ -158,22 +158,22 @@ class SyncCtoModuleCheck extends BackendModule
         $return .= '</tr>';
 
         // Upload maximum filesize
-        $upload_max_filesize = ini_get('upload_max_filesize');
-        $ok = (intval($upload_max_filesize) >= 8);
+        $upload_max_filesize =  $this->getSize(ini_get('upload_max_filesize'));
+        $ok = (intval($upload_max_filesize) >= 8000000);
         $return .= '<tr class="' . ($ok ? 'ok' : 'warning') . '">';
         $return .= '<td>' . $GLOBALS['TL_LANG']['tl_syncCto_check']['umf'][0] . '</td>';
         $return .= '<td class="dot">' . ($ok ? '&nbsp;' : '•') . '</td>';
-        $return .= '<td class="value">' . $upload_max_filesize . '</td>';
+        $return .= '<td class="value">' . $this->getReadableSize($upload_max_filesize) . '</td>';
         $return .= '<td>' . $GLOBALS['TL_LANG']['tl_syncCto_check']['umf'][1] . '</td>';
         $return .= '</tr>';
 
         // Post maximum size
-        $post_max_size = ini_get('post_max_size');
-        $ok = (intval($post_max_size) >= 8);
+        $post_max_size = $this->getSize(ini_get('post_max_size'));
+        $ok = (intval($post_max_size) >= 8000000);
         $return .= '<tr class="' . ($ok ? 'ok' : 'warning') . '">';
         $return .= '<td>' . $GLOBALS['TL_LANG']['tl_syncCto_check']['pms'][0] . '</td>';
         $return .= '<td class="dot">' . ($ok ? '&nbsp;' : '•') . '</td>';
-        $return .= '<td class="value">' . $post_max_size . '</td>';
+        $return .= '<td class="value">' . $this->getReadableSize($post_max_size) . '</td>';
         $return .= '<td>' . $GLOBALS['TL_LANG']['tl_syncCto_check']['pms'][1] . '</td>';
         $return .= '</tr>';
 		
@@ -240,7 +240,14 @@ class SyncCtoModuleCheck extends BackendModule
         $return .= '</table>';
         return $return;
     }
-
+    
+    private function getSize($strValue)
+    {
+        return (int) str_replace(
+                array("M", "G"), 
+                array("000000", "000000000"), 
+                $strValue);
+    }
 }
 
 ?>
