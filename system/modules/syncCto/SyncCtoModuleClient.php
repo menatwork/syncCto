@@ -606,6 +606,9 @@ class SyncCtoModuleClient extends BackendModule
 
                         break;
                     
+                    /**
+                     * Check for deleted folders
+                     */
                     case 5:
                         switch ($intSyncTyp)
                         {
@@ -636,15 +639,18 @@ class SyncCtoModuleClient extends BackendModule
                             {
                                 case SyncCtoEnum::FILESTATE_BOMBASTIC_BIG:
                                     $this->arrListCompare[$key]["css"] = "unknown";
+                                    $this->arrListCompare[$key]["css_big"] = "ignored";
                                     break;
 
-                                case SyncCtoEnum::FILESTATE_NEED:
                                 case SyncCtoEnum::FILESTATE_TOO_BIG_NEED:
+                                    $this->arrListCompare[$key]["css_big"] = "skipped";
+                                case SyncCtoEnum::FILESTATE_NEED:
                                     $this->arrListCompare[$key]["css"] = "modified";
                                     break;
 
-                                case SyncCtoEnum::FILESTATE_MISSING:
                                 case SyncCtoEnum::FILESTATE_TOO_BIG_MISSING:
+                                    $this->arrListCompare[$key]["css_big"] = "skippes";
+                                case SyncCtoEnum::FILESTATE_MISSING:
                                     $this->arrListCompare[$key]["css"] = "new";
                                     break;
 
