@@ -227,6 +227,16 @@ class SyncCtoModuleCheck extends BackendModule
         $return .= '<td>' . $GLOBALS['TL_LANG']['tl_syncCto_check']['zip_archive'][1] . '</td>';
         $return .= '</tr>';
 		
+        // suhosin
+        $suhosin = ini_get('suhosin.session.max_id_length');
+        $ok = ($suhosin == false);
+        $return .= '<tr class="' . ($ok ? 'ok' : 'warning') . '">';
+        $return .= '<td>' . $GLOBALS['TL_LANG']['tl_syncCto_check']['suhosin'][0] . '</td>';
+        $return .= '<td class="dot">' . ($ok ? '&nbsp;' : '•') . '</td>';
+        $return .= '<td class="value">' . ($suhosin ? $GLOBALS['TL_LANG']['tl_syncCto_check']['on'] : $GLOBALS['TL_LANG']['tl_syncCto_check']['off']) . '</td>';
+        $return .= '<td>' . $GLOBALS['TL_LANG']['tl_syncCto_check']['suhosin'][1] . '</td>';
+        $return .= '</tr>';
+		
         $return .= '</table>';
         return $return;
     }

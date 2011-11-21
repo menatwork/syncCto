@@ -10,8 +10,12 @@
     <h2><?php echo $GLOBALS['TL_LANG']['tl_syncCto_check']['other_sync_issues']; ?></h2>
     <p><?php echo $GLOBALS['TL_LANG']['tl_syncCto_check']['explanation_sync_issues']; ?><br /><?php echo $GLOBALS['TL_LANG']['tl_syncCto_check']['known_issues']; ?></p>
     <ul>
-        <li><a <?php echo LINK_NEW_WINDOW; ?> href="http://goo.gl/oj7rv"><?php echo $GLOBALS['TL_LANG']['tl_syncCto_check']['suhosin']; ?></a></li>
-        <li><a <?php echo LINK_NEW_WINDOW; ?> href="http://goo.gl/4T3qa"><?php echo $GLOBALS['TL_LANG']['tl_syncCto_check']['max_request_len']; ?></a></li>
+        <li><a <?php echo LINK_NEW_WINDOW; ?> href="http://goo.gl/oj7rv"><?php echo $GLOBALS['TL_LANG']['tl_syncCto_check']['suhosin_issue']; ?></a></li>
+        <li><a <?php echo LINK_NEW_WINDOW; ?> href="http://goo.gl/4T3qa"><?php echo $GLOBALS['TL_LANG']['tl_syncCto_check']['mrl_issue']; ?></a></li>
     </ul>
 
 </div>
+
+<pre><?php // print_r(ini_get_all()); ?></pre>
+
+<pre><?php // print_r($_SERVER); ?></pre>

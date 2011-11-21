@@ -2,7 +2,7 @@
 
 /**
  * Contao Open Source CMS
- * Copyright (C) 2005-2010 Leo Feyer
+ * Copyright (C) 2005-2011 Leo Feyer
  *
  * Formerly known as TYPOlight Open Source CMS.
  *
@@ -38,7 +38,7 @@ $GLOBALS['TL_LANG']['tl_syncCto_clients']['delete']             = array('Client 
 $GLOBALS['TL_LANG']['tl_syncCto_clients']['show']               = array('Clientdetails', 'Details des Clients ID %s anzeigen');
 $GLOBALS['TL_LANG']['tl_syncCto_clients']['syncTo']             = array('Client synchronisieren', 'Client ID %s synchronisieren');
 $GLOBALS['TL_LANG']['tl_syncCto_clients']['syncFrom']           = array('Server synchronisieren', 'Server synchronisieren');
-$GLOBALS['TL_LANG']['tl_syncCto_clients']['syncFromConfirm']    = 'Soll der Server wirklich synchronisiert werden? Es werden Daten vom Client geladen, die Ansicht kann einige Zeit brauchen, bis Sie erstellt wird.';
+$GLOBALS['TL_LANG']['tl_syncCto_clients']['syncFromConfirm']    = 'Soll der Server wirklich synchronisiert werden? Es werden Daten vom Client geladen.';
 
 /**
  * Legends
@@ -57,6 +57,6 @@ $GLOBALS['TL_LANG']['tl_syncCto_clients']['address']            = array('Domain'
 $GLOBALS['TL_LANG']['tl_syncCto_clients']['path']               = array('Serverpfad', 'Bitte geben Sie den Pfad zur Installation ein, falls sich diese in einem Unterordner befindet.');
 $GLOBALS['TL_LANG']['tl_syncCto_clients']['port']               = array('Portnummer', 'Bitte geben Sie die Nummer des HTTP-Ports ein. Standard ist 80.');
 $GLOBALS['TL_LANG']['tl_syncCto_clients']['apikey']             = array('ctoCommunication API Key', 'Dieser Schlüssel sichert die Kommunikation zwischen den Contao-Installationen ab.');
-$GLOBALS['TL_LANG']['tl_syncCto_clients']['codifyengine']       = array("Verschlüsselungs-Engine", "Wählen Sie bitte die Verschlüsselungs-Engine aus.");
+$GLOBALS['TL_LANG']['tl_syncCto_clients']['codifyengine']       = array('Verschlüsselungs-Engine', 'Wählen Sie bitte die Verschlüsselungs-Engine aus.');
 
 ?>

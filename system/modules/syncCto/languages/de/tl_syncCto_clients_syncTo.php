@@ -2,7 +2,7 @@
 
 /**
  * Contao Open Source CMS
- * Copyright (C) 2005-2010 Leo Feyer
+ * Copyright (C) 2005-2011 Leo Feyer
  *
  * Formerly known as TYPOlight Open Source CMS.
  *
@@ -30,17 +30,17 @@
 /**
  * Legends
  */
-$GLOBALS['TL_LANG']['tl_syncCto_clients_syncTo']['sync_legend']                         = "Synchronisations-Einstellungen";
-$GLOBALS['TL_LANG']['tl_syncCto_clients_syncTo']['filelist_legend']                     = "Dateien und Ordner";
-$GLOBALS['TL_LANG']['tl_syncCto_clients_syncTo']['table_recommend_legend']              = "Empfohlene Tabellen";
-$GLOBALS['TL_LANG']['tl_syncCto_clients_syncTo']['table_none_recommend_legend']         = "Nicht empfohlene Tabellen";
+$GLOBALS['TL_LANG']['tl_syncCto_clients_syncTo']['sync_legend']                         = 'Synchronisations-Einstellungen';
+$GLOBALS['TL_LANG']['tl_syncCto_clients_syncTo']['filelist_legend']                     = 'Dateien und Ordner';
+$GLOBALS['TL_LANG']['tl_syncCto_clients_syncTo']['table_recommend_legend']              = 'Empfohlene Tabellen';
+$GLOBALS['TL_LANG']['tl_syncCto_clients_syncTo']['table_none_recommend_legend']         = 'Nicht empfohlene Tabellen';
 $GLOBALS['TL_LANG']['tl_syncCto_clients_syncTo']['edit']                                = 'Synchronisation des Clients';
 
 /**
  * Fields
  */
-$GLOBALS['TL_LANG']['tl_syncCto_clients_syncTo']['sync_type']                           = array("Art der Synchronisation", "Hier können Sie die Art der Synchronisation auswählen.");
-$GLOBALS['TL_LANG']['tl_syncCto_clients_syncTo']['database_tables_recommended']         = array("Empfohlene Tabellen", "Hier können Sie die empfohlenen Tabellen für die Synchronisation auswählen.");
-$GLOBALS['TL_LANG']['tl_syncCto_clients_syncTo']['database_tables_none_recommended']    = array("Nicht empfohlene Tabellen", "Hier können die NICHT empfohlenen Tabellen für das Backup ausgewählt werden. Benutzung auf eigene Gefahr.");
-$GLOBALS['TL_LANG']['tl_syncCto_clients_syncTo']['filelist']                            = array("Quelldateien", "Bitte wählen Sie eine Datei oder einen Ordner aus der Dateiübersicht.");
+$GLOBALS['TL_LANG']['tl_syncCto_clients_syncTo']['sync_type']                           = array('Art der Synchronisation', 'Hier können Sie die Art der Synchronisation auswählen.');
+$GLOBALS['TL_LANG']['tl_syncCto_clients_syncTo']['database_tables_recommended']         = array('Empfohlene Tabellen', 'Hier können Sie die empfohlenen Tabellen für die Synchronisation auswählen.');
+$GLOBALS['TL_LANG']['tl_syncCto_clients_syncTo']['database_tables_none_recommended']    = array('Nicht empfohlene Tabellen', 'Hier können die NICHT empfohlenen Tabellen für das Backup ausgewählt werden. Benutzung auf eigene Gefahr.');
+$GLOBALS['TL_LANG']['tl_syncCto_clients_syncTo']['filelist']                            = array('Quelldateien', 'Bitte wählen Sie eine Datei oder einen Ordner aus der Dateiübersicht.');
 ?>
