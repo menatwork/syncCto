@@ -127,9 +127,9 @@ if ((($objInput->get("do") == 'synccto_clients') && $objInput->get("act") == '')
 }
 
 // Size limit for files in bytes, will be checked
-$GLOBALS['SYC_SIZE']['limit'] = 523000000;
+$GLOBALS['SYC_SIZE']['limit'] = 524288000;
 // Size limit for files in bytes, completely ignored
-$GLOBALS['SYC_SIZE']['limit_ignore'] = 784000000;
+$GLOBALS['SYC_SIZE']['limit_ignore'] = 838860800;
 
 /**
  * Blacklists

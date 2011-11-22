@@ -643,13 +643,13 @@ class SyncCtoModuleClient extends BackendModule
                                     break;
 
                                 case SyncCtoEnum::FILESTATE_TOO_BIG_NEED:
-                                    $this->arrListCompare[$key]["css_big"] = "skipped";
+                                    $this->arrListCompare[$key]["css_big"] = "ignored";
                                 case SyncCtoEnum::FILESTATE_NEED:
                                     $this->arrListCompare[$key]["css"] = "modified";
                                     break;
 
                                 case SyncCtoEnum::FILESTATE_TOO_BIG_MISSING:
-                                    $this->arrListCompare[$key]["css_big"] = "skippes";
+                                    $this->arrListCompare[$key]["css_big"] = "ignored";
                                 case SyncCtoEnum::FILESTATE_MISSING:
                                     $this->arrListCompare[$key]["css"] = "new";
                                     break;

@@ -30,16 +30,20 @@
                 </tr>
             </thead>
             <tbody>            
-            <?php foreach ($this->filelist as $key => $file): ?> 
+            <?php foreach ($this->filelist as $key => $file): ?>
                 <tr>
+                    <?php $file["path"] = utf8_encode($file["path"]); ?>                    
                     <?php if($this->compare_complex  == 1 && !empty($file["css_big"])) : ?>
-                        <td class="state <?php echo $file["css"]; ?>"><?php echo $GLOBALS['TL_LANG']['MSC'][$file["css"] . '_file']; ?>123</td>
+                        <td class="state <?php echo $file["css"]; ?>"><?php echo $GLOBALS['TL_LANG']['MSC'][$file["css_big"] . '_files']; ?></td>
                     <?php else: ?>
                         <td class="state <?php echo $file["css"]; ?>"><?php echo $GLOBALS['TL_LANG']['MSC'][$file["css"] . '_file']; ?></td>
                     <?php endif; ?>
-                    
                     <td class="filesize"><?php echo ($file["size"] == -1) ? "N.A." : $this->getReadableSize($file["size"]); ?></td>
-                    <td class="checkbox"><?php if ($i == 1 || $this->compare_complex == false): ?><input class="tl_checkbox" type="checkbox" name="del-file-<?php echo $key; ?>" value="<?php echo $key; ?>" /><?php else: ?> X <?php endif; ?></td>  
+                    <?php if($this->compare_complex == false): ?>
+                        <td class="checkbox"><input class="tl_checkbox" type="checkbox" name="del-file-<?php echo $key; ?>" value="<?php echo $key; ?>" /></td>                   
+                    <?php else: ?>
+                        <td class="checkbox"><?php if (empty($file["css_big"])): ?><input class="tl_checkbox" type="checkbox" name="del-file-<?php echo $key; ?>" value="<?php echo $key; ?>" /><?php else: ?> X <?php endif; ?></td>  
+                    <?php endif; ?>
                     <td class="last" title="<?php echo $file["path"]; ?>"><?php echo (strlen($file["path"]) >= 60) ? substr($file["path"], 0, 30) . "[...]" . substr($file["path"], strlen($file["path"]) - 30, strlen($file["path"]) - 1) : $file["path"]; ?></td>
                 </tr>
             <?php endforeach; ?>
