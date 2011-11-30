@@ -218,15 +218,36 @@ class SyncCtoCommunicationClient extends CtoCommunication
      * @return array 
      */
     public function runCecksumCompare($arrChecksumList)
-    {
+    { 
+        if (!is_array($arrChecksumList))
+        {
+            throw new Exception("Filelist is not a array.");
+        }
+
+        $strPath = $this->objSyncCtoHelper->standardizePath($GLOBALS['SYC_PATH']['tmp'], "syncList.syncCto");
+        $strMime = "application/octet-stream";
+
+        $objFile = new File($strPath);
+        $objFile->write(serialize($arrChecksumList));
+        $objFile->close();
+
         $arrData = array(
             array(
-                "name" => "checksumlist",
-                "value" => $arrChecksumList,
+                "name" => "md5",
+                "value" => md5_file(TL_ROOT . "/" . $strPath),
             ),
+            array(
+                "name" => "file",
+                "value" => md5($strPath),
+            ),
+            array(
+                "name" => md5($strPath),
+                "filename" => "syncList.syncCto",
+                "filepath" => TL_ROOT . "/" . $this->objSyncCtoHelper->standardizePath($GLOBALS['SYC_PATH']['tmp'], "syncList.syncCto"),
+                "mime" => $strMime,
+            )
         );
 
-        $this->setCodifyEngine(SyncCtoEnum::CODIFY_EMPTY);
         return $this->runServer("SYNCCTO_CHECKSUM_COMPARE", $arrData);
     }
 
@@ -285,23 +306,41 @@ class SyncCtoCommunicationClient extends CtoCommunication
     }
 
     /**
+     * @todo
      * Check for deleted files
      * 
      * @param array $arrFilelist
      * @return array 
      */
     public function checkDeleteFiles($arrFilelist)
-    {
-         $arrData = array(
+    {        
+        if (!is_array($arrFilelist))
+        {
+            throw new Exception("Filelist is not a array.");
+        }
+        
+        $strPath = $this->objSyncCtoHelper->standardizePath($GLOBALS['SYC_PATH']['tmp'], "syncList.syncCto");
+        $strMime = "application/octet-stream";
+        
+        $objFile = new File($strPath);
+        $objFile->write(serialize($arrFilelist));
+        $objFile->close();
+        
+        exit();
+
+        $arrData = array(
             array(
-                "name" => "fileList",
-                "value" => $arrFilelist,
+                "name" => "md5",
+                "value" => md5_file(TL_ROOT . "/" .  $strPath),
             ),
+            array(
+                "name" => md5($strPath),
+                "filename" => "syncList.syncCto",
+                "filepath" => TL_ROOT . "/" .  $this->objSyncCtoHelper->standardizePath($GLOBALS['SYC_PATH']['tmp']),
+                "mime" => $strMime,
+            )
         );
 
-        // Set no codify engine
-        $this->setCodifyEngine(SyncCtoEnum::CODIFY_EMPTY);
-        
         return $this->runServer("SYNCCTO_CHECK_DELETE_FILE", $arrData);
     }
 
@@ -378,6 +417,7 @@ class SyncCtoCommunicationClient extends CtoCommunication
     }
 
     /**
+     * @todo
      * Delete files
      * 
      * @param array $arrFilelist

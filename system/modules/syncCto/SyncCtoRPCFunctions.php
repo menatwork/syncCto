@@ -151,6 +151,46 @@ class SyncCtoRPCFunctions extends Backend
         }
     }
 
+    /* -------------------------------------------------------------------------
+     * Extended syncCto core functions
+     */
+        
+    public function checkDeleteFiles()
+    {
+        foreach ($_FILES as $key => $value)
+        {
+            echo $value;
+        }
+        
+        exit();
+    }
+    
+    public function runCecksumCompare($strMD5, $strFilename)
+    {        
+        if(!key_exists($strFilename, $_FILES))
+        {
+            throw new Exception("Could not find file.");
+        }
+        
+        if(md5_file($_FILES[$strFilename]["tmp_name"]) != $strMD5)
+        {
+            throw new Exception("Unknown md5 hash.");
+        }
+        
+        $objFiles = Files::getInstance();
+        $objFiles->move_uploaded_file($_FILES[$strFilename]["tmp_name"], $this->objSyncCtoHelper->standardizePath($GLOBALS['SYC_PATH']['tmp'], "syncListInc.syncCto"));
+        
+        $objFile = new File($this->objSyncCtoHelper->standardizePath($GLOBALS['SYC_PATH']['tmp'], "syncListInc.syncCto"));
+        $arrChecksumList = deserialize($objFile->getContent());
+        $objFile->close();   
+        
+        if(!is_array($arrChecksumList))
+        {
+            throw new Exception("Could not rebuild array.");
+        }
+        
+        return $this->objSyncCtoFiles->runCecksumCompare($arrChecksumList);
+    }
     
 }
 

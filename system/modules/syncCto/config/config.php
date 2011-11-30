@@ -220,10 +220,10 @@ $GLOBALS["CTOCOM_FUNCTIONS"]["SYNCCTO_FILEBACKUP"] = array(
 
 // Compare 2 filelists
 $GLOBALS["CTOCOM_FUNCTIONS"]["SYNCCTO_CHECKSUM_COMPARE"] = array(
-    "class" => "SyncCtoFiles",
+    "class" => "SyncCtoRPCFunctions",
     "function" => "runCecksumCompare",
     "typ" => "POST",
-    "parameter" => array("checksumlist"),
+    "parameter" => array("md5", "file"),
 );
 
 // Get Filelist of contao core
@@ -325,7 +325,7 @@ $GLOBALS["CTOCOM_FUNCTIONS"]["SYNCCTO_GET_CONFIG"] = array(
 
 // Check for deleted files
 $GLOBALS["CTOCOM_FUNCTIONS"]["SYNCCTO_CHECK_DELETE_FILE"] = array(
-    "class" => "SyncCtoFiles",
+    "class" => "SyncCtoRPCFunctions",
     "function" => "checkDeleteFiles",
     "typ" => "POST",
     "parameter" => array("fileList"),
