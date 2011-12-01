@@ -259,6 +259,9 @@ class SyncCtoHelper extends Backend
     {
         if ($strAction == 'syncCtoPing')
         {
+            // Set time limit for this function
+            set_time_limit(5);
+            
             if (strlen($this->Input->post('clientID')) != 0 && is_numeric($this->Input->post('clientID')))
             {
                 try

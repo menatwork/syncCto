@@ -623,7 +623,10 @@ class SyncCtoFiles extends System
      */
 
     public function recursiveFileList($arrList, $strPath, $blnTlFiles = false)
-    {
+    {   
+        // Set time limit for this function to 5 minutes
+        set_time_limit(300);
+
         // Load blacklists and whitelists
         $arrFolderBlacklist = $this->objSyncCtoHelper->getBlacklistFolder();
         $arrFileBlacklist = $this->objSyncCtoHelper->getBlacklistFile();
@@ -762,6 +765,9 @@ class SyncCtoFiles extends System
 
     public function recursiveFolderList($arrList, $strPath, $blnTlFiles = false)
     {
+        // Set time limit for this function to 5 minutes
+        set_time_limit(300);
+
         // Load blacklists and whitelists
         $arrFolderBlacklist = $this->objSyncCtoHelper->getBlacklistFolder();
         $arrFolderWhiteList = $this->objSyncCtoHelper->getWhitelistFolder();

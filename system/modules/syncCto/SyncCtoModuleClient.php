@@ -706,7 +706,7 @@ class SyncCtoModuleClient extends BackendModule
                         $intCountDelete = 0;
 
                         $intTotalSize = 0;
-
+                        
                         // Count files
                         foreach ($this->arrListCompare as $key => $value)
                         {
@@ -1525,9 +1525,6 @@ class SyncCtoModuleClient extends BackendModule
 
                         try
                         {
-                            // Max limit for file send, 10 minutes
-                            set_time_limit(7200);
-
                             // Send files
                             $this->objSyncCtoCommunicationClient->sendFile(dirname($value["path"]), basename($value["path"]), $value["checksum"], SyncCtoEnum::UPLOAD_SYNC_TEMP);
                             $this->arrListCompare[$key]["transmission"] = SyncCtoEnum::FILETRANS_SEND;
@@ -1699,7 +1696,7 @@ class SyncCtoModuleClient extends BackendModule
                             $compare .= "<ul>";
                             foreach ($valueOuter as $valueInner)
                             {
-                                $compare .= "<li>" . htmlentities($valueInner) . "</li>";
+                                $compare .= "<li>" . $valueInner . "</li>";
                             }
                             $compare .= "</ul>";
                             $compare .= "</li>";
@@ -1733,7 +1730,7 @@ class SyncCtoModuleClient extends BackendModule
                                     continue;
 
                                 $compare .= "<li>";
-                                $compare .= htmlentities($value["path"]);
+                                $compare .= utf8_encode($value["path"]);;
                                 $compare .= "</li>";
                             }
                             $compare .= "</ul>";
@@ -1757,7 +1754,7 @@ class SyncCtoModuleClient extends BackendModule
                                     continue;
 
                                 $compare .= "<li>";
-                                $compare .= htmlentities($value["path"]);
+                                $compare .= utf8_encode($value["path"]);;
                                 $compare .= "</li>";
                             }
                             $compare .= "</ul>";
@@ -1782,7 +1779,7 @@ class SyncCtoModuleClient extends BackendModule
                                     continue;
 
                                 $compare .= "<li>";
-                                $compare .= htmlentities($value["path"]);
+                                $compare .= utf8_encode($value["path"]);;
                                 $compare .= "</li>";
                             }
                             $compare .= "</ul>";
