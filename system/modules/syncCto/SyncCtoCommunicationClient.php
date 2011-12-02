@@ -196,6 +196,16 @@ class SyncCtoCommunicationClient extends CtoCommunication
     {
         return $this->runServer("SYNCCTO_PARAMETER");
     }
+    
+    /**
+     * Get informations for purgedata
+     * 
+     * @return array 
+     */
+    public function getPurgData()
+    {
+        return $this->runServer("SYNCCTO_GET_PURGEDATA");
+    }
 
     /* -------------------------------------------------------------------------
      * File Operations
@@ -209,6 +219,16 @@ class SyncCtoCommunicationClient extends CtoCommunication
     public function purgeTemp()
     {
         return $this->runServer("SYNCCTO_PURGETEMP");
+    }
+    
+    /**
+     * Use the contao function for maintance
+     * 
+     * @return boolean 
+     */
+    public function purgeData()
+    {
+        return $this->runServer("SYNCCTO_PURGEDATA");
     }
 
     /**
@@ -354,7 +374,7 @@ class SyncCtoCommunicationClient extends CtoCommunication
     {
         // 5 min. time out.
         @set_time_limit(3600);
-
+        
         //Build path
         $strFilePath = $this->objSyncCtoHelper->standardizePath($strFolder, $strFile);
 

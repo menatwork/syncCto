@@ -192,6 +192,12 @@ class SyncCtoRPCFunctions extends Backend
         return $this->objSyncCtoFiles->runCecksumCompare($arrChecksumList);
     }
     
+    /* -------------------------------------------------------------------------
+     * Contao core calls
+     */
+    
+    
+
 }
 
 ?>

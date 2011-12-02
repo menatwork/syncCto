@@ -259,6 +259,14 @@ $GLOBALS["CTOCOM_FUNCTIONS"]["SYNCCTO_PURGETEMP"] = array(
     "parameter" => FALSE,
 );
 
+// Get folder path list
+$GLOBALS["CTOCOM_FUNCTIONS"]["SYNCCTO_PURGEDATA"] = array(
+    "class" => "SyncCtoFiles",
+    "function" => "purgeData",
+    "typ" => "POST",
+    "parameter" => false,
+);
+
 // Rebuild a split file
 $GLOBALS["CTOCOM_FUNCTIONS"]["SYNCCTO_REBUILD_SPLITFILE"] = array(
     "class" => "SyncCtoFiles",
@@ -354,4 +362,5 @@ $GLOBALS["CTOCOM_FUNCTIONS"]["SYNCCTO_GET_PATHLIST"] = array(
     "typ" => "POST",
     "parameter" => array("name"),
 );
+
 ?>

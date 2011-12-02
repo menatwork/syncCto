@@ -901,6 +901,20 @@ class SyncCtoFiles extends System
         $objFolder = new Folder($strPath);
         $objFolder->clear();
     }
+    
+    /**
+     * Use the contao maintance
+     * 
+     * @return boolean
+     */
+    public function purgeData()
+    {
+        $this->Input->setPost('FORM_SUBMIT', 'tl_purge');
+        $this->Input->setPost('tables', serialize(array('html_folder', 'scripts_folder', 'css_files', 'xml_files')));
+
+        $objPurgeData = new PurgeData();
+        $objPurgeData->run();
+    }
 
     /* -------------------------------------------------------------------------
      * File Operations 

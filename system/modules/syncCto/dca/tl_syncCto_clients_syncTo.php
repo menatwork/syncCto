@@ -45,7 +45,7 @@ $GLOBALS['TL_DCA']['tl_syncCto_clients_syncTo'] = array(
     // Palettes
     'palettes' => array
         (
-        'default' => '{sync_legend},sync_type;{table_recommend_legend},database_tables_recommended;{table_none_recommend_legend},database_tables_none_recommended;{filelist_legend},filelist',
+        'default' => '{sync_legend},sync_type,purgeData;{table_recommend_legend},database_tables_recommended;{table_none_recommend_legend},database_tables_none_recommended;{filelist_legend},filelist',
     ),
     // Fields
     'fields' => array(
@@ -80,6 +80,13 @@ $GLOBALS['TL_DCA']['tl_syncCto_clients_syncTo'] = array(
             'inputType' => 'fileTree',
             'exclude' => true,
             'eval' => array('files' => true, 'filesOnly' => false, 'fieldType' => 'checkbox'),
+        ),
+        'purgeData' => array
+            (
+            'label' => array("Client aufräumen","Wählen Sie dies Option aus um den Client nach dem syncronisieren aufzuräumen."),
+            'inputType' => 'checkbox',
+            'exclude' => true,
+            'eval' => array('multiple' => false),
         ),
     )
 );
@@ -171,6 +178,16 @@ class tl_syncCto_clients_syncTo extends Backend
         else
         {
             $this->Session->set("syncCto_SyncTables", FALSE);
+        }
+        
+        // Set purgeDataflag    
+        if($this->Input->post("purgeData") == 1)
+        {
+            $this->Session->set("syncCto_PurgeData", TRUE);
+        }
+        else
+        {
+            $this->Session->set("syncCto_PurgeData", FALSE);
         }
 
         // Files for backup siles       

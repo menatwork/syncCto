@@ -32,8 +32,7 @@
             </thead>
             <tbody>            
             <?php foreach ($this->filelist as $key => $file): ?>
-                <tr>
-                    <?php $file["path"] = utf8_encode($file["path"]); ?>
+                <tr>                    
                     <?php if($this->compare_complex  == 1 && !empty($file["css_big"])) : ?>
                         <td class="state <?php echo $file["css"]; ?>"><?php echo $GLOBALS['TL_LANG']['MSC'][$file["css_big"] . '_files']; ?></td>
                     <?php else: ?>
