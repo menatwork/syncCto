@@ -60,7 +60,7 @@ class SyncCtoFiles extends System
         $this->objSyncCtoHelper = SyncCtoHelper::getInstance();
         $this->objFiles = Files::getInstance();
         $this->strTimestampFormat = standardize($GLOBALS['TL_CONFIG']['datimFormat']);
-        
+
         // language 
         $this->loadLanguageFile("default");
 
@@ -136,7 +136,7 @@ class SyncCtoFiles extends System
     /* -------------------------------------------------------------------------
      * Checksum Functions
      */
-    
+
     /**
      * Create a checksum list from contao core folders
      * 
@@ -623,7 +623,7 @@ class SyncCtoFiles extends System
      */
 
     public function recursiveFileList($arrList, $strPath, $blnTlFiles = false)
-    {   
+    {
         // Set time limit for this function to 5 minutes
         set_time_limit(300);
 
@@ -716,8 +716,8 @@ class SyncCtoFiles extends System
                     {
                         continue;
                     }
-                    
-                    if(empty ($strPath))
+
+                    if (empty($strPath))
                     {
                         // Add to list
                         $arrList[] = $valueItem;
@@ -758,8 +758,8 @@ class SyncCtoFiles extends System
         // Return list
         return $arrList;
     }
-    
-     /* -------------------------------------------------------------------------
+
+    /* -------------------------------------------------------------------------
      * Helper functions
      */
 
@@ -813,8 +813,8 @@ class SyncCtoFiles extends System
                 return $arrList;
             }
         }
-        
-        
+
+
 
         // Is the given string a file
         if (is_file(TL_ROOT . "/" . $strPath))
@@ -901,7 +901,7 @@ class SyncCtoFiles extends System
         $objFolder = new Folder($strPath);
         $objFolder->clear();
     }
-    
+
     /**
      * Use the contao maintance
      * 
@@ -909,11 +909,61 @@ class SyncCtoFiles extends System
      */
     public function purgeData()
     {
-        $this->Input->setPost('FORM_SUBMIT', 'tl_purge');
-        $this->Input->setPost('tables', serialize(array('html_folder', 'scripts_folder', 'css_files', 'xml_files')));
+        if(version_compare("2.10", VERSION, "<") == true)
+        {
+            return true;
+        }
 
-        $objPurgeData = new PurgeData();
-        $objPurgeData->run();
+        $this->import('Automator');
+        $this->import('StyleSheets');
+        $this->import("Database");
+
+        // Html folder
+        $this->Automator->purgeHtmlFolder();
+
+        // Scripts folder
+        $this->Automator->purgeScriptsFolder();
+
+        // Temporary folder
+        $this->Automator->purgeTempFolder();
+
+        // CSS files
+        $this->StyleSheets->updateStyleSheets();
+
+        // XML files
+        // HOOK: use the googlesitemap module
+        if (in_array('googlesitemap', $this->Config->getActiveModules()))
+        {
+            $this->import('GoogleSitemap');
+            $this->GoogleSitemap->generateSitemap();
+        }
+        else
+        {
+            $this->Automator->generateSitemap();
+        }
+
+        // HOOK: recreate news feeds
+        if (in_array('news', $this->Config->getActiveModules()))
+        {
+            $this->import('News');
+            $this->News->generateFeeds();
+        }
+
+        // HOOK: recreate calendar feeds
+        if (in_array('calendar', $this->Config->getActiveModules()))
+        {
+            $this->import('Calendar');
+            $this->Calendar->generateFeeds();
+        }
+
+        // Database table
+        // Get all cachable tables from TL_CACHE
+        foreach ($GLOBALS['TL_CACHE'] as $k => $v)
+        {
+            $this->Database->execute("TRUNCATE TABLE " . $v);
+        }
+
+        return true;
     }
 
     /* -------------------------------------------------------------------------
@@ -1112,7 +1162,6 @@ class SyncCtoFiles extends System
                         {
                             $arrFileList[$key]['transmission'] = SyncCtoEnum::FILETRANS_SKIPPED;
                             $arrFileList[$key]["skipreason"] = $GLOBALS['TL_LANG']['ERR']['cant_delete_file'];
-                            
                         }
                     }
                     catch (Exception $exc)
@@ -1218,15 +1267,16 @@ class SyncCtoFiles extends System
     {
         if (!file_exists(TL_ROOT . "/" . $strPath))
         {
-            throw new Exception(vsprintf($GLOBALS['TL_LANG']['ERR']['unknown_file'] , array($strPath)));
+            throw new Exception(vsprintf($GLOBALS['TL_LANG']['ERR']['unknown_file'], array($strPath)));
         }
-        
+
         $objFile = new File($strPath);
         $strContent = base64_encode($objFile->getContent());
         $objFile->close();
-        
+
         return array("md5" => md5_file(TL_ROOT . "/" . $strPath), "content" => $strContent);
     }
 
 }
+
 ?>

@@ -45,7 +45,8 @@ $GLOBALS['TL_DCA']['tl_syncCto_clients_syncTo'] = array(
     // Palettes
     'palettes' => array
         (
-        'default' => '{sync_legend},sync_type,purgeData;{table_recommend_legend},database_tables_recommended;{table_none_recommend_legend},database_tables_none_recommended;{filelist_legend},filelist',
+        '210' => '{sync_legend},sync_type,purgeData;{table_recommend_legend},database_tables_recommended;{table_none_recommend_legend},database_tables_none_recommended;{filelist_legend},filelist',
+        '209' => '{sync_legend},sync_type;{table_recommend_legend},database_tables_recommended;{table_none_recommend_legend},database_tables_none_recommended;{filelist_legend},filelist',
     ),
     // Fields
     'fields' => array(
@@ -90,6 +91,16 @@ $GLOBALS['TL_DCA']['tl_syncCto_clients_syncTo'] = array(
         ),
     )
 );
+
+// Show a other palette for 2.9 and 2.10
+if(version_compare("2.10", VERSION, "<") == true)
+{
+    $GLOBALS['TL_DCA']['tl_syncCto_clients_syncTo']['palettes']['default'] = $GLOBALS['TL_DCA']['tl_syncCto_clients_syncTo']['palettes']['209'];
+}
+else
+{
+    $GLOBALS['TL_DCA']['tl_syncCto_clients_syncTo']['palettes']['default'] = $GLOBALS['TL_DCA']['tl_syncCto_clients_syncTo']['palettes']['210'];
+}
 
 /**
  * Class for syncTo configurations

@@ -1618,10 +1618,11 @@ class SyncCtoModuleClient extends BackendModule
                 case 5:
                     if ($intSyncTyp == SYNCCTO_FULL)
                     {
-                        $this->objSyncCtoCommunicationClient->runLocalConfigImport();
+                        $this->objSyncCtoCommunicationClient->runLocalConfigImport();          
                         $mixStepPool["step"] = 6;
-                    }
-
+                        break;
+                    }                    
+                    
                     $arrContenData["data"][5]["description"] = $GLOBALS['TL_LANG']['tl_syncCto_sync']["step_5"]['description_1'];
 
                 /** ------------------------------------------------------------
@@ -1632,23 +1633,34 @@ class SyncCtoModuleClient extends BackendModule
                     $this->objSyncCtoFiles->purgeTemp();
                     $this->objSyncCtoCommunicationClient->referrerEnable();
                     
+                    $mixStepPool["step"] = 7;
+                    
                     break;
                     
                 case 7: 
                     if($booPurgeData == true)
                     {
-                        //$this->objSyncCtoCommunicationClient->purgeData();
-                    }                   
-
+                        $this->objSyncCtoCommunicationClient->purgeData();
+                    }      
+                    
+                    $mixStepPool["step"] = 8;
+                    
                     $this->log(vsprintf("Successfully finishing of synchronization client ID %s.", array($this->Input->get("id"))), __CLASS__ . " " . __FUNCTION__, "INFO");
-            
+                                
+                    break;
+                    
+                case 8:
+                    $this->objSyncCtoCommunicationClient->referrerEnable();
+                    $mixStepPool["step"] = 9;
+                    break;
+                    
                 /** ------------------------------------------------------------
                  * Show information
                  */
-                case 8:
+                case 9:
                     if ($intSyncTyp == SYNCCTO_SMALL && ( (count($this->arrListCompare) == 0 || $this->arrListCompare == FALSE) && !is_array($this->arrListCompare)))
                     {
-                        $mixStepPool["step"] = 7;
+                        $mixStepPool["step"] = 9;
 
                         $arrContenData["data"][5]["html"] = "";
                         $arrContenData["data"][5]["state"] = $GLOBALS['TL_LANG']['MSC']['skipped'];
@@ -1659,7 +1671,7 @@ class SyncCtoModuleClient extends BackendModule
                     }
                     else if (count($this->arrListCompare) == 0 || $this->arrListCompare == FALSE || !is_array($this->arrListCompare))
                     {
-                        $mixStepPool["step"] = 7;
+                        $mixStepPool["step"] = 9;
 
                         $arrContenData["data"][5]["html"] = "";
                         $arrContenData["data"][5]["state"] = $GLOBALS['TL_LANG']['MSC']['skipped'];
@@ -1670,7 +1682,7 @@ class SyncCtoModuleClient extends BackendModule
                     }
                     else
                     {
-                        $mixStepPool["step"] = 7;
+                        $mixStepPool["step"] = 9;
 
                         $arrContenData["data"][5]["description"] = vsprintf($GLOBALS['TL_LANG']['tl_syncCto_sync']["step_5"]['description_2'], array($intSendCount, count($this->arrListCompare)));
                         $arrContenData["data"][5]["state"] = $GLOBALS['TL_LANG']['MSC']['ok'];
