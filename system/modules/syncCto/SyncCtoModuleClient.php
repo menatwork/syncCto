@@ -1284,7 +1284,6 @@ class SyncCtoModuleClient extends BackendModule
         $arrContenData["error_msg"] = "";
         $arrContenData["data"][4]["state"] = $GLOBALS['TL_LANG']['MSC']['progress'];
 
-
         $arrTables = $this->Session->get("syncCto_SyncTables");
 
         /* ---------------------------------------------------------------------
@@ -1631,7 +1630,6 @@ class SyncCtoModuleClient extends BackendModule
                 case 6:
                     $this->objSyncCtoCommunicationClient->purgeTemp();
                     $this->objSyncCtoFiles->purgeTemp();
-                    $this->objSyncCtoCommunicationClient->referrerEnable();
                     
                     $mixStepPool["step"] = 7;
                     
@@ -1660,8 +1658,6 @@ class SyncCtoModuleClient extends BackendModule
                 case 9:
                     if ($intSyncTyp == SYNCCTO_SMALL && ( (count($this->arrListCompare) == 0 || $this->arrListCompare == FALSE) && !is_array($this->arrListCompare)))
                     {
-                        $mixStepPool["step"] = 9;
-
                         $arrContenData["data"][5]["html"] = "";
                         $arrContenData["data"][5]["state"] = $GLOBALS['TL_LANG']['MSC']['skipped'];
                         $arrContenData["data"][5]["description"] = $GLOBALS['TL_LANG']['tl_syncCto_sync']["step_5"]['description_1'];
@@ -1671,8 +1667,6 @@ class SyncCtoModuleClient extends BackendModule
                     }
                     else if (count($this->arrListCompare) == 0 || $this->arrListCompare == FALSE || !is_array($this->arrListCompare))
                     {
-                        $mixStepPool["step"] = 9;
-
                         $arrContenData["data"][5]["html"] = "";
                         $arrContenData["data"][5]["state"] = $GLOBALS['TL_LANG']['MSC']['skipped'];
                         $arrContenData["data"][5]["description"] = $GLOBALS['TL_LANG']['tl_syncCto_sync']["step_5"]['description_1'];
@@ -1682,8 +1676,6 @@ class SyncCtoModuleClient extends BackendModule
                     }
                     else
                     {
-                        $mixStepPool["step"] = 9;
-
                         $arrContenData["data"][5]["description"] = vsprintf($GLOBALS['TL_LANG']['tl_syncCto_sync']["step_5"]['description_2'], array($intSendCount, count($this->arrListCompare)));
                         $arrContenData["data"][5]["state"] = $GLOBALS['TL_LANG']['MSC']['ok'];
                         $arrContenData["finished"] = true;
