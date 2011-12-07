@@ -84,7 +84,7 @@ $GLOBALS['TL_DCA']['tl_syncCto_clients_syncTo'] = array(
         ),
         'purgeData' => array
             (
-            'label' => array("Client aufräumen","Wählen Sie dies Option aus um den Client nach dem syncronisieren aufzuräumen."),
+            'label' => &$GLOBALS['TL_LANG']['tl_syncCto_clients_syncTo']['purgeData'],
             'inputType' => 'checkbox',
             'exclude' => true,
             'eval' => array('multiple' => false),

@@ -43,5 +43,5 @@ $GLOBALS['TL_LANG']['tl_syncCto_clients_syncTo']['sync_type']                   
 $GLOBALS['TL_LANG']['tl_syncCto_clients_syncTo']['database_tables_recommended']         = array('Recommended tables', 'Here you can select the recommended tables for synchronization.');
 $GLOBALS['TL_LANG']['tl_syncCto_clients_syncTo']['database_tables_none_recommended']    = array('Not recommended tables', 'Here you can select the not recommended tables for synchronization. Use at your own risk.');
 $GLOBALS['TL_LANG']['tl_syncCto_clients_syncTo']['filelist']                            = array('Source files', 'Please select a file or folder from the files directory.');
-
+$GLOBALS['TL_LANG']['tl_syncCto_clients_syncTo']['purgeData']                           = array('Purge data', 'Please select this option, if you want to purge the client temp data.');
 ?>
