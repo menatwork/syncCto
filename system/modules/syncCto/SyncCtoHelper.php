@@ -280,7 +280,7 @@ class SyncCtoHelper extends Backend
 
                     // Clean link
                     $objClient->path = preg_replace("/\/\z/i", "", $objClient->path);
-                    $objClient->path = preg_replace("/ctoCommunication.php\z/i", "", $objClient->path);
+                    $objClient->path = preg_replace("/ctoCommunication.php\z/", "", $objClient->path);
 
                     // Build link
                     $strServer = $objClient->address . ":" . $objClient->port;
@@ -294,10 +294,19 @@ class SyncCtoHelper extends Backend
                     {
                         $strUrl = $objClient->address . ":" . $objClient->port . "/" . $objClient->path . "/ctoCommunication.php?act=ping";
                     }
-
+                    
                     $intReturn = 0;
 
                     $objRequest = new RequestExtendedCached();
+                    
+                    // Set http auth
+                    if ($objClient->http_auth == true)
+                    {
+                        $this->import("Encryption");
+
+                        $objRequest->strHTTPUser = $objClient->http_username;
+                        $objRequest->strHTTPPassword = $this->Encryption->decrypt($objClient->http_password);
+                    }
 
                     // Check Server
                     $objRequest->send($strServer);

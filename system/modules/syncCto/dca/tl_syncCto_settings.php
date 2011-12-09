@@ -1,4 +1,5 @@
-<?php if (!defined('TL_ROOT')) die('You can not access this file directly!');
+<?php
+if (!defined('TL_ROOT')) die('You can not access this file directly!');
 
 /**
  * Contao Open Source CMS
@@ -26,7 +27,6 @@
  * @license    GNU/LGPL
  * @filesource
  */
-
 $GLOBALS['TL_DCA']['tl_syncCto_settings'] = array(
     // Config
     'config' => array
@@ -38,7 +38,12 @@ $GLOBALS['TL_DCA']['tl_syncCto_settings'] = array(
     // Palettes
     'palettes' => array
         (
-        'default' => '{blacklist_legend:hide},syncCto_folder_blacklist,syncCto_file_blacklist;{whitelist_legend:hide},syncCto_folder_whitelist;{local_blacklist_legend},syncCto_local_blacklist;{hidden_tables_legend:hide},syncCto_hidden_tables;{tables_legend},syncCto_database_tables;{debug_legend},syncCto_debug_mode;'
+        '__selector__' => array('syncCto_custom_settings'),
+        'default' => '{blacklist_legend:hide},syncCto_folder_blacklist,syncCto_file_blacklist;{whitelist_legend:hide},syncCto_folder_whitelist;{local_blacklist_legend},syncCto_local_blacklist;{hidden_tables_legend:hide},syncCto_hidden_tables;{tables_legend},syncCto_database_tables;{debug_legend},syncCto_debug_mode;{custom_legend:hide},syncCto_custom_settings;'
+    ),
+    'subpalettes' => array
+        (
+        'syncCto_custom_settings' => 'syncCto_wait_timeout,syncCto_interactive_timeout',
     ),
     // Fields
     'fields' => array(
@@ -98,6 +103,27 @@ $GLOBALS['TL_DCA']['tl_syncCto_settings'] = array(
             'inputType' => 'checkbox',
             'exclude' => true,
         ),
+        'syncCto_custom_settings' => array
+            (
+            'label' => &$GLOBALS['TL_LANG']['tl_syncCto_settings']['custom_settings'],
+            'inputType' => 'checkbox',
+            'exclude' => true,
+            'eval' => array('submitOnChange' => true),
+        ),
+        'syncCto_wait_timeout' => array
+            (
+            'label' => &$GLOBALS['TL_LANG']['tl_syncCto_settings']['wait_timeout'],
+            'inputType' => 'text',
+            'exclude' => true,
+            'eval' => array('tl_class' => 'w50'),
+        ),
+        'syncCto_interactive_timeout' => array
+            (
+            'label' => &$GLOBALS['TL_LANG']['tl_syncCto_settings']['interactive_timeout'],
+            'inputType' => 'text',
+            'exclude' => true,
+            'eval' => array('tl_class' => 'w50'),
+        ),
     )
 );
 
@@ -126,10 +152,10 @@ class tl_syncCto_settings extends Backend
      * @return array 
      */
     public function localconfigEntries()
-    {      
+    {
         return $this->objSyncCtoHelper->loadConfigs(SyncCtoEnum::LOADCONFIG_KEYS_ONLY);
     }
-    
+
     /**
      * Load blacklist localconfig entries
      * 
@@ -174,7 +200,7 @@ class tl_syncCto_settings extends Backend
         return $this->objSyncCtoHelper->getWhitelistFolder();
     }
 
-    /** 
+    /**
      * Load hidden tables
      * 
      * @param string $strValue

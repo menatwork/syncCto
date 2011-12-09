@@ -100,7 +100,11 @@ $GLOBALS['TL_DCA']['tl_synccto_clients'] = array(
     ),
     // Palettes
     'palettes' => array(
-        'default' => '{apikey_legend},apikey;{title_legend},title,description;{connection_legend},address,path,port,codifyengine;'
+        '__selector__' => array('http_auth'),
+        'default' => '{apikey_legend},apikey;{title_legend},title,description;{connection_legend},address,path,port,codifyengine;{auth_legend},http_auth',
+    ),
+    'subpalettes' => array(
+        'http_auth' => 'http_username,http_password',
     ),
     // Fields
     'fields' => array(
@@ -147,7 +151,7 @@ $GLOBALS['TL_DCA']['tl_synccto_clients'] = array(
             'search' => true,
             'default' => '80',
             'exclude' => true,
-            'eval' => array('mandatory' => true, 'tl_class'=>'w50')
+            'eval' => array('rgxp' => 'digit', 'mandatory' => true, 'tl_class'=>'w50')
         ),
         'codifyengine' => array(
             'label' => &$GLOBALS['TL_LANG']['tl_syncCto_clients']['codifyengine'],
@@ -156,6 +160,24 @@ $GLOBALS['TL_DCA']['tl_synccto_clients'] = array(
             'exclude' => true,
             'options_callback' => array("tl_synccto_clients", "callCodifyengines"),
             'eval' => array('mandatory' => true, 'tl_class'=>'w50', 'helpwizard' => true),
+        ),
+        'http_auth' => array (
+            'label' => &$GLOBALS['TL_LANG']['tl_syncCto_clients']['http_auth'],
+            'inputType' => 'checkbox',
+            'exclude' => true,
+            'eval' => array('submitOnChange' => true),
+        ),
+        'http_username' => array(
+            'label' => &$GLOBALS['TL_LANG']['tl_syncCto_clients']['http_username'],
+            'inputType' => 'text',
+            'exclude' => true,
+            'eval' => array('mandatory' => true, 'tl_class'=>'w50'),
+        ),
+        'http_password' => array(
+            'label' => &$GLOBALS['TL_LANG']['tl_syncCto_clients']['http_password'],
+            'inputType' => 'text',
+            'exclude' => true,
+            'eval' => array('mandatory' => true, 'encrypt' => true, 'tl_class'=>'w50'),
         ),
     )
 );

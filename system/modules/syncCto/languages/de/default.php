@@ -77,7 +77,7 @@ $GLOBALS['TL_LANG']['MSC']['big_files']                     = 'Groß';
 $GLOBALS['TL_LANG']['MSC']['skipped_files']                 = 'Übersprungen';
 $GLOBALS['TL_LANG']['MSC']['ignored_files']                 = 'Ignoriert';
 $GLOBALS['TL_LANG']['MSC']['submit_files']                  = 'Dateien transferieren';
-$GLOBALS['TL_LANG']['MSC']['delete_files']                  = 'Ausgewählte Dateien entfernen';
+$GLOBALS['TL_LANG']['MSC']['delete_files']                  = 'Ausgewählte Dateien aus der Liste entfernen';
 $GLOBALS['TL_LANG']['MSC']['information_last_sync']         = 'Die letzte Synchronisierung wurde um %s am %s vom User %s (%s) durchgeführt.';
 //$GLOBALS['TL_LANG']['MSC']['skipped_files']                 = " Datei(en) übersprungen.";
 

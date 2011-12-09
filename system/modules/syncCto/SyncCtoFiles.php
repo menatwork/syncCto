@@ -688,6 +688,12 @@ class SyncCtoFiles extends System
         // Is the given string a folder
         else
         {
+            // Check if folder exists
+            if(!file_exists(TL_ROOT . "/" . $strPath))
+            {
+                return $arrList;
+            }
+
             // Scan Folder
             $arrScan = scan(TL_ROOT . "/" . $strPath);
 

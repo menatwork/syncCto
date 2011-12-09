@@ -1656,7 +1656,10 @@ class SyncCtoModuleClient extends BackendModule
                  * Show information
                  */
                 case 9:
-                    if ($intSyncTyp == SYNCCTO_SMALL && ( (count($this->arrListCompare) == 0 || $this->arrListCompare == FALSE) && !is_array($this->arrListCompare)))
+                    if ($intSyncTyp == SYNCCTO_SMALL
+                            && ( (count($this->arrListCompare) == 0 || $this->arrListCompare == FALSE)
+                            && !is_array($this->arrListCompare))
+                            && $booPurgeData == FALSE)
                     {
                         $arrContenData["data"][5]["html"] = "";
                         $arrContenData["data"][5]["state"] = $GLOBALS['TL_LANG']['MSC']['skipped'];
@@ -1665,7 +1668,10 @@ class SyncCtoModuleClient extends BackendModule
 
                         break;
                     }
-                    else if (count($this->arrListCompare) == 0 || $this->arrListCompare == FALSE || !is_array($this->arrListCompare))
+                    else if ((count($this->arrListCompare) == 0
+                            || $this->arrListCompare == FALSE
+                            || !is_array($this->arrListCompare))
+                            && $booPurgeData == FALSE)
                     {
                         $arrContenData["data"][5]["html"] = "";
                         $arrContenData["data"][5]["state"] = $GLOBALS['TL_LANG']['MSC']['skipped'];
@@ -1722,12 +1728,12 @@ class SyncCtoModuleClient extends BackendModule
 
                             $arrSort = array();
                             
-                            if ($intSendCount != 0)
+                            if (($intSendCount - $intDelCount) != 0)
                             {
                                 $compare .= '<ul class="fileinfo">';
 
                                 $compare .= "<li>";
-                                $compare .= '<strong>' . $GLOBALS['TL_LANG']['tl_syncCto_sync']["step_5"]['description_7'] . '</strong>';
+                                $compare .= '<strong>1' . $GLOBALS['TL_LANG']['tl_syncCto_sync']["step_5"]['description_7'] . '</strong>';
                                 $compare .= "<ul>";
 
                                 foreach ($this->arrListCompare as $key => $value)
@@ -3071,8 +3077,6 @@ class SyncCtoModuleClient extends BackendModule
                  * Show information
                  */
                 case 7:
-                    echo 7;
-
                     if ($intSyncTyp == SYNCCTO_SMALL && ( (count($this->arrListCompare) == 0 || $this->arrListCompare == FALSE) && !is_array($this->arrListCompare)))
                     {
                         $mixStepPool["step"] = 7;

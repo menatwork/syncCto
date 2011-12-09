@@ -19,13 +19,16 @@ CREATE TABLE `tl_synccto_clients` (
     `description` text NULL,
     `address` text NOT NULL,
     `path` varchar(255) NOT NULL default '',
-    `port` text NULL,
+    `port` int(10) unsigned NOT NULL default '0',
     `codifyengine` text NOT NULL,
     `cookie` longtext NULL,
     `syncTo_user` int(10) unsigned NOT NULL default '0',
     `syncFrom_user` int(10) unsigned NOT NULL default '0',
     `syncTo_tstamp` int(10) unsigned NOT NULL default '0',
     `syncFrom_tstamp` int(10) unsigned NOT NULL default '0',
+    `http_auth` char(1) NOT NULL default '',
+    `http_username` varchar(128) NOT NULL default '',
+    `http_password` varchar(128) NOT NULL default '',
     PRIMARY KEY  (`id`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 

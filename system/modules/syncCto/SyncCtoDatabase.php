@@ -224,15 +224,15 @@ class SyncCtoDatabase extends Backend
             $strPath = $GLOBALS['SYC_PATH']['db'];
         }
 
-        $objZipWrite = new ZipWriter($strPath . $strFilename);
+        $objZipWrite = new ZipWriter($strPath . $strFilename);  
 
-        $arrTables = $this->getTableStructure();
-        $arrData = $this->getTableData();
+        $arrTables = $this->getTableStructure();        
+        $arrData = $this->getTableData();               
 
         $objZipWrite->addString($this->buildFileSQLTables($arrTables) . $this->buildFileSQLInsert($arrData), $this->strFilenameSQL);
-        $objZipWrite->addString(serialize($arrData), $this->strFilenameInsert);
+        $objZipWrite->addString(serialize($arrData), $this->strFilenameInsert);       
         $objZipWrite->addString(serialize($arrTables), $this->strFilenameTable);
-
+        
         $objZipWrite->close();
 
         return $strFilename;
@@ -266,6 +266,18 @@ class SyncCtoDatabase extends Backend
         if (!is_array($arrInsert) || !is_array($arrRestoreTables))
         {
             throw new Exception("Could not load SQL files. Maybe damaged?");
+        }
+
+        // Set time out for database. Ticket #2653
+        if ($GLOBALS['TL_CONFIG']['syncCto_custom_settings'] == true
+                && intval($GLOBALS['TL_CONFIG']['syncCto_wait_timeout']) > 0
+                && intval($GLOBALS['TL_CONFIG']['syncCto_interactive_timeout']) > 0)
+        {
+            $this->Database->query('SET SESSION wait_timeout = GREATEST(' . intval($GLOBALS['TL_CONFIG']['syncCto_wait_timeout']) . ', @@wait_timeout), SESSION interactive_timeout = GREATEST(' . intval($GLOBALS['TL_CONFIG']['syncCto_interactive_timeout']) . ', @@wait_timeout);');
+        }
+        else
+        {
+            $this->Database->query('SET SESSION wait_timeout = GREATEST(28000, @@wait_timeout), SESSION interactive_timeout = GREATEST(28000, @@wait_timeout);');
         }
 
         try
@@ -489,6 +501,11 @@ class SyncCtoDatabase extends Backend
             if ($zeile['Auto_increment'] != "")
                 $return[$zeile['Name']]['TABLE_OPTIONS'] .= " AUTO_INCREMENT=" . $zeile['Auto_increment'] . " ";
         }
+        
+        // Free up some mem
+        unset($objStatus);
+        unset($tables);
+        unset($zeile);
 
         return $return;
     }
@@ -578,7 +595,7 @@ class SyncCtoDatabase extends Backend
                     }
                     else
                     {
-                        $arrReturn[$table]['values'][$ii][$fields[$i]['name']] = "''";
+                        //$arrReturn[$table]['values'][$ii][$fields[$i]['name']] = "''";
                     }
 
                     $i++;
@@ -587,6 +604,8 @@ class SyncCtoDatabase extends Backend
                 $ii++;
             }
         }
+        
+        unset($tables);
 
         return $arrReturn;
     }
@@ -627,18 +646,18 @@ class SyncCtoDatabase extends Backend
         $strBody .= "`) VALUES ( ";
 
         $arrValues = array();
-        for ($i = 0; $i < count($arrData); $i++)
+        for ($i = 0; $i < count($arrKeys); $i++)
         {
-            if ($booPrepare)
+            if (isset($arrData[$arrKeys[$i]]))
             {
                 $strBody .= $arrData[$arrKeys[$i]];
             }
             else
             {
-                $strBody .= $arrData[$arrKeys[$i]];
+                $strBody .= '';
             }
 
-            if ($i < count($arrData) - 1)
+            if ($i < count($arrKeys) - 1)
                 $strBody .= ", ";
         }
 

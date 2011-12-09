@@ -110,7 +110,15 @@ class SyncCtoCommunicationClient extends CtoCommunication
 
         $this->setClient($strUrl, $objClient->codifyengine);
         $this->setApiKey($objClient->apikey);
-
+        
+        if($objClient->http_auth == true)
+        {
+            $this->import("Encryption");
+            
+            $this->strHTTPUser = $objClient->http_username;
+            $this->strHTTPPassword = $this->Encryption->decrypt($objClient->http_password);
+        }
+        
         // Set debug modus for ctoCom.
         if ($GLOBALS['TL_CONFIG']['syncCto_debug_mode'] == true)
         {
@@ -144,7 +152,7 @@ class SyncCtoCommunicationClient extends CtoCommunication
     }
 
     /**
-     * Enable the refferer check on the client
+     * Enable the referrer check on the client
      * 
      * @return boolean 
      */

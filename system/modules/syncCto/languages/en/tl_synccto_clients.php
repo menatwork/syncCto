@@ -46,6 +46,7 @@ $GLOBALS['TL_LANG']['tl_syncCto_clients']['syncFromConfirm']    = 'Do you really
 $GLOBALS['TL_LANG']['tl_synccto_clients']['title_legend']       = 'Client description';
 $GLOBALS['TL_LANG']['tl_synccto_clients']['connection_legend']  = 'Connection settings';
 $GLOBALS['TL_LANG']['tl_synccto_clients']['apikey_legend']      = 'Encryption';
+$GLOBALS['TL_LANG']['tl_synccto_clients']['auth_legend']        = 'HTTP Authentication';
 
 /**
  * Fields
@@ -58,5 +59,8 @@ $GLOBALS['TL_LANG']['tl_syncCto_clients']['path']               = array('Server 
 $GLOBALS['TL_LANG']['tl_syncCto_clients']['port']               = array('Port number', 'Please enter the number of the HTTP port. Default is 80.');
 $GLOBALS['TL_LANG']['tl_syncCto_clients']['apikey']             = array('ctoCommunication API key', 'This key ensures the communication between the contao installations.');
 $GLOBALS['TL_LANG']['tl_syncCto_clients']['codifyengine']       = array('Encryption', 'Please choose the encryption engine.');
+$GLOBALS['TL_LANG']['tl_syncCto_clients']['http_auth']          = array('Activate HTTP Authentication', 'Please choose this option to active the HTTP Authentication');
+$GLOBALS['TL_LANG']['tl_syncCto_clients']['http_username']      = array('Username', 'Please enter the username for authentication.');
+$GLOBALS['TL_LANG']['tl_syncCto_clients']['http_password']      = array('Password', 'Please enter the password for authentication.');
 
 ?>

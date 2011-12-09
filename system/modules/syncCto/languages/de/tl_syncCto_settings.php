@@ -38,6 +38,7 @@ $GLOBALS['TL_LANG']['tl_syncCto_settings']['hidden_tables_legend']      = 'Verst
 $GLOBALS['TL_LANG']['tl_syncCto_settings']['tables_legend']             = 'Nicht empfohlene Tabellen';
 $GLOBALS['TL_LANG']['tl_syncCto_settings']['security_legend']           = 'Verschlüsselung';
 $GLOBALS['TL_LANG']['tl_syncCto_settings']['debug_legend']              = 'Debugmodus';
+$GLOBALS['TL_LANG']['tl_syncCto_settings']['custom_legend']             = 'Experten-Einstellungen';
 
 /**
  * Fields
@@ -49,4 +50,8 @@ $GLOBALS['TL_LANG']['tl_syncCto_settings']['local_blacklist']           = array(
 $GLOBALS['TL_LANG']['tl_syncCto_settings']['database_tables']           = array('Nicht empfohlene Tabellen', 'Hier können Sie definieren welche Datenbank-Tabellen Sie nicht für die Synchronisation empfehlen.');
 $GLOBALS['TL_LANG']['tl_syncCto_settings']['hidden_tables']             = array('Versteckte Tabellen', 'Hier können Sie den Zugriff auf eine oder mehrere Datenbank-Tabellen für die Synchronisation festlegen.');
 $GLOBALS['TL_LANG']['tl_syncCto_settings']['debug_mode']                = array('Debugmodus aktivieren', 'Informationen zur Laufzeit und den übertragenen Dateien auf dem Bildschirm ausgeben.');
+$GLOBALS['TL_LANG']['tl_syncCto_settings']['custom_settings']           = array('Experten-Einstellungen aktivieren', 'Klicken Sie hier wenn Sie wissen was Sie tun.');
+$GLOBALS['TL_LANG']['tl_syncCto_settings']['wait_timeout']              = array('"wait_timeout" konfigurieren', 'Mehr Informationen: http://goo.gl/rC5Y4');
+$GLOBALS['TL_LANG']['tl_syncCto_settings']['interactive_timeout']       = array('"interactive_timeout" konfigurieren', 'Mehr Informationen: http://goo.gl/VHxRK');
+
 ?>
