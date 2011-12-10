@@ -1,0 +1,3 @@
+[submodule "ctoCommunication"]
+	path = ctoCommunication
+	url = ../ctoCommunication.git
