@@ -1454,7 +1454,7 @@ class SyncCtoModuleClient extends BackendModule
          */
 
         // Check if there is any file for upload
-        if (count($this->arrListCompare) == 0 || !is_array($this->arrListCompare) && $mixStepPool["step"] == 1)
+        if ((count($this->arrListCompare) == 0 || !is_array($this->arrListCompare)) && $mixStepPool["step"] == 1)
         {
             $mixStepPool["step"] = 5;
         }
