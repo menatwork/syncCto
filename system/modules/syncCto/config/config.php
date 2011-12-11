@@ -275,6 +275,14 @@ $GLOBALS["CTOCOM_FUNCTIONS"]["SYNCCTO_REBUILD_SPLITFILE"] = array(
     "parameter" => array("splitname", "splitcount", "movepath", "md5"),
 );
 
+// split a file
+$GLOBALS["CTOCOM_FUNCTIONS"]["SYNCCTO_SPLITFILE"] = array(
+    "class" => "SyncCtoFiles",
+    "function" => "splitFiles",
+    "typ" => "POST",
+    "parameter" => array("splitname", "destfolder", "destfile", "limit"),
+);
+
 // Send a file
 $GLOBALS["CTOCOM_FUNCTIONS"]["SYNCCTO_SEND_FILE"] = array(
     "class" => "SyncCtoFiles",

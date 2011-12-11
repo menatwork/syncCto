@@ -654,7 +654,7 @@ class SyncCtoDatabase extends Backend
             }
             else
             {
-                $strBody .= '';
+                $strBody .= "''";
             }
 
             if ($i < count($arrKeys) - 1)

@@ -497,6 +497,39 @@ class SyncCtoCommunicationClient extends CtoCommunication
     }
     
     /**
+     * Build splitfiles back to one big file
+     * 
+     * @param type $strSplitname
+     * @param type $intSplitcount
+     * @param type $strMovepath
+     * @param type $strMD5
+     * @return type 
+     */
+    public function runSplitFiles($strSrcFile, $strDesFolder, $strDesFile, $intSizeLimit)
+    {
+        $arrData = array(
+            array(
+                "name" => "splitname",
+                "value" => $strSrcFile,
+            ),
+            array(
+                "name" => "destfolder",
+                "value" => $strDesFolder,
+            ),
+            array(
+                "name" => "destfile",
+                "value" => $strDesFile,
+            ),
+            array(
+                "name" => "limit",
+                "value" => $intSizeLimit,
+            ),
+        );
+
+        return $this->runServer("SYNCCTO_SPLITFILE", $arrData);
+    }
+    
+    /**
      * Get a file
      * 
      * @param type $strPath
