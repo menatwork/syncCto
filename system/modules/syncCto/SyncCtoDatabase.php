@@ -285,8 +285,8 @@ class SyncCtoDatabase extends Backend
             // Create temp tables
             foreach ($arrRestoreTables as $key => $value)
             {
-                $this->Database->prepare("DROP TABLE IF EXISTS " . "synccto_temp_" . $key)->execute();
-                $this->Database->prepare($this->buildSQLTable($value, "synccto_temp_" . $key))->execute();
+                $this->Database->prepare("DROP TABLE IF EXISTS " . "synccto_temp_" . $key)->executeUncached();
+                $this->Database->prepare($this->buildSQLTable($value, "synccto_temp_" . $key))->executeUncached();
             }
 
             // Inserts
@@ -297,7 +297,7 @@ class SyncCtoDatabase extends Backend
                     foreach ($table['values'] as $value)
                     {
                         $strSQL = $this->buildSQLInsert("synccto_temp_" . $table['name'], $table['keys'], $value, true);
-                        $this->Database->prepare($strSQL)->execute();
+                        $this->Database->prepare($strSQL)->executeUncached();
                     }
                 }
             }
@@ -305,15 +305,15 @@ class SyncCtoDatabase extends Backend
             // Rename temp tables
             foreach ($arrRestoreTables as $key => $value)
             {
-                $this->Database->prepare("DROP TABLE IF EXISTS " . $key)->execute();
-                $this->Database->prepare("RENAME TABLE " . "synccto_temp_" . $key . " TO " . $key)->execute();
+                $this->Database->prepare("DROP TABLE IF EXISTS " . $key)->executeUncached();
+                $this->Database->prepare("RENAME TABLE " . "synccto_temp_" . $key . " TO " . $key)->executeUncached();
             }
         }
         catch (Exception $exc)
         {
             foreach ($arrRestoreTables as $key => $value)
             {
-                $this->Database->prepare("DROP TABLE IF EXISTS " . "synccto_temp_" . $key)->execute();
+                $this->Database->prepare("DROP TABLE IF EXISTS " . "synccto_temp_" . $key)->executeUncached();
             }
 
             throw $exc;
@@ -355,7 +355,7 @@ class SyncCtoDatabase extends Backend
             $fields = $this->Database->listFields($table);
 
             // Get list of indicies
-            $arrIndexes = $this->Database->prepare("SHOW INDEX FROM `$table`")->execute()->fetchAllAssoc();
+            $arrIndexes = $this->Database->prepare("SHOW INDEX FROM `$table`")->executeUncached()->fetchAllAssoc();
 
             foreach ($fields as $field)
             {
@@ -491,21 +491,16 @@ class SyncCtoDatabase extends Backend
         }
 
         // Table status
-        $objStatus = $this->Database->prepare("SHOW TABLE STATUS")->execute();
-        while ($zeile = $objStatus->fetchAssoc())
+        $objStatus = $this->Database->prepare("SHOW TABLE STATUS")->executeUncached();
+        while ($row = $objStatus->fetchAssoc())
         {
-            if (!in_array($zeile['Name'], $this->arrBackupTables))
+            if (!in_array($row['Name'], $this->arrBackupTables))
                 continue;
 
-            $return[$zeile['Name']]['TABLE_OPTIONS'] = " ENGINE=" . $zeile['Engine'] . " DEFAULT CHARSET=" . substr($zeile['Collation'], 0, strpos($zeile['Collation'], "_")) . "";
-            if ($zeile['Auto_increment'] != "")
-                $return[$zeile['Name']]['TABLE_OPTIONS'] .= " AUTO_INCREMENT=" . $zeile['Auto_increment'] . " ";
+            $return[$row['Name']]['TABLE_OPTIONS'] = " ENGINE=" . $row['Engine'] . " DEFAULT CHARSET=" . substr($row['Collation'], 0, strpos($row['Collation'], "_")) . "";
+            if ($row['Auto_increment'] != "")
+                $return[$row['Name']]['TABLE_OPTIONS'] .= " AUTO_INCREMENT=" . $row['Auto_increment'] . " ";
         }
-        
-        // Free up some mem
-        unset($objStatus);
-        unset($tables);
-        unset($zeile);
 
         return $return;
     }
@@ -538,7 +533,7 @@ class SyncCtoDatabase extends Backend
                 continue;
             }
 
-            $objData = $this->Database->prepare("SELECT * FROM $table")->execute();
+            $objData = $this->Database->prepare("SELECT * FROM $table")->executeUncached();
             $fields = $this->Database->listFields($table);
 
             foreach ($fields as $key => $value)
@@ -593,10 +588,6 @@ class SyncCtoDatabase extends Backend
                                 break;
                         }
                     }
-                    else
-                    {
-                        //$arrReturn[$table]['values'][$ii][$fields[$i]['name']] = "''";
-                    }
 
                     $i++;
                 }
@@ -605,8 +596,6 @@ class SyncCtoDatabase extends Backend
             }
         }
         
-        unset($tables);
-
         return $arrReturn;
     }
 
