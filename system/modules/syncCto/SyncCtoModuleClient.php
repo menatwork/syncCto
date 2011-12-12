@@ -3317,7 +3317,7 @@ class SyncCtoModuleClient extends BackendModule
                                 $compare .= '<ul class="fileinfo">';
 
                                 $compare .= "<li>";
-                                $compare .= '<strong>1' . $GLOBALS['TL_LANG']['tl_syncCto_sync']["step_5"]['description_7'] . '</strong>';
+                                $compare .= '<strong>' . $GLOBALS['TL_LANG']['tl_syncCto_sync']["step_5"]['description_7'] . '</strong>';
                                 $compare .= "<ul>";
 
                                 foreach ($this->arrListCompare as $key => $value)
