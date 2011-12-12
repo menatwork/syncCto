@@ -359,6 +359,8 @@ class SyncCtoDatabase extends Backend
 
             foreach ($fields as $field)
             {
+                
+                
                 if (version_compare(VERSION, '2.10', '<'))
                 {
                     // Indices
@@ -407,9 +409,7 @@ class SyncCtoDatabase extends Backend
                                 {
                                     if ($valueIndexe["Column_name"] == $valueField)
                                     {
-                                        $strTyp = $valueIndexe["Index_type"];
-                                        $arrReturn[] = "`$valueField` (" . $valueIndexe["Sub_part"] . ")";
-
+                                        $return[$table]['TABLE_CREATE_DEFINITIONS'][$field["name"]] = "UNIQUE KEY (`" . implode("`,`", $field["index_fields"]) . "`)";
                                         break;
                                     }
                                 }
@@ -426,9 +426,7 @@ class SyncCtoDatabase extends Backend
                                 {
                                     if ($valueIndexe["Column_name"] == $valueField)
                                     {
-                                        $strTyp = $valueIndexe["Index_type"];
-                                        $arrReturn[] = "`$valueField`";
-
+                                        $return[$table]['TABLE_CREATE_DEFINITIONS'][$field["name"]] = "KEY $valueField (`$valueField`)";
                                         break;
                                     }
                                 }
@@ -449,7 +447,7 @@ class SyncCtoDatabase extends Backend
                         continue;
                     }
                 }
-
+                
                 unset($field['index']);
 
                 $name = $field['name'];
@@ -489,7 +487,7 @@ class SyncCtoDatabase extends Backend
                 $return[$table]['TABLE_FIELDS'][$name] = trim(implode(' ', $field));
             }
         }
-
+        
         // Table status
         $objStatus = $this->Database->prepare("SHOW TABLE STATUS")->executeUncached();
         while ($row = $objStatus->fetchAssoc())
