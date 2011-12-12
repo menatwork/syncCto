@@ -57,6 +57,7 @@ $GLOBALS['TL_LANG']['MSC']['unknown_step']                  = 'Unknown step';
  * Headline
  */
 $GLOBALS['TL_LANG']['MSC']['step']                          = 'Step';
+$GLOBALS['TL_LANG']['MSC']['abort']                         = "Abort!";
 $GLOBALS['TL_LANG']['MSC']['complete']                      = 'Completed!';
 $GLOBALS['TL_LANG']['MSC']['debug_mode']                    = 'Debug mode';
 
@@ -80,6 +81,12 @@ $GLOBALS['TL_LANG']['MSC']['submit_files']                  = 'Submit files';
 $GLOBALS['TL_LANG']['MSC']['delete_files']                  = 'Delete selected files from the list';
 $GLOBALS['TL_LANG']['MSC']['information_last_sync']         = 'Last synchronisation was made at %s on %s from user %s (%s).';
 $GLOBALS['TL_LANG']['MSC']['skipped_files']                 = ' File(s) skipped.';
+
+/**
+ * Buttons
+ */
+$GLOBALS['TL_LANG']['MSC']['abort_sync']                    = array("Abort", 'In progress');
+$GLOBALS['TL_LANG']['MSC']['repeat_sync']                   = array("Repeat", 'In progress');
 
 /**
  * Debug mode

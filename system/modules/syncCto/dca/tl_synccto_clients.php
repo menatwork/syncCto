@@ -101,7 +101,7 @@ $GLOBALS['TL_DCA']['tl_synccto_clients'] = array(
     // Palettes
     'palettes' => array(
         '__selector__' => array('http_auth'),
-        'default' => '{apikey_legend},apikey;{title_legend},title,description;{connection_legend},address,path,port,codifyengine;{auth_legend},http_auth',
+        'default' => '{apikey_legend},apikey;{title_legend},title,description;{connection_legend},address,path,port,codifyengine;{expert_legend:hide},http_auth',
     ),
     'subpalettes' => array(
         'http_auth' => 'http_username,http_password',
@@ -165,7 +165,7 @@ $GLOBALS['TL_DCA']['tl_synccto_clients'] = array(
             'label' => &$GLOBALS['TL_LANG']['tl_syncCto_clients']['http_auth'],
             'inputType' => 'checkbox',
             'exclude' => true,
-            'eval' => array('submitOnChange' => true),
+            'eval' => array('submitOnChange' => true, 'tl_class'=>'clr'),
         ),
         'http_username' => array(
             'label' => &$GLOBALS['TL_LANG']['tl_syncCto_clients']['http_username'],

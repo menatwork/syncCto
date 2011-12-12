@@ -51,6 +51,14 @@
         </div>
     <?php endif; ?>
 
+    <?php if ($this->showControl == true): ?>
+        <div class="tl_box" id="buttons">
+            <a href="<?php echo $this->abortLink; ?>" onclick="$(this).setProperty('text', '<?php echo $GLOBALS['TL_LANG']['MSC']['abort_sync']['1']; ?>');" class="tl_submit"><?php echo $GLOBALS['TL_LANG']['MSC']['abort_sync']['0']; ?></a>
+        <?php if ($this->error): ?>
+            <a href="<?php echo $this->tryAgainLink; ?>" onclick="$(this).setProperty('text', '<?php echo $GLOBALS['TL_LANG']['MSC']['repeat_sync']['1']; ?>');" class="tl_submit"><?php echo $GLOBALS['TL_LANG']['MSC']['repeat_sync']['0']; ?></a>
+        <?php endif; ?>
+        </div>
+    <?php endif; ?>
 
     <script type="text/javascript">
         <!--//--><![CDATA[//><!--

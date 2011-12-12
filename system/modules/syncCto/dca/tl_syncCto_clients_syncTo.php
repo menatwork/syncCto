@@ -231,7 +231,8 @@ class tl_syncCto_clients_syncTo extends Backend
             "start" => microtime(true),
             "headline" => $GLOBALS['TL_LANG']['tl_syncCto_clients_syncTo']['edit'],
             "information" => "",
-            "data" => array()
+            "data" => array(),
+            "abort" => false,
         );
 
         $this->Session->set("syncCto_Content", $arrContenData);

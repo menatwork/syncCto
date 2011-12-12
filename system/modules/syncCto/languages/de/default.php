@@ -57,6 +57,7 @@ $GLOBALS['TL_LANG']['MSC']['unknown_step']                  = "Unbekannter Schri
  * Headline
  */
 $GLOBALS['TL_LANG']['MSC']['step']                          = "Schritt";
+$GLOBALS['TL_LANG']['MSC']['abort']                         = "Abbruch!";
 $GLOBALS['TL_LANG']['MSC']['complete']                      = "Fertig!";
 $GLOBALS['TL_LANG']['MSC']['debug_mode']                    = "Debugausgaben";
 
@@ -80,6 +81,12 @@ $GLOBALS['TL_LANG']['MSC']['submit_files']                  = 'Dateien transferi
 $GLOBALS['TL_LANG']['MSC']['delete_files']                  = 'Ausgewählte Dateien aus der Liste entfernen';
 $GLOBALS['TL_LANG']['MSC']['information_last_sync']         = 'Die letzte Synchronisierung wurde um %s am %s vom User %s (%s) durchgeführt.';
 //$GLOBALS['TL_LANG']['MSC']['skipped_files']                 = " Datei(en) übersprungen.";
+
+/**
+ * Buttons
+ */
+$GLOBALS['TL_LANG']['MSC']['abort_sync']                    = array("Abbrechen", 'In Arbeit');
+$GLOBALS['TL_LANG']['MSC']['repeat_sync']                   = array("Wiederholen", 'In Arbeit');
 
 /**
  * Debug mode

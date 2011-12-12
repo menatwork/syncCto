@@ -9,7 +9,7 @@
     <?php if (strlen($this->information) != 0): ?>
         <p class="info tl_info"><?php echo $this->information; ?></p>
     <?php endif; ?>
-
+        
     <?php foreach ($this->data as $key => $value) : ?>
 
         <div class="<?php echo ($key == 1) ? "tl_tbox" : "tl_box"; ?> block">
@@ -28,7 +28,7 @@
         </div>
 
     <?php endforeach; ?>
-
+   
     <?php if ($this->refresh == true && $this->error == false && $this->finished == false): ?>
         <meta http-equiv="refresh" content="2; URL=<?php echo $this->Environment->base; ?><?php echo $this->url; ?>&amp;step=<?php echo $this->step ?>" />
         <img style="margin-bottom:20px;" src="system/modules/syncCto/html/ajax-loader.gif" alt="" />
@@ -50,8 +50,16 @@
             </p>
         </div>
     <?php endif; ?>
-
-
+        
+    <?php if ($this->showControl == true): ?>
+        <div class="tl_box" id="buttons">
+            <a href="<?php echo $this->abortLink; ?>" onclick="$(this).setProperty('text', '<?php echo $GLOBALS['TL_LANG']['MSC']['abort_sync']['1']; ?>');" class="tl_submit"><?php echo $GLOBALS['TL_LANG']['MSC']['abort_sync']['0']; ?></a>
+        <?php if ($this->error): ?>
+            <a href="<?php echo $this->tryAgainLink; ?>" onclick="$(this).setProperty('text', '<?php echo $GLOBALS['TL_LANG']['MSC']['repeat_sync']['1']; ?>');" class="tl_submit"><?php echo $GLOBALS['TL_LANG']['MSC']['repeat_sync']['0']; ?></a>
+        <?php endif; ?>
+        </div>
+    <?php endif; ?>
+        
     <script type="text/javascript">
         <!--//--><![CDATA[//><!--
         window.scrollTo(null, ($('step<?php echo $this->step; ?>').getPosition().y - 40));

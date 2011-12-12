@@ -83,6 +83,11 @@ class SyncCtoModuleClient extends BackendModule
             $_SESSION["TL_ERROR"] = array($GLOBALS['TL_LANG']['ERR']['call_directly']);
             $this->redirect("contao/main.php?do=synccto_clients");
         }
+        
+        // Set template
+        $this->Template->showControl = true;
+        $this->Template->tryAgainLink = $this->Environment->requestUri;
+        $this->Template->abortLink = $this->Environment->requestUri . "&abort=true";
 
         // Which table is in use
         switch ($this->Input->get("table"))
@@ -131,6 +136,12 @@ class SyncCtoModuleClient extends BackendModule
         {
             $_SESSION["TL_ERROR"] = array($GLOBALS['TL_LANG']['ERR']['client_set']);
             $this->redirect("contao/main.php?do=synccto_clients");
+        }
+        
+        if($this->Input->get("abort") == "true")
+        {
+            $this->pageSyncAbort();
+            return;
         }
 
         // Set up temp file for filetransmission
@@ -225,7 +236,6 @@ class SyncCtoModuleClient extends BackendModule
      */
     private function pageSyncFrom()
     {
-
         // Build Step
         if ($this->Input->get("step") == "" || $this->Input->get("step") == null)
         {
@@ -245,6 +255,12 @@ class SyncCtoModuleClient extends BackendModule
         {
             $_SESSION["TL_ERROR"] = array($GLOBALS['TL_LANG']['ERR']['client_set']);
             $this->redirect("contao/main.php?do=synccto_clients");
+        }
+
+        if ($this->Input->get("abort") == "true")
+        {
+            $this->pageSyncToAbort();
+            return;
         }
 
         // Set up temp file for filetransmission
@@ -329,11 +345,81 @@ class SyncCtoModuleClient extends BackendModule
             $objCompareList->close();
         }
     }
+    
+     /**
+     * Abort function
+     */
+    private function pageSyncAbort()
+    {
+        // Load content
+        $arrContenData = $this->Session->get("syncCto_Content");
+
+        // Set content back to normale mode
+        $arrContenData["error"] = false;
+        $arrContenData["error_msg"] = "";
+
+        if ($arrContenData["abort"] == false)
+        {
+            try
+            {
+                // Reste Session
+                $this->Session->set("syncCto_StepPool1", FALSE);
+                $this->Session->set("syncCto_StepPool2", FALSE);
+                $this->Session->set("syncCto_StepPool3", FALSE);
+                $this->Session->set("syncCto_StepPool4", FALSE);
+                $this->Session->set("syncCto_StepPool5", FALSE);
+                $this->Session->set("syncCto_StepPool6", FALSE);
+
+                $this->Session->set("syncCto_PurgeData", FALSE);
+                $this->Session->set("syncCto_SyncTables", FALSE);
+                $this->Session->set("syncCto_Filelist", FALSE);
+                $this->Session->set("syncCto_Typ", 99);
+
+                // Reste server and client
+                $this->objSyncCtoFiles->purgeTemp();
+                $this->objSyncCtoCommunicationClient->purgeTemp();
+                $this->objSyncCtoCommunicationClient->referrerEnable();
+            }
+            catch (Exception $exc)
+            {
+                // Nothing to do 
+            }
+
+            // Set last to skipped        
+            $arrKeys = array_keys($arrContenData["data"]);
+            $arrContenData["data"][$arrKeys[count($arrKeys) - 1]]["state"] = $GLOBALS['TL_LANG']['MSC']['skipped'];
+            $arrContenData["data"][$arrKeys[count($arrKeys) - 1]]["html"] = "";
+
+            // Set Abort information 
+            $arrContenData["data"][99]["title"] = $GLOBALS['TL_LANG']['MSC']['abort'];
+            $arrContenData["data"][99]["description"] = $GLOBALS['TL_LANG']['tl_syncCto_sync']['abort'];
+            $arrContenData["data"][99]["state"] = "";
+        }
+
+        $arrContenData["abort"] == true;
+
+        $this->Template->goBack = $this->script . $arrContenData["goBack"];
+        $this->Template->data = $arrContenData["data"];
+        $this->Template->step = 99;
+        $this->Template->error = false;
+        $this->Template->error_msg = "";
+        $this->Template->refresh = false;
+        $this->Template->url = $arrContenData["url"];
+        $this->Template->start = $arrContenData["start"];
+        $this->Template->headline = $arrContenData["headline"];
+        $this->Template->information = $arrContenData["information"];
+        $this->Template->finished = $arrContenData["finished"];
+        $this->Template->showControl = FALSE;
+
+        $this->Session->set("syncCto_Content", $arrContenData);
+
+        return;
+    }
 
     /* -------------------------------------------------------------------------
      * Start SyncCto syncTo
      */
-
+    
     /**
      * Check client communication
      */
@@ -473,7 +559,7 @@ class SyncCtoModuleClient extends BackendModule
         $this->Template->start = $arrContenData["start"];
         $this->Template->headline = $arrContenData["headline"];
         $this->Template->information = $arrContenData["information"];
-        $this->Template->finished = $arrContenData["finished"];
+        $this->Template->finished = $arrContenData["finished"];        
 
         $this->Session->set("syncCto_StepPool1", $mixStepPool);
         $this->Session->set("syncCto_Content", $arrContenData);

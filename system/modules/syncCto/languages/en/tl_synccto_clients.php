@@ -46,7 +46,7 @@ $GLOBALS['TL_LANG']['tl_syncCto_clients']['syncFromConfirm']    = 'Do you really
 $GLOBALS['TL_LANG']['tl_synccto_clients']['title_legend']       = 'Client description';
 $GLOBALS['TL_LANG']['tl_synccto_clients']['connection_legend']  = 'Connection settings';
 $GLOBALS['TL_LANG']['tl_synccto_clients']['apikey_legend']      = 'Encryption';
-$GLOBALS['TL_LANG']['tl_synccto_clients']['auth_legend']        = 'HTTP Authentication';
+$GLOBALS['TL_LANG']['tl_synccto_clients']['expert_legend']      = 'Expert settings';
 
 /**
  * Fields
