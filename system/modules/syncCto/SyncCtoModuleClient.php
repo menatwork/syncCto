@@ -1742,6 +1742,14 @@ class SyncCtoModuleClient extends BackendModule
                  * Show information
                  */
                 case 9:
+                    // Set success information 
+                    $arrContenData["data"][99]["title"] = $GLOBALS['TL_LANG']['MSC']['complete'];
+                    $arrContenData["data"][99]["description"] = $GLOBALS['TL_LANG']['tl_syncCto_sync']['complete'];
+                    $arrContenData["data"][99]["state"] = "";
+                    
+                    // Hide control div
+                    $this->Template->showControl = false;
+                    
                     if ($intSyncTyp == SYNCCTO_SMALL
                             && ( (count($this->arrListCompare) == 0 || $this->arrListCompare == FALSE)
                             && !is_array($this->arrListCompare))

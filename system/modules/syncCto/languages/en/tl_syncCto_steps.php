@@ -64,7 +64,7 @@ $GLOBALS['TL_LANG']['tl_syncCto_sync']['step_5']['description_7'] = 'Transferred
 $GLOBALS['TL_LANG']['tl_syncCto_sync']['step_5']['description_8'] = 'Deleted files:';
 $GLOBALS['TL_LANG']['tl_syncCto_sync']['step_5']['description_9'] = 'Incorrect files:';
 
-// Abort
 $GLOBALS['TL_LANG']['tl_syncCto_sync']['abort'] = 'Abort the synchronization and cleanup the client.';
+$GLOBALS['TL_LANG']['tl_syncCto_sync']['complete'] = 'The synchronization was successfully completed.';
 
 ?>
