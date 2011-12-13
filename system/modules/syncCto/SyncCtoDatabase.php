@@ -403,44 +403,27 @@ class SyncCtoDatabase extends Backend
                         }
                         else if ($field["index"] == "UNIQUE")
                         {
-                            foreach ($field["index_fields"] as $keyField => $valueField)
-                            {
-                                foreach ($arrIndexes as $keyIndexe => $valueIndexe)
-                                {
-                                    if ($valueIndexe["Column_name"] == $valueField)
-                                    {
-                                        $return[$table]['TABLE_CREATE_DEFINITIONS'][$field["name"]] = "UNIQUE KEY (`" . implode("`,`", $field["index_fields"]) . "`)";
-                                        break;
-                                    }
-                                }
-                            }
+                            $return[$table]['TABLE_CREATE_DEFINITIONS'][$field["name"]] = "UNIQUE KEY `" . $field["name"] . "` (`" . implode("`,`", $field["index_fields"]) . "`)";
                         }
                         else if ($field["index"] == "KEY")
                         {
-                            $strTyp;
-                            $arrReturn = array();
-
-                            foreach ($field["index_fields"] as $keyField => $valueField)
+                            foreach ($arrIndexes as $keyIndexes => $valueIndexes)
                             {
-                                foreach ($arrIndexes as $keyIndexe => $valueIndexe)
+                                if ($valueIndexes["Key_name"] == $field["name"])
                                 {
-                                    if ($valueIndexe["Column_name"] == $valueField)
+                                    switch ($valueIndexes["Index_type"])
                                     {
-                                        $return[$table]['TABLE_CREATE_DEFINITIONS'][$field["name"]] = "KEY $valueField (`$valueField`)";
-                                        break;
+                                        case "FULLTEXT":
+                                            $return[$table]['TABLE_CREATE_DEFINITIONS'][$field["name"]] = "FULLTEXT KEY `" . $field['name'] . "` (`" . implode("`,`", $field["index_fields"]) . "`)";
+                                            break;
+
+                                        default:
+                                            $return[$table]['TABLE_CREATE_DEFINITIONS'][$field["name"]] = "KEY `" . $field['name'] . "` (`" . implode("`,`", $field["index_fields"]) . "`)";
+                                            break;
                                     }
+                                    
+                                    break;
                                 }
-                            }
-
-                            switch ($strTyp)
-                            {
-                                case "FULLTEXT":
-                                    $return[$table]['TABLE_CREATE_DEFINITIONS'][$field["name"]] = "FULLTEXT KEY `" . $field['name'] . "` (" . implode(",", $arrReturn) . ")";
-                                    break;
-
-                                default:
-                                    $return[$table]['TABLE_CREATE_DEFINITIONS'][$field["name"]] = "KEY `" . $field['name'] . "` (" . implode(",", $arrReturn) . ")";
-                                    break;
                             }
                         }
 
@@ -486,7 +469,7 @@ class SyncCtoDatabase extends Backend
 
                 $return[$table]['TABLE_FIELDS'][$name] = trim(implode(' ', $field));
             }
-        }
+        } 
         
         // Table status
         $objStatus = $this->Database->prepare("SHOW TABLE STATUS")->executeUncached();
