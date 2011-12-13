@@ -259,7 +259,7 @@ class SyncCtoModuleClient extends BackendModule
 
         if ($this->Input->get("abort") == "true")
         {
-            $this->pageSyncToAbort();
+            $this->pageSyncAbort();
             return;
         }
 
@@ -2371,7 +2371,7 @@ class SyncCtoModuleClient extends BackendModule
                         $objTemp->id = $this->Input->get("id");
                         $objTemp->step = $this->intStep;
                         $objTemp->totalsize = $intTotalSize;
-                        $objTemp->direction = "To";
+                        $objTemp->direction = "From";
                         $objTemp->compare_complex = false;
 
                         // Build content                       
@@ -2422,6 +2422,12 @@ class SyncCtoModuleClient extends BackendModule
         {
             $mixStepPool = array("step" => 1);
         }
+        
+        $strTempFolder = $this->Session->get("syncCto_Client_Tempfolder");
+        if(empty ($strTempFolder))
+        {
+            $strTempFolder = FALSE;
+        }
 
         // Load content
         $arrContenData = $this->Session->get("syncCto_Content");
@@ -2432,7 +2438,7 @@ class SyncCtoModuleClient extends BackendModule
         $arrContenData["data"][3]["state"] = $GLOBALS['TL_LANG']['MSC']['progress'];
 
         // Check if there is any file for upload
-        if (TRUE || count($this->arrListCompare) == 0 || !is_array($this->arrListCompare))
+        if (count($this->arrListCompare) == 0 || !is_array($this->arrListCompare))
         {
             $arrContenData["data"][3]["state"] = $GLOBALS['TL_LANG']['MSC']['skipped'];
 
@@ -2467,6 +2473,8 @@ class SyncCtoModuleClient extends BackendModule
 
                             break;
                         }
+                        
+                        $strTempFolder = $this->objSyncCtoCommunicationClient->getPathList("tmp");
 
                         $intClientUploadLimit = intval(str_replace("M", "000000", $arrClientParameter['upload_max_filesize']));
                         $intClientMemoryLimit = intval(str_replace("M", "000000", $arrClientParameter['memory_limit']));
@@ -2633,7 +2641,7 @@ class SyncCtoModuleClient extends BackendModule
                             $objTemp->id = $this->Input->get("id");
                             $objTemp->step = $this->intStep;
                             $objTemp->totalsize = $intTotalsize;
-                            $objTemp->direction = "To";
+                            $objTemp->direction = "From";
                             $objTemp->compare_complex = true;
 
                             $arrContenData["data"][3]["html"] = $objTemp->parse();
@@ -2670,9 +2678,11 @@ class SyncCtoModuleClient extends BackendModule
                                 $intCount++;
                                 continue;
                             }
-
+                            
+                            $strSavePath = $this->objSyncCtoHelper->standardizePath($strTempFolder . $key);
+                                                       
                             // Splitt file
-                            $intSplits = $this->objSyncCtoCommunicationClient->runSplitFiles($value["path"], $GLOBALS['SYC_PATH']['tmp'] . $key, $key, ($mixStepPool["limit"] / 100 * $mixStepPool["percent"]));
+                            $intSplits = $this->objSyncCtoCommunicationClient->runSplitFiles($value["path"], $strSavePath, $key, ($mixStepPool["limit"] / 100 * $mixStepPool["percent"]));
 
                             $this->arrListCompare[$key]["splitcount"] = $intSplits;
                             $this->arrListCompare[$key]["splitname"] = $key;
@@ -2698,7 +2708,7 @@ class SyncCtoModuleClient extends BackendModule
                         break;
 
                     /**
-                     * Send bigfiles 
+                     * Get bigfiles 
                      */
                     case 4:
                         $intCountSplit = 0;
@@ -2744,8 +2754,8 @@ class SyncCtoModuleClient extends BackendModule
                                 set_time_limit(7200);
 
                                 // Send file to client
-                                $arrResponse = $this->objSyncCtoCommunicationClient->sendFile($GLOBALS['SYC_PATH']['tmp'] . $key, $value["splitname"] . ".sync" . $ii, "", SyncCtoEnum::UPLOAD_SYNC_SPLIT, $value["splitname"]);
-
+                                $arrResponse = $this->objSyncCtoCommunicationClient->getFile($this->objSyncCtoHelper->standardizePath($strTempFolder, $key, $value["splitname"] . ".sync$ii"), $this->objSyncCtoHelper->standardizePath($GLOBALS['SYC_PATH']['tmp'], $key, $value["splitname"] . ".sync$ii"));
+                                
                                 $this->arrListCompare[$key]["split_transfer"] = $ii + 1;
 
                                 // check time limit 30 secs
@@ -2772,6 +2782,9 @@ class SyncCtoModuleClient extends BackendModule
                         break;
 
                     case 5:
+                        echo "Step 5";
+                        exit();
+                        
                         $intCountSplit = 0;
                         $intCount = 0;
 
@@ -2863,7 +2876,8 @@ class SyncCtoModuleClient extends BackendModule
         $this->Template->finished = $arrContenData["finished"];
 
         $this->Session->set("syncCto_StepPool3", $mixStepPool);
-        $this->Session->set("syncCto_Content", $arrContenData);
+        $this->Session->set("syncCto_Content", $arrContenData);        
+        $this->Session->set("syncCto_Client_Tempfolder", $strTempFolder);        
     }
 
     /**
@@ -3062,13 +3076,13 @@ class SyncCtoModuleClient extends BackendModule
         /* ---------------------------------------------------------------------
          * Run page
          */
-
+        
         // Check if there is any file for upload
-        if (count($this->arrListCompare) == 0 || !is_array($this->arrListCompare) && $mixStepPool["step"] == 1)
+        if ((count($this->arrListCompare) == 0 || !is_array($this->arrListCompare)) && $mixStepPool["step"] == 1)
         {
-            $mixStepPool["step"] = 5;
+            $mixStepPool["step"] = 4;
         }
-
+        
         try
         {
             $intStart = time();
@@ -3211,7 +3225,7 @@ class SyncCtoModuleClient extends BackendModule
                             $this->objSyncCtoHelper->importConfig($arrLocalconfig);
                         }
 
-                        $mixStepPool["step"] = 6;
+                        $mixStepPool["step"] = 5;
                     }
 
                     $arrContenData["data"][5]["description"] = $GLOBALS['TL_LANG']['tl_syncCto_sync']["step_5"]['description_1'];
@@ -3219,35 +3233,43 @@ class SyncCtoModuleClient extends BackendModule
                 /** ------------------------------------------------------------
                  * Cleanup
                  */
-                case 6:
+                case 5:
                     $this->objSyncCtoCommunicationClient->purgeTemp();
                     $this->objSyncCtoFiles->purgeTemp();
 
-                    $mixStepPool["step"] = 7;
+                    $mixStepPool["step"] = 6;
 
                     break;
 
-                case 7:
+                case 6:
                     if ($booPurgeData == true)
                     {
                         $this->objSyncCtoFiles->purgeData();
                     }
 
-                    $mixStepPool["step"] = 8;
+                    $mixStepPool["step"] = 7;
 
                     $this->log(vsprintf("Successfully finishing of synchronization client ID %s.", array($this->Input->get("id"))), __CLASS__ . " " . __FUNCTION__, "INFO");
 
                     break;
 
-                case 8:
+                case 7:
                     $this->objSyncCtoCommunicationClient->referrerEnable();
-                    $mixStepPool["step"] = 9;
+                    $mixStepPool["step"] = 8;
                     break;
 
                 /** ------------------------------------------------------------
                  * Show information
                  */
-                case 9:
+                case 8:
+                     // Set success information 
+                    $arrContenData["data"][99]["title"] = $GLOBALS['TL_LANG']['MSC']['complete'];
+                    $arrContenData["data"][99]["description"] = $GLOBALS['TL_LANG']['tl_syncCto_sync']['complete'];
+                    $arrContenData["data"][99]["state"] = "";
+                    
+                    // Hide control div
+                    $this->Template->showControl = false;
+                    
                     if ($intSyncTyp == SYNCCTO_SMALL
                             && ( (count($this->arrListCompare) == 0 || $this->arrListCompare == FALSE)
                             && !is_array($this->arrListCompare))

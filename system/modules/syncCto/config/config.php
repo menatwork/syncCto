@@ -188,7 +188,7 @@ $GLOBALS['SYC_CONFIG']['folder_whitelist'] = array(
  */
 $GLOBALS['SYC_PATH']['db'] = $GLOBALS['TL_CONFIG']['uploadPath'] . '/syncCto_backups/database/';
 $GLOBALS['SYC_PATH']['file'] = $GLOBALS['TL_CONFIG']['uploadPath'] . '/syncCto_backups/files/';
-$GLOBALS['SYC_PATH']['debug'] = "system/tmp/";
+$GLOBALS['SYC_PATH']['debug'] = $GLOBALS['TL_CONFIG']['uploadPath'] . '/syncCto_backups/debug/';
 $GLOBALS['SYC_PATH']['tmp'] = "system/tmp/";
 
 /**
@@ -344,7 +344,7 @@ $GLOBALS["CTOCOM_FUNCTIONS"]["SYNCCTO_CHECK_DELETE_FILE"] = array(
     "class" => "SyncCtoRPCFunctions",
     "function" => "checkDeleteFiles",
     "typ" => "POST",
-    "parameter" => array("fileList"),
+    "parameter" => array("md5", "file"),
 );
 
 // Load all Tables from database

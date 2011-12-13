@@ -340,31 +340,33 @@ class SyncCtoCommunicationClient extends CtoCommunication
      * @param array $arrFilelist
      * @return array 
      */
-    public function checkDeleteFiles($arrFilelist)
+    public function checkDeleteFiles($arrChecksumList)
     {        
-        if (!is_array($arrFilelist))
+        if (!is_array($arrChecksumList))
         {
             throw new Exception("Filelist is not a array.");
         }
-        
+
         $strPath = $this->objSyncCtoHelper->standardizePath($GLOBALS['SYC_PATH']['tmp'], "syncList.syncCto");
         $strMime = "application/octet-stream";
-        
+
         $objFile = new File($strPath);
-        $objFile->write(serialize($arrFilelist));
+        $objFile->write(serialize($arrChecksumList));
         $objFile->close();
-        
-        exit();
 
         $arrData = array(
             array(
                 "name" => "md5",
-                "value" => md5_file(TL_ROOT . "/" .  $strPath),
+                "value" => md5_file(TL_ROOT . "/" . $strPath),
+            ),
+            array(
+                "name" => "file",
+                "value" => md5($strPath),
             ),
             array(
                 "name" => md5($strPath),
                 "filename" => "syncList.syncCto",
-                "filepath" => TL_ROOT . "/" .  $this->objSyncCtoHelper->standardizePath($GLOBALS['SYC_PATH']['tmp']),
+                "filepath" => TL_ROOT . "/" . $strPath,
                 "mime" => $strMime,
             )
         );
