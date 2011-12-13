@@ -2,7 +2,7 @@
 /**
  * TL_ROOT/system/modules/syncCto/languages/fr/explain.php 
  * 
- * Contao extension: syncCto 2.0.0 alpha2 
+ * Contao extension: syncCto 2.0.0 beta2 
  * French translation file 
  * 
  * Copyright : &copy; 2011 MEN AT WORK 
@@ -17,6 +17,7 @@
  
 $GLOBALS['TL_LANG']['XPL']['apiKey']['0']['0'] = "ctoCommunication clé API";
 $GLOBALS['TL_LANG']['XPL']['apiKey']['0']['1'] = "La clé API permet l'encodage d'une synchronisation entre deux installations de Contao.<br /><br />The key is always generated while using the common settings. You have to copy and insert it in the specific field on the server.";
+$GLOBALS['TL_LANG']['XPL']['security']['0']['0'] = "Algoritme de chiffrement";
 $GLOBALS['TL_LANG']['XPL']['security']['0']['1'] = "synCto offre par défaut trois types de synchronisation. Deux avec encodage et un sans encodage.<br /><br />Utiliser uniquement la synchronisation qui n'est pas encodée pour les projets internes. Sinon les attaques provenant de l'extérieur sont possibles.";
  
 ?>

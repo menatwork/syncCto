@@ -2,7 +2,7 @@
 /**
  * TL_ROOT/system/modules/syncCto/languages/fr/tl_user.php 
  * 
- * Contao extension: syncCto 2.0.0 alpha2 
+ * Contao extension: syncCto 2.0.0 beta2 
  * French translation file 
  * 
  * Copyright : &copy; 2011 MEN AT WORK 

@@ -2,7 +2,7 @@
 /**
  * TL_ROOT/system/modules/syncCto/languages/fr/tl_synccto_clients.php 
  * 
- * Contao extension: syncCto 2.0.0 alpha2 
+ * Contao extension: syncCto 2.0.0 beta2 
  * French translation file 
  * 
  * Copyright : &copy; 2011 MEN AT WORK 
@@ -20,6 +20,7 @@ $GLOBALS['TL_LANG']['tl_synccto_clients']['new']['1'] = "Nouveau client";
 $GLOBALS['TL_LANG']['tl_synccto_clients']['title_legend'] = "Description du client";
 $GLOBALS['TL_LANG']['tl_synccto_clients']['connection_legend'] = "Paramètres de connexion";
 $GLOBALS['TL_LANG']['tl_synccto_clients']['apikey_legend'] = "Chiffrement";
+$GLOBALS['TL_LANG']['tl_synccto_clients']['expert_legend'] = "Paramètres avancés";
 $GLOBALS['TL_LANG']['tl_syncCto_clients']['all']['0'] = "Édition multiple";
 $GLOBALS['TL_LANG']['tl_syncCto_clients']['edit']['0'] = "Éditer le client";
 $GLOBALS['TL_LANG']['tl_syncCto_clients']['edit']['1'] = "Éditer le client ID %s";
@@ -50,5 +51,11 @@ $GLOBALS['TL_LANG']['tl_syncCto_clients']['apikey']['0'] = "ctoCommunication cl�
 $GLOBALS['TL_LANG']['tl_syncCto_clients']['apikey']['1'] = "Cette clé assure la communication entre les installations de Contao.";
 $GLOBALS['TL_LANG']['tl_syncCto_clients']['codifyengine']['0'] = "Chiffrement";
 $GLOBALS['TL_LANG']['tl_syncCto_clients']['codifyengine']['1'] = "Veuillez, s'il vous plaît, choisir l'algorithme de chiffrement.";
+$GLOBALS['TL_LANG']['tl_syncCto_clients']['http_auth']['0'] = "Activer l'authentification HTTP";
+$GLOBALS['TL_LANG']['tl_syncCto_clients']['http_auth']['1'] = "Veuillez, s'il vous plaît, choisir cette option pour activer l'authentification HTTP";
+$GLOBALS['TL_LANG']['tl_syncCto_clients']['http_username']['0'] = "Nom d'utilisateur";
+$GLOBALS['TL_LANG']['tl_syncCto_clients']['http_username']['1'] = "Veuillez, s'il vous plaît, insérer le nom d'utilisateur pour l'authentification.";
+$GLOBALS['TL_LANG']['tl_syncCto_clients']['http_password']['0'] = "Mot de passe";
+$GLOBALS['TL_LANG']['tl_syncCto_clients']['http_password']['1'] = "Veuillez, s'il vous plaît, insérer le mot de passe pour l'authentification.";
  
 ?>

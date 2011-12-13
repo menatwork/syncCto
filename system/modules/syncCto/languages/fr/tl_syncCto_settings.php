@@ -2,7 +2,7 @@
 /**
  * TL_ROOT/system/modules/syncCto/languages/fr/tl_syncCto_settings.php 
  * 
- * Contao extension: syncCto 2.0.0 alpha2 
+ * Contao extension: syncCto 2.0.0 beta2 
  * French translation file 
  * 
  * Copyright : &copy; 2011 MEN AT WORK 
@@ -23,6 +23,7 @@ $GLOBALS['TL_LANG']['tl_syncCto_settings']['hidden_tables_legend'] = "Tables cac
 $GLOBALS['TL_LANG']['tl_syncCto_settings']['tables_legend'] = "Tables non recommandées";
 $GLOBALS['TL_LANG']['tl_syncCto_settings']['security_legend'] = "Chiffrement";
 $GLOBALS['TL_LANG']['tl_syncCto_settings']['debug_legend'] = "Mode de débogage";
+$GLOBALS['TL_LANG']['tl_syncCto_settings']['custom_legend'] = "Paramètres avancés";
 $GLOBALS['TL_LANG']['tl_syncCto_settings']['folder_blacklist']['0'] = "Liste noire des dossiers";
 $GLOBALS['TL_LANG']['tl_syncCto_settings']['folder_blacklist']['1'] = "Ici vous pouvez définir les dossiers qui doivent être ignorés pour la synchronisation.";
 $GLOBALS['TL_LANG']['tl_syncCto_settings']['file_blacklist']['0'] = "Liste noire des fichiers";
@@ -37,5 +38,11 @@ $GLOBALS['TL_LANG']['tl_syncCto_settings']['hidden_tables']['0'] = "Tables cach�
 $GLOBALS['TL_LANG']['tl_syncCto_settings']['hidden_tables']['1'] = "Ici vous pouvez accorder l'accès à une ou plusieurs tables de la base de données pour la synchronisation.";
 $GLOBALS['TL_LANG']['tl_syncCto_settings']['debug_mode']['0'] = "Activer le mode de débogage";
 $GLOBALS['TL_LANG']['tl_syncCto_settings']['debug_mode']['1'] = "Affiche à l'écran des informations telles que les données synchronisées ou les données d'exécution.";
+$GLOBALS['TL_LANG']['tl_syncCto_settings']['custom_settings']['0'] = "Activer les paramètres avancés";
+$GLOBALS['TL_LANG']['tl_syncCto_settings']['custom_settings']['1'] = "Cliquez ici si vous savez ce que vous faites.";
+$GLOBALS['TL_LANG']['tl_syncCto_settings']['wait_timeout']['0'] = "Configurer \"wait_timeout\"";
+$GLOBALS['TL_LANG']['tl_syncCto_settings']['wait_timeout']['1'] = "Plus d'informations: http://goo.gl/rC5Y4";
+$GLOBALS['TL_LANG']['tl_syncCto_settings']['interactive_timeout']['0'] = "Configurer \"interactive_timeout\"";
+$GLOBALS['TL_LANG']['tl_syncCto_settings']['interactive_timeout']['1'] = "Plus d'informations: http://goo.gl/VHxRK";
  
 ?>

@@ -2,7 +2,7 @@
 /**
  * TL_ROOT/system/modules/syncCto/languages/fr/default.php 
  * 
- * Contao extension: syncCto 2.0.0 alpha2 
+ * Contao extension: syncCto 2.0.0 beta2 
  * French translation file 
  * 
  * Copyright : &copy; 2011 MEN AT WORK 
@@ -27,6 +27,7 @@ $GLOBALS['TL_LANG']['MSC']['error'] = "Erreur";
 $GLOBALS['TL_LANG']['MSC']['skipped'] = "Ignoré";
 $GLOBALS['TL_LANG']['MSC']['unknown_step'] = "Étape inconnue";
 $GLOBALS['TL_LANG']['MSC']['step'] = "Étape";
+$GLOBALS['TL_LANG']['MSC']['abort'] = "Interrompre !";
 $GLOBALS['TL_LANG']['MSC']['complete'] = "Terminé !";
 $GLOBALS['TL_LANG']['MSC']['debug_mode'] = "Mode de débogage";
 $GLOBALS['TL_LANG']['MSC']['select_all_files'] = "Sélectionner tous les fichiers";
@@ -45,6 +46,10 @@ $GLOBALS['TL_LANG']['MSC']['ignored_files'] = "Ignoré";
 $GLOBALS['TL_LANG']['MSC']['submit_files'] = "Envoyer des fichiers";
 $GLOBALS['TL_LANG']['MSC']['delete_files'] = "Supprimer les fichiers sélectionnés";
 $GLOBALS['TL_LANG']['MSC']['information_last_sync'] = "La dernière synchronisation a été faite à %s sur %s par l'utilisateur %s (%s).";
+$GLOBALS['TL_LANG']['MSC']['abort_sync']['0'] = "Interrompre";
+$GLOBALS['TL_LANG']['MSC']['abort_sync']['1'] = "En cours";
+$GLOBALS['TL_LANG']['MSC']['repeat_sync']['0'] = "Répéter";
+$GLOBALS['TL_LANG']['MSC']['repeat_sync']['1'] = "En cours";
 $GLOBALS['TL_LANG']['MSC']['run_time'] = "Running time: %s seconds";
 $GLOBALS['TL_LANG']['MSC']['memory_limit'] = "Limite de mémoire: %s";
 $GLOBALS['TL_LANG']['SYC']['files'] = "Fichier de synchronisation";

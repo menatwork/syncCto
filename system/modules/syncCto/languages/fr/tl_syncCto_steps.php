@@ -2,7 +2,7 @@
 /**
  * TL_ROOT/system/modules/syncCto/languages/fr/tl_syncCto_steps.php 
  * 
- * Contao extension: syncCto 2.0.0 alpha2 
+ * Contao extension: syncCto 2.0.0 beta2 
  * French translation file 
  * 
  * Copyright : &copy; 2011 MEN AT WORK 
@@ -38,5 +38,7 @@ $GLOBALS['TL_LANG']['tl_syncCto_sync']['step_5']['description_6'] = "fichier(s) 
 $GLOBALS['TL_LANG']['tl_syncCto_sync']['step_5']['description_7'] = "Fichiers transférés:";
 $GLOBALS['TL_LANG']['tl_syncCto_sync']['step_5']['description_8'] = "Fichiers supprimés:";
 $GLOBALS['TL_LANG']['tl_syncCto_sync']['step_5']['description_9'] = "Fichiers incorrects:";
+$GLOBALS['TL_LANG']['tl_syncCto_sync']['abort'] = "Interrompre la synchronisation et nettoyage du client.";
+$GLOBALS['TL_LANG']['tl_syncCto_sync']['complete'] = "La synchronisation a été exécutée avec succès.";
  
 ?>

@@ -2,7 +2,7 @@
 /**
  * TL_ROOT/system/modules/syncCto/languages/fr/tl_syncCto_clients_syncTo.php 
  * 
- * Contao extension: syncCto 2.0.0 alpha2 
+ * Contao extension: syncCto 2.0.0 beta2 
  * French translation file 
  * 
  * Copyright : &copy; 2011 MEN AT WORK 
@@ -28,5 +28,7 @@ $GLOBALS['TL_LANG']['tl_syncCto_clients_syncTo']['database_tables_none_recommend
 $GLOBALS['TL_LANG']['tl_syncCto_clients_syncTo']['database_tables_none_recommended']['1'] = "Ici vous pouvez sélectionner les tables non recommandées pour la synchronisation. A utiliser avec prudence.";
 $GLOBALS['TL_LANG']['tl_syncCto_clients_syncTo']['filelist']['0'] = "Fichiers sources";
 $GLOBALS['TL_LANG']['tl_syncCto_clients_syncTo']['filelist']['1'] = "Veuillez, s'il vous plaît, sélectionner un fichier ou un dossier à partir de l'explorateur de fichiers.";
+$GLOBALS['TL_LANG']['tl_syncCto_clients_syncTo']['purgeData']['0'] = "Purger les données";
+$GLOBALS['TL_LANG']['tl_syncCto_clients_syncTo']['purgeData']['1'] = "Veuillez, s'il vous plaît, sélectionner cette option, si vous voulez purger les données temporaires du client.";
  
 ?>
