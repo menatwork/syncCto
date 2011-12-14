@@ -119,7 +119,7 @@ class SyncCtoModuleCheck extends BackendModule
 
         // Maximum execution time
         $max_execution_time = ini_get('max_execution_time');
-        $ok = ($max_execution_time >= 30);
+        $ok = ($max_execution_time >= 30 || $max_execution_time == 0);
         $return .= '<tr class="' . ($ok ? 'ok' : 'warning') . '">';
         $return .= '<td>' . $GLOBALS['TL_LANG']['tl_syncCto_check']['met'][0] . '</td>';
         $return .= '<td class="dot">' . ($ok ? '&nbsp;' : '•') . '</td>';
