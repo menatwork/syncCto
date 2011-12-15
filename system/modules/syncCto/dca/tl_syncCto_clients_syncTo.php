@@ -26,7 +26,6 @@
  * @license    GNU/LGPL
  * @filesource
  */
-
 $GLOBALS['TL_DCA']['tl_syncCto_clients_syncTo'] = array(
     // Config
     'config' => array
@@ -36,6 +35,7 @@ $GLOBALS['TL_DCA']['tl_syncCto_clients_syncTo'] = array(
         'disableSubmit' => false,
         'onload_callback' => array(
             array('tl_syncCto_clients_syncTo', 'onload_callback'),
+            array('tl_syncCto_clients_syncTo', 'checkVersion'),
             array('tl_syncCto_clients_syncTo', 'checkPermission'),
         ),
         'onsubmit_callback' => array(
@@ -45,8 +45,7 @@ $GLOBALS['TL_DCA']['tl_syncCto_clients_syncTo'] = array(
     // Palettes
     'palettes' => array
         (
-        '210' => '{sync_legend},sync_type,purgeData;{table_recommend_legend},database_tables_recommended;{table_none_recommend_legend},database_tables_none_recommended;{filelist_legend},filelist',
-        '209' => '{sync_legend},sync_type;{table_recommend_legend},database_tables_recommended;{table_none_recommend_legend},database_tables_none_recommended;{filelist_legend},filelist',
+        'default' => '{sync_legend},sync_type,purgeData;{table_recommend_legend},database_tables_recommended;{table_none_recommend_legend},database_tables_none_recommended;{filelist_legend},filelist',
     ),
     // Fields
     'fields' => array(
@@ -92,22 +91,12 @@ $GLOBALS['TL_DCA']['tl_syncCto_clients_syncTo'] = array(
     )
 );
 
-// Show a other palette for 2.9 and 2.10
-if(version_compare("2.10", VERSION, "<") == true)
-{
-    $GLOBALS['TL_DCA']['tl_syncCto_clients_syncTo']['palettes']['default'] = $GLOBALS['TL_DCA']['tl_syncCto_clients_syncTo']['palettes']['209'];
-}
-else
-{
-    $GLOBALS['TL_DCA']['tl_syncCto_clients_syncTo']['palettes']['default'] = $GLOBALS['TL_DCA']['tl_syncCto_clients_syncTo']['palettes']['210'];
-}
-
 /**
  * Class for syncTo configurations
  */
 class tl_syncCto_clients_syncTo extends Backend
 {
-    
+
     /**
      * Constructor
      */
@@ -139,6 +128,19 @@ class tl_syncCto_clients_syncTo extends Backend
         );
 
         $dc->addButton('start_sync', $arrData);
+    }
+
+    /**
+     * Set new and remove old buttons
+     * 
+     * @param DataContainer $dc 
+     */
+    public function checkVersion(DataContainer $dc)
+    {
+        if (version_compare(VERSION . '.' . BUILD, '2.10.0', '<'))
+        {
+            $GLOBALS['TL_DCA']['tl_syncCto_clients_syncTo']['palettes']['default'] = str_replace('sync_type,purgeData', 'sync_type', $GLOBALS['TL_DCA']['tl_syncCto_clients_syncTo']['palettes']['default']);
+        }
     }
 
     /**
@@ -190,9 +192,9 @@ class tl_syncCto_clients_syncTo extends Backend
         {
             $this->Session->set("syncCto_SyncTables", FALSE);
         }
-        
+
         // Set purgeDataflag    
-        if($this->Input->post("purgeData") == 1)
+        if ($this->Input->post("purgeData") == 1)
         {
             $this->Session->set("syncCto_PurgeData", TRUE);
         }
