@@ -1782,7 +1782,7 @@ class SyncCtoModuleClient extends BackendModule
                             ->fetchAllAssoc();
 
                     $arrContenData["data"][99]["title"] = $GLOBALS['TL_LANG']['MSC']['complete'];
-                    $strLink = vsprintf('<a href="%s:%s%s" target="_blank">', array($arrClientLink[0]['address'], $arrClientLink[0]['port'], $arrClientLink[0]['path']));
+                    $strLink = vsprintf('<a href="%s:%s%s" target="_blank" style="text-decoration:underline;">', array($arrClientLink[0]['address'], $arrClientLink[0]['port'], $arrClientLink[0]['path']));
                     $arrContenData["data"][99]["description"] = vsprintf($GLOBALS['TL_LANG']['tl_syncCto_sync']['complete'], array($strLink, "</a>"));
                     $arrContenData["data"][99]["state"] = "";
 
@@ -3323,7 +3323,7 @@ class SyncCtoModuleClient extends BackendModule
                             ->fetchAllAssoc();
 
                     $arrContenData["data"][99]["title"] = $GLOBALS['TL_LANG']['MSC']['complete'];
-                    $strLink = vsprintf('<a href="%s:%s%s" target="_blank">', array($arrClientLink[0]['address'], $arrClientLink[0]['port'], $arrClientLink[0]['path']));
+                    $strLink = vsprintf('<a href="%s:%s%s" target="_blank" style="text-decoration:underline;">', array($arrClientLink[0]['address'], $arrClientLink[0]['port'], $arrClientLink[0]['path']));
                     $arrContenData["data"][99]["description"] = vsprintf($GLOBALS['TL_LANG']['tl_syncCto_sync']['complete'], array($strLink, "</a>"));
                     $arrContenData["data"][99]["state"] = "";
 
