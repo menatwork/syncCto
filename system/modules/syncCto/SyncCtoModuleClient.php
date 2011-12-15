@@ -377,7 +377,24 @@ class SyncCtoModuleClient extends BackendModule
 
                 // Reste server and client
                 $this->objSyncCtoFiles->purgeTemp();
-                $this->objSyncCtoCommunicationClient->purgeTemp();
+                $this->objSyncCtoCommunicationClient->purgeTemp();                
+            }
+            catch (Exception $exc)
+            {
+                // Nothing to do 
+            }
+            
+            try
+            {
+                $this->objSyncCtoCommunicationClient->stopConnection();
+            }
+            catch (Exception $exc)
+            {
+                // Nothing to do 
+            }
+            
+            try
+            {
                 $this->objSyncCtoCommunicationClient->referrerEnable();
             }
             catch (Exception $exc)
@@ -464,11 +481,21 @@ class SyncCtoModuleClient extends BackendModule
 
                     $mixStepPool["step"] = 2;
                     break;
+                
+                /**
+                 * Start connection
+                 */
+                case 2:
+                    $this->objSyncCtoCommunicationClient->startConnection();
+
+                    $mixStepPool["step"] = 3;
+                    break;
+
 
                 /**
                  * Referer check deactivate
                  */
-                case 2:
+                case 3:
                     if (!$this->objSyncCtoCommunicationClient->referrerDisable())
                     {
                         $arrContenData["data"][1]["state"] = $GLOBALS['TL_LANG']['MSC']['error'];
@@ -478,14 +505,14 @@ class SyncCtoModuleClient extends BackendModule
                         break;
                     }
 
-                    $mixStepPool["step"] = 3;
+                    $mixStepPool["step"] = 4;
                     break;
 
 
                 /**
                  * Check version
                  */
-                case 3:
+                case 4:
                     $strVersion = $this->objSyncCtoCommunicationClient->getVersionSyncCto();
 
                     if (!version_compare($strVersion, $GLOBALS['SYC_VERSION'], "="))
@@ -514,13 +541,13 @@ class SyncCtoModuleClient extends BackendModule
 
                     $arrContenData["data"][1]["description"] = $GLOBALS['TL_LANG']['tl_syncCto_sync']["step_1"]['description_2'];
 
-                    $mixStepPool["step"] = 4;
+                    $mixStepPool["step"] = 5;
                     break;
 
                 /**
                  * Clear client and server temp folder  
                  */
-                case 4:
+                case 5:
                     $this->objSyncCtoCommunicationClient->purgeTemp();
                     $this->objSyncCtoFiles->purgeTemp();
 
@@ -1737,19 +1764,31 @@ class SyncCtoModuleClient extends BackendModule
                     $this->objSyncCtoCommunicationClient->referrerEnable();
                     $mixStepPool["step"] = 9;
                     break;
+                
+                 case 9:
+                    $this->objSyncCtoCommunicationClient->stopConnection();
+                    $mixStepPool["step"] = 10;
+                    break;
 
                 /** ------------------------------------------------------------
                  * Show information
                  */
-                case 9:
+                case 10:
                     // Set success information 
+                    $arrClientLink = $this->Database
+                            ->prepare("SELECT * FROM tl_synccto_clients WHERE id=?")
+                            ->limit(1)
+                            ->execute($this->Input->get("id"))
+                            ->fetchAllAssoc();
+
                     $arrContenData["data"][99]["title"] = $GLOBALS['TL_LANG']['MSC']['complete'];
-                    $arrContenData["data"][99]["description"] = $GLOBALS['TL_LANG']['tl_syncCto_sync']['complete'];
+                    $strLink = vsprintf('<a href="%s:%s%s" target="_blank">', array($arrClientLink[0]['address'], $arrClientLink[0]['port'], $arrClientLink[0]['path']));
+                    $arrContenData["data"][99]["description"] = vsprintf($GLOBALS['TL_LANG']['tl_syncCto_sync']['complete'], array($strLink, "</a>"));
                     $arrContenData["data"][99]["state"] = "";
-                    
+
                     // Hide control div
                     $this->Template->showControl = false;
-                    
+
                     if ($intSyncTyp == SYNCCTO_SMALL
                             && ( (count($this->arrListCompare) == 0 || $this->arrListCompare == FALSE)
                             && !is_array($this->arrListCompare))
@@ -1989,9 +2028,18 @@ class SyncCtoModuleClient extends BackendModule
                     break;
 
                 /**
-                 * Referer check deactivate
+                 * Start connection
                  */
                 case 2:
+                    $this->objSyncCtoCommunicationClient->startConnection();
+
+                    $mixStepPool["step"] = 3;
+                    break;
+
+                /**
+                 * Referer check deactivate
+                 */
+                case 3:
                     if (!$this->objSyncCtoCommunicationClient->referrerDisable())
                     {
                         $arrContenData["data"][1]["state"] = $GLOBALS['TL_LANG']['MSC']['error'];
@@ -2001,14 +2049,14 @@ class SyncCtoModuleClient extends BackendModule
                         break;
                     }
 
-                    $mixStepPool["step"] = 3;
+                    $mixStepPool["step"] = 4;
                     break;
 
 
                 /**
                  * Check version
                  */
-                case 3:
+                case 4:
                     $strVersion = $this->objSyncCtoCommunicationClient->getVersionSyncCto();
 
                     if (!version_compare($strVersion, $GLOBALS['SYC_VERSION'], "="))
@@ -2037,13 +2085,13 @@ class SyncCtoModuleClient extends BackendModule
 
                     $arrContenData["data"][1]["description"] = $GLOBALS['TL_LANG']['tl_syncCto_sync']["step_1"]['description_2'];
 
-                    $mixStepPool["step"] = 4;
+                    $mixStepPool["step"] = 5;
                     break;
 
                 /**
                  * Clear client and server temp folder  
                  */
-                case 4:
+                case 5:
                     $this->objSyncCtoCommunicationClient->purgeTemp();
                     $this->objSyncCtoFiles->purgeTemp();
 
@@ -3252,21 +3300,33 @@ class SyncCtoModuleClient extends BackendModule
                     $this->log(vsprintf("Successfully finishing of synchronization client ID %s.", array($this->Input->get("id"))), __CLASS__ . " " . __FUNCTION__, "INFO");
 
                     break;
-
+                
                 case 7:
                     $this->objSyncCtoCommunicationClient->referrerEnable();
                     $mixStepPool["step"] = 8;
+                    break;
+                
+                case 8:
+                    $this->objSyncCtoCommunicationClient->stopConnection();
+                    $mixStepPool["step"] = 9;
                     break;
 
                 /** ------------------------------------------------------------
                  * Show information
                  */
-                case 8:
-                     // Set success information 
+                case 9:
+                    // Set success information 
+                    $arrClientLink = $this->Database
+                            ->prepare("SELECT * FROM tl_synccto_clients WHERE id=?")
+                            ->limit(1)
+                            ->execute($this->Input->get("id"))
+                            ->fetchAllAssoc();
+
                     $arrContenData["data"][99]["title"] = $GLOBALS['TL_LANG']['MSC']['complete'];
-                    $arrContenData["data"][99]["description"] = $GLOBALS['TL_LANG']['tl_syncCto_sync']['complete'];
+                    $strLink = vsprintf('<a href="%s:%s%s" target="_blank">', array($arrClientLink[0]['address'], $arrClientLink[0]['port'], $arrClientLink[0]['path']));
+                    $arrContenData["data"][99]["description"] = vsprintf($GLOBALS['TL_LANG']['tl_syncCto_sync']['complete'], array($strLink, "</a>"));
                     $arrContenData["data"][99]["state"] = "";
-                    
+
                     // Hide control div
                     $this->Template->showControl = false;
                     
