@@ -64,8 +64,8 @@ class SyncCtoFiles extends System
         // language 
         $this->loadLanguageFile("default");
 
-        // Set runtime to 5 minutes
-        set_time_limit(3600);
+        // Set runtime to 10 minutes
+        set_time_limit(600);
     }
 
     /**
