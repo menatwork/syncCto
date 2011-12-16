@@ -45,7 +45,7 @@ $GLOBALS['TL_DCA']['tl_syncCto_clients_syncFrom'] = array(
     // Palettes
     'palettes' => array
         (
-        'default' => '{sync_legend},sync_type;{table_legend},database_tables;{filelist_legend},filelist',
+        'default' => '{sync_legend},sync_type;{table_legend},database_tables;',
     ),
     // Fields
     'fields' => array(
@@ -65,14 +65,7 @@ $GLOBALS['TL_DCA']['tl_syncCto_clients_syncFrom'] = array(
             'exclude' => true,
             'eval' => array('multiple' => true),
             'options_callback' => array('SyncCtoHelper', 'getDatabaseTablesClient'),
-        ),
-        'filelist' => array
-            (
-            'label' => &$GLOBALS['TL_LANG']['tl_syncCto_clients_syncFrom']['filelist'],
-            'inputType' => 'fileTree',
-            'exclude' => true,
-            'eval' => array('files' => true, 'filesOnly' => false, 'fieldType' => 'checkbox'),
-        ),
+        )
     )
 );
 
@@ -151,16 +144,6 @@ class tl_syncCto_clients_syncFrom extends Backend
         else
         {
             $this->Session->set("syncCto_SyncTables", FALSE);
-        }
-
-        // Files for backup siles       
-        if (is_array($this->Input->post('filelist')) && count($this->Input->post('filelist')) != 0)
-        {
-            $this->Session->set("syncCto_Filelist", $this->Input->post('filelist'));
-        }
-        else
-        {
-            $this->Session->set("syncCto_Filelist", FALSE);
         }
 
         $this->Session->set("syncCto_Start", microtime(true));
