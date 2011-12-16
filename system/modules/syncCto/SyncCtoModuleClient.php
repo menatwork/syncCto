@@ -1813,6 +1813,18 @@ class SyncCtoModuleClient extends BackendModule
 
                         break;
                     }
+                    else if ((count($this->arrListCompare) == 0
+                            || $this->arrListCompare == FALSE
+                            || !is_array($this->arrListCompare))
+                            && $booPurgeData == TRUE)
+                    {
+                        $arrContenData["data"][5]["html"] = "";
+                        $arrContenData["data"][5]["state"] = $GLOBALS['TL_LANG']['MSC']['ok'];
+                        $arrContenData["data"][5]["description"] = $GLOBALS['TL_LANG']['tl_syncCto_sync']["step_5"]['description_1'];
+                        $arrContenData["finished"] = true;
+
+                        break;
+                    }
                     else
                     {
                         $arrContenData["data"][5]["description"] = vsprintf($GLOBALS['TL_LANG']['tl_syncCto_sync']["step_5"]['description_2'], array($intSendCount, count($this->arrListCompare)));
