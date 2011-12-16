@@ -45,7 +45,7 @@
                     <?php endif; ?>
                     <?php if(!mb_check_encoding($value["path"], 'UTF-8') && $file["state"] != 4):?>    
                         <td class="last" title="<?php echo $file["path"]; ?>"><?php echo (strlen($file["path"]) >= 60) ? substr($file["path"], 0, 30) . "[...]" . substr($file["path"], strlen($file["path"]) - 30, strlen($file["path"]) - 1) : $file["path"]; ?></td>
-                    <?php elseif(mb_check_encoding($value["path"], 'UTF-8') && $file["state"] == 4): ?>
+                    <?php elseif(!mb_check_encoding($value["path"], 'UTF-8') && $file["state"] == 4): ?>
                         <td class="last" title="<?php echo $file["path"]; ?>"><?php echo utf8_encode((strlen($file["path"]) >= 60) ? substr($file["path"], 0, 30) . "[...]" . substr($file["path"], strlen($file["path"]) - 30, strlen($file["path"]) - 1) : $file["path"]); ?></td>
                     <?php else: ?>
                         <td class="last" title="<?php echo $file["path"]; ?>"><?php echo (strlen($file["path"]) >= 60) ? substr($file["path"], 0, 30) . "[...]" . substr($file["path"], strlen($file["path"]) - 30, strlen($file["path"]) - 1) : $file["path"]; ?></td>
