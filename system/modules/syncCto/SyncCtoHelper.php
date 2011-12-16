@@ -687,11 +687,30 @@ class SyncCtoHelper extends Backend
             // Start connection
             $objSyncCtoCommunicationClient->startConnection();
             // Get Tables
-            $arrTables = $objSyncCtoCommunicationClient->getDatabaseTables();
+            $arrTablesClient = $objSyncCtoCommunicationClient->getDatabaseTables();
             // Stop connection
             $objSyncCtoCommunicationClient->stopConnection();
-            // Return Tables
-            return $arrTables;
+
+            // Recommended tables
+            $arrBlacklist = deserialize($GLOBALS['SYC_CONFIG']['table_hidden']);
+            if (!is_array($arrBlacklist))
+            {
+                $arrBlacklist = array();
+            }
+
+            $arrReturnTables = array();
+
+            foreach ($arrTablesClient as $key => $value)
+            {
+                if (in_array($value, $arrBlacklist))
+                {
+                    continue;
+                }
+
+                $arrReturnTables[] = $value;
+            }
+
+            return $arrReturnTables;
         }
         catch (Exception $exc)
         {
