@@ -1890,7 +1890,7 @@ class SyncCtoModuleClient extends BackendModule
                                         continue;
 
                                     $compare .= "<li>";
-                                    $compare .= $value["path"];
+                                    $compare .= (mb_check_encoding($value["path"], 'UTF-8')) ? $value["path"] : utf8_encode($value["path"]);
                                     $compare .= "</li>";
                                 }
                                 $compare .= "</ul>";
@@ -1917,7 +1917,7 @@ class SyncCtoModuleClient extends BackendModule
                                         continue;
 
                                     $compare .= "<li>";
-                                    $compare .= $value["path"];
+                                    $compare .= (mb_check_encoding($value["path"], 'UTF-8')) ? $value["path"] : utf8_encode($value["path"]);
                                     $compare .= "</li>";
                                 }
                                 $compare .= "</ul>";
@@ -1946,7 +1946,7 @@ class SyncCtoModuleClient extends BackendModule
                                         continue;
 
                                     $compare .= "<li>";
-                                    $compare .= $value["path"];
+                                    $compare .= (mb_check_encoding($value["path"], 'UTF-8')) ? $value["path"] : utf8_encode($value["path"]);
                                     $compare .= "</li>";
                                 }
                                 $compare .= "</ul>";
@@ -2842,9 +2842,6 @@ class SyncCtoModuleClient extends BackendModule
                         break;
 
                     case 5:
-                        echo "Step 5";
-                        exit();
-                        
                         $intCountSplit = 0;
                         $intCount = 0;
 
@@ -2858,6 +2855,8 @@ class SyncCtoModuleClient extends BackendModule
 
                         foreach ($this->arrListCompare as $key => $value)
                         {
+                            set_time_limit(600);
+                            
                             if ($value["split"] != true)
                             {
                                 continue;
@@ -2878,8 +2877,8 @@ class SyncCtoModuleClient extends BackendModule
                                 $intCount++;
                                 continue;
                             }
-
-                            if (!$this->objSyncCtoCommunicationClient->buildSingleFile($value["splitname"], $value["splitcount"], $value["path"], $value["checksum"]))
+                            
+                            if (!$this->objSyncCtoFiles->rebuildSplitFiles($value["splitname"], $value["splitcount"], $value["path"], $value["checksum"]))
                             {
                                 throw new Exception(vsprintf($GLOBALS['TL_LANG']['tl_syncCto_sync']['error_step_3']['rebuild'], array($value["path"])));
                             }
@@ -3431,7 +3430,7 @@ class SyncCtoModuleClient extends BackendModule
                                         continue;
 
                                     $compare .= "<li>";
-                                    $compare .= $value["path"];
+                                    $compare .= (mb_check_encoding($value["path"], 'UTF-8')) ? $value["path"] : utf8_encode($value["path"]);
                                     $compare .= "</li>";
                                 }
                                 $compare .= "</ul>";
@@ -3458,7 +3457,7 @@ class SyncCtoModuleClient extends BackendModule
                                         continue;
 
                                     $compare .= "<li>";
-                                    $compare .= $value["path"];
+                                    $compare .= (mb_check_encoding($value["path"], 'UTF-8')) ? $value["path"] : utf8_encode($value["path"]);
                                     $compare .= "</li>";
                                 }
                                 $compare .= "</ul>";
@@ -3487,7 +3486,7 @@ class SyncCtoModuleClient extends BackendModule
                                         continue;
 
                                     $compare .= "<li>";
-                                    $compare .= $value["path"];
+                                    $compare .= (mb_check_encoding($value["path"], 'UTF-8')) ? $value["path"] : utf8_encode($value["path"]);
                                     $compare .= "</li>";
                                 }
                                 $compare .= "</ul>";
