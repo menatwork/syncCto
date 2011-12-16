@@ -2798,8 +2798,8 @@ class SyncCtoModuleClient extends BackendModule
 
                             for ($ii = $value["split_transfer"]; $ii < $value["splitcount"]; $ii++)
                             {
-                                // Max limit for file send, 10 minutes
-                                set_time_limit(7200);
+                                // Max limit for file send, 20 minutes
+                                set_time_limit(1200);
 
                                 // Send file to client
                                 $arrResponse = $this->objSyncCtoCommunicationClient->getFile($this->objSyncCtoHelper->standardizePath($strTempFolder, $key, $value["splitname"] . ".sync$ii"), $this->objSyncCtoHelper->standardizePath($GLOBALS['SYC_PATH']['tmp'], $key, $value["splitname"] . ".sync$ii"));

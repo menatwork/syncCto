@@ -684,11 +684,18 @@ class SyncCtoHelper extends Backend
 
         try
         {
-            return $objSyncCtoCommunicationClient->getDatabaseTables();
+            // Start connection
+            $objSyncCtoCommunicationClient->startConnection();
+            // Get Tables
+            $arrTables = $objSyncCtoCommunicationClient->getDatabaseTables();
+            // Stop connection
+            $objSyncCtoCommunicationClient->stopConnection();
+            // Return Tables
+            return $arrTables;
         }
         catch (Exception $exc)
         {
-            $_SESSION["TL_ERROR"][]= $exc->getMessage();
+            $_SESSION["TL_ERROR"][] = $exc->getMessage();
             return array();
         }
     }
