@@ -44,13 +44,7 @@
                     <?php else: ?>
                         <td class="checkbox"><?php if (empty($file["css_big"])): ?><input class="tl_checkbox" type="checkbox" name="del-file-<?php echo $key; ?>" value="<?php echo $key; ?>" /><?php else: ?> X <?php endif; ?></td>  
                     <?php endif; ?>
-                    <?php if(!mb_check_encoding($value["path"], 'UTF-8') && $file["state"] != 4):?>    
-                        <td class="last" title="<?php echo $file["path"]; ?>"><?php echo (strlen($file["path"]) >= 60) ? substr($file["path"], 0, 30) . "[...]" . substr($file["path"], strlen($file["path"]) - 30, strlen($file["path"]) - 1) : $file["path"]; ?></td>
-                    <?php elseif(!mb_check_encoding($value["path"], 'UTF-8') && $file["state"] == 4): ?>
-                        <td class="last" title="<?php echo $file["path"]; ?>"><?php echo utf8_encode((strlen($file["path"]) >= 60) ? substr($file["path"], 0, 30) . "[...]" . substr($file["path"], strlen($file["path"]) - 30, strlen($file["path"]) - 1) : $file["path"]); ?></td>
-                    <?php else: ?>
-                        <td class="last" title="<?php echo $file["path"]; ?>"><?php echo (strlen($file["path"]) >= 60) ? substr($file["path"], 0, 30) . "[...]" . substr($file["path"], strlen($file["path"]) - 30, strlen($file["path"]) - 1) : $file["path"]; ?></td>
-                    <?php endif; ?>
+                    <td class="last" title="<?php echo $file["path"]; ?>"><?php echo (strlen($file["path"]) >= 60) ? substr($file["path"], 0, 30) . "[...]" . substr($file["path"], strlen($file["path"]) - 30, strlen($file["path"]) - 1) : $file["path"]; ?></td>
                 </tr>
             <?php endforeach; ?>
             </tbody>
