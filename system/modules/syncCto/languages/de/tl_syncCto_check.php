@@ -53,6 +53,7 @@ $GLOBALS['TL_LANG']['tl_syncCto_check']['dst']                      = array('Def
 $GLOBALS['TL_LANG']['tl_syncCto_check']['fsocket']                  = array('Fsockopen', 'Die empfohlene Einstellung ist An.');
 $GLOBALS['TL_LANG']['tl_syncCto_check']['fopen']                    = array('Fopen', 'Die empfohlene Einstellung ist An.');
 $GLOBALS['TL_LANG']['tl_syncCto_check']['zip_archive']              = array('ZipArchive', 'Die empfohlene Einstellung ist An.');
+$GLOBALS['TL_LANG']['tl_syncCto_check']['bcmath']                   = array('BC Math', 'Die empfohlene Einstellung ist An.');
 $GLOBALS['TL_LANG']['tl_syncCto_check']['suhosin']                  = array('Suhosin', 'Die empfohlene Einstellung ist Aus.');
 
 /**

@@ -52,6 +52,7 @@ $GLOBALS['TL_LANG']['tl_syncCto_check']['mit']                      = array('Max
 $GLOBALS['TL_LANG']['tl_syncCto_check']['dst']                      = array('Default socket timeout', 'Recommended setting is 30 or greater.');
 $GLOBALS['TL_LANG']['tl_syncCto_check']['fsocket']                  = array('Fsockopen', 'Recommended setting is On.');
 $GLOBALS['TL_LANG']['tl_syncCto_check']['fopen']                    = array('Fopen', 'Recommended setting is On.');
+$GLOBALS['TL_LANG']['tl_syncCto_check']['bcmath']                   = array('BC Math', 'Recommended setting is On.');
 $GLOBALS['TL_LANG']['tl_syncCto_check']['zip_archive']              = array('ZipArchive', 'Recommended setting is On.');
 $GLOBALS['TL_LANG']['tl_syncCto_check']['suhosin']                  = array('Suhosin', 'Recommended setting is Off.');
 

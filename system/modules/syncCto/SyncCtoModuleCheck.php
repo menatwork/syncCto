@@ -198,7 +198,7 @@ class SyncCtoModuleCheck extends BackendModule
         $return .= '</tr>';
 		
         // fsockopen
-        $fsockopen = function_exists(fsockopen);
+        $fsockopen = function_exists("fsockopen");
         $ok = ($fsockopen == true);
         $return .= '<tr class="' . ($ok ? 'ok' : 'warning') . '">';
         $return .= '<td>' . $GLOBALS['TL_LANG']['tl_syncCto_check']['fsocket'][0] . '</td>';
@@ -225,6 +225,16 @@ class SyncCtoModuleCheck extends BackendModule
         $return .= '<td class="dot">' . ($ok ? '&nbsp;' : '•') . '</td>';
         $return .= '<td class="value">' . ($zip_archive ? $GLOBALS['TL_LANG']['tl_syncCto_check']['on'] : $GLOBALS['TL_LANG']['tl_syncCto_check']['off']) . '</td>';
         $return .= '<td>' . $GLOBALS['TL_LANG']['tl_syncCto_check']['zip_archive'][1] . '</td>';
+        $return .= '</tr>';
+
+        // bcmath
+        $bcmath = function_exists('bcadd');
+        $ok = ($bcmath == true);
+        $return .= '<tr class="' . ($ok ? 'ok' : 'warning') . '">';
+        $return .= '<td>' . $GLOBALS['TL_LANG']['tl_syncCto_check']['bcmath'][0] . '</td>';
+        $return .= '<td class="dot">' . ($ok ? '&nbsp;' : '•') . '</td>';
+        $return .= '<td class="value">' . ($zip_archive ? $GLOBALS['TL_LANG']['tl_syncCto_check']['on'] : $GLOBALS['TL_LANG']['tl_syncCto_check']['off']) . '</td>';
+        $return .= '<td>' . $GLOBALS['TL_LANG']['tl_syncCto_check']['bcmath'][1] . '</td>';
         $return .= '</tr>';
 		
         // suhosin
