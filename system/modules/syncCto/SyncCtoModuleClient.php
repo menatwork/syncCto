@@ -71,6 +71,9 @@ class SyncCtoModuleClient extends BackendModule
 
         // Load Language 
         $this->loadLanguageFile("tl_syncCto_steps");
+        
+        // Import
+        $this->import("Backenduser", "User");
     }
 
     /**
@@ -303,7 +306,7 @@ class SyncCtoModuleClient extends BackendModule
         {
             case 1:
                 $this->Database->prepare("UPDATE `tl_synccto_clients` %s WHERE `tl_synccto_clients`.`id` = ?")
-                        ->set(array("syncTo_user" => $this->User->id, "syncTo_tstamp" => time()))
+                        ->set(array("syncFrom_user" => $this->User->id, "syncFrom_tstamp" => time()))
                         ->execute($this->Input->get("id"));
 
                 $this->pageSyncFromShowStep1();

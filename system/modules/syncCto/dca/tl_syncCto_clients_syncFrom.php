@@ -45,7 +45,7 @@ $GLOBALS['TL_DCA']['tl_syncCto_clients_syncFrom'] = array(
     // Palettes
     'palettes' => array
         (
-        'default' => '{sync_legend},sync_type;{table_legend},database_tables;',
+        'default' => '{sync_legend},lastSync,sync_type;{table_legend},database_tables;',
     ),
     // Fields
     'fields' => array(
@@ -65,7 +65,13 @@ $GLOBALS['TL_DCA']['tl_syncCto_clients_syncFrom'] = array(
             'exclude' => true,
             'eval' => array('multiple' => true),
             'options_callback' => array('SyncCtoHelper', 'getDatabaseTablesClient'),
-        )
+        ),
+        'lastSync' => array
+            (
+            'label' => " ",
+            'exclude' => true,
+            'inputType' => 'statictext',
+        ),
     )
 );
 
@@ -106,6 +112,32 @@ class tl_syncCto_clients_syncFrom extends Backend
         );
 
         $dc->addButton('start_sync', $arrData);
+
+        // Update a field with last sync information
+        $objSyncTime = $this->Database->prepare("SELECT cl.syncFrom_tstamp as syncFrom_tstamp, user.name as syncFrom_user, user.username as syncFrom_alias
+                                            FROM tl_synccto_clients as cl 
+                                            INNER JOIN tl_user as user
+                                            ON cl.syncTo_user = user.id
+                                            WHERE cl.id = ?")
+                ->limit(1)
+                ->execute($this->Input->get("id"));
+        
+        if (strlen($objSyncTime->syncFrom_tstamp) != 0 && strlen($objSyncTime->syncFrom_user) != 0 && strlen($objSyncTime->syncFrom_alias) != 0)
+        {
+            $strLastSync = vsprintf($GLOBALS['TL_LANG']['MSC']['information_last_sync'], array(
+                date($GLOBALS['TL_CONFIG']['timeFormat'], $objSyncTime->syncFrom_tstamp),
+                date($GLOBALS['TL_CONFIG']['dateFormat'], $objSyncTime->syncFrom_tstamp),
+                $objSyncTime->syncFrom_user,
+                $objSyncTime->syncFrom_alias)
+            );
+
+            // Set data
+            $dc->setData("lastSync", "<p class='tl_info'>" . $strLastSync . "</p><br />");
+        }
+        else
+        {
+            $GLOBALS['TL_DCA']['tl_syncCto_clients_syncFrom']['palettes']['default'] = str_replace(",lastSync", "", $GLOBALS['TL_DCA']['tl_syncCto_clients_syncFrom']['palettes']['default']);
+        }
     }
 
     /**
