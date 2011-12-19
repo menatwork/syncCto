@@ -60,7 +60,7 @@ $GLOBALS['TL_LANG']['tl_syncCto_check']['suhosin']                  = array('Suh
  * Text
  */
 $GLOBALS['TL_LANG']['tl_syncCto_check']['other_sync_issues']        = 'Weitere Problemfälle';
-$GLOBALS['TL_LANG']['tl_syncCto_check']['explanation_sync_issues']  = 'In machen Fällen kann eine Synchronisation trotz eines guten Systemchecks nicht ausgeführt werden.';
+$GLOBALS['TL_LANG']['tl_syncCto_check']['explanation_sync_issues']  = 'In machen Fällen kann eine Synchronisation trotz eines positiven Systemchecks nicht ausgeführt werden.';
 $GLOBALS['TL_LANG']['tl_syncCto_check']['known_issues']             = 'Folgende fehlerhafte Konfigurationen sind bekannt:';
 $GLOBALS['TL_LANG']['tl_syncCto_check']['suhosin_issue']            = 'Suhosin verhindert die Synchronisation';
 $GLOBALS['TL_LANG']['tl_syncCto_check']['mrl_issue']                = 'Der MaxRequestLen ist zu gering';
