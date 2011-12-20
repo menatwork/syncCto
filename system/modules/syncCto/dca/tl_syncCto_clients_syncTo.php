@@ -77,7 +77,7 @@ $GLOBALS['TL_DCA']['tl_syncCto_clients_syncTo'] = array(
         'filelist' => array
             (
             'label' => &$GLOBALS['TL_LANG']['tl_syncCto_clients_syncTo']['filelist'],
-            'inputType' => 'fileTree',
+            'inputType' => 'fileTreeMemory',
             'exclude' => true,
             'eval' => array('files' => true, 'filesOnly' => false, 'fieldType' => 'checkbox'),
         ),
