@@ -4,16 +4,6 @@
   */
   
  /*
-  * httprequestextended
-  * http://www.contao.org/erweiterungsliste/view/httprequestextended.html
-  */
- 
- /*
-  * cron
-  * http://www.contao.org/erweiterungsliste/view/cron.html
-  */
-  
- /*
   * textwizard
   * http://www.contao.org/erweiterungsliste/view/textwizard.html
   */
