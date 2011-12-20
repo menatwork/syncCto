@@ -2456,7 +2456,6 @@ class SyncCtoModuleClient extends BackendModule
     }
 
     /**
-     * @todo impl.
      * Split Files
      */
     private function pageSyncFromShowStep3()

@@ -334,7 +334,6 @@ class SyncCtoCommunicationClient extends CtoCommunication
     }
 
     /**
-     * @todo
      * Check for deleted files
      * 
      * @param array $arrFilelist
@@ -447,7 +446,6 @@ class SyncCtoCommunicationClient extends CtoCommunication
     }
 
     /**
-     * @todo
      * Delete files
      * 
      * @param array $arrFilelist
