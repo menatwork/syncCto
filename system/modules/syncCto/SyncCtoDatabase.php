@@ -1,4 +1,7 @@
-<?php if (!defined('TL_ROOT')) die('You cannot access this file directly!');
+<?php
+
+if (!defined('TL_ROOT'))
+    die('You cannot access this file directly!');
 
 /**
  * Contao Open Source CMS
@@ -48,7 +51,7 @@ class SyncCtoDatabase extends Backend
     protected $strTimestampFormat;
     //- Objects ------------------
     protected $objSyncCtoHelper;
-    
+
     /**
      * List of default ignore values
      * 
@@ -58,7 +61,7 @@ class SyncCtoDatabase extends Backend
         "NOW",
         "CURRENT_TIMESTAMP",
     );
-    
+
     /**
      * List of default ignore values
      * 
@@ -95,7 +98,7 @@ class SyncCtoDatabase extends Backend
         {
             $this->arrHiddenTables = array();
         }
-        
+
         $this->objSyncCtoHelper = SyncCtoHelper::getInstance();
 
         $this->strTimestampFormat = standardize($GLOBALS['TL_CONFIG']['datimFormat']);
@@ -203,6 +206,8 @@ class SyncCtoDatabase extends Backend
      */
     public function runDump($arrTables, $booTempFolder)
     {
+        $intStart = time();
+
         if (is_array($arrTables) && is_array($this->arrBackupTables))
         {
             $this->arrBackupTables = array_unique(array_merge($this->arrBackupTables, $arrTables));
@@ -212,6 +217,161 @@ class SyncCtoDatabase extends Backend
         {
             throw new Exception("No tables found for backup.");
         }
+
+        $arrPeak = array();
+
+        $arrTables = $this->Database->listTables();
+
+        $strRandomToken = md5(time() . " | " . rand(0, 65535));
+
+        // Temp files
+        $objFileSQL = new File("system/tmp/TempSQLDump.$strRandomToken");
+        $objFileSQL->write("");
+        $objFileStructure = new File("system/tmp/TempStructureDump.$strRandomToken");
+        $objFileStructure->write("");
+        $objFileData = new File("system/tmp/TempDataDump.$strRandomToken");
+        $objFileData->write("");
+
+        foreach ($arrTables as $key => $TableName)
+        {
+            // Get data
+            $arrStructure = $this->getTableStructure($TableName);
+
+            // Check if empty
+            if (count($arrStructure) == 0)
+            {
+                continue;
+            }
+
+            // Write serialize array in file
+            $objFileStructure->append(serialize(array("name" => $TableName, "value" => $arrStructure)));
+
+            // Write SQL 
+            $objFileSQL->append("-- \r");
+            $objFileSQL->append("-- Dumping data for table $TableName");
+            $objFileSQL->append("-- \r");
+            $objFileSQL->append("\r");
+            $objFileSQL->append($this->buildSQLTable($arrStructure, $TableName));
+
+            // Get data from table
+            if (!in_array($TableName, $this->arrBackupTables) || in_array($TableName, $this->arrHiddenTables))
+            {
+                $objFileSQL->append("-- --------------------------------------------------------\r");
+                $objFileSQL->append("\r");
+                continue;
+            }
+
+            $fields = $this->Database->listFields($TableName);
+
+            $arrFieldMeta = array();
+
+            foreach ($fields as $key => $value)
+            {
+                if ($value["type"] == "index")
+                {
+                    continue;
+                }
+
+                $arrFieldMeta[$value["name"]] = $value;
+            }
+
+            $objCount = $this->Database->prepare("SELECT Count(*) as count FROM $TableName")->executeUncached();
+            $intElementsPerRequest = 500;
+
+            for ($i = 0; $i < 100000; $i++)
+            {
+                if (($i * $intElementsPerRequest) > $objCount->count)
+                {
+                    break;
+                }
+
+                $objData = $this->Database->prepare("SELECT * FROM $TableName")->limit($intElementsPerRequest, ($i * $intElementsPerRequest))->executeUncached();
+
+                $strSQL = "";
+                $strSer = "";
+
+                while ($row = $objData->fetchAssoc())
+                {
+                    $arrTableData = array("table" => $TableName, "values" => array());
+
+                    $arrPeak[$this->getReadableSize(memory_get_usage(true))] = $this->getReadableSize(memory_get_usage(true));
+
+                    foreach ($row as $field_key => $field_data)
+                    {
+                        if (!isset($field_data))
+                        {
+                            $arrTableData['values'][$field_key] = "NULL";
+                        }
+                        else if ($field_data != "")
+                        {
+                            switch (strtolower($arrFieldMeta[$field_key]['type']))
+                            {
+                                case 'blob':
+                                case 'tinyblob':
+                                case 'mediumblob':
+                                case 'longblob':
+                                    $arrTableData['values'][$field_key] = "0x" . bin2hex($field_data);
+                                    break;
+
+                                case 'smallint':
+                                case 'int':
+                                    $arrTableData['values'][$field_key] = $field_data;
+                                    break;
+
+                                case 'text':
+                                case 'mediumtext':
+                                    if (strpos($field_data, "'") != false)
+                                    {
+                                        $arrTableData['values'][$field_key] = "0x" . bin2hex($field_data);
+                                        break;
+                                    }
+                                default:
+                                    $arrTableData['values'][$field_key] = " '" . str_replace(array("\\", "'", "\r", "\n"), array("\\\\", "\\'", "\\r", "\\n"), $field_data) . "'";
+                                    break;
+                            }
+                        }
+                        else
+                        {
+                            $arrTableData['values'][$field_key] = "''";
+                        }
+                    }
+
+                    $strSQL .= $this->buildSQLInsert($arrTableData["table"], array_keys($arrTableData["values"]), $arrTableData["values"]) . "\n";
+                    $strSer .= base64_encode(gzcompress(json_encode($arrTableData))) . "\n";
+
+                    if (strlen($strSQL) > 60000)
+                    {
+                        $objFileSQL->append($strSQL, "");
+                        $strSQL = "";
+                    }
+
+                    if (strlen($strSer) > 60000)
+                    {
+                        $objFileData->append($strSer, "");
+                        $strSer = "";
+                    }
+                }
+
+                if (strlen($strSQL) != 0)
+                {
+                    $objFileSQL->append($strSQL, "");
+                    $strSQL = "";
+                }
+
+                if (strlen($strSer) != 0)
+                {
+                    $objFileData->append($strSer, "");
+                    $strSer = "";
+                }
+            }
+
+            $objFileSQL->append("-- --------------------------------------------------------\r");
+            $objFileSQL->append("\r");
+        }
+
+        $objFileSQL->close();
+        $objFileStructure->close();
+        $objFileData->close();
 
         $strFilename = date($this->strTimestampFormat) . "_" . $this->strSuffixZipName;
 
@@ -224,16 +384,19 @@ class SyncCtoDatabase extends Backend
             $strPath = $GLOBALS['SYC_PATH']['db'];
         }
 
-        $objZipWrite = new ZipWriter($strPath . $strFilename);  
+        $objZipWrite = new ZipWriter($strPath . $strFilename);
 
-        $arrTables = $this->getTableStructure();        
-        $arrData = $this->getTableData();               
+        $objZipWrite->addFile("system/tmp/TempSQLDump.$strRandomToken", $this->strFilenameSQL);
+        $objZipWrite->addFile("system/tmp/TempStructureDump.$strRandomToken", $this->strFilenameTable);
+        $objZipWrite->addFile("system/tmp/TempDataDump.$strRandomToken", $this->strFilenameInsert);
 
-        $objZipWrite->addString($this->buildFileSQLTables($arrTables) . $this->buildFileSQLInsert($arrData), $this->strFilenameSQL);
-        $objZipWrite->addString(serialize($arrData), $this->strFilenameInsert);       
-        $objZipWrite->addString(serialize($arrTables), $this->strFilenameTable);
-        
         $objZipWrite->close();
+
+        $objFiles = Files::getInstance();
+
+        $objFiles->delete("system/tmp/TempSQLDump.$strRandomToken");
+        $objFiles->delete("system/tmp/TempStructureDump.$strRandomToken");
+        $objFiles->delete("system/tmp/TempDataDump.$strRandomToken");
 
         return $strFilename;
     }
@@ -247,28 +410,7 @@ class SyncCtoDatabase extends Backend
      */
     public function runRestore($strRestoreFile)
     {
-        $objZipRead = new ZipReader($strRestoreFile);
-
-        if (!$objZipRead->getFile($this->strFilenameInsert))
-        {
-            throw new Exception("Could not load SQL file inserts. Maybe damaged?");
-        }
-
-        $arrInsert = deserialize($objZipRead->unzip());
-
-        if (!$objZipRead->getFile($this->strFilenameTable))
-        {
-            throw new Exception("Could not load SQL file table. Maybe damaged?");
-        }
-
-        $arrRestoreTables = deserialize($objZipRead->unzip());
-
-        if (!is_array($arrInsert) || !is_array($arrRestoreTables))
-        {
-            throw new Exception("Could not load SQL files. Maybe damaged?");
-        }
-
-        // Set time out for database. Ticket #2653
+         // Set time out for database. Ticket #2653
         if ($GLOBALS['TL_CONFIG']['syncCto_custom_settings'] == true
                 && intval($GLOBALS['TL_CONFIG']['syncCto_wait_timeout']) > 0
                 && intval($GLOBALS['TL_CONFIG']['syncCto_interactive_timeout']) > 0)
@@ -279,46 +421,107 @@ class SyncCtoDatabase extends Backend
         {
             $this->Database->query('SET SESSION wait_timeout = GREATEST(28000, @@wait_timeout), SESSION interactive_timeout = GREATEST(28000, @@wait_timeout);');
         }
-
+        
+        $objZipRead = new ZipReader($strRestoreFile);
+                
+        // Get structure
+        if (!$objZipRead->getFile($this->strFilenameTable))
+        {
+            throw new Exception("Could not load SQL file table. Maybe damaged?");
+        }
+        
+        $mixTables = $objZipRead->unzip();
+        $mixTables = trimsplit("\n", $mixTables);
+        
+        $arrRestoreTables = array();
+        
         try
         {
-            // Create temp tables
-            foreach ($arrRestoreTables as $key => $value)
+            foreach ($mixTables as $key => $value)
             {
-                $this->Database->prepare("DROP TABLE IF EXISTS " . "synccto_temp_" . $key)->executeUncached();
-                $this->Database->prepare($this->buildSQLTable($value, "synccto_temp_" . $key))->executeUncached();
-            }
-
-            // Inserts
-            foreach ($arrInsert as $table)
-            {
-                if (!empty($table['values']))
+                if (empty($value))
                 {
-                    foreach ($table['values'] as $value)
-                    {
-                        $strSQL = $this->buildSQLInsert("synccto_temp_" . $table['name'], $table['keys'], $value, true);
-                        $this->Database->prepare($strSQL)->executeUncached();
-                    }
+                    continue;
                 }
-            }
+                
+                $value = deserialize($value);
+                
+                if (!is_array($value))
+                {
+                    throw new Exception("Could not load SQL file table. Maybe damaged?");
+                }
 
-            // Rename temp tables
-            foreach ($arrRestoreTables as $key => $value)
-            {
-                $this->Database->prepare("DROP TABLE IF EXISTS " . $key)->executeUncached();
-                $this->Database->prepare("RENAME TABLE " . "synccto_temp_" . $key . " TO " . $key)->executeUncached();
+                $this->Database->prepare("DROP TABLE IF EXISTS " . "synccto_temp_" . $value["name"])->executeUncached();
+                $this->Database->prepare($this->buildSQLTable($value["value"], "synccto_temp_" . $value["name"]))->executeUncached();
+                
+                $arrRestoreTables[] = $value["name"];
             }
         }
         catch (Exception $exc)
         {
             foreach ($arrRestoreTables as $key => $value)
             {
-                $this->Database->prepare("DROP TABLE IF EXISTS " . "synccto_temp_" . $key)->executeUncached();
+                $this->Database->prepare("DROP TABLE IF EXISTS " . "synccto_temp_" . $value)->executeUncached();
             }
 
             throw $exc;
         }
 
+        // Get insert
+        if (!$objZipRead->getFile($this->strFilenameInsert))
+        {
+            throw new Exception("Could not load SQL file inserts. Maybe damaged?");
+        }
+        
+        $strContent = $objZipRead->unzip();
+        
+        // Write temp File
+        $objTempfile = tmpfile();
+        fputs($objTempfile, $strContent, strlen($strContent));
+        
+        unset ($strContent);
+        
+        // Set pointer on position zero
+        rewind($objTempfile);
+        while ($mixLine = fgets($objTempfile, 500000))
+        {
+            if(empty ($mixLine))
+            {
+                continue;
+            }            
+            
+            $mixLine = json_decode(gzuncompress(base64_decode($mixLine)),true);
+      
+            if (!is_array($mixLine))
+            {
+                throw new Exception("Could not load SQL file inserts. Maybe damaged?");
+            }
+
+            try
+            {
+                $strSQL = $this->buildSQLInsert("synccto_temp_" . $mixLine['table'], array_keys($mixLine['values']), $mixLine['values'], true);
+                $this->Database->prepare($strSQL)->executeUncached();
+            }
+            catch (Exception $exc)
+            {
+                foreach ($arrRestoreTables as $key => $value)
+                {
+                    $this->Database->prepare("DROP TABLE IF EXISTS " . "synccto_temp_" . $value)->executeUncached();
+                }
+
+                throw $exc;
+            }
+        }
+        
+        fclose($objTempfile);
+
+        // Rename temp tables
+        foreach ($arrRestoreTables as $key => $value)
+        {
+            $this->Database->prepare("DROP TABLE IF EXISTS " . $value)->executeUncached();
+            $this->Database->prepare("RENAME TABLE " . "synccto_temp_" . $value . " TO " . $value)->executeUncached();            
+        }
+            
         return;
     }
 
@@ -331,146 +534,142 @@ class SyncCtoDatabase extends Backend
      * 
      * @return array 
      */
-    private function getTableStructure()
+    private function getTableStructure($strTableName)
     {
         $tables = $this->Database->listTables();
 
         // Check if a table is selected
-        if (!count($tables))
+        if (!count($tables) || !in_array($strTableName, $tables))
         {
             throw new Exception($GLOBALS['TL_LANG']['ERR']['missing_tables_selection']);
         }
 
         $return = array();
-        
-        foreach ($tables as $table)
+
+        // Check if table is in blacklist
+        if (!in_array($strTableName, $this->arrBackupTables))
         {
-            // Check if table is in blacklist
-            if (!in_array($table, $this->arrBackupTables))
+            return $return;
+        }
+
+        // Get list of fields
+        $fields = $this->Database->listFields($strTableName);
+
+        // Get list of indicies
+        $arrIndexes = $this->Database->prepare("SHOW INDEX FROM `$strTableName`")->executeUncached()->fetchAllAssoc();
+
+        foreach ($fields as $field)
+        {
+            if (version_compare(VERSION, '2.10', '<'))
             {
-                continue;
-            }
-
-            // Get list of fields
-            $fields = $this->Database->listFields($table);
-
-            // Get list of indicies
-            $arrIndexes = $this->Database->prepare("SHOW INDEX FROM `$table`")->executeUncached()->fetchAllAssoc();
-
-            foreach ($fields as $field)
-            {
-                
-                
-                if (version_compare(VERSION, '2.10', '<'))
+                // Indices
+                if (strlen($field['index']) != 0)
                 {
-                    // Indices
-                    if (strlen($field['index']) != 0)
+                    switch ($field['index'])
                     {
-                        switch ($field['index'])
-                        {
-                            case 'PRIMARY':
-                                $return[$table]['TABLE_CREATE_DEFINITIONS'][$field["name"]] = 'PRIMARY KEY  (`' . $field["name"] . '`)';
-                                break;
+                        case 'PRIMARY':
+                            $return['TABLE_CREATE_DEFINITIONS'][$field["name"]] = 'PRIMARY KEY  (`' . $field["name"] . '`)';
+                            break;
 
-                            case 'UNIQUE':
-                                $return[$table]['TABLE_CREATE_DEFINITIONS'][$field["name"]] = 'UNIQUE KEY `' . $field["name"] . '` (`' . $field["name"] . '`)';
-                                break;
+                        case 'UNIQUE':
+                            $return['TABLE_CREATE_DEFINITIONS'][$field["name"]] = 'UNIQUE KEY `' . $field["name"] . '` (`' . $field["name"] . '`)';
+                            break;
 
-                            case 'FULLTEXT':
-                                $return[$table]['TABLE_CREATE_DEFINITIONS'][$field["name"]] = 'FULLTEXT KEY `' . $field["name"] . '` (`' . $field["name"] . '`)';
-                                break;
+                        case 'FULLTEXT':
+                            $return['TABLE_CREATE_DEFINITIONS'][$field["name"]] = 'FULLTEXT KEY `' . $field["name"] . '` (`' . $field["name"] . '`)';
+                            break;
 
-                            default:
-                                if ((strpos(' ' . $field['type'], 'text') || strpos(' ' . $field['type'], 'char')) && ($field['null'] == 'NULL'))
-                                {
-                                    $return[$table]['TABLE_CREATE_DEFINITIONS'][$field["name"]] = 'FULLTEXT KEY `' . $field["name"] . '` (`' . $field["name"] . '`)';
-                                }
-                                else
-                                {
-                                    $return[$table]['TABLE_CREATE_DEFINITIONS'][$field["name"]] = 'KEY `' . $field["name"] . '` (`' . $field["name"] . '`)';
-                                }
-                                break;
-                        }
+                        default:
+                            if ((strpos(' ' . $field['type'], 'text') || strpos(' ' . $field['type'], 'char')) && ($field['null'] == 'NULL'))
+                            {
+                                $return['TABLE_CREATE_DEFINITIONS'][$field["name"]] = 'FULLTEXT KEY `' . $field["name"] . '` (`' . $field["name"] . '`)';
+                            }
+                            else
+                            {
+                                $return['TABLE_CREATE_DEFINITIONS'][$field["name"]] = 'KEY `' . $field["name"] . '` (`' . $field["name"] . '`)';
+                            }
+                            break;
                     }
                 }
-                else
+            }
+            else
+            {
+                if ($field["type"] == "index")
                 {
-                    if ($field["type"] == "index")
+                    if ($field["name"] == "PRIMARY")
                     {
-                        if ($field["name"] == "PRIMARY")
+                        $return['TABLE_CREATE_DEFINITIONS'][$field["name"]] = "PRIMARY KEY (`" . implode("`,`", $field["index_fields"]) . "`)";
+                    }
+                    else if ($field["index"] == "UNIQUE")
+                    {
+                        $return['TABLE_CREATE_DEFINITIONS'][$field["name"]] = "UNIQUE KEY `" . $field["name"] . "` (`" . implode("`,`", $field["index_fields"]) . "`)";
+                    }
+                    else if ($field["index"] == "KEY")
+                    {
+                        foreach ($arrIndexes as $keyIndexes => $valueIndexes)
                         {
-                            $return[$table]['TABLE_CREATE_DEFINITIONS'][$field["name"]] = "PRIMARY KEY (`" . implode("`,`", $field["index_fields"]) . "`)";
-                        }
-                        else if ($field["index"] == "UNIQUE")
-                        {
-                            $return[$table]['TABLE_CREATE_DEFINITIONS'][$field["name"]] = "UNIQUE KEY `" . $field["name"] . "` (`" . implode("`,`", $field["index_fields"]) . "`)";
-                        }
-                        else if ($field["index"] == "KEY")
-                        {
-                            foreach ($arrIndexes as $keyIndexes => $valueIndexes)
+                            if ($valueIndexes["Key_name"] == $field["name"])
                             {
-                                if ($valueIndexes["Key_name"] == $field["name"])
+                                switch ($valueIndexes["Index_type"])
                                 {
-                                    switch ($valueIndexes["Index_type"])
-                                    {
-                                        case "FULLTEXT":
-                                            $return[$table]['TABLE_CREATE_DEFINITIONS'][$field["name"]] = "FULLTEXT KEY `" . $field['name'] . "` (`" . implode("`,`", $field["index_fields"]) . "`)";
-                                            break;
+                                    case "FULLTEXT":
+                                        $return['TABLE_CREATE_DEFINITIONS'][$field["name"]] = "FULLTEXT KEY `" . $field['name'] . "` (`" . implode("`,`", $field["index_fields"]) . "`)";
+                                        break;
 
-                                        default:
-                                            $return[$table]['TABLE_CREATE_DEFINITIONS'][$field["name"]] = "KEY `" . $field['name'] . "` (`" . implode("`,`", $field["index_fields"]) . "`)";
-                                            break;
-                                    }
-                                    
-                                    break;
+                                    default:
+                                        $return['TABLE_CREATE_DEFINITIONS'][$field["name"]] = "KEY `" . $field['name'] . "` (`" . implode("`,`", $field["index_fields"]) . "`)";
+                                        break;
                                 }
+
+                                break;
                             }
                         }
-
-                        continue;
                     }
-                }
-                
-                unset($field['index']);
 
-                $name = $field['name'];
-                $field['name'] = '`' . $field['name'] . '`';
-
-                // Field type
-                if (strlen($field['length']))
-                {
-                    $field['type'] .= '(' . $field['length'] . (strlen($field['precision']) ? ',' . $field['precision'] : '') . ')';
-
-                    unset($field['length']);
-                    unset($field['precision']);
+                    continue;
                 }
-
-                // Default values
-                if (in_array(strtolower($field['type']), $this->arrDefaultValueTypIgnore) || stristr($field['extra'], 'auto_increment'))
-                {
-                    unset($field['default']);
-                }
-                else if (strtolower($field['default']) == 'null')
-                {
-                    $field['default'] = "default NULL";
-                }
-                else if (is_null($field['default']))
-                {
-                    $field['default'] = "";
-                }
-                else if (in_array(strtoupper($field['default']), $this->arrDefaultValueFunctionIgnore))
-                {
-                    $field['default'] = "default " . $field['default'];
-                }
-                else
-                {
-                    $field['default'] = "default '" . $field['default'] . "'";
-                }
-
-                $return[$table]['TABLE_FIELDS'][$name] = trim(implode(' ', $field));
             }
-        } 
-        
+
+            unset($field['index']);
+
+            $name = $field['name'];
+            $field['name'] = '`' . $field['name'] . '`';
+
+            // Field type
+            if (strlen($field['length']))
+            {
+                $field['type'] .= '(' . $field['length'] . (strlen($field['precision']) ? ',' . $field['precision'] : '') . ')';
+
+                unset($field['length']);
+                unset($field['precision']);
+            }
+
+            // Default values
+            if (in_array(strtolower($field['type']), $this->arrDefaultValueTypIgnore) || stristr($field['extra'], 'auto_increment'))
+            {
+                unset($field['default']);
+            }
+            else if (strtolower($field['default']) == 'null')
+            {
+                $field['default'] = "default NULL";
+            }
+            else if (is_null($field['default']))
+            {
+                $field['default'] = "";
+            }
+            else if (in_array(strtoupper($field['default']), $this->arrDefaultValueFunctionIgnore))
+            {
+                $field['default'] = "default " . $field['default'];
+            }
+            else
+            {
+                $field['default'] = "default '" . $field['default'] . "'";
+            }
+
+            $return['TABLE_FIELDS'][$name] = trim(implode(' ', $field));
+        }
+
+
         // Table status
         $objStatus = $this->Database->prepare("SHOW TABLE STATUS")->executeUncached();
         while ($row = $objStatus->fetchAssoc())
@@ -478,9 +677,9 @@ class SyncCtoDatabase extends Backend
             if (!in_array($row['Name'], $this->arrBackupTables))
                 continue;
 
-            $return[$row['Name']]['TABLE_OPTIONS'] = " ENGINE=" . $row['Engine'] . " DEFAULT CHARSET=" . substr($row['Collation'], 0, strpos($row['Collation'], "_")) . "";
+            $return['TABLE_OPTIONS'] = " ENGINE=" . $row['Engine'] . " DEFAULT CHARSET=" . substr($row['Collation'], 0, strpos($row['Collation'], "_")) . "";
             if ($row['Auto_increment'] != "")
-                $return[$row['Name']]['TABLE_OPTIONS'] .= " AUTO_INCREMENT=" . $row['Auto_increment'] . " ";
+                $return['TABLE_OPTIONS'] .= " AUTO_INCREMENT=" . $row['Auto_increment'] . " ";
         }
 
         return $return;
@@ -508,7 +707,7 @@ class SyncCtoDatabase extends Backend
             {
                 continue;
             }
-            
+
             if (in_array($table, $this->arrHiddenTables))
             {
                 continue;
@@ -576,7 +775,7 @@ class SyncCtoDatabase extends Backend
                 $ii++;
             }
         }
-        
+
         return $arrReturn;
     }
 
