@@ -512,7 +512,7 @@ class SyncCtoHelper extends Backend
             {
                 continue;
             }
-            $arrTables[] = $value;
+            $arrTables[$value] = $value . '<span style="color: #aaaaaa; padding-left: 3px;">(' . $this->getReadableSize($this->Database->getSizeOf($value)) . ')</span>';
         }
 
         return $arrTables;
@@ -547,7 +547,7 @@ class SyncCtoHelper extends Backend
             {
                 continue;
             }
-            $arrTables[] = $value;
+            $arrTables[$value] = $value . '<span style="color: #aaaaaa; padding-left: 3px;">(' . $this->getReadableSize($this->Database->getSizeOf($value)) . ')</span>';
         }
 
         return $arrTables;
@@ -589,7 +589,7 @@ class SyncCtoHelper extends Backend
                 continue;
             }
             
-            $arrTables[] = $value;
+            $arrTables[$value] = $value . '<span style="color: #aaaaaa; padding-left: 3px;">(' . $this->getReadableSize($this->Database->getSizeOf($value)) . ')</span>';
         }
 
         return $arrTables;
