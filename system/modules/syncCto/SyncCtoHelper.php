@@ -49,9 +49,14 @@ class SyncCtoHelper extends Backend
      */
     protected function __construct()
     {
+        // Import
         $this->BackendUser = BackendUser::getInstance();
 
+        // Parent
         parent::__construct();
+        
+        // Language
+        $this->loadLanguageFile("default");
     }
 
     /**
@@ -610,71 +615,7 @@ class SyncCtoHelper extends Backend
             return '<span style="color: #aaaaaa; padding-left: 3px;">(' . $this->getReadableSize($this->Database->getSizeOf($strTableName)) . ', ' . vsprintf($GLOBALS['TL_LANG']['MSC']['entries'], array($objCount->Count)) . ')</span>';
         }
     }
-
-    /**
-     * Returns a list with recommended database tables
-     * 
-     * @return array 
-     */
-    public function getDatabaseTablesClient()
-    {
-        // Build communication class
-        $objSyncCtoCommunicationClient = SyncCtoCommunicationClient::getInstance();
-        $objSyncCtoCommunicationClient->setClientBy($this->Input->get("id"));
-
-        try
-        {
-            // Start connection
-            $objSyncCtoCommunicationClient->startConnection();
-            // Get Tables
-            $arrTablesClientRec = $objSyncCtoCommunicationClient->getRecommendedTables();
-            $arrTablesClientNRec = $objSyncCtoCommunicationClient->getNoneRecommendedTables();
-
-            // Stop connection
-            $objSyncCtoCommunicationClient->stopConnection();
-
-            // Check if we have a array 
-            if (!is_array($arrTablesClientRec))
-            {
-                $arrTablesClientRec = array();
-            }
-
-            if (!is_array($arrTablesClientNRec))
-            {
-                $arrTablesClientNRec = array();
-            }
-            
-            // Merge both array
-            $arrTablesClient = array_merge($arrTablesClientRec, $arrTablesClientNRec);
-
-            // Recommended tables
-            $arrBlacklist = deserialize($GLOBALS['SYC_CONFIG']['table_hidden']);
-            if (!is_array($arrBlacklist))
-            {
-                $arrBlacklist = array();
-            }
-
-            $arrReturnTables = array();
-
-            foreach ($arrTablesClient as $key => $value)
-            {
-                if (in_array($key, $arrBlacklist))
-                {
-                    continue;
-                }
-
-                $arrReturnTables[$key] = $value;
-            }
-
-            return $arrReturnTables;
-        }
-        catch (Exception $exc)
-        {
-            $_SESSION["TL_ERROR"][] = $exc->getMessage();
-            return array();
-        }
-    }
-
+    
     /**
      * Import configuration entries
      *
@@ -698,6 +639,82 @@ class SyncCtoHelper extends Backend
         }
 
         return true;
+    }
+
+    /* -------------------------------------------------------------------------
+     * Remote Calls
+     */
+
+    /**
+     * Returns a list with recommended database tables
+     * 
+     * @return array 
+     */
+    public function getRecommendedDatabaseTablesClient()
+    {
+        // Build communication class
+        $objSyncCtoCommunicationClient = SyncCtoCommunicationClient::getInstance();
+        $objSyncCtoCommunicationClient->setClientBy($this->Input->get("id"));
+
+        try
+        {
+            // Start connection
+            $objSyncCtoCommunicationClient->startConnection();
+            // Get Tables
+            $arrTablesClient = $objSyncCtoCommunicationClient->getRecommendedTables();
+
+            // Stop connection
+            $objSyncCtoCommunicationClient->stopConnection();
+
+            // Check if we have a array 
+            if (!is_array($arrTablesClient))
+            {
+                $arrTablesClient = array();
+            }
+
+            return $arrTablesClient;
+        }
+        catch (Exception $exc)
+        {
+            $_SESSION["TL_ERROR"][] = $exc->getMessage();
+            return array();
+        }
+    }
+
+    /**
+     * Returns a list with none recommended database tables
+     * 
+     * @return array 
+     */
+    public function getNoneRecommendedDatabaseTablesClient()
+    {
+        // Build communication class
+        $objSyncCtoCommunicationClient = SyncCtoCommunicationClient::getInstance();
+        $objSyncCtoCommunicationClient->setClientBy($this->Input->get("id"));
+
+        try
+        {
+            // Start connection
+            $objSyncCtoCommunicationClient->startConnection();
+            // Get Tables
+            $arrTablesClient = $objSyncCtoCommunicationClient->getNoneRecommendedTables();
+
+            // Stop connection
+            $objSyncCtoCommunicationClient->stopConnection();
+
+            // Check if we have a array 
+            if (!is_array($arrTablesClient))
+            {
+                $arrTablesClient = array();
+            }
+
+            return $arrTablesClient;
+        }
+        catch (Exception $exc)
+        {
+            $_SESSION["TL_ERROR"][] = $exc->getMessage();
+            return array();
+        }
     }
 
 }

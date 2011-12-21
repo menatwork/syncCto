@@ -45,7 +45,7 @@ $GLOBALS['TL_DCA']['tl_syncCto_clients_syncFrom'] = array(
     // Palettes
     'palettes' => array
         (
-        'default' => '{sync_legend},lastSync,sync_type;{table_legend},database_tables;',
+        'default' => '{sync_legend},lastSync,sync_type;{table_recommend_legend},database_tables_recommended;{table_none_recommend_legend},database_tables_none_recommended;',
     ),
     // Fields
     'fields' => array(
@@ -58,19 +58,35 @@ $GLOBALS['TL_DCA']['tl_syncCto_clients_syncFrom'] = array(
             'reference' => &$GLOBALS['TL_LANG']['SYC'],
             'options_callback' => array('SyncCtoHelper', 'getSyncType'),
         ),
-        'database_tables' => array
-            (
-            'label' => &$GLOBALS['TL_LANG']['tl_syncCto_clients_syncFrom']['database_tables_recommended'],
-            'inputType' => 'checkbox',
-            'exclude' => true,
-            'eval' => array('multiple' => true),
-            'options_callback' => array('SyncCtoHelper', 'getDatabaseTablesClient'),
-        ),
+//        'database_tables' => array
+//            (
+//            'label' => &$GLOBALS['TL_LANG']['tl_syncCto_clients_syncFrom']['database_tables'],
+//            'inputType' => 'checkbox',
+//            'exclude' => true,
+//            'eval' => array('multiple' => true),
+//            'options_callback' => array('SyncCtoHelper', 'getDatabaseTablesClient'),
+//        ),
         'lastSync' => array
             (
             'label' => " ",
             'exclude' => true,
             'inputType' => 'statictext',
+        ),
+        'database_tables_recommended' => array
+            (
+            'label' => &$GLOBALS['TL_LANG']['tl_syncCto_clients_syncFrom']['database_tables_recommended'],
+            'inputType' => 'checkbox',
+            'exclude' => true,
+            'eval' => array('multiple' => true),
+            'options_callback' => array('SyncCtoHelper', 'getRecommendedDatabaseTablesClient'),
+        ),
+        'database_tables_none_recommended' => array
+            (
+            'label' => &$GLOBALS['TL_LANG']['tl_syncCto_clients_syncFrom']['database_tables_none_recommended'],
+            'inputType' => 'checkbox',
+            'exclude' => true,
+            'eval' => array('multiple' => true),
+            'options_callback' => array('SyncCtoHelper', 'getNoneRecommendedDatabaseTablesClient'),
         ),
     )
 );

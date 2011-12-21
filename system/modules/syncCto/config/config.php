@@ -358,8 +358,8 @@ $GLOBALS["CTOCOM_FUNCTIONS"]["SYNCCTO_RECOMMENDED_TABLES"] = array(
 
 // Load none recomment Tables from client
 $GLOBALS["CTOCOM_FUNCTIONS"]["SYNCCTO_NONERECOMMENDED_TABLES"] = array(
-    "class" => "Database",
-    "function" => "databaseTablesNoneRecommendedWithHidden",
+    "class" => "SyncCtoHelper",
+    "function" => "databaseTablesNoneRecommended",
     "typ" => "POST",
     "parameter" => false,
 );
