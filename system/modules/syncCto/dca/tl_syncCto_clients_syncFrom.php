@@ -58,14 +58,6 @@ $GLOBALS['TL_DCA']['tl_syncCto_clients_syncFrom'] = array(
             'reference' => &$GLOBALS['TL_LANG']['SYC'],
             'options_callback' => array('SyncCtoHelper', 'getSyncType'),
         ),
-//        'database_tables' => array
-//            (
-//            'label' => &$GLOBALS['TL_LANG']['tl_syncCto_clients_syncFrom']['database_tables'],
-//            'inputType' => 'checkbox',
-//            'exclude' => true,
-//            'eval' => array('multiple' => true),
-//            'options_callback' => array('SyncCtoHelper', 'getDatabaseTablesClient'),
-//        ),
         'lastSync' => array
             (
             'label' => " ",
@@ -181,12 +173,26 @@ class tl_syncCto_clients_syncFrom extends Backend
         {
             $this->Session->set("syncCto_Typ", SYNCCTO_SMALL);
         }
+        
+        
 
         // Load table lists
-        if ($this->Input->post("database_tables") != "")
+        if ($this->Input->post("database_tables_recommended") != "" || $this->Input->post("database_tables_none_recommended") != "")
         {
-            $arrSyncTables = $this->Input->post("database_tables");
+            if (is_array($this->Input->post("database_tables_recommended")))
+            {
+                $arrSyncTables = $this->Input->post("database_tables_recommended");
+            }
+            else
+            {
+                $arrSyncTables = array();
+            }
 
+            if (is_array($this->Input->post("database_tables_none_recommended")))
+            {
+                $arrSyncTables = array_merge($arrSyncTables, $this->Input->post("database_tables_none_recommended"));
+            }
+            
             $this->Session->set("syncCto_SyncTables", $arrSyncTables);
         }
         else
