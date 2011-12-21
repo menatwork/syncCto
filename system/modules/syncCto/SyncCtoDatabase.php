@@ -204,10 +204,9 @@ class SyncCtoDatabase extends Backend
      * @param bool $booTempFolder Schould the tmp folde used instead of backupfolder
      * @return null 
      */
-    public function runDump($arrTables, $booTempFolder)
+    public function runDump($arrTables, $booTempFolder, $booOnlyMachine = false)
     {
-        $intStart = time();
-
+        // Check if there are any tables selected for an export
         if (is_array($arrTables) && is_array($this->arrBackupTables))
         {
             $this->arrBackupTables = array_unique(array_merge($this->arrBackupTables, $arrTables));
@@ -218,10 +217,10 @@ class SyncCtoDatabase extends Backend
             throw new Exception("No tables found for backup.");
         }
 
-        $arrPeak = array();
-
+        // Get a list of all Tables
         $arrTables = $this->Database->listTables();
 
+        // Write some tempfiles
         $strRandomToken = md5(time() . " | " . rand(0, 65535));
 
         // Temp files
@@ -232,21 +231,26 @@ class SyncCtoDatabase extends Backend
         $objFileData = new File("system/tmp/TempDataDump.$strRandomToken");
         $objFileData->write("");
         
+        // Write header for sql file
         $today = date("Y-m-d");
         $time = date("H:i:s");
 
+        // Write Header
         $string .= "-- syncCto SQL Dump\r\n";
-        $string .= "-- Version " . SyncCtoGetVersion . "\r\n";
+        $string .= "-- Version " . $GLOBALS['SYC_VERSION'] . "\r\n";
         $string .= "-- http://men-at-work.de\r\n";
         $string .= "-- \r\n";
         $string .= "-- Time stamp       : $today at $time\r\n";
         $string .= "\r\n";
         $string .= "SET SQL_MODE=\"NO_AUTO_VALUE_ON_ZERO\";\r\n";
         $string .= "\r\n";
-        $string .= "-- --------------------------------------------------------\r";
+        $string .= "\r\n";
+        $string .= "-- --------------------------------------------------------\r\n";
+        $string .= "\r\n";
 
-        $objFileSQL->append($string);
+        $objFileSQL->append($string, "");
 
+        // Run each table
         foreach ($arrTables as $key => $TableName)
         {
             // Get data
@@ -276,6 +280,7 @@ class SyncCtoDatabase extends Backend
                 continue;
             }
 
+            // Get fields
             $fields = $this->Database->listFields($TableName);
 
             $arrFieldMeta = array();
@@ -307,6 +312,7 @@ class SyncCtoDatabase extends Backend
 
                 while ($row = $objData->fetchAssoc())
                 {
+
                     $arrTableData = array("table" => $TableName, "values" => array());
 
                     $arrPeak[$this->getReadableSize(memory_get_usage(true))] = $this->getReadableSize(memory_get_usage(true));
@@ -354,32 +360,33 @@ class SyncCtoDatabase extends Backend
                     $strSQL .= $this->buildSQLInsert($arrTableData["table"], array_keys($arrTableData["values"]), $arrTableData["values"]) . "\n";
                     $strSer .= base64_encode(gzcompress(json_encode($arrTableData))) . "\n";
 
-                    if (strlen($strSQL) > 60000)
+                    if (strlen($strSQL) > 100000)
                     {
-                        $objFileSQL->append($strSQL, "");
+                        $objFileSQL->append(substr($strSQL,0,-1));
                         $strSQL = "";
                     }
 
-                    if (strlen($strSer) > 60000)
+                    if (strlen($strSer) > 100000)
                     {
-                        $objFileData->append($strSer, "");
+                        $objFileData->append(substr($strSer,0,-1));
                         $strSer = "";
                     }
                 }
 
                 if (strlen($strSQL) != 0)
                 {
-                    $objFileSQL->append($strSQL, "");
+                    $objFileSQL->append(substr($strSQL,0,-1));
                     $strSQL = "";
                 }
 
                 if (strlen($strSer) != 0)
                 {
-                    $objFileData->append($strSer, "");
+                    $objFileData->append(substr($strSer,0,-1));
                     $strSer = "";
                 }
             }
 
+            $objFileSQL->append("\r");
             $objFileSQL->append("-- --------------------------------------------------------\r");
             $objFileSQL->append("\r");
         }
@@ -449,7 +456,7 @@ class SyncCtoDatabase extends Backend
         $mixTables = trimsplit("\n", $mixTables);
         
         $arrRestoreTables = array();
-        
+
         try
         {
             foreach ($mixTables as $key => $value)
@@ -458,9 +465,9 @@ class SyncCtoDatabase extends Backend
                 {
                     continue;
                 }
-                
+
                 $value = deserialize($value);
-                
+
                 if (!is_array($value))
                 {
                     throw new Exception("Could not load SQL file table. Maybe damaged?");
@@ -468,7 +475,7 @@ class SyncCtoDatabase extends Backend
 
                 $this->Database->query("DROP TABLE IF EXISTS " . "synccto_temp_" . $value["name"]);
                 $this->Database->query($this->buildSQLTable($value["value"], "synccto_temp_" . $value["name"]));
-                
+
                 $arrRestoreTables[] = $value["name"];
             }
         }
@@ -482,61 +489,91 @@ class SyncCtoDatabase extends Backend
             throw $exc;
         }
 
-        // Get insert
-        if (!$objZipRead->getFile($this->strFilenameInsert))
+        try
         {
-            throw new Exception("Could not load SQL file inserts. Maybe damaged?");
-        }
-        
-        $strContent = $objZipRead->unzip();
-        
-        // Write temp File
-        $objTempfile = tmpfile();
-        fputs($objTempfile, $strContent, strlen($strContent));
-        
-        unset ($strContent);
-        
-        // Set pointer on position zero
-        rewind($objTempfile);
-        while ($mixLine = fgets($objTempfile, 500000))
-        {
-            if(empty ($mixLine))
-            {
-                continue;
-            }            
-            
-            $mixLine = json_decode(gzuncompress(base64_decode($mixLine)),true);
-      
-            if (!is_array($mixLine))
+            // Get insert
+            if (!$objZipRead->getFile($this->strFilenameInsert))
             {
                 throw new Exception("Could not load SQL file inserts. Maybe damaged?");
             }
 
-            try
+            $strContent = $objZipRead->unzip();
+
+            // Write temp File
+            $objTempfile = tmpfile();
+            fputs($objTempfile, $strContent, strlen($strContent));
+
+            unset($strContent);
+
+            // Set pointer on position zero
+            rewind($objTempfile);
+
+            $i = 0;
+            while ($mixLine = fgets($objTempfile))
             {
-                $strSQL = $this->buildSQLInsert("synccto_temp_" . $mixLine['table'], array_keys($mixLine['values']), $mixLine['values'], true);
-                $this->Database->query($strSQL);
-            }
-            catch (Exception $exc)
-            {
-                foreach ($arrRestoreTables as $key => $value)
+                $i++;
+
+                if (empty($mixLine) || strlen($mixLine) == 0)
                 {
-                    $this->Database->query("DROP TABLE IF EXISTS " . "synccto_temp_" . $value);
+                    continue;
                 }
 
-                throw $exc;
+                $mixLine = json_decode(@gzuncompress(base64_decode($mixLine)), true);
+
+                if ($mixLine == FALSE)
+                {
+                    throw new Exception("Could not load SQL file inserts or unzip it. Maybe damaged on line $i?");
+                }
+
+                if (!is_array($mixLine))
+                {
+                    throw new Exception("Could not load SQL file inserts. Maybe damaged on line $i?");
+                }
+
+                try
+                {
+                    $strSQL = $this->buildSQLInsert("synccto_temp_" . $mixLine['table'], array_keys($mixLine['values']), $mixLine['values'], true);
+                    $this->Database->query($strSQL);
+                }
+                catch (Exception $exc)
+                {
+                    foreach ($arrRestoreTables as $key => $value)
+                    {
+                        $this->Database->query("DROP TABLE IF EXISTS " . "synccto_temp_" . $value);
+                    }
+
+                    throw $exc;
+                }
+            }
+
+            fclose($objTempfile);
+
+            // Rename temp tables
+            foreach ($arrRestoreTables as $key => $value)
+            {
+                $this->Database->query("DROP TABLE IF EXISTS " . $value);
+                $this->Database->query("RENAME TABLE " . "synccto_temp_" . $value . " TO " . $value);
             }
         }
-        
-        fclose($objTempfile);
-
-        // Rename temp tables
-        foreach ($arrRestoreTables as $key => $value)
+        catch (Exception $exc)
         {
-            $this->Database->query("DROP TABLE IF EXISTS " . $value);
-            $this->Database->query("RENAME TABLE " . "synccto_temp_" . $value . " TO " . $value);            
+            foreach ($arrRestoreTables as $key => $value)
+            {
+                $this->Database->query("DROP TABLE IF EXISTS " . "synccto_temp_" . $value);
+            }
+
+            throw $exc;
         }
-            
+
+        // Get a list of all Tables
+        foreach ($this->Database->listTables() as $key => $value)
+        {
+            if(stripos($value, "synccto_temp_") !== FALSE)
+            {
+                $this->Database->query("DROP TABLE IF EXISTS $value");
+            }
+        }
+
         return;
     }
 
@@ -910,45 +947,6 @@ class SyncCtoDatabase extends Backend
         }
 
         return $string;
-    }
-
-    /**
-     * Build a whole insert sql file
-     * 
-     * @param array $arrData Array with datas
-     * @return stirng 
-     */
-    private function buildFileSQLInsert($arrData)
-    {
-        if (count($arrData) == 0)
-        {
-            $string .= "-- No tables found in database.\r\n";
-        }
-        else
-        {
-            foreach ($arrData as $table)
-            {
-                if (!empty($table['values']))
-                {
-                    $string .= "-- \r\n";
-                    $string .= "-- Dumping data for table " . $table['name'] . "\r\n";
-                    $string .= "-- \r\n";
-                    $string .= "\r\n";
-
-                    foreach ($table['values'] as $value)
-                    {
-                        $string .= $this->buildSQLInsert($table['name'], $table['keys'], $value, false);
-                        $string .= ";\r\n";
-                    }
-
-                    $string .= "\r\n";
-                    $string .= "-- --------------------------------------------------------\r\n";
-                    $string .= "\r\n";
-                }
-            }
-        }
-
-        return $string . "\r\n";
     }
 
 }
