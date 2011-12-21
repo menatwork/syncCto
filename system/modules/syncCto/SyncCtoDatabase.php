@@ -231,6 +231,21 @@ class SyncCtoDatabase extends Backend
         $objFileStructure->write("");
         $objFileData = new File("system/tmp/TempDataDump.$strRandomToken");
         $objFileData->write("");
+        
+        $today = date("Y-m-d");
+        $time = date("H:i:s");
+
+        $string .= "-- syncCto SQL Dump\r\n";
+        $string .= "-- Version " . SyncCtoGetVersion . "\r\n";
+        $string .= "-- http://men-at-work.de\r\n";
+        $string .= "-- \r\n";
+        $string .= "-- Time stamp       : $today at $time\r\n";
+        $string .= "\r\n";
+        $string .= "SET SQL_MODE=\"NO_AUTO_VALUE_ON_ZERO\";\r\n";
+        $string .= "\r\n";
+        $string .= "-- --------------------------------------------------------\r";
+
+        $objFileSQL->append($string);
 
         foreach ($arrTables as $key => $TableName)
         {
@@ -451,8 +466,8 @@ class SyncCtoDatabase extends Backend
                     throw new Exception("Could not load SQL file table. Maybe damaged?");
                 }
 
-                $this->Database->prepare("DROP TABLE IF EXISTS " . "synccto_temp_" . $value["name"])->executeUncached();
-                $this->Database->prepare($this->buildSQLTable($value["value"], "synccto_temp_" . $value["name"]))->executeUncached();
+                $this->Database->query("DROP TABLE IF EXISTS " . "synccto_temp_" . $value["name"]);
+                $this->Database->query($this->buildSQLTable($value["value"], "synccto_temp_" . $value["name"]));
                 
                 $arrRestoreTables[] = $value["name"];
             }
@@ -461,7 +476,7 @@ class SyncCtoDatabase extends Backend
         {
             foreach ($arrRestoreTables as $key => $value)
             {
-                $this->Database->prepare("DROP TABLE IF EXISTS " . "synccto_temp_" . $value)->executeUncached();
+                $this->Database->query("DROP TABLE IF EXISTS " . "synccto_temp_" . $value);
             }
 
             throw $exc;
@@ -500,13 +515,13 @@ class SyncCtoDatabase extends Backend
             try
             {
                 $strSQL = $this->buildSQLInsert("synccto_temp_" . $mixLine['table'], array_keys($mixLine['values']), $mixLine['values'], true);
-                $this->Database->prepare($strSQL)->executeUncached();
+                $this->Database->query($strSQL);
             }
             catch (Exception $exc)
             {
                 foreach ($arrRestoreTables as $key => $value)
                 {
-                    $this->Database->prepare("DROP TABLE IF EXISTS " . "synccto_temp_" . $value)->executeUncached();
+                    $this->Database->query("DROP TABLE IF EXISTS " . "synccto_temp_" . $value);
                 }
 
                 throw $exc;
@@ -518,8 +533,8 @@ class SyncCtoDatabase extends Backend
         // Rename temp tables
         foreach ($arrRestoreTables as $key => $value)
         {
-            $this->Database->prepare("DROP TABLE IF EXISTS " . $value)->executeUncached();
-            $this->Database->prepare("RENAME TABLE " . "synccto_temp_" . $value . " TO " . $value)->executeUncached();            
+            $this->Database->query("DROP TABLE IF EXISTS " . $value);
+            $this->Database->query("RENAME TABLE " . "synccto_temp_" . $value . " TO " . $value);            
         }
             
         return;
