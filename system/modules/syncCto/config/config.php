@@ -348,10 +348,18 @@ $GLOBALS["CTOCOM_FUNCTIONS"]["SYNCCTO_CHECK_DELETE_FILE"] = array(
     "parameter" => array("md5", "file"),
 );
 
-// Load all Tables from database
-$GLOBALS["CTOCOM_FUNCTIONS"]["CTO_DATABASE_LISTTABLES"] = array(
+// Load recomment Tables from client
+$GLOBALS["CTOCOM_FUNCTIONS"]["SYNCCTO_RECOMMENDED_TABLES"] = array(
+    "class" => "SyncCtoHelper",
+    "function" => "databaseTablesRecommended",
+    "typ" => "POST",
+    "parameter" => false,
+);
+
+// Load none recomment Tables from client
+$GLOBALS["CTOCOM_FUNCTIONS"]["SYNCCTO_NONERECOMMENDED_TABLES"] = array(
     "class" => "Database",
-    "function" => "listTables",
+    "function" => "databaseTablesNoneRecommendedWithHidden",
     "typ" => "POST",
     "parameter" => false,
 );

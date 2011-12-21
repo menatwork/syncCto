@@ -615,15 +615,25 @@ class SyncCtoCommunicationClient extends CtoCommunication
          
         return $this->runServer("SYNCCTO_RUN_DUMP", $arrData);
     }
-    
-     /**
+
+    /**
      * Returns a list without the hidden tables
      * 
      * @return array 
      */
-    public function getDatabaseTables()
+    public function getRecommendedTables()
     {
-        return $this->runServer("CTO_DATABASE_LISTTABLES");
+        return $this->runServer("SYNCCTO_RECOMMENDED_TABLES");
+    }
+
+    /**
+     * Returns a list without the hidden tables
+     * 
+     * @return array 
+     */
+    public function getNoneRecommendedTables()
+    {
+        return $this->runServer("SYNCCTO_NONERECOMMENDED_TABLES");
     }
 
     /* -------------------------------------------------------------------------

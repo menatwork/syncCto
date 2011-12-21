@@ -261,7 +261,7 @@ class SyncCtoHelper extends Backend
         {
             // Set time limit for this function
             set_time_limit(5);
-            
+
             if (strlen($this->Input->post('clientID')) != 0 && is_numeric($this->Input->post('clientID')))
             {
                 try
@@ -294,11 +294,11 @@ class SyncCtoHelper extends Backend
                     {
                         $strUrl = $objClient->address . ":" . $objClient->port . "/" . $objClient->path . "/ctoCommunication.php?act=ping";
                     }
-                    
+
                     $intReturn = 0;
 
                     $objRequest = new RequestExtendedCached();
-                    
+
                     // Set http auth
                     if ($objClient->http_auth == true)
                     {
@@ -367,7 +367,7 @@ class SyncCtoHelper extends Backend
             );
 
             // check for required extensions
-            foreach ($arrRequiredExtensions as  $key => $val)
+            foreach ($arrRequiredExtensions as $key => $val)
             {
                 if (!in_array($val, $this->Config->getActiveModules()))
                 {
@@ -512,7 +512,7 @@ class SyncCtoHelper extends Backend
             {
                 continue;
             }
-            
+
             $arrTables[$value] = $value . $this->getTableMeta($value);
         }
 
@@ -548,7 +548,7 @@ class SyncCtoHelper extends Backend
             {
                 continue;
             }
-                
+
             $arrTables[$value] = $value . $this->getTableMeta($value);
         }
 
@@ -568,7 +568,7 @@ class SyncCtoHelper extends Backend
         {
             $arrBlacklist = array();
         }
-        
+
         $arrHiddenlist = deserialize($GLOBALS['SYC_CONFIG']['table_hidden']);
         if (!is_array($arrHiddenlist))
         {
@@ -590,13 +590,13 @@ class SyncCtoHelper extends Backend
             {
                 continue;
             }
-            
+
             $arrTables[$value] = $value . $this->getTableMeta($value);
         }
 
         return $arrTables;
     }
-    
+
     private function getTableMeta($strTableName)
     {
         $objCount = $this->Database->prepare("SELECT COUNT(*) as Count FROM $strTableName")->execute();
@@ -627,9 +627,25 @@ class SyncCtoHelper extends Backend
             // Start connection
             $objSyncCtoCommunicationClient->startConnection();
             // Get Tables
-            $arrTablesClient = $objSyncCtoCommunicationClient->getDatabaseTables();
+            $arrTablesClientRec = $objSyncCtoCommunicationClient->getRecommendedTables();
+            $arrTablesClientNRec = $objSyncCtoCommunicationClient->getNoneRecommendedTables();
+
             // Stop connection
             $objSyncCtoCommunicationClient->stopConnection();
+
+            // Check if we have a array 
+            if (!is_array($arrTablesClientRec))
+            {
+                $arrTablesClientRec = array();
+            }
+
+            if (!is_array($arrTablesClientNRec))
+            {
+                $arrTablesClientNRec = array();
+            }
+            
+            // Merge both array
+            $arrTablesClient = array_merge($arrTablesClientRec, $arrTablesClientNRec);
 
             // Recommended tables
             $arrBlacklist = deserialize($GLOBALS['SYC_CONFIG']['table_hidden']);
@@ -642,12 +658,12 @@ class SyncCtoHelper extends Backend
 
             foreach ($arrTablesClient as $key => $value)
             {
-                if (in_array($value, $arrBlacklist))
+                if (in_array($key, $arrBlacklist))
                 {
                     continue;
                 }
 
-                $arrReturnTables[] = $value;
+                $arrReturnTables[$key] = $value;
             }
 
             return $arrReturnTables;
@@ -683,8 +699,6 @@ class SyncCtoHelper extends Backend
 
         return true;
     }
-    
-    
 
 }
 
