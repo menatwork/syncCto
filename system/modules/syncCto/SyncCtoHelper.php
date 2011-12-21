@@ -512,7 +512,9 @@ class SyncCtoHelper extends Backend
             {
                 continue;
             }
-            $arrTables[$value] = $value . '<span style="color: #aaaaaa; padding-left: 3px;">(' . $this->getReadableSize($this->Database->getSizeOf($value)) . ')</span>';
+
+            $objCount = $this->Database->prepare("SELECT COUNT(*) as Count FROM $value")->execute();
+            $arrTables[$value] = $value . '<span style="color: #aaaaaa; padding-left: 3px;">(' . $this->getReadableSize($this->Database->getSizeOf($value)) . ', ' . vsprintf($GLOBALS['TL_LANG']['MSC']['entries'] , array($objCount->Count)) . ')</span>';
         }
 
         return $arrTables;
@@ -547,12 +549,14 @@ class SyncCtoHelper extends Backend
             {
                 continue;
             }
-            $arrTables[$value] = $value . '<span style="color: #aaaaaa; padding-left: 3px;">(' . $this->getReadableSize($this->Database->getSizeOf($value)) . ')</span>';
+            
+            $objCount = $this->Database->prepare("SELECT COUNT(*) as Count FROM $value")->execute();
+            $arrTables[$value] = $value . '<span style="color: #aaaaaa; padding-left: 3px;">(' . $this->getReadableSize($this->Database->getSizeOf($value)) . ', ' . vsprintf($GLOBALS['TL_LANG']['MSC']['entries'] , array($objCount->Count)) . ')</span>';
         }
 
         return $arrTables;
     }
-    
+
     /**
      * Returns a list with none recommended database tables
      *
@@ -588,8 +592,9 @@ class SyncCtoHelper extends Backend
             {
                 continue;
             }
-            
-            $arrTables[$value] = $value . '<span style="color: #aaaaaa; padding-left: 3px;">(' . $this->getReadableSize($this->Database->getSizeOf($value)) . ')</span>';
+
+            $objCount = $this->Database->prepare("SELECT COUNT(*) as Count FROM $value")->execute();
+            $arrTables[$value] = $value . '<span style="color: #aaaaaa; padding-left: 3px;">(' . $this->getReadableSize($this->Database->getSizeOf($value)) . ', ' . vsprintf($GLOBALS['TL_LANG']['MSC']['entries'], array($objCount->Count)) . ')</span>';
         }
 
         return $arrTables;
