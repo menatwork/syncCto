@@ -80,7 +80,7 @@ $GLOBALS['TL_LANG']['MSC']['ignored_files']                 = 'Ignoriert';
 $GLOBALS['TL_LANG']['MSC']['submit_files']                  = 'Submit files';
 $GLOBALS['TL_LANG']['MSC']['delete_files']                  = 'Delete selected files from the list';
 $GLOBALS['TL_LANG']['MSC']['information_last_sync']         = 'Last synchronisation was made at %s on %s from user %s (%s).';
-$GLOBALS['TL_LANG']['MSC']['skipped_files']                 = ' File(s) skipped.';
+//$GLOBALS['TL_LANG']['MSC']['skipped_files']                 = ' File(s) skipped.';
 
 /**
  * Buttons
