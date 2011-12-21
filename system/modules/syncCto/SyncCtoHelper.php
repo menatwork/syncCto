@@ -512,9 +512,8 @@ class SyncCtoHelper extends Backend
             {
                 continue;
             }
-
-            $objCount = $this->Database->prepare("SELECT COUNT(*) as Count FROM $value")->execute();
-            $arrTables[$value] = $value . '<span style="color: #aaaaaa; padding-left: 3px;">(' . $this->getReadableSize($this->Database->getSizeOf($value)) . ', ' . vsprintf($GLOBALS['TL_LANG']['MSC']['entries'] , array($objCount->Count)) . ')</span>';
+            
+            $arrTables[$value] = $value . $this->getTableMeta($value);
         }
 
         return $arrTables;
@@ -549,9 +548,8 @@ class SyncCtoHelper extends Backend
             {
                 continue;
             }
-            
-            $objCount = $this->Database->prepare("SELECT COUNT(*) as Count FROM $value")->execute();
-            $arrTables[$value] = $value . '<span style="color: #aaaaaa; padding-left: 3px;">(' . $this->getReadableSize($this->Database->getSizeOf($value)) . ', ' . vsprintf($GLOBALS['TL_LANG']['MSC']['entries'] , array($objCount->Count)) . ')</span>';
+                
+            $arrTables[$value] = $value . $this->getTableMeta($value);
         }
 
         return $arrTables;
@@ -592,12 +590,25 @@ class SyncCtoHelper extends Backend
             {
                 continue;
             }
-
-            $objCount = $this->Database->prepare("SELECT COUNT(*) as Count FROM $value")->execute();
-            $arrTables[$value] = $value . '<span style="color: #aaaaaa; padding-left: 3px;">(' . $this->getReadableSize($this->Database->getSizeOf($value)) . ', ' . vsprintf($GLOBALS['TL_LANG']['MSC']['entries'], array($objCount->Count)) . ')</span>';
+            
+            $arrTables[$value] = $value . $this->getTableMeta($value);
         }
 
         return $arrTables;
+    }
+    
+    private function getTableMeta($strTableName)
+    {
+        $objCount = $this->Database->prepare("SELECT COUNT(*) as Count FROM $strTableName")->execute();
+
+        if (version_compare(VERSION, "2.10", "<"))
+        {
+            return '<span style="color: #aaaaaa; padding-left: 3px;">(' . vsprintf($GLOBALS['TL_LANG']['MSC']['entries'], array($objCount->Count)) . ')</span>';
+        }
+        else
+        {
+            return '<span style="color: #aaaaaa; padding-left: 3px;">(' . $this->getReadableSize($this->Database->getSizeOf($strTableName)) . ', ' . vsprintf($GLOBALS['TL_LANG']['MSC']['entries'], array($objCount->Count)) . ')</span>';
+        }
     }
 
     /**
