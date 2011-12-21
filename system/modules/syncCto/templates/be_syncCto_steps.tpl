@@ -62,7 +62,7 @@
 
     <script type="text/javascript">
         <!--//--><![CDATA[//><!--
-        window.scrollTo(null, ($('step<?php echo $this->step; ?>').getPosition().y - 40));
+        window.scrollTo(null, ($('step<?php $mixStep = array_keys($this->data); $mixStep = $mixStep[count($mixStep) - 1]; echo $mixStep; ?>').getPosition().y - 40));
         //--><!]]>
     </script>
 
