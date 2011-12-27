@@ -139,7 +139,8 @@ $GLOBALS['SYC_CONFIG']['table_hidden'] = array(
     'tl_session',
     'tl_undo',
     'tl_version',
-    'tl_ctocom_cache'
+    'tl_synccto_clients',
+    'tl_ctocom_cache',
 );
 
 // Folders
