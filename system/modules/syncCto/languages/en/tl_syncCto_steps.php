@@ -55,7 +55,7 @@ $GLOBALS['TL_LANG']['tl_syncCto_sync']['step_4']['description_4'] = 'The sql fil
 
 // Step 5
 $GLOBALS['TL_LANG']['tl_syncCto_sync']['step_5']['description_1'] = 'Process files.';
-$GLOBALS['TL_LANG']['tl_syncCto_sync']['step_5']['description_2'] = '%s of %s files were transferred.';
+$GLOBALS['TL_LANG']['tl_syncCto_sync']['step_5']['description_2'] = '%s of %s files were processed.';
 $GLOBALS['TL_LANG']['tl_syncCto_sync']['step_5']['description_3'] = 'Import configuration files.';
 $GLOBALS['TL_LANG']['tl_syncCto_sync']['step_5']['description_4'] = ' file(s) will be skipped.';
 $GLOBALS['TL_LANG']['tl_syncCto_sync']['step_5']['description_5'] = ' file(s) sent.';
