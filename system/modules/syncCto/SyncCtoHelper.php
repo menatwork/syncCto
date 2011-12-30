@@ -309,8 +309,8 @@ class SyncCtoHelper extends Backend
                     {
                         $this->import("Encryption");
 
-                        $objRequest->strHTTPUser = $objClient->http_username;
-                        $objRequest->strHTTPPassword = $this->Encryption->decrypt($objClient->http_password);
+                        $objRequest->username = $objClient->http_username;                        
+                        $objRequest->password = $this->Encryption->decrypt($objClient->http_password);
                     }
 
                     // Check Server
