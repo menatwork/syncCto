@@ -54,7 +54,7 @@ class SyncCtoHelper extends Backend
 
         // Parent
         parent::__construct();
-        
+
         // Language
         $this->loadLanguageFile("default");
     }
@@ -264,13 +264,22 @@ class SyncCtoHelper extends Backend
     {
         if ($strAction == 'syncCtoPing')
         {
-            // Set time limit for this function
-            set_time_limit(5);
-
             if (strlen($this->Input->post('clientID')) != 0 && is_numeric($this->Input->post('clientID')))
             {
+                // Set time limit for this function
+                set_time_limit(10);
+
                 try
                 {
+                    if (version_compare(VERSION . '.' . BUILD, '2.10.0', '<'))
+                    {
+                        $arrReturn = array("success" => false, "value" => 0, "error" => "", "token" => "");
+                    }
+                    else
+                    {
+                        $arrReturn = array("success" => false, "value" => 0, "error" => "", "token" => REQUEST_TOKEN);
+                    }
+
                     // Load Client from database
                     $objClient = $this->Database->prepare("SELECT * FROM tl_synccto_clients WHERE id = %s")
                             ->limit(1)
@@ -279,7 +288,9 @@ class SyncCtoHelper extends Backend
                     // Check if a client was loaded
                     if ($objClient->numRows == 0)
                     {
-                        echo "false";
+                        $arrReturn["success"] = false;
+                        $arrReturn["error"] = "Unknown client";
+                        echo json_encode($arrReturn);
                         exit();
                     }
 
@@ -309,7 +320,7 @@ class SyncCtoHelper extends Backend
                     {
                         $this->import("Encryption");
 
-                        $objRequest->username = $objClient->http_username;                        
+                        $objRequest->username = $objClient->http_username;
                         $objRequest->password = $this->Encryption->decrypt($objClient->http_password);
                     }
 
@@ -327,18 +338,22 @@ class SyncCtoHelper extends Backend
                         $intReturn = $intReturn + 2;
                     }
 
-                    echo $intReturn;
+                    $arrReturn["success"] = true;
+                    $arrReturn["value"] = $intReturn;
                 }
                 catch (Exception $exc)
                 {
-                    echo "false";
+                    $arrReturn["success"] = false;
+                    $arrReturn["error"] = $exc->getMessage() . $exc->getFile() . " on " . $exc->getLine();
                 }
             }
             else
             {
-                echo "false";
+                $arrReturn["success"] = false;
+                $arrReturn["error"] = "Missing client id.";
             }
 
+            echo json_encode($arrReturn);
             exit();
         }
     }
@@ -615,7 +630,7 @@ class SyncCtoHelper extends Backend
             return '<span style="color: #aaaaaa; padding-left: 3px;">(' . $this->getReadableSize($this->Database->getSizeOf($strTableName)) . ', ' . vsprintf($GLOBALS['TL_LANG']['MSC']['entries'], array($objCount->Count)) . ')</span>';
         }
     }
-    
+
     /**
      * Import configuration entries
      *
