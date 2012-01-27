@@ -39,7 +39,7 @@ $GLOBALS['TL_DCA']['tl_syncCto_settings'] = array(
     'palettes' => array
         (
         '__selector__' => array('syncCto_custom_settings'),
-        'default' => '{blacklist_legend:hide},syncCto_folder_blacklist,syncCto_file_blacklist;{whitelist_legend:hide},syncCto_folder_whitelist;{local_blacklist_legend},syncCto_local_blacklist;{hidden_tables_legend:hide},syncCto_hidden_tables;{tables_legend},syncCto_database_tables;{debug_legend},syncCto_debug_mode;{custom_legend:hide},syncCto_custom_settings;'
+        'default' => '{blacklist_legend:hide},syncCto_folder_blacklist,syncCto_file_blacklist;{whitelist_legend:hide},syncCto_folder_whitelist;{local_blacklist_legend},syncCto_local_blacklist;{hidden_tables_legend:hide},syncCto_hidden_tables;{tables_legend},syncCto_database_tables;{debug_legend},syncCto_debug_mode;{custom_legend:hide},syncCto_handshake,syncCto_custom_settings;'
     ),
     'subpalettes' => array
         (
@@ -100,6 +100,12 @@ $GLOBALS['TL_DCA']['tl_syncCto_settings'] = array(
         'syncCto_debug_mode' => array
             (
             'label' => &$GLOBALS['TL_LANG']['tl_syncCto_settings']['debug_mode'],
+            'inputType' => 'checkbox',
+            'exclude' => true,
+        ),
+		'syncCto_handshake' => array
+            (
+            'label' => &$GLOBALS['TL_LANG']['tl_syncCto_settings']['handshake'],
             'inputType' => 'checkbox',
             'exclude' => true,
         ),
