@@ -1,5 +1,4 @@
-<?php
-if (!defined('TL_ROOT')) die('You can not access this file directly!');
+<?php if (!defined('TL_ROOT')) die('You can not access this file directly!');
 
 /**
  * Contao Open Source CMS
@@ -117,8 +116,7 @@ $GLOBALS['TL_DCA']['tl_syncCto_settings'] = array(
             'exclude' => true,
             'eval' => array('tl_class' => 'w50'),
         ),
-        'syncCto_interactive_timeout' => array
-            (
+        'syncCto_interactive_timeout' => array(
             'label' => &$GLOBALS['TL_LANG']['tl_syncCto_settings']['interactive_timeout'],
             'inputType' => 'text',
             'exclude' => true,
