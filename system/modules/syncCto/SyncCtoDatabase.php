@@ -255,7 +255,7 @@ class SyncCtoDatabase extends Backend
         {
             // Get data
             $arrStructure = $this->getTableStructure($TableName);
-
+            
             // Check if empty
             if (count($arrStructure) == 0)
             {
@@ -696,7 +696,14 @@ class SyncCtoDatabase extends Backend
             {
                 foreach ($arrTempIndex as $key => $value)
                 {
-                    $return['TABLE_CREATE_DEFINITIONS'][$key] = vsprintf($value["body"], implode("`, `", $value["fields"]));
+                    if($key == 'PRIMARY')
+                    {
+                        $return['TABLE_CREATE_DEFINITIONS'][$key] = vsprintf($value["body"], array(implode("`, `", $value["fields"])));
+                    }
+                    else
+                    {
+                        $return['TABLE_CREATE_DEFINITIONS'][$key] = vsprintf($value["body"], array($key, implode("`, `", $value["fields"])));
+                    }
                 }
             }
 
@@ -741,16 +748,17 @@ class SyncCtoDatabase extends Backend
 
         // Table status
         $objStatus = $this->Database->prepare("SHOW TABLE STATUS")->executeUncached();
-        while ($row       = $objStatus->fetchAssoc())
-        {
-            if (!in_array($row['Name'], $this->arrBackupTables))
+                
+        while ($row = $objStatus->fetchAssoc())
+        {            
+            if ($row['Name'] != $strTableName)
                 continue;
 
             $return['TABLE_OPTIONS'] = " ENGINE=" . $row['Engine'] . " DEFAULT CHARSET=" . substr($row['Collation'], 0, strpos($row['Collation'], "_")) . "";
             if ($row['Auto_increment'] != "")
                 $return['TABLE_OPTIONS'] .= " AUTO_INCREMENT=" . $row['Auto_increment'] . " ";
         }
-
+        
         return $return;
     }
 
