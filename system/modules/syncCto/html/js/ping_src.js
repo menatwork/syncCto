@@ -65,6 +65,11 @@ function sendNextRequest(_strToken, _objElements, _intIndex)
 
 window.addEvent("domready",function(){
     
+    if(typeof(REQUEST_TOKEN) == "undefined")
+    {
+        REQUEST_TOKEN = 0;
+    }
+    
     if($$('img.ping').length != 0)
     {
         sendNextRequest(REQUEST_TOKEN, $$('img.ping'), 0);   
