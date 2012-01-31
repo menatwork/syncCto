@@ -40,14 +40,14 @@ class SyncCtoDatabase extends Backend
      */
 
     //- Singelten pattern --------
-    protected static $instance = null;
+    protected static $instance          = null;
     //- Vars ---------------------
     protected $arrBackupTables;
     protected $arrHiddenTables;
-    protected $strSuffixZipName = "DB-Backup.zip";
-    protected $strFilenameTable = "DB-Backup_tbl.txt";
+    protected $strSuffixZipName  = "DB-Backup.zip";
+    protected $strFilenameTable  = "DB-Backup_tbl.txt";
     protected $strFilenameInsert = "DB-Backup_ins.txt";
-    protected $strFilenameSQL = "DB-Backup.sql";
+    protected $strFilenameSQL    = "DB-Backup.sql";
     protected $strTimestampFormat;
     //- Objects ------------------
     protected $objSyncCtoHelper;
@@ -224,16 +224,16 @@ class SyncCtoDatabase extends Backend
         $strRandomToken = md5(time() . " | " . rand(0, 65535));
 
         // Temp files
-        $objFileSQL = new File("system/tmp/TempSQLDump.$strRandomToken");
+        $objFileSQL       = new File("system/tmp/TempSQLDump.$strRandomToken");
         $objFileSQL->write("");
         $objFileStructure = new File("system/tmp/TempStructureDump.$strRandomToken");
         $objFileStructure->write("");
-        $objFileData = new File("system/tmp/TempDataDump.$strRandomToken");
+        $objFileData      = new File("system/tmp/TempDataDump.$strRandomToken");
         $objFileData->write("");
-        
+
         // Write header for sql file
         $today = date("Y-m-d");
-        $time = date("H:i:s");
+        $time  = date("H:i:s");
 
         // Write Header
         $string .= "-- syncCto SQL Dump\r\n";
@@ -263,7 +263,7 @@ class SyncCtoDatabase extends Backend
             }
 
             // Write serialize array in file
-            $objFileStructure->append(serialize(array("name" => $TableName, "value" => $arrStructure)));
+            $objFileStructure->append(serialize(array("name"  => $TableName, "value" => $arrStructure)));
 
             // Write SQL 
             $objFileSQL->append("-- \r");
@@ -295,7 +295,7 @@ class SyncCtoDatabase extends Backend
                 $arrFieldMeta[$value["name"]] = $value;
             }
 
-            $objCount = $this->Database->prepare("SELECT Count(*) as count FROM $TableName")->executeUncached();
+            $objCount              = $this->Database->prepare("SELECT Count(*) as count FROM $TableName")->executeUncached();
             $intElementsPerRequest = 500;
 
             for ($i = 0; $i < 100000; $i++)
@@ -313,9 +313,7 @@ class SyncCtoDatabase extends Backend
                 while ($row = $objData->fetchAssoc())
                 {
 
-                    $arrTableData = array("table" => $TableName, "values" => array());
-
-                    $arrPeak[$this->getReadableSize(memory_get_usage(true))] = $this->getReadableSize(memory_get_usage(true));
+                    $arrTableData = array("table"  => $TableName, "values" => array());
 
                     foreach ($row as $field_key => $field_data)
                     {
@@ -362,26 +360,26 @@ class SyncCtoDatabase extends Backend
 
                     if (strlen($strSQL) > 100000)
                     {
-                        $objFileSQL->append(substr($strSQL,0,-1));
+                        $objFileSQL->append(substr($strSQL, 0, -1));
                         $strSQL = "";
                     }
 
                     if (strlen($strSer) > 100000)
                     {
-                        $objFileData->append(substr($strSer,0,-1));
+                        $objFileData->append(substr($strSer, 0, -1));
                         $strSer = "";
                     }
                 }
 
                 if (strlen($strSQL) != 0)
                 {
-                    $objFileSQL->append(substr($strSQL,0,-1));
+                    $objFileSQL->append(substr($strSQL, 0, -1));
                     $strSQL = "";
                 }
 
                 if (strlen($strSer) != 0)
                 {
-                    $objFileData->append(substr($strSer,0,-1));
+                    $objFileData->append(substr($strSer, 0, -1));
                     $strSer = "";
                 }
             }
@@ -432,7 +430,7 @@ class SyncCtoDatabase extends Backend
      */
     public function runRestore($strRestoreFile)
     {
-         // Set time out for database. Ticket #2653
+        // Set time out for database. Ticket #2653
         if ($GLOBALS['TL_CONFIG']['syncCto_custom_settings'] == true
                 && intval($GLOBALS['TL_CONFIG']['syncCto_wait_timeout']) > 0
                 && intval($GLOBALS['TL_CONFIG']['syncCto_interactive_timeout']) > 0)
@@ -443,18 +441,18 @@ class SyncCtoDatabase extends Backend
         {
             $this->Database->query('SET SESSION wait_timeout = GREATEST(28000, @@wait_timeout), SESSION interactive_timeout = GREATEST(28000, @@wait_timeout);');
         }
-        
+
         $objZipRead = new ZipReader($strRestoreFile);
-                
+
         // Get structure
         if (!$objZipRead->getFile($this->strFilenameTable))
         {
             throw new Exception("Could not load SQL file table. Maybe damaged?");
         }
-        
+
         $mixTables = $objZipRead->unzip();
         $mixTables = trimsplit("\n", $mixTables);
-        
+
         $arrRestoreTables = array();
 
         try
@@ -508,7 +506,7 @@ class SyncCtoDatabase extends Backend
             // Set pointer on position zero
             rewind($objTempfile);
 
-            $i = 0;
+            $i       = 0;
             while ($mixLine = fgets($objTempfile))
             {
                 $i++;
@@ -568,7 +566,7 @@ class SyncCtoDatabase extends Backend
         // Get a list of all Tables
         foreach ($this->Database->listTables() as $key => $value)
         {
-            if(stripos($value, "synccto_temp_") !== FALSE)
+            if (stripos($value, "synccto_temp_") !== FALSE)
             {
                 $this->Database->query("DROP TABLE IF EXISTS $value");
             }
@@ -610,6 +608,12 @@ class SyncCtoDatabase extends Backend
         // Get list of indicies
         $arrIndexes = $this->Database->prepare("SHOW INDEX FROM `$strTableName`")->executeUncached()->fetchAllAssoc();
 
+        // Bugfix: If we have Contao 2.9.x use a temp array for the TABLE_CREATE_DEFINITIONS
+        if (version_compare(VERSION, '2.10', '<'))
+        {
+            $arrTempIndex = array();
+        }
+
         foreach ($fields as $field)
         {
             if (version_compare(VERSION, '2.10', '<'))
@@ -620,25 +624,30 @@ class SyncCtoDatabase extends Backend
                     switch ($field['index'])
                     {
                         case 'PRIMARY':
-                            $return['TABLE_CREATE_DEFINITIONS'][$field["name"]] = 'PRIMARY KEY  (`' . $field["name"] . '`)';
+                            $arrTempIndex["PRIMARY"]["body"]     = 'PRIMARY KEY  (`%s`)';
+                            $arrTempIndex["PRIMARY"]["fields"][] = $field["name"];
                             break;
 
                         case 'UNIQUE':
-                            $return['TABLE_CREATE_DEFINITIONS'][$field["name"]] = 'UNIQUE KEY `' . $field["name"] . '` (`' . $field["name"] . '`)';
+                            $arrTempIndex[$field["name"]]["body"]     = 'UNIQUE KEY `%s` (`%s`)';
+                            $arrTempIndex[$field["name"]]["fields"][] = $field["name"];
                             break;
 
                         case 'FULLTEXT':
-                            $return['TABLE_CREATE_DEFINITIONS'][$field["name"]] = 'FULLTEXT KEY `' . $field["name"] . '` (`' . $field["name"] . '`)';
+                            $arrTempIndex[$field["name"]]["body"]     = 'FULLTEXT KEY `%s` (`%s`)';
+                            $arrTempIndex[$field["name"]]["fields"][] = $field["name"];
                             break;
 
                         default:
                             if ((strpos(' ' . $field['type'], 'text') || strpos(' ' . $field['type'], 'char')) && ($field['null'] == 'NULL'))
                             {
-                                $return['TABLE_CREATE_DEFINITIONS'][$field["name"]] = 'FULLTEXT KEY `' . $field["name"] . '` (`' . $field["name"] . '`)';
+                                $arrTempIndex[$field["name"]]["body"]     = 'FULLTEXT KEY `%s` (`%s`)';
+                                $arrTempIndex[$field["name"]]["fields"][] = $field["name"];
                             }
                             else
                             {
-                                $return['TABLE_CREATE_DEFINITIONS'][$field["name"]] = 'KEY `' . $field["name"] . '` (`' . $field["name"] . '`)';
+                                $arrTempIndex[$field["name"]]["body"]     = 'KEY `%s` (`%s`)';
+                                $arrTempIndex[$field["name"]]["fields"][] = $field["name"];
                             }
                             break;
                     }
@@ -682,9 +691,18 @@ class SyncCtoDatabase extends Backend
                 }
             }
 
+            // Bugfix: if we have contao 2.9.x build the TABLE_CREATE_DEFINITIONS from temp array
+            if (version_compare(VERSION, '2.10', '<'))
+            {
+                foreach ($arrTempIndex as $key => $value)
+                {
+                    $return['TABLE_CREATE_DEFINITIONS'][$key] = vsprintf($value["body"], implode("`, `", $value["fields"]));
+                }
+            }
+
             unset($field['index']);
 
-            $name = $field['name'];
+            $name          = $field['name'];
             $field['name'] = '`' . $field['name'] . '`';
 
             // Field type
@@ -721,10 +739,9 @@ class SyncCtoDatabase extends Backend
             $return['TABLE_FIELDS'][$name] = trim(implode(' ', $field));
         }
 
-
         // Table status
         $objStatus = $this->Database->prepare("SHOW TABLE STATUS")->executeUncached();
-        while ($row = $objStatus->fetchAssoc())
+        while ($row       = $objStatus->fetchAssoc())
         {
             if (!in_array($row['Name'], $this->arrBackupTables))
                 continue;
@@ -766,7 +783,7 @@ class SyncCtoDatabase extends Backend
             }
 
             $objData = $this->Database->prepare("SELECT * FROM $table")->executeUncached();
-            $fields = $this->Database->listFields($table);
+            $fields  = $this->Database->listFields($table);
 
             foreach ($fields as $key => $value)
             {
@@ -866,7 +883,6 @@ class SyncCtoDatabase extends Backend
         $strBody .= implode("`, `", $arrKeys);
         $strBody .= "`) VALUES ( ";
 
-        $arrValues = array();
         for ($i = 0; $i < count($arrKeys); $i++)
         {
             if (isset($arrData[$arrKeys[$i]]))
@@ -907,7 +923,7 @@ class SyncCtoDatabase extends Backend
     private function buildFileSQLTables($arrTables)
     {
         $today = date("Y-m-d");
-        $time = date("H:i:s");
+        $time  = date("H:i:s");
 
         $string .= "-- syncCto SQL Dump\r\n";
         $string .= "-- Version " . SyncCtoGetVersion . "\r\n";
