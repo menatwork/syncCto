@@ -115,7 +115,7 @@ class tl_syncCto_clients_syncFrom extends Backend
             'formkey' => 'start_sync',
             'class' => '',
             'accesskey' => 'g',
-            'value' => specialchars($GLOBALS['TL_LANG']['MSC']['syncTo']),
+            'value' => specialchars($GLOBALS['TL_LANG']['MSC']['syncFrom']),
             'button_callback' => array('tl_syncCto_clients_syncFrom', 'onsubmit_callback')
         );
 
