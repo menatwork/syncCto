@@ -172,6 +172,7 @@ $GLOBALS['SYC_CONFIG']['local_blacklist'] = array(
     'dbCharset',
     'dbPort',
     'ctoCom_APIKey',
+	'ctoCom_disableRefererCheck'
 );
 
 /**
