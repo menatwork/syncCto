@@ -643,6 +643,11 @@ class SyncCtoHelper extends Backend
 
         foreach ($arrConfig as $key => $value)
         {
+            if($key == "disableRefererCheck" && $value == true)
+            {
+                 $this->Config->update("\$GLOBALS['TL_CONFIG']['ctoCom_disableRefererCheck']", true);
+            }
+            
             if (in_array($key, $arrLocalConfig))
             {
                 $this->Config->update("\$GLOBALS['TL_CONFIG']['" . $key . "']", $value);
