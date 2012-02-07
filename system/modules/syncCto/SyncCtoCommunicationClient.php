@@ -214,6 +214,23 @@ class SyncCtoCommunicationClient extends CtoCommunication
     {
         return $this->runServer("SYNCCTO_GET_PURGEDATA");
     }
+    
+    /**
+     * Set the attention flag from client
+     * 
+     * @param boolean $booState 
+     */
+    public function setAttentionFlag($booState)
+    {
+        $arrData = array(
+            array(
+                "name" => "state",
+                "value" => $booState,
+            ),
+        );
+        
+        return $this->runServer("SYNCCTO_SET_ATTENTION_FLAG", $arrData);
+    }
 
     /* -------------------------------------------------------------------------
      * File Operations

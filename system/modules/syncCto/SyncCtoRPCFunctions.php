@@ -26,13 +26,12 @@
  * @license    GNU/LGPL
  * @filesource
  */
-
 class SyncCtoRPCFunctions extends Backend
 {
     /* -------------------------------------------------------------------------
      * Vars
      */
-    
+
     protected $objSyncCtoFiles;
     protected $objSyncCtoHelper;
     protected $objSyncCtoDatabase;
@@ -44,7 +43,7 @@ class SyncCtoRPCFunctions extends Backend
     /* -------------------------------------------------------------------------
      * Core
      */
-    
+
     /**
      * Constructor
      */
@@ -88,14 +87,14 @@ class SyncCtoRPCFunctions extends Backend
     public function getClientParameter()
     {
         return array(
-            'max_execution_time' => ini_get('max_execution_time'),
-            'memory_limit' => ini_get('memory_limit'),
-            'file_uploads' => ini_get('file_uploads'),
+            'max_execution_time'  => ini_get('max_execution_time'),
+            'memory_limit'        => ini_get('memory_limit'),
+            'file_uploads'        => ini_get('file_uploads'),
             'upload_max_filesize' => ini_get('upload_max_filesize'),
-            'post_max_size' => ini_get('post_max_size')
+            'post_max_size'       => ini_get('post_max_size')
         );
     }
-    
+
     /**
      * Return localconfig
      * 
@@ -125,13 +124,13 @@ class SyncCtoRPCFunctions extends Backend
      */
     public function getPathList($strName = null)
     {
-        if($strName == null)
+        if ($strName == null)
         {
             return array(
-                'db' => $GLOBALS['SYC_PATH']['db'],
-                'file' => $GLOBALS['SYC_PATH']['file'],
+                'db'    => $GLOBALS['SYC_PATH']['db'],
+                'file'  => $GLOBALS['SYC_PATH']['file'],
                 'debug' => $GLOBALS['SYC_PATH']['debug'],
-                'tmp' =>$GLOBALS['SYC_PATH']['tmp']
+                'tmp'   => $GLOBALS['SYC_PATH']['tmp']
             );
         }
         else
@@ -151,10 +150,32 @@ class SyncCtoRPCFunctions extends Backend
         }
     }
 
+    /**
+     * Set the syncFrom flag in der localconfig
+     * 
+     * @param boolean $booMode
+     * @return boolean 
+     */
+    public function setSyncFromFlag($booMode)
+    {
+        $arrLocalConfig = $this->loadConfigs(SyncCtoEnum::LOADCONFIG_KEYS_ONLY);
+        
+        if (in_array("\$GLOBALS['TL_CONFIG']['syncCto_syncFrom_flag']", $arrLocalConfig))
+        {
+            $this->Config->update("\$GLOBALS['TL_CONFIG']['syncCto_syncFrom_flag']", $booMode);
+        }
+        else
+        {
+            $this->Config->add("\$GLOBALS['TL_CONFIG']['syncCto_syncFrom_flag']", $booMode);
+        }
+
+        return true;
+    }
+
     /* -------------------------------------------------------------------------
      * Extended syncCto core functions
      */
-        
+
     /**
      * Get file and rebuild the array for checking delete files
      * 
@@ -177,7 +198,7 @@ class SyncCtoRPCFunctions extends Backend
         $objFiles = Files::getInstance();
         $objFiles->move_uploaded_file($_FILES[$strFilename]["tmp_name"], $this->objSyncCtoHelper->standardizePath($GLOBALS['SYC_PATH']['tmp'], "syncListInc.syncCto"));
 
-        $objFile = new File($this->objSyncCtoHelper->standardizePath($GLOBALS['SYC_PATH']['tmp'], "syncListInc.syncCto"));
+        $objFile         = new File($this->objSyncCtoHelper->standardizePath($GLOBALS['SYC_PATH']['tmp'], "syncListInc.syncCto"));
         $arrChecksumList = deserialize($objFile->getContent());
         $objFile->close();
 
@@ -188,7 +209,7 @@ class SyncCtoRPCFunctions extends Backend
 
         return $this->objSyncCtoFiles->checkDeleteFiles($arrChecksumList);
     }
-    
+
     /**
      * Get filelist and rebuild the array and run checksum compare.
      * 
@@ -197,37 +218,31 @@ class SyncCtoRPCFunctions extends Backend
      * @return mixed 
      */
     public function runCecksumCompare($strMD5, $strFilename)
-    {        
-        if(!key_exists($strFilename, $_FILES))
+    {
+        if (!key_exists($strFilename, $_FILES))
         {
             throw new Exception("Could not find file.");
         }
-        
-        if(md5_file($_FILES[$strFilename]["tmp_name"]) != $strMD5)
+
+        if (md5_file($_FILES[$strFilename]["tmp_name"]) != $strMD5)
         {
             throw new Exception("Unknown md5 hash.");
         }
-        
+
         $objFiles = Files::getInstance();
         $objFiles->move_uploaded_file($_FILES[$strFilename]["tmp_name"], $this->objSyncCtoHelper->standardizePath($GLOBALS['SYC_PATH']['tmp'], "syncListInc.syncCto"));
-        
-        $objFile = new File($this->objSyncCtoHelper->standardizePath($GLOBALS['SYC_PATH']['tmp'], "syncListInc.syncCto"));
+
+        $objFile         = new File($this->objSyncCtoHelper->standardizePath($GLOBALS['SYC_PATH']['tmp'], "syncListInc.syncCto"));
         $arrChecksumList = deserialize($objFile->getContent());
-        $objFile->close();   
-        
-        if(!is_array($arrChecksumList))
+        $objFile->close();
+
+        if (!is_array($arrChecksumList))
         {
             throw new Exception("Could not rebuild array.");
         }
-        
+
         return $this->objSyncCtoFiles->runCecksumCompare($arrChecksumList);
     }
-    
-    /* -------------------------------------------------------------------------
-     * Contao core calls
-     */
-    
-    
 
 }
 

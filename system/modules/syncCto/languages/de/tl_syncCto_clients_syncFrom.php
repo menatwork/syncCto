@@ -43,4 +43,6 @@ $GLOBALS['TL_LANG']['tl_syncCto_clients_syncFrom']['sync_type']                 
 $GLOBALS['TL_LANG']['tl_syncCto_clients_syncFrom']['database_tables_recommended']       = array('Empfohlene Tabellen', 'Hier können Sie die empfohlenen Tabellen für die Synchronisation auswählen.');
 $GLOBALS['TL_LANG']['tl_syncCto_clients_syncFrom']['database_tables_none_recommended']  = array('Nicht empfohlene Tabellen', 'Hier können die NICHT empfohlenen Tabellen für das Backup ausgewählt werden. Benutzung auf eigene Gefahr.');
 $GLOBALS['TL_LANG']['tl_syncCto_clients_syncFrom']['filelist']                          = array('Quelldateien', 'Bitte wählen Sie eine Datei oder einen Ordner aus der Dateiübersicht.');
+$GLOBALS['TL_LANG']['tl_syncCto_clients_syncFrom']['setAttentionFlag']                    = array('Titel', 'Text');
+$GLOBALS['TL_LANG']['tl_syncCto_clients_syncFrom']['setAttentionFlag']                    = array('Titel', 'Text');
 ?>

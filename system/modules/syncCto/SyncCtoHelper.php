@@ -187,35 +187,35 @@ class SyncCtoHelper extends Backend
 
     public function getBlacklistFolder()
     {
-        $arrLocalconfig = deserialize($GLOBALS['TL_CONFIG']['syncCto_folder_blacklist']);
+        $arrLocalconfig   = deserialize($GLOBALS['TL_CONFIG']['syncCto_folder_blacklist']);
         $arrSyncCtoConfig = $GLOBALS['SYC_CONFIG']['folder_blacklist'];
         return $this->mergeConfigs($arrLocalconfig, $arrSyncCtoConfig);
     }
 
     public function getWhitelistFolder()
     {
-        $arrLocalconfig = deserialize($GLOBALS['TL_CONFIG']['syncCto_folder_whitelist']);
+        $arrLocalconfig   = deserialize($GLOBALS['TL_CONFIG']['syncCto_folder_whitelist']);
         $arrSyncCtoConfig = $GLOBALS['SYC_CONFIG']['folder_whitelist'];
         return $this->mergeConfigs($arrLocalconfig, $arrSyncCtoConfig);
     }
 
     public function getBlacklistFile()
     {
-        $arrLocalconfig = deserialize($GLOBALS['TL_CONFIG']['syncCto_file_blacklist']);
+        $arrLocalconfig   = deserialize($GLOBALS['TL_CONFIG']['syncCto_file_blacklist']);
         $arrSyncCtoConfig = $GLOBALS['SYC_CONFIG']['file_blacklist'];
         return $this->mergeConfigs($arrLocalconfig, $arrSyncCtoConfig);
     }
 
     public function getBlacklistLocalconfig()
     {
-        $arrLocalconfig = deserialize($GLOBALS['TL_CONFIG']['syncCto_local_blacklist']);
+        $arrLocalconfig   = deserialize($GLOBALS['TL_CONFIG']['syncCto_local_blacklist']);
         $arrSyncCtoConfig = $GLOBALS['SYC_CONFIG']['local_blacklist'];
         return $this->mergeConfigs($arrLocalconfig, $arrSyncCtoConfig);
     }
 
     public function getTablesHidden()
     {
-        $arrLocalconfig = deserialize($GLOBALS['TL_CONFIG']['syncCto_hidden_tables']);
+        $arrLocalconfig   = deserialize($GLOBALS['TL_CONFIG']['syncCto_hidden_tables']);
         $arrSyncCtoConfig = $GLOBALS['SYC_CONFIG']['table_hidden'];
         return $this->mergeConfigs($arrLocalconfig, $arrSyncCtoConfig);
     }
@@ -273,11 +273,11 @@ class SyncCtoHelper extends Backend
                 {
                     if (version_compare(VERSION . '.' . BUILD, '2.10.0', '<'))
                     {
-                        $arrReturn = array("success" => false, "value" => 0, "error" => "", "token" => "");
+                        $arrReturn = array("success" => false, "value"   => 0, "error"   => "", "token"   => "");
                     }
                     else
                     {
-                        $arrReturn = array("success" => false, "value" => 0, "error" => "", "token" => REQUEST_TOKEN);
+                        $arrReturn = array("success" => false, "value"   => 0, "error"   => "", "token"   => REQUEST_TOKEN);
                     }
 
                     // Load Client from database
@@ -289,7 +289,7 @@ class SyncCtoHelper extends Backend
                     if ($objClient->numRows == 0)
                     {
                         $arrReturn["success"] = false;
-                        $arrReturn["error"] = "Unknown client";
+                        $arrReturn["error"]   = "Unknown client";
                         echo json_encode($arrReturn);
                         exit();
                     }
@@ -339,18 +339,18 @@ class SyncCtoHelper extends Backend
                     }
 
                     $arrReturn["success"] = true;
-                    $arrReturn["value"] = $intReturn;
+                    $arrReturn["value"]   = $intReturn;
                 }
                 catch (Exception $exc)
                 {
                     $arrReturn["success"] = false;
-                    $arrReturn["error"] = $exc->getMessage() . $exc->getFile() . " on " . $exc->getLine();
+                    $arrReturn["error"]   = $exc->getMessage() . $exc->getFile() . " on " . $exc->getLine();
                 }
             }
             else
             {
                 $arrReturn["success"] = false;
-                $arrReturn["error"] = "Missing client id.";
+                $arrReturn["error"]   = "Missing client id.";
             }
 
             echo json_encode($arrReturn);
@@ -377,8 +377,8 @@ class SyncCtoHelper extends Backend
             // required extensions
             $arrRequiredExtensions = array(
                 'ctoCommunication' => 'ctoCommunication',
-                'textwizard' => 'textwizard',
-                '3CFramework' => '3cframework'
+                'textwizard'       => 'textwizard',
+                '3CFramework'      => '3cframework'
             );
 
             // required files
@@ -417,6 +417,24 @@ class SyncCtoHelper extends Backend
                     }
                 }
             }
+        }
+
+        return $strContent;
+    }
+
+    /**
+     * Insert a warning msg if SycnFrom was activate
+     * 
+     * @param string $strContent
+     * @param string $strTemplate
+     * @return stinrg 
+     */
+    public function checkLockStatus($strContent, $strTemplate)
+    {
+        if ($strTemplate == 'be_main' && $GLOBALS['TL_CONFIG']['syncCto_syncFrom_flag'] == true)
+        {              
+            $objTemplate = new BackendTemplate("syncCto/be_attention");
+            $strContent = preg_replace("/<div.*id=\"container\".*>/", $objTemplate->parse() . "\n$0", $strContent);
         }
 
         return $strContent;
@@ -643,11 +661,11 @@ class SyncCtoHelper extends Backend
 
         foreach ($arrConfig as $key => $value)
         {
-            if($key == "disableRefererCheck" && $value == true)
+            if ($key == "disableRefererCheck" && $value == true)
             {
-                 $this->Config->update("\$GLOBALS['TL_CONFIG']['ctoCom_disableRefererCheck']", true);
+                $this->Config->update("\$GLOBALS['TL_CONFIG']['ctoCom_disableRefererCheck']", true);
             }
-            
+
             if (in_array($key, $arrLocalConfig))
             {
                 $this->Config->update("\$GLOBALS['TL_CONFIG']['" . $key . "']", $value);
@@ -657,7 +675,7 @@ class SyncCtoHelper extends Backend
                 $this->Config->add("\$GLOBALS['TL_CONFIG']['" . $key . "']", $value);
             }
         }
-
+        
         return true;
     }
 

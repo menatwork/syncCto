@@ -1522,11 +1522,14 @@ class SyncCtoModuleClient extends BackendModule
         $mixStepPool = $this->Session->get("syncCto_StepPool5");
         if ($mixStepPool == FALSE)
             $mixStepPool = array("step" => 1);
+        
+        // Load attention flag from session
+        $booAttentionFlag = $this->Session->get("syncCto_AttentionFlag");
 
         // Load content
         $arrContenData = $this->Session->get("syncCto_Content");
         $arrContenData["error"] = false;
-        $arrContenData["data"][5]["state"] = $GLOBALS['TL_LANG']['MSC']['progress'];
+        $arrContenData["data"][5]["state"] = $GLOBALS['TL_LANG']['MSC']['progress'];        
 
         // Needed files/information        
         $intSyncTyp = $this->Session->get("syncCto_Typ");
@@ -1746,6 +1749,12 @@ class SyncCtoModuleClient extends BackendModule
                 case 6:
                     $this->objSyncCtoCommunicationClient->purgeTemp();
                     $this->objSyncCtoFiles->purgeTemp();
+                    
+                     // Set attention flag
+                    if($booAttentionFlag == true)
+                    {
+                        $this->objSyncCtoCommunicationClient->setAttentionFlag(false);
+                    }   
 
                     $mixStepPool["step"] = 7;
 
@@ -2014,6 +2023,9 @@ class SyncCtoModuleClient extends BackendModule
         {
             $mixStepPool = array("step" => 1);
         }
+        
+        // Load attention flag from session
+        $booAttentionFlag = $this->Session->get("syncCto_AttentionFlag");
 
         // Load content
         $arrContenData = $this->Session->get("syncCto_Content");
@@ -2069,9 +2081,15 @@ class SyncCtoModuleClient extends BackendModule
 
 
                 /**
-                 * Check version
+                 * Check version / Set Attention flag
                  */
                 case 4:
+                    // Set attention flag
+                    if($booAttentionFlag == true)
+                    {
+                        $this->objSyncCtoCommunicationClient->setAttentionFlag(true);
+                    }   
+                    
                     $strVersion = $this->objSyncCtoCommunicationClient->getVersionSyncCto();
 
                     if (!version_compare($strVersion, $GLOBALS['SYC_VERSION'], "="))
@@ -2099,7 +2117,7 @@ class SyncCtoModuleClient extends BackendModule
                     }
 
                     $arrContenData["data"][1]["description"] = $GLOBALS['TL_LANG']['tl_syncCto_sync']["step_1"]['description_2'];
-
+                    
                     $mixStepPool["step"] = 5;
                     break;
 
@@ -2124,6 +2142,8 @@ class SyncCtoModuleClient extends BackendModule
                     $this->intStep++;
 
                     break;
+                
+                
             }
         }
         catch (Exception $exc)

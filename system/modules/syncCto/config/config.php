@@ -89,6 +89,7 @@ $GLOBALS['SYC_SYNC'] = array_merge_recursive(array(
  */
 $GLOBALS['TL_HOOKS']['executePreActions'][] = array('SyncCtoHelper', 'pingClientStatus');
 $GLOBALS['TL_HOOKS']['parseBackendTemplate'][] = array('SyncCtoHelper', 'checkExtensions');
+$GLOBALS['TL_HOOKS']['parseBackendTemplate'][] = array('SyncCtoHelper', 'checkLockStatus');
 
 /**
  * Permissions
@@ -111,13 +112,18 @@ if ($objInput->get("do") == 'synccto_clients' && $objInput->get("act") != 'start
 }
 
 /**
- * CSS
+ * CSS / JS
  */
 if (($objInput->get("table") == 'tl_syncCto_clients_syncTo' || $objInput->get("table") == 'tl_syncCto_clients_syncFrom') && TL_MODE == 'BE')
 {
     $GLOBALS['TL_CSS'][] = 'system/modules/syncCto/html/css/filelist_src.css';
     $GLOBALS['TL_JAVASCRIPT'][] = 'system/modules/syncCto/html/js/htmltable.js';
     $GLOBALS['TL_JAVASCRIPT'][] = 'system/modules/syncCto/html/js/filelist_src.js';
+}
+
+if($GLOBALS['TL_CONFIG']['syncCto_syncFrom_flag'] == true)
+{
+    $GLOBALS['TL_CSS'][] = 'system/modules/syncCto/html/css/attention_src.css';
 }
 
 if ((($objInput->get("do") == 'synccto_clients') && $objInput->get("act") == '') && $objInput->get("table") == '' && TL_MODE == 'BE')
@@ -380,6 +386,14 @@ $GLOBALS["CTOCOM_FUNCTIONS"]["SYNCCTO_GET_PATHLIST"] = array(
     "function" => "getPathList",
     "typ" => "POST",
     "parameter" => array("name"),
+);
+
+// Set SyncFrom Flag
+$GLOBALS["CTOCOM_FUNCTIONS"]["SYNCCTO_SET_SYNCFROM_FLAG"] = array(
+    "class" => "SyncCtoRPCFunctions",
+    "function" => "setSyncFromFlag",
+    "typ" => "POST",
+    "parameter" => array("state"),
 );
 
 ?>

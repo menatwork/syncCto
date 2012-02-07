@@ -45,7 +45,7 @@ $GLOBALS['TL_DCA']['tl_syncCto_clients_syncFrom'] = array(
     // Palettes
     'palettes' => array
         (
-        'default' => '{sync_legend},lastSync,sync_type;{table_recommend_legend},database_tables_recommended;{table_none_recommend_legend},database_tables_none_recommended;',
+        'default' => '{sync_legend},lastSync,sync_type,attention_Flag;{table_recommend_legend},database_tables_recommended;{table_none_recommend_legend},database_tables_none_recommended;',
     ),
     // Fields
     'fields' => array(
@@ -79,6 +79,13 @@ $GLOBALS['TL_DCA']['tl_syncCto_clients_syncFrom'] = array(
             'exclude' => true,
             'eval' => array('multiple' => true),
             'options_callback' => array('SyncCtoHelper', 'getNoneRecommendedDatabaseTablesClient'),
+        ),
+        'attention_Flag' => array
+            (
+            'label' => &$GLOBALS['TL_LANG']['tl_syncCto_clients_syncFrom']['setAttentionFlag'],
+            'inputType' => 'checkbox',
+            'exclude' => true,
+            'eval' => array('multiple' => false),
         ),
     )
 );
@@ -174,7 +181,15 @@ class tl_syncCto_clients_syncFrom extends Backend
             $this->Session->set("syncCto_Typ", SYNCCTO_SMALL);
         }
         
-        
+        // Set attention flag
+        if($this->Input->post("attention_Flag") == 1 )
+        {
+            $this->Session->set("syncCto_AttentionFlag", true);
+        }
+        else
+        {
+            $this->Session->set("syncCto_AttentionFlag", false);
+        }
 
         // Load table lists
         if ($this->Input->post("database_tables_recommended") != "" || $this->Input->post("database_tables_none_recommended") != "")
