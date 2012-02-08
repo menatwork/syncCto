@@ -46,7 +46,7 @@ $GLOBALS['BE_MOD'] = array_merge(
             'icon' => 'system/modules/syncCto/html/iconSettings.png'
         ),
         'synccto_clients' => array(
-            'tables' => array('tl_synccto_clients', 'tl_syncCto_clients_syncTo', 'tl_syncCto_clients_syncFrom'),
+            'tables' => array('tl_synccto_clients', 'tl_syncCto_clients_syncTo', 'tl_syncCto_clients_syncFrom', 'tl_syncCto_clients_syncTest'),
             'icon' => 'system/modules/syncCto/html/iconClients.png',
             'callback' => 'SyncCtoModuleClient',
         ),
@@ -107,6 +107,13 @@ if ($objInput->get("do") == 'syncCto_backups' && $objInput->get("table") != '' &
 }
 
 if ($objInput->get("do") == 'synccto_clients' && $objInput->get("act") != 'start' && ($objInput->get("table") == 'tl_syncCto_clients_syncTo' || $objInput->get("table") == 'tl_syncCto_clients_syncFrom' || $objInput->get("table") == '' ) && TL_MODE == 'BE')
+{
+    unset($GLOBALS['BE_MOD']['syncCto']['synccto_clients']['callback']);
+}
+
+
+// Testing
+if ($objInput->get("table") == 'tl_syncCto_clients_syncTest')
 {
     unset($GLOBALS['BE_MOD']['syncCto']['synccto_clients']['callback']);
 }

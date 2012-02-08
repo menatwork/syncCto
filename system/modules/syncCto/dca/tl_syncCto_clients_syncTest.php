@@ -76,8 +76,9 @@ $GLOBALS['TL_DCA']['tl_syncCto_clients_syncTest'] = array(
             'label' => array("Systemwartung", "Hier können Sie Systemwartung auf dem entfernten System starten."),
             'inputType' => 'checkbox',
             'options'   => array(
-                "Temporäretabellen leeren (tl_undo|tl_version|tl_search)",
-                "Temporäreordner leeren (html|scripts|tmp)",
+                "tl_Search neu aufbauen",
+                "Temporäretabellen leeren",
+                "Temporäreordner leeren",
                 "CSS-Dateien erstellen",
                 "XML-Dateien erstellen"
             ),

@@ -27,21 +27,25 @@
  * @filesource
  */
  
+
 /**
  * Legends
  */
-$GLOBALS['TL_LANG']['tl_syncCto_clients_syncTo']['sync_legend']                         = 'Synchronisations-Einstellungen';
-$GLOBALS['TL_LANG']['tl_syncCto_clients_syncTo']['filelist_legend']                     = 'Dateien und Ordner';
-$GLOBALS['TL_LANG']['tl_syncCto_clients_syncTo']['table_recommend_legend']              = 'Empfohlene Tabellen';
-$GLOBALS['TL_LANG']['tl_syncCto_clients_syncTo']['table_none_recommend_legend']         = 'Nicht empfohlene Tabellen';
+$GLOBALS['TL_LANG']['tl_syncCto_clients_syncTo']['sync_legend']                         = 'Datei-Synchronisation';
+$GLOBALS['TL_LANG']['tl_syncCto_clients_syncTo']['table_legend']                        = 'Datenbank-Synchronisation';
+$GLOBALS['TL_LANG']['tl_syncCto_clients_syncTo']['systemoperations_legend']             = 'Systemwartung';
 $GLOBALS['TL_LANG']['tl_syncCto_clients_syncTo']['edit']                                = 'Synchronisation des Clients';
 
 /**
  * Fields
  */
-$GLOBALS['TL_LANG']['tl_syncCto_clients_syncTo']['sync_type']                           = array('Art der Synchronisation', 'Hier können Sie die Art der Synchronisation auswählen.');
+$GLOBALS['TL_LANG']['tl_syncCto_clients_syncTo']['sync_type']                           = array("Dateien synchronisieren", "Wählen Sie hier bitte aus welche Teile der Contao-Installation synchronisiert werden sollen.");
+$GLOBALS['TL_LANG']['tl_syncCto_clients_syncTo']['database_check']                      = array("Datenbank synchronisieren", "Wählen Sie diese Option wenn Sie die Datenbank synchronisieren wollen.");
 $GLOBALS['TL_LANG']['tl_syncCto_clients_syncTo']['database_tables_recommended']         = array('Empfohlene Tabellen', 'Hier können Sie die empfohlenen Tabellen für die Synchronisation auswählen.');
 $GLOBALS['TL_LANG']['tl_syncCto_clients_syncTo']['database_tables_none_recommended']    = array('Nicht empfohlene Tabellen', 'Hier können die NICHT empfohlenen Tabellen für das Backup ausgewählt werden. Benutzung auf eigene Gefahr.');
-$GLOBALS['TL_LANG']['tl_syncCto_clients_syncTo']['filelist']                            = array('Quelldateien', 'Bitte wählen Sie eine Datei oder einen Ordner aus der Dateiübersicht.');
-$GLOBALS['TL_LANG']['tl_syncCto_clients_syncTo']['purgeData']                           = array('Daten bereinigen', 'Bitte wählen Sie diese Option aus um die Daten auf dem Client zu bereinigen.');
+$GLOBALS['TL_LANG']['tl_syncCto_clients_syncTo']['systemoperations_check']              = array("Systemwartung aktivieren", "Wählen Sie diese Option wenn Sie die Datenbank synchronisieren wollen.");
+$GLOBALS['TL_LANG']['tl_syncCto_clients_syncTo']['systemoperations_maintenance']        = array("Client bereinigen", "Hier können Sie die Systemwartung auf dem Client starten.");
+$GLOBALS['TL_LANG']['tl_syncCto_clients_syncTo']['attentionFlag']                       = array("Warnhinweis anzeigen", "Wählen Sie diese Option wenn der Warnhinweis auf dem Client deaktiviert werden soll.")
+
+                  
 ?>

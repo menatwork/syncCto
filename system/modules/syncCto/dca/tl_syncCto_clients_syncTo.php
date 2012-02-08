@@ -1,4 +1,7 @@
-<?php if (!defined('TL_ROOT')) die('You can not access this file directly!');
+<?php
+
+if (!defined('TL_ROOT'))
+    die('You can not access this file directly!');
 
 /**
  * Contao Open Source CMS
@@ -21,22 +24,19 @@
  * Software Foundation website at <http://www.gnu.org/licenses/>.
  *
  * PHP version 5
- * @copyright  MEN AT WORK 2011
+ * @copyright  MEN AT WORK 2012
  * @package    syncCto
  * @license    GNU/LGPL
  * @filesource
  */
 $GLOBALS['TL_DCA']['tl_syncCto_clients_syncTo'] = array(
     // Config
-    'config' => array
-        (
+    'config' => array(
         'dataContainer' => 'Memory',
         'closed' => true,
         'disableSubmit' => false,
         'onload_callback' => array(
-            array('tl_syncCto_clients_syncTo', 'onload_callback'),
-            array('tl_syncCto_clients_syncTo', 'checkVersion'),
-            array('tl_syncCto_clients_syncTo', 'checkPermission'),
+            array('tl_syncCto_clients_syncTo', 'onload_callback')
         ),
         'onsubmit_callback' => array(
             array('tl_syncCto_clients_syncTo', 'onsubmit_callback'),
@@ -45,61 +45,91 @@ $GLOBALS['TL_DCA']['tl_syncCto_clients_syncTo'] = array(
     // Palettes
     'palettes' => array
         (
-        'default' => '{sync_legend},lastSync,sync_type,purgeData,attentionFlag;{table_recommend_legend},database_tables_recommended;{table_none_recommend_legend},database_tables_none_recommended;{filelist_legend},filelist',
+        '__selector__' => array('database_check', 'systemoperations_check'),
+        'default' => '{sync_legend},lastSync,sync_type;{table_legend},database_check;{systemoperations_legend},systemoperations_check,attentionFlag;',
+    ),
+    // Sub Palettes
+    'subpalettes' => array(
+        'database_check' => 'database_tables_recommended,database_tables_none_recommended',
+        'systemoperations_check' => 'systemoperations_maintenance',
     ),
     // Fields
     'fields' => array(
-        'sync_type' => array
-            (
-            'label' => &$GLOBALS['TL_LANG']['tl_syncCto_clients_syncTo']['sync_type'],
-            'inputType' => 'select',
-            'exclude' => true,
-            'eval' => array('helpwizard' => true),
-            'reference' => &$GLOBALS['TL_LANG']['SYC'],
-            'options_callback' => array('SyncCtoHelper', 'getSyncType'),
-        ),
-        'database_tables_recommended' => array
-            (
-            'label' => &$GLOBALS['TL_LANG']['tl_syncCto_clients_syncTo']['database_tables_recommended'],
-            'inputType' => 'checkbox',
-            'exclude' => true,
-            'eval' => array('multiple' => true),
-            'options_callback' => array('SyncCtoHelper', 'databaseTablesRecommended'),
-        ),
-        'database_tables_none_recommended' => array
-            (
-            'label' => &$GLOBALS['TL_LANG']['tl_syncCto_clients_syncTo']['database_tables_none_recommended'],
-            'inputType' => 'checkbox',
-            'exclude' => true,
-            'eval' => array('multiple' => true),
-            'options_callback' => array('SyncCtoHelper', 'databaseTablesNoneRecommended'),
-        ),
-        'filelist' => array
-            (
-            'label' => &$GLOBALS['TL_LANG']['tl_syncCto_clients_syncTo']['filelist'],
-            'inputType' => 'fileTree',
-            'exclude' => true,
-            'eval' => array('files' => true, 'filesOnly' => false, 'fieldType' => 'checkbox'),
-        ),
-        'purgeData' => array
-            (
-            'label' => &$GLOBALS['TL_LANG']['tl_syncCto_clients_syncTo']['purgeData'],
-            'inputType' => 'checkbox',
-            'exclude' => true,
-            'eval' => array('multiple' => false),
-        ),
-        'attentionFlag' => array
-            (
-            'label' => &$GLOBALS['TL_LANG']['tl_syncCto_clients_syncTo']['setAttentionFlag'],
-            'inputType' => 'checkbox',
-            'exclude' => true,
-            'eval' => array('multiple' => false),
-        ),
+        // Data -------------------------
         'lastSync' => array
             (
             'label' => " ",
             'exclude' => true,
             'inputType' => 'statictext',
+        ),
+        'sync_type' => array(
+            'label' => $GLOBALS['TL_LANG']['tl_syncCto_clients_syncTo']['sync_type'],
+            'inputType' => 'checkbox',
+            'exclude' => true,
+            'reference' => &$GLOBALS['TL_LANG']['SYC']['syncCto'],
+            'options_callback' => array('SyncCtoHelper', 'getFileSyncOptions'),
+            'eval' => array(
+                'multiple' => true,
+                'checkAll' => true
+            ),
+        ),
+        // DB --------------------------
+        'database_check' => array(
+            'label' => &$GLOBALS['TL_LANG']['tl_syncCto_clients_syncTo']['database_check'],
+            'inputType' => 'checkbox',
+            'exclude' => true,
+            'eval' => array(
+                'submitOnChange' => true,
+                'tl_class' => 'clr'
+            ),
+        ),
+        'database_tables_recommended' => array(
+            'label' => &$GLOBALS['TL_LANG']['tl_syncCto_clients_syncTo']['database_tables_recommended'],
+            'inputType' => 'checkbox',
+            'exclude' => true,
+            'eval' => array(
+                'multiple' => true
+            ),
+            'options_callback' => array('SyncCtoHelper', 'databaseTablesRecommended'),
+        ),
+        'database_tables_none_recommended' => array(
+            'label' => &$GLOBALS['TL_LANG']['tl_syncCto_clients_syncTo']['database_tables_none_recommended'],
+            'inputType' => 'checkbox',
+            'exclude' => true,
+            'eval' => array(
+                'multiple' => true
+            ),
+            'options_callback' => array('SyncCtoHelper', 'databaseTablesNoneRecommended'),
+        ),
+        // System ---------------------
+        'systemoperations_check' => array(
+            'label' => &$GLOBALS['TL_LANG']['tl_syncCto_clients_syncTo']['systemoperations_check'],
+            'inputType' => 'checkbox',
+            'exclude' => true,
+            'eval' => array(
+                'submitOnChange' => true,
+                'tl_class' => 'clr'
+            ),
+        ),
+        'systemoperations_maintenance' => array(
+            'label' => &$GLOBALS['TL_LANG']['tl_syncCto_clients_syncTo']['systemoperations_maintenance'],
+            'inputType' => 'checkbox',
+            'exclude' => true,
+            'reference' => &$GLOBALS['TL_LANG']['SYC']['syncCto'],
+            'eval' => array(
+                'multiple' => true,
+                'checkAll' => true
+            ),
+            'options_callback' => array('SyncCtoHelper', 'getMaintanceOptions'),
+        ),
+        'attentionFlag' => array
+            (
+            'label' => &$GLOBALS['TL_LANG']['tl_syncCto_clients_syncTo']['attentionFlag'],
+            'inputType' => 'checkbox',
+            'exclude' => true,
+            'eval' => array(
+                'multiple' => false
+            ),
         ),
     )
 );
@@ -128,7 +158,6 @@ class tl_syncCto_clients_syncTo extends Backend
     public function onload_callback(DataContainer $dc)
     {
         // Add/Remove some buttons
-        
         $dc->removeButton('save');
         $dc->removeButton('saveNclose');
 
@@ -143,7 +172,7 @@ class tl_syncCto_clients_syncTo extends Backend
         );
 
         $dc->addButton('start_sync', $arrData);
-        
+
         // Update a field with last sync information
         $objSyncTime = $this->Database->prepare("SELECT cl.syncTo_tstamp as syncTo_tstamp, user.name as syncTo_user, user.username as syncTo_alias
                                             FROM tl_synccto_clients as cl 
@@ -167,13 +196,14 @@ class tl_syncCto_clients_syncTo extends Backend
         }
         else
         {
-           $GLOBALS['TL_DCA']['tl_syncCto_clients_syncTo']['palettes']['default'] = str_replace(",lastSync", "", $GLOBALS['TL_DCA']['tl_syncCto_clients_syncTo']['palettes']['default']);
+            $GLOBALS['TL_DCA']['tl_syncCto_clients_syncTo']['palettes']['default'] = str_replace(",lastSync", "", $GLOBALS['TL_DCA']['tl_syncCto_clients_syncTo']['palettes']['default']);
         }
     }
 
     /**
      * Set new and remove old buttons
      * 
+     * @deprecated
      * @param DataContainer $dc 
      */
     public function checkVersion(DataContainer $dc)
@@ -192,27 +222,57 @@ class tl_syncCto_clients_syncTo extends Backend
      */
     public function onsubmit_callback(DataContainer $dc)
     {
-
-        // Check sync. typ
-        if (strlen($this->Input->post('sync_type')) != 0)
+        // Synchronization type
+        if (is_array($this->Input->post("sync_type")) && count($this->Input->post("sync_type")) != 0)
         {
-            if ($this->Input->post('sync_type') == SYNCCTO_FULL || $this->Input->post('sync_type') == SYNCCTO_SMALL)
+            $this->Session->set("syncCto_Typ", $this->Input->post('sync_type'));
+        }
+        else
+        {
+            $this->Session->set("syncCto_Typ", array());
+        }
+
+        // Synchronization for Database
+        if ($this->Input->post("database_check") == 1)
+        {
+            $arrTables = array();
+
+            if (is_array($this->Input->post("database_tables_recommended")) && count($this->Input->post("database_tables_recommended")) != 0)
             {
-                $this->Session->set("syncCto_Typ", $this->Input->post('sync_type'));
+                $arrTables = $this->Input->post("database_tables_recommended");
+            }
+
+            if (is_array($this->Input->post("database_tables_none_recommended")) && count($this->Input->post("database_tables_recommended")) != 0)
+            {
+                $arrTables = array_merge($arrTables, $this->Input->post("database_tables_none_recommended"));
+            }
+
+            $this->Session->set("syncCto_SyncTables", $arrTables);
+        }
+        else
+        {
+            $this->Session->set("syncCto_SyncTables", array());
+        }
+
+        // Systemoperation execute
+        if ($this->Input->post("systemoperations_check") == 1)
+        {
+            if (is_array($this->Input->post("systemoperations_maintenance") && count($this->Input->post("systemoperations_maintenance")) != 0))
+            {
+                $this->Session->set("syncCto_Systemoperations_Maintenance", $this->Input->post("systemoperations_maintenance"));
             }
             else
             {
-                $_SESSION["TL_ERROR"][] = $GLOBALS['TL_LANG']['ERR']['unknown_function'];
-                return;
+                $this->Session->set("syncCto_Systemoperations_Maintenance", array());
             }
         }
         else
         {
-            $this->Session->set("syncCto_Typ", SYNCCTO_SMALL);
+            $this->Session->set("syncCto_Systemoperations_Maintenance", array());
         }
-        
-        // Set attention flag
-        if($this->Input->post("attentionFlag") == 1 )
+
+        // Attention flag
+        if ($this->Input->post("attentionFlag") == 1)
         {
             $this->Session->set("syncCto_AttentionFlag", true);
         }
@@ -220,92 +280,8 @@ class tl_syncCto_clients_syncTo extends Backend
         {
             $this->Session->set("syncCto_AttentionFlag", false);
         }
-
-        // Load table lists and merge them
-        if ($this->Input->post("database_tables_recommended") != "" || $this->Input->post("database_tables_none_recommended") != "")
-        {
-            if ($this->Input->post("database_tables_recommended") != "" && $this->Input->post("database_tables_none_recommended") != "")
-            {
-                $arrSyncTables = array_merge($this->Input->post("database_tables_recommended"), $this->Input->post("database_tables_none_recommended"));
-            }
-            else if ($this->Input->post("database_tables_recommended"))
-            {
-                $arrSyncTables = $this->Input->post("database_tables_recommended");
-            }
-            else if ($this->Input->post("database_tables_none_recommended"))
-            {
-                $arrSyncTables = $this->Input->post("database_tables_none_recommended");
-            }
-
-            $this->Session->set("syncCto_SyncTables", $arrSyncTables);
-        }
-        else
-        {
-            $this->Session->set("syncCto_SyncTables", FALSE);
-        }
-
-        // Set purgeDataflag    
-        if ($this->Input->post("purgeData") == 1)
-        {
-            $this->Session->set("syncCto_PurgeData", TRUE);
-        }
-        else
-        {
-            $this->Session->set("syncCto_PurgeData", FALSE);
-        }
-
-        // Files for backup siles       
-        if (is_array($this->Input->post('filelist')) && count($this->Input->post('filelist')) != 0)
-        {
-            $this->Session->set("syncCto_Filelist", $this->Input->post('filelist', true));
-        }
-        else
-        {
-            $this->Session->set("syncCto_Filelist", FALSE);
-        }
-
-        $this->Session->set("syncCto_Start", microtime(true));
-
-        $this->Session->set("syncCto_StepPool1", FALSE);
-        $this->Session->set("syncCto_StepPool2", FALSE);
-        $this->Session->set("syncCto_StepPool3", FALSE);
-        $this->Session->set("syncCto_StepPool4", FALSE);
-        $this->Session->set("syncCto_StepPool5", FALSE);
-        $this->Session->set("syncCto_StepPool6", FALSE);
-
-        $arrContenData = array(
-            "error" => false,
-            "error_msg" => "",
-            "refresh" => true,
-            "finished" => false,
-            "step" => 1,
-            "url" => "contao/main.php?do=synccto_clients&amp;table=tl_syncCto_clients_syncTo&amp;act=start&amp;id=" . (int) $this->Input->get("id"),
-            "goBack" => "contao/main.php?do=synccto_clients",
-            "start" => microtime(true),
-            "headline" => $GLOBALS['TL_LANG']['tl_syncCto_clients_syncTo']['edit'],
-            "information" => "",
-            "data" => array(),
-            "abort" => false,
-        );
-
-        $this->Session->set("syncCto_Content", $arrContenData);
-
-        $this->redirect($this->Environment->base . "contao/main.php?do=synccto_clients&amp;table=tl_syncCto_clients_syncTo&amp;act=start&amp;id=" . $this->Input->get("id"));
-    }
-
-    /**
-     * Check user permission
-     * 
-     * @return string
-     */
-    public function checkPermission()
-    {
-        if ($this->BackendUser->isAdmin)
-        {
-            return;
-        }
-
-        $GLOBALS['TL_DCA']['tl_syncCto_clients_syncTo']['list']['sorting']['root'] = $this->BackendUser->filemounts;
+        
+        $this->redirect($this->Environment->base . "contao/main.php?do=synccto_clients&amp;table=tl_syncCto_clients_syncTo&amp;act=start&amp;step=0&amp;id=" . $this->Input->get("id"));
     }
 
 }

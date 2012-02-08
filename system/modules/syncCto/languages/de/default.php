@@ -28,6 +28,24 @@
  */
 
 /**
+ * Referenz
+ */
+// File synchronization options
+$GLOBALS['TL_LANG']['SYC']['syncCto']['core']               = "Contao-Installation";
+$GLOBALS['TL_LANG']['SYC']['syncCto']['core_change']        = "Veränderte Dateien";
+$GLOBALS['TL_LANG']['SYC']['syncCto']['core_delete']        = "Gelöschte Dateien";
+$GLOBALS['TL_LANG']['SYC']['syncCto']['user']               = "Persönliche Dateien (tl_files)";
+$GLOBALS['TL_LANG']['SYC']['syncCto']['user_change']        = "Veränderte Dateien";
+$GLOBALS['TL_LANG']['SYC']['syncCto']['user_delete']        = "Gelöschte Dateien";
+// Maintance options
+$GLOBALS['TL_LANG']['SYC']['syncCto']['options']            = "Optionen";    
+$GLOBALS['TL_LANG']['SYC']['syncCto']['search_index']       = "Suchindex neu aufbauen";    
+$GLOBALS['TL_LANG']['SYC']['syncCto']['temp_tables']        = "Temporäre DB-Tabellen leeren";    
+$GLOBALS['TL_LANG']['SYC']['syncCto']['temp_folders']       = "Temporäre Ordner leeren";    
+$GLOBALS['TL_LANG']['SYC']['syncCto']['css_create']         = "CSS-Dateien neu erstellen";    
+$GLOBALS['TL_LANG']['SYC']['syncCto']['xml_create']         = "XML-Dateien neu erstellen";    
+
+/**
  * Back end modules
  */
 $GLOBALS['TL_LANG']['MSC']['edit']                          = 'Bearbeiten';
@@ -106,7 +124,8 @@ $GLOBALS['TL_LANG']['ERR']['cant_open']                     = "Datei %s kann nic
 $GLOBALS['TL_LANG']['ERR']['checksum_error']                = "Fehler in den Prüfsummen.";
 $GLOBALS['TL_LANG']['ERR']['cant_move_file']                = "Fehler beim verschieben der Datei %s nach %s.";
 $GLOBALS['TL_LANG']['ERR']['cant_delete_file']              = "Fehler beim löschen der Datei.";
-$GLOBALS['TL_LANG']['ERR']['syncCto_attention']             = "ACHTUNG! Es werden zurzeit Aktualisierungen im Hintergrund durchgeführt die dazu führen könnten das jede Änderung auf diesem System überschrieben wird.";
+$GLOBALS['TL_LANG']['ERR']['attention_headline']            = "Achtung bei Änderungen am System";
+$GLOBALS['TL_LANG']['ERR']['attention_text']             	= "Es werden zurzeit Aktualisierungen im Hintergrund durchgeführt die dazu führen könnten das Änderungen auf dieser Installation überschrieben werden.";
 
 // Database
 $GLOBALS['TL_LANG']['ERR']['missing_tables_selection']      = "Es wurde(n) keine Tabell(en) ausgewählt.";

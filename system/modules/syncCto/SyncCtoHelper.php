@@ -220,40 +220,9 @@ class SyncCtoHelper extends Backend
         return $this->mergeConfigs($arrLocalconfig, $arrSyncCtoConfig);
     }
 
-    /**
-     * Standardize path for folder
-     * 
-     * @return string the normalized path as String
+    /* -------------------------------------------------------------------------
+     * Callbacks
      */
-    public function standardizePath()
-    {
-        $arrPath = func_get_args();
-
-        if (count($arrPath) == 0 || $arrPath == null || $arrPath == "")
-        {
-            return "";
-        }
-
-        $strVar = "";
-
-        foreach ($arrPath as $itPath)
-        {
-            $itPath = str_replace(array(TL_ROOT, "\\"), array("", "/"), $itPath);
-            $itPath = explode("/", $itPath);
-
-            foreach ($itPath as $itFolder)
-            {
-                if ($itFolder == "" || $itFolder == "." || $itFolder == "..")
-                {
-                    continue;
-                }
-
-                $strVar .= "/" . $itFolder;
-            }
-        }
-
-        return preg_replace("/^\//i", "", $strVar);
-    }
 
     /**
      * Ping the current client status
@@ -432,9 +401,19 @@ class SyncCtoHelper extends Backend
     public function checkLockStatus($strContent, $strTemplate)
     {
         if ($strTemplate == 'be_main' && $GLOBALS['TL_CONFIG']['syncCto_attentionFlag'] == true)
-        {              
-            $objTemplate = new BackendTemplate("syncCto/be_attention");
-            $strContent = preg_replace("/<div.*id=\"container\".*>/", $objTemplate->parse() . "\n$0", $strContent);
+        {
+            $objTemplate = new BackendTemplate("be_syncCto_attention");
+
+            $strNewContent = preg_replace("/<div.*id=\"container\".*>/", $objTemplate->parse() . "\n$0", $strContent, 1);
+
+            if ($strNewContent == "")
+            {
+                return $strContent;
+            }
+            else
+            {
+                $strContent = $strNewContent;
+            }
         }
 
         return $strContent;
@@ -443,6 +422,7 @@ class SyncCtoHelper extends Backend
     /**
      * Return all sync types as array
      * 
+     * @deprecated
      * @return array 
      */
     public function getSyncType()
@@ -463,6 +443,7 @@ class SyncCtoHelper extends Backend
     /**
      * Return all backup types as array
      * 
+     * @deprecated
      * @return array 
      */
     public function getBackupType()
@@ -478,6 +459,84 @@ class SyncCtoHelper extends Backend
         }
 
         return $groups;
+    }
+
+    /**
+     * Get a list with all file synchronization options
+     * @return array 
+     */
+    public function getFileSyncOptions()
+    {
+        $arrReturn = array(
+            "core" => array(
+                "core_change" => "core_change",
+                "core_delete" => "core_delete"
+            ),
+            "user"  => array(
+                "user_change" => "user_change",
+                "user_delete" => "user_delete"
+            )
+        );
+
+        return $arrReturn;
+    }
+
+    /**
+     * Get a list with all maintance options
+     * @return array 
+     */
+    public function getMaintanceOptions()
+    {
+        $arrReturn = array(
+            'options' => array(
+                "search_index" => "search_index",
+                "temp_tables" => "temp_tables",
+                "temp_folders" => "temp_folders",
+                "css_create" => "css_create",
+                "xml_create" => "xml_create",
+            )
+        );
+
+        return $arrReturn;
+    }
+
+    /* -------------------------------------------------------------------------
+     * Helper Functions
+     */
+
+    /**
+     * Standardize path for folder
+     * 
+     * @return string the normalized path as String
+     */
+    public function standardizePath()
+    {
+        $arrPath = func_get_args();
+
+        if (count($arrPath) == 0 || $arrPath == null || $arrPath == "")
+        {
+            return "";
+        }
+
+        $strVar = "";
+
+        foreach ($arrPath as $itPath)
+        {
+            $itPath = str_replace(array(TL_ROOT, "\\"), array("", "/"), $itPath);
+            $itPath = explode("/", $itPath);
+
+            foreach ($itPath as $itFolder)
+            {
+                if ($itFolder == "" || $itFolder == "." || $itFolder == "..")
+                {
+                    continue;
+                }
+
+                $strVar .= "/" . $itFolder;
+            }
+        }
+
+        return preg_replace("/^\//i", "", $strVar);
     }
 
     /**
@@ -675,7 +734,7 @@ class SyncCtoHelper extends Backend
                 $this->Config->add("\$GLOBALS['TL_CONFIG']['" . $key . "']", $value);
             }
         }
-        
+
         return true;
     }
 
