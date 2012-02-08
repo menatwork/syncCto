@@ -106,6 +106,7 @@ $GLOBALS['TL_LANG']['ERR']['cant_open']                     = 'Can not be opened
 $GLOBALS['TL_LANG']['ERR']['checksum_error']                = 'Checksum error.';
 $GLOBALS['TL_LANG']['ERR']['cant_move_file']                = "Can't move file from %s to %s.";
 $GLOBALS['TL_LANG']['ERR']['cant_delete_file']              = 'Error deleting file.';
+$GLOBALS['TL_LANG']['ERR']['syncCto_attention']             = "ACHTUNG! Es werden zurzeit Aktualisierungen im Hintergrund durchgeführt die dazu führen könnten das jede Änderung auf diesem System überschrieben wird.";
 
 // Database
 $GLOBALS['TL_LANG']['ERR']['missing_tables_selection']      = 'No table(s) is/are selected.';

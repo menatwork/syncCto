@@ -45,7 +45,7 @@ $GLOBALS['TL_DCA']['tl_syncCto_clients_syncTo'] = array(
     // Palettes
     'palettes' => array
         (
-        'default' => '{sync_legend},lastSync,sync_type,purgeData,attention_Flag;{table_recommend_legend},database_tables_recommended;{table_none_recommend_legend},database_tables_none_recommended;{filelist_legend},filelist',
+        'default' => '{sync_legend},lastSync,sync_type,purgeData,attentionFlag;{table_recommend_legend},database_tables_recommended;{table_none_recommend_legend},database_tables_none_recommended;{filelist_legend},filelist',
     ),
     // Fields
     'fields' => array(
@@ -77,7 +77,7 @@ $GLOBALS['TL_DCA']['tl_syncCto_clients_syncTo'] = array(
         'filelist' => array
             (
             'label' => &$GLOBALS['TL_LANG']['tl_syncCto_clients_syncTo']['filelist'],
-            'inputType' => 'fileTreeMemory',
+            'inputType' => 'fileTree',
             'exclude' => true,
             'eval' => array('files' => true, 'filesOnly' => false, 'fieldType' => 'checkbox'),
         ),
@@ -88,7 +88,7 @@ $GLOBALS['TL_DCA']['tl_syncCto_clients_syncTo'] = array(
             'exclude' => true,
             'eval' => array('multiple' => false),
         ),
-        'attention_Flag' => array
+        'attentionFlag' => array
             (
             'label' => &$GLOBALS['TL_LANG']['tl_syncCto_clients_syncTo']['setAttentionFlag'],
             'inputType' => 'checkbox',
@@ -212,7 +212,7 @@ class tl_syncCto_clients_syncTo extends Backend
         }
         
         // Set attention flag
-        if($this->Input->post("attention_Flag") == 1 )
+        if($this->Input->post("attentionFlag") == 1 )
         {
             $this->Session->set("syncCto_AttentionFlag", true);
         }

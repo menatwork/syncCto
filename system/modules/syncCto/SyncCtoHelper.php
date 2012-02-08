@@ -431,7 +431,7 @@ class SyncCtoHelper extends Backend
      */
     public function checkLockStatus($strContent, $strTemplate)
     {
-        if ($strTemplate == 'be_main' && $GLOBALS['TL_CONFIG']['syncCto_syncFrom_flag'] == true)
+        if ($strTemplate == 'be_main' && $GLOBALS['TL_CONFIG']['syncCto_attentionFlag'] == true)
         {              
             $objTemplate = new BackendTemplate("syncCto/be_attention");
             $strContent = preg_replace("/<div.*id=\"container\".*>/", $objTemplate->parse() . "\n$0", $strContent);

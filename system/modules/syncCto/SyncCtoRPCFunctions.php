@@ -156,17 +156,17 @@ class SyncCtoRPCFunctions extends Backend
      * @param boolean $booMode
      * @return boolean 
      */
-    public function setSyncFromFlag($booMode)
+    public function setAttentionFlag($booMode)
     {
-        $arrLocalConfig = $this->loadConfigs(SyncCtoEnum::LOADCONFIG_KEYS_ONLY);
+        $arrLocalConfig = $this->objSyncCtoHelper->loadConfigs(SyncCtoEnum::LOADCONFIG_KEYS_ONLY);
         
-        if (in_array("\$GLOBALS['TL_CONFIG']['syncCto_syncFrom_flag']", $arrLocalConfig))
+        if (in_array("\$GLOBALS['TL_CONFIG']['syncCto_attentionFlag']", $arrLocalConfig))
         {
-            $this->Config->update("\$GLOBALS['TL_CONFIG']['syncCto_syncFrom_flag']", $booMode);
+            $this->Config->update("\$GLOBALS['TL_CONFIG']['syncCto_attentionFlag']", $booMode);
         }
         else
         {
-            $this->Config->add("\$GLOBALS['TL_CONFIG']['syncCto_syncFrom_flag']", $booMode);
+            $this->Config->add("\$GLOBALS['TL_CONFIG']['syncCto_attentionFlag']", $booMode);
         }
 
         return true;

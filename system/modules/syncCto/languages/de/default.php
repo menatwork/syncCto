@@ -106,6 +106,7 @@ $GLOBALS['TL_LANG']['ERR']['cant_open']                     = "Datei %s kann nic
 $GLOBALS['TL_LANG']['ERR']['checksum_error']                = "Fehler in den Prüfsummen.";
 $GLOBALS['TL_LANG']['ERR']['cant_move_file']                = "Fehler beim verschieben der Datei %s nach %s.";
 $GLOBALS['TL_LANG']['ERR']['cant_delete_file']              = "Fehler beim löschen der Datei.";
+$GLOBALS['TL_LANG']['ERR']['syncCto_attention']             = "ACHTUNG! Es werden zurzeit Aktualisierungen im Hintergrund durchgeführt die dazu führen könnten das jede Änderung auf diesem System überschrieben wird.";
 
 // Database
 $GLOBALS['TL_LANG']['ERR']['missing_tables_selection']      = "Es wurde(n) keine Tabell(en) ausgewählt.";

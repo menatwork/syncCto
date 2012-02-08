@@ -45,7 +45,7 @@ $GLOBALS['TL_DCA']['tl_syncCto_clients_syncFrom'] = array(
     // Palettes
     'palettes' => array
         (
-        'default' => '{sync_legend},lastSync,sync_type,attention_Flag;{table_recommend_legend},database_tables_recommended;{table_none_recommend_legend},database_tables_none_recommended;',
+        'default' => '{sync_legend},lastSync,sync_type,attentionFlag;{table_recommend_legend},database_tables_recommended;{table_none_recommend_legend},database_tables_none_recommended;',
     ),
     // Fields
     'fields' => array(
@@ -80,7 +80,7 @@ $GLOBALS['TL_DCA']['tl_syncCto_clients_syncFrom'] = array(
             'eval' => array('multiple' => true),
             'options_callback' => array('SyncCtoHelper', 'getNoneRecommendedDatabaseTablesClient'),
         ),
-        'attention_Flag' => array
+        'attentionFlag' => array
             (
             'label' => &$GLOBALS['TL_LANG']['tl_syncCto_clients_syncFrom']['setAttentionFlag'],
             'inputType' => 'checkbox',
@@ -182,7 +182,7 @@ class tl_syncCto_clients_syncFrom extends Backend
         }
         
         // Set attention flag
-        if($this->Input->post("attention_Flag") == 1 )
+        if($this->Input->post("attentionFlag") == 1 )
         {
             $this->Session->set("syncCto_AttentionFlag", true);
         }

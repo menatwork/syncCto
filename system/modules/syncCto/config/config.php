@@ -121,12 +121,12 @@ if (($objInput->get("table") == 'tl_syncCto_clients_syncTo' || $objInput->get("t
     $GLOBALS['TL_JAVASCRIPT'][] = 'system/modules/syncCto/html/js/filelist_src.js';
 }
 
-if($GLOBALS['TL_CONFIG']['syncCto_syncFrom_flag'] == true)
+if($GLOBALS['TL_CONFIG']['syncCto_attentionFlag'] == true)
 {
     $GLOBALS['TL_CSS'][] = 'system/modules/syncCto/html/css/attention_src.css';
 }
 
-if ((($objInput->get("do") == 'synccto_clients') && $objInput->get("act") == '') && $objInput->get("table") == '' && TL_MODE == 'BE')
+if (($objInput->get("do") == 'synccto_clients' && $objInput->get("act") == '') && $objInput->get("table") == '' && TL_MODE == 'BE')
 {
     $GLOBALS['TL_JAVASCRIPT'][] = 'system/modules/syncCto/html/js/ping_src.js';
 }
@@ -166,6 +166,7 @@ $GLOBALS['SYC_CONFIG']['file_blacklist'] = array(
 
 // Folders
 $GLOBALS['SYC_CONFIG']['local_blacklist'] = array(
+    // Contao core
     'websitePath',
     'installPassword',
     'encryptionKey',
@@ -177,8 +178,14 @@ $GLOBALS['SYC_CONFIG']['local_blacklist'] = array(
     'dbPconnect',
     'dbCharset',
     'dbPort',
+    // CtoCom
     'ctoCom_APIKey',
-	'ctoCom_disableRefererCheck'
+    'ctoCom_disableRefererCheck',
+    'ctoCom_responseLength',
+    'ctoCom_handshake',
+    // SyncCto
+    'syncCto_debug_mode',
+    'syncCto_attentionFlag'
 );
 
 /**
@@ -389,9 +396,9 @@ $GLOBALS["CTOCOM_FUNCTIONS"]["SYNCCTO_GET_PATHLIST"] = array(
 );
 
 // Set SyncFrom Flag
-$GLOBALS["CTOCOM_FUNCTIONS"]["SYNCCTO_SET_SYNCFROM_FLAG"] = array(
+$GLOBALS["CTOCOM_FUNCTIONS"]["SYNCCTO_SET_ATTENTION_FLAG"] = array(
     "class" => "SyncCtoRPCFunctions",
-    "function" => "setSyncFromFlag",
+    "function" => "setAttentionFlag",
     "typ" => "POST",
     "parameter" => array("state"),
 );
