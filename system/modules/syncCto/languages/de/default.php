@@ -31,12 +31,16 @@
  * Referenz
  */
 // File synchronization options
-$GLOBALS['TL_LANG']['SYC']['syncCto']['core']               = "Contao-Installation";
-$GLOBALS['TL_LANG']['SYC']['syncCto']['core_change']        = "Veränderte Dateien";
-$GLOBALS['TL_LANG']['SYC']['syncCto']['core_delete']        = "Gelöschte Dateien";
-$GLOBALS['TL_LANG']['SYC']['syncCto']['user']               = "Persönliche Dateien (tl_files)";
-$GLOBALS['TL_LANG']['SYC']['syncCto']['user_change']        = "Veränderte Dateien";
-$GLOBALS['TL_LANG']['SYC']['syncCto']['user_delete']        = "Gelöschte Dateien";
+$GLOBALS['TL_LANG']['SYC']['syncCto']['core']                       = "Contao-Installation";
+$GLOBALS['TL_LANG']['SYC']['syncCto']['core_change']                = "Veränderte Dateien";
+$GLOBALS['TL_LANG']['SYC']['syncCto']['core_delete']                = "Gelöschte Dateien";
+$GLOBALS['TL_LANG']['SYC']['syncCto']['user']                       = "Persönliche Dateien (tl_files)";
+$GLOBALS['TL_LANG']['SYC']['syncCto']['user_change']                = "Veränderte Dateien";
+$GLOBALS['TL_LANG']['SYC']['syncCto']['user_delete']                = "Gelöschte Dateien";
+$GLOBALS['TL_LANG']['SYC']['syncCto']['configfiles']                = "Konfigurationsdateien";
+$GLOBALS['TL_LANG']['SYC']['syncCto']['localconfig_update']         = "Alle Einträge aktualisieren";
+$GLOBALS['TL_LANG']['SYC']['syncCto']['localconfig_errors']         = "Fehlermeldungen anzeigen";
+$GLOBALS['TL_LANG']['SYC']['syncCto']['localconfig_refererCheck']   = "Anfrage-Tokens deaktivieren";
 // Maintance options
 $GLOBALS['TL_LANG']['SYC']['syncCto']['options']            = "Optionen";    
 $GLOBALS['TL_LANG']['SYC']['syncCto']['search_index']       = "Suchindex neu aufbauen";    

@@ -472,9 +472,14 @@ class SyncCtoHelper extends Backend
                 "core_change" => "core_change",
                 "core_delete" => "core_delete"
             ),
-            "user"  => array(
+            "user" => array(
                 "user_change" => "user_change",
                 "user_delete" => "user_delete"
+            ),
+            "configfiles" => array(
+                "localconfig_update" => "localconfig_update",
+                "localconfig_errors" => "localconfig_errors",
+                "localconfig_refererCheck" => "localconfig_refererCheck",
             )
         );
 

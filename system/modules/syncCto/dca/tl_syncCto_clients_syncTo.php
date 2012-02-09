@@ -222,17 +222,19 @@ class tl_syncCto_clients_syncTo extends Backend
      */
     public function onsubmit_callback(DataContainer $dc)
     {
+        $arrSyncSettings = array();
+
         // Synchronization type
         if (is_array($this->Input->post("sync_type")) && count($this->Input->post("sync_type")) != 0)
         {
-            $this->Session->set("syncCto_Typ", $this->Input->post('sync_type'));
+            $arrSyncSettings["syncCto_Type"] = $this->Input->post('sync_type');
         }
         else
         {
-            $this->Session->set("syncCto_Typ", array());
+            $arrSyncSettings["syncCto_Type"] = array();
         }
 
-        // Synchronization for Database
+        // Synchronization for database
         if ($this->Input->post("database_check") == 1)
         {
             $arrTables = array();
@@ -247,39 +249,41 @@ class tl_syncCto_clients_syncTo extends Backend
                 $arrTables = array_merge($arrTables, $this->Input->post("database_tables_none_recommended"));
             }
 
-            $this->Session->set("syncCto_SyncTables", $arrTables);
+            $arrSyncSettings["syncCto_SyncTables"] = $arrTables;
         }
         else
         {
-            $this->Session->set("syncCto_SyncTables", array());
+            $arrSyncSettings["syncCto_SyncTables"] = array();
         }
 
         // Systemoperation execute
         if ($this->Input->post("systemoperations_check") == 1)
-        {
-            if (is_array($this->Input->post("systemoperations_maintenance") && count($this->Input->post("systemoperations_maintenance")) != 0))
+        {                        
+            if (is_array($this->Input->post("systemoperations_maintenance")) && count($this->Input->post("systemoperations_maintenance")) != 0)
             {
-                $this->Session->set("syncCto_Systemoperations_Maintenance", $this->Input->post("systemoperations_maintenance"));
+                $arrSyncSettings["syncCto_Systemoperations_Maintenance"] = $this->Input->post("systemoperations_maintenance");
             }
             else
             {
-                $this->Session->set("syncCto_Systemoperations_Maintenance", array());
+                $arrSyncSettings["syncCto_Systemoperations_Maintenance"] = array();
             }
         }
         else
         {
-            $this->Session->set("syncCto_Systemoperations_Maintenance", array());
+            $arrSyncSettings["syncCto_Systemoperations_Maintenance"] = array();
         }
 
         // Attention flag
         if ($this->Input->post("attentionFlag") == 1)
         {
-            $this->Session->set("syncCto_AttentionFlag", true);
+            $arrSyncSettings["syncCto_AttentionFlag"] = true;
         }
         else
         {
-            $this->Session->set("syncCto_AttentionFlag", false);
+            $arrSyncSettings["syncCto_AttentionFlag"] = false;
         }
+        
+        $this->Session->set("syncCto_SyncSettings_" . $dc->id, $arrSyncSettings);
         
         $this->redirect($this->Environment->base . "contao/main.php?do=synccto_clients&amp;table=tl_syncCto_clients_syncTo&amp;act=start&amp;step=0&amp;id=" . $this->Input->get("id"));
     }

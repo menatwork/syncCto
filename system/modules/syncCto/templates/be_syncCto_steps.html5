@@ -30,7 +30,7 @@
     <?php endforeach; ?>
    
     <?php if ($this->refresh == true && $this->error == false && $this->finished == false): ?>
-        <meta http-equiv="refresh" content="2; URL=<?php echo $this->Environment->base; ?><?php echo $this->url; ?>&amp;step=<?php echo $this->step ?>" />
+        <meta http-equiv="refresh" content="5; URL=<?php echo $this->Environment->base; ?><?php echo $this->url; ?>&amp;step=<?php echo $this->step ?>" />
         <img style="margin-bottom:20px;" src="system/modules/syncCto/html/ajax-loader.gif" alt="" />
     <?php endif; ?>
 
@@ -46,7 +46,10 @@
             <h1><?php echo $GLOBALS['TL_LANG']['MSC']['debug_mode']; ?></h1>
             <p class="debug tl_help">
                 <?php echo vsprintf($GLOBALS['TL_LANG']['MSC']['run_time'], array(number_format(microtime(true) - $this->start, 2))); ?><br />
-                <?php echo vsprintf($GLOBALS['TL_LANG']['MSC']['memory_limit'], array($this->getReadableSize(memory_get_peak_usage(true)))); ?>
+                <?php echo vsprintf($GLOBALS['TL_LANG']['MSC']['memory_limit'], array($this->getReadableSize(memory_get_peak_usage(true)))); ?><br />
+                <br />
+                Step: <?php echo $this->step; ?><br />
+                SubStep: <?php echo $this->subStep; ?>
             </p>
         </div>
     <?php endif; ?>
@@ -60,11 +63,7 @@
         </div>
     <?php endif; ?>
         
-    <script type="text/javascript">
-        <!--//--><![CDATA[//><!--
-        window.scrollTo(null, ($('step<?php $mixStep = array_keys($this->data); $mixStep = $mixStep[count($mixStep) - 1]; echo $mixStep; ?>').getPosition().y - 40));
-        //--><!]]>
-    </script>
+
 
 </div>
 
