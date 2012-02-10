@@ -583,7 +583,7 @@ class SyncCtoCommunicationClient extends CtoCommunication
      * @param string $strName
      * @return mixed 
      */
-    public function getPathList($strName)
+    public function getPathList($strName = null)
     {
          $arrData = array(
             array(

@@ -129,7 +129,7 @@ $GLOBALS['TL_LANG']['ERR']['checksum_error']                = "Fehler in den Pr�
 $GLOBALS['TL_LANG']['ERR']['cant_move_file']                = "Fehler beim verschieben der Datei %s nach %s.";
 $GLOBALS['TL_LANG']['ERR']['cant_delete_file']              = "Fehler beim löschen der Datei.";
 $GLOBALS['TL_LANG']['ERR']['attention_headline']            = "Achtung bei Änderungen am System";
-$GLOBALS['TL_LANG']['ERR']['attention_text']             	= "Es werden zurzeit Aktualisierungen im Hintergrund durchgeführt die dazu führen könnten das Änderungen auf dieser Installation überschrieben werden.";
+$GLOBALS['TL_LANG']['ERR']['attention_text']                = "Es werden zurzeit Aktualisierungen im Hintergrund durchgeführt die dazu führen könnten das Änderungen auf dieser Installation überschrieben werden.";
 
 // Database
 $GLOBALS['TL_LANG']['ERR']['missing_tables_selection']      = "Es wurde(n) keine Tabell(en) ausgewählt.";

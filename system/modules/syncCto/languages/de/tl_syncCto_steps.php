@@ -40,12 +40,15 @@ $GLOBALS['TL_LANG']['tl_syncCto_sync']['step_2']['description_1'] = 'Abgleich un
 $GLOBALS['TL_LANG']['tl_syncCto_sync']['step_2']['description_2'] = 'Nach löschbaren Dateien suchen.';
 $GLOBALS['TL_LANG']['tl_syncCto_sync']['step_2']['description_3'] = 'Aufbereitung der Vergleichsliste.';
 $GLOBALS['TL_LANG']['tl_syncCto_sync']['step_2']['description_4'] = 'Es wurden %s neue, %s veränderte, %s gelöschte und %s nicht zustellbare Datei(en) gefunden.';
+$GLOBALS['TL_LANG']['tl_syncCto_sync']['step_2']['description_5'] = 'Es wurden %s zu große Dateien gefunden.';
 
 // Step 3
-$GLOBALS['TL_LANG']['tl_syncCto_sync']['step_3']['description_1'] = 'Große Dateien transferieren.';
-$GLOBALS['TL_LANG']['tl_syncCto_sync']['step_3']['description_2'] = '%s von %s großen Datei(en) verarbeitet.';
-$GLOBALS['TL_LANG']['tl_syncCto_sync']['step_3']['description_3'] = 'Große Dateien zusammenbauen.';
-$GLOBALS['TL_LANG']['tl_syncCto_sync']['step_3']['description_4'] = '%s von %s großen Datei(en) wurden erfolgreich verarbeitet.';
+$GLOBALS['TL_LANG']['tl_syncCto_sync']['step_3']['description_1'] = 'Dateien verarbeiten.';
+$GLOBALS['TL_LANG']['tl_syncCto_sync']['step_3']['description_2'] = '%s von %s Datei(en) verarbeitet.';
+$GLOBALS['TL_LANG']['tl_syncCto_sync']['step_3']['description_3'] = 'Große Dateien transferieren.';
+$GLOBALS['TL_LANG']['tl_syncCto_sync']['step_3']['description_4'] = '%s von %s großen Datei(en) verarbeitet.';
+$GLOBALS['TL_LANG']['tl_syncCto_sync']['step_3']['description_5'] = 'Große Dateien zusammenbauen.';
+$GLOBALS['TL_LANG']['tl_syncCto_sync']['step_3']['description_6'] = '%s von %s großen Datei(en) wurden erfolgreich verarbeitet.';
 
 // Step 4
 $GLOBALS['TL_LANG']['tl_syncCto_sync']['step_4']['description_1'] = 'SQL-Scripte erstellen.';
@@ -54,8 +57,6 @@ $GLOBALS['TL_LANG']['tl_syncCto_sync']['step_4']['description_3'] = 'SQL-Scripte
 $GLOBALS['TL_LANG']['tl_syncCto_sync']['step_4']['description_4'] = 'SQL-Scripte wurden erfolgreich verarbeitet.';
 
 // Step 5
-$GLOBALS['TL_LANG']['tl_syncCto_sync']['step_5']['description_1'] = 'Dateien verarbeiten.';
-$GLOBALS['TL_LANG']['tl_syncCto_sync']['step_5']['description_2'] = '%s von %s Datei(en) verarbeitet.';
 $GLOBALS['TL_LANG']['tl_syncCto_sync']['step_5']['description_3'] = 'Konfigurationsdateien importieren.';
 $GLOBALS['TL_LANG']['tl_syncCto_sync']['step_5']['description_4'] = ' Datei(en) übersprungen.';
 $GLOBALS['TL_LANG']['tl_syncCto_sync']['step_5']['description_5'] = ' Datei(en) gesendet.';
