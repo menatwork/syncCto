@@ -29,6 +29,7 @@ CREATE TABLE `tl_synccto_clients` (
     `http_auth` char(1) NOT NULL default '',
     `http_username` varchar(128) NOT NULL default '',
     `http_password` varchar(128) NOT NULL default '',
+    `last_table_hash` blob NULL,
     PRIMARY KEY  (`id`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 

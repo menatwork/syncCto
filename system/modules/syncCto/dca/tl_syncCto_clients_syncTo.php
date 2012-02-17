@@ -1,7 +1,4 @@
-<?php
-
-if (!defined('TL_ROOT'))
-    die('You can not access this file directly!');
+<?php if (!defined('TL_ROOT')) die('You can not access this file directly!');
 
 /**
  * Contao Open Source CMS
@@ -43,8 +40,7 @@ $GLOBALS['TL_DCA']['tl_syncCto_clients_syncTo'] = array(
         )
     ),
     // Palettes
-    'palettes' => array
-        (
+    'palettes' => array(
         '__selector__' => array('database_check', 'systemoperations_check'),
         'default' => '{sync_legend},lastSync,sync_type;{table_legend},database_check;{systemoperations_legend},systemoperations_check,attentionFlag;',
     ),
@@ -69,8 +65,7 @@ $GLOBALS['TL_DCA']['tl_syncCto_clients_syncTo'] = array(
             'reference' => &$GLOBALS['TL_LANG']['SYC']['syncCto'],
             'options_callback' => array('SyncCtoHelper', 'getFileSyncOptions'),
             'eval' => array(
-                'multiple' => true,
-                'checkAll' => true
+                'multiple' => true
             ),
         ),
         // DB --------------------------
@@ -80,7 +75,7 @@ $GLOBALS['TL_DCA']['tl_syncCto_clients_syncTo'] = array(
             'exclude' => true,
             'eval' => array(
                 'submitOnChange' => true,
-                'tl_class' => 'clr'
+                'tl_class' => 'clr',
             ),
         ),
         'database_tables_recommended' => array(
@@ -88,18 +83,24 @@ $GLOBALS['TL_DCA']['tl_syncCto_clients_syncTo'] = array(
             'inputType' => 'checkbox',
             'exclude' => true,
             'eval' => array(
-                'multiple' => true
+                'multiple' => true,
+                'helpwizard' => true
             ),
-            'options_callback' => array('SyncCtoHelper', 'databaseTablesRecommended'),
+            'options_callback' => array('tl_syncCto_clients_syncTo', 'databaseTablesRecommended'),
+            'reference' => &$GLOBALS['TL_LANG']['SYC']['syncCto'],
+            'explanation' => 'syncCto_database',
         ),
         'database_tables_none_recommended' => array(
             'label' => &$GLOBALS['TL_LANG']['tl_syncCto_clients_syncTo']['database_tables_none_recommended'],
             'inputType' => 'checkbox',
             'exclude' => true,
             'eval' => array(
-                'multiple' => true
+                'multiple' => true,
+                'helpwizard' => true
             ),
-            'options_callback' => array('SyncCtoHelper', 'databaseTablesNoneRecommended'),
+            'options_callback' => array('tl_syncCto_clients_syncTo', 'databaseTablesNoneRecommended'),
+            'reference' => &$GLOBALS['TL_LANG']['SYC']['syncCto'],
+            'explanation' => 'syncCto_database',
         ),
         // System ---------------------
         'systemoperations_check' => array(
@@ -140,14 +141,75 @@ $GLOBALS['TL_DCA']['tl_syncCto_clients_syncTo'] = array(
 class tl_syncCto_clients_syncTo extends Backend
 {
 
+    // Vars
+    protected $objSyncCtoHelper;
+
     /**
      * Constructor
      */
     public function __construct()
     {
-        $this->BackendUser = BackendUser::getInstance();
+        $this->objSyncCtoHelper = SyncCtoHelper::getInstance();
 
         parent::__construct();
+    }
+
+    public function databaseTablesNoneRecommended()
+    {
+        // Check if extendet db view is enabled
+        if($GLOBALS['TL_CONFIG']['syncCto_extended_db_view'] !== TRUE)
+        {
+            return $this->objSyncCtoHelper->databaseTablesNoneRecommended();
+        }
+        
+        $objLastHash = $this->Database->prepare("SELECT last_table_hash FROM tl_synccto_clients WHERE id=?")->execute(intval($this->Input->get("id")));
+        // Check if we have a client
+        if ($objLastHash->numRows == 0)
+        {
+            return $this->objSyncCtoHelper->databaseTablesNoneRecommended();
+        }
+        // Check if we have some hashes
+        if ($objLastHash->last_table_hash == "")
+        {
+            return $this->objSyncCtoHelper->databaseTablesNoneRecommended();
+        }
+        // Rebuild array
+        if (is_array(deserialize($objLastHash->last_table_hash)) == false)
+        {
+            $this->log("Could not rebuild last hash list for client " . $this->Input->get("id"), __CLASS__ . " | " . __FUNCTION__, "Show last changes");
+            return $this->objSyncCtoHelper->databaseTablesNoneRecommended();
+        }
+
+        return $this->objSyncCtoHelper->databaseTablesNoneRecommended(deserialize($objLastHash->last_table_hash));
+    }
+
+    public function databaseTablesRecommended()
+    {
+         // Check if extendet db view is enabled
+        if($GLOBALS['TL_CONFIG']['syncCto_extended_db_view'] !== TRUE)
+        {
+            return $this->objSyncCtoHelper->databaseTablesRecommended();
+        }
+        
+        $objLastHash = $this->Database->prepare("SELECT last_table_hash FROM tl_synccto_clients WHERE id=?")->execute(intval($this->Input->get("id")));
+        // Check if we have a client
+        if ($objLastHash->numRows == 0)
+        {
+            return $this->objSyncCtoHelper->databaseTablesRecommended();
+        }
+        // Check if we have some hashes
+        if ($objLastHash->last_table_hash == "")
+        {
+            return $this->objSyncCtoHelper->databaseTablesRecommended();
+        }
+        // Rebuild array
+        if (is_array(deserialize($objLastHash->last_table_hash)) == false)
+        {
+            $this->log("Could not rebuild last hash list for client " . $this->Input->get("id"), __CLASS__ . " | " . __FUNCTION__, "Show last changes");
+            return $this->objSyncCtoHelper->databaseTablesRecommended();
+        }
+
+        return $this->objSyncCtoHelper->databaseTablesRecommended(deserialize($objLastHash->last_table_hash));
     }
 
     /**
@@ -223,7 +285,7 @@ class tl_syncCto_clients_syncTo extends Backend
     public function onsubmit_callback(DataContainer $dc)
     {
         $arrSyncSettings = array();
-
+        
         // Synchronization type
         if (is_array($this->Input->post("sync_type")) && count($this->Input->post("sync_type")) != 0)
         {
@@ -233,7 +295,7 @@ class tl_syncCto_clients_syncTo extends Backend
         {
             $arrSyncSettings["syncCto_Type"] = array();
         }
-
+        
         // Synchronization for database
         if ($this->Input->post("database_check") == 1)
         {
@@ -258,7 +320,7 @@ class tl_syncCto_clients_syncTo extends Backend
 
         // Systemoperation execute
         if ($this->Input->post("systemoperations_check") == 1)
-        {                        
+        {
             if (is_array($this->Input->post("systemoperations_maintenance")) && count($this->Input->post("systemoperations_maintenance")) != 0)
             {
                 $arrSyncSettings["syncCto_Systemoperations_Maintenance"] = $this->Input->post("systemoperations_maintenance");
@@ -282,9 +344,9 @@ class tl_syncCto_clients_syncTo extends Backend
         {
             $arrSyncSettings["syncCto_AttentionFlag"] = false;
         }
-        
+
         $this->Session->set("syncCto_SyncSettings_" . $dc->id, $arrSyncSettings);
-        
+
         $this->redirect($this->Environment->base . "contao/main.php?do=synccto_clients&amp;table=tl_syncCto_clients_syncTo&amp;act=start&amp;step=0&amp;id=" . $this->Input->get("id"));
     }
 

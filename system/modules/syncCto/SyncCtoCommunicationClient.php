@@ -1,4 +1,7 @@
-<?php if (!defined('TL_ROOT')) die('You cannot access this file directly!');
+<?php
+
+if (!defined('TL_ROOT'))
+    die('You cannot access this file directly!');
 
 /**
  * Contao Open Source CMS
@@ -110,25 +113,25 @@ class SyncCtoCommunicationClient extends CtoCommunication
 
         $this->setClient($strUrl, $objClient->codifyengine);
         $this->setApiKey($objClient->apikey);
-        
-        if($objClient->http_auth == true)
+
+        if ($objClient->http_auth == true)
         {
             $this->import("Encryption");
-            
+
             $this->strHTTPUser = $objClient->http_username;
             $this->strHTTPPassword = $this->Encryption->decrypt($objClient->http_password);
         }
-        
+
         // Set debug modus for ctoCom.
         if ($GLOBALS['TL_CONFIG']['syncCto_debug_mode'] == true)
         {
             $this->setDebug(true);
             $this->setMeasurement(true);
-            
+
             $this->setFileDebug($this->objSyncCtoHelper->standardizePath($GLOBALS['SYC_PATH']['debug'], "CtoComDebug.txt"));
             $this->setFileMeasurement($this->objSyncCtoHelper->standardizePath($GLOBALS['SYC_PATH']['debug'], "CtoComMeasurement.txt"));
         }
-        
+
         return array(
             "title" => $objClient->title,
             "address" => $objClient->address,
@@ -204,7 +207,7 @@ class SyncCtoCommunicationClient extends CtoCommunication
     {
         return $this->runServer("SYNCCTO_PARAMETER");
     }
-    
+
     /**
      * Get informations for purgedata
      * 
@@ -214,7 +217,7 @@ class SyncCtoCommunicationClient extends CtoCommunication
     {
         return $this->runServer("SYNCCTO_GET_PURGEDATA");
     }
-    
+
     /**
      * Set the attention flag from client
      * 
@@ -228,8 +231,42 @@ class SyncCtoCommunicationClient extends CtoCommunication
                 "value" => $booState,
             ),
         );
-        
+
         return $this->runServer("SYNCCTO_SET_ATTENTION_FLAG", $arrData);
+    }
+
+    /**
+     * Set the reffere flag from client
+     * 
+     * @param boolean $booState 
+     */
+    public function setReferrerDisable($booState)
+    {
+        $arrData = array(
+            array(
+                "name" => "state",
+                "value" => $booState,
+            ),
+        );
+
+        return $this->runServer("SYNCCTO_SET_REFERRER_DISABLE_FLAG", $arrData);
+    }
+    
+    /**
+     * Set the reffere flag from client
+     * 
+     * @param boolean $booState 
+     */
+    public function setDisplayErrors($booState)
+    {
+        $arrData = array(
+            array(
+                "name" => "state",
+                "value" => $booState,
+            ),
+        );
+
+        return $this->runServer("SYNCCTO_SET_DISPLAY_ERRORS_FLAG", $arrData);
     }
 
     /* -------------------------------------------------------------------------
@@ -245,15 +282,22 @@ class SyncCtoCommunicationClient extends CtoCommunication
     {
         return $this->runServer("SYNCCTO_PURGETEMP");
     }
-    
+
     /**
      * Use the contao function for maintance
      * 
      * @return boolean 
      */
-    public function purgeData()
+    public function runMaintenance($arrSettings)
     {
-        return $this->runServer("SYNCCTO_PURGEDATA");
+        $arrData = array(
+            array(
+                "name" => "options",
+                "value" => $arrSettings,
+            )
+        );
+
+        return $this->runServer("SYNCCTO_MAINTENANCE", $arrData);
     }
 
     /**
@@ -263,7 +307,7 @@ class SyncCtoCommunicationClient extends CtoCommunication
      * @return array 
      */
     public function runCecksumCompare($arrChecksumList)
-    { 
+    {
         if (!is_array($arrChecksumList))
         {
             throw new Exception("Filelist is not a array.");
@@ -313,7 +357,7 @@ class SyncCtoCommunicationClient extends CtoCommunication
 
         // Set no codify engine
         $this->setCodifyEngine(SyncCtoEnum::CODIFY_EMPTY);
-        
+
         return $this->runServer("SYNCCTO_CHECKSUM_FILES", $arrData);
     }
 
@@ -326,10 +370,10 @@ class SyncCtoCommunicationClient extends CtoCommunication
     {
         // Set no codify engine
         $this->setCodifyEngine(SyncCtoEnum::CODIFY_EMPTY);
-        
+
         return $this->runServer("SYNCCTO_CHECKSUM_CORE");
     }
-    
+
     /**
      * Get a list with folder from contao core/files
      * 
@@ -357,7 +401,7 @@ class SyncCtoCommunicationClient extends CtoCommunication
      * @return array 
      */
     public function checkDeleteFiles($arrChecksumList)
-    {        
+    {
         if (!is_array($arrChecksumList))
         {
             throw new Exception("Filelist is not a array.");
@@ -400,7 +444,7 @@ class SyncCtoCommunicationClient extends CtoCommunication
     {
         // 5 min. time out.
         @set_time_limit(3600);
-        
+
         //Build path
         $strFilePath = $this->objSyncCtoHelper->standardizePath($strFolder, $strFile);
 
@@ -512,7 +556,7 @@ class SyncCtoCommunicationClient extends CtoCommunication
 
         return $this->runServer("SYNCCTO_REBUILD_SPLITFILE", $arrData);
     }
-    
+
     /**
      * Build splitfiles back to one big file
      * 
@@ -545,7 +589,7 @@ class SyncCtoCommunicationClient extends CtoCommunication
 
         return $this->runServer("SYNCCTO_SPLITFILE", $arrData);
     }
-    
+
     /**
      * Get a file
      * 
@@ -563,19 +607,19 @@ class SyncCtoCommunicationClient extends CtoCommunication
         );
 
         $arrResult = $this->runServer("SYNCCTO_GET_FILE", $arrData);
-            
+
         $objFile = new File($strSavePath);
         $objFile->write(base64_decode($arrResult["content"]));
         $objFile->close();
-        
-        if(md5_file(TL_ROOT . "/" . $strSavePath) != $arrResult["md5"])
+
+        if (md5_file(TL_ROOT . "/" . $strSavePath) != $arrResult["md5"])
         {
             throw new Exception($GLOBALS['TL_LANG']['ERR']['checksum_error']);
         }
-        
+
         return $strSavePath;
     }
-    
+
     /**
      * Get a list or a string with path information from 
      * syncCto.
@@ -585,13 +629,13 @@ class SyncCtoCommunicationClient extends CtoCommunication
      */
     public function getPathList($strName = null)
     {
-         $arrData = array(
+        $arrData = array(
             array(
                 "name" => "name",
                 "value" => $strName,
             ),
         );
-        
+
         return $this->runServer("SYNCCTO_GET_PATHLIST", $arrData);
     }
 
@@ -616,10 +660,10 @@ class SyncCtoCommunicationClient extends CtoCommunication
 
         return $this->runServer("SYNCCTO_IMPORT_DATABASE", $arrData);
     }
-    
+
     public function runDatabaseDump($arrTables, $booTempFolder)
     {
-         $arrData = array(
+        $arrData = array(
             array(
                 "name" => "tables",
                 "value" => $arrTables,
@@ -629,7 +673,7 @@ class SyncCtoCommunicationClient extends CtoCommunication
                 "value" => $booTempFolder,
             ),
         );
-         
+
         return $this->runServer("SYNCCTO_RUN_DUMP", $arrData);
     }
 
@@ -667,7 +711,7 @@ class SyncCtoCommunicationClient extends CtoCommunication
         // Load blacklist for localconfig
         $arrConfigBlacklist = $this->objSyncCtoHelper->getBlacklistLocalconfig();
         // Load localconfig
-        $arrConfig = $this->objSyncCtoHelper->loadConfigs(SyncCtoEnum::LOADCONFIG_KEY_VALUE);
+        $arrConfig          = $this->objSyncCtoHelper->loadConfigs(SyncCtoEnum::LOADCONFIG_KEY_VALUE);
 
         // Kick blacklist entries
         foreach ($arrConfig as $key => $value)
@@ -685,7 +729,7 @@ class SyncCtoCommunicationClient extends CtoCommunication
 
         return $this->runServer("SYNCCTO_IMPORT_CONFIG", $arrData);
     }
-    
+
     public function getLocalConfig()
     {
         $arrData = array(
@@ -698,6 +742,7 @@ class SyncCtoCommunicationClient extends CtoCommunication
 
         return $this->runServer("SYNCCTO_GET_CONFIG", $arrData);
     }
+
 }
 
 ?>

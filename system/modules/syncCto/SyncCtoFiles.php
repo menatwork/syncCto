@@ -1,4 +1,7 @@
-<?php if (!defined('TL_ROOT')) die('You cannot access this file directly!');
+<?php
+
+if (!defined('TL_ROOT'))
+    die('You cannot access this file directly!');
 
 /**
  * Contao Open Source CMS
@@ -30,14 +33,14 @@
 /**
  * Class for file operations
  */
-class SyncCtoFiles extends System
+class SyncCtoFiles extends Backend
 {
     /* -------------------------------------------------------------------------
      * Vars
      */
 
     // Singelten pattern
-    protected static $instance = null;
+    protected static $instance         = null;
     // Vars
     protected $strSuffixZipName = "File-Backup.zip";
     protected $strTimestampFormat;
@@ -333,7 +336,7 @@ class SyncCtoFiles extends System
         {
             if ($value['state'] == SyncCtoEnum::FILESTATE_BOMBASTIC_BIG)
             {
-                $arrFileList[$key] = $arrChecksumList[$key];
+                $arrFileList[$key]        = $arrChecksumList[$key];
                 $arrFileList[$key]["raw"] = "file bombastic";
             }
             else if (file_exists(TL_ROOT . "/" . $value['path']))
@@ -346,14 +349,14 @@ class SyncCtoFiles extends System
                 {
                     if ($value['state'] == SyncCtoEnum::FILESTATE_TOO_BIG)
                     {
-                        $arrFileList[$key] = $arrChecksumList[$key];
-                        $arrFileList[$key]["raw"] = "need big";
+                        $arrFileList[$key]          = $arrChecksumList[$key];
+                        $arrFileList[$key]["raw"]   = "need big";
                         $arrFileList[$key]["state"] = SyncCtoEnum::FILESTATE_TOO_BIG_NEED;
                     }
                     else
                     {
-                        $arrFileList[$key] = $arrChecksumList[$key];
-                        $arrFileList[$key]["raw"] = "need";
+                        $arrFileList[$key]          = $arrChecksumList[$key];
+                        $arrFileList[$key]["raw"]   = "need";
                         $arrFileList[$key]["state"] = SyncCtoEnum::FILESTATE_NEED;
                     }
                 }
@@ -362,14 +365,14 @@ class SyncCtoFiles extends System
             {
                 if ($value['state'] == SyncCtoEnum::FILESTATE_TOO_BIG)
                 {
-                    $arrFileList[$key] = $arrChecksumList[$key];
-                    $arrFileList[$key]["raw"] = "missing big";
+                    $arrFileList[$key]          = $arrChecksumList[$key];
+                    $arrFileList[$key]["raw"]   = "missing big";
                     $arrFileList[$key]["state"] = SyncCtoEnum::FILESTATE_TOO_BIG_MISSING;
                 }
                 else
                 {
-                    $arrFileList[$key] = $arrChecksumList[$key];
-                    $arrFileList[$key]["raw"] = "missing";
+                    $arrFileList[$key]          = $arrChecksumList[$key];
+                    $arrFileList[$key]["raw"]   = "missing";
                     $arrFileList[$key]["state"] = SyncCtoEnum::FILESTATE_MISSING;
                 }
             }
@@ -391,9 +394,9 @@ class SyncCtoFiles extends System
         {
             if (!file_exists(TL_ROOT . "/" . $valueItem["path"]))
             {
-                $arrReturn[$keyItem] = $valueItem;
+                $arrReturn[$keyItem]          = $valueItem;
                 $arrReturn[$keyItem]["state"] = SyncCtoEnum::FILESTATE_DELETE;
-                $arrReturn[$keyItem]["css"] = "deleted";
+                $arrReturn[$keyItem]["css"]   = "deleted";
             }
         }
 
@@ -629,7 +632,7 @@ class SyncCtoFiles extends System
 
         // Load blacklists and whitelists
         $arrFolderBlacklist = $this->objSyncCtoHelper->getBlacklistFolder();
-        $arrFileBlacklist = $this->objSyncCtoHelper->getBlacklistFile();
+        $arrFileBlacklist   = $this->objSyncCtoHelper->getBlacklistFile();
         $arrFolderWhiteList = $this->objSyncCtoHelper->getWhitelistFolder();
 
         if ($blnTlFiles)
@@ -689,7 +692,7 @@ class SyncCtoFiles extends System
         else
         {
             // Check if folder exists
-            if(!file_exists(TL_ROOT . "/" . $strPath))
+            if (!file_exists(TL_ROOT . "/" . $strPath))
             {
                 return $arrList;
             }
@@ -904,8 +907,8 @@ class SyncCtoFiles extends System
             $strPath = $this->objSyncCtoHelper->standardizePath($GLOBALS['SYC_PATH']['tmp'], $strFolder);
         }
 
-        $objFolder = new Folder($strPath);
-        $objFolder->clear();
+        //$objFolder = new Folder($strPath);
+        //$objFolder->clear();
     }
 
     /**
@@ -913,9 +916,9 @@ class SyncCtoFiles extends System
      * 
      * @return boolean
      */
-    public function purgeData()
+    public function runMaintenance($arrSetings)
     {
-        if(version_compare("2.10", VERSION, "<") == true)
+        if (version_compare("2.10", VERSION, "<") == true)
         {
             return true;
         }
@@ -924,51 +927,63 @@ class SyncCtoFiles extends System
         $this->import('StyleSheets');
         $this->import("Database");
 
-        // Html folder
-        $this->Automator->purgeHtmlFolder();
-
-        // Scripts folder
-        $this->Automator->purgeScriptsFolder();
-
-        // Temporary folder
-        $this->Automator->purgeTempFolder();
-
-        // CSS files
-        $this->StyleSheets->updateStyleSheets();
-
-        // XML files
-        // HOOK: use the googlesitemap module
-        if (in_array('googlesitemap', $this->Config->getActiveModules()))
-        {
-            $this->import('GoogleSitemap');
-            $this->GoogleSitemap->generateSitemap();
-        }
-        else
-        {
-            $this->Automator->generateSitemap();
-        }
-
-        // HOOK: recreate news feeds
-        if (in_array('news', $this->Config->getActiveModules()))
-        {
-            $this->import('News');
-            $this->News->generateFeeds();
-        }
-
-        // HOOK: recreate calendar feeds
-        if (in_array('calendar', $this->Config->getActiveModules()))
-        {
-            $this->import('Calendar');
-            $this->Calendar->generateFeeds();
-        }
-
         // Database table
         // Get all cachable tables from TL_CACHE
-        foreach ($GLOBALS['TL_CACHE'] as $k => $v)
+        if (in_array("temp_tables", $arrSetings))
         {
-            $this->Database->execute("TRUNCATE TABLE " . $v);
+            foreach ($GLOBALS['TL_CACHE'] as $k => $v)
+            {
+                $this->Database->execute("TRUNCATE TABLE " . $v);
+            }
         }
 
+        if (in_array("temp_folders", $arrSetings))
+        {
+            // Html folder
+            $this->Automator->purgeHtmlFolder();
+
+            // Scripts folder
+            $this->Automator->purgeScriptsFolder();
+
+            // Temporary folder
+            $this->Automator->purgeTempFolder();
+        }
+
+        if (in_array("css_create", $arrSetings))
+        {
+            // CSS files
+            $this->StyleSheets->updateStyleSheets();
+        }
+
+        if (in_array("xml_create", $arrSetings))
+        {
+            // XML files
+            // HOOK: use the googlesitemap module
+            if (in_array('googlesitemap', $this->Config->getActiveModules()))
+            {
+                $this->import('GoogleSitemap');
+                $this->GoogleSitemap->generateSitemap();
+            }
+            else
+            {
+                $this->Automator->generateSitemap();
+            }
+
+            // HOOK: recreate news feeds
+            if (in_array('news', $this->Config->getActiveModules()))
+            {
+                $this->import('News');
+                $this->News->generateFeeds();
+            }
+
+            // HOOK: recreate calendar feeds
+            if (in_array('calendar', $this->Config->getActiveModules()))
+            {
+                $this->import('Calendar');
+                $this->Calendar->generateFeeds();
+            }
+        }
+        
         return true;
     }
 
@@ -995,7 +1010,7 @@ class SyncCtoFiles extends System
         }
 
         $objFolder = new Folder($strDesFolder);
-        $objFile = new File($strSrcFile);
+        $objFile   = new File($strSrcFile);
 
         if ($objFile->filesize < 0)
         {
@@ -1003,7 +1018,7 @@ class SyncCtoFiles extends System
         }
 
         $booRun = true;
-        $i = 0;
+        $i      = 0;
         for ($i; $booRun; $i++)
         {
             $fp = fopen(TL_ROOT . "/" . $strSrcFile, "rb");
@@ -1074,7 +1089,7 @@ class SyncCtoFiles extends System
             }
 
             // Create new file objects
-            $objFilePart = new File($strReadFile);
+            $objFilePart  = new File($strReadFile);
             $hanFileWhole = fopen(TL_ROOT . "/" . $strSavePath, "a+");
 
             // Write part file to main file
@@ -1126,7 +1141,7 @@ class SyncCtoFiles extends System
                 unset($objFolder);
             }
 
-            $strFileSource = $this->objSyncCtoHelper->standardizePath($GLOBALS['SYC_PATH']['tmp'], "sync", $value["path"]);
+            $strFileSource      = $this->objSyncCtoHelper->standardizePath($GLOBALS['SYC_PATH']['tmp'], "sync", $value["path"]);
             $strFileDestination = $this->objSyncCtoHelper->standardizePath($value["path"]);
 
             if ($this->objFiles->copy($strFileSource, $strFileDestination) == false)
@@ -1167,13 +1182,13 @@ class SyncCtoFiles extends System
                         else
                         {
                             $arrFileList[$key]['transmission'] = SyncCtoEnum::FILETRANS_SKIPPED;
-                            $arrFileList[$key]["skipreason"] = $GLOBALS['TL_LANG']['ERR']['cant_delete_file'];
+                            $arrFileList[$key]["skipreason"]   = $GLOBALS['TL_LANG']['ERR']['cant_delete_file'];
                         }
                     }
                     catch (Exception $exc)
                     {
                         $arrFileList[$key]['transmission'] = SyncCtoEnum::FILETRANS_SKIPPED;
-                        $arrFileList[$key]["skipreason"] = $exc->getMessage();
+                        $arrFileList[$key]["skipreason"]   = $exc->getMessage();
                     }
                 }
                 else
@@ -1186,7 +1201,7 @@ class SyncCtoFiles extends System
                     catch (Exception $exc)
                     {
                         $arrFileList[$key]['transmission'] = SyncCtoEnum::FILETRANS_SKIPPED;
-                        $arrFileList[$key]["skipreason"] = $exc->getMessage();
+                        $arrFileList[$key]["skipreason"]   = $exc->getMessage();
                     }
                 }
             }
@@ -1218,8 +1233,8 @@ class SyncCtoFiles extends System
             }
 
             $strFolder = $arrMetafiles[$key]["folder"];
-            $strFile = $arrMetafiles[$key]["file"];
-            $strMD5 = $arrMetafiles[$key]["MD5"];
+            $strFile   = $arrMetafiles[$key]["file"];
+            $strMD5    = $arrMetafiles[$key]["MD5"];
 
             switch ($arrMetafiles[$key]["typ"])
             {
@@ -1276,7 +1291,7 @@ class SyncCtoFiles extends System
             throw new Exception(vsprintf($GLOBALS['TL_LANG']['ERR']['unknown_file'], array($strPath)));
         }
 
-        $objFile = new File($strPath);
+        $objFile    = new File($strPath);
         $strContent = base64_encode($objFile->getContent());
         $objFile->close();
 

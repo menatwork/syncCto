@@ -42,7 +42,7 @@ $GLOBALS['TL_DCA']['tl_syncCto_settings'] = array(
     ),
     'subpalettes' => array
         (
-        'syncCto_custom_settings' => 'syncCto_wait_timeout,syncCto_interactive_timeout',
+        'syncCto_custom_settings' => 'syncCto_wait_timeout,syncCto_interactive_timeout,syncCto_extended_db_view',
     ),
     // Fields
     'fields' => array(
@@ -119,6 +119,12 @@ $GLOBALS['TL_DCA']['tl_syncCto_settings'] = array(
         'syncCto_interactive_timeout' => array(
             'label' => &$GLOBALS['TL_LANG']['tl_syncCto_settings']['interactive_timeout'],
             'inputType' => 'text',
+            'exclude' => true,
+            'eval' => array('tl_class' => 'w50'),
+        ),
+        'syncCto_extended_db_view' => array(
+            'label' => &$GLOBALS['TL_LANG']['tl_syncCto_settings']['syncCto_extended_db_view'],
+            'inputType' => 'checkbox',
             'exclude' => true,
             'eval' => array('tl_class' => 'w50'),
         ),

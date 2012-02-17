@@ -1,4 +1,7 @@
-<?php if (!defined('TL_ROOT')) die('You cannot access this file directly!');
+<?php
+
+if (!defined('TL_ROOT'))
+    die('You cannot access this file directly!');
 
 /**
  * Contao Open Source CMS
@@ -242,11 +245,11 @@ class SyncCtoHelper extends Backend
                 {
                     if (version_compare(VERSION . '.' . BUILD, '2.10.0', '<'))
                     {
-                        $arrReturn = array("success" => false, "value"   => 0, "error"   => "", "token"   => "");
+                        $arrReturn = array("success" => false, "value" => 0, "error" => "", "token" => "");
                     }
                     else
                     {
-                        $arrReturn = array("success" => false, "value"   => 0, "error"   => "", "token"   => REQUEST_TOKEN);
+                        $arrReturn = array("success" => false, "value" => 0, "error" => "", "token" => REQUEST_TOKEN);
                     }
 
                     // Load Client from database
@@ -346,8 +349,8 @@ class SyncCtoHelper extends Backend
             // required extensions
             $arrRequiredExtensions = array(
                 'ctoCommunication' => 'ctoCommunication',
-                'textwizard'       => 'textwizard',
-                '3CFramework'      => '3cframework'
+                'textwizard' => 'textwizard',
+                '3CFramework' => '3cframework'
             );
 
             // required files
@@ -494,7 +497,6 @@ class SyncCtoHelper extends Backend
     {
         $arrReturn = array(
             'options' => array(
-                "search_index" => "search_index",
                 "temp_tables" => "temp_tables",
                 "temp_folders" => "temp_folders",
                 "css_create" => "css_create",
@@ -586,11 +588,84 @@ class SyncCtoHelper extends Backend
     }
 
     /**
+     * Return a list with all hashes form tables
+     * 
+     * @param string/array $mixTableNames 
+     */
+    public function getDatabaseTablesHash($mixTableNames = null)
+    {
+        // If we have only a string for tablenames set it as array
+        if ($mixTableNames != null && !is_array($mixTableNames))
+        {
+            $arrTableNames = array($mixTableNames);
+        }
+
+        // Return array
+        $arrHash = array();
+
+        // Load all Tables
+        $arrTables = $this->Database->listTables();
+
+        foreach ($arrTables as $strTable)
+        {
+            // Skip hidden tables
+            if (in_array($strTable, $GLOBALS['SYC_CONFIG']['table_hidden']))
+            {
+                continue;
+            }
+
+            // Check if we search some special tables
+            if (is_array($arrTableNames) && count($arrTableNames) != 0 && !in_array($strTable, $arrTableNames))
+            {
+                continue;
+            }
+
+            // Check if we have rows in table
+            $objCount = $this->Database->prepare("SELECT COUNT(*) as count FROM $strTable")->execute();
+            if ($objCount->count == 0)
+            {
+                $arrHash[$strTable] = 0;
+            }
+
+            // Load all fields
+            $arrFields = array();
+            $arrDBFields = $this->Database->listFields($strTable);
+
+            foreach ($arrDBFields as $arrField)
+            {
+                // Skip field primary for contao 2.10 >
+                if ($arrField['name'] == "PRIMARY")
+                {
+                    break;
+                }
+
+                $arrFields[] = $arrField['name'];
+            }
+
+            // Build hash
+            $strSQL   = "SELECT MD5(GROUP_CONCAT( CONCAT_WS('#'," . implode(", ", $arrFields) . ") SEPARATOR '##' )) as hash  FROM $strTable";
+            $objQuery = $this->Database->prepare($strSQL)->execute();
+
+            $arrHash[$strTable] = $objQuery->hash;
+        }
+
+        if ($mixTableNames != null && !is_array($mixTableNames))
+        {
+            return $arrHash[$mixTableNames];
+        }
+        else
+        {
+            return $arrHash;
+        }
+    }
+
+    /**
      * Returns a list with recommended database tables
      *
+     * @param array $arrHashLast A Hash list for checking hash
      * @return array
      */
-    public function databaseTablesRecommended()
+    public function databaseTablesRecommended($arrHashLast = null)
     {
         // Recommended tables
         $arrBlacklist = deserialize($GLOBALS['TL_CONFIG']['syncCto_database_tables']);
@@ -615,18 +690,54 @@ class SyncCtoHelper extends Backend
                 continue;
             }
 
-            $arrTables[$value] = $value . $this->getTableMeta($value);
+            if ($arrHashLast != null && is_array($arrHashLast))
+            {
+                if ($arrHashLast[$value] == $this->getDatabaseTablesHash($value))
+                {
+                    $arrTables["tables_no_changes"][$value] = $this->getTableMeta($value, true);
+                }
+                else
+                {
+                    $arrTables["tables_changes"][$value] = $this->getTableMeta($value, false);
+                }
+            }
+            else
+            {
+                $arrTables[$value] = $this->getTableMeta($value);
+            }
         }
 
-        return $arrTables;
+        if ($arrHashLast != null && is_array($arrHashLast))
+        {
+            if (count($arrTables["tables_changes"]) == 0 || count($arrTables["tables_no_changes"]) == 0)
+            {
+                if (count($arrTables["tables_no_changes"]) == 0)
+                {
+                    return $arrTables["tables_changes"];
+                }
+                else
+                {
+                    return $arrTables["tables_no_changes"];
+                }
+            }
+            else
+            {
+                return $arrTables;
+            }
+        }
+        else
+        {
+            return $arrTables;
+        }
     }
 
     /**
      * Returns a list with none recommended database tables
      *
+     * @param array $arrHashLast A Hash list for checking hash
      * @return array
      */
-    public function databaseTablesNoneRecommended()
+    public function databaseTablesNoneRecommended($arrHashLast = null)
     {
         // None recommended tables
         $arrBlacklist = deserialize($GLOBALS['TL_CONFIG']['syncCto_database_tables']);
@@ -651,10 +762,45 @@ class SyncCtoHelper extends Backend
                 continue;
             }
 
-            $arrTables[$value] = $value . $this->getTableMeta($value);
+            if ($arrHashLast != null && is_array($arrHashLast))
+            {
+                if ($arrHashLast[$value] == $this->getDatabaseTablesHash($value))
+                {
+                    $arrTables["tables_no_changes"][$value] = $this->getTableMeta($value, true);
+                }
+                else
+                {
+                    $arrTables["tables_changes"][$value] = $this->getTableMeta($value, false);
+                }
+            }
+            else
+            {
+                $arrTables[$value] = $this->getTableMeta($value);
+            }
         }
 
-        return $arrTables;
+        if ($arrHashLast != null && is_array($arrHashLast))
+        {
+            if (count($arrTables["tables_changes"]) == 0 || count($arrTables["tables_no_changes"]) == 0)
+            {
+                if (count($arrTables["tables_no_changes"]) == 0)
+                {
+                    return $arrTables["tables_changes"];
+                }
+                else
+                {
+                    return $arrTables["tables_no_changes"];
+                }
+            }
+            else
+            {                
+                return $arrTables;
+            }
+        }
+        else
+        {
+            return $arrTables;
+        }
     }
 
     /**
@@ -699,18 +845,34 @@ class SyncCtoHelper extends Backend
         return $arrTables;
     }
 
-    private function getTableMeta($strTableName)
+    private function getTableMeta($strTableName, $booHashSame = null)
     {
-        $objCount = $this->Database->prepare("SELECT COUNT(*) as Count FROM $strTableName")->execute();
+        $objCount  = $this->Database->prepare("SELECT COUNT(*) as Count FROM $strTableName")->execute();
+        $strReturn = "";
 
-        if (version_compare(VERSION, "2.10", "<"))
+        if ($booHashSame === FALSE)
         {
-            return '<span style="color: #aaaaaa; padding-left: 3px;">(' . vsprintf($GLOBALS['TL_LANG']['MSC']['entries'], array($objCount->Count)) . ')</span>';
+            $strReturn .= '<span style="padding-left: 3px;">' . $strTableName . '</span>';
+        }
+        else if ($booHashSame === TRUE)
+        {
+            $strReturn .= '<span style="padding-left: 3px;">' . $strTableName . '</span>';
         }
         else
         {
-            return '<span style="color: #aaaaaa; padding-left: 3px;">(' . $this->getReadableSize($this->Database->getSizeOf($strTableName)) . ', ' . vsprintf($GLOBALS['TL_LANG']['MSC']['entries'], array($objCount->Count)) . ')</span>';
+            $strReturn .= $strTableName;
         }
+
+        if (version_compare(VERSION, "2.10", "<"))
+        {
+            $strReturn .= '<span style="color: #aaaaaa; padding-left: 3px;">(' . vsprintf($GLOBALS['TL_LANG']['MSC']['entries'], array($objCount->Count)) . ')</span>';
+        }
+        else
+        {
+            $strReturn .= '<span style="color: #aaaaaa; padding-left: 3px;">(' . $this->getReadableSize($this->Database->getSizeOf($strTableName)) . ', ' . vsprintf($GLOBALS['TL_LANG']['MSC']['entries'], array($objCount->Count)) . ')</span>';
+        }
+
+        return $strReturn;
     }
 
     /**

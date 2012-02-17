@@ -42,12 +42,15 @@ $GLOBALS['TL_LANG']['SYC']['syncCto']['localconfig_update']         = "Alle Eint
 $GLOBALS['TL_LANG']['SYC']['syncCto']['localconfig_errors']         = "Fehlermeldungen anzeigen";
 $GLOBALS['TL_LANG']['SYC']['syncCto']['localconfig_refererCheck']   = "Anfrage-Tokens deaktivieren";
 // Maintance options
-$GLOBALS['TL_LANG']['SYC']['syncCto']['options']            = "Optionen";    
-$GLOBALS['TL_LANG']['SYC']['syncCto']['search_index']       = "Suchindex neu aufbauen";    
-$GLOBALS['TL_LANG']['SYC']['syncCto']['temp_tables']        = "Temporäre DB-Tabellen leeren";    
-$GLOBALS['TL_LANG']['SYC']['syncCto']['temp_folders']       = "Temporäre Ordner leeren";    
-$GLOBALS['TL_LANG']['SYC']['syncCto']['css_create']         = "CSS-Dateien neu erstellen";    
-$GLOBALS['TL_LANG']['SYC']['syncCto']['xml_create']         = "XML-Dateien neu erstellen";    
+$GLOBALS['TL_LANG']['SYC']['syncCto']['options']                    = "Optionen";    
+$GLOBALS['TL_LANG']['SYC']['syncCto']['search_index']               = "Suchindex neu aufbauen";    
+$GLOBALS['TL_LANG']['SYC']['syncCto']['temp_tables']                = "Temporäre DB-Tabellen leeren";    
+$GLOBALS['TL_LANG']['SYC']['syncCto']['temp_folders']               = "Temporäre Ordner leeren";    
+$GLOBALS['TL_LANG']['SYC']['syncCto']['css_create']                 = "CSS-Dateien neu erstellen";    
+$GLOBALS['TL_LANG']['SYC']['syncCto']['xml_create']                 = "XML-Dateien neu erstellen";    
+// Tables
+$GLOBALS['TL_LANG']['SYC']['syncCto']['tables_no_changes']          = "Keine änderungen seit letzten synchronisation";    
+$GLOBALS['TL_LANG']['SYC']['syncCto']['tables_changes']          = "Änderungen seit letzten synchronisation";     
 
 /**
  * Back end modules

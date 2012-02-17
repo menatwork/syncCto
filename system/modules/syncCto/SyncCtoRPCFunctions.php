@@ -1,4 +1,7 @@
-<?php if (!defined('TL_ROOT')) die('You cannot access this file directly!');
+<?php
+
+if (!defined('TL_ROOT'))
+    die('You cannot access this file directly!');
 
 /**
  * Contao Open Source CMS
@@ -87,11 +90,11 @@ class SyncCtoRPCFunctions extends Backend
     public function getClientParameter()
     {
         return array(
-            'max_execution_time'  => ini_get('max_execution_time'),
-            'memory_limit'        => ini_get('memory_limit'),
-            'file_uploads'        => ini_get('file_uploads'),
+            'max_execution_time' => ini_get('max_execution_time'),
+            'memory_limit' => ini_get('memory_limit'),
+            'file_uploads' => ini_get('file_uploads'),
             'upload_max_filesize' => ini_get('upload_max_filesize'),
-            'post_max_size'       => ini_get('post_max_size')
+            'post_max_size' => ini_get('post_max_size')
         );
     }
 
@@ -127,10 +130,10 @@ class SyncCtoRPCFunctions extends Backend
         if ($strName == null)
         {
             return array(
-                'db'    => $GLOBALS['SYC_PATH']['db'],
-                'file'  => $GLOBALS['SYC_PATH']['file'],
+                'db' => $GLOBALS['SYC_PATH']['db'],
+                'file' => $GLOBALS['SYC_PATH']['file'],
                 'debug' => $GLOBALS['SYC_PATH']['debug'],
-                'tmp'   => $GLOBALS['SYC_PATH']['tmp']
+                'tmp' => $GLOBALS['SYC_PATH']['tmp']
             );
         }
         else
@@ -159,7 +162,7 @@ class SyncCtoRPCFunctions extends Backend
     public function setAttentionFlag($booMode)
     {
         $arrLocalConfig = $this->objSyncCtoHelper->loadConfigs(SyncCtoEnum::LOADCONFIG_KEYS_ONLY);
-        
+
         if (in_array("\$GLOBALS['TL_CONFIG']['syncCto_attentionFlag']", $arrLocalConfig))
         {
             $this->Config->update("\$GLOBALS['TL_CONFIG']['syncCto_attentionFlag']", $booMode);
@@ -167,6 +170,44 @@ class SyncCtoRPCFunctions extends Backend
         else
         {
             $this->Config->add("\$GLOBALS['TL_CONFIG']['syncCto_attentionFlag']", $booMode);
+        }
+
+        return true;
+    }
+
+    /**
+     * Set the ctoCom flag for disableRefererCheck
+     * @param boolean $booState
+     * @return boolean 
+     */
+    public function setReferrerDisable($booState)
+    {
+        if (key_exists("ctoCom_disableRefererCheck", $GLOBALS['TL_CONFIG']))
+        {
+            $this->Config->update("\$GLOBALS['TL_CONFIG']['ctoCom_disableRefererCheck']", $booState);
+        }
+        else
+        {
+            $this->Config->add("\$GLOBALS['TL_CONFIG']['ctoCom_disableRefererCheck']", $booState);
+        }
+
+        return true;
+    }
+    
+    /**
+     * Set the displayErrors flag
+     * @param boolean $booState
+     * @return boolean 
+     */
+    public function setDisplayErrors($booState)
+    {
+        if (key_exists("ctoCom_disableRefererCheck", $GLOBALS['TL_CONFIG']))
+        {
+            $this->Config->update("\$GLOBALS['TL_CONFIG']['displayErrors']", $booState);
+        }
+        else
+        {
+            $this->Config->add("\$GLOBALS['TL_CONFIG']['displayErrors']", $booState);
         }
 
         return true;

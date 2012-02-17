@@ -76,14 +76,6 @@ $GLOBALS['SYC_BACKUP'] = array_merge_recursive(array(
         ), is_array($GLOBALS['SYC_BACKUP']) ? $GLOBALS['SYC_BACKUP'] : array()
 );
 
-$GLOBALS['SYC_SYNC'] = array_merge_recursive(array(
-    'files' => array(
-        'option_small' => SYNCCTO_SMALL,
-        'option_full' => SYNCCTO_FULL,
-    ),
-        ), is_array($GLOBALS['SYC_SYNC']) ? $GLOBALS['SYC_SYNC'] : array()
-);
-
 /**
  * Hooks
  */
@@ -154,6 +146,7 @@ $GLOBALS['SYC_CONFIG']['table_hidden'] = array(
     'tl_version',
     'tl_synccto_clients',
     'tl_ctocom_cache',
+    'tl_requestcache',
 );
 
 // Folders
@@ -282,12 +275,12 @@ $GLOBALS["CTOCOM_FUNCTIONS"]["SYNCCTO_PURGETEMP"] = array(
     "parameter" => FALSE,
 );
 
-// Get folder path list
-$GLOBALS["CTOCOM_FUNCTIONS"]["SYNCCTO_PURGEDATA"] = array(
+// Run maintenance
+$GLOBALS["CTOCOM_FUNCTIONS"]["SYNCCTO_MAINTENANCE"] = array(
     "class" => "SyncCtoFiles",
-    "function" => "purgeData",
+    "function" => "runMaintenance",
     "typ" => "POST",
-    "parameter" => false,
+    "parameter" => array("options"),
 );
 
 // Rebuild a split file
@@ -402,10 +395,26 @@ $GLOBALS["CTOCOM_FUNCTIONS"]["SYNCCTO_GET_PATHLIST"] = array(
     "parameter" => array("name"),
 );
 
-// Set SyncFrom Flag
+// Set the attention flag
 $GLOBALS["CTOCOM_FUNCTIONS"]["SYNCCTO_SET_ATTENTION_FLAG"] = array(
     "class" => "SyncCtoRPCFunctions",
     "function" => "setAttentionFlag",
+    "typ" => "POST",
+    "parameter" => array("state"),
+);
+
+// Set SyncFrom Flag
+$GLOBALS["CTOCOM_FUNCTIONS"]["SYNCCTO_SET_REFERRER_DISABLE_FLAG"] = array(
+    "class" => "SyncCtoRPCFunctions",
+    "function" => "setReferrerDisable",
+    "typ" => "POST",
+    "parameter" => array("state"),
+);
+
+// Set displayErrors Flag
+$GLOBALS["CTOCOM_FUNCTIONS"]["SYNCCTO_SET_DISPLAY_ERRORS_FLAG"] = array(
+    "class" => "SyncCtoRPCFunctions",
+    "function" => "setDisplayErrors",
     "typ" => "POST",
     "parameter" => array("state"),
 );
