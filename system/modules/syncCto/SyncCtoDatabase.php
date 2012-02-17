@@ -1,5 +1,4 @@
 <?php
-
 if (!defined('TL_ROOT'))
     die('You cannot access this file directly!');
 
@@ -40,14 +39,14 @@ class SyncCtoDatabase extends Backend
      */
 
     //- Singelten pattern --------
-    protected static $instance          = null;
+    protected static $instance = null;
     //- Vars ---------------------
     protected $arrBackupTables;
     protected $arrHiddenTables;
-    protected $strSuffixZipName  = "DB-Backup.zip";
-    protected $strFilenameTable  = "DB-Backup_tbl.txt";
+    protected $strSuffixZipName = "DB-Backup.zip";
+    protected $strFilenameTable = "DB-Backup_tbl.txt";
     protected $strFilenameInsert = "DB-Backup_ins.txt";
-    protected $strFilenameSQL    = "DB-Backup.sql";
+    protected $strFilenameSQL = "DB-Backup.sql";
     protected $strTimestampFormat;
     //- Objects ------------------
     protected $objSyncCtoHelper;
@@ -194,8 +193,8 @@ class SyncCtoDatabase extends Backend
 
     /* -------------------------------------------------------------------------
      * Create functions
-     */
-
+     */  
+    
     /**
      * Function for creating a sql dump file.
      * 
@@ -205,7 +204,11 @@ class SyncCtoDatabase extends Backend
      * @return null 
      */
     public function runDump($arrTables, $booTempFolder, $booOnlyMachine = false)
-    {
+    {         
+        var_dump('memory_usage_peak', $this->getReadableSize(memory_get_peak_usage(true)));
+        
+        $time_start = microtime(true);
+
         // Check if there are any tables selected for an export
         if (is_array($arrTables) && is_array($this->arrBackupTables))
         {
@@ -222,18 +225,409 @@ class SyncCtoDatabase extends Backend
 
         // Write some tempfiles
         $strRandomToken = md5(time() . " | " . rand(0, 65535));
+        
+        // ---------------------------------------------------------------------
+        
+        // Set memory limits in bytes
+        $strMemoryLimit = ini_get('memory_limit');
+        
+        if(stripos($strMemoryLimit, 'M'))
+        {
+            $memoryLimit = (int) (((str_replace('M', '', $strMemoryLimit) * 1024) * 1024) / 3);
+        }
+        elseif(stripos($strMemoryLimit, 'G'))
+        {
+            $memoryLimit = (int) ((((str_replace('G', '', $strMemoryLimit) * 1024) * 1024) * 1024) / 3);
+        }
+        else
+        {
+            // Set to 128MB
+            $memoryLimit = 131072;
+        }
+        unset($strMemoryLimit);
+        
+        $currentMemory = (memory_get_usage());
+        if ($currentMemory > $memoryLimit)
+        {
+            var_dump("Line 250: " . $this ->getReadableSize($currentMemory));
+        }
+        
+        /**
+         * Create Files 
+         */
+        // Create XML File
+        $objFile = new File("system/tmp/TempXMLDump.xml");
+        $objFile->write("");
+        $objFile->close();
 
-        // Temp files
-        $objFileSQL       = new File("system/tmp/TempSQLDump.$strRandomToken");
+        // Create XML File
+        $objXml = new XMLWriter();
+        $objXml->openMemory();
+        $objXml->setIndent(true);
+        $objXml->setIndentString("\t");
+
+        // XML Start
+        $objXml->startDocument('1.0', 'UTF-8');
+        $objXml->startElement('database');
+
+        // Write meta (header)
+        $objXml->startElement('metatags');
+        $objXml->writeElement('create_unix', time());
+        $objXml->writeElement('create_date', date('Y-m-d', time()));
+        $objXml->writeElement('create_time', date('H:i', time()));
+        $objXml->endElement(); // End metatags
+
+        $objFile->append($objXml->flush(true));
+        $objFile->close();
+
+        // ---------------------------------------------------------------------        
+        // Create SQL File
+
+        $objFileSQL = new File("system/tmp/TempSQLDump.sql");
         $objFileSQL->write("");
-        $objFileStructure = new File("system/tmp/TempStructureDump.$strRandomToken");
-        $objFileStructure->write("");
-        $objFileData      = new File("system/tmp/TempDataDump.$strRandomToken");
-        $objFileData->write("");
+        $objFileSQL->close();
 
+        // Write header        
+        $objFileSQL->append("-- syncCto SQL Dump\r\n" .
+                "-- Version " . $GLOBALS['SYC_VERSION'] . "\r\n" .
+                "-- http://men-at-work.de\r\n" .
+                "-- \r\n" .
+                "-- Time stamp       : " . date('Y-m-d', time()) . " at " . date('H:i', time()) . "\r\n" .
+                "\r\n" .
+                "SET SQL_MODE=\"NO_AUTO_VALUE_ON_ZERO\";\r\n" .
+                "\r\n" .
+                "\r\n" .
+                "-- --------------------------------------------------------\r\n" .
+                "\r\n", "");
+        $objFileSQL->close();
+
+        $currentMemory = (memory_get_usage());
+        if ($currentMemory > $memoryLimit)
+        {
+            var_dump("Line 305: " . $this ->getReadableSize($currentMemory));
+        }        
+        
+        /**
+         * Write Table inforamtion and content to file 
+         */
+        // Run each table
+        foreach ($arrTables as $key => $TableName)
+        {
+            // Get data
+            $arrStructure = $this->getTableStructure($TableName);
+
+            // Check if empty
+            if (count($arrStructure) == 0)
+            {
+                continue;
+            }
+
+            // Write SQL
+            $objFileSQL->append("-- \r");
+            $objFileSQL->append("-- Dumping data for table $TableName");
+            $objFileSQL->append("-- \r");
+            $objFileSQL->append("\r");
+            $objFileSQL->append($this->buildSQLTable($arrStructure, $TableName));
+
+            $objXml->startElement('TABLE_STRUCTURE');
+            $objXml->writeAttribute('name', $TableName);
+
+            foreach ($arrStructure AS $key => $value)
+            {
+                if (is_array($value))
+                {
+                    $objXml->startElement($key);
+
+                    foreach ($value As $k => $v)
+                    {
+                        $objXml->startElement('field');
+                        $objXml->writeAttribute('name', $k);
+                        $objXml->text($v);
+                        $objXml->endElement(); // End field
+                        
+                        $currentMemory = (memory_get_usage());
+                        if ($currentMemory > $memoryLimit)
+                        {
+                            var_dump("Line 349: " . $this ->getReadableSize($currentMemory));
+                        }                        
+                    }
+
+                    $objXml->endElement(); // End undefined                    
+                }
+                else
+                {
+                    $objXml->writeElement($key, $value);
+                }
+
+                $currentMemory = (memory_get_usage());
+                if ($currentMemory > $memoryLimit)
+                {
+                    $objFile->append($objXml->flush(true));
+                    $objFile->close();
+                }
+            }
+
+            $objXml->endElement(); // End TABLE_STRUCTURE 
+        }
+
+        $strSQL = "";
+        
+        // Run each table
+        foreach ($arrTables as $key => $TableName)
+        {                        
+            $time_table_start = microtime(true);
+            
+            // Get data from table
+            if (!in_array($TableName, $this->arrBackupTables) || in_array($TableName, $this->arrHiddenTables))
+            {
+                $objFileSQL->append("-- --------------------------------------------------------\r");
+                $objFileSQL->append("\r");
+                continue;
+            }     
+
+            // Get fields
+            $fields = $this->Database->listFields($TableName);
+
+            $arrFieldMeta = array();
+
+            foreach ($fields as $key => $value)
+            {
+                if ($value["type"] == "index")
+                {
+                    continue;
+                }
+
+                $arrFieldMeta[$value["name"]] = $value;
+            }
+
+            unset($fields);
+            
+            $objXml->startElement('TABLE_VALUES');
+            $objXml->writeAttribute('name', $TableName);
+
+            $objCount = $this->Database->prepare("SELECT Count(*) as count FROM $TableName")->executeUncached();           
+            $intElementsPerRequest = 500;
+           
+            for ($i = 0; TRUE; $i++)
+            {
+                
+                if (($i * $intElementsPerRequest) > $objCount->count)
+                {
+                    break;
+                }
+
+                $objData = $this->Database->prepare("SELECT * FROM $TableName")->limit($intElementsPerRequest, ($i * $intElementsPerRequest))->executeUncached();
+                
+                while ($row = $objData->fetchAssoc())
+                {
+                    $objXml->startElement('ROW');
+
+                    $arrTableData = array("table" => $TableName, "values" => array());
+                    
+                    foreach ($row as $field_key => $field_data)
+                    {                        
+                        if (!isset($field_data))
+                        {
+                            $arrTableData['values'][$field_key] = "NULL";
+
+                            $objXml->startElement('field');
+                            $objXml->writeAttribute('type', $arrFieldMeta[$field_key]['type']);
+                            $objXml->writeAttribute('name', $field_key);
+                            $objXml->writeCData('NULL');
+                            $objXml->endElement(); // End field
+                        }
+                        else if ($field_data != "")
+                        {
+                            switch (strtolower($arrFieldMeta[$field_key]['type']))
+                            {
+                                case 'blob':
+                                case 'tinyblob':
+                                case 'mediumblob':
+                                case 'longblob':
+                                    $arrTableData['values'][$field_key] = "0x" . bin2hex($field_data);
+
+                                    $objXml->startElement('field');
+                                    $objXml->writeAttribute('name', $field_key);
+                                    $objXml->writeAttribute('type', $arrFieldMeta[$field_key]['type']);
+                                    $objXml->writeCData("0x" . bin2hex($field_data));
+                                    $objXml->endElement(); // End field                                    
+                                    break;
+                                default:
+                                    $arrTableData['values'][$field_key] = $field_data;
+
+                                    $objXml->startElement('field');
+                                    $objXml->writeAttribute('name', $field_key);
+                                    $objXml->writeAttribute('type', $arrFieldMeta[$field_key]['type']);
+                                    $objXml->writeCData($field_data);
+                                    $objXml->endElement(); // End field                                      
+                                    break;
+                            }
+                        }
+                        else
+                        {
+                            $arrTableData['values'][$field_key] = "NULL";
+
+                            $objXml->startElement('field');
+                            $objXml->writeAttribute('type', $arrFieldMeta[$field_key]['type']);
+                            $objXml->writeAttribute('name', $field_key);
+                            $objXml->writeCData('NULL');
+                            $objXml->endElement(); // End field
+                        }
+                        
+                        $currentMemory = (memory_get_usage());
+                        if ($currentMemory > $memoryLimit)
+                        {
+                            var_dump("for: $i , table: $TableName");
+                            var_dump($this ->getReadableSize($memoryLimit));
+                            var_dump($this ->getReadableSize($currentMemory));
+
+                            $objFile->append($objXml->flush(true));
+                            $objFile->close();
+                        }                        
+                    }
+
+                    $strSQL .= $this->buildSQLInsert($arrTableData["table"], array_keys($arrTableData["values"]), $arrTableData["values"]) . "\n";
+                    
+                    $currentMemory = (memory_get_usage());
+                    if ($currentMemory > $memoryLimit)
+                    {
+                        var_dump("for: $i , table: $TableName");
+                        var_dump($this ->getReadableSize($memoryLimit));
+                        var_dump($this ->getReadableSize($currentMemory));
+                        
+                        $objFileSQL->append(substr($strSQL, 0, -1));
+                        $objFileSQL->close();                        
+                        $strSQL = "";
+
+                        $objFile->append($objXml->flush(true));
+                        $objFile->close();
+                    }
+                    $objXml->endElement(); // End ROW
+                }
+
+                $currentMemory = (memory_get_usage());
+                if ($currentMemory > $memoryLimit)
+                {
+                    var_dump("for: $i , table: $TableName");
+                    var_dump($this ->getReadableSize($memoryLimit));
+                    var_dump($this ->getReadableSize($currentMemory));                    
+                    
+                    if(strlen($strSQL) > 0)
+                    {
+                        $objFileSQL->append(substr($strSQL, 0, -1));
+                        $objFileSQL->close();                        
+                        $strSQL = "";
+                    }
+
+                    $objFile->append($objXml->flush(true));
+                    $objFile->close();
+                }
+            }
+
+            $objXml->endElement(); // End TABLE_VALUES
+            
+            $time_table_end = microtime(true);
+            $time = $time_table_end - $time_table_start;
+            var_dump('-----------------------------------------------------------');
+            var_dump("for: $i , table: $TableName, time: $time seconds");
+
+            $currentMemory = (memory_get_usage());
+            if ($currentMemory > $memoryLimit)
+            {
+                var_dump("for: $i , table: $TableName");
+                var_dump($this ->getReadableSize($memoryLimit));
+                var_dump($this ->getReadableSize($currentMemory));                
+                
+                if(strlen($strSQL) > 0)
+                {
+                    $objFileSQL->append(substr($strSQL, 0, -1));
+                    $objFileSQL->close();                        
+                    $strSQL = "";
+                }                
+                
+                $objFile->append($objXml->flush(true));
+                $objFile->close();
+            }
+        }
+
+        // Add analysis values
+        $objXml->startElement('analysis');
+
+        $time_end = microtime(true);
+        $time = $time_end - $time_start;
+        var_dump('-----------------------------------------------------------');
+        var_dump('memory_limit', $this->getReadableSize($memoryLimit));
+        var_dump('memory_usage_peak', $this->getReadableSize(memory_get_peak_usage(true)));
+        var_dump("Create SQL and XML in $time seconds");
+
+
+        $objXml->writeElement('memory_limit', $this->getReadableSize($memoryLimit));
+        $objXml->writeElement('memory_usage_peak', $this->getReadableSize(memory_get_peak_usage(true)));
+
+        $objXml->endElement(); // End analysis          
+
+        $objXml->endElement(); // End dump
+        
+        if(strlen($strSQL) > 0)
+        {
+            $objFileSQL->append(substr($strSQL, 0, -1));
+            $objFileSQL->close();
+            unset($strSQL);
+        }           
+        
+        $objFileSQL->append("\r");
+        $objFileSQL->append("-- --------------------------------------------------------\r");
+        $objFileSQL->append("\r");
+        $objFileSQL->close();
+        
+        // Final flush to make sure we haven't missed anything
+        $objFile->append($objXml->flush(true));
+        $objFile->close();       
+        exit();
+        
+        // ---------------------------------------------------------------------
+
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        // ---------------------------------------------------------------------
         // Write header for sql file
         $today = date("Y-m-d");
-        $time  = date("H:i:s");
+        $time = date("H:i:s");
 
         // Write Header
         $string .= "-- syncCto SQL Dump\r\n";
@@ -250,12 +644,15 @@ class SyncCtoDatabase extends Backend
 
         $objFileSQL->append($string, "");
 
+
+
+
         // Run each table
         foreach ($arrTables as $key => $TableName)
         {
             // Get data
             $arrStructure = $this->getTableStructure($TableName);
-            
+
             // Check if empty
             if (count($arrStructure) == 0)
             {
@@ -263,7 +660,7 @@ class SyncCtoDatabase extends Backend
             }
 
             // Write serialize array in file
-            $objFileStructure->append(serialize(array("name"  => $TableName, "value" => $arrStructure)));
+            $objFileStructure->append(serialize(array("name" => $TableName, "value" => $arrStructure)));
 
             // Write SQL 
             $objFileSQL->append("-- \r");
@@ -295,10 +692,10 @@ class SyncCtoDatabase extends Backend
                 $arrFieldMeta[$value["name"]] = $value;
             }
 
-            $objCount              = $this->Database->prepare("SELECT Count(*) as count FROM $TableName")->executeUncached();
+            $objCount = $this->Database->prepare("SELECT Count(*) as count FROM $TableName")->executeUncached();
             $intElementsPerRequest = 500;
 
-            for ($i = 0; $i < 100000; $i++)
+            for ($i = 0; $i < 2; $i++)
             {
                 if (($i * $intElementsPerRequest) > $objCount->count)
                 {
@@ -313,7 +710,7 @@ class SyncCtoDatabase extends Backend
                 while ($row = $objData->fetchAssoc())
                 {
 
-                    $arrTableData = array("table"  => $TableName, "values" => array());
+                    $arrTableData = array("table" => $TableName, "values" => array());
 
                     foreach ($row as $field_key => $field_data)
                     {
@@ -506,7 +903,7 @@ class SyncCtoDatabase extends Backend
             // Set pointer on position zero
             rewind($objTempfile);
 
-            $i       = 0;
+            $i = 0;
             while ($mixLine = fgets($objTempfile))
             {
                 $i++;
@@ -624,29 +1021,29 @@ class SyncCtoDatabase extends Backend
                     switch ($field['index'])
                     {
                         case 'PRIMARY':
-                            $arrTempIndex["PRIMARY"]["body"]     = 'PRIMARY KEY  (`%s`)';
+                            $arrTempIndex["PRIMARY"]["body"] = 'PRIMARY KEY  (`%s`)';
                             $arrTempIndex["PRIMARY"]["fields"][] = $field["name"];
                             break;
 
                         case 'UNIQUE':
-                            $arrTempIndex[$field["name"]]["body"]     = 'UNIQUE KEY `%s` (`%s`)';
+                            $arrTempIndex[$field["name"]]["body"] = 'UNIQUE KEY `%s` (`%s`)';
                             $arrTempIndex[$field["name"]]["fields"][] = $field["name"];
                             break;
 
                         case 'FULLTEXT':
-                            $arrTempIndex[$field["name"]]["body"]     = 'FULLTEXT KEY `%s` (`%s`)';
+                            $arrTempIndex[$field["name"]]["body"] = 'FULLTEXT KEY `%s` (`%s`)';
                             $arrTempIndex[$field["name"]]["fields"][] = $field["name"];
                             break;
 
                         default:
                             if ((strpos(' ' . $field['type'], 'text') || strpos(' ' . $field['type'], 'char')) && ($field['null'] == 'NULL'))
                             {
-                                $arrTempIndex[$field["name"]]["body"]     = 'FULLTEXT KEY `%s` (`%s`)';
+                                $arrTempIndex[$field["name"]]["body"] = 'FULLTEXT KEY `%s` (`%s`)';
                                 $arrTempIndex[$field["name"]]["fields"][] = $field["name"];
                             }
                             else
                             {
-                                $arrTempIndex[$field["name"]]["body"]     = 'KEY `%s` (`%s`)';
+                                $arrTempIndex[$field["name"]]["body"] = 'KEY `%s` (`%s`)';
                                 $arrTempIndex[$field["name"]]["fields"][] = $field["name"];
                             }
                             break;
@@ -696,7 +1093,7 @@ class SyncCtoDatabase extends Backend
             {
                 foreach ($arrTempIndex as $key => $value)
                 {
-                    if($key == 'PRIMARY')
+                    if ($key == 'PRIMARY')
                     {
                         $return['TABLE_CREATE_DEFINITIONS'][$key] = vsprintf($value["body"], array(implode("`, `", $value["fields"])));
                     }
@@ -709,7 +1106,7 @@ class SyncCtoDatabase extends Backend
 
             unset($field['index']);
 
-            $name          = $field['name'];
+            $name = $field['name'];
             $field['name'] = '`' . $field['name'] . '`';
 
             // Field type
@@ -748,9 +1145,9 @@ class SyncCtoDatabase extends Backend
 
         // Table status
         $objStatus = $this->Database->prepare("SHOW TABLE STATUS")->executeUncached();
-                
+
         while ($row = $objStatus->fetchAssoc())
-        {            
+        {
             if ($row['Name'] != $strTableName)
                 continue;
 
@@ -758,7 +1155,7 @@ class SyncCtoDatabase extends Backend
             if ($row['Auto_increment'] != "")
                 $return['TABLE_OPTIONS'] .= " AUTO_INCREMENT=" . $row['Auto_increment'] . " ";
         }
-        
+
         return $return;
     }
 
@@ -791,7 +1188,7 @@ class SyncCtoDatabase extends Backend
             }
 
             $objData = $this->Database->prepare("SELECT * FROM $table")->executeUncached();
-            $fields  = $this->Database->listFields($table);
+            $fields = $this->Database->listFields($table);
 
             foreach ($fields as $key => $value)
             {
@@ -931,7 +1328,7 @@ class SyncCtoDatabase extends Backend
     private function buildFileSQLTables($arrTables)
     {
         $today = date("Y-m-d");
-        $time  = date("H:i:s");
+        $time = date("H:i:s");
 
         $string .= "-- syncCto SQL Dump\r\n";
         $string .= "-- Version " . SyncCtoGetVersion . "\r\n";
