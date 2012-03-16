@@ -58,7 +58,7 @@ $GLOBALS['TL_DCA']['tl_syncCto_restore_db'] = array(
             (
             'label' => &$GLOBALS['TL_LANG']['tl_syncCto_restore_db']['filelist'],            
             'inputType' => 'fileTreeMemory',
-            'eval' => array('files' => true, 'filesOnly' => true, 'fieldType' => 'radio', 'path' => $GLOBALS['TL_CONFIG']['uploadPath'] . '/syncCto_backups/database', 'extensions' => 'zip'),
+            'eval' => array('files' => true, 'filesOnly' => true, 'fieldType' => 'radio', 'path' => $GLOBALS['TL_CONFIG']['uploadPath'] . '/syncCto_backups/database', 'extensions' => 'zip,synccto'),
         ),
     )
 );

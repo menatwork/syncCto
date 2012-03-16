@@ -576,7 +576,7 @@ class SyncCtoHelper extends Backend
         foreach ($this->Database->listTables() as $key => $value)
         {
             // Check if table is a hidden one.
-            if (in_array($value, $arrTablesHidden))
+            if (in_array($value, $arrTablesHidden) || preg_match("/synccto_temp_.*/", $value))
             {
                 continue;
             }
@@ -680,7 +680,7 @@ class SyncCtoHelper extends Backend
 
         foreach ($this->databaseTables() as $key => $value)
         {
-            if (in_array($value, $arrBlacklist))
+            if (in_array($value, $arrBlacklist) || preg_match("/synccto_temp_.*/", $value) )
             {
                 continue;
             }
@@ -752,7 +752,7 @@ class SyncCtoHelper extends Backend
 
         foreach ($this->databaseTables() as $key => $value)
         {
-            if (!in_array($value, $arrBlacklist))
+            if (!in_array($value, $arrBlacklist) || preg_match("/synccto_temp_.*/", $value))
             {
                 continue;
             }
@@ -829,7 +829,7 @@ class SyncCtoHelper extends Backend
 
         foreach ($this->Database->listTables() as $key => $value)
         {
-            if (!in_array($value, $arrBlacklist) && !in_array($value, $arrHiddenlist))
+            if (!in_array($value, $arrBlacklist) && !in_array($value, $arrHiddenlist) || preg_match("/synccto_temp_.*/", $value))
             {
                 continue;
             }
