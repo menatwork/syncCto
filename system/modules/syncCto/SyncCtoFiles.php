@@ -907,8 +907,8 @@ class SyncCtoFiles extends Backend
             $strPath = $this->objSyncCtoHelper->standardizePath($GLOBALS['SYC_PATH']['tmp'], $strFolder);
         }
 
-        //$objFolder = new Folder($strPath);
-        //$objFolder->clear();
+        $objFolder = new Folder($strPath);
+        $objFolder->clear();
     }
 
     /**
