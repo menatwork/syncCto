@@ -575,7 +575,10 @@ class SyncCtoDatabase extends Backend
             }
         }
 
-        $objFileSQL->close();
+        if ($booOnlyMachine == false)
+        {
+            $objFileSQL->close();
+        }
 
         $strFilename = date($this->strTimestampFormat) . "_" . $this->strSuffixZipName;
 
@@ -590,15 +593,23 @@ class SyncCtoDatabase extends Backend
 
         $objZipWrite = new ZipWriter($strPath . $strFilename);
 
-        $objZipWrite->addFile("system/tmp/TempSQLDump.$strRandomToken", $this->strFilenameSQL);
+        if ($booOnlyMachine == false)
+        {
+            $objZipWrite->addFile("system/tmp/TempSQLDump.$strRandomToken", $this->strFilenameSQL);
+        }
         $objZipWrite->addFile("system/tmp/TempSyncCtoDump.$strRandomToken", $this->strFilenameSyncCto);
 
         $objZipWrite->close();
 
         $objFiles = Files::getInstance();
 
-        $objFiles->delete("system/tmp/TempSQLDump.$strRandomToken");
+        if ($booOnlyMachine == false)
+        {
+            $objFiles->delete("system/tmp/TempSQLDump.$strRandomToken");
+        }
         $objFiles->delete("system/tmp/TempSyncCtoDump.$strRandomToken");
+
+        echo "through";
 
         return $strFilename;
     }
@@ -615,7 +626,6 @@ class SyncCtoDatabase extends Backend
 
         while ($this->objXMLReader->read())
         {
-
             switch ($this->objXMLReader->nodeType)
             {
                 case XMLReader::CDATA:
