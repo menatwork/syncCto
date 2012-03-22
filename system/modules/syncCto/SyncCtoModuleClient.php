@@ -1724,7 +1724,7 @@ class SyncCtoModuleClient extends BackendModule
                  * Build SQL Zip File
                  */
                 case 2:
-                    $this->objStepPool->zipname = $this->objSyncCtoDatabase->runDump($this->arrSyncSettings['syncCto_SyncTables'], true);
+                    $this->objStepPool->zipname = $this->objSyncCtoDatabase->runDump($this->arrSyncSettings['syncCto_SyncTables'], true, true);
                     $this->objStepPool->arrTableHash = $this->objSyncCtoHelper->getDatabaseTablesHash();
 
                     $this->objData->setDescription($GLOBALS['TL_LANG']['tl_syncCto_sync']["step_4"]['description_2']);
@@ -1940,7 +1940,6 @@ class SyncCtoModuleClient extends BackendModule
                 case 8:
                     $this->objSyncCtoCommunicationClient->purgeTemp();
                     $this->objSyncCtoFiles->purgeTemp();
-
                     $this->objStepPool->step++;
                     break;
 
