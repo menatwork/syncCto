@@ -24,7 +24,7 @@ if (!defined('TL_ROOT'))
  * Software Foundation website at <http://www.gnu.org/licenses/>.
  *
  * PHP version 5
- * @copyright  MEN AT WORK 2011
+ * @copyright  MEN AT WORK 2012
  * @package    syncCto
  * @license    GNU/LGPL
  * @filesource
@@ -146,6 +146,7 @@ class SyncCtoModuleClient extends BackendModule
         catch (Exception $exc)
         {
             $_SESSION["TL_ERROR"] = array($GLOBALS['TL_LANG']['ERR']['client_set']);
+            $this->log($exc->getMessage(), __CLASS__ . " | " . __FUNCTION__, TL_ERROR);
             $this->redirect("contao/main.php?do=synccto_clients");
         }
 
@@ -166,10 +167,16 @@ class SyncCtoModuleClient extends BackendModule
 
         if ($this->Input->get("abort") == "true")
         {
+            // Load content from session
+            $this->loadContenData();
             // So abort page
             $this->pageSyncAbort();
             // Save content in session
             $this->saveContentData();
+            // Set template vars
+            $this->setTemplateVars();
+            // Hidden control
+            $this->Template->showControl = false;
             return;
         }
 
@@ -314,11 +321,11 @@ class SyncCtoModuleClient extends BackendModule
     protected function initTempLists()
     {
         // Load Files
-        $objFileList = new File($this->objSyncCtoHelper->standardizePath($GLOBALS['SYC_PATH']['tmp'], "syncfilelistTo-ID-" . $this->intClientID . ".txt"));
+        $objFileList = new File($this->objSyncCtoHelper->standardizePath($GLOBALS['SYC_PATH']['tmp'], "syncfilelist-ID-" . $this->intClientID . ".txt"));
         $objFileList->delete();
         $objFileList->close();
 
-        $objCompareList = new File($this->objSyncCtoHelper->standardizePath($GLOBALS['SYC_PATH']['tmp'], "synccomparelistTo-ID-" . $this->intClientID . ".txt"));
+        $objCompareList = new File($this->objSyncCtoHelper->standardizePath($GLOBALS['SYC_PATH']['tmp'], "synccomparelist-ID-" . $this->intClientID . ".txt"));
         $objCompareList->delete();
         $objCompareList->close();
     }
@@ -326,7 +333,7 @@ class SyncCtoModuleClient extends BackendModule
     protected function loadTempLists()
     {
         // Load Files
-        $objFileList = new File($this->objSyncCtoHelper->standardizePath($GLOBALS['SYC_PATH']['tmp'], "syncfilelistTo-ID-" . $this->intClientID . ".txt"));
+        $objFileList = new File($this->objSyncCtoHelper->standardizePath($GLOBALS['SYC_PATH']['tmp'], "syncfilelist-ID-" . $this->intClientID . ".txt"));
 
         $strContent = $objFileList->getContent();
 
@@ -341,7 +348,7 @@ class SyncCtoModuleClient extends BackendModule
 
         $objFileList->close();
 
-        $objCompareList = new File($this->objSyncCtoHelper->standardizePath($GLOBALS['SYC_PATH']['tmp'], "synccomparelistTo-ID-" . $this->intClientID . ".txt"));
+        $objCompareList = new File($this->objSyncCtoHelper->standardizePath($GLOBALS['SYC_PATH']['tmp'], "synccomparelist-ID-" . $this->intClientID . ".txt"));
 
         $strContent = $objCompareList->getContent();
         if (strlen($strContent) == 0)
@@ -362,7 +369,7 @@ class SyncCtoModuleClient extends BackendModule
         $objFileList->write(serialize($this->arrListFile));
         $objFileList->close();
 
-        $objCompareList = new File($this->objSyncCtoHelper->standardizePath($GLOBALS['SYC_PATH']['tmp'], "synccomparelistTo-ID-" . $this->intClientID . ".txt"));
+        $objCompareList = new File($this->objSyncCtoHelper->standardizePath($GLOBALS['SYC_PATH']['tmp'], "synccomparelist-ID-" . $this->intClientID . ".txt"));
         $objCompareList->write(serialize($this->arrListCompare));
         $objCompareList->close();
     }
@@ -466,7 +473,7 @@ class SyncCtoModuleClient extends BackendModule
             $this->objData = new ContentData(array(), $this->intStep);
 
             // Init tmep files
-            $this->initTempLists();
+            $this->initTempLists(SyncCtoEnum::SYNC_TO);
 
             // Update last sync
             $this->Database->prepare("UPDATE `tl_synccto_clients` %s WHERE `tl_synccto_clients`.`id` = ?")
@@ -479,7 +486,7 @@ class SyncCtoModuleClient extends BackendModule
             // Reset some Sessions
             $this->resetStepPoolByID(array(1, 2, 3, 4, 5, 6));
             $this->resetClientInformation();
-            
+
             $this->Session->set("SyncCto_FileLock_ID" . $this->intClientID, array("lock" => false));
         }
 
@@ -535,7 +542,7 @@ class SyncCtoModuleClient extends BackendModule
         {
             // Init|Check
             case 1:
-                $this->pageSyncToShowStep1();
+                $this->pageSyncShowStep1();
                 break;
 
             // Filelists
@@ -564,7 +571,7 @@ class SyncCtoModuleClient extends BackendModule
                 break;
 
             default:
-                $_SESSION["TL_ERROR"] = array("Unbekannter Schritt für Backup.");
+                $_SESSION["TL_ERROR"] = array("Unknown step for sync.");
                 $this->redirect("contao/main.php?do=synccto_clients");
                 break;
         }
@@ -579,114 +586,129 @@ class SyncCtoModuleClient extends BackendModule
      */
     private function pageSyncFrom()
     {
-        // Build Step
-        if ($this->Input->get("step") == "" || $this->Input->get("step") == null)
+        // Init | Set Step to 1
+        if ($this->intStep == 0)
         {
+            // Init content
+            $this->booError = false;
+            $this->booAbort = false;
+            $this->booFinished = false;
+            $this->strError = "";
+            $this->booRefresh = true;
+            $this->strUrl = "contao/main.php?do=synccto_clients&amp;table=tl_syncCto_clients_syncFrom&amp;act=start&amp;id=" . $this->intClientID;
+            $this->strGoBack = $this->Environment->base . "contao/main.php?do=synccto_clients";
+            $this->strHeadline = $GLOBALS['TL_LANG']['tl_syncCto_clients_syncFrom']['edit'];
+            $this->strInformation = "";
             $this->intStep = 1;
+            $this->floStart = microtime(true);
+            $this->objData = new ContentData(array(), $this->intStep);
+
+            // Init tmep files
+            $this->initTempLists();
+
+            // Update last sync
+            $this->Database->prepare("UPDATE `tl_synccto_clients` %s WHERE `tl_synccto_clients`.`id` = ?")
+                    ->set(array("syncFrom_user" => $this->User->id, "syncFrom_tstamp" => time()))
+                    ->execute($this->intClientID);
+
+            // Write log
+            $this->log(vsprintf("Start synchronization server with client ID %s.", array($this->Input->get("id"))), __CLASS__ . " " . __FUNCTION__, "INFO");
+
+            // Reset some Sessions
+            $this->resetStepPoolByID(array(1, 2, 3, 4, 5, 6));
+            $this->resetClientInformation();
+
+            $this->Session->set("SyncCto_FileLock_ID" . $this->intClientID, array("lock" => false));
         }
-        else
+
+        // Check if we have to do the current step
+        switch ($this->intStep)
         {
-            $this->intStep = intval($this->Input->get("step"));
+            // Nothing to do
+            case 1:
+                break;
+
+            // Check if we have files
+            case 2:
+                if (!$this->checkSyncFileList())
+                {
+                    $this->intStep++;
+                    $this->objData->nextStep();
+                }
+                else
+                {
+                    break;
+                }
+
+            // Check if we have files and some big ones
+            case 3:
+                if (!$this->checkSyncFileList())
+                {
+                    $this->intStep++;
+                    $this->objData->nextStep();
+                }
+                else
+                {
+                    break;
+                }
+
+            // Check if some tables are choosen
+            case 4:
+                if (!$this->checkSyncDatabase())
+                {
+                    $this->intStep++;
+                    $this->objData->nextStep();
+                }
+                else
+                {
+                    break;
+                }
         }
 
-        // Set client for communication
-        try
-        {
-            $this->objSyncCtoCommunicationClient->setClientBy(intval($this->Input->get("id")));
-        }
-        catch (Exception $exc)
-        {
-            $_SESSION["TL_ERROR"] = array($GLOBALS['TL_LANG']['ERR']['client_set']);
-            $this->redirect("contao/main.php?do=synccto_clients");
-        }
-
-        if ($this->Input->get("abort") == "true")
-        {
-            $this->pageSyncAbort();
-            return;
-        }
-
-        // Set up temp file for filetransmission
-        if ($this->intStep != 1)
-        {
-            $intID = $this->Input->get("id");
-
-            // Load Files
-            $objFileList = new File($this->objSyncCtoHelper->standardizePath($GLOBALS['SYC_PATH']['tmp'], "syncfilelistFrom-ID-$intID.txt"));
-
-            $strContent = $objFileList->getContent();
-            if (strlen($strContent) == 0)
-            {
-                $this->arrListFile = array();
-            }
-            else
-            {
-                $this->arrListFile = deserialize($strContent);
-            }
-
-            $objFileList->close();
-
-            $objCompareList = new File($this->objSyncCtoHelper->standardizePath($GLOBALS['SYC_PATH']['tmp'], "synccomparelistFrom-ID-$intID.txt"));
-
-            $strContent = $objCompareList->getContent();
-            if (strlen($strContent) == 0)
-            {
-                $this->arrListCompare = array();
-            }
-            else
-            {
-                $this->arrListCompare = deserialize($strContent);
-            }
-
-            $objCompareList->close();
-        }
+        // Load step pool for current step
+        $this->loadStepPool();
 
         // Load Step
         switch ($this->intStep)
         {
+            // Init|Check
             case 1:
-                $this->Database->prepare("UPDATE `tl_synccto_clients` %s WHERE `tl_synccto_clients`.`id` = ?")
-                        ->set(array("syncFrom_user" => $this->User->id, "syncFrom_tstamp" => time()))
-                        ->execute($this->Input->get("id"));
-
-                $this->pageSyncFromShowStep1();
+                $this->pageSyncShowStep1();
                 break;
 
+            // Filelists
             case 2:
+                $this->loadTempLists();
                 $this->pageSyncFromShowStep2();
+                $this->saveTempLists();
                 break;
 
+            // File send 
             case 3:
+                $this->loadTempLists();
                 $this->pageSyncFromShowStep3();
+                $this->saveTempLists();
                 break;
 
+            // Database
             case 4:
                 $this->pageSyncFromShowStep4();
                 break;
 
+            // Import Files | Import Config | etc.
             case 5:
+                $this->loadTempLists();
                 $this->pageSyncFromShowStep5();
                 break;
 
             default:
-                $_SESSION["TL_ERROR"] = array("Unbekannter Schritt für Backup.");
+                $_SESSION["TL_ERROR"] = array("Unknown step for sync.");
                 $this->redirect("contao/main.php?do=synccto_clients");
                 break;
         }
 
-        // Save informatione 
-        if ($this->intStep != 1)
-        {
-            $intID = $this->Input->get("id");
-
-            $objFileList = new File($this->objSyncCtoHelper->standardizePath($GLOBALS['SYC_PATH']['tmp'], "syncfilelistFrom-ID-$intID.txt"));
-            $objFileList->write(serialize($this->arrListFile));
-            $objFileList->close();
-
-            $objCompareList = new File($this->objSyncCtoHelper->standardizePath($GLOBALS['SYC_PATH']['tmp'], "synccomparelistFrom-ID-$intID.txt"));
-            $objCompareList->write(serialize($this->arrListCompare));
-            $objCompareList->close();
-        }
+        // Save step pool for current step
+        $this->saveStepPool();
     }
 
     /**
@@ -696,38 +718,16 @@ class SyncCtoModuleClient extends BackendModule
      */
     private function pageSyncAbort()
     {
-        // Load content
-        $arrContenData = $this->Session->get("syncCto_Content");
-
-        // Set content back to normale mode
-        $arrContenData["error"]     = false;
-        $arrContenData["error_msg"] = "";
-
-        if ($arrContenData["abort"] == false)
+        if ($this->booAbort == false)
         {
-            try
-            {
-                // Reste Session
-                $this->Session->set("syncCto_StepPool1", FALSE);
-                $this->Session->set("syncCto_StepPool2", FALSE);
-                $this->Session->set("syncCto_StepPool3", FALSE);
-                $this->Session->set("syncCto_StepPool4", FALSE);
-                $this->Session->set("syncCto_StepPool5", FALSE);
-                $this->Session->set("syncCto_StepPool6", FALSE);
+            // Set content back to normale mode
+            $this->booError = false;
+            $this->strError = "";
+            $this->booAbort = true;
+            $this->booRefresh = false;
 
-                $this->Session->set("syncCto_PurgeData", FALSE);
-                $this->Session->set("syncCto_SyncTables", FALSE);
-                $this->Session->set("syncCto_Filelist", FALSE);
-                $this->Session->set("syncCto_Typ", 99);
-
-                // Reste server and client
-                $this->objSyncCtoFiles->purgeTemp();
-                $this->objSyncCtoCommunicationClient->purgeTemp();
-            }
-            catch (Exception $exc)
-            {
-                // Nothing to do 
-            }
+            // Reset Session
+            $this->resetStepPoolByID(array(1, 2, 3, 4, 5, 6));
 
             try
             {
@@ -747,45 +747,29 @@ class SyncCtoModuleClient extends BackendModule
                 // Nothing to do 
             }
 
+            // Set stepe
+            $this->intStep = 99;
+
             // Set last to skipped        
-            $arrKeys                                                       = array_keys($arrContenData["data"]);
-            $arrContenData["data"][$arrKeys[count($arrKeys) - 1]]["state"] = $GLOBALS['TL_LANG']['MSC']['skipped'];
-            $arrContenData["data"][$arrKeys[count($arrKeys) - 1]]["html"]  = "";
+            $this->objData->setState($GLOBALS['TL_LANG']['MSC']['skipped']);
+            $this->objData->setHtml("");
 
             // Set Abort information 
-            $arrContenData["data"][99]["title"]       = $GLOBALS['TL_LANG']['MSC']['abort'];
-            $arrContenData["data"][99]["description"] = $GLOBALS['TL_LANG']['tl_syncCto_sync']['abort'];
-            $arrContenData["data"][99]["state"]       = "";
+            $this->objData->setStep(99);
+            $this->objData->setTitle($GLOBALS['TL_LANG']['MSC']['abort']);
+            $this->objData->setDescription($GLOBALS['TL_LANG']['tl_syncCto_sync']['abort']);
+            $this->objData->setState("");
         }
-
-        $arrContenData["abort"] == true;
-
-        $this->Template->goBack = $this->script . $arrContenData["goBack"];
-        $this->Template->data = $arrContenData["data"];
-        $this->Template->step = 99;
-        $this->Template->error = false;
-        $this->Template->error_msg = "";
-        $this->Template->refresh = false;
-        $this->Template->url = $arrContenData["url"];
-        $this->Template->start = $arrContenData["start"];
-        $this->Template->headline = $arrContenData["headline"];
-        $this->Template->information = $arrContenData["information"];
-        $this->Template->finished = $arrContenData["finished"];
-        $this->Template->showControl = FALSE;
-
-        $this->Session->set("syncCto_Content", $arrContenData);
-
-        return;
     }
 
     /* -------------------------------------------------------------------------
-     * Start SyncCto syncTo
+     * Step function for SyncTo AND SyncFrom
      */
 
     /**
      * Start the connection and save some parameter to session
      */
-    private function pageSyncToShowStep1()
+    private function pageSyncShowStep1()
     {
         // Init
         if ($this->objStepPool->step == null)
@@ -961,6 +945,10 @@ class SyncCtoModuleClient extends BackendModule
             $this->objData->setState($GLOBALS['TL_LANG']['MSC']['error']);
         }
     }
+
+    /* -------------------------------------------------------------------------
+     * Start SyncCto syncTo
+     */
 
     /**
      * Build checksum list and ask client
@@ -2193,33 +2181,20 @@ class SyncCtoModuleClient extends BackendModule
      */
 
     /**
-     * Check client communication
+     * Build checksum list and ask client
      */
-    private function pageSyncFromShowStep1()
+    private function pageSyncFromShowStep2()
     {
-        $this->log(vsprintf("Start synchronization client ID %s.", array($this->Input->get("id"))), __CLASS__ . " " . __FUNCTION__, "INFO");
-
-        /* ---------------------------------------------------------------------
-         * Init
-         */
-
-        // State save for this step
-        $mixStepPool = $this->Session->get("syncCto_StepPool1");
-        if ($mixStepPool == FALSE)
+        // Init
+        if ($this->objStepPool->step == null)
         {
-            $mixStepPool = array("step" => 1);
+            $this->objStepPool->step = 1;
         }
 
-        // Load attention flag from session
-        $booAttentionFlag = $this->Session->get("syncCto_AttentionFlag");
-
-        // Load content
-        $arrContenData = $this->Session->get("syncCto_Content");
-
         // Set content back to normale mode
-        $arrContenData["error"]            = false;
-        $arrContenData["error_msg"]        = "";
-        $arrContenData["data"][1]["state"] = $GLOBALS['TL_LANG']['MSC']['progress'];
+        $this->booError = false;
+        $this->strError = "";
+        $this->objData->setState($GLOBALS['TL_LANG']['MSC']['progress']);
 
         /* ---------------------------------------------------------------------
          * Run page
@@ -2227,265 +2202,93 @@ class SyncCtoModuleClient extends BackendModule
 
         try
         {
-            switch ($mixStepPool["step"])
+            switch ($this->objStepPool->step)
             {
                 /**
                  * Show step
                  */
                 case 1:
-                    $arrContenData["data"][1]["title"]       = $GLOBALS['TL_LANG']['MSC']['step'] . " %s";
-                    $arrContenData["data"][1]["description"] = $GLOBALS['TL_LANG']['tl_syncCto_sync']["step_1"]['description_1'];
-                    $arrContenData["data"][1]["state"]       = $GLOBALS['TL_LANG']['MSC']['progress'];
+                    $this->objData->setState($GLOBALS['TL_LANG']['MSC']['progress']);
+                    $this->objData->setTitle($GLOBALS['TL_LANG']['MSC']['step'] . " %s");
+                    $this->objData->setDescription($GLOBALS['TL_LANG']['tl_syncCto_sync']["step_2"]['description_1']);
 
-                    $mixStepPool["step"] = 2;
-                    break;
-
-                /**
-                 * Start connection
-                 */
-                case 2:
-                    $this->objSyncCtoCommunicationClient->startConnection();
-
-                    $mixStepPool["step"] = 3;
-                    break;
-
-                /**
-                 * Referer check deactivate
-                 */
-                case 3:
-                    if (!$this->objSyncCtoCommunicationClient->referrerDisable())
-                    {
-                        $arrContenData["data"][1]["state"] = $GLOBALS['TL_LANG']['MSC']['error'];
-                        $arrContenData["error"]            = true;
-                        $arrContenData["error_msg"]        = $GLOBALS['TL_LANG']['tl_syncCto_sync']['error_step_1']['referer'];
-
-                        break;
-                    }
-
-                    $mixStepPool["step"] = 4;
-                    break;
-
-
-                /**
-                 * Check version / Set Attention flag
-                 */
-                case 4:
-                    // Set attention flag
-                    if ($booAttentionFlag == true)
-                    {
-                        $this->objSyncCtoCommunicationClient->setAttentionFlag(true);
-                    }
-
-                    $strVersion = $this->objSyncCtoCommunicationClient->getVersionSyncCto();
-
-                    if (!version_compare($strVersion, $GLOBALS['SYC_VERSION'], "="))
-                    {
-                        $this->log(vsprintf("Not the same version from syncCto on synchronization client ID %s. Serverversion: %s. Clientversion: %s", array($this->Input->get("id"), $GLOBALS['SYC_VERSION'], $strVersion)), __CLASS__ . " " . __FUNCTION__, "INFO");
-
-                        $arrContenData["data"][1]["state"] = $GLOBALS['TL_LANG']['MSC']['error'];
-                        $arrContenData["error"]            = true;
-                        $arrContenData["error_msg"]        = vsprintf($GLOBALS['TL_LANG']['ERR']['version'], array("syncCto", $GLOBALS['SYC_VERSION'], $strVersion));
-
-                        break;
-                    }
-
-                    $strVersion = $this->objSyncCtoCommunicationClient->getVersionContao();
-
-                    if (!version_compare($strVersion, VERSION, "="))
-                    {
-                        $this->log(vsprintf("Not the same version from contao on synchronization client ID %s. Serverversion: %s. Clientversion: %s", array($this->Input->get("id"), $GLOBALS['SYC_VERSION'], $strVersion)), __CLASS__ . " " . __FUNCTION__, "INFO");
-
-                        $arrContenData["data"][1]["state"] = $GLOBALS['TL_LANG']['MSC']['error'];
-                        $arrContenData["error"]            = true;
-                        $arrContenData["error_msg"]        = vsprintf($GLOBALS['TL_LANG']['ERR']['version'], array("Contao", VERSION, $strVersion));
-
-                        break;
-                    }
-
-                    $arrContenData["data"][1]["description"] = $GLOBALS['TL_LANG']['tl_syncCto_sync']["step_1"]['description_2'];
-
-                    $mixStepPool["step"] = 5;
-                    break;
-
-                /**
-                 * Clear client and server temp folder  
-                 */
-                case 5:
-                    $this->objSyncCtoCommunicationClient->purgeTemp();
-                    $this->objSyncCtoFiles->purgeTemp();
-
-                    // Current step is okay.
-                    $arrContenData["data"][1]["state"]       = $GLOBALS['TL_LANG']['MSC']['ok'];
-                    $arrContenData["data"][1]["description"] = $GLOBALS['TL_LANG']['tl_syncCto_sync']["step_1"]['description_1'];
-
-                    // Create next step.
-                    $arrContenData["data"][2]["state"]       = $GLOBALS['TL_LANG']['MSC']['progress'];
-                    $arrContenData["data"][2]["title"]       = $GLOBALS['TL_LANG']['MSC']['step'] . " 2";
-                    $arrContenData["data"][2]["description"] = $GLOBALS['TL_LANG']['tl_syncCto_sync']["step_2"]['description_1'];
-
-                    $mixStepPool = FALSE;
-
-                    $this->intStep++;
+                    $this->objStepPool->step++;
 
                     break;
-            }
-        }
-        catch (Exception $exc)
-        {
-            $this->log(vsprintf("Error on synchronization client ID %s", array($this->Input->get("id"))), __CLASS__ . " " . __FUNCTION__, "ERROR");
 
-            $arrContenData["error"]            = true;
-            $arrContenData["data"][1]["state"] = $GLOBALS['TL_LANG']['MSC']['error'];
-            $arrContenData["error_msg"]        = $exc->getMessage();
-        }
-
-        $this->Template->goBack = $this->script . $arrContenData["goBack"];
-        $this->Template->data = $arrContenData["data"];
-        $this->Template->step = $this->intStep;
-        $this->Template->error = $arrContenData["error"];
-        $this->Template->error_msg = $arrContenData["error_msg"];
-        $this->Template->refresh = $arrContenData["refresh"];
-        $this->Template->url = $arrContenData["url"];
-        $this->Template->start = $arrContenData["start"];
-        $this->Template->headline = $arrContenData["headline"];
-        $this->Template->information = $arrContenData["information"];
-        $this->Template->finished = $arrContenData["finished"];
-
-        $this->Session->set("syncCto_StepPool1", $mixStepPool);
-        $this->Session->set("syncCto_Content", $arrContenData);
-    }
-
-    /**
-     * Build checksum list and ask client
-     */
-    private function pageSyncFromShowStep2()
-    {
-        /* ---------------------------------------------------------------------
-         * Init
-         */
-
-        // Needed files/information
-        $intSyncTyp = $this->Session->get("syncCto_Typ");
-
-        // State save for this step
-        $mixStepPool = $this->Session->get("syncCto_StepPool2");
-        if ($mixStepPool == FALSE)
-        {
-            $mixStepPool = array("step" => 1);
-        }
-
-        // Load content
-        $arrContenData = $this->Session->get("syncCto_Content");
-
-        // Set content back to normale mode
-        $arrContenData["error"]            = false;
-        $arrContenData["error_msg"]        = "";
-        $arrContenData["data"][2]["state"] = $GLOBALS['TL_LANG']['MSC']['progress'];
-
-        /* ---------------------------------------------------------------------
-         * Run page
-         */
-
-
-        try
-        {
-            switch ($mixStepPool["step"])
-            {
                 /**
                  * Build checksum list for 'files'
                  */
-                case 1:
-                    if ($intSyncTyp == SYNCCTO_SMALL || $intSyncTyp == SYNCCTO_FULL)
+                case 2:
+                    if (in_array("user_change", $this->arrSyncSettings["syncCto_Type"]))
                     {
-                        // Write filelist to file
-                        $this->arrListFile = $this->objSyncCtoCommunicationClient->getChecksumFiles();
-                        $mixStepPool["step"] = 2;
+                        $this->arrListFile = $this->objSyncCtoCommunicationClient->getChecksumFiles(array());
+                        
+                        
+                        var_dump($this->arrListFile);
+                        exit();
+                        
+                        $this->objStepPool->step++;
+                        break;
                     }
                     else
                     {
                         $this->arrListFile = array();
-                        $mixStepPool["step"] = 2;
                     }
-
-                    break;
 
                 /**
                  * Build checksum list for Conta core
                  */
-                case 2:
-                    if ($intSyncTyp == SYNCCTO_FULL)
+                case 3:
+                    if (in_array("core_change", $this->arrSyncSettings["syncCto_Type"]))
                     {
                         $this->arrListFile = array_merge($this->arrListFile, $this->objSyncCtoCommunicationClient->getChecksumCore());
+                        $this->objStepPool->step++;
+                        break;
                     }
-                    else
-                    {
-                        $this->arrListFile = array_merge($this->arrListFile, array());
-                    }
-
-                    $mixStepPool["step"] = 3;
-
-                    break;
 
                 /**
-                 * Send it to the client
+                 * Check List
                  */
-                case 3:
-                    $this->arrListCompare = $this->objSyncCtoFiles->runCecksumCompare($this->arrListFile);
+                case 4:
+                    if (in_array("core_change", $this->arrSyncSettings["syncCto_Type"]) || in_array("user_change", $this->arrSyncSettings["syncCto_Type"]))
+                    {
+                        $this->arrListCompare = $this->objSyncCtoFiles->runCecksumCompare($this->arrListFile);
 
-                    $arrContenData["data"][2]["description"] = $GLOBALS['TL_LANG']['tl_syncCto_sync']["step_2"]['description_2'];
-                    $mixStepPool["step"]                     = 4;
-
-                    break;
+                        $this->objData->setDescription($GLOBALS['TL_LANG']['tl_syncCto_sync']["step_2"]['description_2']);
+                        $this->objStepPool->step++;
+                        break;
+                    }
 
                 /**
                  * Check for deleted files
                  */
-                case 4:
-                    switch ($intSyncTyp)
-                    {
-                        case SYNCCTO_FULL:
-                            $arrChecksumClient = $this->objSyncCtoFiles->runChecksumCore();
-                            $this->arrListCompare = array_merge($this->arrListCompare, $this->objSyncCtoCommunicationClient->checkDeleteFiles($arrChecksumClient));
-
-                        case SYNCCTO_SMALL:
-                            $arrChecksumClient = $this->objSyncCtoFiles->runChecksumFiles();
-                            $this->arrListCompare = array_merge($this->arrListCompare, $this->objSyncCtoCommunicationClient->checkDeleteFiles($arrChecksumClient));
-
-                        default:
-                            break;
-                    }
-
-                    $mixStepPool["step"] = 5;
-
-                    break;
-
-                /**
-                 * Check for deleted folders
-                 */
                 case 5:
-                    switch ($intSyncTyp)
+                    if (in_array("core_delete", $this->arrSyncSettings["syncCto_Type"]))
                     {
-                        case SYNCCTO_FULL:
-                            $arrChecksumClient = $this->objSyncCtoFiles->runChecksumFolders();
-                            $this->arrListCompare = array_merge($this->arrListCompare, $this->objSyncCtoCommunicationClient->checkDeleteFiles($arrChecksumClient));
+                        $arrChecksumClient = $this->objSyncCtoFiles->runChecksumCore();
+                        $this->arrListCompare = array_merge($this->arrListCompare, $this->objSyncCtoCommunicationClient->checkDeleteFiles($arrChecksumClient));
 
-                        case SYNCCTO_SMALL:
-                            $arrChecksumClient = $this->objSyncCtoFiles->runChecksumFolders(true);
-                            $this->arrListCompare = array_merge($this->arrListCompare, $this->objSyncCtoCommunicationClient->checkDeleteFiles($arrChecksumClient));
 
-                        default:
-                            break;
+                        $this->objStepPool->step++;
+                        break;
                     }
 
-                    $arrContenData["data"][2]["description"] = $GLOBALS['TL_LANG']['tl_syncCto_sync']["step_2"]['description_3'];
-                    $mixStepPool["step"]                     = 6;
+                case 6:
+                    if (in_array("user_delete", $this->arrSyncSettings["syncCto_Type"]))
+                    {
+                        $arrChecksumClient = $this->objSyncCtoFiles->runChecksumFiles();
+                        $this->arrListCompare = array_merge($this->arrListCompare, $this->objSyncCtoCommunicationClient->checkDeleteFiles($arrChecksumClient));
+                    }
 
+                    $this->objData->setDescription($GLOBALS['TL_LANG']['tl_syncCto_sync']["step_2"]['description_3']);
+                    $this->objStepPool->step++;
                     break;
 
                 /**
-                 * Set CSS
+                 * Set CSS and search for bigfiles
                  */
-                case 6:
+                case 7:
                     foreach ($this->arrListCompare as $key => $value)
                     {
                         switch ($value["state"])
@@ -2515,15 +2318,29 @@ class SyncCtoModuleClient extends BackendModule
                                 $this->arrListCompare[$key]["css"] = "unknown";
                                 break;
                         }
+
+                        if ($value["state"] == SyncCtoEnum::FILESTATE_TOO_BIG_DELETE
+                                || $value["state"] == SyncCtoEnum::FILESTATE_TOO_BIG_MISSING
+                                || $value["state"] == SyncCtoEnum::FILESTATE_TOO_BIG_NEED
+                                || $value["state"] == SyncCtoEnum::FILESTATE_TOO_BIG_SAME
+                                || $value["state"] == SyncCtoEnum::FILESTATE_BOMBASTIC_BIG
+                                || $value["state"] == SyncCtoEnum::FILESTATE_DELETE)
+                        {
+                            continue;
+                        }
+                        else if ($value["size"] > $this->arrClientInformation["upload_sizeLimit"])
+                        {
+                            $this->arrListCompare[$key]["split"] = true;
+                        }
                     }
 
-                    $mixStepPool["step"] = 7;
+                    $this->objStepPool->step++;
                     break;
 
                 /**
                  * Show list with files and count
                  */
-                case 7:
+                case 8:
                     // Del and submit Function
                     $arrDel = $_POST;
 
@@ -2536,19 +2353,23 @@ class SyncCtoModuleClient extends BackendModule
                     }
                     else if (key_exists("transfer", $arrDel))
                     {
-                        // Set current step informations
-                        $arrContenData["data"][2]["state"]       = $GLOBALS['TL_LANG']['MSC']['ok'];
-                        $arrContenData["data"][2]["description"] = $GLOBALS['TL_LANG']['tl_syncCto_sync']["step_2"]['description_1'];
-                        $arrContenData["data"][2]["html"]        = "";
-                        $arrContenData["refresh"]                = true;
+                        foreach ($this->arrListCompare as $key => $value)
+                        {
+                            if ($value["split"] == true)
+                            {
+                                $this->objData->setDescription($GLOBALS['TL_LANG']['tl_syncCto_sync']["step_2"]['description_1']);
+                                $this->objData->setHtml("");
+                                $this->booRefresh = true;
+                                $this->objStepPool->step++;
+                                return;
+                            }
+                        }
 
-                        // Set next step information
-                        $arrContenData["data"][3]["state"]       = $GLOBALS['TL_LANG']['MSC']['progress'];
-                        $arrContenData["data"][3]["title"]       = $GLOBALS['TL_LANG']['MSC']['step'] . " 3";
-                        $arrContenData["data"][3]["description"] = $GLOBALS['TL_LANG']['tl_syncCto_sync']["step_3"]['description_1'];
-
+                        $this->objData->setState($GLOBALS['TL_LANG']['MSC']['ok']);
+                        $this->objData->setDescription($GLOBALS['TL_LANG']['tl_syncCto_sync']["step_2"]['description_1']);
+                        $this->objData->setHtml("");
+                        $this->booRefresh = true;
                         $this->intStep++;
-                        $mixStepPool = false;
                         break;
                     }
 
@@ -2591,26 +2412,19 @@ class SyncCtoModuleClient extends BackendModule
                         }
                     }
 
-                    $mixStepPool["missing"] = $intCountMissing;
-                    $mixStepPool["need"]    = $intCountNeed;
-                    $mixStepPool["ignored"] = $intCountIgnored;
-                    $mixStepPool["delete"]  = $intCountDelete;
+                    $this->objStepPool->missing = $intCountMissing;
+                    $this->objStepPool->need = $intCountNeed;
+                    $this->objStepPool->ignored = $intCountIgnored;
+                    $this->objStepPool->delete = $intCountDelete;
 
                     // Save files and go on or skip here
                     if ($intCountMissing == 0 && $intCountNeed == 0 && $intCountIgnored == 0 && $intCountDelete == 0)
                     {
                         // Set current step informations
-                        $arrContenData["data"][2]["state"]       = $GLOBALS['TL_LANG']['MSC']['skipped'];
-                        $arrContenData["data"][2]["description"] = $GLOBALS['TL_LANG']['tl_syncCto_sync']["step_2"]['description_1'];
-                        $arrContenData["data"][2]["html"]        = "";
-                        $arrContenData["refresh"]                = true;
-
-                        // Set next step information
-                        $arrContenData["data"][3]["state"]       = $GLOBALS['TL_LANG']['MSC']['progress'];
-                        $arrContenData["data"][3]["title"]       = $GLOBALS['TL_LANG']['MSC']['step'] . " 3";
-                        $arrContenData["data"][3]["description"] = $GLOBALS['TL_LANG']['tl_syncCto_sync']["step_3"]['description_1'];
-
-                        $mixStepPool = false;
+                        $this->objData->setState($GLOBALS['TL_LANG']['MSC']['skipped']);
+                        $this->objData->setDescription($GLOBALS['TL_LANG']['tl_syncCto_sync']["step_2"]['description_1']);
+                        $this->objData->setHtml("");
+                        $this->booRefresh = true;
                         $this->intStep++;
 
                         break;
@@ -2618,18 +2432,107 @@ class SyncCtoModuleClient extends BackendModule
 
                     $objTemp = new BackendTemplate("be_syncCto_filelist");
                     $objTemp->filelist = $this->arrListCompare;
-                    $objTemp->id = $this->Input->get("id");
+                    $objTemp->id = $this->intClientID;
                     $objTemp->step = $this->intStep;
                     $objTemp->totalsize = $intTotalSize;
                     $objTemp->direction = "From";
                     $objTemp->compare_complex = false;
 
-                    // Build content                       
-                    $arrContenData["data"][2]["description"] = vsprintf($GLOBALS['TL_LANG']['tl_syncCto_sync']["step_2"]['description_4'], array($intCountMissing, $intCountNeed, $intCountDelete, $intCountIgnored));
-                    $arrContenData["data"][2]["html"] = $objTemp->parse();
-                    $arrContenData["refresh"]         = false;
+                    // Build content 
+                    $this->objData->setDescription(vsprintf($GLOBALS['TL_LANG']['tl_syncCto_sync']["step_2"]['description_4'], array($intCountMissing, $intCountNeed, $intCountDelete, $intCountIgnored)));
+                    $this->objData->setHtml($objTemp->parse());
+                    $this->booRefresh = false;
+                    break;
 
-                    $mixStepPool["step"] = 7;
+
+                /**
+                 * Search for big file
+                 */
+                case 9:
+                    var_dump("i am out for big files search");
+                    exit();
+                    
+                    
+                    // build list with big files
+                    $arrTempList = array();
+                    $intTotalsize = 0;
+
+                    // Del Function
+                    $arrDel = $_POST;
+
+                    if (is_array($arrDel) && key_exists("delete", $arrDel))
+                    {
+                        foreach ($arrDel as $key => $value)
+                        {
+                            if (key_exists($value, $this->arrListCompare))
+                            {
+                                unset($this->arrListCompare[$value]);
+                            }
+                        }
+                    }
+                    else if (is_array($arrDel) && key_exists("transfer", $arrDel))
+                    {
+                        $this->objData->setState($GLOBALS['TL_LANG']['MSC']['ok']);
+                        $this->objData->setDescription($GLOBALS['TL_LANG']['tl_syncCto_sync']["step_3"]['description_1']);
+                        $this->objData->setHtml("");
+                        $this->booRefresh = true;
+                        $this->intStep++;
+                        break;
+                    }
+
+                    // Count split files
+                    $intCountSplit = 0;
+                    foreach ($this->arrListCompare as $key => $value)
+                    {
+                        if ($value["split"] == true)
+                        {
+                            $intCountSplit++;
+                        }
+                    }
+
+                    // Skip if we have zero
+                    if ($intCountSplit == 0)
+                    {
+                        $this->objData->setHtml("");
+                        $this->objData->setDescription($GLOBALS['TL_LANG']['tl_syncCto_sync']['step_2']['description_1']);
+                        $this->objData->setState($GLOBALS['TL_LANG']['MSC']['ok']);
+                        $this->booRefresh = true;
+                        $this->intStep++;
+                        break;
+                    }
+
+                    // Build list
+                    foreach ($this->arrListCompare as $key => $value)
+                    {
+                        if ($value["state"] == SyncCtoEnum::FILESTATE_TOO_BIG_DELETE ||
+                                $value["state"] == SyncCtoEnum::FILESTATE_TOO_BIG_MISSING ||
+                                $value["state"] == SyncCtoEnum::FILESTATE_TOO_BIG_NEED ||
+                                $value["state"] == SyncCtoEnum::FILESTATE_TOO_BIG_SAME ||
+                                $value["state"] == SyncCtoEnum::FILESTATE_BOMBASTIC_BIG)
+                        {
+                            $arrTempList[$key] = $this->arrListCompare[$key];
+                            $intTotalsize += $value["size"];
+                        }
+                        else if ($value["split"] == 1)
+                        {
+                            $arrTempList[$key] = $this->arrListCompare[$key];
+                            $intTotalsize += $value["size"];
+                        }
+                    }
+
+                    uasort($arrTempList, 'syncCtoModelClientCMP');
+
+                    $objTemp = new BackendTemplate("be_syncCto_filelist");
+                    $objTemp->filelist = $arrTempList;
+                    $objTemp->id = $this->intClientID;
+                    $objTemp->step = $this->intStep;
+                    $objTemp->totalsize = $intTotalsize;
+                    $objTemp->direction = "To";
+                    $objTemp->compare_complex = true;
+
+                    $this->objData->setHtml($objTemp->parse());
+                    $this->objData->setDescription(vsprintf($GLOBALS['TL_LANG']['tl_syncCto_sync']['step_2']['description_5'], array($intCountSplit)));
+                    $this->booRefresh = false;
 
                     break;
             }
@@ -2638,25 +2541,11 @@ class SyncCtoModuleClient extends BackendModule
         {
             $this->log(vsprintf("Error on synchronization client ID %s", array($this->Input->get("id"))), __CLASS__ . " " . __FUNCTION__, "ERROR");
 
-            $arrContenData["error"]            = true;
-            $arrContenData["data"][2]["state"] = $GLOBALS['TL_LANG']['MSC']['error'];
-            $arrContenData["error_msg"]        = $exc->getMessage();
+            $this->booError = true;
+            $this->strError = $exc->getMessage();
+
+            $this->objData->setState($GLOBALS['TL_LANG']['MSC']['error']);
         }
-
-        $this->Template->goBack = $this->script . $arrContenData["goBack"];
-        $this->Template->data = $arrContenData["data"];
-        $this->Template->step = $this->intStep;
-        $this->Template->error = $arrContenData["error"];
-        $this->Template->error_msg = $arrContenData["error_msg"];
-        $this->Template->refresh = $arrContenData["refresh"];
-        $this->Template->url = $arrContenData["url"];
-        $this->Template->start = $arrContenData["start"];
-        $this->Template->headline = $arrContenData["headline"];
-        $this->Template->information = $arrContenData["information"];
-        $this->Template->finished = $arrContenData["finished"];
-
-        $this->Session->set("syncCto_StepPool2", $mixStepPool);
-        $this->Session->set("syncCto_Content", $arrContenData);
     }
 
     /**
@@ -3890,6 +3779,11 @@ class ContentData
     public function setHtml($html)
     {
         $this->arrValues[$this->intStep]["html"] = $html;
+    }
+
+    public function setStep($intStep)
+    {
+        $this->intStep = $intStep;
     }
 
     public function __get($name)
