@@ -66,9 +66,6 @@ class SyncCtoFiles extends Backend
 
         // language 
         $this->loadLanguageFile("default");
-
-        // Set runtime to 10 minutes
-        set_time_limit(600);
     }
 
     /**
@@ -137,8 +134,87 @@ class SyncCtoFiles extends Backend
     }
 
     /* -------------------------------------------------------------------------
+     * Scann Functions
+     */
+
+    public function runRecursiveFolderScann($booRoot = false, $booFile = false, $strFolder = "")
+    {
+        $arrReturn = array();
+
+        // No root no files so give an empty array back
+        if ($booRoot == false && $booFile == false)
+        {
+            return $arrReturn;
+        }
+
+        // Check if we have a file folder but it`s not markt as scan
+        if ($booFile == false && preg_match("^" . $GLOBALS['TL_CONFIG']['uploadPath'] . "/.*^", $strFolder))
+        {
+            return $arrReturn;
+        }
+
+        // Check if we have a file folder but it`s not markt as scan
+        if ($booRoot == false && !preg_match("^" . $GLOBALS['TL_CONFIG']['uploadPath'] . "/.*^", $strFolder))
+        {
+            return $arrReturn;
+        }
+
+        if ($strFolder == "" && $booRoot == true)
+        {
+            $arrReturn = array_merge($arrReturn, $this->runRecursiveFolderScann($booRoot, $booFile, TL_ROOT));
+        }
+
+        if ($strFolder == "" && $booFile == true)
+        {
+            $arrReturn = array_merge($arrReturn, $this->runRecursiveFolderScann($booRoot, $booFile, TL_ROOT . "/" . $GLOBALS['TL_CONFIG']['uploadPath']));
+        }
+
+        if ($strFolder != "")
+        {
+            if (is_dir($strFolder))
+            {
+                $arrResult = scan($strFolder, true);
+                
+                foreach ($arrResult as $value)
+                {                    
+                    if (is_dir($strFolder . "/" . $value))
+                    {
+                        $arrReturn[] = $value;                        
+                        $arrReturn   = array_merge($arrReturn, $this->runRecursiveFolderScann($booRoot, $booFile, $strFolder . "/" . $value));
+                    }
+                }
+            }
+        }
+
+        return $arrReturn;
+    }
+
+    /* -------------------------------------------------------------------------
      * Checksum Functions
      */
+
+    /**
+     * @todo
+     * @param type $booRoot
+     * @param type $booFile
+     * @return type 
+     */
+    public function checksumFolder($booRoot = false, $booFile = false)
+    {
+        $arrReturn = array();
+
+        if ($booRoot == false)
+        {
+            $arrReturn = array_merge($arrReturn, array());
+        }
+
+        if ($booFile == false)
+        {
+            $arrReturn = array_merge($arrReturn, array());
+        }
+
+        return $arrReturn;
+    }
 
     /**
      * Create a checksum list from contao core folders
@@ -983,7 +1059,7 @@ class SyncCtoFiles extends Backend
                 $this->Calendar->generateFeeds();
             }
         }
-        
+
         return true;
     }
 
