@@ -1,7 +1,4 @@
-<?php
-
-if (!defined('TL_ROOT'))
-    die('You cannot access this file directly!');
+<?php if (!defined('TL_ROOT')) die('You cannot access this file directly!');
 
 /**
  * Contao Open Source CMS
@@ -419,7 +416,7 @@ class SyncCtoFiles extends Backend
             {
                 if (md5_file(TL_ROOT . "/" . $value['path']) == $value['checksum'])
                 {
-                    // Do nocthing
+                    // Do nothing
                 }
                 else
                 {
