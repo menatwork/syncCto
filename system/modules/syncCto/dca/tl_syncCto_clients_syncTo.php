@@ -192,20 +192,23 @@ class tl_syncCto_clients_syncTo extends Backend
         }
         
         $objLastHash = $this->Database->prepare("SELECT last_table_hash FROM tl_synccto_clients WHERE id=?")->execute(intval($this->Input->get("id")));
+        
         // Check if we have a client
         if ($objLastHash->numRows == 0)
         {
             return $this->objSyncCtoHelper->databaseTablesRecommended();
         }
+        
         // Check if we have some hashes
         if ($objLastHash->last_table_hash == "")
         {
             return $this->objSyncCtoHelper->databaseTablesRecommended();
         }
+        
         // Rebuild array
         if (is_array(deserialize($objLastHash->last_table_hash)) == false)
         {
-            $this->log("Could not rebuild last hash list for client " . $this->Input->get("id"), __CLASS__ . " | " . __FUNCTION__, "Show last changes");
+            $this->log("Could not rebuild last hash list for client " . $this->Input->get("id"), __CLASS__ . " | " . __FUNCTION__, TL_ERROR);
             return $this->objSyncCtoHelper->databaseTablesRecommended();
         }
 
