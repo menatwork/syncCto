@@ -1,7 +1,4 @@
-<?php
-
-if (!defined('TL_ROOT'))
-    die('You cannot access this file directly!');
+<?php if (!defined('TL_ROOT')) die('You cannot access this file directly!');
 
 /**
  * Contao Open Source CMS
@@ -42,6 +39,7 @@ class SyncCtoHelper extends Backend
     // instance
     protected static $instance = null;
     protected $BackendUser;
+    protected $objSyncCtoDatabase;
 
     /* -------------------------------------------------------------------------
      * Core
@@ -190,35 +188,35 @@ class SyncCtoHelper extends Backend
 
     public function getBlacklistFolder()
     {
-        $arrLocalconfig   = deserialize($GLOBALS['TL_CONFIG']['syncCto_folder_blacklist']);
+        $arrLocalconfig = deserialize($GLOBALS['TL_CONFIG']['syncCto_folder_blacklist']);
         $arrSyncCtoConfig = $GLOBALS['SYC_CONFIG']['folder_blacklist'];
         return $this->mergeConfigs($arrLocalconfig, $arrSyncCtoConfig);
     }
 
     public function getWhitelistFolder()
     {
-        $arrLocalconfig   = deserialize($GLOBALS['TL_CONFIG']['syncCto_folder_whitelist']);
+        $arrLocalconfig = deserialize($GLOBALS['TL_CONFIG']['syncCto_folder_whitelist']);
         $arrSyncCtoConfig = $GLOBALS['SYC_CONFIG']['folder_whitelist'];
         return $this->mergeConfigs($arrLocalconfig, $arrSyncCtoConfig);
     }
 
     public function getBlacklistFile()
     {
-        $arrLocalconfig   = deserialize($GLOBALS['TL_CONFIG']['syncCto_file_blacklist']);
+        $arrLocalconfig = deserialize($GLOBALS['TL_CONFIG']['syncCto_file_blacklist']);
         $arrSyncCtoConfig = $GLOBALS['SYC_CONFIG']['file_blacklist'];
         return $this->mergeConfigs($arrLocalconfig, $arrSyncCtoConfig);
     }
 
     public function getBlacklistLocalconfig()
     {
-        $arrLocalconfig   = deserialize($GLOBALS['TL_CONFIG']['syncCto_local_blacklist']);
+        $arrLocalconfig = deserialize($GLOBALS['TL_CONFIG']['syncCto_local_blacklist']);
         $arrSyncCtoConfig = $GLOBALS['SYC_CONFIG']['local_blacklist'];
         return $this->mergeConfigs($arrLocalconfig, $arrSyncCtoConfig);
     }
 
     public function getTablesHidden()
     {
-        $arrLocalconfig   = deserialize($GLOBALS['TL_CONFIG']['syncCto_hidden_tables']);
+        $arrLocalconfig = deserialize($GLOBALS['TL_CONFIG']['syncCto_hidden_tables']);
         $arrSyncCtoConfig = $GLOBALS['SYC_CONFIG']['table_hidden'];
         return $this->mergeConfigs($arrLocalconfig, $arrSyncCtoConfig);
     }
@@ -261,7 +259,7 @@ class SyncCtoHelper extends Backend
                     if ($objClient->numRows == 0)
                     {
                         $arrReturn["success"] = false;
-                        $arrReturn["error"]   = "Unknown client";
+                        $arrReturn["error"] = "Unknown client";
                         echo json_encode($arrReturn);
                         exit();
                     }
@@ -311,18 +309,18 @@ class SyncCtoHelper extends Backend
                     }
 
                     $arrReturn["success"] = true;
-                    $arrReturn["value"]   = $intReturn;
+                    $arrReturn["value"] = $intReturn;
                 }
                 catch (Exception $exc)
                 {
                     $arrReturn["success"] = false;
-                    $arrReturn["error"]   = $exc->getMessage() . $exc->getFile() . " on " . $exc->getLine();
+                    $arrReturn["error"] = $exc->getMessage() . $exc->getFile() . " on " . $exc->getLine();
                 }
             }
             else
             {
                 $arrReturn["success"] = false;
-                $arrReturn["error"]   = "Missing client id.";
+                $arrReturn["error"] = "Missing client id.";
             }
 
             echo json_encode($arrReturn);
@@ -588,78 +586,6 @@ class SyncCtoHelper extends Backend
     }
 
     /**
-     * Return a list with all hashes form tables
-     * 
-     * @param string/array $mixTableNames 
-     */
-    public function getDatabaseTablesHash($mixTableNames = null)
-    {
-        // If we have only a string for tablenames set it as array
-        if ($mixTableNames != null && !is_array($mixTableNames))
-        {
-            $arrTableNames = array($mixTableNames);
-        }
-
-        // Return array
-        $arrHash = array();
-
-        // Load all Tables
-        $arrTables = $this->Database->listTables();
-
-        foreach ($arrTables as $strTable)
-        {
-            // Skip hidden tables
-            if (in_array($strTable, $GLOBALS['SYC_CONFIG']['table_hidden']))
-            {
-                continue;
-            }
-
-            // Check if we search some special tables
-            if (is_array($arrTableNames) && count($arrTableNames) != 0 && !in_array($strTable, $arrTableNames))
-            {
-                continue;
-            }
-
-            // Check if we have rows in table
-            $objCount = $this->Database->prepare("SELECT COUNT(*) as count FROM $strTable")->execute();
-            if ($objCount->count == 0)
-            {
-                $arrHash[$strTable] = 0;
-            }
-
-            // Load all fields
-            $arrFields = array();
-            $arrDBFields = $this->Database->listFields($strTable);
-
-            foreach ($arrDBFields as $arrField)
-            {
-                // Skip field primary for contao 2.10 >
-                if ($arrField['name'] == "PRIMARY")
-                {
-                    break;
-                }
-
-                $arrFields[] = $arrField['name'];
-            }
-
-            // Build hash
-            $strSQL   = "SELECT MD5(GROUP_CONCAT( CONCAT_WS('#'," . implode(", ", $arrFields) . ") SEPARATOR '##' )) as hash  FROM $strTable";
-            $objQuery = $this->Database->prepare($strSQL)->execute();
-
-            $arrHash[$strTable] = $objQuery->hash;
-        }
-
-        if ($mixTableNames != null && !is_array($mixTableNames))
-        {
-            return $arrHash[$mixTableNames];
-        }
-        else
-        {
-            return $arrHash;
-        }
-    }
-
-    /**
      * Returns a list with recommended database tables
      *
      * @param array $arrHashLast A Hash list for checking hash
@@ -680,7 +606,7 @@ class SyncCtoHelper extends Backend
 
         foreach ($this->databaseTables() as $key => $value)
         {
-            if (in_array($value, $arrBlacklist) || preg_match("/synccto_temp_.*/", $value) )
+            if (in_array($value, $arrBlacklist) || preg_match("/synccto_temp_.*/", $value))
             {
                 continue;
             }
@@ -793,7 +719,7 @@ class SyncCtoHelper extends Backend
                 }
             }
             else
-            {                
+            {
                 return $arrTables;
             }
         }
@@ -847,7 +773,7 @@ class SyncCtoHelper extends Backend
 
     private function getTableMeta($strTableName, $booHashSame = null)
     {
-        $objCount  = $this->Database->prepare("SELECT COUNT(*) as Count FROM $strTableName")->execute();
+        $objCount = $this->Database->prepare("SELECT COUNT(*) as Count FROM $strTableName")->execute();
         $strReturn = "";
 
         if ($booHashSame === FALSE)
@@ -873,6 +799,82 @@ class SyncCtoHelper extends Backend
         }
 
         return $strReturn;
+    }
+
+    /**
+     * Return a list with all hashes form tables
+     * 
+     * @param string/array $mixTableNames 
+     */
+    public function getDatabaseTablesHash($mixTableNames = array())
+    {
+        // If we have only a string for tablenames set it as array
+        if (!is_array($mixTableNames))
+        {
+            $arrTableNames = array($mixTableNames);
+        }
+        else
+        {
+            $arrTableNames = $mixTableNames;
+        }
+
+        // Return array
+        $arrHash = array();
+
+        // Load all Tables
+        $arrTables = $this->Database->listTables();
+
+        foreach ($arrTables as $strTable)
+        {
+            // Skip hidden tables
+            if (in_array($strTable, $GLOBALS['SYC_CONFIG']['table_hidden']))
+            {
+                continue;
+            }
+
+            // Check if we search some special tables
+            if (is_array($arrTableNames) && count($arrTableNames) != 0 && !in_array($strTable, $arrTableNames))
+            {
+                continue;
+            }
+
+            // Check if we have rows in table
+            $objCount = $this->Database->prepare("SELECT COUNT(*) as count FROM $strTable")->execute();
+            if ($objCount->count == 0)
+            {
+                $arrHash[$strTable] = 0;
+            }
+
+            // Load all fields
+            $arrFields = array();
+            $arrDBFields = $this->Database->listFields($strTable);
+
+            foreach ($arrDBFields as $arrField)
+            {
+                // Skip field primary for contao 2.10 >
+                if ($arrField['name'] == "PRIMARY")
+                {
+                    break;
+                }
+
+                $arrFields[] = $arrField['name'];
+            }
+
+            // Build hash
+            $strSQL = "SELECT MD5(GROUP_CONCAT( CONCAT_WS('#', `" . implode("`, `", $arrFields) . "`) SEPARATOR '##' )) as hash  FROM $strTable";
+            $objQuery = $this->Database->prepare($strSQL)->execute();
+
+            $arrHash[$strTable] = $objQuery->hash;
+        }
+
+        if (!is_array($mixTableNames))
+        {
+            return $arrHash[$mixTableNames];
+        }
+        else
+        {
+            return $arrHash;
+        }
     }
 
     /**
