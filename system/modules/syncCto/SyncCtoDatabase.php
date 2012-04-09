@@ -1,7 +1,4 @@
-<?php
-
-if (!defined('TL_ROOT'))
-    die('You cannot access this file directly!');
+<?php if (!defined('TL_ROOT')) die('You cannot access this file directly!');
 
 /**
  * Contao Open Source CMS
@@ -40,13 +37,13 @@ class SyncCtoDatabase extends Backend
      */
 
     //- Singelten pattern --------
-    protected static $instance           = null;
+    protected static $instance = null;
     //- Vars ---------------------
     protected $arrBackupTables;
     protected $arrHiddenTables;
-    protected $strSuffixZipName   = "DB-Backup.zip";
+    protected $strSuffixZipName = "DB-Backup.zip";
     protected $strFilenameSyncCto = "DB-Backup.synccto";
-    protected $strFilenameSQL     = "DB-Backup.sql";
+    protected $strFilenameSQL = "DB-Backup.sql";
     protected $strTimestampFormat;
     //- Objects ------------------
     protected $objSyncCtoHelper;
@@ -419,7 +416,7 @@ class SyncCtoDatabase extends Backend
         {
             // Write header for sql file
             $today = date("Y-m-d");
-            $time  = date("H:i:s");
+            $time = date("H:i:s");
 
             // Write Header
             $string .= "-- syncCto SQL Dump\r\n";
@@ -609,8 +606,6 @@ class SyncCtoDatabase extends Backend
         }
         $objFiles->delete("system/tmp/TempSyncCtoDump.$strRandomToken");
 
-        echo "through";
-
         return $strFilename;
     }
 
@@ -620,9 +615,9 @@ class SyncCtoDatabase extends Backend
         $arrTables = array();
 
         // Current Values
-        $strCurrentTable         = "";
+        $strCurrentTable = "";
         $strCurrentNodeAttribute = "";
-        $strCurrentNodeName      = "";
+        $strCurrentNodeName = "";
 
         while ($this->objXMLReader->read())
         {
@@ -710,11 +705,11 @@ class SyncCtoDatabase extends Backend
         $arrFields = array();
 
         // Current Values
-        $strCurrentTable             = "";
+        $strCurrentTable = "";
         $strCurrentNodeAttributeName = "";
         $strCurrentNodeAttributeType = "";
-        $strCurrentNodeName          = "";
-        $intCounter                  = 0;
+        $strCurrentNodeName = "";
+        $intCounter = 0;
 
         while ($this->objXMLReader->read())
         {
@@ -735,7 +730,7 @@ class SyncCtoDatabase extends Backend
                     {
                         case "table":
                             $strCurrentTable = $this->objXMLReader->getAttribute("name");
-                            $arrValues       = array();
+                            $arrValues = array();
                             $arrFields = array();
                             $intCounter = 0;
                             break;
@@ -1002,7 +997,7 @@ class SyncCtoDatabase extends Backend
             // Set pointer on position zero
             rewind($objTempfile);
 
-            $i       = 0;
+            $i = 0;
             while ($mixLine = fgets($objTempfile))
             {
                 $i++;
@@ -1104,29 +1099,29 @@ class SyncCtoDatabase extends Backend
                     switch ($field['index'])
                     {
                         case 'PRIMARY':
-                            $arrTempIndex["PRIMARY"]["body"]     = 'PRIMARY KEY  (`%s`)';
+                            $arrTempIndex["PRIMARY"]["body"] = 'PRIMARY KEY  (`%s`)';
                             $arrTempIndex["PRIMARY"]["fields"][] = $field["name"];
                             break;
 
                         case 'UNIQUE':
-                            $arrTempIndex[$field["name"]]["body"]     = 'UNIQUE KEY `%s` (`%s`)';
+                            $arrTempIndex[$field["name"]]["body"] = 'UNIQUE KEY `%s` (`%s`)';
                             $arrTempIndex[$field["name"]]["fields"][] = $field["name"];
                             break;
 
                         case 'FULLTEXT':
-                            $arrTempIndex[$field["name"]]["body"]     = 'FULLTEXT KEY `%s` (`%s`)';
+                            $arrTempIndex[$field["name"]]["body"] = 'FULLTEXT KEY `%s` (`%s`)';
                             $arrTempIndex[$field["name"]]["fields"][] = $field["name"];
                             break;
 
                         default:
                             if ((strpos(' ' . $field['type'], 'text') || strpos(' ' . $field['type'], 'char')) && ($field['null'] == 'NULL'))
                             {
-                                $arrTempIndex[$field["name"]]["body"]     = 'FULLTEXT KEY `%s` (`%s`)';
+                                $arrTempIndex[$field["name"]]["body"] = 'FULLTEXT KEY `%s` (`%s`)';
                                 $arrTempIndex[$field["name"]]["fields"][] = $field["name"];
                             }
                             else
                             {
-                                $arrTempIndex[$field["name"]]["body"]     = 'KEY `%s` (`%s`)';
+                                $arrTempIndex[$field["name"]]["body"] = 'KEY `%s` (`%s`)';
                                 $arrTempIndex[$field["name"]]["fields"][] = $field["name"];
                             }
                             break;
@@ -1189,7 +1184,7 @@ class SyncCtoDatabase extends Backend
 
             unset($field['index']);
 
-            $name          = $field['name'];
+            $name = $field['name'];
             $field['name'] = '`' . $field['name'] . '`';
 
             // Field type
@@ -1271,7 +1266,7 @@ class SyncCtoDatabase extends Backend
             }
 
             $objData = $this->Database->prepare("SELECT * FROM $table")->executeUncached();
-            $fields  = $this->Database->listFields($table);
+            $fields = $this->Database->listFields($table);
 
             foreach ($fields as $key => $value)
             {
@@ -1411,7 +1406,7 @@ class SyncCtoDatabase extends Backend
     private function buildFileSQLTables($arrTables)
     {
         $today = date("Y-m-d");
-        $time  = date("H:i:s");
+        $time = date("H:i:s");
 
         $string .= "-- syncCto SQL Dump\r\n";
         $string .= "-- Version " . SyncCtoGetVersion . "\r\n";
@@ -1452,7 +1447,6 @@ class SyncCtoDatabase extends Backend
 
         return $string;
     }
-
 }
 
 ?>
