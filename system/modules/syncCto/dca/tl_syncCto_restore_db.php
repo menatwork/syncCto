@@ -29,8 +29,7 @@
 
 $GLOBALS['TL_DCA']['tl_syncCto_restore_db'] = array(
     // Config
-    'config' => array
-        (
+    'config' => array(
         'dataContainer' => 'Memory',
         'closed' => true,
         'disableSubmit' => false,
@@ -48,17 +47,22 @@ $GLOBALS['TL_DCA']['tl_syncCto_restore_db'] = array(
         ),
     ),
     // Palettes
-    'palettes' => array
-        (
+    'palettes' => array(
         'default' => '{filelist_legend},filelist;',
     ),
     // Fields
     'fields' => array(
-        'filelist' => array
-            (
-            'label' => &$GLOBALS['TL_LANG']['tl_syncCto_restore_db']['filelist'],            
+        'filelist' => array(
+            'label' => &$GLOBALS['TL_LANG']['tl_syncCto_restore_db']['filelist'],
             'inputType' => 'fileTreeMemory',
-            'eval' => array('files' => true, 'filesOnly' => true, 'fieldType' => 'radio', 'path' => $GLOBALS['TL_CONFIG']['uploadPath'] . '/syncCto_backups/database', 'extensions' => 'zip,synccto'),
+            'eval' => array(
+                'files' => true,
+                'filesOnly' => true,
+                'fieldType' => 'radio',
+                'path' => $GLOBALS['TL_CONFIG']['uploadPath'] .
+                '/syncCto_backups/database',
+                'extensions' => 'zip,synccto'
+            ),
         ),
     )
 );
@@ -75,7 +79,7 @@ class tl_syncCto_restore_db extends Backend
      * @param DataContainer $dc 
      */
     public function onload_callback(DataContainer $dc)
-    {        
+    {
         $dc->removeButton('save');
         $dc->removeButton('saveNclose');
 
@@ -100,30 +104,28 @@ class tl_syncCto_restore_db extends Backend
      */
     public function onsubmit_callback(DataContainer $dc)
     {
-        $arrStepPool = $this->Session->get("SyncCto_DB_StepPool");
+        $strFile = $this->Input->post("filelist");
 
-        if (!is_array($arrStepPool))
+        // Check if a file is selected
+        if ($strFile == "")
         {
-            $arrStepPool = array();
+            $_SESSION["TL_ERROR"][] = $GLOBALS['TL_LANG']['ERR']['missing_file_selection'];
+            $this->redirect($this->Environment->base . "contao/main.php?do=syncCto_backups&table=tl_syncCto_restore_db");
         }
 
-        if ($this->Input->post("filelist") == "")
+        // Check if file exists
+        if (!file_exists(TL_ROOT . "/" . $strFile))
         {
-            $_SESSION["TL_INFO"][] = $GLOBALS['TL_LANG']['ERR']['missing_file_selection'];
-            return;
+            $_SESSION["TL_ERROR"] = array(vsprintf($GLOBALS['TL_LANG']['ERR']['unknown_file'], array($strFile)));
+            $this->redirect($this->Environment->base . "contao/main.php?do=syncCto_backups&table=tl_syncCto_restore_db");
         }
 
-        if (!file_exists(TL_ROOT . "/" . $this->Input->post("filelist")))
-        {
-            $_SESSION["TL_ERROR"] = array(vsprintf($GLOBALS['TL_LANG']['ERR']['unknown_file'] , array($this->Input->post("filelist"))));
-            return;
-        }
+        // Save in session
+        $arrBackupSettings = array();
+        $arrBackupSettings['syncCto_restoreFile'] = $strFile;
+        $this->Session->set("syncCto_BackupSettings", $arrBackupSettings);
 
-        $arrStepPool["SyncCto_Restore"] = $this->Input->post("filelist");
-
-        $this->Session->set("SyncCto_DB_StepPool", $arrStepPool);
-
-        $this->redirect($this->Environment->base . "contao/main.php?do=syncCto_backups&amp;table=tl_syncCto_restore_db&amp;act=start");
+        $this->redirect($this->Environment->base . "contao/main.php?do=syncCto_backups&table=tl_syncCto_restore_db&act=start");
     }
 
     /**

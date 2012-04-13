@@ -29,8 +29,7 @@
 
 $GLOBALS['TL_DCA']['tl_syncCto_restore_file'] = array(
     // Config
-    'config' => array
-        (
+    'config' => array(
         'dataContainer' => 'Memory',
         'closed' => true,
         'disableSubmit' => false,
@@ -48,17 +47,21 @@ $GLOBALS['TL_DCA']['tl_syncCto_restore_file'] = array(
         ),
     ),
     // Palettes
-    'palettes' => array
-        (
+    'palettes' => array(
         'default' => '{filelist_legend},filelist;',
     ),
     // Fields
     'fields' => array(
-        'filelist' => array
-            (
-            'label' => &$GLOBALS['TL_LANG']['tl_syncCto_restore_file']['filelist'],            
+        'filelist' => array(
+            'label' => &$GLOBALS['TL_LANG']['tl_syncCto_restore_file']['filelist'],
             'inputType' => 'fileTreeMemory',
-            'eval' => array('files' => true, 'filesOnly' => true, 'fieldType' => 'radio', 'path' => $GLOBALS['TL_CONFIG']['uploadPath'] . '/syncCto_backups/files', 'extensions' => 'rar,zip'),
+            'eval' => array(
+                'files' => true,
+                'filesOnly' => true,
+                'fieldType' => 'radio',
+                'path' => $GLOBALS['TL_CONFIG']['uploadPath'] .
+                '/syncCto_backups/files', 'extensions' => 'rar,zip'
+            ),
         ),
     )
 );
@@ -100,22 +103,16 @@ class tl_syncCto_restore_file extends Backend
      */
     public function onsubmit_callback(DataContainer $dc)
     {
-        $arrStepPool = $this->Session->get("SyncCto_File_StepPool");
-
-        if (!is_array($arrStepPool))
-        {
-            $arrStepPool = array();
-        }
-
+        // Check if a file was selected
         if ($this->Input->post("filelist") == "")
         {
-            $_SESSION["TL_ERROR"] = array(vsprintf($GLOBALS['TL_LANG']['ERR']['unknown_file'] , array($this->Input->post("filelist"))));
-            return;
+            $_SESSION["TL_ERROR"] = array(vsprintf($GLOBALS['TL_LANG']['ERR']['unknown_file'], array($this->Input->post("filelist"))));
+            $this->redirect($this->Environment->base . "contao/main.php?do=syncCto_backups&table=tl_syncCto_restore_file");
         }
 
-        $arrStepPool["file"] = $this->Input->post("filelist");
-
-        $this->Session->set("SyncCto_File_StepPool", $arrStepPool);
+        $arrBackupSettings = array();
+        $arrBackupSettings['backup_file'] = $this->Input->post("filelist");
+        $this->Session->set("syncCto_BackupSettings", $arrBackupSettings);
 
         $this->redirect($this->Environment->base . "contao/main.php?do=syncCto_backups&amp;table=tl_syncCto_restore_file&amp;act=start");
     }

@@ -1,4 +1,7 @@
-<?php if (!defined('TL_ROOT')) die('You can not access this file directly!');
+<?php
+
+if (!defined('TL_ROOT'))
+    die('You can not access this file directly!');
 
 /**
  * Contao Open Source CMS
@@ -26,11 +29,9 @@
  * @license    GNU/LGPL
  * @filesource
  */
-
 $GLOBALS['TL_DCA']['tl_syncCto_backup_file'] = array(
     // Config
-    'config' => array
-        (
+    'config' => array(
         'dataContainer' => 'Memory',
         'closed' => true,
         'disableSubmit' => false,
@@ -48,19 +49,26 @@ $GLOBALS['TL_DCA']['tl_syncCto_backup_file'] = array(
         ),
     ),
     // Palettes
-    'palettes' => array
-        (
-        'default' => '{backup_legend},backup_type,backup_name;{filelist_legend},filelist;',
+    'palettes' => array(
+        '__selector__' => array('user_files'),
+        'default' => '{filelist_legend},core_files,user_files;{backup_legend},backup_name;',
+    ),
+    // Sub Palettes
+    'subpalettes' => array(
+        'user_files' => 'filelist'
     ),
     // Fields
     'fields' => array(
-        'backup_type' => array
-            (
-            'label' => &$GLOBALS['TL_LANG']['tl_syncCto_backup_file']['backup_type'],
-            'inputType' => 'select',
+        'core_files' => array(
+            'label' => &$GLOBALS['TL_LANG']['tl_syncCto_backup_file']['core_files'],
+            'inputType' => 'checkbox',
+            'exclude' => true
+        ),
+        'user_files' => array(
+            'label' => &$GLOBALS['TL_LANG']['tl_syncCto_backup_file']['user_files'],
+            'inputType' => 'checkbox',
             'exclude' => true,
-            'reference' => &$GLOBALS['TL_LANG']['SYC'],
-            'options_callback' => array('SyncCtoHelper', 'getBackupType'),
+            'eval' => array('submitOnChange' => true),
         ),
         'filelist' => array
             (
@@ -95,8 +103,7 @@ class tl_syncCto_backup_file extends Backend
         $dc->removeButton('save');
         $dc->removeButton('saveNclose');
 
-        $arrData = array
-            (
+        $arrData = array(
             'id' => 'start_backup',
             'formkey' => 'start_backup',
             'class' => '',
@@ -116,35 +123,31 @@ class tl_syncCto_backup_file extends Backend
      */
     public function onsubmit_callback(DataContainer $dc)
     {
-        $arrStepPool = $this->Session->get("SyncCto_File_StepPool");
-
-        if (!is_array($arrStepPool))
+        // Check if core or user backup is selected
+        if ($this->Input->post('core_files') != 1 && $this->Input->post('user_files') != 1)
         {
-            $arrStepPool = array();
+            $_SESSION["TL_ERROR"][] = $GLOBALS['TL_LANG']['ERR']['missing_file_selection'];
+            $this->redirect($this->Environment->base . "contao/main.php?do=syncCto_backups&table=tl_syncCto_backup_file");
         }
 
-        // Check sync. typ
-        if (strlen($this->Input->post('backup_type')) != 0)
+        // Check if we have a filelist for user files
+        if ($this->Input->post('core_files') != 1 
+                && $this->Input->post('user_files') == 1 
+                && is_array($this->Input->post('filelist', true)) != true
+                && count($this->Input->post('filelist', true)) == 0)
         {
-            if ($this->Input->post('backup_type') == SYNCCTO_FULL || $this->Input->post('backup_type') == SYNCCTO_SMALL)
-            {
-                $arrStepPool["syncCto_Typ"] = $this->Input->post('backup_type');
-            }
-            else
-            {
-                $_SESSION["TL_ERROR"][] = $GLOBALS['TL_LANG']['ERR']['unknown_backup_method'];
-                return;
-            }
-        }
-        else
-        {
-            $arrStepPool["syncCto_Typ"] = SYNCCTO_SMALL;
+            $_SESSION["TL_ERROR"][] = $GLOBALS['TL_LANG']['ERR']['missing_file_selection'];
+            $this->redirect($this->Environment->base . "contao/main.php?do=syncCto_backups&table=tl_syncCto_backup_file");
         }
 
-        $arrStepPool["backup_name"] = $this->Input->post('backup_name', true);
-        $arrStepPool["filelist"] = $this->Input->post('filelist', true);
-        
-        $this->Session->set("SyncCto_File_StepPool", $arrStepPool);
+        $arrBackupSettings = array();
+
+        $arrBackupSettings['core_files']    = $this->Input->post('core_files');
+        $arrBackupSettings['user_files']    = $this->Input->post('user_files');
+        $arrBackupSettings['user_filelist'] = $this->Input->post('filelist', true);
+        $arrBackupSettings['backup_name']   = $this->Input->post('backup_name', true);
+
+        $this->Session->set("syncCto_BackupSettings", $arrBackupSettings);
 
         $this->redirect($this->Environment->base . "contao/main.php?do=syncCto_backups&amp;table=tl_syncCto_backup_file&amp;act=start");
     }
