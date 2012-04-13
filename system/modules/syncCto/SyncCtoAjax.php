@@ -1,5 +1,13 @@
 <?php
 
+/**
+ * Beta Class for SyncCto and AJAX
+ * 
+ * @author MEN AT WORK 2012
+ * @version 0.0.1
+ * @package syncCto 
+ */
+
 class SyncCtoAjax extends SyncCtoCommunicationClient
 {
 
@@ -74,6 +82,7 @@ class SyncCtoAjax extends SyncCtoCommunicationClient
             {
                 throw new Exception("No client id was send.");
             }
+            
             $this->intClientID = intval($this->Input->post("id"));
 
             // Load and check compare list

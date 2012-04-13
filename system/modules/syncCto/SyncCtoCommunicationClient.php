@@ -251,7 +251,7 @@ class SyncCtoCommunicationClient extends CtoCommunication
 
         return $this->runServer("SYNCCTO_SET_REFERRER_DISABLE_FLAG", $arrData);
     }
-    
+
     /**
      * Set the reffere flag from client
      * 
@@ -270,7 +270,7 @@ class SyncCtoCommunicationClient extends CtoCommunication
     }
 
     /* -------------------------------------------------------------------------
-     * File Operations
+     * Maintance
      */
 
     /**
@@ -278,9 +278,14 @@ class SyncCtoCommunicationClient extends CtoCommunication
      * 
      * @return type 
      */
-    public function purgeTemp()
+    public function purgeTempFolder()
     {
         return $this->runServer("SYNCCTO_PURGETEMP");
+    }
+    
+    public function purgeTempTables()
+    {
+        return $this->runServer("SYNCCTO_PURGETEMP_TABLES");
     }
 
     /**
@@ -299,6 +304,10 @@ class SyncCtoCommunicationClient extends CtoCommunication
 
         return $this->runServer("SYNCCTO_MAINTENANCE", $arrData);
     }
+
+    /* -------------------------------------------------------------------------
+     * File Operations
+     */
 
     /**
      * Compare a filelist with the filesystem
