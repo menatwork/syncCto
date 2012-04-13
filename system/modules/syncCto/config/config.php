@@ -32,7 +32,7 @@ $objInput = Input::getInstance();
 /**
  * Current syncCto version
  */
-$GLOBALS['SYC_VERSION'] = '2.0.0';
+$GLOBALS['SYC_VERSION'] = '2.2.0';
 
 /**
  * Back end modules
@@ -64,24 +64,12 @@ $GLOBALS['BE_MOD'] = array_merge(
         ), array_slice($GLOBALS['BE_MOD'], $i)
 );
 
-// Backup
-define("SYNCCTO_SMALL", 1);
-define("SYNCCTO_FULL", 2);
-
-$GLOBALS['SYC_BACKUP'] = array_merge_recursive(array(
-    'backup' => array(
-        'option_small' => SYNCCTO_SMALL,
-        'option_full' => SYNCCTO_FULL,
-    ),
-        ), is_array($GLOBALS['SYC_BACKUP']) ? $GLOBALS['SYC_BACKUP'] : array()
-);
-
 /**
  * Hooks
  */
-$GLOBALS['TL_HOOKS']['executePreActions'][] = array('SyncCtoHelper', 'pingClientStatus');
-$GLOBALS['TL_HOOKS']['parseBackendTemplate'][] = array('SyncCtoHelper', 'checkExtensions');
-$GLOBALS['TL_HOOKS']['parseBackendTemplate'][] = array('SyncCtoHelper', 'checkLockStatus');
+$GLOBALS['TL_HOOKS']['executePreActions'][]     = array('SyncCtoHelper', 'pingClientStatus');
+$GLOBALS['TL_HOOKS']['parseBackendTemplate'][]  = array('SyncCtoHelper', 'checkExtensions');
+$GLOBALS['TL_HOOKS']['parseBackendTemplate'][]  = array('SyncCtoHelper', 'checkLockStatus');
 
 /**
  * Permissions
@@ -103,19 +91,12 @@ if ($objInput->get("do") == 'synccto_clients' && $objInput->get("act") != 'start
     unset($GLOBALS['BE_MOD']['syncCto']['synccto_clients']['callback']);
 }
 
-
-// Testing
-if ($objInput->get("table") == 'tl_syncCto_clients_syncTest')
-{
-    unset($GLOBALS['BE_MOD']['syncCto']['synccto_clients']['callback']);
-}
-
 /**
  * CSS / JS
  */
 if (($objInput->get("table") == 'tl_syncCto_clients_syncTo' || $objInput->get("table") == 'tl_syncCto_clients_syncFrom') && TL_MODE == 'BE')
 {
-    $GLOBALS['TL_CSS'][] = 'system/modules/syncCto/html/css/filelist_src.css';
+    $GLOBALS['TL_CSS'][]        = 'system/modules/syncCto/html/css/filelist_src.css';
     $GLOBALS['TL_JAVASCRIPT'][] = 'system/modules/syncCto/html/js/htmltable.js';
     $GLOBALS['TL_JAVASCRIPT'][] = 'system/modules/syncCto/html/js/filelist_src.js';
 }
@@ -210,6 +191,7 @@ $GLOBALS['SYC_PATH']['tmp'] = "system/tmp/";
 /**
  * CtoCommunication RPC Calls
  */
+
 // Get SyncCto Version 
 $GLOBALS["CTOCOM_FUNCTIONS"]["SYNCCTO_VERSION"] = array(
     "class" => "SyncCtoRPCFunctions",
@@ -266,9 +248,16 @@ $GLOBALS["CTOCOM_FUNCTIONS"]["SYNCCTO_CHECKSUM_FOLDERS"] = array(
     "parameter" => array("files"),
 );
 
-
 // Clear Temp folder
 $GLOBALS["CTOCOM_FUNCTIONS"]["SYNCCTO_PURGETEMP"] = array(
+    "class" => "SyncCtoFiles",
+    "function" => "purgeTemp",
+    "typ" => "GET",
+    "parameter" => FALSE,
+);
+
+// Clear Temp tables
+$GLOBALS["CTOCOM_FUNCTIONS"]["SYNCCTO_PURGETEMP_TABLES"] = array(
     "class" => "SyncCtoFiles",
     "function" => "purgeTemp",
     "typ" => "GET",
