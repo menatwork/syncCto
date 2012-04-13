@@ -157,11 +157,11 @@ class tl_syncCto_clients_syncTo extends Backend
     public function databaseTablesNoneRecommended()
     {
         // Check if extendet db view is enabled
-        if($GLOBALS['TL_CONFIG']['syncCto_extended_db_view'] !== TRUE)
+        if ($GLOBALS['TL_CONFIG']['syncCto_extended_db_view'] !== TRUE)
         {
             return $this->objSyncCtoHelper->databaseTablesNoneRecommended();
         }
-        
+
         $objLastHash = $this->Database->prepare("SELECT last_table_hash FROM tl_synccto_clients WHERE id=?")->execute(intval($this->Input->get("id")));
         // Check if we have a client
         if ($objLastHash->numRows == 0)
@@ -185,26 +185,26 @@ class tl_syncCto_clients_syncTo extends Backend
 
     public function databaseTablesRecommended()
     {
-         // Check if extendet db view is enabled
-        if($GLOBALS['TL_CONFIG']['syncCto_extended_db_view'] !== TRUE)
+        // Check if extendet db view is enabled
+        if ($GLOBALS['TL_CONFIG']['syncCto_extended_db_view'] !== TRUE)
         {
             return $this->objSyncCtoHelper->databaseTablesRecommended();
         }
-        
+
         $objLastHash = $this->Database->prepare("SELECT last_table_hash FROM tl_synccto_clients WHERE id=?")->execute(intval($this->Input->get("id")));
-        
+
         // Check if we have a client
         if ($objLastHash->numRows == 0)
         {
             return $this->objSyncCtoHelper->databaseTablesRecommended();
         }
-        
+
         // Check if we have some hashes
         if ($objLastHash->last_table_hash == "")
         {
             return $this->objSyncCtoHelper->databaseTablesRecommended();
         }
-        
+
         // Rebuild array
         if (is_array(deserialize($objLastHash->last_table_hash)) == false)
         {
@@ -239,11 +239,12 @@ class tl_syncCto_clients_syncTo extends Backend
         $dc->addButton('start_sync', $arrData);
 
         // Update a field with last sync information
-        $objSyncTime = $this->Database->prepare("SELECT cl.syncTo_tstamp as syncTo_tstamp, user.name as syncTo_user, user.username as syncTo_alias
-                                            FROM tl_synccto_clients as cl 
-                                            INNER JOIN tl_user as user
-                                            ON cl.syncTo_user = user.id
-                                            WHERE cl.id = ?")
+        $objSyncTime = $this->Database
+                ->prepare("SELECT cl.syncTo_tstamp as syncTo_tstamp, user.name as syncTo_user, user.username as syncTo_alias
+                            FROM tl_synccto_clients as cl 
+                            INNER JOIN tl_user as user
+                            ON cl.syncTo_user = user.id
+                            WHERE cl.id = ?")
                 ->limit(1)
                 ->execute($this->Input->get("id"));
 
@@ -288,7 +289,7 @@ class tl_syncCto_clients_syncTo extends Backend
     public function onsubmit_callback(DataContainer $dc)
     {
         $arrSyncSettings = array();
-        
+
         // Synchronization type
         if (is_array($this->Input->post("sync_type")) && count($this->Input->post("sync_type")) != 0)
         {
@@ -298,7 +299,7 @@ class tl_syncCto_clients_syncTo extends Backend
         {
             $arrSyncSettings["syncCto_Type"] = array();
         }
-        
+
         // Synchronization for database
         if ($this->Input->post("database_check") == 1)
         {
