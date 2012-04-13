@@ -26,6 +26,7 @@
  * @license    GNU/LGPL
  * @filesource
  */
+
 $GLOBALS['TL_DCA']['tl_syncCto_settings'] = array(
     // Config
     'config' => array
@@ -42,7 +43,7 @@ $GLOBALS['TL_DCA']['tl_syncCto_settings'] = array(
     ),
     'subpalettes' => array
         (
-        'syncCto_custom_settings' => 'syncCto_wait_timeout,syncCto_interactive_timeout,syncCto_extended_db_view',
+        'syncCto_custom_settings' => 'syncCto_wait_timeout,syncCto_interactive_timeout,syncCto_extended_db_view,syncCto_colored_db_view',
     ),
     // Fields
     'fields' => array(
@@ -127,6 +128,28 @@ $GLOBALS['TL_DCA']['tl_syncCto_settings'] = array(
             'inputType' => 'checkbox',
             'exclude' => true,
             'eval' => array('tl_class' => 'w50'),
+        ),
+        'syncCto_colored_db_view' => array(
+            'label' => &$GLOBALS['TL_LANG']['tl_syncCto_settings']['syncCto_colored_db_view'],
+            'exclude' => true,
+            'inputType' => 'multiColumnWizard',
+            'eval' => array(
+                'tl_class' => 'clr',
+                'columnFields' => array(
+                    'entries' => array(
+                        'label' => &$GLOBALS['TL_LANG']['tl_syncCto_settings']['entries'],
+                        'exclude' => true,
+                        'inputType' => 'text',                        
+                        'eval' => array('style' => 'width:150px')
+                    ),
+                    'color' => array(
+                        'label' => &$GLOBALS['TL_LANG']['tl_syncCto_settings']['color'],
+                        'exclude' => true,
+                        'inputType' => 'text',
+                        'eval' => array('style' => 'width:280px')
+                    )
+                )
+            )
         ),
     )
 );

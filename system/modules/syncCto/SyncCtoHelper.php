@@ -38,8 +38,10 @@ class SyncCtoHelper extends Backend
 
     // instance
     protected static $instance = null;
-    protected $BackendUser;
+    // Objects   
     protected $objSyncCtoDatabase;
+    // Vars
+    protected $arrDbColorLimits;
 
     /* -------------------------------------------------------------------------
      * Core
@@ -51,13 +53,32 @@ class SyncCtoHelper extends Backend
     protected function __construct()
     {
         // Import
-        $this->BackendUser = BackendUser::getInstance();
+        $this->import("BackendUser");
 
         // Parent
         parent::__construct();
 
         // Language
         $this->loadLanguageFile("default");
+
+        // Load color limits for db
+        $this->arrDbColorLimits = array();
+        $arrEntriesCount = array();
+
+        if ($GLOBALS['TL_CONFIG']['syncCto_colored_db_view'] != "")
+        {
+            $this->arrDbColorLimits = deserialize($GLOBALS['TL_CONFIG']['syncCto_colored_db_view']);
+
+            if (is_array($this->arrDbColorLimits))
+            {
+                foreach ($this->arrDbColorLimits as $key => $value)
+                {
+                    $arrEntriesCount[$key] = $value['entries'];
+                }
+
+                array_multisort($arrEntriesCount, SORT_NUMERIC, SORT_DESC, $this->arrDbColorLimits);
+            }
+        }
     }
 
     /**
@@ -188,35 +209,35 @@ class SyncCtoHelper extends Backend
 
     public function getBlacklistFolder()
     {
-        $arrLocalconfig = deserialize($GLOBALS['TL_CONFIG']['syncCto_folder_blacklist']);
+        $arrLocalconfig   = deserialize($GLOBALS['TL_CONFIG']['syncCto_folder_blacklist']);
         $arrSyncCtoConfig = $GLOBALS['SYC_CONFIG']['folder_blacklist'];
         return $this->mergeConfigs($arrLocalconfig, $arrSyncCtoConfig);
     }
 
     public function getWhitelistFolder()
     {
-        $arrLocalconfig = deserialize($GLOBALS['TL_CONFIG']['syncCto_folder_whitelist']);
+        $arrLocalconfig   = deserialize($GLOBALS['TL_CONFIG']['syncCto_folder_whitelist']);
         $arrSyncCtoConfig = $GLOBALS['SYC_CONFIG']['folder_whitelist'];
         return $this->mergeConfigs($arrLocalconfig, $arrSyncCtoConfig);
     }
 
     public function getBlacklistFile()
     {
-        $arrLocalconfig = deserialize($GLOBALS['TL_CONFIG']['syncCto_file_blacklist']);
+        $arrLocalconfig   = deserialize($GLOBALS['TL_CONFIG']['syncCto_file_blacklist']);
         $arrSyncCtoConfig = $GLOBALS['SYC_CONFIG']['file_blacklist'];
         return $this->mergeConfigs($arrLocalconfig, $arrSyncCtoConfig);
     }
 
     public function getBlacklistLocalconfig()
     {
-        $arrLocalconfig = deserialize($GLOBALS['TL_CONFIG']['syncCto_local_blacklist']);
+        $arrLocalconfig   = deserialize($GLOBALS['TL_CONFIG']['syncCto_local_blacklist']);
         $arrSyncCtoConfig = $GLOBALS['SYC_CONFIG']['local_blacklist'];
         return $this->mergeConfigs($arrLocalconfig, $arrSyncCtoConfig);
     }
 
     public function getTablesHidden()
     {
-        $arrLocalconfig = deserialize($GLOBALS['TL_CONFIG']['syncCto_hidden_tables']);
+        $arrLocalconfig   = deserialize($GLOBALS['TL_CONFIG']['syncCto_hidden_tables']);
         $arrSyncCtoConfig = $GLOBALS['SYC_CONFIG']['table_hidden'];
         return $this->mergeConfigs($arrLocalconfig, $arrSyncCtoConfig);
     }
@@ -259,7 +280,7 @@ class SyncCtoHelper extends Backend
                     if ($objClient->numRows == 0)
                     {
                         $arrReturn["success"] = false;
-                        $arrReturn["error"] = "Unknown client";
+                        $arrReturn["error"]   = "Unknown client";
                         echo json_encode($arrReturn);
                         exit();
                     }
@@ -309,18 +330,18 @@ class SyncCtoHelper extends Backend
                     }
 
                     $arrReturn["success"] = true;
-                    $arrReturn["value"] = $intReturn;
+                    $arrReturn["value"]   = $intReturn;
                 }
                 catch (Exception $exc)
                 {
                     $arrReturn["success"] = false;
-                    $arrReturn["error"] = $exc->getMessage() . $exc->getFile() . " on " . $exc->getLine();
+                    $arrReturn["error"]   = $exc->getMessage() . $exc->getFile() . " on " . $exc->getLine();
                 }
             }
             else
             {
                 $arrReturn["success"] = false;
-                $arrReturn["error"] = "Missing client id.";
+                $arrReturn["error"]   = "Missing client id.";
             }
 
             echo json_encode($arrReturn);
@@ -765,7 +786,7 @@ class SyncCtoHelper extends Backend
                 continue;
             }
 
-            $arrTables[$value] = $value . $this->getTableMeta($value);
+            $arrTables[$value] = $this->getTableMeta($value);
         }
 
         return $arrTables;
@@ -773,7 +794,7 @@ class SyncCtoHelper extends Backend
 
     private function getTableMeta($strTableName, $booHashSame = null)
     {
-        $objCount = $this->Database->prepare("SELECT COUNT(*) as Count FROM $strTableName")->execute();
+        $objCount  = $this->Database->prepare("SELECT COUNT(*) as Count FROM $strTableName")->execute();
         $strReturn = "";
 
         if ($booHashSame === FALSE)
@@ -789,13 +810,25 @@ class SyncCtoHelper extends Backend
             $strReturn .= $strTableName;
         }
 
+        $intEntriesCount = $objCount->Count;
+        $strColor        = "#aaaaaa";
+        
+        foreach ($this->arrDbColorLimits as $value)
+        {
+            if ($intEntriesCount > $value['entries'])
+            {
+                $strColor = $value['color'];
+                break;
+            }
+        }
+
         if (version_compare(VERSION, "2.10", "<"))
         {
-            $strReturn .= '<span style="color: #aaaaaa; padding-left: 3px;">(' . vsprintf($GLOBALS['TL_LANG']['MSC']['entries'], array($objCount->Count)) . ')</span>';
+            $strReturn .= '<span style="color: ' . $strColor . '; padding-left: 3px;">(' . vsprintf($GLOBALS['TL_LANG']['MSC']['entries'], array($intEntriesCount)) . ')</span>';
         }
         else
         {
-            $strReturn .= '<span style="color: #aaaaaa; padding-left: 3px;">(' . $this->getReadableSize($this->Database->getSizeOf($strTableName)) . ', ' . vsprintf($GLOBALS['TL_LANG']['MSC']['entries'], array($objCount->Count)) . ')</span>';
+            $strReturn .= '<span style="color: ' . $strColor . '; padding-left: 3px;">(' . $this->getReadableSize($this->Database->getSizeOf($strTableName)) . ', ' . vsprintf($GLOBALS['TL_LANG']['MSC']['entries'], array($intEntriesCount)) . ')</span>';
         }
 
         return $strReturn;
@@ -861,7 +894,7 @@ class SyncCtoHelper extends Backend
             }
 
             // Build hash
-            $strSQL = "SELECT MD5(GROUP_CONCAT( CONCAT_WS('#', `" . implode("`, `", $arrFields) . "`) SEPARATOR '##' )) as hash  FROM $strTable";
+            $strSQL   = "SELECT MD5(GROUP_CONCAT( CONCAT_WS('#', `" . implode("`, `", $arrFields) . "`) SEPARATOR '##' )) as hash  FROM $strTable";
             $objQuery = $this->Database->prepare($strSQL)->execute();
 
             $arrHash[$strTable] = $objQuery->hash;
