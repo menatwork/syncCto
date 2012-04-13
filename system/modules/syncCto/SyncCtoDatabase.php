@@ -36,16 +36,17 @@ class SyncCtoDatabase extends Backend
      * Vars
      */
 
-    //- Singelten pattern --------
-    protected static $instance = null;
-    //- Vars ---------------------
+    // Singelten pattern
+    protected static $instance           = null;
+    // Vars 
     protected $arrBackupTables;
     protected $arrHiddenTables;
-    protected $strSuffixZipName = "DB-Backup.zip";
+    protected $strSuffixZipName   = "DB-Backup.zip";
     protected $strFilenameSyncCto = "DB-Backup.synccto";
-    protected $strFilenameSQL = "DB-Backup.sql";
+    protected $strFilenameSQL     = "DB-Backup.sql";
     protected $strTimestampFormat;
-    //- Objects ------------------
+    protected $intMaxMemoryUsage;
+    // Objects 
     protected $objSyncCtoHelper;
     protected $objXMLReader;
 
@@ -78,6 +79,26 @@ class SyncCtoDatabase extends Backend
         'datetime'
     );
 
+    /**
+     * Search for special chars
+     * 
+     * @var array 
+     */
+    protected $arrSearchFor = array(
+        "\\",
+        "'"
+    );
+
+    /**
+     * Replace special chars with
+     * 
+     * @var array 
+     */
+    protected $arrReplaceWith = array(
+        "\\\\",
+        "\\'"
+    );
+
     /* -------------------------------------------------------------------------
      * Core
      */
@@ -89,16 +110,21 @@ class SyncCtoDatabase extends Backend
     {
         parent::__construct();
 
+        // Init some vars
         $this->arrBackupTables = array();
+        $this->strTimestampFormat = standardize($GLOBALS['TL_CONFIG']['datimFormat']);
+        $this->intMaxMemoryUsage = intval(str_replace(array("m", "M", "k", "K"), array("000000", "000000", "000", "000"), ini_get('memory_limit')));
+        $this->intMaxMemoryUsage = $this->intMaxMemoryUsage / 100 * 80;
+
+        // Load hidden tables
         $this->arrHiddenTables = deserialize($GLOBALS['SYC_CONFIG']['table_hidden']);
         if (!is_array($this->arrHiddenTables))
         {
             $this->arrHiddenTables = array();
         }
 
+        // Load Helper
         $this->objSyncCtoHelper = SyncCtoHelper::getInstance();
-
-        $this->strTimestampFormat = standardize($GLOBALS['TL_CONFIG']['datimFormat']);
     }
 
     /**
@@ -126,9 +152,13 @@ class SyncCtoDatabase extends Backend
         {
             case "backupTables":
                 if (!is_array($value))
-                    throw new Exception("Value must be type of array.");
-
-                $this->arrBackupTables = $value;
+                {
+                    $this->arrBackupTables[] = $value;
+                }
+                else
+                {
+                    $this->arrBackupTables = $value;
+                }
                 break;
 
             case "filenameInsert":
@@ -187,21 +217,47 @@ class SyncCtoDatabase extends Backend
      */
 
     /**
-     * Function for creating a sql dump file.
+     * Check if we have enough ram, if not, write all data to file
      * 
-     * @param array $arrTables Table list for backup
-     * @param string $strZip Name of zip file
-     * @param bool $booTempFolder Schould the tmp folde used instead of backupfolder
-     * @return null 
+     * @param XMLWriter $objXml
+     * @param resource $objGzFile 
      */
-    public function runDump($arrTables, $booTempFolder, $booOnlyMachine = false)
+    protected function checkRAM(XMLWriter $objXml, $objGzFile)
     {
-        // Check if there are any tables selected for an export
-        if (is_array($arrTables) && is_array($this->arrBackupTables))
+        if ($this->intMaxMemoryUsage < memory_get_usage(true))
         {
-            $this->arrBackupTables = array_unique(array_merge($this->arrBackupTables, $arrTables));
+            $strXMLFlush = $objXml->flush(true);
+            gzputs($objGzFile, $strXMLFlush, strlen($strXMLFlush));
+        }
+    }
+
+    /**
+     * Function for creating a sql/xml dump file.
+     * 
+     * @param array $mixTables Table or a list of tables for backup
+     * @param string $strZip Name of zip file
+     * @param bool $booTempFolder Should the tmp folde used instead of backupfolder
+     * @return void 
+     */
+    public function runDump($mixTables, $booTempFolder, $booOnlyMachine = false)
+    {
+        // Set time limit to unlimited
+        set_time_limit(0);
+
+        // Add to the backup array all tables
+        if (is_array($mixTables))
+        {
+            $this->arrBackupTables = array_merge($this->arrBackupTables, $mixTables);
+        }
+        else if ($mixTables != "" && $mixTables != null)
+        {
+            $this->arrBackupTables[] = $mixTables;
         }
 
+        // make the backup array unique
+        $this->arrBackupTables = array_unique($this->arrBackupTables);
+
+        // Check if we have some tables for backup
         if (!is_array($this->arrBackupTables) || $this->arrBackupTables == null || count($this->arrBackupTables) == 0)
         {
             throw new Exception("No tables found for backup.");
@@ -213,18 +269,20 @@ class SyncCtoDatabase extends Backend
         // Write some tempfiles
         $strRandomToken = md5(time() . " | " . rand(0, 65535));
 
+        // Write SQL file
         if ($booOnlyMachine == false)
         {
-            $objFileSQL = new File("system/tmp/TempSQLDump.$strRandomToken");
+            $objFileSQL = new File($this->objSyncCtoHelper->standardizePath($GLOBALS['SYC_PATH']['tmp'], "TempSQLDump.$strRandomToken"));
             $objFileSQL->write("");
         }
 
-        $objGzFile = new File("system/tmp/TempSyncCtoDump.$strRandomToken");
+        // Write gzip xml file
+        $objGzFile = new File($this->objSyncCtoHelper->standardizePath($GLOBALS['SYC_PATH']['tmp'], "TempSyncCtoDump.$strRandomToken"));
         $objGzFile->write("");
         $objGzFile->close();
 
-        //Compression
-        $objGzFile = gzopen(TL_ROOT . "/system/tmp/TempSyncCtoDump.$strRandomToken", "wb");
+        // Compression
+        $objGzFile = gzopen(TL_ROOT . "/" . $this->objSyncCtoHelper->standardizePath($GLOBALS['SYC_PATH']['tmp'], "TempSyncCtoDump.$strRandomToken"), "wb");
 
         // Create XML File
         $objXml = new XMLWriter();
@@ -244,13 +302,19 @@ class SyncCtoDatabase extends Backend
         $objXml->writeElement('create_time', date('H:i', time()));
         $objXml->endElement(); // End metatags
 
-        $strXMLFlush = $objXml->flush(true);
-        gzputs($objGzFile, $strXMLFlush, strlen($strXMLFlush));
-
         $objXml->startElement('structure');
 
         foreach ($arrTables as $key => $TableName)
         {
+            // Check if the current table marked as backup
+            if (!in_array($TableName, $this->arrBackupTables))
+            {
+                continue;
+            }
+
+            // Check if we have enough ram
+            $this->checkRAM($objXml, $objGzFile);
+
             // Get data
             $arrStructure = $this->getTableStructure($TableName);
 
@@ -264,27 +328,33 @@ class SyncCtoDatabase extends Backend
             $objXml->writeAttribute("name", $TableName);
 
             $objXml->startElement('fields');
-            foreach ($arrStructure['TABLE_FIELDS'] as $keyField => $valueField)
+            if (is_array($arrStructure['TABLE_FIELDS']))
             {
-                $objXml->startElement('field');
-                $objXml->writeAttribute("name", $keyField);
-                $objXml->writeCdata($valueField);
-                $objXml->endElement(); // End field
+                foreach ($arrStructure['TABLE_FIELDS'] as $keyField => $valueField)
+                {
+                    $objXml->startElement('field');
+                    $objXml->writeAttribute("name", $keyField);
+                    $objXml->text($valueField);
+                    $objXml->endElement(); // End field
+                }
             }
             $objXml->endElement(); // End fields
 
             $objXml->startElement('definitions');
-            foreach ($arrStructure['TABLE_CREATE_DEFINITIONS'] as $keyField => $valueField)
+            if (is_array($arrStructure['TABLE_CREATE_DEFINITIONS']))
             {
-                $objXml->startElement('def');
-                $objXml->writeAttribute("name", $keyField);
-                $objXml->writeCdata($valueField);
-                $objXml->endElement(); // End field
+                foreach ($arrStructure['TABLE_CREATE_DEFINITIONS'] as $keyField => $valueField)
+                {
+                    $objXml->startElement('def');
+                    $objXml->writeAttribute("name", $keyField);
+                    $objXml->text($valueField);
+                    $objXml->endElement(); // End field
+                }
             }
             $objXml->endElement(); // End fields
 
             $objXml->startElement("option");
-            $objXml->writeCdata($arrStructure['TABLE_OPTIONS']);
+            $objXml->text($arrStructure['TABLE_OPTIONS']);
             $objXml->endElement();
 
             $objXml->endElement(); // End table
@@ -292,13 +362,19 @@ class SyncCtoDatabase extends Backend
 
         $objXml->endElement(); // End structure
 
-        $strXMLFlush = $objXml->flush(true);
-        gzputs($objGzFile, $strXMLFlush, strlen($strXMLFlush));
-
         $objXml->startElement('data');
 
         foreach ($arrTables as $key => $TableName)
         {
+            // Check if the current table marked as backup
+            if (!in_array($TableName, $this->arrBackupTables))
+            {
+                continue;
+            }
+
+            // Check if we have enough ram
+            $this->checkRAM($objXml, $objGzFile);
+
             // Check if table is in blacklist
             if (!in_array($TableName, $this->arrBackupTables))
             {
@@ -327,6 +403,9 @@ class SyncCtoDatabase extends Backend
 
             for ($i = 0; true; $i++)
             {
+                // Check if we have enough ram
+                $this->checkRAM($objXml, $objGzFile);
+
                 $objData = $this->Database
                         ->prepare("SELECT * FROM $TableName")
                         ->limit($intElementsPerRequest, ($i * $intElementsPerRequest))
@@ -339,6 +418,9 @@ class SyncCtoDatabase extends Backend
 
                 while ($row = $objData->fetchAssoc())
                 {
+                    // Check if we have enough ram
+                    $this->checkRAM($objXml, $objGzFile);
+
                     $objXml->startElement('row');
                     $objXml->writeAttribute("id", $row["id"]);
 
@@ -350,44 +432,72 @@ class SyncCtoDatabase extends Backend
                         if (!isset($field_data))
                         {
                             $objXml->writeAttribute("type", "null");
-                            $objXml->writeCdata("NULL");
+                            $objXml->text("NULL");
                         }
                         else if ($field_data != "")
                         {
                             switch (strtolower($arrFieldMeta[$field_key]['type']))
                             {
+                                case 'binary':
+                                case 'varbinary':
                                 case 'blob':
                                 case 'tinyblob':
                                 case 'mediumblob':
                                 case 'longblob':
                                     $objXml->writeAttribute("type", "blob");
-                                    $objXml->writeCdata("0x" . bin2hex($field_data));
+                                    $objXml->text("0x" . bin2hex($field_data));
                                     break;
 
+                                case 'tinyint':
                                 case 'smallint':
+                                case 'mediumint':
                                 case 'int':
+                                case 'integer':
+                                case 'bigint':
                                     $objXml->writeAttribute("type", "int");
-                                    $objXml->writeCdata($field_data);
+                                    $objXml->text($field_data);
                                     break;
 
+                                case 'float':
+                                case 'double':
+                                case 'real':
+                                case 'decimal':
+                                case 'numeric':
+                                    $objXml->writeAttribute("type", "decimal");
+                                    $objXml->text($field_data);
+                                    break;
+
+                                case 'date':
+                                case 'datetime':
+                                case 'timestamp':
+                                case 'time':
+                                case 'year':
+                                    $objXml->writeAttribute("type", "date");
+                                    $objXml->text("'" . $field_data . "'");
+                                    break;
+
+                                case 'char':
+                                case 'varchar':
                                 case 'text':
+                                case 'tinytext':
                                 case 'mediumtext':
-                                    if (strpos($field_data, "'") != false)
-                                    {
-                                        $objXml->writeAttribute("type", "text");
-                                        $objXml->writeCdata("0x" . bin2hex($field_data));
-                                        break;
-                                    }
+                                case 'longtext':
+                                case 'enum':
+                                case 'set':
+                                    $objXml->writeAttribute("type", "text");
+                                    $objXml->writeCdata("'" . str_replace($this->arrSearchFor, $this->arrReplaceWith, $field_data) . "'");
+                                    break;
+
                                 default:
                                     $objXml->writeAttribute("type", "default");
-                                    $objXml->writeCdata(" '" . str_replace(array("\\", "'", "\r", "\n"), array("\\\\", "\\'", "\\r", "\\n"), $field_data) . "'");
+                                    $objXml->writeCdata("'" . str_replace($this->arrSearchFor, $this->arrReplaceWith, $field_data) . "'");
                                     break;
                             }
                         }
                         else
                         {
                             $objXml->writeAttribute("type", "empty");
-                            $objXml->writeCdata("''");
+                            $objXml->text("''");
                         }
 
                         $objXml->endElement(); // End field
@@ -395,9 +505,6 @@ class SyncCtoDatabase extends Backend
 
                     $objXml->endElement(); // End row
                 }
-
-                $strXMLFlush = $objXml->flush(true);
-                gzputs($objGzFile, $strXMLFlush, strlen($strXMLFlush));
             }
 
             $objXml->endElement(); // End table
@@ -409,14 +516,13 @@ class SyncCtoDatabase extends Backend
 
         $strXMLFlush = $objXml->flush(true);
         gzputs($objGzFile, $strXMLFlush, strlen($strXMLFlush));
-
         gzclose($objGzFile);
 
         if ($booOnlyMachine == false)
         {
             // Write header for sql file
             $today = date("Y-m-d");
-            $time = date("H:i:s");
+            $time  = date("H:i:s");
 
             // Write Header
             $string .= "-- syncCto SQL Dump\r\n";
@@ -426,7 +532,6 @@ class SyncCtoDatabase extends Backend
             $string .= "-- Time stamp : $today at $time\r\n";
             $string .= "\r\n";
             $string .= "SET SQL_MODE=\"NO_AUTO_VALUE_ON_ZERO\";\r\n";
-            $string .= "\r\n";
             $string .= "\r\n";
             $string .= "-- --------------------------------------------------------\r\n";
             $string .= "\r\n";
@@ -454,19 +559,13 @@ class SyncCtoDatabase extends Backend
                 }
 
                 // Write SQL
-                $string .= "-- \r";
-                $string .= "-- Dumping data for table $TableName";
-                $string .= "-- \r";
-                $string .= "\r";
+                $string .= "-- \r\n";
+                $string .= "-- Dumping table $TableName \r\n";
+                $string .= "-- \r\n";
+                $string .= "\r\n";
                 $string .= $this->buildSQLTable($arrStructure, $TableName);
-
-                // Get data from table
-                if (!in_array($TableName, $this->arrBackupTables) || in_array($TableName, $this->arrHiddenTables))
-                {
-                    $string .="-- --------------------------------------------------------\r";
-                    $string .="\r";
-                    continue;
-                }
+                $string .= "\r\n";
+                $string .= "\r\n";
 
                 $objFileSQL->append($string, "");
                 $objFileSQL->close();
@@ -488,6 +587,7 @@ class SyncCtoDatabase extends Backend
                 }
 
                 $intElementsPerRequest = 500;
+                $booFirstEntry         = true;
 
                 for ($i = 0; true; $i++)
                 {
@@ -496,63 +596,91 @@ class SyncCtoDatabase extends Backend
                             ->limit($intElementsPerRequest, ($i * $intElementsPerRequest))
                             ->executeUncached();
 
+                    $strSQL = "";
+
+                    // Check if we have some files
                     if ($objData->numRows == 0)
                     {
+                        // if end reach insert ';'
+                        if ($booFirstEntry != true)
+                        {
+                            $strSQL .= ";\r\n\r\n";
+                        }
+
+                        $strSQL .= "-- --------------------------------------------------------\r\n\r\n";
+
+                        $objFileSQL->append($strSQL, "");
+                        $objFileSQL->close();
+
                         break;
                     }
 
-                    $strSQL = "";
+                    // Start INSERT INTO
+                    if ($i == 0)
+                    {
+                        $strSQL .= "INSERT IGNORE INTO " . $TableName . " (`";
+                        $strSQL .= implode("`, `", array_keys($arrFieldMeta));
+                        $strSQL .= "`) VALUES";
+                    }
 
+                    // Run through each row
                     while ($row = $objData->fetchAssoc())
                     {
-                        $arrTableData = array("table" => $TableName, "values" => array());
+                        $arrTableData = array();
 
-                        foreach ($row as $field_key => $field_data)
+                        foreach (array_keys($arrFieldMeta) as $fieldName)
                         {
-                            if (!isset($field_data))
+                            if (!isset($row[$fieldName]))
                             {
-                                $arrTableData['values'][$field_key] = "NULL";
+                                $arrTableData[] = "NULL";
                             }
-                            else if ($field_data != "")
+                            else if ($row[$fieldName] != "")
                             {
-                                switch (strtolower($arrFieldMeta[$field_key]['type']))
+                                switch (strtolower($arrFieldMeta[$fieldName]['type']))
                                 {
                                     case 'blob':
                                     case 'tinyblob':
                                     case 'mediumblob':
                                     case 'longblob':
-                                        $arrTableData['values'][$field_key] = "0x" . bin2hex($field_data);
+                                        $arrTableData[] = "0x" . bin2hex($row[$fieldName]);
                                         break;
 
                                     case 'smallint':
                                     case 'int':
-                                        $arrTableData['values'][$field_key] = $field_data;
+                                        $arrTableData[] = $row[$fieldName];
                                         break;
 
                                     case 'text':
                                     case 'mediumtext':
-                                        if (strpos($field_data, "'") != false)
+                                        if (strpos($row[$fieldName], "'") != false)
                                         {
-                                            $arrTableData['values'][$field_key] = "0x" . bin2hex($field_data);
+                                            $arrTableData[] = "0x" . bin2hex($row[$fieldName]);
                                             break;
                                         }
                                     default:
-                                        $arrTableData['values'][$field_key] = " '" . str_replace(array("\\", "'", "\r", "\n"), array("\\\\", "\\'", "\\r", "\\n"), $field_data) . "'";
+                                        $arrTableData[] = "'" . str_replace($this->arrSearchFor, $this->arrReplaceWith, $row[$fieldName]) . "'";
                                         break;
                                 }
                             }
                             else
                             {
-                                $arrTableData['values'][$field_key] = "''";
+                                $arrTableData[] = "''";
                             }
                         }
 
-                        $strSQL .= $this->buildSQLInsert($arrTableData["table"], array_keys($arrTableData["values"]), $arrTableData["values"]) . "\n";
-
+                        if ($booFirstEntry == true)
+                        {
+                            $booFirstEntry = false;
+                            $strSQL .= "\r\n(" . implode(", ", $arrTableData) . ")";
+                        }
+                        else
+                        {
+                            $strSQL .= ",\r\n(" . implode(", ", $arrTableData) . ")";
+                        }
 
                         if (strlen($strSQL) > 100000)
                         {
-                            $objFileSQL->append(substr($strSQL, 0, -1), "");
+                            $objFileSQL->append($strSQL, "");
                             $objFileSQL->close();
                             $strSQL = "";
                         }
@@ -560,15 +688,11 @@ class SyncCtoDatabase extends Backend
 
                     if (strlen($strSQL) != 0)
                     {
-                        $objFileSQL->append(substr($strSQL, 0, -1), "");
+                        $objFileSQL->append($strSQL, "");
                         $objFileSQL->close();
                         $strSQL = "";
                     }
                 }
-
-                $objFileSQL->append("\r");
-                $objFileSQL->append("-- --------------------------------------------------------\r");
-                $objFileSQL->append("\r");
             }
         }
 
@@ -615,14 +739,15 @@ class SyncCtoDatabase extends Backend
         $arrTables = array();
 
         // Current Values
-        $strCurrentTable = "";
+        $strCurrentTable         = "";
         $strCurrentNodeAttribute = "";
-        $strCurrentNodeName = "";
+        $strCurrentNodeName      = "";
 
         while ($this->objXMLReader->read())
         {
             switch ($this->objXMLReader->nodeType)
             {
+                case XMLReader::TEXT:
                 case XMLReader::CDATA:
                     switch ($strCurrentNodeName)
                     {
@@ -705,16 +830,17 @@ class SyncCtoDatabase extends Backend
         $arrFields = array();
 
         // Current Values
-        $strCurrentTable = "";
+        $strCurrentTable             = "";
         $strCurrentNodeAttributeName = "";
         $strCurrentNodeAttributeType = "";
-        $strCurrentNodeName = "";
-        $intCounter = 0;
+        $strCurrentNodeName          = "";
+        $intCounter                  = 0;
 
         while ($this->objXMLReader->read())
         {
             switch ($this->objXMLReader->nodeType)
             {
+                case XMLReader::TEXT:
                 case XMLReader::CDATA:
                     switch ($strCurrentNodeName)
                     {
@@ -730,7 +856,7 @@ class SyncCtoDatabase extends Backend
                     {
                         case "table":
                             $strCurrentTable = $this->objXMLReader->getAttribute("name");
-                            $arrValues = array();
+                            $arrValues       = array();
                             $arrFields = array();
                             $intCounter = 0;
                             break;
@@ -754,7 +880,7 @@ class SyncCtoDatabase extends Backend
                             $intCounter++;
                             if (count($arrValues) >= $intMaxInsert)
                             {
-                                $strBody = "INSERT IGNORE INTO synccto_temp_" . $strCurrentTable . " (`";
+                                $strBody = "INSERT INTO synccto_temp_" . $strCurrentTable . " (`";
                                 $strBody .= implode("`, `", $arrFields);
                                 $strBody .= "`) VALUES \n";
 
@@ -783,7 +909,7 @@ class SyncCtoDatabase extends Backend
                                 break;
                             }
 
-                            $strBody = "INSERT IGNORE INTO synccto_temp_" . $strCurrentTable . " (`";
+                            $strBody = "INSERT INTO synccto_temp_" . $strCurrentTable . " (`";
                             $strBody .= implode("`, `", $arrFields);
                             $strBody .= "`) VALUES \n";
 
@@ -997,7 +1123,7 @@ class SyncCtoDatabase extends Backend
             // Set pointer on position zero
             rewind($objTempfile);
 
-            $i = 0;
+            $i       = 0;
             while ($mixLine = fgets($objTempfile))
             {
                 $i++;
@@ -1061,21 +1187,7 @@ class SyncCtoDatabase extends Backend
      */
     private function getTableStructure($strTableName)
     {
-        $tables = $this->Database->listTables();
-
-        // Check if a table is selected
-        if (!count($tables) || !in_array($strTableName, $tables))
-        {
-            throw new Exception($GLOBALS['TL_LANG']['ERR']['missing_tables_selection']);
-        }
-
         $return = array();
-
-        // Check if table is in blacklist
-        if (!in_array($strTableName, $this->arrBackupTables))
-        {
-            return $return;
-        }
 
         // Get list of fields
         $fields = $this->Database->listFields($strTableName);
@@ -1099,29 +1211,29 @@ class SyncCtoDatabase extends Backend
                     switch ($field['index'])
                     {
                         case 'PRIMARY':
-                            $arrTempIndex["PRIMARY"]["body"] = 'PRIMARY KEY  (`%s`)';
+                            $arrTempIndex["PRIMARY"]["body"]     = 'PRIMARY KEY  (`%s`)';
                             $arrTempIndex["PRIMARY"]["fields"][] = $field["name"];
                             break;
 
                         case 'UNIQUE':
-                            $arrTempIndex[$field["name"]]["body"] = 'UNIQUE KEY `%s` (`%s`)';
+                            $arrTempIndex[$field["name"]]["body"]     = 'UNIQUE KEY `%s` (`%s`)';
                             $arrTempIndex[$field["name"]]["fields"][] = $field["name"];
                             break;
 
                         case 'FULLTEXT':
-                            $arrTempIndex[$field["name"]]["body"] = 'FULLTEXT KEY `%s` (`%s`)';
+                            $arrTempIndex[$field["name"]]["body"]     = 'FULLTEXT KEY `%s` (`%s`)';
                             $arrTempIndex[$field["name"]]["fields"][] = $field["name"];
                             break;
 
                         default:
                             if ((strpos(' ' . $field['type'], 'text') || strpos(' ' . $field['type'], 'char')) && ($field['null'] == 'NULL'))
                             {
-                                $arrTempIndex[$field["name"]]["body"] = 'FULLTEXT KEY `%s` (`%s`)';
+                                $arrTempIndex[$field["name"]]["body"]     = 'FULLTEXT KEY `%s` (`%s`)';
                                 $arrTempIndex[$field["name"]]["fields"][] = $field["name"];
                             }
                             else
                             {
-                                $arrTempIndex[$field["name"]]["body"] = 'KEY `%s` (`%s`)';
+                                $arrTempIndex[$field["name"]]["body"]     = 'KEY `%s` (`%s`)';
                                 $arrTempIndex[$field["name"]]["fields"][] = $field["name"];
                             }
                             break;
@@ -1184,7 +1296,7 @@ class SyncCtoDatabase extends Backend
 
             unset($field['index']);
 
-            $name = $field['name'];
+            $name          = $field['name'];
             $field['name'] = '`' . $field['name'] . '`';
 
             // Field type
@@ -1238,100 +1350,6 @@ class SyncCtoDatabase extends Backend
     }
 
     /**
-     * Build a array with data from all tables
-     * 
-     * @return array 
-     */
-    private function getTableData()
-    {
-        $tables = $this->Database->listTables();
-
-        if (!count($tables))
-        {
-            throw new Exception($GLOBALS['TL_LANG']['ERR']['missing_tables_selection']);
-        }
-
-        $arrReturn = array();
-
-        foreach ($tables as $table)
-        {
-            if (!in_array($table, $this->arrBackupTables))
-            {
-                continue;
-            }
-
-            if (in_array($table, $this->arrHiddenTables))
-            {
-                continue;
-            }
-
-            $objData = $this->Database->prepare("SELECT * FROM $table")->executeUncached();
-            $fields = $this->Database->listFields($table);
-
-            foreach ($fields as $key => $value)
-            {
-                if ($value["type"] == "index")
-                {
-                    continue;
-                }
-
-                $arrReturn[$table]['keys'][] = $value['name'];
-            }
-
-            $ii = 0;
-
-            while ($row = $objData->fetchRow())
-            {
-                $arrReturn[$table]['name'] = $table;
-
-                $i = 0;
-
-                foreach ($row as $field_data)
-                {
-                    if (!isset($field_data))
-                    {
-                        $arrReturn[$table]['values'][$ii][$fields[$i]['name']] = "NULL";
-                    }
-                    else if ($field_data != "")
-                    {
-                        switch (strtolower($fields[$i]['type']))
-                        {
-                            case 'blob':
-                            case 'tinyblob':
-                            case 'mediumblob':
-                            case 'longblob':
-                                $arrReturn[$table]['values'][$ii][$fields[$i]['name']] = "0x" . bin2hex($field_data);
-                                break;
-
-                            case 'smallint':
-                            case 'int':
-                                $arrReturn[$table]['values'][$ii][$fields[$i]['name']] = $field_data;
-                                break;
-
-                            case 'text':
-                            case 'mediumtext':
-                                if (strpos($field_data, "'") != false)
-                                {
-                                    $arrReturn[$table]['values'][$ii][$fields[$i]['name']] = "0x" . bin2hex($field_data);
-                                    break;
-                                }
-                            default:
-                                $arrReturn[$table]['values'][$ii][$fields[$i]['name']] = " '" . str_replace(array("\\", "'", "\r", "\n"), array("\\\\", "\\'", "\\r", "\\n"), $field_data) . "'";
-                                break;
-                        }
-                    }
-
-                    $i++;
-                }
-
-                $ii++;
-            }
-        }
-
-        return $arrReturn;
-    }
-
-    /**
      * Build a "CREATE TABLE" sql statemant
      * 
      * @param array $arrTable Table Informations
@@ -1340,9 +1358,7 @@ class SyncCtoDatabase extends Backend
      */
     private function buildSQLTable($arrTable, $strName)
     {
-        $string = "";
-
-        $string .= "CREATE TABLE `" . $strName . "` (\n  " . implode(",\n  ", $arrTable['TABLE_FIELDS']) . (count($arrTable['TABLE_CREATE_DEFINITIONS']) ? ',' : '') . "\n";
+        $string = "CREATE TABLE `" . $strName . "` (\n  " . implode(",\n  ", $arrTable['TABLE_FIELDS']) . (count($arrTable['TABLE_CREATE_DEFINITIONS']) ? ',' : '') . "\n";
 
         if (is_Array($arrTable['TABLE_CREATE_DEFINITIONS']))
             $string .= "  " . implode(",\n  ", $arrTable['TABLE_CREATE_DEFINITIONS']) . "\n";
@@ -1393,60 +1409,6 @@ class SyncCtoDatabase extends Backend
         }
     }
 
-    /* -------------------------------------------------------------------------
-     * Functions for creating SQL for backup
-     */
-
-    /**
-     * Build a whole sql dump file
-     * 
-     * @param array $arrTables Array with Tables
-     * @return string 
-     */
-    private function buildFileSQLTables($arrTables)
-    {
-        $today = date("Y-m-d");
-        $time = date("H:i:s");
-
-        $string .= "-- syncCto SQL Dump\r\n";
-        $string .= "-- Version " . SyncCtoGetVersion . "\r\n";
-        $string .= "-- http://men-at-work.de\r\n";
-        $string .= "-- \r\n";
-        $string .= "-- Time stamp       : $today at $time\r\n";
-        $string .= "\r\n";
-        $string .= "SET SQL_MODE=\"NO_AUTO_VALUE_ON_ZERO\";\r\n";
-        $string .= "\r\n";
-        $string .= "-- --------------------------------------------------------\r\n";
-
-        if (count($arrTables) == 0)
-        {
-            $string .= "-- No tables found in database.";
-        }
-        else
-        {
-            foreach (array_keys($arrTables) as $table)
-            {
-                $string .= "\r\n";
-                $string .= "-- \r\n";
-                $string .= "-- Table structure for table '$table'\r\n";
-                $string .= "-- \r\n";
-                $string .= "\r\n";
-                $string .= "DROP TABLE IF EXISTS `" . $table . "`;\r\n";
-                $string .= "CREATE TABLE `" . $table . "` (\n  " . implode(",\n  ", $arrTables[$table]['TABLE_FIELDS']) . (count($arrTables[$table]['TABLE_CREATE_DEFINITIONS']) ? ',' : '') . "\n";
-
-                if (is_Array($arrTables[$table]['TABLE_CREATE_DEFINITIONS']))
-                {
-                    $string .= "  " . implode(",\n  ", $arrTables[$table]['TABLE_CREATE_DEFINITIONS']) . "\n";
-                }
-
-                $string .= ")" . $arrTables[$table]['TABLE_OPTIONS'] . ";\r\n\r\n";
-
-                $string .= "-- --------------------------------------------------------\r\n";
-            }
-        }
-
-        return $string;
-    }
 }
 
 ?>
