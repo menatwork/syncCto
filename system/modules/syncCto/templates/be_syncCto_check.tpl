@@ -3,6 +3,8 @@
 <div id="syncCto_check">
     <h2><?php echo $GLOBALS['TL_LANG']['tl_syncCto_check']['configuration']; ?></h2>
     <?php echo $this->checkPhpConfiguration; ?> 
+    <h2><?php echo $GLOBALS['TL_LANG']['tl_syncCto_check']['functions']; ?></h2>
+    <?php echo $this->checkPhpFunctions; ?> 
     <?php if ($this->safeModeHack): ?>
         <p class="warn"><?php echo $GLOBALS['TL_LANG']['tl_syncCto_check']['safemodehack']; ?></p>
     <?php endif; ?>
@@ -15,7 +17,3 @@
     </ul>
 
 </div>
-
-<pre><?php // print_r(ini_get_all()); ?></pre>
-
-<pre><?php // print_r($_SERVER); ?></pre>
