@@ -75,8 +75,6 @@ class SyncCtoHelper extends Backend
                 {
                     $arrEntriesCount[$key] = $value['entries'];
                 }
-
-                array_multisort($arrEntriesCount, SORT_NUMERIC, SORT_DESC, $this->arrDbColorLimits);
             }
         }
     }
@@ -112,11 +110,10 @@ class SyncCtoHelper extends Backend
         {
             foreach ($arrLocalconfig as $value)
             {
-                if (in_array($value, $arrSyncCtoConfig))
+                if ($value == "" || in_array($value, $arrSyncCtoConfig) )
+                {
                     continue;
-
-                if ($value == "")
-                    continue;
+                }
 
                 $arrSyncCtoConfig[] = $value;
             }
@@ -442,48 +439,6 @@ class SyncCtoHelper extends Backend
     }
 
     /**
-     * Return all sync types as array
-     * 
-     * @deprecated
-     * @return array 
-     */
-    public function getSyncType()
-    {
-        $groups = array();
-
-        foreach ($GLOBALS['SYC_SYNC'] as $key => $value)
-        {
-            foreach ($value as $key2 => $value2)
-            {
-                $groups[$key][$value2] = $key2;
-            }
-        }
-
-        return $groups;
-    }
-
-    /**
-     * Return all backup types as array
-     * 
-     * @deprecated
-     * @return array 
-     */
-    public function getBackupType()
-    {
-        $groups = array();
-
-        foreach ($GLOBALS['SYC_BACKUP'] as $key => $value)
-        {
-            foreach ($value as $key2 => $value2)
-            {
-                $groups[$key][$value2] = $key2;
-            }
-        }
-
-        return $groups;
-    }
-
-    /**
      * Get a list with all file synchronization options
      * @return array 
      */
@@ -515,12 +470,10 @@ class SyncCtoHelper extends Backend
     public function getMaintanceOptions()
     {
         $arrReturn = array(
-            'options' => array(
-                "temp_tables" => "temp_tables",
-                "temp_folders" => "temp_folders",
-                "css_create" => "css_create",
-                "xml_create" => "xml_create",
-            )
+            "temp_tables" => "temp_tables",
+            "temp_folders" => "temp_folders",
+            "css_create" => "css_create",
+            "xml_create" => "xml_create",
         );
 
         return $arrReturn;
@@ -532,8 +485,9 @@ class SyncCtoHelper extends Backend
 
     /**
      * Standardize path for folder
+     * No TL_ROOT, No starting /
      * 
-     * @return string the normalized path as String
+     * @return string the normalized path
      */
     public function standardizePath()
     {
@@ -792,46 +746,80 @@ class SyncCtoHelper extends Backend
         return $arrTables;
     }
 
+    /**
+     * Get Table Meta
+     * 
+     * @param string $strTableName
+     * @param boolean $booHashSame
+     * @return string 
+     */
     private function getTableMeta($strTableName, $booHashSame = null)
     {
         $objCount  = $this->Database->prepare("SELECT COUNT(*) as Count FROM $strTableName")->execute();
-        $strReturn = "";
-
-        if ($booHashSame === FALSE)
-        {
-            $strReturn .= '<span style="padding-left: 3px;">' . $strTableName . '</span>';
-        }
-        else if ($booHashSame === TRUE)
-        {
-            $strReturn .= '<span style="padding-left: 3px;">' . $strTableName . '</span>';
-        }
-        else
-        {
-            $strReturn .= $strTableName;
-        }
-
         $intEntriesCount = $objCount->Count;
-        $strColor        = "#aaaaaa";
+        $intEntriesSize = $this->Database->getSizeOf($strTableName);
         
-        foreach ($this->arrDbColorLimits as $value)
+        $strColor = 'AAA';
+
+        if($GLOBALS['TL_CONFIG']['syncCto_custom_settings'])
         {
-            if ($intEntriesCount > $value['entries'])
+            $booBreakLoop = FALSE;
+            foreach($this->arrDbColorLimits AS $arrColorLimits)
             {
-                $strColor = $value['color'];
-                break;
+                switch ($arrColorLimits['unit'])
+                {
+                    case 'kb':
+                        if(($intEntriesSize / 1000) > $arrColorLimits['entries'])
+                        {             
+                            $booBreakLoop = TRUE;                        
+                        }
+                        break;
+
+                    case 'mb':
+                        if(($intEntriesSize / 1000 / 1000) > $arrColorLimits['entries'])
+                        {
+                            $booBreakLoop = TRUE;                        
+                        }                    
+                        break;
+
+                    case 'entries':                    
+                        if ($intEntriesCount > $arrColorLimits['entries'])
+                        {                     
+                            $booBreakLoop = TRUE;
+                        }                    
+                        break;
+                }
+
+                if($booBreakLoop == TRUE)
+                {
+                    if($arrColorLimits != '')
+                    {
+                        $strColor = $arrColorLimits['color'];
+                    }
+                    break;
+                }
             }
         }
-
-        if (version_compare(VERSION, "2.10", "<"))
-        {
-            $strReturn .= '<span style="color: ' . $strColor . '; padding-left: 3px;">(' . vsprintf($GLOBALS['TL_LANG']['MSC']['entries'], array($intEntriesCount)) . ')</span>';
-        }
-        else
-        {
-            $strReturn .= '<span style="color: ' . $strColor . '; padding-left: 3px;">(' . $this->getReadableSize($this->Database->getSizeOf($strTableName)) . ', ' . vsprintf($GLOBALS['TL_LANG']['MSC']['entries'], array($intEntriesCount)) . ')</span>';
-        }
-
+        $strReturn  = '<span style="color: #' . $strColor . '; padding-left: 3px;">';
+        $strReturn .= $strTableName;
+        $strReturn .= '<span style="padding-left: 3px;">';
+        $strReturn .= '(' . $this->getReadableSize($intEntriesSize) . ', ' . vsprintf($GLOBALS['TL_LANG']['MSC']['entries'], array($intEntriesCount)) . ')';
+        $strReturn .= '</span>';
+        $strReturn .= '</span>';     
         return $strReturn;
+               
+//        if ($booHashSame === FALSE)
+//        {
+//            $strReturn .= '<span style="padding-left: 3px;">' . $strTableName . '</span>';
+//        }
+//        else if ($booHashSame === TRUE)
+//        {
+//            $strReturn .= '<span style="padding-left: 3px;">' . $strTableName . '</span>';
+//        }
+//        else
+//        {
+//            $strReturn .= $strTableName;
+//        }
     }
 
     /**
@@ -939,7 +927,31 @@ class SyncCtoHelper extends Backend
 
         return true;
     }
+    
+    /**
+     * Check for customer regular expression
+     * 
+     * @param type $strRegexp
+     * @param type $varValue
+     * @param Widget $objWidget
+     * @return boolean 
+     */
+    public function customRegexp($strRegexp, $varValue, Widget $objWidget)
+    {
+        switch ($strRegexp)
+        {
+            case 'colorRgb':
+                if (!preg_match('/^([0-9a-f]{3}|[0-9a-f]{6})$/i', $varValue))
+                {
+                    $objWidget->addError('Field ' . $objWidget->label . ' should be a color RGB code.');
+                }
 
+                return true;
+                break;
+        }
+        return false;
+    }
+    
     /* -------------------------------------------------------------------------
      * Remote Calls
      */

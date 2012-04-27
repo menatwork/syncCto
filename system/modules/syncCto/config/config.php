@@ -32,7 +32,7 @@ $objInput = Input::getInstance();
 /**
  * Current syncCto version
  */
-$GLOBALS['SYC_VERSION'] = '2.2.0';
+$GLOBALS['SYC_VERSION'] = '2.0.0';
 
 /**
  * Back end modules
@@ -70,6 +70,7 @@ $GLOBALS['BE_MOD'] = array_merge(
 $GLOBALS['TL_HOOKS']['executePreActions'][]     = array('SyncCtoHelper', 'pingClientStatus');
 $GLOBALS['TL_HOOKS']['parseBackendTemplate'][]  = array('SyncCtoHelper', 'checkExtensions');
 $GLOBALS['TL_HOOKS']['parseBackendTemplate'][]  = array('SyncCtoHelper', 'checkLockStatus');
+$GLOBALS['TL_HOOKS']['addCustomRegexp'][]       = array('SyncCtoHelper', 'customRegexp');
 
 /**
  * Permissions
@@ -98,7 +99,7 @@ if (($objInput->get("table") == 'tl_syncCto_clients_syncTo' || $objInput->get("t
 {
     $GLOBALS['TL_CSS'][]        = 'system/modules/syncCto/html/css/filelist_src.css';
     $GLOBALS['TL_JAVASCRIPT'][] = 'system/modules/syncCto/html/js/htmltable.js';
-    $GLOBALS['TL_JAVASCRIPT'][] = 'system/modules/syncCto/html/js/filelist_src.js';
+    $GLOBALS['TL_JAVASCRIPT'][] = 'system/modules/syncCto/html/js/filelist.js';
 }
 
 if($GLOBALS['TL_CONFIG']['syncCto_attentionFlag'] == true)
@@ -108,7 +109,7 @@ if($GLOBALS['TL_CONFIG']['syncCto_attentionFlag'] == true)
 
 if (($objInput->get("do") == 'synccto_clients' && $objInput->get("act") == '') && $objInput->get("table") == '' && TL_MODE == 'BE')
 {
-    $GLOBALS['TL_JAVASCRIPT'][] = 'system/modules/syncCto/html/js/ping_src.js';
+    $GLOBALS['TL_JAVASCRIPT'][] = 'system/modules/syncCto/html/js/ping.js';
 }
 
 // Size limit for files in bytes, will be checked
@@ -159,6 +160,7 @@ $GLOBALS['SYC_CONFIG']['local_blacklist'] = array(
     'dbPconnect',
     'dbCharset',
     'dbPort',
+    'displayErrors',
     // CtoCom
     'ctoCom_APIKey',
     'ctoCom_disableRefererCheck',
@@ -208,7 +210,7 @@ $GLOBALS["CTOCOM_FUNCTIONS"]["SYNCCTO_PARAMETER"] = array(
     "parameter" => FALSE,
 );
 
-// Run a file packup
+// Run a file backup
 $GLOBALS["CTOCOM_FUNCTIONS"]["SYNCCTO_FILEBACKUP"] = array(
     "class" => "SyncCtoFiles",
     "function" => "runDump",
@@ -237,7 +239,7 @@ $GLOBALS["CTOCOM_FUNCTIONS"]["SYNCCTO_CHECKSUM_FILES"] = array(
     "class" => "SyncCtoFiles",
     "function" => "runChecksumFiles",
     "typ" => "POST",
-    "parameter" => array("fileList"),
+    "parameter" => FALSE,
 );
 
 // Get Filelist of file
@@ -250,14 +252,6 @@ $GLOBALS["CTOCOM_FUNCTIONS"]["SYNCCTO_CHECKSUM_FOLDERS"] = array(
 
 // Clear Temp folder
 $GLOBALS["CTOCOM_FUNCTIONS"]["SYNCCTO_PURGETEMP"] = array(
-    "class" => "SyncCtoFiles",
-    "function" => "purgeTemp",
-    "typ" => "GET",
-    "parameter" => FALSE,
-);
-
-// Clear Temp tables
-$GLOBALS["CTOCOM_FUNCTIONS"]["SYNCCTO_PURGETEMP_TABLES"] = array(
     "class" => "SyncCtoFiles",
     "function" => "purgeTemp",
     "typ" => "GET",
@@ -381,7 +375,7 @@ $GLOBALS["CTOCOM_FUNCTIONS"]["SYNCCTO_GET_PATHLIST"] = array(
     "class" => "SyncCtoRPCFunctions",
     "function" => "getPathList",
     "typ" => "POST",
-    "parameter" => array("name"),
+        "parameter" => array("name"),
 );
 
 // Set the attention flag

@@ -156,12 +156,6 @@ class tl_syncCto_clients_syncTo extends Backend
 
     public function databaseTablesNoneRecommended()
     {
-        // Check if extendet db view is enabled
-        if ($GLOBALS['TL_CONFIG']['syncCto_extended_db_view'] !== TRUE)
-        {
-            return $this->objSyncCtoHelper->databaseTablesNoneRecommended();
-        }
-
         $objLastHash = $this->Database->prepare("SELECT last_table_hash FROM tl_synccto_clients WHERE id=?")->execute(intval($this->Input->get("id")));
         // Check if we have a client
         if ($objLastHash->numRows == 0)
@@ -185,12 +179,6 @@ class tl_syncCto_clients_syncTo extends Backend
 
     public function databaseTablesRecommended()
     {
-        // Check if extendet db view is enabled
-        if ($GLOBALS['TL_CONFIG']['syncCto_extended_db_view'] !== TRUE)
-        {
-            return $this->objSyncCtoHelper->databaseTablesRecommended();
-        }
-
         $objLastHash = $this->Database->prepare("SELECT last_table_hash FROM tl_synccto_clients WHERE id=?")->execute(intval($this->Input->get("id")));
 
         // Check if we have a client
@@ -348,7 +336,7 @@ class tl_syncCto_clients_syncTo extends Backend
         {
             $arrSyncSettings["syncCto_AttentionFlag"] = false;
         }
-
+        
         $this->Session->set("syncCto_SyncSettings_" . $dc->id, $arrSyncSettings);
 
         $this->redirect($this->Environment->base . "contao/main.php?do=synccto_clients&amp;table=tl_syncCto_clients_syncTo&amp;act=start&amp;step=0&amp;id=" . $this->Input->get("id"));

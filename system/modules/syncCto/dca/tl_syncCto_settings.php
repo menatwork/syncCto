@@ -43,33 +43,66 @@ $GLOBALS['TL_DCA']['tl_syncCto_settings'] = array(
     ),
     'subpalettes' => array
         (
-        'syncCto_custom_settings' => 'syncCto_wait_timeout,syncCto_interactive_timeout,syncCto_extended_db_view,syncCto_colored_db_view',
+        'syncCto_custom_settings' => 'syncCto_wait_timeout,syncCto_interactive_timeout,syncCto_colored_db_view',
     ),
     // Fields
-    'fields' => array(
-        'syncCto_folder_blacklist' => array
-            (
+    'fields' => array( 
+        'syncCto_folder_blacklist' => array(
             'label' => &$GLOBALS['TL_LANG']['tl_syncCto_settings']['folder_blacklist'],
-            'inputType' => 'textwizard',
             'exclude' => true,
-            'eval' => array('trailingSlash' => false, 'style' => 'width:595px', 'allowHtml' => false),
+            'inputType' => 'multiColumnWizard',
+            'eval' => array(
+                'tl_class' => 'clr',
+                'columnFields' => array(
+                    'entries' => array(
+                        'label' => &$GLOBALS['TL_LANG']['tl_syncCto_settings']['folder_blacklist'],
+                        'exclude' => true,
+                        'inputType' => 'text',                        
+                        'eval' => array('trailingSlash' => false, 'style' => 'width:595px', 'allowHtml' => false),
+                        
+                    )
+                )
+            ),
             'load_callback' => array(array('tl_syncCto_settings', 'loadBlacklistFolder')),
+            'save_callback' => array(array('tl_syncCto_settings', 'saveMcwEntrie'))
         ),
-        'syncCto_file_blacklist' => array
-            (
+        'syncCto_file_blacklist' => array(
             'label' => &$GLOBALS['TL_LANG']['tl_syncCto_settings']['file_blacklist'],
-            'inputType' => 'textwizard',
             'exclude' => true,
-            'eval' => array('trailingSlash' => false, 'style' => 'width:595px', 'allowHtml' => false),
+            'inputType' => 'multiColumnWizard',
+            'eval' => array(
+                'tl_class' => 'clr',
+                'columnFields' => array(
+                    'entries' => array(
+                        'label' => &$GLOBALS['TL_LANG']['tl_syncCto_settings']['file_blacklist'],
+                        'exclude' => true,
+                        'inputType' => 'text',                        
+                        'eval' => array('trailingSlash' => false, 'style' => 'width:595px', 'allowHtml' => false),
+                        
+                    )
+                )
+            ),
             'load_callback' => array(array('tl_syncCto_settings', 'loadBlacklistFile')),
+            'save_callback' => array(array('tl_syncCto_settings', 'saveMcwEntrie'))
         ),
-        'syncCto_folder_whitelist' => array
-            (
+        'syncCto_folder_whitelist' => array(
             'label' => &$GLOBALS['TL_LANG']['tl_syncCto_settings']['folder_whitelist'],
-            'inputType' => 'textwizard',
             'exclude' => true,
-            'eval' => array('trailingSlash' => false, 'style' => 'width:595px', 'allowHtml' => false),
+            'inputType' => 'multiColumnWizard',
+            'eval' => array(
+                'tl_class' => 'clr',
+                'columnFields' => array(
+                    'entries' => array(
+                        'label' => &$GLOBALS['TL_LANG']['tl_syncCto_settings']['folder_whitelist'],
+                        'exclude' => true,
+                        'inputType' => 'text',                        
+                        'eval' => array('trailingSlash' => false, 'style' => 'width:595px', 'allowHtml' => false),
+                        
+                    )
+                )
+            ),
             'load_callback' => array(array('tl_syncCto_settings', 'loadWhitelistFolder')),
+            'save_callback' => array(array('tl_syncCto_settings', 'saveMcwEntrie'))
         ),
         'syncCto_local_blacklist' => array
             (
@@ -123,12 +156,6 @@ $GLOBALS['TL_DCA']['tl_syncCto_settings'] = array(
             'exclude' => true,
             'eval' => array('tl_class' => 'w50'),
         ),
-        'syncCto_extended_db_view' => array(
-            'label' => &$GLOBALS['TL_LANG']['tl_syncCto_settings']['syncCto_extended_db_view'],
-            'inputType' => 'checkbox',
-            'exclude' => true,
-            'eval' => array('tl_class' => 'w50'),
-        ),
         'syncCto_colored_db_view' => array(
             'label' => &$GLOBALS['TL_LANG']['tl_syncCto_settings']['syncCto_colored_db_view'],
             'exclude' => true,
@@ -142,14 +169,26 @@ $GLOBALS['TL_DCA']['tl_syncCto_settings'] = array(
                         'inputType' => 'text',                        
                         'eval' => array('style' => 'width:150px')
                     ),
+                    'unit' => array
+                    (
+                        'label' => &$GLOBALS['TL_LANG']['tl_syncCto_settings']['units'],
+			'inputType' => 'select',
+                        'options' => array('kb', 'mb', 'entries'),
+                        'reference' => &$GLOBALS['TL_LANG']['tl_syncCto_settings']['units']['select'],
+                        'eval' => array('includeBlankOption' => true)
+                    ),
                     'color' => array(
                         'label' => &$GLOBALS['TL_LANG']['tl_syncCto_settings']['color'],
                         'exclude' => true,
                         'inputType' => 'text',
-                        'eval' => array('style' => 'width:280px')
+                        'eval' => array('style' => 'width:280px', 'maxlength' => 6, 'rgxp' => 'colorRgb'),
+                        'wizard' => array
+                        (
+                                array('tl_syncCto_settings', 'colorPicker')
+                        )                          
                     )
                 )
-            )
+            )          
         ),
     )
 );
@@ -173,6 +212,27 @@ class tl_syncCto_settings extends Backend
         $this->objSyncCtoHelper = SyncCtoHelper::getInstance();
     }
 
+    /**
+     * Return the color picker wizard
+     * 
+     * @param DataContainer
+     * @return string
+     */
+    public function colorPicker(DataContainer $dc)
+    {
+        return ' ' . $this->generateImage('pickcolor.gif', $GLOBALS['TL_LANG']['MSC']['colorpicker'], 'style="vertical-align:top;cursor:pointer" id="moo_'.$dc->field.'"') . 
+                '<script>
+                    new MooRainbow("moo_'.$dc->field.'", {
+                        id:"ctrl_' . $dc->field . '",
+                        startColor:((cl = $("ctrl_' . $dc->field . '").value.hexToRgb(true)) ? cl : [255, 0, 0]),
+                        imgPath:"plugins/colorpicker/images/",
+                        onComplete: function(color) {
+                            $("ctrl_' . $dc->field . '").value = color.hex.replace("#", "");
+                        }
+                    });
+                </script>';
+    }    
+    
     /**
      * Load localconfig entries
      * 
@@ -201,8 +261,38 @@ class tl_syncCto_settings extends Backend
      * @return array 
      */
     public function loadBlacklistFolder($strValue)
+    {        
+        $arrList = array();
+        foreach($this->objSyncCtoHelper->getBlacklistFolder() AS $key => $value)
+        {
+            $arrList[$key] = array('entries' => $value);
+        }
+        return $arrList;
+    }
+    
+    /**
+     * Save black and white folder and file list
+     * 
+     * @param string $strValue
+     * @return string
+     */
+    public function saveMcwEntrie($strValue)
     {
-        return $this->objSyncCtoHelper->getBlacklistFolder();
+        $arrList = deserialize($strValue); 
+        $arrSaveList = array();
+        
+        if(is_array($arrSaveList) && count($arrList) > 0)
+        {        
+            foreach($arrList AS $key => $arrValue)
+            {
+                foreach($arrValue AS $value)
+                {
+                    $arrSaveList[$key] = $value;
+                }
+            }
+            return serialize($arrSaveList);
+        }
+        return serialize(array());
     }
 
     /**
@@ -213,7 +303,12 @@ class tl_syncCto_settings extends Backend
      */
     public function loadBlacklistFile($strValue)
     {
-        return $this->objSyncCtoHelper->getBlacklistFile();
+        $arrList = array();
+        foreach($this->objSyncCtoHelper->getBlacklistFile() AS $key => $value)
+        {
+            $arrList[$key] = array('entries' => $value);
+        }
+        return $arrList;
     }
 
     /**
@@ -224,7 +319,13 @@ class tl_syncCto_settings extends Backend
      */
     public function loadWhitelistFolder($strValue)
     {
-        return $this->objSyncCtoHelper->getWhitelistFolder();
+        
+        $arrList = array();
+        foreach($this->objSyncCtoHelper->getWhitelistFolder() AS $key => $value)
+        {
+            $arrList[$key] = array('entries' => $value);
+        }
+        return $arrList;        
     }
 
     /**
