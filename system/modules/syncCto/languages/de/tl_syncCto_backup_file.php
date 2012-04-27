@@ -37,15 +37,10 @@ $GLOBALS['TL_LANG']['tl_syncCto_backup_file']['edit']                           
 /**
  * Fields
  */
-$GLOBALS['TL_LANG']['tl_syncCto_backup_file']['backup_type']                    = array("Art des Backups", "Hier können Sie die Art des Backups auswählen.");
+$GLOBALS['TL_LANG']['tl_syncCto_backup_file']['core_files']                     = array("Contao-Installation", "Hier können Sie auswählen ob der Contao Kern gesichert werden soll.");
+$GLOBALS['TL_LANG']['tl_syncCto_backup_file']['user_files']                     = array("Persönliche Dateien (tl_files)", "Hier können Sie auswählen ob die Benutzerdateien gesichert werden sollen.");
 $GLOBALS['TL_LANG']['tl_syncCto_backup_file']['backup_name']                    = array("Dateiname", "Hier können Sie einen optionalen Namen zur eindeutigen Identifikation eingeben.");
 $GLOBALS['TL_LANG']['tl_syncCto_backup_file']['filelist']                       = array("Quelldateien", "Bitte wählen Sie eine Datei oder einen Ordner aus der Dateiübersicht.");
-
-/**
- * Options
- */
-$GLOBALS['TL_LANG']['tl_syncCto_backup_file']['option_full'] = 'Contao-Installation';
-$GLOBALS['TL_LANG']['tl_syncCto_backup_file']['option_small'] = 'Persönliche Daten';
 
 /**
  * List

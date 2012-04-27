@@ -32,6 +32,7 @@
  */
 $GLOBALS['TL_LANG']['tl_syncCto_check']['check']                    = 'Systemcheck';
 $GLOBALS['TL_LANG']['tl_syncCto_check']['configuration']            = 'PHP Konfiguration';
+$GLOBALS['TL_LANG']['tl_syncCto_check']['functions']                = 'PHP Funktionen';
  
 /**
  * Table
@@ -54,6 +55,8 @@ $GLOBALS['TL_LANG']['tl_syncCto_check']['fsocket']                  = array('Fso
 $GLOBALS['TL_LANG']['tl_syncCto_check']['fopen']                    = array('Fopen', 'Die empfohlene Einstellung ist An.');
 $GLOBALS['TL_LANG']['tl_syncCto_check']['zip_archive']              = array('ZipArchive', 'Die empfohlene Einstellung ist An.');
 $GLOBALS['TL_LANG']['tl_syncCto_check']['bcmath']                   = array('BC Math', 'Die empfohlene Einstellung ist An.');
+$GLOBALS['TL_LANG']['tl_syncCto_check']['xmlreader']                = array('XMLReader', 'Die empfohlene Einstellung ist An.');
+$GLOBALS['TL_LANG']['tl_syncCto_check']['xmlwriter']                = array('XMLWriter', 'Die empfohlene Einstellung ist An.');
 $GLOBALS['TL_LANG']['tl_syncCto_check']['suhosin']                  = array('Suhosin', 'Die empfohlene Einstellung ist Aus.');
 
 /**

@@ -53,6 +53,11 @@ $GLOBALS['TL_LANG']['tl_syncCto_settings']['debug_mode']                = array(
 $GLOBALS['TL_LANG']['tl_syncCto_settings']['custom_settings']           = array('Experten-Einstellungen aktivieren', 'Klicken Sie hier wenn Sie wissen was Sie tun.');
 $GLOBALS['TL_LANG']['tl_syncCto_settings']['wait_timeout']              = array('"wait_timeout" konfigurieren', 'Mehr Informationen: http://goo.gl/rC5Y4');
 $GLOBALS['TL_LANG']['tl_syncCto_settings']['interactive_timeout']       = array('"interactive_timeout" konfigurieren', 'Mehr Informationen: http://goo.gl/VHxRK');
-$GLOBALS['TL_LANG']['tl_syncCto_settings']['syncCto_extended_db_view']  = array('Erweiterte Ansicht für Datenbankvergleichslisten', 'Wählen Sie diese Option wenn Sie einen erweiterte Datenbank Liste bei der Synchronisation haben mächten, die unterschiede seit der letzten Synchronisation anzeigt.');
+$GLOBALS['TL_LANG']['tl_syncCto_settings']['syncCto_colored_db_view']   = array('Limits für Datenbankvergleichslisten', 'Hier können Sie Limits bestimmen. Diese Limits werden in den Datenbankvergleichslisten farblich angezeigt.');
+$GLOBALS['TL_LANG']['tl_syncCto_settings']['syncCto_colored_db_view']   = array('Limits für Datenbankvergleichslisten', 'Hier können Sie Limits bestimmen. Diese Limits werden in den Datenbankvergleichslisten farblich angezeigt.');
+$GLOBALS['TL_LANG']['tl_syncCto_settings']['entries']                   = array('Einträge Limit', 'Hier können Sie das Limit bestimmen ab den ein Eintrag farblich markiert werden soll.');
+$GLOBALS['TL_LANG']['tl_syncCto_settings']['units']                     = array('Einheit', 'Hier können Sie die Einheit für das Limit bestimmen');
+$GLOBALS['TL_LANG']['tl_syncCto_settings']['color']                     = array('Farbe (CSS - Hex|Colorname)', 'Hier können Sie die Farbe angeben die verwendet werden soll um das Limit zu genzeichnen.');
+$GLOBALS['TL_LANG']['tl_syncCto_settings']['units']['select']           = array('kb' => 'KB','mb' => 'MB', 'entries' => 'Einträge');
 
 ?>
