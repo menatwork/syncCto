@@ -449,7 +449,7 @@ class SyncCtoModuleClient extends BackendModule
     {
         // Init | Set Step to 1
         if ($this->intStep == 0)
-        { 
+        {
             // Init content
             $this->booError = false;
             $this->booAbort = false;
@@ -710,57 +710,6 @@ class SyncCtoModuleClient extends BackendModule
         $this->saveStepPool();
     }
 
-    /**
-     * Abort function
-     * @todo
-     * @deprecated
-     */
-    private function pageSyncAbort()
-    {
-        if ($this->booAbort == false)
-        {
-            // Set content back to normale mode
-            $this->booError = false;
-            $this->strError = "";
-            $this->booAbort = true;
-            $this->booRefresh = false;
-
-            // Reset Session
-            $this->resetStepPoolByID(array(1, 2, 3, 4, 5, 6));
-
-            try
-            {
-                $this->objSyncCtoCommunicationClient->stopConnection();
-            }
-            catch (Exception $exc)
-            {
-                // Nothing to do 
-            }
-
-            try
-            {
-                $this->objSyncCtoCommunicationClient->referrerEnable();
-            }
-            catch (Exception $exc)
-            {
-                // Nothing to do 
-            }
-
-            // Set stepe
-            $this->intStep = 99;
-
-            // Set last to skipped        
-            $this->objData->setState($GLOBALS['TL_LANG']['MSC']['skipped']);
-            $this->objData->setHtml("");
-
-            // Set Abort information 
-            $this->objData->setStep(99);
-            $this->objData->setTitle($GLOBALS['TL_LANG']['MSC']['abort']);
-            $this->objData->setDescription($GLOBALS['TL_LANG']['tl_syncCto_sync']['abort']);
-            $this->objData->setState("");
-        }
-    }
-
     /* -------------------------------------------------------------------------
      * Step function for SyncTo AND SyncFrom
      */
@@ -945,6 +894,55 @@ class SyncCtoModuleClient extends BackendModule
         }
     }
 
+    /**
+     * Abort function
+     */
+    private function pageSyncAbort()
+    {
+        if ($this->booAbort == false)
+        {
+            // Set content back to normale mode
+            $this->booError = false;
+            $this->strError = "";
+            $this->booAbort = true;
+            $this->booRefresh = false;
+
+            // Reset Session
+            $this->resetStepPoolByID(array(1, 2, 3, 4, 5, 6));
+
+            try
+            {
+                $this->objSyncCtoCommunicationClient->stopConnection();
+            }
+            catch (Exception $exc)
+            {
+                // Nothing to do 
+            }
+
+            try
+            {
+                $this->objSyncCtoCommunicationClient->referrerEnable();
+            }
+            catch (Exception $exc)
+            {
+                // Nothing to do 
+            }
+
+            // Set stepe
+            $this->intStep = 99;
+
+            // Set last to skipped        
+            $this->objData->setState($GLOBALS['TL_LANG']['MSC']['skipped']);
+            $this->objData->setHtml("");
+
+            // Set Abort information 
+            $this->objData->setStep(99);
+            $this->objData->setTitle($GLOBALS['TL_LANG']['MSC']['abort']);
+            $this->objData->setDescription($GLOBALS['TL_LANG']['tl_syncCto_sync']['abort']);
+            $this->objData->setState("");
+        }
+    }
+
     /* -------------------------------------------------------------------------
      * Start SyncCto syncTo
      */
@@ -965,10 +963,7 @@ class SyncCtoModuleClient extends BackendModule
         $this->strError = "";
         $this->objData->setState($GLOBALS['TL_LANG']['MSC']['progress']);
 
-        /* ---------------------------------------------------------------------
-         * Run page
-         */
-
+        // Run page
         try
         {
             switch ($this->objStepPool->step)
@@ -1140,6 +1135,7 @@ class SyncCtoModuleClient extends BackendModule
                     $intCountDelete  = 0;
 
                     $intTotalSize = 0;
+                    $intTotalSizeDel = 0;
 
                     // Count files
                     foreach ($this->arrListCompare as $key => $value)
@@ -1148,14 +1144,17 @@ class SyncCtoModuleClient extends BackendModule
                         {
                             case SyncCtoEnum::FILESTATE_MISSING:
                                 $intCountMissing++;
+                                $intTotalSize += $value["size"];
                                 break;
 
                             case SyncCtoEnum::FILESTATE_NEED:
                                 $intCountNeed++;
+                                $intTotalSize += $value["size"];
                                 break;
 
                             case SyncCtoEnum::FILESTATE_DELETE:
                                 $intCountDelete++;
+                                $intTotalSizeDel += $value["size"];
                                 break;
 
                             case SyncCtoEnum::FILESTATE_BOMBASTIC_BIG:
@@ -1164,11 +1163,6 @@ class SyncCtoModuleClient extends BackendModule
                             case SyncCtoEnum::FILESTATE_TOO_BIG_DELETE :
                                 $intCountIgnored++;
                                 break;
-                        }
-
-                        if ($value["size"] != -1)
-                        {
-                            $intTotalSize += $value["size"];
                         }
                     }
 
@@ -1195,6 +1189,7 @@ class SyncCtoModuleClient extends BackendModule
                     $objTemp->id = $this->intClientID;
                     $objTemp->step = $this->intStep;
                     $objTemp->totalsize = $intTotalSize;
+                    $objTemp->totalsizeDel = $intTotalSizeDel;
                     $objTemp->direction = "To";
                     $objTemp->compare_complex = false;
 
@@ -1267,7 +1262,6 @@ class SyncCtoModuleClient extends BackendModule
                                 $value["state"] == SyncCtoEnum::FILESTATE_BOMBASTIC_BIG)
                         {
                             $arrTempList[$key] = $this->arrListCompare[$key];
-                            $intTotalsize += $value["size"];
                         }
                         else if ($value["split"] == 1)
                         {
@@ -1380,7 +1374,7 @@ class SyncCtoModuleClient extends BackendModule
                  * Send normal files
                  */
                 case 2:
-                    // Send allfiles exclude the big thing ones
+                    // Send allfiles exclude the big ones
                     $intCountTransfer = 1;
 
                     foreach ($this->arrListCompare as $key => $value)
@@ -1564,7 +1558,7 @@ class SyncCtoModuleClient extends BackendModule
                             $this->arrListCompare[$key]["split_transfer"] = $ii + 1;
 
                             // check time limit 30 secs
-                            if ($intStar + 30 < time())
+                            if ($intStart + 30 < time())
                             {
                                 break;
                             }
@@ -1631,7 +1625,7 @@ class SyncCtoModuleClient extends BackendModule
 
                         $this->arrListCompare[$key]["transmission"] = SyncCtoEnum::FILETRANS_SEND;
 
-                        if ($intStar < time() - 30)
+                        if ($intStart < time() - 30)
                         {
                             break;
                         }
@@ -1956,16 +1950,6 @@ class SyncCtoModuleClient extends BackendModule
                     $this->objStepPool->step++;
 
                 case 9:
-                    if (in_array("temp_tables", $this->arrSyncSettings["syncCto_Systemoperations_Maintenance"]))
-                    {
-                        
-                        $this->objStepPool->step++;
-                        break;
-                    }
-
-                    $this->objStepPool->step++;
-
-                case 9:
                     $this->objSyncCtoCommunicationClient->referrerEnable();
                     $this->objStepPool->step++;
                     break;
@@ -2230,10 +2214,7 @@ class SyncCtoModuleClient extends BackendModule
         $this->strError = "";
         $this->objData->setState($GLOBALS['TL_LANG']['MSC']['progress']);
 
-        /* ---------------------------------------------------------------------
-         * Run page
-         */
-
+        // Run page
         try
         {
             switch ($this->objStepPool->step)
@@ -2257,11 +2238,6 @@ class SyncCtoModuleClient extends BackendModule
                     if (in_array("user_change", $this->arrSyncSettings["syncCto_Type"]))
                     {
                         $this->arrListFile = $this->objSyncCtoCommunicationClient->getChecksumFiles(array());
-
-
-                        var_dump($this->arrListFile);
-                        exit();
-
                         $this->objStepPool->step++;
                         break;
                     }
@@ -2288,7 +2264,6 @@ class SyncCtoModuleClient extends BackendModule
                     if (in_array("core_change", $this->arrSyncSettings["syncCto_Type"]) || in_array("user_change", $this->arrSyncSettings["syncCto_Type"]))
                     {
                         $this->arrListCompare = $this->objSyncCtoFiles->runCecksumCompare($this->arrListFile);
-
                         $this->objData->setDescription($GLOBALS['TL_LANG']['tl_syncCto_sync']["step_2"]['description_2']);
                         $this->objStepPool->step++;
                         break;
@@ -2414,6 +2389,7 @@ class SyncCtoModuleClient extends BackendModule
                     $intCountDelete  = 0;
 
                     $intTotalSize = 0;
+                    $intTotalSizeDel = 0;
 
                     // Count files
                     foreach ($this->arrListCompare as $key => $value)
@@ -2422,14 +2398,17 @@ class SyncCtoModuleClient extends BackendModule
                         {
                             case SyncCtoEnum::FILESTATE_MISSING:
                                 $intCountMissing++;
+                                $intTotalSize += $value["size"];
                                 break;
 
                             case SyncCtoEnum::FILESTATE_NEED:
                                 $intCountNeed++;
+                                $intTotalSize += $value["size"];
                                 break;
 
                             case SyncCtoEnum::FILESTATE_DELETE:
                                 $intCountDelete++;
+                                $intTotalSizeDel += $value["size"];
                                 break;
 
                             case SyncCtoEnum::FILESTATE_BOMBASTIC_BIG:
@@ -2438,11 +2417,6 @@ class SyncCtoModuleClient extends BackendModule
                             case SyncCtoEnum::FILESTATE_TOO_BIG_DELETE :
                                 $intCountIgnored++;
                                 break;
-                        }
-
-                        if ($value["size"] != -1)
-                        {
-                            $intTotalSize += $value["size"];
                         }
                     }
 
@@ -2469,6 +2443,7 @@ class SyncCtoModuleClient extends BackendModule
                     $objTemp->id = $this->intClientID;
                     $objTemp->step = $this->intStep;
                     $objTemp->totalsize = $intTotalSize;
+                    $objTemp->totalsizeDel = $intTotalSizeDel;
                     $objTemp->direction = "From";
                     $objTemp->compare_complex = false;
 
@@ -2483,10 +2458,6 @@ class SyncCtoModuleClient extends BackendModule
                  * Search for big file
                  */
                 case 9:
-                    var_dump("i am out for big files search");
-                    exit();
-
-
                     // build list with big files
                     $arrTempList = array();
                     $intTotalsize = 0;
@@ -2583,7 +2554,7 @@ class SyncCtoModuleClient extends BackendModule
     }
 
     /**
-     * Split Files
+     * Send Files / Split Files
      */
     private function pageSyncFromShowStep3()
     {
@@ -2639,7 +2610,7 @@ class SyncCtoModuleClient extends BackendModule
         try
         {
             // Timer 
-            $intStar = time();
+            $intStart = time();
 
             switch ($this->objStepPool->step)
             {
@@ -2842,7 +2813,7 @@ class SyncCtoModuleClient extends BackendModule
                             $this->arrListCompare[$key]["split_transfer"] = $ii + 1;
 
                             // check time limit 30 secs
-                            if ($intStar + 30 < time())
+                            if ($intStart + 30 < time())
                             {
                                 break;
                             }
@@ -2908,7 +2879,7 @@ class SyncCtoModuleClient extends BackendModule
 
                         $this->arrListCompare[$key]["transmission"] = SyncCtoEnum::FILETRANS_SEND;
 
-                        if ($intStar < time() - 30)
+                        if ($intStart < time() - 30)
                         {
                             break;
                         }
