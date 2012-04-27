@@ -1,4 +1,4 @@
-<h1 class="file"><strong><?php echo $GLOBALS['TL_LANG']['MSC']['totalsize']; ?></strong> ~ <?php echo $this->getReadableSize($this->totalsize); ?></h1>
+<h1 class="file"><strong><?php echo $GLOBALS['TL_LANG']['MSC']['totalsize']; ?></strong> ~ <?php echo $this->getReadableSize($this->totalsize); ?><?php echo ($this->totalsizeDel != "") ?  " / ~ " . $this->getReadableSize($this->totalsizeDel) : ""; ?></h1>
 
 <form id="syncCto_filelist_form" action="<?php echo $this->Environment->base; ?>contao/main.php?do=synccto_clients&amp;table=tl_syncCto_clients_sync<?php echo $this->direction; ?>&amp;act=start&amp;step=<?php echo $this->step; ?>&amp;id=<?php echo $this->id; ?>" method="post">
     <div class="formbody">
