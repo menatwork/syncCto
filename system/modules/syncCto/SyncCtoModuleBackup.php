@@ -552,7 +552,7 @@ class SyncCtoModuleBackup extends BackendModule
         $this->strError = "";
         $this->objData->setStep(1);
         $this->objData->setState($GLOBALS['TL_LANG']['MSC']['progress']);
-
+        
         switch ($this->intStep)
         {
             case 1:
@@ -567,32 +567,15 @@ class SyncCtoModuleBackup extends BackendModule
                 break;
 
             case 2:
-                if ($this->arrBackupSettings['user_files'] == true)
-                {
-                    $arrResult = $this->objSyncCtoFiles->runDumpFiles($this->arrBackupSettings['backup_name'], $this->arrBackupSettings['user_filelist']);
-                    $this->objStepPool->zipname = $arrResult["name"];
-                    $this->objStepPool->skippedfiles = $arrResult["skipped"];
+                $arrResult = $this->objSyncCtoFiles->runDump($this->arrBackupSettings['backup_name'], $this->arrBackupSettings['core_files'], $this->arrBackupSettings['user_filelist']);
+                $this->objStepPool->zipname = $arrResult["name"];
+                $this->objStepPool->skippedfiles = $arrResult["skipped"];
 
-                    $this->intStep++;
-                    break;
-                }
+                $this->intStep++;
+                break;
+
 
             case 3:
-                if ($this->arrBackupSettings['core_files'] == true)
-                {
-                    $arrResult = $this->objSyncCtoFiles->runDump($this->arrBackupSettings['backup_name']);
-
-                    $this->objStepPool->zipname = $arrResult["name"];
-                    if (is_array($this->objStepPool->skippedfiles))
-                    {
-                        $this->objStepPool->skippedfiles = array_unique(array_merge($this->objStepPool->skippedfiles, $arrResult["skipped"]));
-                    }
-
-                    $this->intStep++;
-                    break;
-                }
-
-            case 4:
                 $this->booFinished = true;
                 $this->booRefresh = false;
 
