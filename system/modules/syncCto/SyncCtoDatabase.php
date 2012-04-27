@@ -37,7 +37,8 @@ class SyncCtoDatabase extends Backend
      */
 
     // Singelten pattern
-    protected static $instance           = null;
+    protected static $instance    = null;
+    
     // Vars 
     protected $arrBackupTables;
     protected $arrHiddenTables;
@@ -46,8 +47,13 @@ class SyncCtoDatabase extends Backend
     protected $strFilenameSQL     = "DB-Backup.sql";
     protected $strTimestampFormat;
     protected $intMaxMemoryUsage;
+    
     // Objects 
     protected $objSyncCtoHelper;
+    
+    /**
+     * @var XMLReader 
+     */
     protected $objXMLReader;
 
     /**
@@ -135,7 +141,9 @@ class SyncCtoDatabase extends Backend
     public static function getInstance()
     {
         if (self::$instance == null)
+        {
             self::$instance = new SyncCtoDatabase();
+        }
 
         return self::$instance;
     }
@@ -428,7 +436,7 @@ class SyncCtoDatabase extends Backend
                     {
                         $objXml->startElement('field');
                         $objXml->writeAttribute("name", $field_key);
-
+                        
                         if (!isset($field_data))
                         {
                             $objXml->writeAttribute("type", "null");
@@ -712,15 +720,17 @@ class SyncCtoDatabase extends Backend
             $strPath = $GLOBALS['SYC_PATH']['db'];
         }
 
-        $objZipWrite = new ZipWriter($strPath . $strFilename);
+        $objZipArchive = new ZipArchiveCto();
+        $objZipArchive->open($strPath . $strFilename, ZipArchiveCto::CREATE);
 
         if ($booOnlyMachine == false)
         {
-            $objZipWrite->addFile("system/tmp/TempSQLDump.$strRandomToken", $this->strFilenameSQL);
+            $objZipArchive->addFile("system/tmp/TempSQLDump.$strRandomToken", $this->strFilenameSQL);
         }
-        $objZipWrite->addFile("system/tmp/TempSyncCtoDump.$strRandomToken", $this->strFilenameSyncCto);
 
-        $objZipWrite->close();
+        $objZipArchive->addFile("system/tmp/TempSyncCtoDump.$strRandomToken", $this->strFilenameSyncCto);
+
+        $objZipArchive->close();
 
         $objFiles = Files::getInstance();
 
@@ -835,7 +845,7 @@ class SyncCtoDatabase extends Backend
         $strCurrentNodeAttributeType = "";
         $strCurrentNodeName          = "";
         $intCounter                  = 0;
-
+       
         while ($this->objXMLReader->read())
         {
             switch ($this->objXMLReader->nodeType)
@@ -934,7 +944,7 @@ class SyncCtoDatabase extends Backend
                     }
                     break;
             }
-        }
+        }        
     }
 
     /**
@@ -986,7 +996,7 @@ class SyncCtoDatabase extends Backend
                 throw new Exception("Not supportet or Unknown file type.");
                 break;
         }
-
+        
         // Rename temp tables
         foreach ($arrRestoreTables as $key => $value)
         {
@@ -1032,7 +1042,6 @@ class SyncCtoDatabase extends Backend
         $this->objXMLReader = new XMLReader();
         $this->objXMLReader->open(TL_ROOT . "/system/tmp/" . basename($strRestoreFile) . ".xml");
 
-
         while ($this->objXMLReader->read())
         {
             switch ($this->objXMLReader->nodeType)
@@ -1051,29 +1060,33 @@ class SyncCtoDatabase extends Backend
                     break;
             }
         }
-
+        
         $objXMLFile->delete();
 
         return $arrRestoreTables;
     }
 
-    protected function runRestoreFromSer()
+    protected function runRestoreFromSer($strRestoreFile)
     {
-        $objZipRead = new ZipReader($strRestoreFile);
-
-        // Get structure
-        if (!$objZipRead->getFile($this->strFilenameTable))
-        {
-            throw new Exception("Could not load SQL file table. Maybe damaged?");
-        }
-
-        $mixTables = $objZipRead->unzip();
-        $mixTables = trimsplit("\n", $mixTables);
-
+        $objZipArchive    = new ZipArchiveCto();
+        $objTempfile      = tmpfile();
         $arrRestoreTables = array();
 
         try
         {
+            // Open ZIP Archive
+            $objZipArchive->open($strRestoreFile);
+
+            // Get structure
+            if ($objZipArchive->locateName($this->strFilenameTable) === false)
+            {
+                throw new Exception("Could not load SQL file table. Maybe damaged?");
+            }
+
+            $mixTables = $objZipArchive->getFromName($this->strFilenameTable);
+            $mixTables = trimsplit("\n", $mixTables);
+
+            // Create temp tables
             foreach ($mixTables as $key => $value)
             {
                 if (empty($value))
@@ -1093,29 +1106,17 @@ class SyncCtoDatabase extends Backend
 
                 $arrRestoreTables[] = $value["name"];
             }
-        }
-        catch (Exception $exc)
-        {
-            foreach ($arrRestoreTables as $key => $value)
-            {
-                $this->Database->query("DROP TABLE IF EXISTS " . "synccto_temp_" . $value);
-            }
 
-            throw $exc;
-        }
-
-        try
-        {
             // Get insert
-            if (!$objZipRead->getFile($this->strFilenameInsert))
+            if ($objZipArchive->locateName($this->strFilenameInsert) === false)
             {
                 throw new Exception("Could not load SQL file inserts. Maybe damaged?");
             }
 
-            $strContent = $objZipRead->unzip();
+            $strContent = $objZipArchive->getFromName($this->strFilenameInsert);
 
             // Write temp File
-            $objTempfile = tmpfile();
+
             fputs($objTempfile, $strContent, strlen($strContent));
 
             unset($strContent);
@@ -1145,23 +1146,14 @@ class SyncCtoDatabase extends Backend
                     throw new Exception("Could not load SQL file inserts. Maybe damaged on line $i?");
                 }
 
-                try
-                {
-                    $strSQL = $this->buildSQLInsert("synccto_temp_" . $mixLine['table'], array_keys($mixLine['values']), $mixLine['values'], true);
-                    $this->Database->query($strSQL);
-                }
-                catch (Exception $exc)
-                {
-                    foreach ($arrRestoreTables as $key => $value)
-                    {
-                        $this->Database->query("DROP TABLE IF EXISTS " . "synccto_temp_" . $value);
-                    }
-
-                    throw $exc;
-                }
+                $strSQL = $this->buildSQLInsert("synccto_temp_" . $mixLine['table'], array_keys($mixLine['values']), $mixLine['values'], true);
+                $this->Database->query($strSQL);
             }
 
+            $objZipArchive->close();
             fclose($objTempfile);
+
+            return $arrRestoreTables;
         }
         catch (Exception $exc)
         {
@@ -1170,10 +1162,11 @@ class SyncCtoDatabase extends Backend
                 $this->Database->query("DROP TABLE IF EXISTS " . "synccto_temp_" . $value);
             }
 
+            $objZipArchive->close();
+            fclose($objTempfile);
+
             throw $exc;
         }
-
-        return $arrRestoreTables;
     }
 
     /* -------------------------------------------------------------------------
@@ -1195,103 +1188,43 @@ class SyncCtoDatabase extends Backend
         // Get list of indicies
         $arrIndexes = $this->Database->prepare("SHOW INDEX FROM `$strTableName`")->executeUncached()->fetchAllAssoc();
 
-        // Bugfix: If we have Contao 2.9.x use a temp array for the TABLE_CREATE_DEFINITIONS
-        if (version_compare(VERSION, '2.10', '<'))
-        {
-            $arrTempIndex = array();
-        }
+
 
         foreach ($fields as $field)
         {
-            if (version_compare(VERSION, '2.10', '<'))
+            if ($field["type"] == "index")
             {
-                // Indices
-                if (strlen($field['index']) != 0)
+                if ($field["name"] == "PRIMARY")
                 {
-                    switch ($field['index'])
-                    {
-                        case 'PRIMARY':
-                            $arrTempIndex["PRIMARY"]["body"]     = 'PRIMARY KEY  (`%s`)';
-                            $arrTempIndex["PRIMARY"]["fields"][] = $field["name"];
-                            break;
-
-                        case 'UNIQUE':
-                            $arrTempIndex[$field["name"]]["body"]     = 'UNIQUE KEY `%s` (`%s`)';
-                            $arrTempIndex[$field["name"]]["fields"][] = $field["name"];
-                            break;
-
-                        case 'FULLTEXT':
-                            $arrTempIndex[$field["name"]]["body"]     = 'FULLTEXT KEY `%s` (`%s`)';
-                            $arrTempIndex[$field["name"]]["fields"][] = $field["name"];
-                            break;
-
-                        default:
-                            if ((strpos(' ' . $field['type'], 'text') || strpos(' ' . $field['type'], 'char')) && ($field['null'] == 'NULL'))
-                            {
-                                $arrTempIndex[$field["name"]]["body"]     = 'FULLTEXT KEY `%s` (`%s`)';
-                                $arrTempIndex[$field["name"]]["fields"][] = $field["name"];
-                            }
-                            else
-                            {
-                                $arrTempIndex[$field["name"]]["body"]     = 'KEY `%s` (`%s`)';
-                                $arrTempIndex[$field["name"]]["fields"][] = $field["name"];
-                            }
-                            break;
-                    }
+                    $return['TABLE_CREATE_DEFINITIONS'][$field["name"]] = "PRIMARY KEY (`" . implode("`,`", $field["index_fields"]) . "`)";
                 }
-            }
-            else
-            {
-                if ($field["type"] == "index")
+                else if ($field["index"] == "UNIQUE")
                 {
-                    if ($field["name"] == "PRIMARY")
+                    $return['TABLE_CREATE_DEFINITIONS'][$field["name"]] = "UNIQUE KEY `" . $field["name"] . "` (`" . implode("`,`", $field["index_fields"]) . "`)";
+                }
+                else if ($field["index"] == "KEY")
+                {
+                    foreach ($arrIndexes as $valueIndexes)
                     {
-                        $return['TABLE_CREATE_DEFINITIONS'][$field["name"]] = "PRIMARY KEY (`" . implode("`,`", $field["index_fields"]) . "`)";
-                    }
-                    else if ($field["index"] == "UNIQUE")
-                    {
-                        $return['TABLE_CREATE_DEFINITIONS'][$field["name"]] = "UNIQUE KEY `" . $field["name"] . "` (`" . implode("`,`", $field["index_fields"]) . "`)";
-                    }
-                    else if ($field["index"] == "KEY")
-                    {
-                        foreach ($arrIndexes as $keyIndexes => $valueIndexes)
+                        if ($valueIndexes["Key_name"] == $field["name"])
                         {
-                            if ($valueIndexes["Key_name"] == $field["name"])
+                            switch ($valueIndexes["Index_type"])
                             {
-                                switch ($valueIndexes["Index_type"])
-                                {
-                                    case "FULLTEXT":
-                                        $return['TABLE_CREATE_DEFINITIONS'][$field["name"]] = "FULLTEXT KEY `" . $field['name'] . "` (`" . implode("`,`", $field["index_fields"]) . "`)";
-                                        break;
+                                case "FULLTEXT":
+                                    $return['TABLE_CREATE_DEFINITIONS'][$field["name"]] = "FULLTEXT KEY `" . $field['name'] . "` (`" . implode("`,`", $field["index_fields"]) . "`)";
+                                    break;
 
-                                    default:
-                                        $return['TABLE_CREATE_DEFINITIONS'][$field["name"]] = "KEY `" . $field['name'] . "` (`" . implode("`,`", $field["index_fields"]) . "`)";
-                                        break;
-                                }
-
-                                break;
+                                default:
+                                    $return['TABLE_CREATE_DEFINITIONS'][$field["name"]] = "KEY `" . $field['name'] . "` (`" . implode("`,`", $field["index_fields"]) . "`)";
+                                    break;
                             }
+
+                            break;
                         }
                     }
-
-                    continue;
                 }
-            }
 
-            // Bugfix: if we have contao 2.9.x build the TABLE_CREATE_DEFINITIONS from temp array
-            if (version_compare(VERSION, '2.10', '<'))
-            {
-                foreach ($arrTempIndex as $key => $value)
-                {
-                    if ($key == 'PRIMARY')
-                    {
-                        $return['TABLE_CREATE_DEFINITIONS'][$key] = vsprintf($value["body"], array(implode("`, `", $value["fields"])));
-                    }
-                    else
-                    {
-                        $return['TABLE_CREATE_DEFINITIONS'][$key] = vsprintf($value["body"], array($key, implode("`, `", $value["fields"])));
-                    }
-                }
+                continue;
             }
 
             unset($field['index']);
