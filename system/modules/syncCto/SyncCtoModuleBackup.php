@@ -427,15 +427,9 @@ class SyncCtoModuleBackup extends BackendModule
                 $this->objData->setState($GLOBALS['TL_LANG']['MSC']['ok']);
 
                 $strHTML = "<p class='tl_help'><br />";
-                if (version_compare(VERSION, "2.10", "<"))
-                {
-                    $strHTML .= "<a onclick='Backend.openWindow(this, 600, 235); return false;' title='In einem neuen Fenster ansehen' href='contao/popup.php?src=" . $GLOBALS['TL_CONFIG']['uploadPath'] . "/syncCto_backups/database/" . $this->objStepPool->zipname . "'>" . $GLOBALS['TL_LANG']['tl_syncCto_backup_db']['download_backup'] . "</a>";
-                }
-                else
-                {
-                    $strHTML .= "<a rel='lightbox[details 600 300]' title='In einem neuen Fenster ansehen' href='contao/popup.php?src=" . base64_encode($GLOBALS['TL_CONFIG']['uploadPath'] . "/syncCto_backups/database/" . $this->objStepPool->zipname) . "'>" . $GLOBALS['TL_LANG']['tl_syncCto_backup_db']['download_backup'] . "</a>";
-                }
-
+                $strHTML .= "<a rel='lightbox[details 600 300]' title='In einem neuen Fenster ansehen' href='contao/popup.php?src=" . base64_encode($GLOBALS['TL_CONFIG']['uploadPath'] . "/syncCto_backups/database/" . $this->objStepPool->zipname) . "'>" . $GLOBALS['TL_LANG']['tl_syncCto_backup_db']['download_backup'] . "</a>";
+                $strHTML .= "</p>";
+                
                 $this->objData->setStep(2);
                 $this->objData->setTitle($GLOBALS['TL_LANG']['MSC']['complete']);
                 $this->objData->setDescription($GLOBALS['TL_LANG']['tl_syncCto_backup_db']['complete'] . " " . $this->objStepPool->zipname);
@@ -582,35 +576,26 @@ class SyncCtoModuleBackup extends BackendModule
                 $this->objData->setStep(1);
                 $this->objData->setState($GLOBALS['TL_LANG']['MSC']['ok']);
 
-                $strHMTL = "<p class='tl_help'><br />";
-
-                if (version_compare(VERSION, "2.10", "<"))
-                {
-                    $strHMTL .= "<a onclick='Backend.openWindow(this, 600, 235); return false;' title='In einem neuen Fenster ansehen' href='contao/popup.php?src=" . $GLOBALS['TL_CONFIG']['uploadPath'] . "/syncCto_backups/files/" . $this->objStepPool->zipname . "'>" . $GLOBALS['TL_LANG']['tl_syncCto_backup_file']['download_backup'] . "</a>";
-                }
-                else
-                {
-                    $strHMTL .= "<a rel='lightbox[details 600 300]' title='In einem neuen Fenster ansehen' href='contao/popup.php?src=" . base64_encode($GLOBALS['TL_CONFIG']['uploadPath'] . "/syncCto_backups/files/" . $this->objStepPool->zipname) . "'>" . $GLOBALS['TL_LANG']['tl_syncCto_backup_file']['download_backup'] . "</a>";
-                }
-
-                $strHMTL .= "</p>";
+                $strHTML = "<p class='tl_help'><br />";
+                $strHTML .= "<a rel='lightbox[details 600 300]' title='In einem neuen Fenster ansehen' href='contao/popup.php?src=" . base64_encode($GLOBALS['TL_CONFIG']['uploadPath'] . "/syncCto_backups/files/" . $this->objStepPool->zipname) . "'>" . $GLOBALS['TL_LANG']['tl_syncCto_backup_file']['download_backup'] . "</a>";
+                $strHTML .= "</p>";
 
                 if (count($this->objStepPool->skippedfiles) != 0)
                 {
-                    $strHMTL = '<br /><p class="tl_help">' . count($arrStepPool["skippedfiles"]) . $GLOBALS['TL_LANG']['MSC']['skipped_files'] . '</p>';
+                    $strHTML = '<br /><p class="tl_help">' . count($arrStepPool["skippedfiles"]) . $GLOBALS['TL_LANG']['MSC']['skipped_files'] . '</p>';
 
-                    $strHMTL .= '<ul class="fileinfo">';
+                    $strHTML .= '<ul class="fileinfo">';
                     foreach ($this->objStepPool->skippedfiles as $value)
                     {
-                        $strHMTL .= "<li>" . $value . "</li>";
+                        $strHTML .= "<li>" . $value . "</li>";
                     }
-                    $strHMTL .= "</ul>";
+                    $strHTML .= "</ul>";
                 }
 
                 $this->objData->setStep(2);
                 $this->objData->setTitle($GLOBALS['TL_LANG']['MSC']['complete']);
                 $this->objData->setDescription($GLOBALS['TL_LANG']['tl_syncCto_backup_file']['complete'] . " " . $this->objStepPool->zipname);
-                $this->objData->setHtml($strHMTL);
+                $this->objData->setHtml($strHTML);
                 break;
         }
     }

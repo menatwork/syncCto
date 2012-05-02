@@ -110,7 +110,7 @@ class SyncCtoHelper extends Backend
         {
             foreach ($arrLocalconfig as $value)
             {
-                if ($value == "" || in_array($value, $arrSyncCtoConfig) )
+                if ($value == "" || in_array($value, $arrSyncCtoConfig))
                 {
                     continue;
                 }
@@ -259,14 +259,7 @@ class SyncCtoHelper extends Backend
 
                 try
                 {
-                    if (version_compare(VERSION . '.' . BUILD, '2.10.0', '<'))
-                    {
-                        $arrReturn = array("success" => false, "value" => 0, "error" => "", "token" => "");
-                    }
-                    else
-                    {
-                        $arrReturn = array("success" => false, "value" => 0, "error" => "", "token" => REQUEST_TOKEN);
-                    }
+                    $arrReturn = array("success" => false, "value" => 0, "error" => "", "token" => REQUEST_TOKEN);
 
                     // Load Client from database
                     $objClient = $this->Database->prepare("SELECT * FROM tl_synccto_clients WHERE id = %s")
@@ -365,7 +358,7 @@ class SyncCtoHelper extends Backend
             // required extensions
             $arrRequiredExtensions = array(
                 'ctoCommunication' => 'ctoCommunication',
-                'textwizard' => 'textwizard',
+                'MultiColumnWizard' => 'multicolumnwizard',
                 '3CFramework' => '3cframework'
             );
 
@@ -577,7 +570,7 @@ class SyncCtoHelper extends Backend
 
         $arrTablesPermission = $this->BackendUser->syncCto_tables;
 
-        $arrTables = array();
+        $arrTables = array('tables_changes' => array(), 'tables_no_changes' => array());
 
         foreach ($this->databaseTables() as $key => $value)
         {
@@ -592,7 +585,7 @@ class SyncCtoHelper extends Backend
             }
 
             if ($arrHashLast != null && is_array($arrHashLast))
-            {
+            {                
                 if ($arrHashLast[$value] == $this->getDatabaseTablesHash($value))
                 {
                     $arrTables["tables_no_changes"][$value] = $this->getTableMeta($value, true);
@@ -621,15 +614,9 @@ class SyncCtoHelper extends Backend
                     return $arrTables["tables_no_changes"];
                 }
             }
-            else
-            {
-                return $arrTables;
-            }
         }
-        else
-        {
-            return $arrTables;
-        }
+
+        return $arrTables;
     }
 
     /**
@@ -649,7 +636,7 @@ class SyncCtoHelper extends Backend
 
         $arrTablesPermission = $this->BackendUser->syncCto_tables;
 
-        $arrTables = array();
+        $arrTables = array('tables_changes' => array(), 'tables_no_changes' => array());
 
         foreach ($this->databaseTables() as $key => $value)
         {
@@ -693,15 +680,9 @@ class SyncCtoHelper extends Backend
                     return $arrTables["tables_no_changes"];
                 }
             }
-            else
-            {
-                return $arrTables;
-            }
         }
-        else
-        {
-            return $arrTables;
-        }
+
+        return $arrTables;
     }
 
     /**
@@ -755,71 +736,58 @@ class SyncCtoHelper extends Backend
      */
     private function getTableMeta($strTableName, $booHashSame = null)
     {
-        $objCount  = $this->Database->prepare("SELECT COUNT(*) as Count FROM $strTableName")->execute();
+        $objCount        = $this->Database->prepare("SELECT COUNT(*) as Count FROM $strTableName")->execute();
         $intEntriesCount = $objCount->Count;
-        $intEntriesSize = $this->Database->getSizeOf($strTableName);
-        
-        $strColor = 'AAA';
+        $intEntriesSize  = $this->Database->getSizeOf($strTableName);
 
-        if($GLOBALS['TL_CONFIG']['syncCto_custom_settings'])
+        $strColor = '666966';
+
+        if ($GLOBALS['TL_CONFIG']['syncCto_custom_settings'])
         {
-            $booBreakLoop = FALSE;
-            foreach($this->arrDbColorLimits AS $arrColorLimits)
+            $booBreakLoop = false;
+            foreach ($this->arrDbColorLimits AS $arrColorLimits)
             {
                 switch ($arrColorLimits['unit'])
                 {
                     case 'kb':
-                        if(($intEntriesSize / 1000) > $arrColorLimits['entries'])
-                        {             
-                            $booBreakLoop = TRUE;                        
+                        if (($intEntriesSize / 1000) > $arrColorLimits['entries'])
+                        {
+                            $booBreakLoop = true;
                         }
                         break;
 
                     case 'mb':
-                        if(($intEntriesSize / 1000 / 1000) > $arrColorLimits['entries'])
+                        if (($intEntriesSize / 1000 / 1000) > $arrColorLimits['entries'])
                         {
-                            $booBreakLoop = TRUE;                        
-                        }                    
+                            $booBreakLoop = true;
+                        }
                         break;
 
-                    case 'entries':                    
+                    case 'entries':
                         if ($intEntriesCount > $arrColorLimits['entries'])
-                        {                     
-                            $booBreakLoop = TRUE;
-                        }                    
+                        {
+                            $booBreakLoop = true;
+                        }
                         break;
                 }
 
-                if($booBreakLoop == TRUE)
+                if ($booBreakLoop == true)
                 {
-                    if($arrColorLimits != '')
+                    if ($arrColorLimits != '')
                     {
-                        $strColor = $arrColorLimits['color'];
+                        $strColor  = $arrColorLimits['color'];
                     }
                     break;
                 }
             }
         }
-        $strReturn  = '<span style="color: #' . $strColor . '; padding-left: 3px;">';
+        $strReturn = '<span style="color: #' . $strColor . '; padding-left: 3px;">';
         $strReturn .= $strTableName;
         $strReturn .= '<span style="padding-left: 3px;">';
         $strReturn .= '(' . $this->getReadableSize($intEntriesSize) . ', ' . vsprintf($GLOBALS['TL_LANG']['MSC']['entries'], array($intEntriesCount)) . ')';
         $strReturn .= '</span>';
-        $strReturn .= '</span>';     
+        $strReturn .= '</span>';
         return $strReturn;
-               
-//        if ($booHashSame === FALSE)
-//        {
-//            $strReturn .= '<span style="padding-left: 3px;">' . $strTableName . '</span>';
-//        }
-//        else if ($booHashSame === TRUE)
-//        {
-//            $strReturn .= '<span style="padding-left: 3px;">' . $strTableName . '</span>';
-//        }
-//        else
-//        {
-//            $strReturn .= $strTableName;
-//        }
     }
 
     /**
@@ -927,7 +895,7 @@ class SyncCtoHelper extends Backend
 
         return true;
     }
-    
+
     /**
      * Check for customer regular expression
      * 
@@ -951,7 +919,7 @@ class SyncCtoHelper extends Backend
         }
         return false;
     }
-    
+
     /* -------------------------------------------------------------------------
      * Remote Calls
      */

@@ -39,7 +39,7 @@ $GLOBALS['TL_DCA']['tl_syncCto_settings'] = array(
     'palettes' => array
         (
         '__selector__' => array('syncCto_custom_settings'),
-        'default' => '{blacklist_legend:hide},syncCto_folder_blacklist,syncCto_file_blacklist;{whitelist_legend:hide},syncCto_folder_whitelist;{local_blacklist_legend},syncCto_local_blacklist;{hidden_tables_legend:hide},syncCto_hidden_tables;{tables_legend},syncCto_database_tables;{debug_legend},syncCto_debug_mode;{custom_legend:hide},syncCto_custom_settings;'
+        'default' => '{blacklist_legend:hide},syncCto_folder_blacklist,syncCto_file_blacklist;{whitelist_legend:hide},syncCto_folder_whitelist;{local_blacklist_legend},syncCto_local_blacklist;{hidden_tables_legend:hide},syncCto_hidden_tables;{tables_legend},syncCto_database_tables;{custom_legend:hide},syncCto_debug_mode,syncCto_custom_settings;'
     ),
     'subpalettes' => array
         (
@@ -157,7 +157,7 @@ $GLOBALS['TL_DCA']['tl_syncCto_settings'] = array(
             'eval' => array('tl_class' => 'w50'),
         ),
         'syncCto_colored_db_view' => array(
-            'label' => &$GLOBALS['TL_LANG']['tl_syncCto_settings']['syncCto_colored_db_view'],
+            'label' => &$GLOBALS['TL_LANG']['tl_syncCto_settings']['colored_db_view'],
             'exclude' => true,
             'inputType' => 'multiColumnWizard',
             'eval' => array(
@@ -167,21 +167,21 @@ $GLOBALS['TL_DCA']['tl_syncCto_settings'] = array(
                         'label' => &$GLOBALS['TL_LANG']['tl_syncCto_settings']['entries'],
                         'exclude' => true,
                         'inputType' => 'text',                        
-                        'eval' => array('style' => 'width:150px')
+                        'eval' => array('style' => 'width:185px')
                     ),
                     'unit' => array
                     (
                         'label' => &$GLOBALS['TL_LANG']['tl_syncCto_settings']['units'],
-			'inputType' => 'select',
+                        'inputType' => 'select',
                         'options' => array('kb', 'mb', 'entries'),
-                        'reference' => &$GLOBALS['TL_LANG']['tl_syncCto_settings']['units']['select'],
+                        'reference' => &$GLOBALS['TL_LANG']['tl_syncCto_settings']['units'],
                         'eval' => array('includeBlankOption' => true)
                     ),
                     'color' => array(
                         'label' => &$GLOBALS['TL_LANG']['tl_syncCto_settings']['color'],
                         'exclude' => true,
                         'inputType' => 'text',
-                        'eval' => array('style' => 'width:280px', 'maxlength' => 6, 'rgxp' => 'colorRgb'),
+                        'eval' => array('style' => 'width:300px', 'maxlength' => 6, 'rgxp' => 'colorRgb'),
                         'wizard' => array
                         (
                                 array('tl_syncCto_settings', 'colorPicker')
