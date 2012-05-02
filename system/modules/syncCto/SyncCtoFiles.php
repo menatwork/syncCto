@@ -37,9 +37,9 @@ class SyncCtoFiles extends Backend
      */
 
     // Singelten pattern
-    protected static $instance         = null;
+    protected static $instance      = null;
     // Vars
-    protected $strSuffixZipName = "File-Backup.zip";
+    protected $strSuffixZipName     = "File-Backup.zip";
     protected $strTimestampFormat;
     // Lists
     protected $arrFolderBlacklist;
@@ -61,17 +61,17 @@ class SyncCtoFiles extends Backend
         parent::__construct();
 
         // Init
-        $this->objSyncCtoHelper = SyncCtoHelper::getInstance();
-        $this->objFiles = Files::getInstance();
-        $this->strTimestampFormat = standardize($GLOBALS['TL_CONFIG']['datimFormat']);
+        $this->objSyncCtoHelper     = SyncCtoHelper::getInstance();
+        $this->objFiles             = Files::getInstance();
+        $this->strTimestampFormat   = standardize($GLOBALS['TL_CONFIG']['datimFormat']);
 
         // Load blacklists and whitelists
-        $this->arrFolderBlacklist = $this->objSyncCtoHelper->getBlacklistFolder();
-        $this->arrFileBlacklist = $this->objSyncCtoHelper->getBlacklistFile();
-        $this->arrRootFolderList = $this->objSyncCtoHelper->getWhitelistFolder();
+        $this->arrFolderBlacklist   = $this->objSyncCtoHelper->getBlacklistFolder();
+        $this->arrFileBlacklist     = $this->objSyncCtoHelper->getBlacklistFile();
+        $this->arrRootFolderList    = $this->objSyncCtoHelper->getWhitelistFolder();
 
-        $arrSearch = array("\\", ".", "^", "?", "*");
-        $arrReplace = array("\\\\", "\\.", "\\^", ".?", ".*");
+        $arrSearch = array("\\", ".", "^", "?", "*", "/");
+        $arrReplace = array("\\\\", "\\.", "\\^", ".?", ".*", "\\/");
 
         foreach ($this->arrFolderBlacklist as $key => $value)
         {
@@ -286,13 +286,11 @@ class SyncCtoFiles extends Backend
                     if ($value['state'] == SyncCtoEnum::FILESTATE_TOO_BIG)
                     {
                         $arrFileList[$key]          = $arrChecksumList[$key];
-                        $arrFileList[$key]["raw"]   = "need big";
                         $arrFileList[$key]["state"] = SyncCtoEnum::FILESTATE_TOO_BIG_NEED;
                     }
                     else
                     {
                         $arrFileList[$key]          = $arrChecksumList[$key];
-                        $arrFileList[$key]["raw"]   = "need";
                         $arrFileList[$key]["state"] = SyncCtoEnum::FILESTATE_NEED;
                     }
                 }
@@ -302,13 +300,11 @@ class SyncCtoFiles extends Backend
                 if ($value['state'] == SyncCtoEnum::FILESTATE_TOO_BIG)
                 {
                     $arrFileList[$key]          = $arrChecksumList[$key];
-                    $arrFileList[$key]["raw"]   = "missing big";
                     $arrFileList[$key]["state"] = SyncCtoEnum::FILESTATE_TOO_BIG_MISSING;
                 }
                 else
                 {
                     $arrFileList[$key]          = $arrChecksumList[$key];
-                    $arrFileList[$key]["raw"]   = "missing";
                     $arrFileList[$key]["state"] = SyncCtoEnum::FILESTATE_MISSING;
                 }
             }
@@ -429,7 +425,7 @@ class SyncCtoFiles extends Backend
     }
 
     /* -------------------------------------------------------------------------
-     * Scann Functions
+     * Scan Functions
      */
 
     /**
@@ -445,7 +441,7 @@ class SyncCtoFiles extends Backend
         foreach ($this->arrFolderBlacklist as $value)
         {
             // Search with preg for values            
-            if (preg_match("^" . $value . "^i", $strPath) != 0)
+            if (preg_match("/^" . $value . "/i", $strPath) != 0)
             {
                 return true;
             }
@@ -467,7 +463,7 @@ class SyncCtoFiles extends Backend
         foreach ($this->arrFileBlacklist as $value)
         {
             // Search with preg for values            
-            if (preg_match("^" . $value . "^i", $strPath) != 0)
+            if (preg_match("/^" . $value . "/i", $strPath) != 0)
             {
                 return true;
             }
