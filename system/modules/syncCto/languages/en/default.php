@@ -41,9 +41,6 @@ $GLOBALS['TL_LANG']['MSC']['start_backup']                  = 'Start backup';
 $GLOBALS['TL_LANG']['SYC']['files']                         = 'File synchronization';
 $GLOBALS['TL_LANG']['SYC']['backup']                        = 'Backup category';
 
-$GLOBALS['TL_LANG']['SYC']['option_small']                  = array('Personal data', 'Just selected files and folders within tl_files are considered.');
-$GLOBALS['TL_LANG']['SYC']['option_full']                   = array('Contao installation', 'The complete contao installation, including tl_files is considered.');
-
 /**
  * Texte
  */
@@ -79,8 +76,7 @@ $GLOBALS['TL_LANG']['MSC']['skipped_files']                 = 'Übersprungen';
 $GLOBALS['TL_LANG']['MSC']['ignored_files']                 = 'Ignoriert';
 $GLOBALS['TL_LANG']['MSC']['submit_files']                  = 'Submit files';
 $GLOBALS['TL_LANG']['MSC']['delete_files']                  = 'Delete selected files from the list';
-$GLOBALS['TL_LANG']['MSC']['information_last_sync']         = 'Last synchronisation was made at %s on %s from user %s (%s).';
-//$GLOBALS['TL_LANG']['MSC']['skipped_files']                 = ' File(s) skipped.';
+$GLOBALS['TL_LANG']['MSC']['last_sync']         			= 'Last synchronisation was made at %s on %s from user %s (%s).';
 
 /**
  * Buttons

@@ -42,7 +42,7 @@ $GLOBALS['TL_DCA']['tl_syncCto_clients_syncTo'] = array(
     // Palettes
     'palettes' => array(
         '__selector__' => array('database_check', 'systemoperations_check'),
-        'default' => '{sync_legend},lastSync,sync_type;{table_legend},database_check;{systemoperations_legend},systemoperations_check,attentionFlag;',
+        'default' => '{sync_legend},lastSync,disabledCache,sync_type;{table_legend},database_check;{systemoperations_legend},systemoperations_check,attentionFlag;',
     ),
     // Sub Palettes
     'subpalettes' => array(
@@ -51,8 +51,13 @@ $GLOBALS['TL_DCA']['tl_syncCto_clients_syncTo'] = array(
     ),
     // Fields
     'fields' => array(
-        // Data -------------------------
         'lastSync' => array
+            (
+            'label' => " ",
+            'exclude' => true,
+            'inputType' => 'statictext',
+        ),
+        'disabledCache' => array
             (
             'label' => " ",
             'exclude' => true,
@@ -68,7 +73,6 @@ $GLOBALS['TL_DCA']['tl_syncCto_clients_syncTo'] = array(
                 'multiple' => true
             ),
         ),
-        // DB --------------------------
         'database_check' => array(
             'label' => &$GLOBALS['TL_LANG']['tl_syncCto_clients_syncTo']['database_check'],
             'inputType' => 'checkbox',
@@ -83,26 +87,21 @@ $GLOBALS['TL_DCA']['tl_syncCto_clients_syncTo'] = array(
             'inputType' => 'checkbox',
             'exclude' => true,
             'eval' => array(
-                'multiple' => true,
-                'helpwizard' => true
+                'multiple' => true
             ),
             'options_callback' => array('tl_syncCto_clients_syncTo', 'databaseTablesRecommended'),
-            'reference' => &$GLOBALS['TL_LANG']['SYC']['syncCto'],
-            'explanation' => 'syncCto_database',
+            'reference' => &$GLOBALS['TL_LANG']['SYC']['syncCto']
         ),
         'database_tables_none_recommended' => array(
             'label' => &$GLOBALS['TL_LANG']['tl_syncCto_clients_syncTo']['database_tables_none_recommended'],
             'inputType' => 'checkbox',
             'exclude' => true,
             'eval' => array(
-                'multiple' => true,
-                'helpwizard' => true
+                'multiple' => true
             ),
             'options_callback' => array('tl_syncCto_clients_syncTo', 'databaseTablesNoneRecommended'),
-            'reference' => &$GLOBALS['TL_LANG']['SYC']['syncCto'],
-            'explanation' => 'syncCto_database',
+            'reference' => &$GLOBALS['TL_LANG']['SYC']['syncCto']
         ),
-        // System ---------------------
         'systemoperations_check' => array(
             'label' => &$GLOBALS['TL_LANG']['tl_syncCto_clients_syncTo']['systemoperations_check'],
             'inputType' => 'checkbox',
@@ -125,13 +124,13 @@ $GLOBALS['TL_DCA']['tl_syncCto_clients_syncTo'] = array(
         ),
         'attentionFlag' => array
             (
-            'label' => &$GLOBALS['TL_LANG']['tl_syncCto_clients_syncTo']['attentionFlag'],
+            'label' => &$GLOBALS['TL_LANG']['tl_syncCto_clients_syncTo']['attention_flag'],
             'inputType' => 'checkbox',
             'exclude' => true,
             'eval' => array(
                 'multiple' => false
             ),
-        ),
+        )      
     )
 );
 
@@ -210,6 +209,37 @@ class tl_syncCto_clients_syncTo extends Backend
      */
     public function onload_callback(DataContainer $dc)
     {
+        $strInitFilePath = '/system/config/initconfig.php';
+
+        if(file_exists(TL_ROOT . $strInitFilePath))
+        {
+            $strFile = new File($strInitFilePath);
+            $arrFileContent = $strFile->getContentAsArray();
+            $booLocated = FALSE;
+            foreach($arrFileContent AS $strContent)
+            {
+                if(!preg_match("/(\/\*|\*|\*\/|\/\/)/", $strContent))
+                {                                
+                    //system/tmp
+                    if(preg_match("/system\/tmp/", $strContent))
+                    {                            
+                        // Set data
+                        $dc->setData("disabledCache", "<p class='tl_info'>" . $GLOBALS['TL_LANG']['MSC']['disabled_cache'] . "</p>");                                    
+                        $booLocated = TRUE;
+                    }
+                }
+            }
+            
+            if(!$booLocated)
+            {
+                $GLOBALS['TL_DCA']['tl_syncCto_clients_syncTo']['palettes']['default'] = str_replace(",disabledCache", "", $GLOBALS['TL_DCA']['tl_syncCto_clients_syncTo']['palettes']['default']);
+            }
+        }
+        else
+        {
+            $GLOBALS['TL_DCA']['tl_syncCto_clients_syncTo']['palettes']['default'] = str_replace(",disabledCache", "", $GLOBALS['TL_DCA']['tl_syncCto_clients_syncTo']['palettes']['default']);
+        }
+
         // Add/Remove some buttons
         $dc->removeButton('save');
         $dc->removeButton('saveNclose');
@@ -238,7 +268,7 @@ class tl_syncCto_clients_syncTo extends Backend
 
         if (strlen($objSyncTime->syncTo_tstamp) != 0 && strlen($objSyncTime->syncTo_user) != 0 && strlen($objSyncTime->syncTo_alias) != 0)
         {
-            $strLastSync = vsprintf($GLOBALS['TL_LANG']['MSC']['information_last_sync'], array(
+            $strLastSync = vsprintf($GLOBALS['TL_LANG']['MSC']['last_sync'], array(
                 date($GLOBALS['TL_CONFIG']['timeFormat'], $objSyncTime->syncTo_tstamp),
                 date($GLOBALS['TL_CONFIG']['dateFormat'], $objSyncTime->syncTo_tstamp),
                 $objSyncTime->syncTo_user,
@@ -246,7 +276,7 @@ class tl_syncCto_clients_syncTo extends Backend
             );
 
             // Set data
-            $dc->setData("lastSync", "<p class='tl_info'>" . $strLastSync . "</p><br />");
+            $dc->setData("lastSync", "<p class='tl_info'>" . $strLastSync . "</p>");
         }
         else
         {
