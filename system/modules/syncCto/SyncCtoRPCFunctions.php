@@ -63,7 +63,7 @@ class SyncCtoRPCFunctions extends Backend
         $this->objSyncCtoDatabase = SyncCtoDatabase::getInstance();
         $this->objSyncCtoHelper = SyncCtoHelper::getInstance();
 
-        $this->loadLanguageFile("syncCto");
+        $this->loadLanguageFile("default");
 
         $this->arrDebug = array();
     }
@@ -113,7 +113,9 @@ class SyncCtoRPCFunctions extends Backend
         foreach ($arrConfig as $key => $value)
         {
             if (in_array($key, $arrConfigBlacklist))
+            {
                 unset($arrConfig[$key]);
+            }
         }
 
         return $arrConfig;
@@ -148,7 +150,6 @@ class SyncCtoRPCFunctions extends Backend
 
                 default:
                     throw new Exception("Unknown field");
-                    break;
             }
         }
     }
@@ -193,7 +194,7 @@ class SyncCtoRPCFunctions extends Backend
 
         return true;
     }
-    
+
     /**
      * Set the displayErrors flag
      * @param boolean $booState
@@ -228,12 +229,12 @@ class SyncCtoRPCFunctions extends Backend
     {
         if (!key_exists($strFilename, $_FILES))
         {
-            throw new Exception("Could not find file.");
+            throw new Exception(vsprintf($GLOBALS['TL_LANG']['ERR']['unknown_file'], array($strFilename)));
         }
 
         if (md5_file($_FILES[$strFilename]["tmp_name"]) != $strMD5)
         {
-            throw new Exception("Unknown md5 hash.");
+            throw new Exception($GLOBALS['TL_LANG']['ERR']['checksum_error']);
         }
 
         $objFiles = Files::getInstance();
@@ -262,12 +263,12 @@ class SyncCtoRPCFunctions extends Backend
     {
         if (!key_exists($strFilename, $_FILES))
         {
-            throw new Exception("Could not find file.");
+            throw new Exception(vsprintf($GLOBALS['TL_LANG']['ERR']['unknown_file'], array($strFilename)));
         }
 
         if (md5_file($_FILES[$strFilename]["tmp_name"]) != $strMD5)
         {
-            throw new Exception("Unknown md5 hash.");
+            throw new Exception($GLOBALS['TL_LANG']['ERR']['checksum_error']);
         }
 
         $objFiles = Files::getInstance();
@@ -283,6 +284,30 @@ class SyncCtoRPCFunctions extends Backend
         }
 
         return $this->objSyncCtoFiles->runCecksumCompare($arrChecksumList);
+    }
+
+    /**
+     * Execute a SQL command
+     * 
+     * @param array $arrSQL <p>array([ID] => <br/>array("prepare" => [String(SQL)], "execute" => array([mix]) ) <br/>)</p>
+     * @return array <p>array([ID] => [mix])</p>
+     */
+    public function executeSQL($arrSQL)
+    {
+        if (!is_array($arrSQL))
+        {
+            return false;
+        }
+
+        $arrResponse = array();
+
+        foreach ($arrSQL as $key => $value)
+        {
+            $mixDatabase = $this->Database->prepare($value['prepare']);
+            call_user_func_array(array($mixDatabase, "execute"), $value["execute"]);
+        }
+
+        return $arrResponse;
     }
 
 }
