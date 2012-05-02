@@ -359,7 +359,7 @@ class tl_syncCto_clients_syncFrom extends Backend
                 $arrTables = $this->Input->post("database_tables_recommended");
             }
 
-            if (is_array($this->Input->post("database_tables_none_recommended")) && count($this->Input->post("database_tables_recommended")) != 0)
+            if (is_array($this->Input->post("database_tables_none_recommended")) && count($this->Input->post("database_tables_none_recommended")) != 0)
             {
                 $arrTables = array_merge($arrTables, $this->Input->post("database_tables_none_recommended"));
             }

@@ -84,20 +84,22 @@ $GLOBALS['TL_DCA']['tl_syncCto_clients_syncTo'] = array(
         ),
         'database_tables_recommended' => array(
             'label' => &$GLOBALS['TL_LANG']['tl_syncCto_clients_syncTo']['database_tables_recommended'],
-            'inputType' => 'checkbox',
+            'inputType' => 'syncctocheckbox',
             'exclude' => true,
             'eval' => array(
-                'multiple' => true
+                'multiple' => true,
+                'state' => array(1 => 0)
             ),
             'options_callback' => array('tl_syncCto_clients_syncTo', 'databaseTablesRecommended'),
             'reference' => &$GLOBALS['TL_LANG']['SYC']['syncCto']
         ),
         'database_tables_none_recommended' => array(
             'label' => &$GLOBALS['TL_LANG']['tl_syncCto_clients_syncTo']['database_tables_none_recommended'],
-            'inputType' => 'checkbox',
+            'inputType' => 'syncctocheckbox',
             'exclude' => true,
             'eval' => array(
-                'multiple' => true
+                'multiple' => true,
+                'state' => array(1 => 0)
             ),
             'options_callback' => array('tl_syncCto_clients_syncTo', 'databaseTablesNoneRecommended'),
             'reference' => &$GLOBALS['TL_LANG']['SYC']['syncCto']
@@ -305,7 +307,7 @@ class tl_syncCto_clients_syncTo extends Backend
      * @return array 
      */
     public function onsubmit_callback(DataContainer $dc)
-    {
+    {        
         $arrSyncSettings = array();
 
         // Synchronization type
@@ -328,9 +330,10 @@ class tl_syncCto_clients_syncTo extends Backend
                 $arrTables = $this->Input->post("database_tables_recommended");
             }
 
-            if (is_array($this->Input->post("database_tables_none_recommended")) && count($this->Input->post("database_tables_recommended")) != 0)
-            {
+            if (is_array($this->Input->post("database_tables_none_recommended")) && count($this->Input->post("database_tables_none_recommended")) != 0)
+            {                
                 $arrTables = array_merge($arrTables, $this->Input->post("database_tables_none_recommended"));
+               
             }
 
             $arrSyncSettings["syncCto_SyncTables"] = $arrTables;
