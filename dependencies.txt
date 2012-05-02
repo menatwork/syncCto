@@ -4,8 +4,8 @@
   */
   
  /*
-  * textwizard
-  * http://www.contao.org/erweiterungsliste/view/textwizard.html
+  * MultiColumnWizard
+  * http://www.contao.org/erweiterungsliste/view/MultiColumnWizard.html
   */
   
  /*
