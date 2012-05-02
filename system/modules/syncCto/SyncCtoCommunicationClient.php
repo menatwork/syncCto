@@ -682,6 +682,24 @@ class SyncCtoCommunicationClient extends CtoCommunication
 
         return $this->runServer("SYNCCTO_RUN_DUMP", $arrData);
     }
+    
+    /**
+     * Exceute SQL commands on client side
+     * 
+     * @param array $arrSQL array([ID] => <br/>array("prepare" => [String(SQL)], "execute" => array([mix]) ) <br/>)
+     * @return array array([ID] => response)
+     */
+    public function executeSQL($arrSQL)
+    {
+        $arrData = array(
+            array(
+                "name" => "sql",
+                "value" => $arrSQL,
+            )
+        );        
+                
+        return $this->runServer("SYNCCTO_EXECUTE_SQL", $arrData);
+    }
 
     /**
      * Returns a list without the hidden tables

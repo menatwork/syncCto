@@ -32,7 +32,7 @@ $objInput = Input::getInstance();
 /**
  * Current syncCto version
  */
-$GLOBALS['SYC_VERSION'] = '2.0.0';
+$GLOBALS['SYC_VERSION'] = '2.1.0';
 
 /**
  * Back end modules
@@ -58,11 +58,16 @@ $GLOBALS['BE_MOD'] = array_merge(
         'syncCto_check' => array(
             'icon' => 'system/modules/syncCto/html/iconCheck.png',
             'callback' => 'SyncCtoModuleCheck',
-            'stylesheet' => 'system/modules/syncCto/html/css/systemcheck_src.css',
+            'stylesheet' => 'system/modules/syncCto/html/css/systemcheck.css',
         )
     )
         ), array_slice($GLOBALS['BE_MOD'], $i)
 );
+
+/**
+ * Form fields
+ */
+$GLOBALS['BE_FFL']['syncctocheckbox'] = 'SyncCtoCheckBox';
 
 /**
  * Hooks
@@ -97,14 +102,14 @@ if ($objInput->get("do") == 'synccto_clients' && $objInput->get("act") != 'start
  */
 if (($objInput->get("table") == 'tl_syncCto_clients_syncTo' || $objInput->get("table") == 'tl_syncCto_clients_syncFrom') && TL_MODE == 'BE')
 {
-    $GLOBALS['TL_CSS'][]        = 'system/modules/syncCto/html/css/filelist_src.css';
+    $GLOBALS['TL_CSS'][]        = 'system/modules/syncCto/html/css/filelist.css';
     $GLOBALS['TL_JAVASCRIPT'][] = 'system/modules/syncCto/html/js/htmltable.js';
     $GLOBALS['TL_JAVASCRIPT'][] = 'system/modules/syncCto/html/js/filelist.js';
 }
 
 if($GLOBALS['TL_CONFIG']['syncCto_attentionFlag'] == true)
 {
-    $GLOBALS['TL_CSS'][] = 'system/modules/syncCto/html/css/attention_src.css';
+    $GLOBALS['TL_CSS'][] = 'system/modules/syncCto/html/css/attention.css';
 }
 
 if (($objInput->get("do") == 'synccto_clients' && $objInput->get("act") == '') && $objInput->get("table") == '' && TL_MODE == 'BE')
@@ -123,6 +128,7 @@ $GLOBALS['SYC_SIZE']['limit_ignore'] = 838860800;
 // Tables
 $GLOBALS['SYC_CONFIG']['table_hidden'] = array(
     'tl_log',
+    'tl_lock',
     'tl_session',
     'tl_undo',
     'tl_version',
@@ -133,16 +139,16 @@ $GLOBALS['SYC_CONFIG']['table_hidden'] = array(
 
 // Folders
 $GLOBALS['SYC_CONFIG']['folder_blacklist'] = array(
-    'system/html*',
-    'system/logs*',
-    'system/scripts*',
-    'system/tmp*',
-    '*/syncCto_backups*',
+    'system/html',
+    'system/logs',
+    'system/scripts',
+    'system/tmp',
+    '*/syncCto_backups/*',
 );
 
-// Files only Sync.
+// Files only sync.
 $GLOBALS['SYC_CONFIG']['file_blacklist'] = array(
-    '*.htaccess',
+    '.htaccess',
     '*/localconfig.php',
 );
 
@@ -161,12 +167,10 @@ $GLOBALS['SYC_CONFIG']['local_blacklist'] = array(
     'dbCharset',
     'dbPort',
     'displayErrors',
-    // CtoCom
     'ctoCom_APIKey',
     'ctoCom_disableRefererCheck',
     'ctoCom_responseLength',
     'ctoCom_handshake',
-    // SyncCto
     'syncCto_debug_mode',
     'syncCto_attentionFlag'
 );
@@ -368,6 +372,14 @@ $GLOBALS["CTOCOM_FUNCTIONS"]["SYNCCTO_RUN_DUMP"] = array(
     "function" => "runDump",
     "typ" => "POST",
     "parameter" => array("tables", "tempfolder"),
+);
+
+// Execute SQL
+$GLOBALS["CTOCOM_FUNCTIONS"]["SYNCCTO_EXECUTE_SQL"] = array(
+    "class" => "SyncCtoRPCFunctions",
+    "function" => "executeSQL",
+    "typ" => "POST",
+    "parameter" => array("sql"),
 );
 
 // Get folder path list
