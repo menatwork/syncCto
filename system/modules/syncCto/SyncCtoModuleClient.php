@@ -766,7 +766,7 @@ class SyncCtoModuleClient extends BackendModule
                     {
                         $this->objData->setState($GLOBALS['TL_LANG']['MSC']['error']);
                         $this->booError = true;
-                        $this->strError = $GLOBALS['TL_LANG']['tl_syncCto_sync']['error_step_1']['referer'];
+                        $this->strError = $GLOBALS['TL_LANG']['ERR']['referer'];
 
                         break;
                     }
@@ -781,9 +781,12 @@ class SyncCtoModuleClient extends BackendModule
                     $strVersion = $this->objSyncCtoCommunicationClient->getVersionSyncCto();
                     $this->arrClientInformation["version_SyncCto"] = $strVersion;
 
-                    if (!version_compare($strVersion, $GLOBALS['SYC_VERSION'], "="))
+                    $strClientVersion = substr($strVersion, 0, 1);
+                    $strServerVersion = substr($GLOBALS['SYC_VERSION'], 0, 1);
+                    
+                    if (!version_compare($strClientVersion, $strServerVersion, "="))
                     {
-                        $this->log(vsprintf("Not the same version from syncCto on synchronization client ID %s. Serverversion: %s. Clientversion: %s", array($this->Input->get("id"), $GLOBALS['SYC_VERSION'], $strVersion)), __CLASS__ . " " . __FUNCTION__, "INFO");
+                        $this->log(vsprintf("Not the same version from syncCto on synchronization client ID %s. Serverversion: %s. Clientversion: %s", array($this->Input->get("id"), $GLOBALS['SYC_VERSION'], $strVersion)), __CLASS__ . " " . __FUNCTION__, "GENERAL");
 
                         $this->objData->setState($GLOBALS['TL_LANG']['MSC']['error']);
                         $this->booError = true;
@@ -796,7 +799,7 @@ class SyncCtoModuleClient extends BackendModule
 
                     if (!version_compare($strVersion, VERSION, "="))
                     {
-                        $this->log(vsprintf("Not the same version from contao on synchronization client ID %s. Serverversion: %s. Clientversion: %s", array($this->Input->get("id"), $GLOBALS['SYC_VERSION'], $strVersion)), __CLASS__ . " " . __FUNCTION__, "INFO");
+                        $this->log(vsprintf("Not the same version from contao on synchronization client ID %s. Serverversion: %s. Clientversion: %s", array($this->Input->get("id"), $GLOBALS['SYC_VERSION'], $strVersion)), __CLASS__ . " " . __FUNCTION__, "GENERAL");
 
                         $this->objData->setState($GLOBALS['TL_LANG']['MSC']['error']);
                         $this->booError = true;
@@ -836,12 +839,12 @@ class SyncCtoModuleClient extends BackendModule
 
                     $this->arrClientInformation["upload_Parameter"] = $arrClientParameter;
 
-                    // Check if everthing is okay
+                    // Check if everything is okay
                     if ($arrClientParameter['file_uploads'] != 1)
                     {
                         $this->objData->setState($GLOBALS['TL_LANG']['MSC']['error']);
                         $this->booError = true;
-                        $this->strError = $GLOBALS['TL_LANG']['tl_syncCto_sync']['error_step_3']['upload_ini'];
+                        $this->strError = $GLOBALS['TL_LANG']['ERR']['upload_ini'];
 
                         break;
                     }
@@ -1620,7 +1623,7 @@ class SyncCtoModuleClient extends BackendModule
 
                         if (!$this->objSyncCtoCommunicationClient->buildSingleFile($value["splitname"], $value["splitcount"], $value["path"], $value["checksum"]))
                         {
-                            throw new Exception(vsprintf($GLOBALS['TL_LANG']['tl_syncCto_sync']['error_step_3']['rebuild'], array($value["path"])));
+                            throw new Exception(vsprintf($GLOBALS['TL_LANG']['ERR']['rebuild'], array($value["path"])));
                         }
 
                         $this->arrListCompare[$key]["transmission"] = SyncCtoEnum::FILETRANS_SEND;
@@ -1671,7 +1674,7 @@ class SyncCtoModuleClient extends BackendModule
         }
 
         // Set content back to normale mode
-        if ($this->booError == true)
+        if ($this->booError == true && $this->objStepPool->step != 5)
         {
             $this->booError = false;
             $this->strError = "";
@@ -1758,7 +1761,34 @@ class SyncCtoModuleClient extends BackendModule
 
                     $this->Database->prepare("UPDATE tl_synccto_clients SET last_table_hash=? WHERE id=? ")
                             ->execute(serialize($arrLastTableHash), $this->intClientID);
+                    
+                    $this->objStepPool->step++;
 
+                /**
+                 * Hook for custom sql code
+                 */
+                case 5:      
+                    if (isset($GLOBALS['TL_HOOKS']['syncDBUpdate']) && is_array($GLOBALS['TL_HOOKS']['syncDBUpdate']))
+                    {
+                        $arrSQL = array();
+
+                        foreach ($GLOBALS['TL_HOOKS']['syncDBUpdate'] as $callback)
+                        {
+                            $this->import($callback[0]);
+                            $mixReturn = $this->$callback[0]->$callback[1]($this->intClientID, $arrSQL);
+                            
+                            if(!empty($mixReturn) && is_array($mixReturn))
+                            {
+                                $arrSQL = $mixReturn;
+                            } 
+                        }
+                        
+                        if(count($arrSQL) != 0)
+                        {
+                            $this->objSyncCtoCommunicationClient->executeSQL($arrSQL);
+                        }
+                    }
+                    
                     // Show step information
                     $this->objData->setState($GLOBALS['TL_LANG']['MSC']['ok']);
                     $this->objData->setDescription($GLOBALS['TL_LANG']['tl_syncCto_sync']["step_4"]['description_4']);
@@ -1873,7 +1903,7 @@ class SyncCtoModuleClient extends BackendModule
                             }
                         }
 
-                        $this->objData->setDescription($GLOBALS['TL_LANG']['tl_syncCto_sync']["step_5"]['description_3']);
+                        $this->objData->setDescription($GLOBALS['TL_LANG']['tl_syncCto_sync']["step_5"]['description_2']);
                         $this->objStepPool->step++;
                         break;
                     }
@@ -2034,23 +2064,27 @@ class SyncCtoModuleClient extends BackendModule
                     {
                         $this->objData->setHtml("");
                         $this->objData->setState($GLOBALS['TL_LANG']['MSC']['ok']);
-                        $this->objData->setDescription(vsprintf($GLOBALS['TL_LANG']['tl_syncCto_sync']["step_5"]['description_2'], array($intSendCount, count($this->arrListCompare))));
+                        $this->objData->setDescription(vsprintf($GLOBALS['TL_LANG']['tl_syncCto_sync']["step_3"]['description_2'], array($intSendCount, count($this->arrListCompare))));
                         $this->booFinished = true;
                     }
 
                     // Check if there are some skipped files
                     if ($intSkippCount != 0)
                     {
-                        $compare .= '<br /><p class="tl_help">' . $intSkippCount . $GLOBALS['TL_LANG']['tl_syncCto_sync']["step_5"]['description_4'] . '</p>';
+                        $compare .= '<br /><p class="tl_help">' . $intSkippCount . $GLOBALS['TL_LANG']['tl_syncCto_sync']["step_5"]['description_3'] . '</p>';
 
                         $arrSort = array();
 
                         foreach ($this->arrListCompare as $key => $value)
                         {
                             if ($value["transmission"] != SyncCtoEnum::FILETRANS_SKIPPED)
+                            {
                                 continue;
+                            }
 
-                            $arrSort[$value["skipreason"]][] = $value["path"];
+                            $skipreason = preg_replace("/(RPC Call:.*|\<br\>|\<br\/\>)/i", " ", $value["skipreason"]);
+                            
+                            $arrSort[$skipreason][] = $value["path"];
                         }
 
                         $compare .= '<ul class="fileinfo">';
@@ -2074,7 +2108,7 @@ class SyncCtoModuleClient extends BackendModule
                     {
                         if (count($this->arrListCompare) != 0 && is_array($this->arrListCompare))
                         {
-                            $compare .= '<br /><p class="tl_help">' . $intSendCount . $GLOBALS['TL_LANG']['tl_syncCto_sync']["step_5"]['description_5'] . '</p>';
+                            $compare .= '<br /><p class="tl_help">' . $intSendCount . $GLOBALS['TL_LANG']['tl_syncCto_sync']["step_5"]['description_4'] . '</p>';
 
                             $arrSort = array();
 
@@ -2083,7 +2117,7 @@ class SyncCtoModuleClient extends BackendModule
                                 $compare .= '<ul class="fileinfo">';
 
                                 $compare .= "<li>";
-                                $compare .= '<strong>' . $GLOBALS['TL_LANG']['tl_syncCto_sync']["step_5"]['description_7'] . '</strong>';
+                                $compare .= '<strong>' . $GLOBALS['TL_LANG']['tl_syncCto_sync']["step_5"]['description_6'] . '</strong>';
                                 $compare .= "<ul>";
 
                                 foreach ($this->arrListCompare as $key => $value)
@@ -2110,7 +2144,7 @@ class SyncCtoModuleClient extends BackendModule
                                 $compare .= '<ul class="fileinfo">';
 
                                 $compare .= "<li>";
-                                $compare .= '<strong>' . $GLOBALS['TL_LANG']['tl_syncCto_sync']["step_5"]['description_8'] . '</strong>';
+                                $compare .= '<strong>' . $GLOBALS['TL_LANG']['tl_syncCto_sync']["step_5"]['description_7'] . '</strong>';
                                 $compare .= "<ul>";
 
                                 foreach ($this->arrListCompare as $key => $value)
@@ -2134,14 +2168,14 @@ class SyncCtoModuleClient extends BackendModule
 
                             if ($intWaitCount != 0)
                             {
-                                $compare .= '<br /><p class="tl_help">' . $intWaitCount . $GLOBALS['TL_LANG']['tl_syncCto_sync']["step_5"]['description_6'] . '</p>';
+                                $compare .= '<br /><p class="tl_help">' . $intWaitCount . $GLOBALS['TL_LANG']['tl_syncCto_sync']["step_5"]['description_5'] . '</p>';
 
                                 $arrSort = array();
 
                                 $compare .= '<ul class="fileinfo">';
 
                                 $compare .= "<li>";
-                                $compare .= '<strong>' . $GLOBALS['TL_LANG']['tl_syncCto_sync']["step_5"]['description_9'] . '</strong>';
+                                $compare .= '<strong>' . $GLOBALS['TL_LANG']['tl_syncCto_sync']["step_5"]['description_8'] . '</strong>';
                                 $compare .= "<ul>";
 
                                 foreach ($this->arrListCompare as $key => $value)
@@ -2874,7 +2908,7 @@ class SyncCtoModuleClient extends BackendModule
 
                         if (!$this->objSyncCtoFiles->rebuildSplitFiles($value["splitname"], $value["splitcount"], $value["path"], $value["checksum"]))
                         {
-                            throw new Exception(vsprintf($GLOBALS['TL_LANG']['tl_syncCto_sync']['error_step_3']['rebuild'], array($value["path"])));
+                            throw new Exception(vsprintf($GLOBALS['TL_LANG']['ERR']['rebuild'], array($value["path"])));
                         }
 
                         $this->arrListCompare[$key]["transmission"] = SyncCtoEnum::FILETRANS_SEND;
@@ -2976,7 +3010,7 @@ class SyncCtoModuleClient extends BackendModule
                     // Check if the file was send and saved.
                     if (!is_array($arrResponse) || count($arrResponse) == 0)
                     {
-                        throw new Exception("Empty file list from client. Maybe file send was not complet.");
+                        throw new Exception(vsprintf($GLOBALS['TL_LANG']['ERR']['unknown_file'], $strFrom) );
                     }
 
                     $this->objData->setDescription($GLOBALS['TL_LANG']['tl_syncCto_sync']["step_4"]['description_3']);
@@ -3105,7 +3139,7 @@ class SyncCtoModuleClient extends BackendModule
                             }
                         }
 
-                        $this->objData->setDescription($GLOBALS['TL_LANG']['tl_syncCto_sync']["step_5"]['description_3']);
+                        $this->objData->setDescription($GLOBALS['TL_LANG']['tl_syncCto_sync']["step_5"]['description_2']);
                         $this->objStepPool->step++;
                         break;
                     }
@@ -3250,14 +3284,14 @@ class SyncCtoModuleClient extends BackendModule
                     {
                         $this->objData->setHtml("");
                         $this->objData->setState($GLOBALS['TL_LANG']['MSC']['ok']);
-                        $this->objData->setDescription(vsprintf($GLOBALS['TL_LANG']['tl_syncCto_sync']["step_5"]['description_2'], array($intSendCount, count($this->arrListCompare))));
+                        $this->objData->setDescription(vsprintf($GLOBALS['TL_LANG']['tl_syncCto_sync']["step_3"]['description_2'], array($intSendCount, count($this->arrListCompare))));
                         $this->booFinished = true;
                     }
 
                     // Check if there are some skipped files
                     if ($intSkippCount != 0)
                     {
-                        $compare .= '<br /><p class="tl_help">' . $intSkippCount . $GLOBALS['TL_LANG']['tl_syncCto_sync']["step_5"]['description_4'] . '</p>';
+                        $compare .= '<br /><p class="tl_help">' . $intSkippCount . $GLOBALS['TL_LANG']['tl_syncCto_sync']["step_5"]['description_3'] . '</p>';
 
                         $arrSort = array();
 
@@ -3290,7 +3324,7 @@ class SyncCtoModuleClient extends BackendModule
                     {
                         if (count($this->arrListCompare) != 0 && is_array($this->arrListCompare))
                         {
-                            $compare .= '<br /><p class="tl_help">' . $intSendCount . $GLOBALS['TL_LANG']['tl_syncCto_sync']["step_5"]['description_5'] . '</p>';
+                            $compare .= '<br /><p class="tl_help">' . $intSendCount . $GLOBALS['TL_LANG']['tl_syncCto_sync']["step_5"]['description_4'] . '</p>';
 
                             $arrSort = array();
 
@@ -3299,16 +3333,20 @@ class SyncCtoModuleClient extends BackendModule
                                 $compare .= '<ul class="fileinfo">';
 
                                 $compare .= "<li>";
-                                $compare .= '<strong>' . $GLOBALS['TL_LANG']['tl_syncCto_sync']["step_5"]['description_7'] . '</strong>';
+                                $compare .= '<strong>' . $GLOBALS['TL_LANG']['tl_syncCto_sync']["step_5"]['description_6'] . '</strong>';
                                 $compare .= "<ul>";
 
                                 foreach ($this->arrListCompare as $key => $value)
                                 {
                                     if ($value["transmission"] != SyncCtoEnum::FILETRANS_SEND)
+                                    {
                                         continue;
+                                    }
 
                                     if ($value["state"] == SyncCtoEnum::FILESTATE_DELETE)
+                                    {
                                         continue;
+                                    }
 
                                     $compare .= "<li>";
                                     $compare .= (mb_check_encoding($value["path"], 'UTF-8')) ? $value["path"] : utf8_encode($value["path"]);
@@ -3326,16 +3364,20 @@ class SyncCtoModuleClient extends BackendModule
                                 $compare .= '<ul class="fileinfo">';
 
                                 $compare .= "<li>";
-                                $compare .= '<strong>' . $GLOBALS['TL_LANG']['tl_syncCto_sync']["step_5"]['description_8'] . '</strong>';
+                                $compare .= '<strong>' . $GLOBALS['TL_LANG']['tl_syncCto_sync']["step_5"]['description_7'] . '</strong>';
                                 $compare .= "<ul>";
 
                                 foreach ($this->arrListCompare as $key => $value)
                                 {
                                     if ($value["transmission"] != SyncCtoEnum::FILETRANS_SEND)
+                                    {
                                         continue;
+                                    }
 
                                     if ($value["state"] != SyncCtoEnum::FILESTATE_DELETE)
+                                    {
                                         continue;
+                                    }
 
                                     $compare .= "<li>";
                                     $compare .= (mb_check_encoding($value["path"], 'UTF-8')) ? $value["path"] : utf8_encode($value["path"]);
@@ -3350,7 +3392,7 @@ class SyncCtoModuleClient extends BackendModule
 
                             if ($intWaitCount != 0)
                             {
-                                $compare .= '<br /><p class="tl_help">' . $intWaitCount . $GLOBALS['TL_LANG']['tl_syncCto_sync']["step_5"]['description_6'] . '</p>';
+                                $compare .= '<br /><p class="tl_help">' . $intWaitCount . $GLOBALS['TL_LANG']['tl_syncCto_sync']["step_5"]['description_5'] . '</p>';
 
                                 $arrSort = array();
 
@@ -3363,7 +3405,9 @@ class SyncCtoModuleClient extends BackendModule
                                 foreach ($this->arrListCompare as $key => $value)
                                 {
                                     if ($value["transmission"] != SyncCtoEnum::FILETRANS_WAITING)
+                                    {
                                         continue;
+                                    }
 
                                     $compare .= "<li>";
                                     $compare .= (mb_check_encoding($value["path"], 'UTF-8')) ? $value["path"] : utf8_encode($value["path"]);
