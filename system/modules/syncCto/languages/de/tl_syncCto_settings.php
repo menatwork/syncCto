@@ -37,7 +37,6 @@ $GLOBALS['TL_LANG']['tl_syncCto_settings']['whitelist_legend']          = 'White
 $GLOBALS['TL_LANG']['tl_syncCto_settings']['hidden_tables_legend']      = 'Versteckte Tabellen';
 $GLOBALS['TL_LANG']['tl_syncCto_settings']['tables_legend']             = 'Nicht empfohlene Tabellen';
 $GLOBALS['TL_LANG']['tl_syncCto_settings']['security_legend']           = 'Verschlüsselung';
-$GLOBALS['TL_LANG']['tl_syncCto_settings']['debug_legend']              = 'Debugmodus';
 $GLOBALS['TL_LANG']['tl_syncCto_settings']['custom_legend']             = 'Experten-Einstellungen';
 
 /**
@@ -50,14 +49,15 @@ $GLOBALS['TL_LANG']['tl_syncCto_settings']['local_blacklist']           = array(
 $GLOBALS['TL_LANG']['tl_syncCto_settings']['database_tables']           = array('Nicht empfohlene Tabellen', 'Hier können Sie definieren welche Datenbank-Tabellen Sie nicht für die Synchronisation empfehlen.');
 $GLOBALS['TL_LANG']['tl_syncCto_settings']['hidden_tables']             = array('Versteckte Tabellen', 'Hier können Sie den Zugriff auf eine oder mehrere Datenbank-Tabellen für die Synchronisation festlegen.');
 $GLOBALS['TL_LANG']['tl_syncCto_settings']['debug_mode']                = array('Debugmodus aktivieren', 'Informationen zur Laufzeit und den übertragenen Dateien während der Synchronisation anzeigen.');
-$GLOBALS['TL_LANG']['tl_syncCto_settings']['custom_settings']           = array('Experten-Einstellungen aktivieren', 'Klicken Sie hier wenn Sie wissen was Sie tun.');
+$GLOBALS['TL_LANG']['tl_syncCto_settings']['custom_settings']           = array('Experten-Einstellungen aktivieren', 'Klicken Sie hier, wenn Sie wissen was Sie tun.');
 $GLOBALS['TL_LANG']['tl_syncCto_settings']['wait_timeout']              = array('"wait_timeout" konfigurieren', 'Mehr Informationen: http://goo.gl/rC5Y4');
 $GLOBALS['TL_LANG']['tl_syncCto_settings']['interactive_timeout']       = array('"interactive_timeout" konfigurieren', 'Mehr Informationen: http://goo.gl/VHxRK');
-$GLOBALS['TL_LANG']['tl_syncCto_settings']['syncCto_colored_db_view']   = array('Limits für Datenbankvergleichslisten', 'Hier können Sie Limits bestimmen. Diese Limits werden in den Datenbankvergleichslisten farblich angezeigt.');
-$GLOBALS['TL_LANG']['tl_syncCto_settings']['syncCto_colored_db_view']   = array('Limits für Datenbankvergleichslisten', 'Hier können Sie Limits bestimmen. Diese Limits werden in den Datenbankvergleichslisten farblich angezeigt.');
-$GLOBALS['TL_LANG']['tl_syncCto_settings']['entries']                   = array('Einträge Limit', 'Hier können Sie das Limit bestimmen ab den ein Eintrag farblich markiert werden soll.');
-$GLOBALS['TL_LANG']['tl_syncCto_settings']['units']                     = array('Einheit', 'Hier können Sie die Einheit für das Limit bestimmen');
-$GLOBALS['TL_LANG']['tl_syncCto_settings']['color']                     = array('Farbe (CSS - Hex|Colorname)', 'Hier können Sie die Farbe angeben die verwendet werden soll um das Limit zu genzeichnen.');
-$GLOBALS['TL_LANG']['tl_syncCto_settings']['units']['select']           = array('kb' => 'KB','mb' => 'MB', 'entries' => 'Einträge');
+$GLOBALS['TL_LANG']['tl_syncCto_settings']['colored_db_view']           = array('Kennzeichnung von Datenbanklimits', 'Hier können Sie Datenbanklimits farblich kennzeichnen.');
+$GLOBALS['TL_LANG']['tl_syncCto_settings']['entries']                   = array('Wert', '');
+$GLOBALS['TL_LANG']['tl_syncCto_settings']['units']                     = array('Einheit', '');
+$GLOBALS['TL_LANG']['tl_syncCto_settings']['color']                     = array('Farbe (Hex-Wert)', '');
+$GLOBALS['TL_LANG']['tl_syncCto_settings']['units']['kb']               = 'KB';
+$GLOBALS['TL_LANG']['tl_syncCto_settings']['units']['mb']               = 'MB';
+$GLOBALS['TL_LANG']['tl_syncCto_settings']['units']['entries']          = 'Einträge';
 
 ?>

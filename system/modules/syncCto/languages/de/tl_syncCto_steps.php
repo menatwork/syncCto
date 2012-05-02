@@ -57,13 +57,14 @@ $GLOBALS['TL_LANG']['tl_syncCto_sync']['step_4']['description_3'] = 'SQL-Scripte
 $GLOBALS['TL_LANG']['tl_syncCto_sync']['step_4']['description_4'] = 'SQL-Scripte wurden erfolgreich verarbeitet.';
 
 // Step 5
-$GLOBALS['TL_LANG']['tl_syncCto_sync']['step_5']['description_3'] = 'Konfigurationsdateien importieren.';
-$GLOBALS['TL_LANG']['tl_syncCto_sync']['step_5']['description_4'] = ' Datei(en) übersprungen.';
-$GLOBALS['TL_LANG']['tl_syncCto_sync']['step_5']['description_5'] = ' Datei(en) gesendet.';
-$GLOBALS['TL_LANG']['tl_syncCto_sync']['step_5']['description_6'] = ' Datei(en) wartend.';
-$GLOBALS['TL_LANG']['tl_syncCto_sync']['step_5']['description_7'] = 'Übertragende Dateien:';
-$GLOBALS['TL_LANG']['tl_syncCto_sync']['step_5']['description_8'] = 'Gelöschte Dateien:';
-$GLOBALS['TL_LANG']['tl_syncCto_sync']['step_5']['description_9'] = 'Fehlerhafte Dateien:';
+$GLOBALS['TL_LANG']['tl_syncCto_sync']['step_5']['description_1'] = 'Dateien importieren.';
+$GLOBALS['TL_LANG']['tl_syncCto_sync']['step_5']['description_2'] = 'Konfigurationsdateien importieren.';
+$GLOBALS['TL_LANG']['tl_syncCto_sync']['step_5']['description_3'] = ' Datei(en) übersprungen.';
+$GLOBALS['TL_LANG']['tl_syncCto_sync']['step_5']['description_4'] = ' Datei(en) gesendet.';
+$GLOBALS['TL_LANG']['tl_syncCto_sync']['step_5']['description_5'] = ' Datei(en) wartend.';
+$GLOBALS['TL_LANG']['tl_syncCto_sync']['step_5']['description_6'] = 'Übertragende Dateien:';
+$GLOBALS['TL_LANG']['tl_syncCto_sync']['step_5']['description_7'] = 'Gelöschte Dateien:';
+$GLOBALS['TL_LANG']['tl_syncCto_sync']['step_5']['description_8'] = 'Fehlerhafte Dateien:';
 
 $GLOBALS['TL_LANG']['tl_syncCto_sync']['abort'] = 'Abbruch der Synchronisation und Säuberung des Clients.';
 $GLOBALS['TL_LANG']['tl_syncCto_sync']['complete'] = 'Die Synchronisation des %sClients%s wurde erfolgreich abgeschlossen.';
