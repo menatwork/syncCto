@@ -792,7 +792,12 @@ class SyncCtoFiles extends Backend
      */
     public function splitFiles($strSrcFile, $strDesFolder, $strDesFile, $intSizeLimit)
     {
-        @set_time_limit(3600);
+        @set_time_limit(3600);        
+        
+        if($intSizeLimit < 500*1024)
+        {
+            throw new Exception(vsprintf($GLOBALS['TL_LANG']['ERR']['min_size_limit'], array("500KiB")));
+        }
 
         if (!file_exists(TL_ROOT . "/" . $strSrcFile))
         {
