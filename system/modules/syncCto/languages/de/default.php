@@ -21,7 +21,7 @@
  * Software Foundation website at <http://www.gnu.org/licenses/>.
  *
  * PHP version 5
- * @copyright  MEN AT WORK 2011
+ * @copyright  MEN AT WORK 2012
  * @package    Language
  * @license    GNU/LGPL 
  * @filesource
@@ -130,6 +130,7 @@ $GLOBALS['TL_LANG']['ERR']['cant_move_file']                = 'Fehler beim versc
 $GLOBALS['TL_LANG']['ERR']['cant_delete_file']              = 'Fehler beim löschen der Datei.';
 $GLOBALS['TL_LANG']['ERR']['attention_headline']            = 'Achtung bei Änderungen am System';
 $GLOBALS['TL_LANG']['ERR']['attention_text']                = 'Es werden zurzeit Aktualisierungen im Hintergrund durchgeführt die dazu führen könnten das Änderungen auf dieser Installation überschrieben werden.';
+$GLOBALS['TL_LANG']['ERR']['min_size_limit']                = 'Die minimale Dateigröße von s% wurde unterschritten.';
 
 // Database
 $GLOBALS['TL_LANG']['ERR']['missing_tables_selection']      = 'Es wurde(n) keine Tabell(en) ausgewählt.';
