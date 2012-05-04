@@ -21,7 +21,7 @@
  * Software Foundation website at <http://www.gnu.org/licenses/>.
  *
  * PHP version 5
- * @copyright  MEN AT WORK 2011
+ * @copyright  MEN AT WORK 2012
  * @package    syncCto
  * @license    GNU/LGPL
  * @filesource
@@ -601,7 +601,7 @@ class SyncCtoCommunicationClient extends CtoCommunication
      * 
      * @param type $strPath
      * @param string $strSavePath
-     * @return type 
+     * @return boolean 
      */
     public function getFile($strPath, $strSavePath)
     {
@@ -623,7 +623,7 @@ class SyncCtoCommunicationClient extends CtoCommunication
             throw new Exception($GLOBALS['TL_LANG']['ERR']['checksum_error']);
         }
 
-        return $strSavePath;
+        return true;
     }
 
     /**
