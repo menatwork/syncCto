@@ -21,7 +21,7 @@
  * Software Foundation website at <http://www.gnu.org/licenses/>.
  *
  * PHP version 5
- * @copyright  MEN AT WORK 2011
+ * @copyright  MEN AT WORK 2012
  * @package    Language
  * @license    GNU/LGPL 
  * @filesource
@@ -67,6 +67,7 @@ $GLOBALS['TL_LANG']['tl_syncCto_sync']['step_5']['description_7'] = 'Gelöschte 
 $GLOBALS['TL_LANG']['tl_syncCto_sync']['step_5']['description_8'] = 'Fehlerhafte Dateien:';
 
 $GLOBALS['TL_LANG']['tl_syncCto_sync']['abort'] = 'Abbruch der Synchronisation und Säuberung des Clients.';
-$GLOBALS['TL_LANG']['tl_syncCto_sync']['complete'] = 'Die Synchronisation des %sClients%s wurde erfolgreich abgeschlossen.';
+$GLOBALS['TL_LANG']['tl_syncCto_sync']['complete_Client'] = 'Die Synchronisation des %sClients%s wurde erfolgreich abgeschlossen.';
+$GLOBALS['TL_LANG']['tl_syncCto_sync']['complete_Server'] = 'Die Synchronisation des %sServers%s wurde erfolgreich abgeschlossen.';
 
 ?>

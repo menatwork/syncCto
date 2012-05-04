@@ -641,7 +641,14 @@ class SyncCtoModuleClient extends BackendModule
 
             // Check if we have files and some big ones
             case 3:
+                $this->loadTempLists();
+
                 if (!$this->checkSyncFileList())
+                {
+                    $this->intStep++;
+                    $this->objData->nextStep();
+                }
+                else if (count($this->arrListCompare) == 0)
                 {
                     $this->intStep++;
                     $this->objData->nextStep();
@@ -856,7 +863,7 @@ class SyncCtoModuleClient extends BackendModule
 
                     // Check if memory limit on server and client is enough for upload  
                     $intLimit = min($intClientUploadLimit, $intClientMemoryLimit, $intClientPostLimit, $intLocalMemoryLimit);
-
+                
                     // Limit
                     if ($intLimit > 1073741824)
                     { // 1GB
@@ -1137,7 +1144,7 @@ class SyncCtoModuleClient extends BackendModule
                     $intCountIgnored = 0;
                     $intCountDelete  = 0;
 
-                    $intTotalSize = 0;
+                    $intTotalSize    = 0;
                     $intTotalSizeDel = 0;
 
                     // Count files
@@ -1628,10 +1635,7 @@ class SyncCtoModuleClient extends BackendModule
 
                         $this->arrListCompare[$key]["transmission"] = SyncCtoEnum::FILETRANS_SEND;
 
-                        if ($intStart < time() - 30)
-                        {
-                            break;
-                        }
+                        break;
                     }
 
                     if ($intCount != $intCountSplit)
@@ -1707,7 +1711,7 @@ class SyncCtoModuleClient extends BackendModule
                  */
                 case 2:
                     $this->objStepPool->zipname = $this->objSyncCtoDatabase->runDump($this->arrSyncSettings['syncCto_SyncTables'], true, true);
-                    $this->objStepPool->arrTableHash = $this->objSyncCtoHelper->getDatabaseTablesHash($this->arrSyncSettings['syncCto_SyncTables']);
+                    $this->objStepPool->arrTableTimestamp = $this->objSyncCtoHelper->getDatabaseTablesTimestamp($this->arrSyncSettings['syncCto_SyncTables']);
 
                     $this->objData->setDescription($GLOBALS['TL_LANG']['tl_syncCto_sync']["step_4"]['description_2']);
                     $this->objStepPool->step++;
@@ -1739,28 +1743,28 @@ class SyncCtoModuleClient extends BackendModule
                     $this->objSyncCtoCommunicationClient->runSQLImport($this->objSyncCtoHelper->standardizePath($this->arrClientInformation["folders"]["tmp"], "sql", $this->objStepPool->zipname));
 
                     // Update Hash
-                    $mixLastTableHash = $this->Database
-                            ->prepare("SELECT last_table_hash FROM tl_synccto_clients WHERE id=?")
+                    $mixLastTableTimestamp = $this->Database
+                            ->prepare("SELECT last_table_time FROM tl_synccto_clients WHERE id=?")
                             ->limit(1)
                             ->execute($this->intClientID)
                             ->fetchAllAssoc();
 
-                    if (strlen($mixLastTableHash[0]["last_table_hash"]) != 0)
+                    if (strlen($mixLastTableTimestamp[0]["last_table_time"]) != 0)
                     {
-                        $arrLastTableHash = deserialize($mixLastTableHash[0]["last_table_hash"]);
+                        $arrLastTableTimestamp = deserialize($mixLastTableTimestamp[0]["last_table_time"]);
                     }
                     else
                     {
-                        $arrLastTableHash = array();
+                        $arrLastTableTimestamp = array();
                     }
 
-                    foreach ($this->objStepPool->arrTableHash as $key => $value)
+                    foreach ($this->objStepPool->arrTableTimestamp as $key => $value)
                     {
-                        $arrLastTableHash[$key] = $value;
+                        $arrLastTableTimestamp[$key] = $value;
                     }
 
-                    $this->Database->prepare("UPDATE tl_synccto_clients SET last_table_hash=? WHERE id=? ")
-                            ->execute(serialize($arrLastTableHash), $this->intClientID);
+                    $this->Database->prepare("UPDATE tl_synccto_clients SET last_table_time = ? WHERE id = ? ")
+                            ->execute(serialize($arrLastTableTimestamp), $this->intClientID);
                     
                     $this->objStepPool->step++;
 
@@ -1962,13 +1966,22 @@ class SyncCtoModuleClient extends BackendModule
                     }
 
                     $this->objStepPool->step++;
+                    break;
+
+                case 8:
+                    if ($this->arrSyncSettings["syncCto_AttentionFlag"] == true)
+                    {
+                        $this->objSyncCtoCommunicationClient->setAttentionFlag(false);
+                    }                    
+
+                    $this->objStepPool->step++;
                     $this->log(vsprintf("Successfully finishing of synchronization client ID %s.", array($this->Input->get("id"))), __CLASS__ . " " . __FUNCTION__, "INFO");
                     break;
 
                 /**
                  * Cleanup
                  */
-                case 8:
+                case 9:
                     if (in_array("temp_folders", $this->arrSyncSettings["syncCto_Systemoperations_Maintenance"]))
                     {
                         $this->objSyncCtoCommunicationClient->purgeTempFolder();
@@ -1979,12 +1992,12 @@ class SyncCtoModuleClient extends BackendModule
 
                     $this->objStepPool->step++;
 
-                case 9:
+                case 10:
                     $this->objSyncCtoCommunicationClient->referrerEnable();
                     $this->objStepPool->step++;
                     break;
 
-                case 10:
+                case 11:
                     $this->objSyncCtoCommunicationClient->stopConnection();
                     $this->objStepPool->step++;
                     break;
@@ -1992,7 +2005,7 @@ class SyncCtoModuleClient extends BackendModule
                 /**
                  * Show information
                  */
-                case 11:
+                case 12:
                     // Count files
                     if (is_array($this->arrListCompare) && count($this->arrListCompare) != 0 && $this->arrListCompare != false)
                     {
@@ -2054,7 +2067,7 @@ class SyncCtoModuleClient extends BackendModule
 
                         $this->objData->nextStep();
                         $this->objData->setTitle($GLOBALS['TL_LANG']['MSC']['complete']);
-                        $this->objData->setDescription(vsprintf($GLOBALS['TL_LANG']['tl_syncCto_sync']['complete'], array($strLink, "</a>")));
+                        $this->objData->setDescription(vsprintf($GLOBALS['TL_LANG']['tl_syncCto_sync']['complete_Client'], array($strLink, "</a>")));
                         $this->objData->setState("");
 
                         break;
@@ -2207,7 +2220,7 @@ class SyncCtoModuleClient extends BackendModule
 
                     $this->objData->nextStep();
                     $this->objData->setTitle($GLOBALS['TL_LANG']['MSC']['complete']);
-                    $this->objData->setDescription(vsprintf($GLOBALS['TL_LANG']['tl_syncCto_sync']['complete'], array($strLink, "</a>")));
+                    $this->objData->setDescription(vsprintf($GLOBALS['TL_LANG']['tl_syncCto_sync']['complete_Client'], array($strLink, "</a>")));
                     $this->objData->setState("");
 
                     break;
@@ -2422,7 +2435,7 @@ class SyncCtoModuleClient extends BackendModule
                     $intCountIgnored = 0;
                     $intCountDelete  = 0;
 
-                    $intTotalSize = 0;
+                    $intTotalSize    = 0;
                     $intTotalSizeDel = 0;
 
                     // Count files
@@ -2703,7 +2716,14 @@ class SyncCtoModuleClient extends BackendModule
                         try
                         {
                             // Get files
-                            $this->objSyncCtoCommunicationClient->getFile($value["path"], $this->objSyncCtoHelper->standardizePath($GLOBALS['SYC_PATH']['tmp'], "sync", $value["path"]));
+                            $booResponse = $this->objSyncCtoCommunicationClient->getFile($value["path"], $this->objSyncCtoHelper->standardizePath($GLOBALS['SYC_PATH']['tmp'], "sync", $value["path"]));
+
+                            // Check if the file was send and saved.
+                            if ($booResponse != true)
+                            {
+                                throw new Exception(vsprintf($GLOBALS['TL_LANG']['ERR']['unknown_file'], $strFrom));
+                            }
+
                             $this->arrListCompare[$key]["transmission"] = SyncCtoEnum::FILETRANS_SEND;
                         }
                         catch (Exception $exc)
@@ -2737,6 +2757,7 @@ class SyncCtoModuleClient extends BackendModule
                         }
 
                         $this->objData->setDescription($GLOBALS['TL_LANG']['tl_syncCto_sync']["step_3"]['description_1']);
+                        $this->objData->setState($GLOBALS['TL_LANG']['MSC']['ok']);
                         $this->intStep++;
                     }
 
@@ -2773,7 +2794,7 @@ class SyncCtoModuleClient extends BackendModule
                         $strSavePath = $this->objSyncCtoHelper->standardizePath($this->arrClientInformation["folders"]['tmp'], $key);
 
                         // Splitt file
-                        $intSplits = $this->objSyncCtoCommunicationClient->runSplitFiles($value["path"], $strSavePath, $key, ($mixStepPool["limit"] / 100 * $mixStepPool["percent"]));
+                        $intSplits = $this->objSyncCtoCommunicationClient->runSplitFiles($value["path"], $strSavePath, $key, ($this->arrClientInformation["upload_sizeLimit"] / 100 * $this->arrClientInformation["upload_sizePercent"]));
 
                         $this->arrListCompare[$key]["splitcount"] = $intSplits;
                         $this->arrListCompare[$key]["splitname"] = $key;
@@ -2842,7 +2863,13 @@ class SyncCtoModuleClient extends BackendModule
                             set_time_limit(7200);
 
                             // Send file to client
-                            $arrResponse = $this->objSyncCtoCommunicationClient->getFile($this->objSyncCtoHelper->standardizePath($this->arrClientInformation["folders"]['tmp'], $key, $value["splitname"] . ".sync$ii"), $this->objSyncCtoHelper->standardizePath($GLOBALS['SYC_PATH']['tmp'], $key, $value["splitname"] . ".sync$ii"));
+                            $booResponse = $this->objSyncCtoCommunicationClient->getFile($this->objSyncCtoHelper->standardizePath($this->arrClientInformation["folders"]['tmp'], $key, $value["splitname"] . ".sync$ii"), $this->objSyncCtoHelper->standardizePath($GLOBALS['SYC_PATH']['tmp'], $key, $value["splitname"] . ".sync$ii"));
+
+                            // Check if the file was send and saved.
+                            if ($booResponse != true)
+                            {
+                                throw new Exception(vsprintf($GLOBALS['TL_LANG']['ERR']['unknown_file'], $strFrom));
+                            }
 
                             $this->arrListCompare[$key]["split_transfer"] = $ii + 1;
 
@@ -2863,6 +2890,7 @@ class SyncCtoModuleClient extends BackendModule
                     else
                     {
                         $this->objStepPool->step++;
+                        $this->objData->setState($GLOBALS['TL_LANG']['MSC']['ok']);
                         $this->objData->setDescription($GLOBALS['TL_LANG']['tl_syncCto_sync']["step_3"]['description_5']);
                     }
 
@@ -3005,12 +3033,12 @@ class SyncCtoModuleClient extends BackendModule
                 case 3:
                     $strFrom     = $this->objSyncCtoHelper->standardizePath($this->arrClientInformation["folders"]['tmp'], $this->objStepPool->zipname);
                     $strTo       = $this->objSyncCtoHelper->standardizePath($GLOBALS['SYC_PATH']['tmp'], "sql", $this->objStepPool->zipname);
-                    $arrResponse = $this->objSyncCtoCommunicationClient->getFile($strFrom, $strTo);
+                    $booResponse = $this->objSyncCtoCommunicationClient->getFile($strFrom, $strTo);
 
                     // Check if the file was send and saved.
-                    if (!is_array($arrResponse) || count($arrResponse) == 0)
+                    if ($booResponse != true)
                     {
-                        throw new Exception(vsprintf($GLOBALS['TL_LANG']['ERR']['unknown_file'], $strFrom) );
+                        throw new Exception(vsprintf($GLOBALS['TL_LANG']['ERR']['unknown_file'], $strFrom));
                     }
 
                     $this->objData->setDescription($GLOBALS['TL_LANG']['tl_syncCto_sync']["step_4"]['description_3']);
@@ -3019,12 +3047,37 @@ class SyncCtoModuleClient extends BackendModule
                     break;
 
                 /**
-                 * Import on client side
+                 * Import on server side
                  */
                 case 4:
-                    // Import SQL zip 
                     $strSrc = $this->objSyncCtoHelper->standardizePath($GLOBALS['SYC_PATH']['tmp'], "sql", $this->objStepPool->zipname);
                     $this->objSyncCtoDatabase->runRestore($strSrc);
+
+                    // Update Hash
+                    $arrTableTimestamp = $this->objSyncCtoHelper->getDatabaseTablesTimestamp($this->arrSyncSettings['syncCto_SyncTables']);
+                    
+                    $mixLastTableTimestamp = $this->Database
+                            ->prepare("SELECT last_table_time FROM tl_synccto_clients WHERE id=?")
+                            ->limit(1)
+                            ->execute($this->intClientID)
+                            ->fetchAllAssoc();
+
+                    if (strlen($mixLastTableTimestamp[0]["last_table_time"]) != 0)
+                    {
+                        $arrLastTableTimestamp = deserialize($mixLastTableTimestamp[0]["last_table_time"]);
+                    }
+                    else
+                    {
+                        $arrLastTableTimestamp = array();
+                    }
+
+                    foreach ($arrTableTimestamp as $key => $value)
+                    {
+                        $arrLastTableTimestamp[$key] = $value;
+                    }
+
+                    $this->Database->prepare("UPDATE tl_synccto_clients SET last_table_time = ? WHERE id = ? ")
+                            ->execute(serialize($arrLastTableTimestamp), $this->intClientID);
 
                     $this->objData->setState($GLOBALS['TL_LANG']['MSC']['ok']);
                     $this->objData->setDescription($GLOBALS['TL_LANG']['tl_syncCto_sync']["step_4"]['description_4']);
@@ -3183,7 +3236,20 @@ class SyncCtoModuleClient extends BackendModule
                 case 6:
                     if (is_array($this->arrSyncSettings["syncCto_Systemoperations_Maintenance"]) && count($this->arrSyncSettings["syncCto_Systemoperations_Maintenance"]) != 0)
                     {
-                        $this->objSyncCtoCommunicationClient->runMaintenance($this->arrSyncSettings["syncCto_Systemoperations_Maintenance"]);
+                        $this->objSyncCtoFiles->runMaintenance($this->arrSyncSettings["syncCto_Systemoperations_Maintenance"]);
+                    }
+
+                    $this->objStepPool->step++;
+                    break;
+
+                case 7:
+                    if ($this->arrSyncSettings["syncCto_AttentionFlag"] == true)
+                    {
+                        $this->objSyncCtoCommunicationClient->setAttentionFlag(true);
+                    }
+                    else
+                    {
+                        $this->objSyncCtoCommunicationClient->setAttentionFlag(false);
                     }
 
                     $this->objStepPool->step++;
@@ -3193,18 +3259,18 @@ class SyncCtoModuleClient extends BackendModule
                 /**
                  * Cleanup
                  */
-                case 7:
+                case 8:
                     $this->objSyncCtoCommunicationClient->purgeTempFolder();
                     $this->objSyncCtoFiles->purgeTemp();
                     $this->objStepPool->step++;
                     break;
 
-                case 8:
+                case 9:
                     $this->objSyncCtoCommunicationClient->referrerEnable();
                     $this->objStepPool->step++;
                     break;
 
-                case 9:
+                case 10:
                     $this->objSyncCtoCommunicationClient->stopConnection();
                     $this->objStepPool->step++;
                     break;
@@ -3212,7 +3278,7 @@ class SyncCtoModuleClient extends BackendModule
                 /**
                  * Show information
                  */
-                case 10:
+                case 11:
                     // Count files
                     if (is_array($this->arrListCompare) && count($this->arrListCompare) != 0 && $this->arrListCompare != false)
                     {
@@ -3270,11 +3336,11 @@ class SyncCtoModuleClient extends BackendModule
                                 ->execute($this->intClientID)
                                 ->fetchAllAssoc();
 
-                        $strLink = vsprintf('<a href="%s:%s%s" target="_blank" style="text-decoration:underline;">', array($arrClientLink[0]['address'], $arrClientLink[0]['port'], $arrClientLink[0]['path']));
+                        $strLink = vsprintf('<a href="%s" target="_blank" style="text-decoration:underline;">', array($this->Environment->base));
 
                         $this->objData->nextStep();
                         $this->objData->setTitle($GLOBALS['TL_LANG']['MSC']['complete']);
-                        $this->objData->setDescription(vsprintf($GLOBALS['TL_LANG']['tl_syncCto_sync']['complete'], array($strLink, "</a>")));
+                        $this->objData->setDescription(vsprintf($GLOBALS['TL_LANG']['tl_syncCto_sync']['complete_Server'], array($strLink, "</a>")));
                         $this->objData->setState("");
 
                         break;
@@ -3429,11 +3495,11 @@ class SyncCtoModuleClient extends BackendModule
                             ->execute($this->intClientID)
                             ->fetchAllAssoc();
 
-                    $strLink = vsprintf('<a href="%s:%s%s" target="_blank" style="text-decoration:underline;">', array($arrClientLink[0]['address'], $arrClientLink[0]['port'], $arrClientLink[0]['path']));
+                    $strLink = vsprintf('<a href="%s" target="_blank" style="text-decoration:underline;">', array($this->Environment->base));
 
                     $this->objData->nextStep();
                     $this->objData->setTitle($GLOBALS['TL_LANG']['MSC']['complete']);
-                    $this->objData->setDescription(vsprintf($GLOBALS['TL_LANG']['tl_syncCto_sync']['complete'], array($strLink, "</a>")));
+                    $this->objData->setDescription(vsprintf($GLOBALS['TL_LANG']['tl_syncCto_sync']['complete_server'], array($strLink, "</a>")));
                     $this->objData->setState("");
 
                     break;
