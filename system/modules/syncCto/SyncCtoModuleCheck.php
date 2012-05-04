@@ -1,7 +1,4 @@
-<?php
-
-if (!defined('TL_ROOT'))
-    die('You cannot access this file directly!');
+<?php if (!defined('TL_ROOT')) die('You cannot access this file directly!');
 
 /**
  * Contao Open Source CMS
@@ -24,7 +21,7 @@ if (!defined('TL_ROOT'))
  * Software Foundation website at <http://www.gnu.org/licenses/>.
  *
  * PHP version 5
- * @copyright  MEN AT WORK 2011
+ * @copyright  MEN AT WORK 2012
  * @package    syncCto
  * @license    GNU/LGPL
  * @filesource
@@ -165,7 +162,7 @@ class SyncCtoModuleCheck extends BackendModule
         $ok                  = (intval($upload_max_filesize) >= 8000000);
         $return .= '<tr class="' . ($ok ? 'ok' : 'warning') . '">';
         $return .= '<td>' . $GLOBALS['TL_LANG']['tl_syncCto_check']['umf'][0] . '</td>';
-        $return .= '<td class="dot">' . ($ok ? '&nbsp;' : '•') . '</td>';
+        $return .= '<td class="dot">' . ($ok ? '&nbsp;' : 'â€¢') . '</td>';
         $return .= '<td class="value">' . $this->getReadableSize($upload_max_filesize) . '</td>';
         $return .= '<td>' . $GLOBALS['TL_LANG']['tl_syncCto_check']['umf'][1] . '</td>';
         $return .= '</tr>';
@@ -175,7 +172,7 @@ class SyncCtoModuleCheck extends BackendModule
         $ok            = (intval($post_max_size) >= 8000000);
         $return .= '<tr class="' . ($ok ? 'ok' : 'warning') . '">';
         $return .= '<td>' . $GLOBALS['TL_LANG']['tl_syncCto_check']['pms'][0] . '</td>';
-        $return .= '<td class="dot">' . ($ok ? '&nbsp;' : '•') . '</td>';
+        $return .= '<td class="dot">' . ($ok ? '&nbsp;' : 'â€¢') . '</td>';
         $return .= '<td class="value">' . $this->getReadableSize($post_max_size) . '</td>';
         $return .= '<td>' . $GLOBALS['TL_LANG']['tl_syncCto_check']['pms'][1] . '</td>';
         $return .= '</tr>';
@@ -185,7 +182,7 @@ class SyncCtoModuleCheck extends BackendModule
         $ok             = ($max_input_time == '-1' || (intval($max_input_time) >= 60));
         $return .= '<tr class="' . ($ok ? 'ok' : 'warning') . '">';
         $return .= '<td>' . $GLOBALS['TL_LANG']['tl_syncCto_check']['mit'][0] . '</td>';
-        $return .= '<td class="dot">' . ($ok ? '&nbsp;' : '•') . '</td>';
+        $return .= '<td class="dot">' . ($ok ? '&nbsp;' : 'â€¢') . '</td>';
         $return .= '<td class="value">' . $max_input_time . '</td>';
         $return .= '<td>' . $GLOBALS['TL_LANG']['tl_syncCto_check']['mit'][1] . '</td>';
         $return .= '</tr>';
@@ -195,7 +192,7 @@ class SyncCtoModuleCheck extends BackendModule
         $ok                     = (intval($default_socket_timeout) >= 32);
         $return .= '<tr class="' . ($ok ? 'ok' : 'warning') . '">';
         $return .= '<td>' . $GLOBALS['TL_LANG']['tl_syncCto_check']['dst'][0] . '</td>';
-        $return .= '<td class="dot">' . ($ok ? '&nbsp;' : '•') . '</td>';
+        $return .= '<td class="dot">' . ($ok ? '&nbsp;' : 'â€¢') . '</td>';
         $return .= '<td class="value">' . $default_socket_timeout . '</td>';
         $return .= '<td>' . $GLOBALS['TL_LANG']['tl_syncCto_check']['dst'][1] . '</td>';
         $return .= '</tr>';
@@ -205,7 +202,7 @@ class SyncCtoModuleCheck extends BackendModule
         $ok              = ($allow_url_fopen == 1 || $allow_url_fopen == 'On');
         $return .= '<tr class="' . ($ok ? 'ok' : 'warning') . '">';
         $return .= '<td>' . $GLOBALS['TL_LANG']['tl_syncCto_check']['fopen'][0] . '</td>';
-        $return .= '<td class="dot">' . ($ok ? '&nbsp;' : '•') . '</td>';
+        $return .= '<td class="dot">' . ($ok ? '&nbsp;' : 'â€¢') . '</td>';
         $return .= '<td class="value">' . ($allow_url_fopen ? $GLOBALS['TL_LANG']['tl_syncCto_check']['on'] : $GLOBALS['TL_LANG']['tl_syncCto_check']['off']) . '</td>';
         $return .= '<td>' . $GLOBALS['TL_LANG']['tl_syncCto_check']['fopen'][1] . '</td>';
         $return .= '</tr>';
@@ -215,7 +212,7 @@ class SyncCtoModuleCheck extends BackendModule
         $ok      = ($suhosin == false);
         $return .= '<tr class="' . ($ok ? 'ok' : 'warning') . '">';
         $return .= '<td>' . $GLOBALS['TL_LANG']['tl_syncCto_check']['suhosin'][0] . '</td>';
-        $return .= '<td class="dot">' . ($ok ? '&nbsp;' : '•') . '</td>';
+        $return .= '<td class="dot">' . ($ok ? '&nbsp;' : 'â€¢') . '</td>';
         $return .= '<td class="value">' . ($suhosin ? $GLOBALS['TL_LANG']['tl_syncCto_check']['on'] : $GLOBALS['TL_LANG']['tl_syncCto_check']['off']) . '</td>';
         $return .= '<td>' . $GLOBALS['TL_LANG']['tl_syncCto_check']['suhosin'][1] . '</td>';
         $return .= '</tr>';

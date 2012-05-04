@@ -1,4 +1,4 @@
-/* Copyright (c) MEN AT WORK 2011 :: LGPL license */
+/* Copyright (c) MEN AT WORK 2012 :: LGPL license */
 
 function sendNextRequest(_strToken, _objElements, _intIndex)
 {
