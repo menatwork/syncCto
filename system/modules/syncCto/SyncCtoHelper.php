@@ -21,7 +21,7 @@
  * Software Foundation website at <http://www.gnu.org/licenses/>.
  *
  * PHP version 5
- * @copyright  MEN AT WORK 2011
+ * @copyright  MEN AT WORK 2012
  * @package    syncCto
  * @license    GNU/LGPL
  * @filesource
@@ -556,10 +556,10 @@ class SyncCtoHelper extends Backend
     /**
      * Returns a list with recommended database tables
      *
-     * @param array $arrHashLast A Hash list for checking hash
+     * @param array $arrTimestampLast A timestamp list for checking timestamp
      * @return array
      */
-    public function databaseTablesRecommended($arrHashLast = null)
+    public function databaseTablesRecommended($arrTimestampLast = null)
     {
         // Recommended tables
         $arrBlacklist = deserialize($GLOBALS['TL_CONFIG']['syncCto_database_tables']);
@@ -584,9 +584,9 @@ class SyncCtoHelper extends Backend
                 continue;
             }
 
-            if ($arrHashLast != null && is_array($arrHashLast))
+            if ($arrTimestampLast != null && is_array($arrTimestampLast))
             {                
-                if ($arrHashLast[$value] == $this->getDatabaseTablesHash($value))
+                if ($arrTimestampLast[$value] == $this->getDatabaseTablesTimestamp($value))
                 {
                     $arrTables["tables_no_changes"][$value] = $this->getTableMeta($value, true);
                 }
@@ -601,7 +601,7 @@ class SyncCtoHelper extends Backend
             }
         }
 
-        if ($arrHashLast != null && is_array($arrHashLast))
+        if ($arrTimestampLast != null && is_array($arrTimestampLast))
         {
             if (count($arrTables["tables_changes"]) == 0 || count($arrTables["tables_no_changes"]) == 0)
             {
@@ -622,10 +622,10 @@ class SyncCtoHelper extends Backend
     /**
      * Returns a list with none recommended database tables
      *
-     * @param array $arrHashLast A Hash list for checking hash
+     * @param array $arrTimestampLast A timestamp list for checking timestamp
      * @return array
      */
-    public function databaseTablesNoneRecommended($arrHashLast = null)
+    public function databaseTablesNoneRecommended($arrTimestampLast = null)
     {
         // None recommended tables
         $arrBlacklist = deserialize($GLOBALS['TL_CONFIG']['syncCto_database_tables']);
@@ -650,9 +650,9 @@ class SyncCtoHelper extends Backend
                 continue;
             }
 
-            if ($arrHashLast != null && is_array($arrHashLast))
+            if ($arrTimestampLast != null && is_array($arrTimestampLast))
             {
-                if ($arrHashLast[$value] == $this->getDatabaseTablesHash($value))
+                if ($arrTimestampLast[$value] == $this->getDatabaseTablesTimestamp($value))
                 {
                     $arrTables["tables_no_changes"][$value] = $this->getTableMeta($value, true);
                 }
@@ -667,7 +667,7 @@ class SyncCtoHelper extends Backend
             }
         }
 
-        if ($arrHashLast != null && is_array($arrHashLast))
+        if ($arrTimestampLast != null && is_array($arrTimestampLast))
         {
             if (count($arrTables["tables_changes"]) == 0 || count($arrTables["tables_no_changes"]) == 0)
             {
@@ -791,11 +791,11 @@ class SyncCtoHelper extends Backend
     }
 
     /**
-     * Return a list with all hashes form tables
+     * Return a list with all timestamps form tables
      * 
      * @param string/array $mixTableNames 
      */
-    public function getDatabaseTablesHash($mixTableNames = array())
+    public function getDatabaseTablesTimestamp($mixTableNames = array())
     {
         // If we have only a string for tablenames set it as array
         if (!is_array($mixTableNames))
@@ -808,11 +808,19 @@ class SyncCtoHelper extends Backend
         }
 
         // Return array
-        $arrHash = array();
+        $arrTimestamp = array();
 
         // Load all Tables
         $arrTables = $this->Database->listTables();
-
+        
+        $objDBSchema = $this->Database->prepare("SELECT TABLE_NAME, UPDATE_TIME FROM information_schema.TABLES WHERE TABLE_SCHEMA = ?")->execute($GLOBALS['TL_CONFIG']['dbDatabase']);
+        
+        $arrDBSchema = array();
+        while($objDBSchema->next())
+        {
+            $arrDBSchema[$objDBSchema->TABLE_NAME] = strtotime($objDBSchema->UPDATE_TIME);
+        }
+        
         foreach ($arrTables as $strTable)
         {
             // Skip hidden tables
@@ -831,7 +839,7 @@ class SyncCtoHelper extends Backend
             $objCount = $this->Database->prepare("SELECT COUNT(*) as count FROM $strTable")->execute();
             if ($objCount->count == 0)
             {
-                $arrHash[$strTable] = 0;
+                $arrTimestamp[$strTable] = 0;
             }
 
             // Load all fields
@@ -849,20 +857,16 @@ class SyncCtoHelper extends Backend
                 $arrFields[] = $arrField['name'];
             }
 
-            // Build hash
-            $strSQL   = "SELECT MD5(GROUP_CONCAT( CONCAT_WS('#', `" . implode("`, `", $arrFields) . "`) SEPARATOR '##' )) as hash  FROM $strTable";
-            $objQuery = $this->Database->prepare($strSQL)->execute();
-
-            $arrHash[$strTable] = $objQuery->hash;
+            $arrTimestamp[$strTable] = $arrDBSchema[$strTable];
         }
 
         if (!is_array($mixTableNames))
         {
-            return $arrHash[$mixTableNames];
+            return $arrTimestamp[$mixTableNames];
         }
         else
         {
-            return $arrHash;
+            return $arrTimestamp;
         }
     }
 
