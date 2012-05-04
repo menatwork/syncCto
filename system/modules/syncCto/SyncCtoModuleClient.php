@@ -1762,6 +1762,16 @@ class SyncCtoModuleClient extends BackendModule
                     {
                         $arrLastTableTimestamp[$key] = $value;
                     }
+                    
+                    // Search for old entries
+                    $arrTables = $this->Database->listTables();                    
+                    foreach ($arrLastTableTimestamp as $key => $value)
+                    {
+                        if(!in_array($key, $arrTables))
+                        {
+                            unset($arrLastTableTimestamp[$key]);
+                        }
+                    }
 
                     $this->Database->prepare("UPDATE tl_synccto_clients SET last_table_time = ? WHERE id = ? ")
                             ->execute(serialize($arrLastTableTimestamp), $this->intClientID);
@@ -3074,6 +3084,16 @@ class SyncCtoModuleClient extends BackendModule
                     foreach ($arrTableTimestamp as $key => $value)
                     {
                         $arrLastTableTimestamp[$key] = $value;
+                    }
+                    
+                    // Search for old entries
+                    $arrTables = $this->Database->listTables();                    
+                    foreach ($arrLastTableTimestamp as $key => $value)
+                    {
+                        if(!in_array($key, $arrTables))
+                        {
+                            unset($arrLastTableTimestamp[$key]);
+                        }
                     }
 
                     $this->Database->prepare("UPDATE tl_synccto_clients SET last_table_time = ? WHERE id = ? ")
