@@ -41,7 +41,7 @@ $GLOBALS['TL_LANG']['tl_syncCto_restore_db']['filelist']                = array(
 /**
  * List
  */
-$GLOBALS['TL_LANG']['tl_syncCto_restore_db']['step1']                   = 'Import database';
+$GLOBALS['TL_LANG']['tl_syncCto_restore_db']['step1']                   = 'Import database.';
 $GLOBALS['TL_LANG']['tl_syncCto_restore_db']['complete']                = 'The database was successfully imported.';
 
 ?>

@@ -30,7 +30,7 @@
 /**
  * Legends
  */
-$GLOBALS['TL_LANG']['tl_user_group']['syncCto_legend']              = 'SyncCto - Client-Rechte';
-$GLOBALS['TL_LANG']['tl_user_group']['syncCto_tables_legend']       = 'SyncCto - Erlaubte Tabellen';
+$GLOBALS['TL_LANG']['tl_user_group']['syncCto_legend']              = 'Client-Rechte';
+$GLOBALS['TL_LANG']['tl_user_group']['syncCto_tables_legend']       = 'Erlaubte Tabellen';
 
 ?>

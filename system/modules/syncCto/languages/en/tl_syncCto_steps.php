@@ -31,40 +31,38 @@
  * List
  */
 
-// Step 1
-$GLOBALS['TL_LANG']['tl_syncCto_sync']['step_1']['description_1'] = 'Checking client.';
-$GLOBALS['TL_LANG']['tl_syncCto_sync']['step_1']['description_2'] = 'Purge temp folder.';
+$GLOBALS['TL_LANG']['tl_syncCto_sync']['step_1']['description_1']   = 'Checking client.';
+$GLOBALS['TL_LANG']['tl_syncCto_sync']['step_1']['description_2']   = 'Purge temp folder.';
 
-// Step 2
-$GLOBALS['TL_LANG']['tl_syncCto_sync']['step_2']['description_1'] = 'Checking and transferring MD5 list.';
-$GLOBALS['TL_LANG']['tl_syncCto_sync']['step_2']['description_2'] = 'Search for deletable files.';
-$GLOBALS['TL_LANG']['tl_syncCto_sync']['step_2']['description_3'] = 'Loading compare list.';
-$GLOBALS['TL_LANG']['tl_syncCto_sync']['step_2']['description_4'] = '%s new, %s modified, %s deleted and %s not deliverable file(s) are found.';
+$GLOBALS['TL_LANG']['tl_syncCto_sync']['step_2']['description_1']   = 'Checking and transferring MD5 list.';
+$GLOBALS['TL_LANG']['tl_syncCto_sync']['step_2']['description_2']   = 'Search for deletable files.';
+$GLOBALS['TL_LANG']['tl_syncCto_sync']['step_2']['description_3']   = 'Compare MD5 list.';
+$GLOBALS['TL_LANG']['tl_syncCto_sync']['step_2']['description_4']   = '%s new, %s modified, %s deleted and %s not deliverable file(s) are found.';
+$GLOBALS['TL_LANG']['tl_syncCto_sync']['step_2']['description_5']   = '%s large files are found.';
 
-// Step 3
-$GLOBALS['TL_LANG']['tl_syncCto_sync']['step_3']['description_1'] = 'Process large files.';
-$GLOBALS['TL_LANG']['tl_syncCto_sync']['step_3']['description_2'] = '%s of %s large file(s) have been processed.';
-$GLOBALS['TL_LANG']['tl_syncCto_sync']['step_3']['description_3'] = 'Assemble large files.';
-$GLOBALS['TL_LANG']['tl_syncCto_sync']['step_3']['description_4'] = '%s of %s large file(s) have been transferred.';
+$GLOBALS['TL_LANG']['tl_syncCto_sync']['step_3']['description_1']   = 'Process files.';
+$GLOBALS['TL_LANG']['tl_syncCto_sync']['step_3']['description_2']   = '%s of %s file(s) have been processed.';
+$GLOBALS['TL_LANG']['tl_syncCto_sync']['step_3']['description_3']   = 'Transferred large files.';
+$GLOBALS['TL_LANG']['tl_syncCto_sync']['step_3']['description_4']   = '%s of %s large file(s) have been processed.';
+$GLOBALS['TL_LANG']['tl_syncCto_sync']['step_3']['description_5']   = 'Assemble large files.';
+$GLOBALS['TL_LANG']['tl_syncCto_sync']['step_3']['description_6']   = '%s of %s large file(s) have been transferred.';
 
-// Step 4
-$GLOBALS['TL_LANG']['tl_syncCto_sync']['step_4']['description_1'] = 'Creating sql scripts.';
-$GLOBALS['TL_LANG']['tl_syncCto_sync']['step_4']['description_2'] = 'Transferring sql scripts.';
-$GLOBALS['TL_LANG']['tl_syncCto_sync']['step_4']['description_3'] = 'Importing sql scripts.';
-$GLOBALS['TL_LANG']['tl_syncCto_sync']['step_4']['description_4'] = 'The sql file was successfully transferred and imported.';
+$GLOBALS['TL_LANG']['tl_syncCto_sync']['step_4']['description_1']   = 'Creating sql scripts.';
+$GLOBALS['TL_LANG']['tl_syncCto_sync']['step_4']['description_2']   = 'Transferring sql scripts.';
+$GLOBALS['TL_LANG']['tl_syncCto_sync']['step_4']['description_3']   = 'Importing sql scripts.';
+$GLOBALS['TL_LANG']['tl_syncCto_sync']['step_4']['description_4']   = 'The sql file was successfully transferred and imported.';
 
-// Step 5
-$GLOBALS['TL_LANG']['tl_syncCto_sync']['step_5']['description_1'] = 'Process files.';
-$GLOBALS['TL_LANG']['tl_syncCto_sync']['step_5']['description_2'] = '%s of %s files were processed.';
-$GLOBALS['TL_LANG']['tl_syncCto_sync']['step_5']['description_3'] = 'Import configuration files.';
-$GLOBALS['TL_LANG']['tl_syncCto_sync']['step_5']['description_4'] = ' file(s) will be skipped.';
-$GLOBALS['TL_LANG']['tl_syncCto_sync']['step_5']['description_5'] = ' file(s) sent.';
-$GLOBALS['TL_LANG']['tl_syncCto_sync']['step_5']['description_6'] = ' file(s) waiting.';
-$GLOBALS['TL_LANG']['tl_syncCto_sync']['step_5']['description_7'] = 'Transferred files:';
-$GLOBALS['TL_LANG']['tl_syncCto_sync']['step_5']['description_8'] = 'Deleted files:';
-$GLOBALS['TL_LANG']['tl_syncCto_sync']['step_5']['description_9'] = 'Incorrect files:';
+$GLOBALS['TL_LANG']['tl_syncCto_sync']['step_5']['description_1']   = 'Process files.';
+$GLOBALS['TL_LANG']['tl_syncCto_sync']['step_5']['description_2']   = 'Import configuration files.';
+$GLOBALS['TL_LANG']['tl_syncCto_sync']['step_5']['description_3']   = ' file(s) will be skipped.';
+$GLOBALS['TL_LANG']['tl_syncCto_sync']['step_5']['description_4']   = ' file(s) sent.';
+$GLOBALS['TL_LANG']['tl_syncCto_sync']['step_5']['description_5']   = ' file(s) waiting.';
+$GLOBALS['TL_LANG']['tl_syncCto_sync']['step_5']['description_6']   = 'Transferred files:';
+$GLOBALS['TL_LANG']['tl_syncCto_sync']['step_5']['description_7']   = 'Deleted files:';
+$GLOBALS['TL_LANG']['tl_syncCto_sync']['step_5']['description_8']   = 'Incorrect files:';
 
-$GLOBALS['TL_LANG']['tl_syncCto_sync']['abort'] = 'Abort the synchronization and cleanup the client.';
-$GLOBALS['TL_LANG']['tl_syncCto_sync']['complete'] = 'The synchronization of the %sclient%s was successfully completed.';
+$GLOBALS['TL_LANG']['tl_syncCto_sync']['abort']                     = 'Abort the synchronization and cleanup the client.';
+$GLOBALS['TL_LANG']['tl_syncCto_sync']['complete_client']           = 'The synchronization of the %sclient%s was successfully completed.';
+$GLOBALS['TL_LANG']['tl_syncCto_sync']['complete_server']           = 'The synchronization of the %sserver%s was successfully completed.';
 
 ?>

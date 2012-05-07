@@ -2,7 +2,7 @@
 
 /**
  * Contao Open Source CMS
- * Copyright (C) 2005-2011 Leo Feyer
+ * Copyright (C) 2005-2010 Leo Feyer
  *
  * Formerly known as TYPOlight Open Source CMS.
  *
@@ -28,6 +28,31 @@
  */
 
 /**
+ * Reference
+ */
+// Sync
+$GLOBALS['TL_LANG']['SYC']['core']                          = 'Contao Installation';
+$GLOBALS['TL_LANG']['SYC']['core_change']                   = 'Modified files';
+$GLOBALS['TL_LANG']['SYC']['core_delete']                   = 'Deleted files';
+$GLOBALS['TL_LANG']['SYC']['user']                          = 'Personal data (tl_files)';
+$GLOBALS['TL_LANG']['SYC']['user_change']                   = 'Modified files';
+$GLOBALS['TL_LANG']['SYC']['user_delete']                   = 'Deleted files';
+$GLOBALS['TL_LANG']['SYC']['configfiles']                   = 'Configuration files';
+$GLOBALS['TL_LANG']['SYC']['localconfig_update']            = 'Update all entries';
+$GLOBALS['TL_LANG']['SYC']['localconfig_errors']            = 'Display errors';
+$GLOBALS['TL_LANG']['SYC']['localconfig_refererCheck']      = 'Disable request tokens';
+// Maintenance options  
+$GLOBALS['TL_LANG']['SYC']['options']                       = 'Options';    
+$GLOBALS['TL_LANG']['SYC']['search_index']                  = 'Rebuild the search index';    
+$GLOBALS['TL_LANG']['SYC']['temp_tables']                   = 'Purge db tables';    
+$GLOBALS['TL_LANG']['SYC']['temp_folders']                  = 'Purge temp files';    
+$GLOBALS['TL_LANG']['SYC']['css_create']                    = 'Create CSS files';    
+$GLOBALS['TL_LANG']['SYC']['xml_create']                    = 'Create XML files';    
+// Tables   
+$GLOBALS['TL_LANG']['SYC']['tables_no_changes']             = 'No changes';    
+$GLOBALS['TL_LANG']['SYC']['tables_changes']                = 'Changed tables';     
+
+/**
  * Back end modules
  */
 $GLOBALS['TL_LANG']['MSC']['edit']                          = 'Edit';
@@ -38,11 +63,8 @@ $GLOBALS['TL_LANG']['MSC']['syncFrom']                      = 'Synchronize serve
 $GLOBALS['TL_LANG']['MSC']['restore_backup']                = 'Restore backup';
 $GLOBALS['TL_LANG']['MSC']['start_backup']                  = 'Start backup';
 
-$GLOBALS['TL_LANG']['SYC']['files']                         = 'File synchronization';
-$GLOBALS['TL_LANG']['SYC']['backup']                        = 'Backup category';
-
 /**
- * Texte
+ * Text
  */
 $GLOBALS['TL_LANG']['MSC']['ok']                            = 'OK';
 $GLOBALS['TL_LANG']['MSC']['progress']                      = 'In progress';
@@ -62,7 +84,7 @@ $GLOBALS['TL_LANG']['MSC']['debug_mode']                    = 'Debug mode';
  * Filelist
  */
 $GLOBALS['TL_LANG']['MSC']['select_all_files']              = 'Select all files';
-$GLOBALS['TL_LANG']['MSC']['sync_info']                     = 'Please do not close, during the whole synchronization process, the current window.';
+$GLOBALS['TL_LANG']['MSC']['sync_info']                     = 'Please don\'t close the current window, during the whole synchronization process.';
 $GLOBALS['TL_LANG']['MSC']['state']                         = 'State';
 $GLOBALS['TL_LANG']['MSC']['filesize']                      = 'Filesize';
 $GLOBALS['TL_LANG']['MSC']['file']                          = 'File';
@@ -76,7 +98,8 @@ $GLOBALS['TL_LANG']['MSC']['skipped_files']                 = 'Übersprungen';
 $GLOBALS['TL_LANG']['MSC']['ignored_files']                 = 'Ignoriert';
 $GLOBALS['TL_LANG']['MSC']['submit_files']                  = 'Submit files';
 $GLOBALS['TL_LANG']['MSC']['delete_files']                  = 'Delete selected files from the list';
-$GLOBALS['TL_LANG']['MSC']['last_sync']         			= 'Last synchronisation was made at %s on %s from user %s (%s).';
+$GLOBALS['TL_LANG']['MSC']['last_sync']                     = 'Last synchronisation was made at %s on %s from %s (%s).';
+$GLOBALS['TL_LANG']['MSC']['disabled_cache']                = 'Current entries in the "initconfig.php" disrupt a successful synchronization.';
 
 /**
  * Buttons
@@ -93,17 +116,18 @@ $GLOBALS['TL_LANG']['MSC']['memory_limit']                  = 'Memory limit: %s'
 /**
  * Errors
  */
-$GLOBALS['TL_LANG']['ERR']['missing_file_selection']        = 'No file(s) is/are selected.';
-$GLOBALS['TL_LANG']['ERR']['missing_file_information']      = 'Missing file or file information.';
-$GLOBALS['TL_LANG']['ERR']['unknown_file']                  = 'Could not be found the file %s.';
-$GLOBALS['TL_LANG']['ERR']['unknown_file_in_zip']           = 'Could not be found the file %s in the zip.';
-$GLOBALS['TL_LANG']['ERR']['unknown_path']                  = 'Unknown Path.';
-$GLOBALS['TL_LANG']['ERR']['cant_open']                     = 'Can not be opened file %s.';
-$GLOBALS['TL_LANG']['ERR']['checksum_error']                = 'Checksum error.';
-$GLOBALS['TL_LANG']['ERR']['cant_move_file']                = "Can't move file from %s to %s.";
-$GLOBALS['TL_LANG']['ERR']['cant_delete_file']              = 'Error deleting file.';
-$GLOBALS['TL_LANG']['ERR']['attention_headline']            = "Beware of changes to the system";
-$GLOBALS['TL_LANG']['ERR']['attention_text']             	= "There is an updating task running in the background which might overwrite your changes on the system.";
+$GLOBALS['TL_LANG']['ERR']['missing_file_selection']        = 'Es wurde(n) keine Datei(en) ausgewählt.';
+$GLOBALS['TL_LANG']['ERR']['missing_file_information']      = 'Es fehlt entweder eine Datei oder die Information zu einer Datei.';
+$GLOBALS['TL_LANG']['ERR']['unknown_file']                  = 'Die Datei %s konnte nicht gefunden werden.';
+$GLOBALS['TL_LANG']['ERR']['unknown_file_in_zip']           = 'Die Datei %s konnte nicht in der ZIP Datei gefunden werden.';
+$GLOBALS['TL_LANG']['ERR']['unknown_path']                  = 'Unbekannter Pfad.';
+$GLOBALS['TL_LANG']['ERR']['cant_open']                     = 'Datei %s kann nicht geöffnet werden.';
+$GLOBALS['TL_LANG']['ERR']['checksum_error']                = 'Fehler in den Prüfsummen.';
+$GLOBALS['TL_LANG']['ERR']['cant_move_file']                = 'Fehler beim verschieben der Datei %s nach %s.';
+$GLOBALS['TL_LANG']['ERR']['cant_delete_file']              = 'Fehler beim löschen der Datei.';
+$GLOBALS['TL_LANG']['ERR']['attention_headline']            = 'Achtung bei Änderungen am System';
+$GLOBALS['TL_LANG']['ERR']['attention_text']                = 'Es werden zurzeit Aktualisierungen im Hintergrund durchgeführt, die dazu führen könnten das Änderungen auf dieser Installation überschrieben werden.';
+$GLOBALS['TL_LANG']['ERR']['min_size_limit']                = 'Die minimale Dateigröße von s% wurde unterschritten.';
 
 // Database
 $GLOBALS['TL_LANG']['ERR']['missing_tables_selection']      = 'No table(s) is/are selected.';
@@ -119,7 +143,7 @@ $GLOBALS['TL_LANG']['ERR']['call_directly']                 = 'Do not try to run
 $GLOBALS['TL_LANG']['ERR']['client_set']                    = 'The communication between server and client is failed.';
 $GLOBALS['TL_LANG']['ERR']['unknown_client']                = 'Unknown client.';
 
-$GLOBALS['TL_LANG']['ERR']['referer']                       = 'The clients referrer-check could not be deactivated.';
+$GLOBALS['TL_LANG']['ERR']['referer']                       = 'The clients referer-check could not be deactivated.';
 $GLOBALS['TL_LANG']['ERR']['version']                       = 'Version conflict in %s. <br />Server: %s <br />Client: %s';
 $GLOBALS['TL_LANG']['ERR']['upload_ini']                    = 'No success with upload. Funktion is deactivated in the php.ini';
 $GLOBALS['TL_LANG']['ERR']['rebuild']                       = 'Error rebuilding the file(s). Path: %s';

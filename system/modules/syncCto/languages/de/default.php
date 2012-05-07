@@ -31,26 +31,25 @@
  * Reference
  */
 // Sync
-$GLOBALS['TL_LANG']['SYC']['syncCto']['core']                       = 'Contao-Installation';
-$GLOBALS['TL_LANG']['SYC']['syncCto']['core_change']                = 'Veränderte Dateien';
-$GLOBALS['TL_LANG']['SYC']['syncCto']['core_delete']                = 'Gelöschte Dateien';
-$GLOBALS['TL_LANG']['SYC']['syncCto']['user']                       = 'Persönliche Dateien (tl_files)';
-$GLOBALS['TL_LANG']['SYC']['syncCto']['user_change']                = 'Veränderte Dateien';
-$GLOBALS['TL_LANG']['SYC']['syncCto']['user_delete']                = 'Gelöschte Dateien';
-$GLOBALS['TL_LANG']['SYC']['syncCto']['configfiles']                = 'Konfigurationsdateien';
-$GLOBALS['TL_LANG']['SYC']['syncCto']['localconfig_update']         = 'Alle Einträge aktualisieren';
-$GLOBALS['TL_LANG']['SYC']['syncCto']['localconfig_errors']         = 'Fehlermeldungen anzeigen';
-$GLOBALS['TL_LANG']['SYC']['syncCto']['localconfig_refererCheck']   = 'Anfrage-Tokens deaktivieren';
-// Maintance options
-$GLOBALS['TL_LANG']['SYC']['syncCto']['options']                    = 'Optionen';    
-$GLOBALS['TL_LANG']['SYC']['syncCto']['search_index']               = 'Suchindex neu aufbauen';    
-$GLOBALS['TL_LANG']['SYC']['syncCto']['temp_tables']                = 'Temporäre DB-Tabellen leeren';    
-$GLOBALS['TL_LANG']['SYC']['syncCto']['temp_folders']               = 'Temporäre Ordner leeren';    
-$GLOBALS['TL_LANG']['SYC']['syncCto']['css_create']                 = 'CSS-Dateien neu erstellen';    
-$GLOBALS['TL_LANG']['SYC']['syncCto']['xml_create']                 = 'XML-Dateien neu erstellen';    
-// Tables
-$GLOBALS['TL_LANG']['SYC']['syncCto']['tables_no_changes']          = 'Keine Änderungen vorhanden';    
-$GLOBALS['TL_LANG']['SYC']['syncCto']['tables_changes']             = 'Geänderte Tabellen';     
+$GLOBALS['TL_LANG']['SYC']['core']                          = 'Contao-Installation';
+$GLOBALS['TL_LANG']['SYC']['core_change']                   = 'Veränderte Dateien';
+$GLOBALS['TL_LANG']['SYC']['core_delete']                   = 'Gelöschte Dateien';
+$GLOBALS['TL_LANG']['SYC']['user']                          = 'Persönliche Dateien (tl_files)';
+$GLOBALS['TL_LANG']['SYC']['user_change']                   = 'Veränderte Dateien';
+$GLOBALS['TL_LANG']['SYC']['user_delete']                   = 'Gelöschte Dateien';
+$GLOBALS['TL_LANG']['SYC']['configfiles']                   = 'Konfigurationsdateien';
+$GLOBALS['TL_LANG']['SYC']['localconfig_update']            = 'Alle Einträge aktualisieren';
+$GLOBALS['TL_LANG']['SYC']['localconfig_errors']            = 'Fehlermeldungen anzeigen';
+// Maintenance options  
+$GLOBALS['TL_LANG']['SYC']['options']                       = 'Optionen';    
+$GLOBALS['TL_LANG']['SYC']['search_index']                  = 'Suchindex neu aufbauen';    
+$GLOBALS['TL_LANG']['SYC']['temp_tables']                   = 'Temporäre DB-Tabellen leeren';    
+$GLOBALS['TL_LANG']['SYC']['temp_folders']                  = 'Temporäre Ordner leeren';    
+$GLOBALS['TL_LANG']['SYC']['css_create']                    = 'CSS-Dateien neu erstellen';    
+$GLOBALS['TL_LANG']['SYC']['xml_create']                    = 'XML-Dateien neu erstellen';    
+// Tables   
+$GLOBALS['TL_LANG']['SYC']['tables_no_changes']             = 'Keine Änderungen vorhanden';    
+$GLOBALS['TL_LANG']['SYC']['tables_changes']                = 'Geänderte Tabellen';     
 
 /**
  * Back end modules
@@ -62,9 +61,6 @@ $GLOBALS['TL_LANG']['MSC']['syncFrom']                      = 'Server synchronis
 
 $GLOBALS['TL_LANG']['MSC']['restore_backup']                = 'Backup einspielen';
 $GLOBALS['TL_LANG']['MSC']['start_backup']                  = 'Backup starten';
-
-$GLOBALS['TL_LANG']['SYC']['files']                         = 'Datei-Synchronisation';
-$GLOBALS['TL_LANG']['SYC']['backup']                        = 'Backup-Kategorie';
 
 /**
  * Text
@@ -129,7 +125,7 @@ $GLOBALS['TL_LANG']['ERR']['checksum_error']                = 'Fehler in den Pr�
 $GLOBALS['TL_LANG']['ERR']['cant_move_file']                = 'Fehler beim verschieben der Datei %s nach %s.';
 $GLOBALS['TL_LANG']['ERR']['cant_delete_file']              = 'Fehler beim löschen der Datei.';
 $GLOBALS['TL_LANG']['ERR']['attention_headline']            = 'Achtung bei Änderungen am System';
-$GLOBALS['TL_LANG']['ERR']['attention_text']                = 'Es werden zurzeit Aktualisierungen im Hintergrund durchgeführt die dazu führen könnten das Änderungen auf dieser Installation überschrieben werden.';
+$GLOBALS['TL_LANG']['ERR']['attention_text']                = 'Es werden zurzeit Aktualisierungen im Hintergrund durchgeführt, die dazu führen könnten das Änderungen auf dieser Installation überschrieben werden.';
 $GLOBALS['TL_LANG']['ERR']['min_size_limit']                = 'Die minimale Dateigröße von s% wurde unterschritten.';
 
 // Database

@@ -64,7 +64,7 @@ $GLOBALS['TL_DCA']['tl_syncCto_settings'] = array(
                 )
             ),
             'load_callback' => array(array('tl_syncCto_settings', 'loadBlacklistFolder')),
-            'save_callback' => array(array('tl_syncCto_settings', 'saveMcwEntrie'))
+            'save_callback' => array(array('tl_syncCto_settings', 'saveMcwEntries'))
         ),
         'syncCto_file_blacklist' => array(
             'label' => &$GLOBALS['TL_LANG']['tl_syncCto_settings']['file_blacklist'],
@@ -83,7 +83,7 @@ $GLOBALS['TL_DCA']['tl_syncCto_settings'] = array(
                 )
             ),
             'load_callback' => array(array('tl_syncCto_settings', 'loadBlacklistFile')),
-            'save_callback' => array(array('tl_syncCto_settings', 'saveMcwEntrie'))
+            'save_callback' => array(array('tl_syncCto_settings', 'saveMcwEntries'))
         ),
         'syncCto_folder_whitelist' => array(
             'label' => &$GLOBALS['TL_LANG']['tl_syncCto_settings']['folder_whitelist'],
@@ -102,7 +102,7 @@ $GLOBALS['TL_DCA']['tl_syncCto_settings'] = array(
                 )
             ),
             'load_callback' => array(array('tl_syncCto_settings', 'loadWhitelistFolder')),
-            'save_callback' => array(array('tl_syncCto_settings', 'saveMcwEntrie'))
+            'save_callback' => array(array('tl_syncCto_settings', 'saveMcwEntries'))
         ),
         'syncCto_local_blacklist' => array
             (
@@ -184,7 +184,7 @@ $GLOBALS['TL_DCA']['tl_syncCto_settings'] = array(
                         'eval' => array('style' => 'width:300px', 'maxlength' => 6, 'rgxp' => 'colorRgb'),
                         'wizard' => array
                         (
-                                array('tl_syncCto_settings', 'colorPicker')
+                            array('tl_syncCto_settings', 'colorPicker')
                         )                          
                     )
                 )
@@ -271,12 +271,12 @@ class tl_syncCto_settings extends Backend
     }
     
     /**
-     * Save black and white folder and file list
+     * Save blacklist entries
      * 
      * @param string $strValue
      * @return string
      */
-    public function saveMcwEntrie($strValue)
+    public function saveMcwEntries($strValue)
     {
         $arrList = deserialize($strValue); 
         $arrSaveList = array();
@@ -296,7 +296,7 @@ class tl_syncCto_settings extends Backend
     }
 
     /**
-     * Load blacklist files
+     * Load blacklist entries
      * 
      * @param string $strValue
      * @return array

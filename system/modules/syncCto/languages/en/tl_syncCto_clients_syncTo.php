@@ -26,23 +26,24 @@
  * @license    GNU/LGPL 
  * @filesource
  */
- 
+
 /**
  * Legends
  */
-$GLOBALS['TL_LANG']['tl_syncCto_clients_syncTo']['sync_legend']                         = 'Synchronization settings';
-$GLOBALS['TL_LANG']['tl_syncCto_clients_syncTo']['filelist_legend']                     = 'Files and folders';
-$GLOBALS['TL_LANG']['tl_syncCto_clients_syncTo']['table_recommend_legend']              = 'Recommended tables';
-$GLOBALS['TL_LANG']['tl_syncCto_clients_syncTo']['table_none_recommend_legend']         = 'Not recommended tables';
+$GLOBALS['TL_LANG']['tl_syncCto_clients_syncTo']['sync_legend']                         = 'File synchronization';
+$GLOBALS['TL_LANG']['tl_syncCto_clients_syncTo']['table_legend']                        = 'Database synchronization';
+$GLOBALS['TL_LANG']['tl_syncCto_clients_syncTo']['systemoperations_legend']             = 'Maintenance';
 $GLOBALS['TL_LANG']['tl_syncCto_clients_syncTo']['edit']                                = 'Client synchronization';
 
 /**
  * Fields
  */
-$GLOBALS['TL_LANG']['tl_syncCto_clients_syncTo']['sync_type']                           = array('Type of synchronization', 'Here you can select the type of synchronization.');
+$GLOBALS['TL_LANG']['tl_syncCto_clients_syncTo']['sync_type']                           = array('Synchronize files', 'Wählen Sie bitte aus, welche Dateien synchronisiert werden sollen.');
+$GLOBALS['TL_LANG']['tl_syncCto_clients_syncTo']['database_check']                      = array('Synchronize database', 'Wählen Sie diese Option, wenn Sie die Datenbank synchronisieren wollen.');
 $GLOBALS['TL_LANG']['tl_syncCto_clients_syncTo']['database_tables_recommended']         = array('Recommended tables', 'Here you can select the recommended tables for synchronization.');
 $GLOBALS['TL_LANG']['tl_syncCto_clients_syncTo']['database_tables_none_recommended']    = array('Not recommended tables', 'Here you can select the not recommended tables for synchronization. Use at your own risk.');
-$GLOBALS['TL_LANG']['tl_syncCto_clients_syncTo']['filelist']                            = array('Source files', 'Please select a file or folder from the files directory.');
-$GLOBALS['TL_LANG']['tl_syncCto_clients_syncTo']['purgeData']                           = array('Purge data', 'Please select this option, if you want to purge the client temp data.');
-$GLOBALS['TL_LANG']['tl_syncCto_clients_syncTo']['setAttentionFlag']                    = array('Titel', 'Text');
+$GLOBALS['TL_LANG']['tl_syncCto_clients_syncTo']['systemoperations_check']              = array('Activate maintenance', 'Wählen Sie diese Option, wenn die Systemwartung durchgeführt werden soll.');
+$GLOBALS['TL_LANG']['tl_syncCto_clients_syncTo']['systemoperations_maintenance']        = array('Purge client', 'Hier können Sie die Systembereinigung auf dem Client konfigurieren.');
+$GLOBALS['TL_LANG']['tl_syncCto_clients_syncTo']['attention_flag']                      = array('Deactivate warning notice', 'Wählen Sie diese Option, wenn der Warnhinweis auf dem Client deaktiviert werden soll.')
+             
 ?>
