@@ -398,14 +398,6 @@ $GLOBALS["CTOCOM_FUNCTIONS"]["SYNCCTO_SET_ATTENTION_FLAG"] = array(
     "parameter" => array("state"),
 );
 
-// Set SyncFrom Flag
-$GLOBALS["CTOCOM_FUNCTIONS"]["SYNCCTO_SET_REFERRER_DISABLE_FLAG"] = array(
-    "class" => "SyncCtoRPCFunctions",
-    "function" => "setReferrerDisable",
-    "typ" => "POST",
-    "parameter" => array("state"),
-);
-
 // Set displayErrors Flag
 $GLOBALS["CTOCOM_FUNCTIONS"]["SYNCCTO_SET_DISPLAY_ERRORS_FLAG"] = array(
     "class" => "SyncCtoRPCFunctions",

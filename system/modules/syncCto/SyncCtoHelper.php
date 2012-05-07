@@ -448,8 +448,7 @@ class SyncCtoHelper extends Backend
             ),
             "configfiles" => array(
                 "localconfig_update" => "localconfig_update",
-                "localconfig_errors" => "localconfig_errors",
-                "localconfig_refererCheck" => "localconfig_refererCheck",
+                "localconfig_errors" => "localconfig_errors"
             )
         );
 

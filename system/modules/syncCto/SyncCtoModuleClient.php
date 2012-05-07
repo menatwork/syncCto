@@ -1956,20 +1956,7 @@ class SyncCtoModuleClient extends BackendModule
                 /**
                  * Import Config / Set referer check
                  */
-                case 6:
-                    if (in_array("localconfig_refererCheck", $this->arrSyncSettings["syncCto_Type"]))
-                    {
-                        $this->objSyncCtoCommunicationClient->setReferrerDisable(true);
-                    }
-                    else
-                    {
-                        $this->objSyncCtoCommunicationClient->setReferrerDisable(false);
-                    }
-
-                    $this->objStepPool->step++;
-                    break;
-
-                case 7:
+               case 6:
                     if (is_array($this->arrSyncSettings["syncCto_Systemoperations_Maintenance"]) && count($this->arrSyncSettings["syncCto_Systemoperations_Maintenance"]) != 0)
                     {
                         $this->objSyncCtoCommunicationClient->runMaintenance($this->arrSyncSettings["syncCto_Systemoperations_Maintenance"]);
@@ -1978,7 +1965,7 @@ class SyncCtoModuleClient extends BackendModule
                     $this->objStepPool->step++;
                     break;
 
-                case 8:
+                case 7:
                     if ($this->arrSyncSettings["syncCto_AttentionFlag"] == true)
                     {
                         $this->objSyncCtoCommunicationClient->setAttentionFlag(false);
@@ -1991,7 +1978,7 @@ class SyncCtoModuleClient extends BackendModule
                 /**
                  * Cleanup
                  */
-                case 9:
+                case 8:
                     if (in_array("temp_folders", $this->arrSyncSettings["syncCto_Systemoperations_Maintenance"]))
                     {
                         $this->objSyncCtoCommunicationClient->purgeTempFolder();
@@ -2002,12 +1989,12 @@ class SyncCtoModuleClient extends BackendModule
 
                     $this->objStepPool->step++;
 
-                case 10:
+                case 9:
                     $this->objSyncCtoCommunicationClient->referrerEnable();
                     $this->objStepPool->step++;
                     break;
 
-                case 11:
+                case 10:
                     $this->objSyncCtoCommunicationClient->stopConnection();
                     $this->objStepPool->step++;
                     break;
@@ -2015,7 +2002,7 @@ class SyncCtoModuleClient extends BackendModule
                 /**
                  * Show information
                  */
-                case 12:
+                case 11:
                     // Count files
                     if (is_array($this->arrListCompare) && count($this->arrListCompare) != 0 && $this->arrListCompare != false)
                     {
@@ -2077,7 +2064,7 @@ class SyncCtoModuleClient extends BackendModule
 
                         $this->objData->nextStep();
                         $this->objData->setTitle($GLOBALS['TL_LANG']['MSC']['complete']);
-                        $this->objData->setDescription(vsprintf($GLOBALS['TL_LANG']['tl_syncCto_sync']['complete_Client'], array($strLink, "</a>")));
+                        $this->objData->setDescription(vsprintf($GLOBALS['TL_LANG']['tl_syncCto_sync']['complete_client'], array($strLink, "</a>")));
                         $this->objData->setState("");
 
                         break;
@@ -2230,7 +2217,7 @@ class SyncCtoModuleClient extends BackendModule
 
                     $this->objData->nextStep();
                     $this->objData->setTitle($GLOBALS['TL_LANG']['MSC']['complete']);
-                    $this->objData->setDescription(vsprintf($GLOBALS['TL_LANG']['tl_syncCto_sync']['complete_Client'], array($strLink, "</a>")));
+                    $this->objData->setDescription(vsprintf($GLOBALS['TL_LANG']['tl_syncCto_sync']['complete_client'], array($strLink, "</a>")));
                     $this->objData->setState("");
 
                     break;
@@ -3241,19 +3228,6 @@ class SyncCtoModuleClient extends BackendModule
                  * Import Config / Set referer check
                  */
                 case 5:
-                    if (in_array("localconfig_refererCheck", $this->arrSyncSettings["syncCto_Type"]))
-                    {
-                        $this->objSyncCtoCommunicationClient->setReferrerDisable(true);
-                    }
-                    else
-                    {
-                        $this->objSyncCtoCommunicationClient->setReferrerDisable(false);
-                    }
-
-                    $this->objStepPool->step++;
-                    break;
-
-                case 6:
                     if (is_array($this->arrSyncSettings["syncCto_Systemoperations_Maintenance"]) && count($this->arrSyncSettings["syncCto_Systemoperations_Maintenance"]) != 0)
                     {
                         $this->objSyncCtoFiles->runMaintenance($this->arrSyncSettings["syncCto_Systemoperations_Maintenance"]);
@@ -3262,7 +3236,7 @@ class SyncCtoModuleClient extends BackendModule
                     $this->objStepPool->step++;
                     break;
 
-                case 7:
+                case 6:
                     if ($this->arrSyncSettings["syncCto_AttentionFlag"] == true)
                     {
                         $this->objSyncCtoCommunicationClient->setAttentionFlag(true);
@@ -3279,18 +3253,18 @@ class SyncCtoModuleClient extends BackendModule
                 /**
                  * Cleanup
                  */
-                case 8:
+                case 7:
                     $this->objSyncCtoCommunicationClient->purgeTempFolder();
                     $this->objSyncCtoFiles->purgeTemp();
                     $this->objStepPool->step++;
                     break;
 
-                case 9:
+                case 8:
                     $this->objSyncCtoCommunicationClient->referrerEnable();
                     $this->objStepPool->step++;
                     break;
 
-                case 10:
+                case 9:
                     $this->objSyncCtoCommunicationClient->stopConnection();
                     $this->objStepPool->step++;
                     break;
@@ -3298,7 +3272,7 @@ class SyncCtoModuleClient extends BackendModule
                 /**
                  * Show information
                  */
-                case 11:
+                case 10:
                     // Count files
                     if (is_array($this->arrListCompare) && count($this->arrListCompare) != 0 && $this->arrListCompare != false)
                     {
@@ -3360,7 +3334,7 @@ class SyncCtoModuleClient extends BackendModule
 
                         $this->objData->nextStep();
                         $this->objData->setTitle($GLOBALS['TL_LANG']['MSC']['complete']);
-                        $this->objData->setDescription(vsprintf($GLOBALS['TL_LANG']['tl_syncCto_sync']['complete_Server'], array($strLink, "</a>")));
+                        $this->objData->setDescription(vsprintf($GLOBALS['TL_LANG']['tl_syncCto_sync']['complete_server'], array($strLink, "</a>")));
                         $this->objData->setState("");
 
                         break;

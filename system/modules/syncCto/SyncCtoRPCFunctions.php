@@ -174,25 +174,6 @@ class SyncCtoRPCFunctions extends Backend
     }
 
     /**
-     * Set the ctoCom flag for disableRefererCheck
-     * @param boolean $booState
-     * @return boolean 
-     */
-    public function setReferrerDisable($booState)
-    {
-        if (key_exists("ctoCom_disableRefererCheck", $GLOBALS['TL_CONFIG']))
-        {
-            $this->Config->update("\$GLOBALS['TL_CONFIG']['ctoCom_disableRefererCheck']", $booState);
-        }
-        else
-        {
-            $this->Config->add("\$GLOBALS['TL_CONFIG']['ctoCom_disableRefererCheck']", $booState);
-        }
-
-        return true;
-    }
-
-    /**
      * Set the displayErrors flag
      * @param boolean $booState
      * @return boolean 
