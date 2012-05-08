@@ -116,18 +116,18 @@ $GLOBALS['TL_LANG']['MSC']['memory_limit']                  = 'Memory limit: %s'
 /**
  * Errors
  */
-$GLOBALS['TL_LANG']['ERR']['missing_file_selection']        = 'Es wurde(n) keine Datei(en) ausgewählt.';
-$GLOBALS['TL_LANG']['ERR']['missing_file_information']      = 'Es fehlt entweder eine Datei oder die Information zu einer Datei.';
-$GLOBALS['TL_LANG']['ERR']['unknown_file']                  = 'Die Datei %s konnte nicht gefunden werden.';
-$GLOBALS['TL_LANG']['ERR']['unknown_file_in_zip']           = 'Die Datei %s konnte nicht in der ZIP Datei gefunden werden.';
-$GLOBALS['TL_LANG']['ERR']['unknown_path']                  = 'Unbekannter Pfad.';
-$GLOBALS['TL_LANG']['ERR']['cant_open']                     = 'Datei %s kann nicht geöffnet werden.';
-$GLOBALS['TL_LANG']['ERR']['checksum_error']                = 'Fehler in den Prüfsummen.';
-$GLOBALS['TL_LANG']['ERR']['cant_move_file']                = 'Fehler beim verschieben der Datei %s nach %s.';
-$GLOBALS['TL_LANG']['ERR']['cant_delete_file']              = 'Fehler beim löschen der Datei.';
-$GLOBALS['TL_LANG']['ERR']['attention_headline']            = 'Achtung bei Änderungen am System';
-$GLOBALS['TL_LANG']['ERR']['attention_text']                = 'Es werden zurzeit Aktualisierungen im Hintergrund durchgeführt, die dazu führen könnten das Änderungen auf dieser Installation überschrieben werden.';
-$GLOBALS['TL_LANG']['ERR']['min_size_limit']                = 'Die minimale Dateigröße von s% wurde unterschritten.';
+$GLOBALS['TL_LANG']['ERR']['missing_file_selection']        = 'No file(s) is/are selected.';
+$GLOBALS['TL_LANG']['ERR']['missing_file_information']      = 'Missing file or file information.';
+$GLOBALS['TL_LANG']['ERR']['unknown_file']                  = 'Could not be found the file %s.';
+$GLOBALS['TL_LANG']['ERR']['unknown_file_in_zip']           = 'Could not be found the file %s in the zip file.';
+$GLOBALS['TL_LANG']['ERR']['unknown_path']                  = 'Unknown path.';
+$GLOBALS['TL_LANG']['ERR']['cant_open']                     = 'Can not open file %s.';
+$GLOBALS['TL_LANG']['ERR']['checksum_error']                = 'Checksum error.';
+$GLOBALS['TL_LANG']['ERR']['cant_move_file']                = 'Can\'t move file from %s to %s.';
+$GLOBALS['TL_LANG']['ERR']['cant_delete_file']              = 'Error deleting file.';
+$GLOBALS['TL_LANG']['ERR']['attention_headline']            = 'Beware of changes to the system';
+$GLOBALS['TL_LANG']['ERR']['attention_text']                = 'There is an updating process running in the background, which might overwrite your changes. Please wait until the update process is finished, before changing any content or settings of this installation.';
+$GLOBALS['TL_LANG']['ERR']['min_size_limit']                = 'The minimum file size of %s has been reached.';
 
 // Database
 $GLOBALS['TL_LANG']['ERR']['missing_tables_selection']      = 'No table(s) is/are selected.';

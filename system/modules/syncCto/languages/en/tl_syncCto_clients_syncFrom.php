@@ -38,12 +38,12 @@ $GLOBALS['TL_LANG']['tl_syncCto_clients_syncFrom']['edit']                      
 /**
  * Fields
  */
-$GLOBALS['TL_LANG']['tl_syncCto_clients_syncFrom']['sync_type']                         = array('Synchronize files', 'Wählen Sie bitte aus, welche Dateien synchronisiert werden sollen.');
-$GLOBALS['TL_LANG']['tl_syncCto_clients_syncFrom']['database_check']                    = array('Synchronize database', 'Wählen Sie diese Option, wenn Sie die Datenbank synchronisieren wollen.');
+$GLOBALS['TL_LANG']['tl_syncCto_clients_syncFrom']['sync_type']                         = array('Synchronize files', 'Here you can select which files should be synchronized.');
+$GLOBALS['TL_LANG']['tl_syncCto_clients_syncFrom']['database_check']                    = array('Synchronize database', 'Choose this option for database synchronization.');
 $GLOBALS['TL_LANG']['tl_syncCto_clients_syncFrom']['database_tables_recommended']       = array('Recommended tables', 'Here you can select the recommended tables for synchronization.');
 $GLOBALS['TL_LANG']['tl_syncCto_clients_syncFrom']['database_tables_none_recommended']  = array('Not recommended tables', 'Here you can select the not recommended tables for synchronization. Use at your own risk.');
-$GLOBALS['TL_LANG']['tl_syncCto_clients_syncFrom']['systemoperations_check']            = array('Activate maintenance', 'Wählen Sie diese Option, wenn die Systemwartung durchgeführt werden soll.');
-$GLOBALS['TL_LANG']['tl_syncCto_clients_syncFrom']['systemoperations_maintenance']      = array('Purge server', 'Hier können Sie die Systembereinigung auf dem Server konfigurieren.');
-$GLOBALS['TL_LANG']['tl_syncCto_clients_syncFrom']['attention_flag']                    = array('Activate warning notice', 'Wählen Sie diese Option, wenn der Warnhinweis auf dem Client aktiviert werden soll.');
+$GLOBALS['TL_LANG']['tl_syncCto_clients_syncFrom']['systemoperations_check']            = array('Activate maintenance', 'Choose these options to activate the system maintenance.');
+$GLOBALS['TL_LANG']['tl_syncCto_clients_syncFrom']['systemoperations_maintenance']      = array('Purge server', 'Choose this option to configure the maintenance settings on this server.');
+$GLOBALS['TL_LANG']['tl_syncCto_clients_syncFrom']['attention_flag']                    = array('Activate warning notice', 'Choose this option to activate the syncronisation warning on the client.');
 
 ?>
