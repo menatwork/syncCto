@@ -55,7 +55,7 @@ class SyncCtoModuleCheck extends BackendModule
     protected $safeModeHack      = false;
     protected $isWindows         = false;
     protected $folderPermissions = array();
-    protected $filePermissions = array();
+    protected $filePermissions   = array();
 
     /**
      * Constructor
@@ -263,7 +263,7 @@ class SyncCtoModuleCheck extends BackendModule
         $return .= '<tr class="' . ($ok ? 'ok' : 'warning') . '">';
         $return .= '<td>' . $GLOBALS['TL_LANG']['tl_syncCto_check']['bcmath'][0] . '</td>';
         $return .= '<td class="dot">' . ($ok ? '&nbsp;' : '•') . '</td>';
-        $return .= '<td class="value">' . ($zip_archive ? $GLOBALS['TL_LANG']['tl_syncCto_check']['on'] : $GLOBALS['TL_LANG']['tl_syncCto_check']['off']) . '</td>';
+        $return .= '<td class="value">' . ($bcmath ? $GLOBALS['TL_LANG']['tl_syncCto_check']['on'] : $GLOBALS['TL_LANG']['tl_syncCto_check']['off']) . '</td>';
         $return .= '<td>' . $GLOBALS['TL_LANG']['tl_syncCto_check']['bcmath'][1] . '</td>';
         $return .= '</tr>';
 
@@ -273,7 +273,7 @@ class SyncCtoModuleCheck extends BackendModule
         $return .= '<tr class="' . ($ok ? 'ok' : 'warning') . '">';
         $return .= '<td>' . $GLOBALS['TL_LANG']['tl_syncCto_check']['xmlwriter'][0] . '</td>';
         $return .= '<td class="dot">' . ($ok ? '&nbsp;' : '•') . '</td>';
-        $return .= '<td class="value">' . ($zip_archive ? $GLOBALS['TL_LANG']['tl_syncCto_check']['on'] : $GLOBALS['TL_LANG']['tl_syncCto_check']['off']) . '</td>';
+        $return .= '<td class="value">' . ($xmlwriter ? $GLOBALS['TL_LANG']['tl_syncCto_check']['on'] : $GLOBALS['TL_LANG']['tl_syncCto_check']['off']) . '</td>';
         $return .= '<td>' . $GLOBALS['TL_LANG']['tl_syncCto_check']['xmlwriter'][1] . '</td>';
         $return .= '</tr>';
 
@@ -283,7 +283,7 @@ class SyncCtoModuleCheck extends BackendModule
         $return .= '<tr class="' . ($ok ? 'ok' : 'warning') . '">';
         $return .= '<td>' . $GLOBALS['TL_LANG']['tl_syncCto_check']['xmlreader'][0] . '</td>';
         $return .= '<td class="dot">' . ($ok ? '&nbsp;' : '•') . '</td>';
-        $return .= '<td class="value">' . ($zip_archive ? $GLOBALS['TL_LANG']['tl_syncCto_check']['on'] : $GLOBALS['TL_LANG']['tl_syncCto_check']['off']) . '</td>';
+        $return .= '<td class="value">' . ($xmlreader ? $GLOBALS['TL_LANG']['tl_syncCto_check']['on'] : $GLOBALS['TL_LANG']['tl_syncCto_check']['off']) . '</td>';
         $return .= '<td>' . $GLOBALS['TL_LANG']['tl_syncCto_check']['xmlreader'][1] . '</td>';
         $return .= '</tr>';
 
@@ -294,8 +294,7 @@ class SyncCtoModuleCheck extends BackendModule
 
     private function getSize($strValue)
     {
-        return (int) str_replace(
-                        array("M", "G"), array("000000", "000000000"), $strValue);
+        return (int) str_replace(array("M", "G"), array("000000", "000000000"), $strValue);
     }
 
 }
