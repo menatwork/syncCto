@@ -225,7 +225,7 @@ class tl_syncCto_clients_syncFrom extends Backend
                 ->limit(1)
                 ->execute($this->Input->get("id"));
 
-        if (strlen($objSyncTime->syncFrom_tstamp) != 0 && strlen($objSyncTime->syncFrom_user) != 0 && strlen($objSyncTime->syncFrom_alias) != 0)
+        if ($objSyncTime->syncFrom_tstamp != 0 && strlen($objSyncTime->syncFrom_user) != 0 && strlen($objSyncTime->syncFrom_alias) != 0)
         {
             $strLastSync = vsprintf($GLOBALS['TL_LANG']['MSC']['last_sync'], array(
                 date($GLOBALS['TL_CONFIG']['timeFormat'], $objSyncTime->syncFrom_tstamp),
