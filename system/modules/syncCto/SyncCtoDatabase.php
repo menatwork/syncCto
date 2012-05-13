@@ -493,12 +493,13 @@ class SyncCtoDatabase extends Backend
                                 case 'enum':
                                 case 'set':
                                     $objXml->writeAttribute("type", "text");
-                                    $objXml->writeCdata("'" . str_replace($this->arrSearchFor, $this->arrReplaceWith, $field_data) . "'");
+                                    $objXml->writeCdata(base64_encode(str_replace($this->arrSearchFor, $this->arrReplaceWith, $field_data)));
+                                   
                                     break;
 
                                 default:
                                     $objXml->writeAttribute("type", "default");
-                                    $objXml->writeCdata("'" . str_replace($this->arrSearchFor, $this->arrReplaceWith, $field_data) . "'");
+                                    $objXml->writeCdata(base64_encode(str_replace($this->arrSearchFor, $this->arrReplaceWith, $field_data)));
                                     break;
                             }
                         }
@@ -855,7 +856,15 @@ class SyncCtoDatabase extends Backend
                     switch ($strCurrentNodeName)
                     {
                         case "field":
-                            $arrValues[$intCounter][$strCurrentNodeAttributeName] = $this->objXMLReader->value;
+                            if($strCurrentNodeAttributeType == "text" || $strCurrentNodeAttributeType == "default")
+                            {
+                                $arrValues[$intCounter][$strCurrentNodeAttributeName] = "'" . base64_decode($this->objXMLReader->value) . "'";
+                            }
+                            else
+                            {
+                                $arrValues[$intCounter][$strCurrentNodeAttributeName] = $this->objXMLReader->value;
+                            }
+                            
                             break;
                     }
                     break;
@@ -866,7 +875,7 @@ class SyncCtoDatabase extends Backend
                     {
                         case "table":
                             $strCurrentTable = $this->objXMLReader->getAttribute("name");
-                            $arrValues       = array();
+                            $arrValues = array();
                             $arrFields = array();
                             $intCounter = 0;
                             break;
