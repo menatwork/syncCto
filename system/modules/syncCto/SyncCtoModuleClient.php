@@ -579,6 +579,7 @@ class SyncCtoModuleClient extends BackendModule
             case 5:
                 $this->loadTempLists();
                 $this->pageSyncToShowStep5();
+                $this->saveTempLists();
                 break;
 
             default:
@@ -717,6 +718,7 @@ class SyncCtoModuleClient extends BackendModule
             case 5:
                 $this->loadTempLists();
                 $this->pageSyncFromShowStep5();
+                $this->saveTempLists();
                 break;
 
             default:
