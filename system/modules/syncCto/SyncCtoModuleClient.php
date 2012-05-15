@@ -1156,8 +1156,9 @@ class SyncCtoModuleClient extends BackendModule
                     $intCountIgnored = 0;
                     $intCountDelete  = 0;
 
-                    $intTotalSize    = 0;
-                    $intTotalSizeDel = 0;
+                    $intTotalSizeNew    = 0;
+                    $intTotalSizeDel    = 0;
+                    $intTotalSizeChange = 0;
 
                     // Count files
                     foreach ($this->arrListCompare as $key => $value)
@@ -1166,12 +1167,12 @@ class SyncCtoModuleClient extends BackendModule
                         {
                             case SyncCtoEnum::FILESTATE_MISSING:
                                 $intCountMissing++;
-                                $intTotalSize += $value["size"];
+                                $intTotalSizeNew += $value["size"];
                                 break;
 
                             case SyncCtoEnum::FILESTATE_NEED:
                                 $intCountNeed++;
-                                $intTotalSize += $value["size"];
+                                $intTotalSizeChange += $value["size"];
                                 break;
 
                             case SyncCtoEnum::FILESTATE_DELETE:
@@ -1210,8 +1211,9 @@ class SyncCtoModuleClient extends BackendModule
                     $objTemp->filelist = $this->arrListCompare;
                     $objTemp->id = $this->intClientID;
                     $objTemp->step = $this->intStep;
-                    $objTemp->totalsize = $intTotalSize;
+                    $objTemp->totalsizeNew = $intTotalSizeNew;
                     $objTemp->totalsizeDel = $intTotalSizeDel;
+                    $objTemp->totalsizeChange = $intTotalSizeChange;
                     $objTemp->direction = "To";
                     $objTemp->compare_complex = false;
 
@@ -1228,7 +1230,9 @@ class SyncCtoModuleClient extends BackendModule
                 case 9:
                     // build list with big files
                     $arrTempList = array();
-                    $intTotalsize = 0;
+                    $intTotalSizeNew    = 0;
+                    $intTotalSizeDel    = 0;
+                    $intTotalSizeChange = 0;
 
                     // Del Function
                     $arrDel = $_POST;
@@ -1288,7 +1292,7 @@ class SyncCtoModuleClient extends BackendModule
                         else if ($value["split"] == 1)
                         {
                             $arrTempList[$key] = $this->arrListCompare[$key];
-                            $intTotalsize += $value["size"];
+                            $intTotalSizeNew += $value["size"];
                         }
                     }
 
@@ -1298,7 +1302,9 @@ class SyncCtoModuleClient extends BackendModule
                     $objTemp->filelist = $arrTempList;
                     $objTemp->id = $this->intClientID;
                     $objTemp->step = $this->intStep;
-                    $objTemp->totalsize = $intTotalsize;
+                    $objTemp->totalsizeNew = $intTotalSizeNew;
+                    $objTemp->totalsizeChange = $intTotalSizeChange;
+                    $objTemp->totalsizeDel = $intTotalSizeDel;
                     $objTemp->direction = "To";
                     $objTemp->compare_complex = true;
 
@@ -2444,8 +2450,9 @@ class SyncCtoModuleClient extends BackendModule
                     $intCountIgnored = 0;
                     $intCountDelete  = 0;
 
-                    $intTotalSize    = 0;
-                    $intTotalSizeDel = 0;
+                    $intTotalSizeNew    = 0;
+                    $intTotalSizeDel    = 0;
+                    $intTotalSizeChange = 0;
 
                     // Count files
                     foreach ($this->arrListCompare as $key => $value)
@@ -2454,12 +2461,12 @@ class SyncCtoModuleClient extends BackendModule
                         {
                             case SyncCtoEnum::FILESTATE_MISSING:
                                 $intCountMissing++;
-                                $intTotalSize += $value["size"];
+                                $intTotalSizeNew += $value["size"];
                                 break;
 
                             case SyncCtoEnum::FILESTATE_NEED:
                                 $intCountNeed++;
-                                $intTotalSize += $value["size"];
+                                $intTotalSizeChange += $value["size"];
                                 break;
 
                             case SyncCtoEnum::FILESTATE_DELETE:
@@ -2498,8 +2505,9 @@ class SyncCtoModuleClient extends BackendModule
                     $objTemp->filelist = $this->arrListCompare;
                     $objTemp->id = $this->intClientID;
                     $objTemp->step = $this->intStep;
-                    $objTemp->totalsize = $intTotalSize;
+                    $objTemp->totalsizeNew = $intTotalSizeNew;
                     $objTemp->totalsizeDel = $intTotalSizeDel;
+                    $objTemp->totalsizeChange = $intTotalSizeChange;
                     $objTemp->direction = "From";
                     $objTemp->compare_complex = false;
 
@@ -2516,7 +2524,9 @@ class SyncCtoModuleClient extends BackendModule
                 case 9:
                     // build list with big files
                     $arrTempList = array();
-                    $intTotalsize = 0;
+                    $intTotalSizeChange = 0;
+                    $intTotalSizeDel = 0;
+                    $intTotalSizeNew = 0;
 
                     // Del Function
                     $arrDel = $_POST;
@@ -2572,12 +2582,11 @@ class SyncCtoModuleClient extends BackendModule
                                 $value["state"] == SyncCtoEnum::FILESTATE_BOMBASTIC_BIG)
                         {
                             $arrTempList[$key] = $this->arrListCompare[$key];
-                            $intTotalsize += $value["size"];
                         }
                         else if ($value["split"] == 1)
                         {
                             $arrTempList[$key] = $this->arrListCompare[$key];
-                            $intTotalsize += $value["size"];
+                            $intTotalSizeNew += $value["size"];
                         }
                     }
 
@@ -2587,7 +2596,9 @@ class SyncCtoModuleClient extends BackendModule
                     $objTemp->filelist = $arrTempList;
                     $objTemp->id = $this->intClientID;
                     $objTemp->step = $this->intStep;
-                    $objTemp->totalsize = $intTotalsize;
+                    $objTemp->totalsizeNew = $intTotalSizeNew;
+                    $objTemp->totalsizeChange = $intTotalSizeDel;
+                    $objTemp->totalsizeDel = $intTotalSizeNew;
                     $objTemp->direction = "To";
                     $objTemp->compare_complex = true;
 

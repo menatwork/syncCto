@@ -83,6 +83,17 @@
 	margin-top:20px;
   }
   
+  ul.file { 
+	padding-left:0;
+    list-style:none;
+    margin-bottom:20px;
+  }
+  
+  ul.file li { 
+	padding:2px 0;
+    font-weight:bold;
+  }
+  
   p.info {
 	margin:10px 0 15px;
   }

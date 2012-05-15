@@ -142,7 +142,7 @@ $GLOBALS['TL_LANG']['ERR']['call_directly']                 = 'Versuchen Sie nic
 $GLOBALS['TL_LANG']['ERR']['client_set']                    = 'Kommunikation zwischen Server und Client fehlgeschlagen';
 $GLOBALS['TL_LANG']['ERR']['unknown_client']                = 'Unbekannter Client.';
 
-$GLOBALS['TL_LANG']['ERR']['referer']                       = 'Konnte die Referrer-Überprüfung des Clients nicht deaktivieren.';
+$GLOBALS['TL_LANG']['ERR']['referer']                       = 'Konnte die Referer-Überprüfung des Clients nicht deaktivieren.';
 $GLOBALS['TL_LANG']['ERR']['version']                       = 'Versionskonflikt in %s. <br />Server: %s <br />Client: %s';
 $GLOBALS['TL_LANG']['ERR']['upload_ini']                    = 'Upload nicht erfolgreich. Funktion ist in der php.ini deaktiviert.';
 $GLOBALS['TL_LANG']['ERR']['rebuild']                       = 'Fehler beim Zusammenbau der Datei(en). Pfad: %s';
