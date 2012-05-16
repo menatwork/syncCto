@@ -59,8 +59,7 @@ $GLOBALS['TL_DCA']['tl_syncCto_restore_db'] = array(
                 'files' => true,
                 'filesOnly' => true,
                 'fieldType' => 'radio',
-                'path' => $GLOBALS['TL_CONFIG']['uploadPath'] .
-                '/syncCto_backups/database',
+                'path' => $GLOBALS['TL_CONFIG']['uploadPath'] . '/syncCto_backups/database',
                 'extensions' => 'zip,synccto'
             ),
         ),

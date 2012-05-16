@@ -54,13 +54,11 @@ $GLOBALS['TL_DCA']['tl_syncCto_clients_syncFrom'] = array(
         'lastSync' => array
             (
             'label' => " ",
-            'exclude' => true,
             'inputType' => 'statictext',
         ),
         'disabledCache' => array
             (
             'label' => " ",
-            'exclude' => true,
             'inputType' => 'statictext',
         ),        
         'sync_type' => array(
