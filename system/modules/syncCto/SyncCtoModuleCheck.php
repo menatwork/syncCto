@@ -94,7 +94,13 @@ class SyncCtoModuleCheck extends BackendModule
      */
     public function checkPhpConfiguration()
     {
-        $return = '<table cellspacing="0" cellpadding="0" class="extensions" summary="">';
+        $return = '<table width="100%" cellspacing="0" cellpadding="0" class="extensions" summary="">';
+        $return .= '<colgroup>';
+        $return .= '<col width="25%" />';
+        $return .= '<col width="5%" />';
+        $return .= '<col width="15%" />';
+        $return .= '<col width="*" />';
+        $return .= '</colgroup>';
         $return .= '<tr>';
         $return .= '<th>' . $GLOBALS['TL_LANG']['tl_syncCto_check']['parameter'] . '</th>';
         $return .= '<th class="dot" style="width:1%;">&#149;</th>';
@@ -229,7 +235,13 @@ class SyncCtoModuleCheck extends BackendModule
      */
     public function checkPhpFunctions()
     {        
-        $return = '<table cellspacing="0" cellpadding="0" class="extensions" summary="">';
+        $return = '<table width="100%" cellspacing="0" cellpadding="0" class="extensions" summary="">';
+        $return .= '<colgroup>';
+        $return .= '<col width="25%" />';
+        $return .= '<col width="5%" />';
+        $return .= '<col width="15%" />';
+        $return .= '<col width="*" />';
+        $return .= '</colgroup>';
         $return .= '<tr>';
         $return .= '<th>' . $GLOBALS['TL_LANG']['tl_syncCto_check']['parameter'] . '</th>';
         $return .= '<th class="dot" style="width:1%;">&#149;</th>';
