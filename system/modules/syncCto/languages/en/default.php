@@ -48,9 +48,6 @@ $GLOBALS['TL_LANG']['SYC']['temp_tables']                   = 'Purge db tables';
 $GLOBALS['TL_LANG']['SYC']['temp_folders']                  = 'Purge temp files';    
 $GLOBALS['TL_LANG']['SYC']['css_create']                    = 'Create CSS files';    
 $GLOBALS['TL_LANG']['SYC']['xml_create']                    = 'Create XML files';    
-// Tables   
-$GLOBALS['TL_LANG']['SYC']['tables_no_changes']             = 'No changes';    
-$GLOBALS['TL_LANG']['SYC']['tables_changes']                = 'Changed tables';     
 
 /**
  * Back end modules
