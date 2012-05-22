@@ -65,11 +65,6 @@ $GLOBALS['BE_MOD'] = array_merge(
 );
 
 /**
- * Form fields
- */
-$GLOBALS['BE_FFL']['syncctocheckbox'] = 'SyncCtoCheckBox';
-
-/**
  * Hooks
  */
 $GLOBALS['TL_HOOKS']['executePreActions'][]     = array('SyncCtoHelper', 'pingClientStatus');
@@ -82,6 +77,7 @@ $GLOBALS['TL_HOOKS']['addCustomRegexp'][]       = array('SyncCtoHelper', 'custom
  */
 $GLOBALS['TL_PERMISSIONS'][] = 'syncCto_clients';
 $GLOBALS['TL_PERMISSIONS'][] = 'syncCto_clients_p';
+$GLOBALS['TL_PERMISSIONS'][] = 'syncCto_sync_options';
 $GLOBALS['TL_PERMISSIONS'][] = 'syncCto_tables';
 
 /**
@@ -98,24 +94,19 @@ if ($objInput->get("do") == 'synccto_clients' && $objInput->get("act") != 'start
 }
 
 /**
- * CSS / JS
+ * Include attention CSS
  */
-if (($objInput->get("table") == 'tl_syncCto_clients_syncTo' || $objInput->get("table") == 'tl_syncCto_clients_syncFrom') && TL_MODE == 'BE')
-{
-    $GLOBALS['TL_CSS'][]        = 'system/modules/syncCto/html/css/filelist.css';
-    $GLOBALS['TL_JAVASCRIPT'][] = 'system/modules/syncCto/html/js/htmltable.js';
-    $GLOBALS['TL_JAVASCRIPT'][] = 'system/modules/syncCto/html/js/filelist.js';
-}
-
 if($GLOBALS['TL_CONFIG']['syncCto_attentionFlag'] == true)
 {
     $GLOBALS['TL_CSS'][] = 'system/modules/syncCto/html/css/attention.css';
 }
 
-if (($objInput->get("do") == 'synccto_clients' && $objInput->get("act") == '') && $objInput->get("table") == '' && TL_MODE == 'BE')
-{
-    $GLOBALS['TL_JAVASCRIPT'][] = 'system/modules/syncCto/html/js/ping.js';
-}
+//if (($objInput->get("table") == 'tl_syncCto_clients_syncTo' || $objInput->get("table") == 'tl_syncCto_clients_syncFrom') && TL_MODE == 'BE')
+//{
+//    $GLOBALS['TL_CSS'][]        = 'system/modules/syncCto/html/css/filelist.css';
+//    $GLOBALS['TL_JAVASCRIPT'][] = 'system/modules/syncCto/html/js/htmltable.js';
+//    $GLOBALS['TL_JAVASCRIPT'][] = 'system/modules/syncCto/html/js/filelist.js';
+//}
 
 // Size limit for files in bytes, will be checked
 $GLOBALS['SYC_SIZE']['limit'] = 524288000;
@@ -153,8 +144,7 @@ $GLOBALS['SYC_CONFIG']['file_blacklist'] = array(
 );
 
 // Folders
-$GLOBALS['SYC_CONFIG']['local_blacklist'] = array(
-    // Contao core
+$GLOBALS['SYC_CONFIG']['local_blacklist'] = array(   
     'websitePath',
     'installPassword',
     'encryptionKey',
@@ -184,6 +174,34 @@ $GLOBALS['SYC_CONFIG']['folder_whitelist'] = array(
     'system',
     'templates',
     'typolight',
+);
+
+/**
+ * Sync options
+ */
+$GLOBALS['SYC_CONFIG']['sync_options'] = array(
+    'core' => array(
+        'core_change',
+        'core_delete',
+    ),
+    'user' => array(
+        'user_change',
+        'user_delete',
+    ),
+    'configfiles' => array(
+        'localconfig_update',
+        'localconfig_errors',
+    )
+);
+
+/**
+ * Maintance options
+ */
+$GLOBALS['SYC_CONFIG']['maintance_options'] = array(
+    'temp_tables',
+    'temp_folders',
+    'css_create',
+    'xml_create',
 );
 
 /**
@@ -230,7 +248,7 @@ $GLOBALS["CTOCOM_FUNCTIONS"]["SYNCCTO_CHECKSUM_COMPARE"] = array(
     "parameter" => array("md5", "file"),
 );
 
-// Get Filelist of contao core
+// Get filelist of contao core
 $GLOBALS["CTOCOM_FUNCTIONS"]["SYNCCTO_CHECKSUM_CORE"] = array(
     "class" => "SyncCtoFiles",
     "function" => "runChecksumCore",
@@ -238,7 +256,7 @@ $GLOBALS["CTOCOM_FUNCTIONS"]["SYNCCTO_CHECKSUM_CORE"] = array(
     "parameter" => FALSE,
 );
 
-// Get Filelist of file
+// Get filelist of file
 $GLOBALS["CTOCOM_FUNCTIONS"]["SYNCCTO_CHECKSUM_FILES"] = array(
     "class" => "SyncCtoFiles",
     "function" => "runChecksumFiles",
@@ -246,7 +264,7 @@ $GLOBALS["CTOCOM_FUNCTIONS"]["SYNCCTO_CHECKSUM_FILES"] = array(
     "parameter" => FALSE,
 );
 
-// Get Filelist of file
+// Get filelist of file
 $GLOBALS["CTOCOM_FUNCTIONS"]["SYNCCTO_CHECKSUM_FOLDERS"] = array(
     "class" => "SyncCtoFiles",
     "function" => "runChecksumFolders",
@@ -254,7 +272,7 @@ $GLOBALS["CTOCOM_FUNCTIONS"]["SYNCCTO_CHECKSUM_FOLDERS"] = array(
     "parameter" => array("files"),
 );
 
-// Clear Temp folder
+// Clear temp folder
 $GLOBALS["CTOCOM_FUNCTIONS"]["SYNCCTO_PURGETEMP"] = array(
     "class" => "SyncCtoFiles",
     "function" => "purgeTemp",
@@ -278,7 +296,7 @@ $GLOBALS["CTOCOM_FUNCTIONS"]["SYNCCTO_REBUILD_SPLITFILE"] = array(
     "parameter" => array("splitname", "splitcount", "movepath", "md5"),
 );
 
-// split a file
+// Split a file
 $GLOBALS["CTOCOM_FUNCTIONS"]["SYNCCTO_SPLITFILE"] = array(
     "class" => "SyncCtoFiles",
     "function" => "splitFiles",

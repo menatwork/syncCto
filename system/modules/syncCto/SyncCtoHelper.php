@@ -436,23 +436,33 @@ class SyncCtoHelper extends Backend
      * @return array 
      */
     public function getFileSyncOptions()
-    {
-        $arrReturn = array(
-            "core" => array(
-                "core_change" => "core_change",
-                "core_delete" => "core_delete"
-            ),
-            "user" => array(
-                "user_change" => "user_change",
-                "user_delete" => "user_delete"
-            ),
-            "configfiles" => array(
-                "localconfig_update" => "localconfig_update",
-                "localconfig_errors" => "localconfig_errors"
-            )
-        );
-
-        return $arrReturn;
+    {        
+        if($this->BackendUser->isAdmin)
+        {
+            return $GLOBALS['SYC_CONFIG']['sync_options'];
+        }
+        else
+        {
+            $arrUserSyncOptions = $this->BackendUser->syncCto_sync_options;
+            
+            $arrSyncOption = array();
+            foreach($GLOBALS['SYC_CONFIG']['sync_options'] AS $fileType => $arrValue)
+            {
+                foreach($arrValue AS $strRight)
+                {
+                    if(in_array($strRight, $arrUserSyncOptions))
+                    {
+                        if(!array_key_exists($fileType, $arrSyncOption))
+                        {
+                            $arrSyncOption[$fileType] = array();
+                        }
+                        
+                        $arrSyncOption[$fileType][] = $strRight;
+                    }                            
+                }
+            }       
+            return $arrSyncOption;
+        }            
     }
 
     /**
@@ -460,15 +470,8 @@ class SyncCtoHelper extends Backend
      * @return array 
      */
     public function getMaintanceOptions()
-    {
-        $arrReturn = array(
-            "temp_tables" => "temp_tables",
-            "temp_folders" => "temp_folders",
-            "css_create" => "css_create",
-            "xml_create" => "xml_create",
-        );
-
-        return $arrReturn;
+    {       
+        return $GLOBALS['SYC_CONFIG']['maintance_options'];
     }
 
     /* -------------------------------------------------------------------------

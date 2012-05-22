@@ -1726,10 +1726,20 @@ class SyncCtoModuleClient extends BackendModule
 
                     break;
 
+                case 2:
+                    
+                    // TODO DATABASE LIGHTBOX
+                    $this->objData->setState($GLOBALS['TL_LANG']['MSC']['progress']);
+                    $this->objData->setTitle("DATABASE");
+                    $this->objData->setDescription("DATABASE");                    
+                    $this->objStepPool->step++;
+                    
+                    break;
+                
                 /**
                  * Build SQL Zip File
                  */
-                case 2:
+                case 3:
                     $this->objStepPool->zipname = $this->objSyncCtoDatabase->runDump($this->arrSyncSettings['syncCto_SyncTables'], true, true);
                     $this->objStepPool->arrTableTimestamp = $this->objSyncCtoHelper->getDatabaseTablesTimestamp($this->arrSyncSettings['syncCto_SyncTables']);
 
@@ -1741,7 +1751,7 @@ class SyncCtoModuleClient extends BackendModule
                 /**
                  * Send file to client
                  */
-                case 3:
+                case 4:
                     $arrResponse = $this->objSyncCtoCommunicationClient->sendFile($GLOBALS['SYC_PATH']['tmp'], $this->objStepPool->zipname, "", SyncCtoEnum::UPLOAD_SQL_TEMP);
 
                     // Check if the file was send and saved.
@@ -1758,7 +1768,7 @@ class SyncCtoModuleClient extends BackendModule
                 /**
                  * Import on client side
                  */
-                case 4:
+                case 5:
                     // Import SQL zip 
                     $this->objSyncCtoCommunicationClient->runSQLImport($this->objSyncCtoHelper->standardizePath($this->arrClientInformation["folders"]["tmp"], "sql", $this->objStepPool->zipname));
 
@@ -1801,7 +1811,7 @@ class SyncCtoModuleClient extends BackendModule
                 /**
                  * Hook for custom sql code
                  */
-                case 5:      
+                case 6:      
                     if (isset($GLOBALS['TL_HOOKS']['syncDBUpdate']) && is_array($GLOBALS['TL_HOOKS']['syncDBUpdate']))
                     {
                         $arrSQL = array();
@@ -3037,10 +3047,21 @@ class SyncCtoModuleClient extends BackendModule
 
                     break;
 
+
+                case 2:
+                    
+                    // TODO DATABASE LIGHTBOX
+                    $this->objData->setState($GLOBALS['TL_LANG']['MSC']['progress']);
+                    $this->objData->setTitle("DATABASE");
+                    $this->objData->setDescription("DATABASE");                    
+                    $this->objStepPool->step++;
+                    
+                    break;                
+                
                 /**
                  * Build SQL Zip File
                  */
-                case 2:
+                case 3:
 
                     $this->objStepPool->zipname = $this->objSyncCtoCommunicationClient->runDatabaseDump($this->arrSyncSettings['syncCto_SyncTables'], true, true);
 
@@ -3052,7 +3073,7 @@ class SyncCtoModuleClient extends BackendModule
                 /**
                  * Get file to client
                  */
-                case 3:
+                case 4:
                     $strFrom     = $this->objSyncCtoHelper->standardizePath($this->arrClientInformation["folders"]['tmp'], $this->objStepPool->zipname);
                     $strTo       = $this->objSyncCtoHelper->standardizePath($GLOBALS['SYC_PATH']['tmp'], "sql", $this->objStepPool->zipname);
                     $booResponse = $this->objSyncCtoCommunicationClient->getFile($strFrom, $strTo);
@@ -3071,7 +3092,7 @@ class SyncCtoModuleClient extends BackendModule
                 /**
                  * Import on server side
                  */
-                case 4:
+                case 5:
                     $strSrc = $this->objSyncCtoHelper->standardizePath($GLOBALS['SYC_PATH']['tmp'], "sql", $this->objStepPool->zipname);
                     $this->objSyncCtoDatabase->runRestore($strSrc);
 

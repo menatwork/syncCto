@@ -30,8 +30,8 @@
 /**
  * Extend default palette
  */
-$GLOBALS['TL_DCA']['tl_user']['palettes']['extend'] = str_replace('disable', '{syncCto_legend},syncCto_clients,syncCto_clients_p;{syncCto_tables_legend},syncCto_tables;{account_legend},disable', $GLOBALS['TL_DCA']['tl_user']['palettes']['extend']);
-$GLOBALS['TL_DCA']['tl_user']['palettes']['custom'] = str_replace('disable,', '{syncCto_legend},syncCto_clients,syncCto_clients_p;{syncCto_tables_legend},syncCto_tables;{account_legend},disable', $GLOBALS['TL_DCA']['tl_user']['palettes']['custom']);
+$GLOBALS['TL_DCA']['tl_user']['palettes']['extend'] = str_replace('disable', '{syncCto_legend},syncCto_clients,syncCto_clients_p,syncCto_sync_options;{syncCto_tables_legend},syncCto_tables;{account_legend},disable', $GLOBALS['TL_DCA']['tl_user']['palettes']['extend']);
+$GLOBALS['TL_DCA']['tl_user']['palettes']['custom'] = str_replace('disable,', '{syncCto_legend},syncCto_clients,syncCto_clients_p,syncCto_sync_options;{syncCto_tables_legend},syncCto_tables;{account_legend},disable', $GLOBALS['TL_DCA']['tl_user']['palettes']['custom']);
 
 /**
  * Add fields to tl_user
@@ -53,6 +53,16 @@ $GLOBALS['TL_DCA']['tl_user']['fields']['syncCto_clients_p'] = array
     'options' => array('create', 'edit', 'copy', 'delete', 'syncTo', 'syncFrom'),
     'reference' => &$GLOBALS['TL_LANG']['MSC'],
     'eval' => array('multiple' => true)
+);
+
+$GLOBALS['TL_DCA']['tl_user']['fields']['syncCto_sync_options'] = array
+    (
+    'label'     => &$GLOBALS['TL_LANG']['tl_user']['syncCto_sync_options'],
+    'exclude'   => true,
+    'inputType' => 'checkbox',
+    'reference' => &$GLOBALS['TL_LANG']['SYC'],
+    'options_callback' => array('SyncCtoHelper', 'getFileSyncOptions'),
+    'eval'      => array('multiple' => true)
 );
 
 $GLOBALS['TL_DCA']['tl_user']['fields']['syncCto_tables'] = array

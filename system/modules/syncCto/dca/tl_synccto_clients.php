@@ -33,6 +33,7 @@ $GLOBALS['TL_DCA']['tl_synccto_clients'] = array(
         'dataContainer' => 'Table',
         'enableVersioning' => true,
         'onload_callback' => array(
+            array('tl_synccto_clients', 'checkClientStatus'),
             array('tl_synccto_clients', 'checkPermissionClient'),
             array('tl_synccto_clients', 'checkPermissionClientCreate'),
         ),
@@ -219,6 +220,14 @@ class tl_synccto_clients extends Backend
         {
             return $this->checkPermissionClientButton($arguments[0], $arguments[1], $arguments[2], $arguments[3], $arguments[4], $arguments[5], $arrSplitName[2]);
         }
+    }
+    
+    /**
+     * Set the javascript file for client ping 
+     */
+    public function checkClientStatus()
+    {
+        $GLOBALS['TL_JAVASCRIPT'][] = 'system/modules/syncCto/html/js/ping_src.js';        
     }
 
     /**
