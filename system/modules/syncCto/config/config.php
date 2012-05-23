@@ -101,13 +101,6 @@ if($GLOBALS['TL_CONFIG']['syncCto_attentionFlag'] == true)
     $GLOBALS['TL_CSS'][] = 'system/modules/syncCto/html/css/attention.css';
 }
 
-//if (($objInput->get("table") == 'tl_syncCto_clients_syncTo' || $objInput->get("table") == 'tl_syncCto_clients_syncFrom') && TL_MODE == 'BE')
-//{
-//    $GLOBALS['TL_CSS'][]        = 'system/modules/syncCto/html/css/filelist.css';
-//    $GLOBALS['TL_JAVASCRIPT'][] = 'system/modules/syncCto/html/js/htmltable.js';
-//    $GLOBALS['TL_JAVASCRIPT'][] = 'system/modules/syncCto/html/js/filelist.js';
-//}
-
 // Size limit for files in bytes, will be checked
 $GLOBALS['SYC_SIZE']['limit'] = 524288000;
 // Size limit for files in bytes, completely ignored

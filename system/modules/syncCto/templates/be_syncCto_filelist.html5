@@ -1,3 +1,17 @@
+<!DOCTYPE html>
+<html lang="<?php echo $this->language; ?>">
+<head>
+<meta charset="<?php echo $this->charset; ?>">
+<title><?php echo $this->title; ?> - Contao Open Source CMS <?php echo VERSION; ?></title>
+<base href="<?php echo $this->base; ?>">
+<?php echo $this->stylesheets; ?>
+<?php echo $this->javascripts; ?>
+</head>
+<body class="__ua__">
+
+<div id="container">
+<div id="main">    
+    
 <h1 class="file"><strong><?php echo $GLOBALS['TL_LANG']['MSC']['totalsize']; ?></strong></h1>
 
 <ul class="file">
@@ -6,13 +20,12 @@
 <li><?php echo $GLOBALS['TL_LANG']['MSC']['deleted_file']; ?>: ~ <?php echo $this->getReadableSize($this->totalsizeDel); ?></li>
 </ul>
 
-<form id="syncCto_filelist_form" action="<?php echo $this->Environment->base; ?>contao/main.php?do=synccto_clients&amp;table=tl_syncCto_clients_sync<?php echo $this->direction; ?>&amp;act=start&amp;step=<?php echo $this->step; ?>&amp;id=<?php echo $this->id; ?>" method="post">
+<form id="syncCto_filelist_form" action="<?php echo $this->Environment->base; ?>system/modules/syncCto/SyncCtoPopup.php?id=<?php echo $this->id; ?>" method="post">
     <div class="formbody">
         <input type="hidden" name="FORM_SUBMIT" value="<?php echo $this->formId; ?>" />        
         <input type="hidden" name="REQUEST_TOKEN" value="<?php echo REQUEST_TOKEN; ?>">
         
-        <div class="submit_container">
-            <input class="tl_submit" name="transfer" type="submit" value="<?php echo $GLOBALS['TL_LANG']['MSC']['submit_files']; ?>" />
+        <div class="submit_container">         
             <input class="tl_submit" name="delete" type="submit" value="<?php echo $GLOBALS['TL_LANG']['MSC']['delete_files']; ?>" />
         </div>
 
@@ -55,5 +68,15 @@
             <?php endforeach; ?>
             </tbody>
         </table>
+        
+        <div class="submit_container">
+            <input class="tl_submit" name="transfer" type="submit" value="<?php echo $GLOBALS['TL_LANG']['MSC']['submit_files']; ?>" />
+        </div>        
     </div>
 </form>
+
+</div>
+</div>
+
+</body>
+</html>

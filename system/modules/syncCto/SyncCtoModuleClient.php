@@ -1120,17 +1120,10 @@ class SyncCtoModuleClient extends BackendModule
                  * Show list with files and count
                  */
                 case 8:
-                    // Del and submit Function
+                    
                     $arrDel = $_POST;
-
-                    if (key_exists("delete", $arrDel))
-                    {
-                        foreach ($arrDel as $key => $value)
-                        {
-                            unset($this->arrListCompare[$value]);
-                        }
-                    }
-                    else if (key_exists("transfer", $arrDel))
+                    
+                    if (key_exists("forward", $arrDel))
                     {
                         foreach ($this->arrListCompare as $key => $value)
                         {
@@ -1151,7 +1144,7 @@ class SyncCtoModuleClient extends BackendModule
                         $this->intStep++;
                         break;
                     }
-
+                    
                     // Counter
                     $intCountMissing = 0;
                     $intCountNeed    = 0;
@@ -1209,7 +1202,7 @@ class SyncCtoModuleClient extends BackendModule
                         break;
                     }
 
-                    $objTemp = new BackendTemplate("be_syncCto_filelist");
+                    $objTemp = new BackendTemplate("be_syncCto_files");
                     $objTemp->filelist = $this->arrListCompare;
                     $objTemp->id = $this->intClientID;
                     $objTemp->step = $this->intStep;
@@ -1222,98 +1215,8 @@ class SyncCtoModuleClient extends BackendModule
                     // Build content 
                     $this->objData->setDescription(vsprintf($GLOBALS['TL_LANG']['tl_syncCto_sync']["step_2"]['description_4'], array($intCountMissing, $intCountNeed, $intCountDelete, $intCountIgnored)));
                     $this->objData->setHtml($objTemp->parse());
-                    $this->booRefresh = false;
-                    break;
-
-
-                /**
-                 * Search for big file
-                 */
-                case 9:
-                    // build list with big files
-                    $arrTempList = array();
-                    $intTotalSizeNew    = 0;
-                    $intTotalSizeDel    = 0;
-                    $intTotalSizeChange = 0;
-
-                    // Del Function
-                    $arrDel = $_POST;
-
-                    if (is_array($arrDel) && key_exists("delete", $arrDel))
-                    {
-                        foreach ($arrDel as $key => $value)
-                        {
-                            if (key_exists($value, $this->arrListCompare))
-                            {
-                                unset($this->arrListCompare[$value]);
-                            }
-                        }
-                    }
-                    else if (is_array($arrDel) && key_exists("transfer", $arrDel))
-                    {
-                        $this->objData->setState($GLOBALS['TL_LANG']['MSC']['ok']);
-                        $this->objData->setDescription($GLOBALS['TL_LANG']['tl_syncCto_sync']["step_3"]['description_1']);
-                        $this->objData->setHtml("");
-                        $this->booRefresh = true;
-                        $this->intStep++;
-                        break;
-                    }
-
-                    // Count split files
-                    $intCountSplit = 0;
-                    foreach ($this->arrListCompare as $key => $value)
-                    {
-                        if ($value["split"] == true)
-                        {
-                            $intCountSplit++;
-                        }
-                    }
-
-                    // Skip if we have zero
-                    if ($intCountSplit == 0)
-                    {
-                        $this->objData->setHtml("");
-                        $this->objData->setDescription($GLOBALS['TL_LANG']['tl_syncCto_sync']['step_2']['description_1']);
-                        $this->objData->setState($GLOBALS['TL_LANG']['MSC']['ok']);
-                        $this->booRefresh = true;
-                        $this->intStep++;
-                        break;
-                    }
-
-                    // Build list
-                    foreach ($this->arrListCompare as $key => $value)
-                    {
-                        if ($value["state"] == SyncCtoEnum::FILESTATE_TOO_BIG_DELETE ||
-                                $value["state"] == SyncCtoEnum::FILESTATE_TOO_BIG_MISSING ||
-                                $value["state"] == SyncCtoEnum::FILESTATE_TOO_BIG_NEED ||
-                                $value["state"] == SyncCtoEnum::FILESTATE_TOO_BIG_SAME ||
-                                $value["state"] == SyncCtoEnum::FILESTATE_BOMBASTIC_BIG)
-                        {
-                            $arrTempList[$key] = $this->arrListCompare[$key];
-                        }
-                        else if ($value["split"] == 1)
-                        {
-                            $arrTempList[$key] = $this->arrListCompare[$key];
-                            $intTotalSizeNew += $value["size"];
-                        }
-                    }
-
-                    uasort($arrTempList, 'syncCtoModelClientCMP');
-
-                    $objTemp = new BackendTemplate("be_syncCto_filelist");
-                    $objTemp->filelist = $arrTempList;
-                    $objTemp->id = $this->intClientID;
-                    $objTemp->step = $this->intStep;
-                    $objTemp->totalsizeNew = $intTotalSizeNew;
-                    $objTemp->totalsizeChange = $intTotalSizeChange;
-                    $objTemp->totalsizeDel = $intTotalSizeDel;
-                    $objTemp->direction = "To";
-                    $objTemp->compare_complex = true;
-
-                    $this->objData->setHtml($objTemp->parse());
-                    $this->objData->setDescription(vsprintf($GLOBALS['TL_LANG']['tl_syncCto_sync']['step_2']['description_5'], array($intCountSplit)));
-                    $this->booRefresh = false;
-
+                    $this->booRefresh = false;                      
+                    
                     break;
             }
         }
