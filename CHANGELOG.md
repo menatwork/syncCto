@@ -5,6 +5,9 @@ Version 2.1.0 (2012-05-09)
 --------------------------
 
 ### Fixed
+DB-Tabellen erst in den Steps auswählen (see #94).
+
+### Fixed
 Tabellen mit großen Datenmengen rot hinterlegen (see #89).
 
 ### Fixed
