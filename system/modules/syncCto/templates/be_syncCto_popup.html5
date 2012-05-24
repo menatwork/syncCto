@@ -10,17 +10,10 @@
 <body class="__ua__">
 
 <div id="container">
-<div id="main">    
-    
-<h1 class="file"><strong><?php echo $GLOBALS['TL_LANG']['MSC']['totalsize']; ?></strong></h1>
-
-</div>
+    <div id="main"> 
+        <?php echo $this->content; ?>
+    </div>
 </div>
 
-<script>
-    window.addEvent("domready",function(){
-        window.parent.document.getElement('input[name=forward]').click();
-    });
-</script>
 </body>
 </html>
