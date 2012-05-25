@@ -1,0 +1,101 @@
+/* Copyright (c) MEN AT WORK 2012 :: LGPL license */
+
+  #container {
+    width:100%;
+    margin:0 auto;
+    padding:12px 0;
+    overflow:hidden;
+  }
+  
+ /*------------------------------------------------------------------------*/
+
+  #syncCto_filelist {
+	clear:both;
+	width:100%;
+  }
+  
+  th, 
+  td {
+	padding-top:5px;
+	padding-bottom:5px;
+	border:1px solid #fff;
+  }
+  
+  th, 
+  thead td {
+	background-color:#F0F0F0;
+	text-align:left;
+  }
+  
+  th {
+	font-weight:bold;
+	background-image:url(../js/images/sorting.png);
+	background-repeat:no-repeat;
+	background-position:6px 10px;
+	padding-left:19px;
+	cursor:pointer;
+  }
+  
+  th.table-th-sort {
+	background-position:6px center;
+  }
+  
+  th.table-th-sort-rev {
+	background-position:6px -26px;
+  }
+  
+  th.checkbox {
+	background-image:none;
+  }
+  
+  th span {
+	display:none;
+  }
+  
+  td {
+	background-color:#F9F9F9;
+  }
+  
+  td.checkbox, 
+  th.checkbox {
+	text-align:center;
+  }
+  
+  #syncCto_filelist .tl_checkbox {
+	margin:0;
+  }
+  
+  td.state {
+	padding-left:9px;
+	background-color:#F0F0F0;
+  }
+  
+  td.last {
+	text-align:left;
+	padding-left:9px;
+	padding-right:9px;
+  }
+  
+  td.filesize {
+	text-align:right;
+	padding-right:10px;
+  }
+  
+  .submit_container {
+	float:left;
+  }
+  
+  .tl_submit {
+	cursor:pointer;
+	margin:5px 15px 15px 0;
+  }
+  
+  ul.file { 
+    padding-left:0;
+    list-style:none;
+    margin-bottom:20px;
+  }
+  
+  ul.file li { 
+	padding:2px 0;
+  }
