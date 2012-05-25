@@ -1,0 +1,55 @@
+<h1 class="file"><strong><?php echo $this->headline; ?></strong></h1>
+
+<div id="tl_listing" class="tl_listing_container">
+<?php if($this->close || $this->error): ?>
+    <?php if($this->close): ?>
+    <img src="<?php echo $this->Environment->base; ?>system/modules/syncCto/html/ajax-loader.gif" alt="" />
+    <script>
+        window.addEvent("domready",function(){
+            window.parent.document.getElement('input[name=forward]').click();
+        });
+    </script>
+    <?php else: ?>
+    <?php echo $this->text; ?>
+    <?php endif; ?>
+
+<?php else: ?>
+
+<form id="syncCto_db_form" action="<?php echo $this->Environment->base; ?>contao/popupSyncDB.php?id=<?php echo $this->id; ?>&amp;step=<?php echo $this->step; ?>" method="post">
+    <div class="formbody">
+        <input type="hidden" name="FORM_SUBMIT" value="<?php echo $this->formId; ?>" />        
+        <input type="hidden" name="REQUEST_TOKEN" value="<?php echo REQUEST_TOKEN; ?>">
+        
+        <div class="submit_container">
+            <input class="tl_submit" name="transfer" type="submit" value="<?php echo $GLOBALS['TL_LANG']['MSC']['submit_database']; ?>" />
+        </div>
+    </div>
+    
+    <table id="syncCto_dblist">
+    <colgroup>
+        <col width="42%" />
+        <col width="16%" />
+        <col width="42%" />
+    </colgroup>
+    <thead>
+        <tr class="head">
+            <th class="client">Client</th>
+            <th class="diff">Differenz</th>
+            <th class="server">Server</th>
+        </tr>
+    </thead>
+    <tbody>
+        <?php foreach($this->arrCompareList AS $arrCompareTable): ?>            
+        <tr>
+            <td><?php echo $arrCompareTable['syncCto_server']; ?></td>
+            <td class="diff">hallo</td>
+            <td><?php echo $arrCompareTable['syncCto_client']; ?></td>
+        </tr>
+        <?php endforeach; ?>        
+    </tbody>
+    </table>
+    
+</form>
+
+<?php endif; ?>
+</div>

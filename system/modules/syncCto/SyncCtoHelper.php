@@ -92,6 +92,16 @@ class SyncCtoHelper extends Backend
 
         return self::$instance;
     }
+    
+    /**
+     * Return DbColorLimits
+     * 
+     * @return array
+     */
+    public function getDbColorLimits()
+    {
+        return $this->arrDbColorLimits;
+    }    
 
     /* -------------------------------------------------------------------------
      * Config
@@ -572,7 +582,14 @@ class SyncCtoHelper extends Backend
 
         $arrTablesPermission = $this->BackendUser->syncCto_tables;
 
-        $arrTables = array('tables_changes' => array(), 'tables_no_changes' => array());
+        if($arrTimestampLast != null && is_array($arrTimestampLast))
+        {
+            $arrTables = array('tables_changes' => array(), 'tables_no_changes' => array());
+        }
+        else
+        {
+            $arrTables = array();
+        }
 
         foreach ($this->databaseTables() as $key => $value)
         {
@@ -590,11 +607,11 @@ class SyncCtoHelper extends Backend
             {                
                 if ($arrTimestampLast[$value] == $this->getDatabaseTablesTimestamp($value))
                 {
-                    $arrTables["tables_no_changes"][$value] = $this->getTableMeta($value, true);
+                    $arrTables["tables_no_changes"][$value] = $this->getTableMeta($value);
                 }
                 else
                 {
-                    $arrTables["tables_changes"][$value] = $this->getTableMeta($value, false);
+                    $arrTables["tables_changes"][$value] = $this->getTableMeta($value);
                 }
             }
             else
@@ -638,7 +655,14 @@ class SyncCtoHelper extends Backend
 
         $arrTablesPermission = $this->BackendUser->syncCto_tables;
 
-        $arrTables = array('tables_changes' => array(), 'tables_no_changes' => array());
+        if($arrTimestampLast != null && is_array($arrTimestampLast))
+        {
+            $arrTables = array('tables_changes' => array(), 'tables_no_changes' => array());
+        }
+        else
+        {
+            $arrTables = array();
+        }
 
         foreach ($this->databaseTables() as $key => $value)
         {
@@ -656,11 +680,11 @@ class SyncCtoHelper extends Backend
             {
                 if ($arrTimestampLast[$value] == $this->getDatabaseTablesTimestamp($value))
                 {
-                    $arrTables["tables_no_changes"][$value] = $this->getTableMeta($value, true);
+                    $arrTables["tables_no_changes"][$value] = $this->getTableMeta($value);
                 }
                 else
                 {
-                    $arrTables["tables_changes"][$value] = $this->getTableMeta($value, false);
+                    $arrTables["tables_changes"][$value] = $this->getTableMeta($value);
                 }
             }
             else
@@ -736,18 +760,37 @@ class SyncCtoHelper extends Backend
      * @param boolean $booHashSame
      * @return string 
      */
-    private function getTableMeta($strTableName, $booHashSame = null)
+    private function getTableMeta($strTableName)
     {
         $objCount        = $this->Database->prepare("SELECT COUNT(*) as Count FROM $strTableName")->execute();
-        $intEntriesCount = $objCount->Count;
-        $intEntriesSize  = $this->Database->getSizeOf($strTableName);
-
+        
+        $arrTableMeta = array(
+            'name' => $strTableName,
+            'count' => $objCount->Count,
+            'size' => $this->Database->getSizeOf($strTableName)
+        );
+        
+        return $arrTableMeta;
+    }
+    
+    /**
+     * Set styles for the given array recommended table data and return it as string
+     * 
+     * @param array $arrTableMeta
+     * @return string 
+     */
+    public function getStyledTableMeta($arrTableMeta)
+    {
+        $strTableName = $arrTableMeta['name'];
+        $intEntriesCount = $arrTableMeta['count'];
+        $intEntriesSize = $arrTableMeta['size'];
+        
         $strColor = '666966';
 
         if ($GLOBALS['TL_CONFIG']['syncCto_custom_settings'])
         {
             $booBreakLoop = false;
-            foreach ($this->arrDbColorLimits AS $arrColorLimits)
+            foreach (SyncCtoHelper::getInstance()->getDbColorLimits() AS $arrColorLimits)
             {
                 switch ($arrColorLimits['unit'])
                 {
@@ -785,12 +828,12 @@ class SyncCtoHelper extends Backend
         }
         $strReturn = '<span style="color: #' . $strColor . '; padding-left: 3px;">';
         $strReturn .= $strTableName;
-        $strReturn .= '<span style="padding-left: 3px;">';
+        $strReturn .= '<span style="color:#a3a3a3;padding-left: 3px;">';
         $strReturn .= '(' . $this->getReadableSize($intEntriesSize) . ', ' . vsprintf($GLOBALS['TL_LANG']['MSC']['entries'], array($intEntriesCount)) . ')';
         $strReturn .= '</span>';
         $strReturn .= '</span>';
-        return $strReturn;
-    }
+        return $strReturn;        
+    }    
 
     /**
      * Return a list with all timestamps form tables

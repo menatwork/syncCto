@@ -437,17 +437,12 @@ class SyncCtoModuleClient extends BackendModule
 
     protected function checkSyncDatabase()
     {
-        if (!key_exists('syncCto_SyncTables', $this->arrSyncSettings))
+        if (!key_exists('syncCto_SyncDatabase', $this->arrSyncSettings))
         {
             return false;
         }
 
-        if (count($this->arrSyncSettings['syncCto_SyncTables']) == 0)
-        {
-            return false;
-        }
-
-        return true;
+        return $this->arrSyncSettings['syncCto_SyncDatabase'];
     }
 
     /* -------------------------------------------------------------------------
@@ -1624,15 +1619,50 @@ class SyncCtoModuleClient extends BackendModule
                     $this->objStepPool->step++;
 
                     break;
-
+                
                 case 2:
                     
-                    // TODO DATABASE LIGHTBOX
+                    // TODO: SKIP
+//                    if (count($this->arrListCompare) == 0 || key_exists("skip", $_POST))
+//                    {
+//                        $this->objData->setState($GLOBALS['TL_LANG']['MSC']['skipped']);
+//                        $this->objData->setHtml("");
+//                        $this->booRefresh = true;
+//                        $this->intStep++;
+//
+//                        $this->arrListCompare = array();
+//                        
+//                        break;
+//                    }
+                    
+                    // TODO: FORWARD
+                    if (key_exists("forward", $_POST) && count($this->arrListCompare) != 0)
+                    {
+                        $this->objData->setState($GLOBALS['TL_LANG']['MSC']['ok']);
+                        $this->objData->setDescription($GLOBALS['TL_LANG']['tl_syncCto_sync']["step_2"]['description_1']);
+                        $this->objData->setHtml("");
+                        $this->booRefresh = true;
+                        $this->intStep++;
+                        
+                        break;
+                    }                    
+                    
+                    // TODO CHANGE TEMPLATE VARS
+                    $objTemp = new BackendTemplate("be_syncCto_form");
+                    $objTemp->id = $this->intClientID;
+                    $objTemp->step = $this->intStep;
+                    $objTemp->direction = "To";
+                    $objTemp->headline = $GLOBALS['TL_LANG']['MSC']['totalsize'];
+                    $objTemp->cssId = 'syncCto_filelist_form';
+                    $objTemp->forwardValue = $GLOBALS['TL_LANG']['MSC']['submit_files'];
+                    $objTemp->popupClassName = 'popupSyncDB.php';
+
+                    // Build content                    
                     $this->objData->setState($GLOBALS['TL_LANG']['MSC']['progress']);
                     $this->objData->setTitle("DATABASE");
-                    $this->objData->setDescription("DATABASE");                    
-                    $this->objStepPool->step++;
-                    
+                    $this->objData->setHtml($objTemp->parse());
+                    $this->objData->setDescription("DATABASE");
+                    $this->booRefresh = false;                    
                     break;
                 
                 /**
