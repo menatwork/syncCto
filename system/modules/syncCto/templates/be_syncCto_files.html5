@@ -1,7 +1,7 @@
 <h1 class="file"><strong><?php echo $this->headline; ?></strong></h1>
 
+<div id="tl_listing" class="tl_listing_container">
 <?php if($this->close || $this->error): ?>
-   
     <?php if($this->close): ?>
     <img src="system/modules/syncCto/html/ajax-loader.gif" alt="" />
     <script>    
@@ -15,6 +15,8 @@
 
 <?php else: ?>
 
+<h3><?php echo $GLOBALS['TL_LANG']['MSC']['totalsize']; ?></h3>
+
 <ul class="file">
 <li><?php echo $GLOBALS['TL_LANG']['MSC']['new_file']; ?>: ~ <?php echo $this->getReadableSize($this->totalsizeNew); ?></li>
 <li><?php echo $GLOBALS['TL_LANG']['MSC']['modified_file']; ?>: ~ <?php echo $this->getReadableSize($this->totalsizeChange); ?></li>
@@ -26,6 +28,9 @@
         <input type="hidden" name="FORM_SUBMIT" value="<?php echo $this->formId; ?>" />        
         <input type="hidden" name="REQUEST_TOKEN" value="<?php echo REQUEST_TOKEN; ?>">
         
+        <div class="submit_container">
+            <input class="tl_submit" name="transfer" type="submit" value="<?php echo $GLOBALS['TL_LANG']['MSC']['submit_files']; ?>" />
+        </div>
         <div class="submit_container">         
             <input class="tl_submit" name="delete" type="submit" value="<?php echo $GLOBALS['TL_LANG']['MSC']['delete_files']; ?>" />
         </div>
@@ -68,12 +73,9 @@
                 </tr>
             <?php endforeach; ?>
             </tbody>
-        </table>
-        
-        <div class="submit_container">
-            <input class="tl_submit" name="transfer" type="submit" value="<?php echo $GLOBALS['TL_LANG']['MSC']['submit_files']; ?>" />
-        </div>        
+        </table>    
     </div>
 </form>
 
 <?php endif; ?>
+</div>

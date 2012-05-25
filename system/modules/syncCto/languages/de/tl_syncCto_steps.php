@@ -37,7 +37,7 @@ $GLOBALS['TL_LANG']['tl_syncCto_sync']['step_1']['description_2']   = 'Temporär
 $GLOBALS['TL_LANG']['tl_syncCto_sync']['step_2']['description_1']   = 'Abgleich und Versand der Vergleichslisten.';
 $GLOBALS['TL_LANG']['tl_syncCto_sync']['step_2']['description_2']   = 'Nach löschbaren Dateien suchen.';
 $GLOBALS['TL_LANG']['tl_syncCto_sync']['step_2']['description_3']   = 'Aufbereitung der Vergleichsliste.';
-$GLOBALS['TL_LANG']['tl_syncCto_sync']['step_2']['description_4']   = 'Es wurden %s neue (%s), %s veränderte (%s), %s gelöschte (%s) und %s nicht zustellbare Datei(en) gefunden.';
+$GLOBALS['TL_LANG']['tl_syncCto_sync']['step_2']['description_4']   = 'Es wurden %s neue, %s veränderte, %s gelöschte und %s nicht zustellbare Datei(en) gefunden.<br />Das ergibt eine Größe von %s neuen, %s veränderten und %s gelöschten Dateien.';
 $GLOBALS['TL_LANG']['tl_syncCto_sync']['step_2']['description_5']   = 'Es wurden %s zu große Dateien gefunden.';
 
 $GLOBALS['TL_LANG']['tl_syncCto_sync']['step_3']['description_1']   = 'Dateien verarbeiten.';

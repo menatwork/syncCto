@@ -66,6 +66,8 @@ $GLOBALS['TL_LANG']['MSC']['ok']                            = 'OK';
 $GLOBALS['TL_LANG']['MSC']['progress']                      = 'In Bearbeitung';
 $GLOBALS['TL_LANG']['MSC']['error']                         = 'Fehler';
 $GLOBALS['TL_LANG']['MSC']['skipped']                       = 'Übersprungen';
+$GLOBALS['TL_LANG']['MSC']['skip']                          = 'Überspringen';
+$GLOBALS['TL_LANG']['MSC']['popup']                         = 'Vergleichsliste öffnen';
 $GLOBALS['TL_LANG']['MSC']['unknown_step']                  = 'Unbekannter Schritt';
 
 /**
@@ -74,6 +76,7 @@ $GLOBALS['TL_LANG']['MSC']['unknown_step']                  = 'Unbekannter Schri
 $GLOBALS['TL_LANG']['MSC']['step']                          = 'Schritt';
 $GLOBALS['TL_LANG']['MSC']['abort']                         = 'Abbruch!';
 $GLOBALS['TL_LANG']['MSC']['complete']                      = 'Fertig!';
+$GLOBALS['TL_LANG']['MSC']['comparelist']                   = 'Vergleichsliste';
 $GLOBALS['TL_LANG']['MSC']['debug_mode']                    = 'Debugausgaben';
 
 /**
@@ -120,7 +123,7 @@ $GLOBALS['TL_LANG']['ERR']['unknown_path']                  = 'Unbekannter Pfad.
 $GLOBALS['TL_LANG']['ERR']['cant_open']                     = 'Datei %s kann nicht geöffnet werden.';
 $GLOBALS['TL_LANG']['ERR']['checksum_error']                = 'Fehler in den Prüfsummen.';
 $GLOBALS['TL_LANG']['ERR']['cant_move_file']                = 'Fehler beim verschieben der Datei %s nach %s.';
-$GLOBALS['TL_LANG']['ERR']['cant_delete_file']              = 'Fehler beim löschen der Datei.';
+$GLOBALS['TL_LANG']['ERR']['cant_delete_file']              = 'Fehler beim Löschen der Datei.';
 $GLOBALS['TL_LANG']['ERR']['attention_headline']            = 'Achtung bei Änderungen am System';
 $GLOBALS['TL_LANG']['ERR']['attention_text']                = 'Es werden zurzeit Aktualisierungen im Hintergrund durchgeführt, die dazu führen könnten das Änderungen auf dieser Installation überschrieben werden.';
 $GLOBALS['TL_LANG']['ERR']['min_size_limit']                = 'Die minimale Dateigröße von s% wurde unterschritten.';

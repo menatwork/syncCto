@@ -1209,7 +1209,7 @@ class SyncCtoModuleClient extends BackendModule
                     $objTemp->popupClassName = 'popupSyncFiles.php';
 
                     // Build content 
-                    $this->objData->setDescription(vsprintf($GLOBALS['TL_LANG']['tl_syncCto_sync']["step_2"]['description_4'], array($intCountMissing, $this->getReadableSize($intTotalSizeNew), $intCountNeed, $this->getReadableSize($intTotalSizeChange), $intCountDelete, $this->getReadableSize($intTotalSizeDel), $intCountIgnored)));
+                    $this->objData->setDescription(vsprintf($GLOBALS['TL_LANG']['tl_syncCto_sync']["step_2"]['description_4'], array($intCountMissing, $intCountNeed, $intCountDelete, $intCountIgnored, $this->getReadableSize($intTotalSizeNew), $this->getReadableSize($intTotalSizeChange), $this->getReadableSize($intTotalSizeDel))));
                     $this->objData->setHtml($objTemp->parse());
                     $this->booRefresh = false;                      
                     
@@ -2412,7 +2412,7 @@ class SyncCtoModuleClient extends BackendModule
                     $objTemp->popupClassName = 'popupSyncFiles.php';
 
                     // Build content 
-                    $this->objData->setDescription(vsprintf($GLOBALS['TL_LANG']['tl_syncCto_sync']["step_2"]['description_4'], array($intCountMissing, $this->getReadableSize($intTotalSizeNew), $intCountNeed, $this->getReadableSize($intTotalSizeChange), $intCountDelete, $this->getReadableSize($intTotalSizeDel), $intCountIgnored)));
+                    $this->objData->setDescription(vsprintf($GLOBALS['TL_LANG']['tl_syncCto_sync']["step_2"]['description_4'], array($intCountMissing, $intCountNeed, $intCountDelete, $intCountIgnored, $this->getReadableSize($intTotalSizeNew), $this->getReadableSize($intTotalSizeChange), $this->getReadableSize($intTotalSizeDel))));
                     $this->objData->setHtml($objTemp->parse());
                     $this->booRefresh = false;                      
                     

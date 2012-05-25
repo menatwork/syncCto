@@ -3,10 +3,10 @@
         <input type="hidden" name="FORM_SUBMIT" value="<?php echo $this->formId; ?>" />        
         <input type="hidden" name="REQUEST_TOKEN" value="<?php echo REQUEST_TOKEN; ?>">
         
-        <div class="submit_container">
+        <div class="m12 submit_container">
             <input class="tl_submit" name="forward" type="submit" value="<?php echo $this->forwardValue; ?>" />
-            <input class="tl_submit" name="skip" type="submit" value="Skip" />
-            <a class="tl_submit" rel="lightbox[880 500]" href="<?php echo $this->Environment->base; ?>contao/<?php echo $this->popupClassName; ?>?id=<?php echo $this->id; ?>">Popup</a>
+            <input class="tl_submit" name="skip" type="submit" value="<?php echo $GLOBALS['TL_LANG']['MSC']['skip']; ?>" />
+            <a style="padding-bottom:4px;" class="tl_submit" rel="lightbox[765 80%]" href="<?php echo $this->Environment->base; ?>contao/<?php echo $this->popupClassName; ?>?id=<?php echo $this->id; ?>"><?php echo $GLOBALS['TL_LANG']['MSC']['popup']; ?></a>
         </div>
     </div>
 </form>
