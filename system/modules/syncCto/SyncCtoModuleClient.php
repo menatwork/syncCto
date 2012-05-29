@@ -1615,54 +1615,46 @@ class SyncCtoModuleClient extends BackendModule
                 case 1:
                     $this->objData->setState($GLOBALS['TL_LANG']['MSC']['progress']);
                     $this->objData->setTitle($GLOBALS['TL_LANG']['MSC']['step'] . " %s");
-                    $this->objData->setDescription($GLOBALS['TL_LANG']['tl_syncCto_sync']["step_4"]['description_1']);
+                    $this->objData->setDescription($GLOBALS['TL_LANG']['tl_syncCto_sync']['step_4']['description_1']);
                     $this->objStepPool->step++;
 
                     break;
                 
                 case 2:
-                    
-                    // TODO: SKIP
-//                    if (count($this->arrListCompare) == 0 || key_exists("skip", $_POST))
-//                    {
-//                        $this->objData->setState($GLOBALS['TL_LANG']['MSC']['skipped']);
-//                        $this->objData->setHtml("");
-//                        $this->booRefresh = true;
-//                        $this->intStep++;
-//
-//                        $this->arrListCompare = array();
-//                        
-//                        break;
-//                    }
-                    
-                    // TODO: FORWARD
-                    if (key_exists("forward", $_POST) && count($this->arrListCompare) != 0)
+                    if (key_exists("forward", $_POST) && count($this->arrSyncSettings['syncCto_SyncTables']) > 0)
                     {
                         $this->objData->setState($GLOBALS['TL_LANG']['MSC']['ok']);
-                        $this->objData->setDescription($GLOBALS['TL_LANG']['tl_syncCto_sync']["step_2"]['description_1']);
+                        $this->objData->setDescription($GLOBALS['TL_LANG']['tl_syncCto_sync']['step_4']['description_5']);
+                        $this->objData->setHtml("");
+                        $this->booRefresh = true;
+                        $this->objStepPool->step++;
+                        
+                        break;
+                    } 
+                    else if (key_exists("skip", $_POST) || key_exists("forward", $_POST) && count($this->arrSyncSettings['syncCto_SyncTables']) == 0)
+                    {
+                        $this->objData->setState($GLOBALS['TL_LANG']['MSC']['skipped']);
                         $this->objData->setHtml("");
                         $this->booRefresh = true;
                         $this->intStep++;
                         
                         break;
-                    }                    
+                    }
                     
-                    // TODO CHANGE TEMPLATE VARS
                     $objTemp = new BackendTemplate("be_syncCto_form");
                     $objTemp->id = $this->intClientID;
                     $objTemp->step = $this->intStep;
                     $objTemp->direction = "To";
                     $objTemp->headline = $GLOBALS['TL_LANG']['MSC']['totalsize'];
-                    $objTemp->cssId = 'syncCto_filelist_form';
-                    $objTemp->forwardValue = $GLOBALS['TL_LANG']['MSC']['submit_files'];
+                    $objTemp->cssId = 'syncCto_database_form';
+                    $objTemp->forwardValue = $GLOBALS['TL_LANG']['MSC']['submit_database'];
                     $objTemp->popupClassName = 'popupSyncDB.php';
 
-                    // Build content                    
-                    $this->objData->setState($GLOBALS['TL_LANG']['MSC']['progress']);
-                    $this->objData->setTitle("DATABASE");
+                    // Build content 
+                    $this->objData->setDescription($GLOBALS['TL_LANG']['tl_syncCto_sync']['step_4']['description_1']);
                     $this->objData->setHtml($objTemp->parse());
-                    $this->objData->setDescription("DATABASE");
-                    $this->booRefresh = false;                    
+                    $this->booRefresh = false;
+                    
                     break;
                 
                 /**
@@ -1672,7 +1664,7 @@ class SyncCtoModuleClient extends BackendModule
                     $this->objStepPool->zipname = $this->objSyncCtoDatabase->runDump($this->arrSyncSettings['syncCto_SyncTables'], true, true);
                     $this->objStepPool->arrTableTimestamp = $this->objSyncCtoHelper->getDatabaseTablesTimestamp($this->arrSyncSettings['syncCto_SyncTables']);
 
-                    $this->objData->setDescription($GLOBALS['TL_LANG']['tl_syncCto_sync']["step_4"]['description_2']);
+                    $this->objData->setDescription($GLOBALS['TL_LANG']['tl_syncCto_sync']['step_4']['description_2']);
                     $this->objStepPool->step++;
 
                     break;
@@ -1689,7 +1681,7 @@ class SyncCtoModuleClient extends BackendModule
                         throw new Exception("Empty file list from client. Maybe file send was not complet.");
                     }
 
-                    $this->objData->setDescription($GLOBALS['TL_LANG']['tl_syncCto_sync']["step_4"]['description_3']);
+                    $this->objData->setDescription($GLOBALS['TL_LANG']['tl_syncCto_sync']['step_4']['description_3']);
                     $this->objStepPool->step++;
 
                     break;
@@ -1764,7 +1756,7 @@ class SyncCtoModuleClient extends BackendModule
                     
                     // Show step information
                     $this->objData->setState($GLOBALS['TL_LANG']['MSC']['ok']);
-                    $this->objData->setDescription($GLOBALS['TL_LANG']['tl_syncCto_sync']["step_4"]['description_4']);
+                    $this->objData->setDescription($GLOBALS['TL_LANG']['tl_syncCto_sync']['step_4']['description_4']);
 
                     $this->intStep++;
 
@@ -2872,7 +2864,7 @@ class SyncCtoModuleClient extends BackendModule
                 case 1:
                     $this->objData->setState($GLOBALS['TL_LANG']['MSC']['progress']);
                     $this->objData->setTitle($GLOBALS['TL_LANG']['MSC']['step'] . " %s");
-                    $this->objData->setDescription($GLOBALS['TL_LANG']['tl_syncCto_sync']["step_4"]['description_1']);
+                    $this->objData->setDescription($GLOBALS['TL_LANG']['tl_syncCto_sync']['step_4']['description_1']);
                     $this->objStepPool->step++;
 
                     break;
@@ -2883,7 +2875,7 @@ class SyncCtoModuleClient extends BackendModule
                     // TODO DATABASE LIGHTBOX
                     $this->objData->setState($GLOBALS['TL_LANG']['MSC']['progress']);
                     $this->objData->setTitle("DATABASE");
-                    $this->objData->setDescription("DATABASE");                    
+                    $this->objData->setDescription("DATABASE");
                     $this->objStepPool->step++;
                     
                     break;                
@@ -2895,7 +2887,7 @@ class SyncCtoModuleClient extends BackendModule
 
                     $this->objStepPool->zipname = $this->objSyncCtoCommunicationClient->runDatabaseDump($this->arrSyncSettings['syncCto_SyncTables'], true, true);
 
-                    $this->objData->setDescription($GLOBALS['TL_LANG']['tl_syncCto_sync']["step_4"]['description_2']);
+                    $this->objData->setDescription($GLOBALS['TL_LANG']['tl_syncCto_sync']['step_4']['description_2']);
                     $this->objStepPool->step++;
 
                     break;
@@ -2914,7 +2906,7 @@ class SyncCtoModuleClient extends BackendModule
                         throw new Exception(vsprintf($GLOBALS['TL_LANG']['ERR']['unknown_file'], $strFrom));
                     }
 
-                    $this->objData->setDescription($GLOBALS['TL_LANG']['tl_syncCto_sync']["step_4"]['description_3']);
+                    $this->objData->setDescription($GLOBALS['TL_LANG']['tl_syncCto_sync']['step_4']['description_3']);
                     $this->objStepPool->step++;
 
                     break;
@@ -2963,7 +2955,7 @@ class SyncCtoModuleClient extends BackendModule
                             ->execute(serialize($arrLastTableTimestamp), $this->intClientID);
 
                     $this->objData->setState($GLOBALS['TL_LANG']['MSC']['ok']);
-                    $this->objData->setDescription($GLOBALS['TL_LANG']['tl_syncCto_sync']["step_4"]['description_4']);
+                    $this->objData->setDescription($GLOBALS['TL_LANG']['tl_syncCto_sync']['step_4']['description_4']);
 
                     $this->intStep++;
 

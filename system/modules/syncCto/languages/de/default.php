@@ -100,6 +100,13 @@ $GLOBALS['TL_LANG']['MSC']['disabled_cache']                = 'Aktuelle Einträg
 $GLOBALS['TL_LANG']['MSC']['submit_files']                  = 'Dateien transferieren';
 $GLOBALS['TL_LANG']['MSC']['delete_files']                  = 'Ausgewählte Dateien aus der Liste entfernen';
 $GLOBALS['TL_LANG']['MSC']['submit_database']               = 'Datenbank transferieren';
+$GLOBALS['TL_LANG']['MSC']['client']                        = 'Client';
+$GLOBALS['TL_LANG']['MSC']['server']                        = 'Server';
+$GLOBALS['TL_LANG']['MSC']['difference']                    = 'Differenz';
+$GLOBALS['TL_LANG']['MSC']['recom_tables']                  = 'Empfohlene Datenbank-Tabellen';
+$GLOBALS['TL_LANG']['MSC']['nonrecom_tables']               = 'Nicht empfohlene Datenbank-Tabellen';
+$GLOBALS['TL_LANG']['MSC']['db_entry']                      = ' Eintrag';
+$GLOBALS['TL_LANG']['MSC']['db_entries']                    = ' Einträge';
 
 /**
  * Buttons

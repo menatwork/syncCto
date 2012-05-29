@@ -47,10 +47,11 @@ $GLOBALS['TL_LANG']['tl_syncCto_sync']['step_3']['description_4']   = '%s von %s
 $GLOBALS['TL_LANG']['tl_syncCto_sync']['step_3']['description_5']   = 'Große Dateien zusammenbauen.';
 $GLOBALS['TL_LANG']['tl_syncCto_sync']['step_3']['description_6']   = '%s von %s großen Datei(en) wurden erfolgreich verarbeitet.';
 
-$GLOBALS['TL_LANG']['tl_syncCto_sync']['step_4']['description_1']   = 'SQL-Scripte erstellen.';
-$GLOBALS['TL_LANG']['tl_syncCto_sync']['step_4']['description_2']   = 'SQL-Scripte transferieren.';
-$GLOBALS['TL_LANG']['tl_syncCto_sync']['step_4']['description_3']   = 'SQL-Scripte importieren.';
-$GLOBALS['TL_LANG']['tl_syncCto_sync']['step_4']['description_4']   = 'SQL-Scripte wurden erfolgreich verarbeitet.';
+$GLOBALS['TL_LANG']['tl_syncCto_sync']['step_4']['description_1']   = 'Abgleich der Datenbanken.';
+$GLOBALS['TL_LANG']['tl_syncCto_sync']['step_4']['description_2']   = 'SQL-Scripte erstellen.';
+$GLOBALS['TL_LANG']['tl_syncCto_sync']['step_4']['description_3']   = 'SQL-Scripte transferieren.';
+$GLOBALS['TL_LANG']['tl_syncCto_sync']['step_4']['description_4']   = 'SQL-Scripte importieren.';
+$GLOBALS['TL_LANG']['tl_syncCto_sync']['step_4']['description_5']   = 'SQL-Scripte wurden erfolgreich verarbeitet.';
 
 $GLOBALS['TL_LANG']['tl_syncCto_sync']['step_5']['description_1']   = 'Dateien importieren.';
 $GLOBALS['TL_LANG']['tl_syncCto_sync']['step_5']['description_2']   = 'Konfigurationsdateien importieren.';

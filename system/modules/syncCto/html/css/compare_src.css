@@ -1,5 +1,9 @@
 /* Copyright (c) MEN AT WORK 2012 :: LGPL license */
 
+  body {
+    overflow-y:scroll;
+  }
+
   #container {
     width:100%;
     margin:0 auto;
@@ -7,12 +11,20 @@
     overflow:hidden;
   }
   
+  #main {
+    width:97%;
+    margin-left:1.5%;
+  }
+  
  /*------------------------------------------------------------------------*/
 
-  #syncCto_filelist, 
-  #syncCto_dblist {
+  .comparelist, h3 {
 	clear:both;
 	width:100%;
+  }
+  
+  #db-recommended {
+    margin-bottom:30px;
   }
   
   th, 
@@ -33,12 +45,26 @@
 	padding-left:9px;
   }
   
-  #syncCto_filelist th {
+  .comparelist th {
 	background-image:url(../js/images/sorting.png);
 	background-repeat:no-repeat;
 	background-position:6px 10px;
 	padding-left:19px;
 	cursor:pointer;
+  }
+  
+  #db-nonrecommended th, 
+  #db-recommended th {
+	background-image:none;
+	padding-left:9px;
+	cursor:default;
+  }
+
+  #db-recommended th.checkbox, 
+  #db-recommended td.checkbox ,
+  #db-nonrecommended th.checkbox, 
+  #db-nonrecommended td.checkbox {
+	padding-left:4px;
   }
   
   th.table-th-sort {
@@ -51,6 +77,7 @@
   
   th.checkbox {
 	background-image:none;
+    padding-left:0;
   }
   
   th span {
@@ -63,9 +90,10 @@
   
   td.checkbox {
 	text-align:center;
+    padding-left:0;
   }
   
-  #syncCto_filelist .tl_checkbox {
+  #filelist .tl_checkbox {
 	margin:0;
   }
   
@@ -77,7 +105,9 @@
 	background-color:#F0F0F0;
   }
   
-  td.diff, th.diff {
+  td.diff, 
+  #db-nonrecommended th.diff, 
+  #db-recommended th.diff {
 	text-align:center;
     padding:0;
   }
@@ -95,6 +125,10 @@
   
   .submit_container {
 	float:left;
+  }
+  
+  .bottom.submit_container {
+	margin-top:10px;
   }
   
   .tl_submit {
