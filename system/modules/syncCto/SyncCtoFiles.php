@@ -606,28 +606,48 @@ class SyncCtoFiles extends Backend
     /**
      * Unzip files
      * 
-     * @param string $strRestoreFile
-     * @return void 
+     * @param string $strRestoreFile Path to the zip file
+     * @return mixes True - If ervething is okay, Array - If some files could not be extract to a given path.
+     * @throws Exception if the zip file was not able to open.
      */
     public function runRestore($strRestoreFile)
-    {
+    {        
         $objZipArchive = new ZipArchiveCto();
 
         if (($mixError = $objZipArchive->open($strRestoreFile)) !== true)
         {
             throw new Exception($GLOBALS['TL_LANG']['MSC']['error'] . ": " . $objZipArchive->getErrorDescription($mixError));
         }
-
+        
         if ($objZipArchive->numFiles == 0)
         {
             return;
         }
+        
+       
 
-        $objZipArchive->extractTo("");
+        $arrErrorFiles = array();
+
+        for ($i = 0; $i < $objZipArchive->numFiles; $i++)
+        {
+            $filename = $objZipArchive->getNameIndex($i);
+            
+            if (!$objZipArchive->extractTo("/", $filename))
+            {
+                $arrErrorFiles[] = $filename;
+            }
+        }
 
         $objZipArchive->close();
 
-        return;
+        if (count($arrErrorFiles) == 0)
+        {
+            return true;
+        }
+        else
+        {
+            return $arrErrorFiles;
+        }
     }
 
     /* -------------------------------------------------------------------------
