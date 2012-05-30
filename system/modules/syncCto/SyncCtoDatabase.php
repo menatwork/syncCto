@@ -1187,7 +1187,7 @@ class SyncCtoDatabase extends Backend
      * 
      * @return array 
      */
-    private function getTableStructure($strTableName)
+    public function getTableStructure($strTableName)
     {
         $return = array();
 
