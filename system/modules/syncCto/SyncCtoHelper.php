@@ -568,10 +568,9 @@ class SyncCtoHelper extends Backend
     /**
      * Returns a list with recommended database tables
      *
-     * @param array $arrTimestampLast A timestamp list for checking timestamp
      * @return array
      */
-    public function databaseTablesRecommended($arrTimestampLast = null)
+    public function databaseTablesRecommended()
     {
         // Recommended tables
         $arrBlacklist = deserialize($GLOBALS['TL_CONFIG']['syncCto_database_tables']);
@@ -582,14 +581,7 @@ class SyncCtoHelper extends Backend
 
         $arrTablesPermission = $this->BackendUser->syncCto_tables;
 
-        if($arrTimestampLast != null && is_array($arrTimestampLast))
-        {
-            $arrTables = array('tables_changes' => array(), 'tables_no_changes' => array());
-        }
-        else
-        {
-            $arrTables = array();
-        }
+        $arrTables = array();
 
         foreach ($this->databaseTables() as $key => $value)
         {
@@ -603,36 +595,7 @@ class SyncCtoHelper extends Backend
                 continue;
             }
 
-            if ($arrTimestampLast != null && is_array($arrTimestampLast))
-            {                
-                if ($arrTimestampLast[$value] == $this->getDatabaseTablesTimestamp($value))
-                {
-                    $arrTables["tables_no_changes"][$value] = $this->getTableMeta($value);
-                }
-                else
-                {
-                    $arrTables["tables_changes"][$value] = $this->getTableMeta($value);
-                }
-            }
-            else
-            {
-                $arrTables[$value] = $this->getTableMeta($value);
-            }
-        }
-
-        if ($arrTimestampLast != null && is_array($arrTimestampLast))
-        {
-            if (count($arrTables["tables_changes"]) == 0 || count($arrTables["tables_no_changes"]) == 0)
-            {
-                if (count($arrTables["tables_no_changes"]) == 0)
-                {
-                    return $arrTables["tables_changes"];
-                }
-                else
-                {
-                    return $arrTables["tables_no_changes"];
-                }
-            }
+            $arrTables[$value] = $this->getTableMeta($value);
         }
 
         return $arrTables;
@@ -641,10 +604,9 @@ class SyncCtoHelper extends Backend
     /**
      * Returns a list with none recommended database tables
      *
-     * @param array $arrTimestampLast A timestamp list for checking timestamp
      * @return array
      */
-    public function databaseTablesNoneRecommended($arrTimestampLast = null)
+    public function databaseTablesNoneRecommended()
     {
         // None recommended tables
         $arrBlacklist = deserialize($GLOBALS['TL_CONFIG']['syncCto_database_tables']);
@@ -655,14 +617,7 @@ class SyncCtoHelper extends Backend
 
         $arrTablesPermission = $this->BackendUser->syncCto_tables;
 
-        if($arrTimestampLast != null && is_array($arrTimestampLast))
-        {
-            $arrTables = array('tables_changes' => array(), 'tables_no_changes' => array());
-        }
-        else
-        {
-            $arrTables = array();
-        }
+        $arrTables = array();
 
         foreach ($this->databaseTables() as $key => $value)
         {
@@ -676,36 +631,7 @@ class SyncCtoHelper extends Backend
                 continue;
             }
 
-            if ($arrTimestampLast != null && is_array($arrTimestampLast))
-            {
-                if ($arrTimestampLast[$value] == $this->getDatabaseTablesTimestamp($value))
-                {
-                    $arrTables["tables_no_changes"][$value] = $this->getTableMeta($value);
-                }
-                else
-                {
-                    $arrTables["tables_changes"][$value] = $this->getTableMeta($value);
-                }
-            }
-            else
-            {
-                $arrTables[$value] = $this->getTableMeta($value);
-            }
-        }
-
-        if ($arrTimestampLast != null && is_array($arrTimestampLast))
-        {
-            if (count($arrTables["tables_changes"]) == 0 || count($arrTables["tables_no_changes"]) == 0)
-            {
-                if (count($arrTables["tables_no_changes"]) == 0)
-                {
-                    return $arrTables["tables_changes"];
-                }
-                else
-                {
-                    return $arrTables["tables_no_changes"];
-                }
-            }
+            $arrTables[$value] = $this->getTableMeta($value);
         }
 
         return $arrTables;
@@ -858,7 +784,7 @@ class SyncCtoHelper extends Backend
         // Load all Tables
         $arrTables = $this->Database->listTables();
         
-        $objDBSchema = $this->Database->prepare("SELECT TABLE_NAME, UPDATE_TIME FROM information_schema.TABLES WHERE TABLE_SCHEMA = ?")->execute($GLOBALS['TL_CONFIG']['dbDatabase']);
+        $objDBSchema = $this->Database->prepare("SELECT TABLE_NAME, UPDATE_TIME FROM information_schema.TABLES WHERE TABLE_SCHEMA = ?")->executeUncached($GLOBALS['TL_CONFIG']['dbDatabase']);
         
         $arrDBSchema = array();
         while($objDBSchema->next())

@@ -18,12 +18,14 @@
   
  /*------------------------------------------------------------------------*/
 
-  .comparelist, h3 {
+  .comparelist, h3, 
+  form, .formbody {
 	clear:both;
 	width:100%;
+    overflow:hidden;
   }
   
-  #db-recommended {
+  #recommended {
     margin-bottom:30px;
   }
   
@@ -53,17 +55,15 @@
 	cursor:pointer;
   }
   
-  #db-nonrecommended th, 
-  #db-recommended th {
+  #db_form th, 
+  #db_form th {
 	background-image:none;
 	padding-left:9px;
 	cursor:default;
   }
 
-  #db-recommended th.checkbox, 
-  #db-recommended td.checkbox ,
-  #db-nonrecommended th.checkbox, 
-  #db-nonrecommended td.checkbox {
+  #db_form th.checkbox, 
+  #db_form td.checkbox {
 	padding-left:4px;
   }
   
@@ -80,12 +80,28 @@
     padding-left:0;
   }
   
+  td img {
+	float:left;
+    margin-right:5px;
+  }
+  
   th span {
 	display:none;
   }
   
   td {
 	background-color:#F9F9F9;
+    padding-left:9px;
+  }
+  
+  #db_form td.col_1, 
+  #db_form td.col_2 {
+    padding-left:5px;
+  }
+  
+  #db_form td.col_1.none, 
+  #db_form td.col_2.none {
+    padding-left:9px;
   }
   
   td.checkbox {
@@ -97,20 +113,27 @@
 	margin:0;
   }
   
-  td {
-	padding-left:9px;
-  }
-  
   td.state {
 	background-color:#F0F0F0;
   }
   
+  td.changed, p.changed {
+	background-color:#D8F9D8;
+  }
+  
+  td.changed-both, p.changed-both {
+	background-color:#F8F4A0;
+  }  
+
+  td.unchanged, p.unchanged {
+	background-color:#F9D8D8;
+  }
+  
   td.diff, 
-  #db-nonrecommended th.diff, 
-  #db-recommended th.diff {
+  #db_form th.diff {
 	text-align:center;
     padding:0;
-  }
+  }  
   
   td.last {
 	text-align:left;
@@ -121,6 +144,18 @@
 	text-align:right;
 	padding-right:10px;
     padding-left:0;
+  }
+  
+  #legend {
+    float:right;
+    margin-top:6px;
+  }
+  
+  #legend p {
+    float:left;
+    margin-left:10px;
+    margin-bottom:0;
+    padding:2px 10px;
   }
   
   .submit_container {

@@ -10,17 +10,17 @@
         });
     </script>
     <?php else: ?>
-        <p><?php echo $this->text; ?></p>
+        <p class="tl_error"><?php echo $this->text; ?></p>
         <?php if(count($this->arrError) > 0): ?>
         <?php foreach($this->arrError AS $error): ?>
-            <p class="tl_error"><?php echo $error; ?></p>            
+            <p class="tl_error"><?php echo $error; ?></p>
         <?php endforeach; ?>
-        <?php endif; ?>        
+        <?php endif; ?>
     <?php endif; ?>
 
 <?php else: ?>
-    
-<form id="syncCto_db_form" action="<?php echo $this->Environment->base; ?>contao/popupSyncDB.php?id=<?php echo $this->id; ?>&amp;step=<?php echo $this->step; ?>" method="post">
+            
+<form id="db_form" action="<?php echo $this->Environment->base; ?>contao/popupSyncDB.php?id=<?php echo $this->id; ?>&amp;step=<?php echo $this->step; ?>" method="post">
     <div class="formbody">
         <input type="hidden" name="FORM_SUBMIT" value="<?php echo $this->formId; ?>" />        
         <input type="hidden" name="REQUEST_TOKEN" value="<?php echo REQUEST_TOKEN; ?>">
@@ -28,71 +28,53 @@
         <div class="submit_container">
             <input class="tl_submit" name="transfer" type="submit" value="<?php echo $GLOBALS['TL_LANG']['MSC']['submit_database']; ?>" />
         </div>
-    </div>
+        
+        <div id="legend">
+            <p class="changed">Geändert</p>
+            <p class="unchanged">Nicht geändert</p>
+            <p class="changed-both">Beide geändert</p>
+        </div>
     
-    <h3>Empfohlende Datenbank-Tabellen</h3>
-    
-    <table class="comparelist" id="db-recommended">
-    <colgroup>
-        <col width="20px" />
-        <col width="38%" />
-        <col width="*" />
-        <col width="38%" />
-    </colgroup>
-    <thead>
-        <tr class="head">
-            <th class="checkbox"><input class="tl_checkbox" onclick="Backend.toggleCheckboxGroup(this, 'db-recommended')" type="checkbox" /></th>
-            <th class="client"><?php echo $GLOBALS['TL_LANG']['MSC']['client']; ?></th>
-            <th class="diff"><?php echo $GLOBALS['TL_LANG']['MSC']['difference']; ?></th>
-            <th class="server"><?php echo $GLOBALS['TL_LANG']['MSC']['server']; ?></th>
-        </tr>
-    </thead>
-    <tbody>
-        <?php foreach($this->arrCompareList AS $strTableName => $arrCompareTable): ?>   
-            <?php if($arrCompareTable['state'] == 'recommended'): ?>
-            <tr>
-                <td class="checkbox"><?php if($arrCompareTable['server'] != '-'): ?><input type="checkbox" class="tl_checkbox" name="serverTables[]" value="<?php echo $strTableName; ?>" /><?php endif; ?></td>
-                <td><?php echo $arrCompareTable['server']; ?></td>
-                <td class="diff"><?php echo $arrCompareTable['diff']; ?></td>
-                <td><?php echo $arrCompareTable['client']; ?></td>
+        <?php foreach($this->arrStatesCompareList AS $strState => $arrCompareList): ?>
+        <h3><?php echo ($strState == 'recommended') ? $GLOBALS['TL_LANG']['MSC']['recom_tables'] : $GLOBALS['TL_LANG']['MSC']['nonrecom_tables']; ?></h3>
+        <table class="comparelist" id="<?php echo ($strState == 'recommended') ? 'recommended' : 'nonrecommended'; ?>">
+        <colgroup>
+            <col width="20px" />
+            <col width="40%" />
+            <col width="40%" />
+            <col width="*" />
+        </colgroup>
+        <thead>
+            <tr class="head">
+                <th class="checkbox"><input class="tl_checkbox" onclick="Backend.toggleCheckboxGroup(this, '<?php echo ($strState == 'recommended') ? 'recommended' : 'nonrecommended'; ?>')" type="checkbox" /></th>
+                <th class="client"><?php echo $GLOBALS['TL_LANG']['MSC']['client']; ?></th>
+                <th class="server"><?php echo $GLOBALS['TL_LANG']['MSC']['server']; ?></th>
+                <th class="diff"><?php echo $GLOBALS['TL_LANG']['MSC']['difference']; ?></th>
             </tr>
-            <?php endif; ?>
-        <?php endforeach; ?>        
-    </tbody>
-    </table>
+        </thead>
+        <tbody>
+            <?php foreach($arrCompareList AS $strTableName => $arrCompareTable): ?>   
+                <tr>
+                    <td class="col_0 checkbox"><?php if($arrCompareTable['server'] != '-'): ?><input type="checkbox" class="tl_checkbox" name="serverTables[]" value="<?php echo $strTableName; ?>" /><?php endif; ?></td>
+                    <td class="col_1 <?php echo $arrCompareTable['client']['class']; ?>">
+                        <?php if ($arrCompareTable['client']['name'] != '-'): ?><img src="<?php echo $this->Environment->base; ?>system/modules/syncCto/html/iconInformation.png" alt="tooltip" title="<?php echo $arrCompareTable['client']['tooltip']; ?>" /><?php endif; ?>
+                        <?php echo $arrCompareTable['client']['name']; ?>
+                    </td>
+                    <td class="col_2 <?php echo $arrCompareTable['server']['class']; ?>">
+                        <?php if ($arrCompareTable['server']['name'] != '-'): ?><img src="<?php echo $this->Environment->base; ?>system/modules/syncCto/html/iconInformation.png" alt="tooltip" title="<?php echo $arrCompareTable['server']['tooltip']; ?>" /><?php endif; ?>
+                        <?php echo $arrCompareTable['server']['name']; ?>
+                    </td>
+                    <td class="col_3 diff"><?php echo $arrCompareTable['diff']; ?></td>
+                </tr>
+            <?php endforeach; ?>        
+        </tbody>
+        </table>    
+        <?php endforeach; ?> 
+        
+        <div class="bottom submit_container">
+            <input class="tl_submit" name="transfer" type="submit" value="<?php echo $GLOBALS['TL_LANG']['MSC']['submit_database']; ?>" />
+        </div>
     
-    <h3>Nicht empfohlende Datenbank-Tabellen</h3>
-    <table class="comparelist" id="db-nonrecommended">
-    <colgroup>
-        <col width="20px" />
-        <col width="38%" />
-        <col width="*" />
-        <col width="38%" />
-    </colgroup>
-    <thead>
-        <tr class="head">
-            <th class="checkbox"><input class="tl_checkbox" onclick="Backend.toggleCheckboxGroup(this, 'db-nonrecommended')" type="checkbox" /></th>
-            <th class="client"><?php echo $GLOBALS['TL_LANG']['MSC']['client']; ?></th>
-            <th class="diff"><?php echo $GLOBALS['TL_LANG']['MSC']['difference']; ?></th>
-            <th class="server"><?php echo $GLOBALS['TL_LANG']['MSC']['server']; ?></th>
-        </tr>
-    </thead>
-    <tbody>
-        <?php foreach($this->arrCompareList AS $strTableName => $arrCompareTable): ?>
-            <?php if($arrCompareTable['state'] == 'nonRecommended'): ?>
-            <tr>
-                <td class="checkbox"><?php if($arrCompareTable['server'] != '-'): ?><input type="checkbox" class="tl_checkbox" name="serverTables[]" value="<?php echo $strTableName; ?>" /><?php endif; ?></td>
-                <td><?php echo $arrCompareTable['server']; ?></td>
-                <td class="diff"><?php echo $arrCompareTable['diff']; ?></td>
-                <td><?php echo $arrCompareTable['client']; ?></td>
-            </tr>
-            <?php endif; ?>
-        <?php endforeach; ?>        
-    </tbody>
-    </table>    
-    
-    <div class="bottom submit_container">
-        <input class="tl_submit" name="transfer" type="submit" value="<?php echo $GLOBALS['TL_LANG']['MSC']['submit_database']; ?>" />
     </div>
     
 </form>
