@@ -140,6 +140,7 @@ $GLOBALS['SYC_CONFIG']['file_blacklist'] = array(
 $GLOBALS['SYC_CONFIG']['local_blacklist'] = array(   
     'websitePath',
     'installPassword',
+    'disableRefererCheck',
     'encryptionKey',
     'dbDriver',
     'dbHost',

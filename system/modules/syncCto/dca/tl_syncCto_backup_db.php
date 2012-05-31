@@ -141,14 +141,7 @@ class tl_syncCto_backup_db extends Backend
      * @return array
      */
     public function onsubmit_callback(DataContainer $dc)
-    {    
-        // Check Table list
-        if ($this->Input->post("database_tables_recommended") == "" && $this->Input->post("database_tables_none_recommended") == "")
-        {
-            $_SESSION["TL_ERROR"][] = $GLOBALS['TL_LANG']['ERR']['missing_tables_selection'];
-            $this->redirect($this->Environment->base . "contao/main.php?do=syncCto_backups&table=tl_syncCto_backup_db");
-        }
-        
+    {        
         $arrBackupSettings = array();
 
         // Merge recommend and none recommend post arrays
@@ -166,8 +159,33 @@ class tl_syncCto_backup_db extends Backend
         }
 
         $this->Session->set("syncCto_BackupSettings", $arrBackupSettings);
-
-        $this->redirect($this->Environment->base . "contao/main.php?do=syncCto_backups&table=tl_syncCto_backup_db&act=start");
+        
+        $arrPostUnset = array('FORM_SUBMIT', 'FORM_FIELDS', 'REQUEST_TOKEN', 'start_backup');
+        $arrPost = $_POST;
+        
+        foreach($arrPostUnset AS $value)
+        {
+            if(array_key_exists($value, $arrPost))
+            {
+                unset($arrPost[$value]);
+            }
+        }
+        
+        if(count($arrPost) > 0)
+        {
+            if (array_key_exists('syncCto_submit_false', $_SESSION["TL_ERROR"]))
+            {
+                unset($_SESSION["TL_ERROR"]['syncCto_submit_false']);
+            }
+            $this->redirect($this->Environment->base . "contao/main.php?do=syncCto_backups&table=tl_syncCto_backup_db&act=start");
+        }
+        else
+        {
+            if(!array_key_exists('syncCto_submit_false', $_SESSION["TL_ERROR"]))
+            {
+                $_SESSION["TL_ERROR"]['syncCto_submit_false'] = $GLOBALS['TL_LANG']['ERR']['missing_tables_selection'];
+            }
+        }  
     }
 
     /**

@@ -227,7 +227,7 @@ class tl_synccto_clients extends Backend
      */
     public function checkClientStatus()
     {
-        $GLOBALS['TL_JAVASCRIPT'][] = 'system/modules/syncCto/html/js/ping_src.js';        
+        $GLOBALS['TL_JAVASCRIPT'][] = 'system/modules/syncCto/html/js/ping.js';        
     }
 
     /**
