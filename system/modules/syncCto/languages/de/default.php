@@ -30,7 +30,6 @@
 /**
  * Reference
  */
-// Sync
 $GLOBALS['TL_LANG']['SYC']['core']                          = 'Contao-Installation';
 $GLOBALS['TL_LANG']['SYC']['core_change']                   = 'Veränderte Dateien';
 $GLOBALS['TL_LANG']['SYC']['core_delete']                   = 'Gelöschte Dateien';
@@ -40,7 +39,6 @@ $GLOBALS['TL_LANG']['SYC']['user_delete']                   = 'Gelöschte Dateie
 $GLOBALS['TL_LANG']['SYC']['configfiles']                   = 'Konfigurationsdateien';
 $GLOBALS['TL_LANG']['SYC']['localconfig_update']            = 'Alle Einträge aktualisieren';
 $GLOBALS['TL_LANG']['SYC']['localconfig_errors']            = 'Fehlermeldungen anzeigen';
-// Maintenance options  
 $GLOBALS['TL_LANG']['SYC']['options']                       = 'Optionen';    
 $GLOBALS['TL_LANG']['SYC']['search_index']                  = 'Suchindex neu aufbauen';    
 $GLOBALS['TL_LANG']['SYC']['temp_tables']                   = 'Temporäre DB-Tabellen leeren';    
@@ -55,7 +53,6 @@ $GLOBALS['TL_LANG']['MSC']['edit']                          = 'Bearbeiten';
 $GLOBALS['TL_LANG']['MSC']['copy']                          = 'Duplizieren';
 $GLOBALS['TL_LANG']['MSC']['syncTo']                        = 'Client synchronisieren';
 $GLOBALS['TL_LANG']['MSC']['syncFrom']                      = 'Server synchronisieren';
-
 $GLOBALS['TL_LANG']['MSC']['restore_backup']                = 'Backup einspielen';
 $GLOBALS['TL_LANG']['MSC']['start_backup']                  = 'Backup starten';
 
@@ -82,8 +79,6 @@ $GLOBALS['TL_LANG']['MSC']['debug_mode']                    = 'Debugausgaben';
 /**
  * Compare list
  */
-$GLOBALS['TL_LANG']['MSC']['select_all_files']              = 'Alle Dateien auswählen';
-$GLOBALS['TL_LANG']['MSC']['sync_info']                     = 'Bitte schließen Sie während der gesamten Synchronisation nicht das aktuelle Fenster.';
 $GLOBALS['TL_LANG']['MSC']['state']                         = 'Status';
 $GLOBALS['TL_LANG']['MSC']['filesize']                      = 'Dateigröße';
 $GLOBALS['TL_LANG']['MSC']['file']                          = 'Datei';
@@ -138,16 +133,10 @@ $GLOBALS['TL_LANG']['ERR']['cant_delete_file']              = 'Fehler beim Lösc
 $GLOBALS['TL_LANG']['ERR']['attention_headline']            = 'Achtung bei Änderungen am System';
 $GLOBALS['TL_LANG']['ERR']['attention_text']                = 'Es werden zurzeit Aktualisierungen im Hintergrund durchgeführt, die dazu führen könnten das Änderungen auf dieser Installation überschrieben werden.';
 $GLOBALS['TL_LANG']['ERR']['min_size_limit']                = 'Die minimale Dateigröße von s% wurde unterschritten.';
-
-// Database
 $GLOBALS['TL_LANG']['ERR']['missing_tables_selection']      = 'Es wurde(n) keine Tabell(en) ausgewählt.';
-
-// Functions
 $GLOBALS['TL_LANG']['ERR']['unknown_backup_method']         = 'Die gewählte Backup Methode ist nicht bekannt.';
 $GLOBALS['TL_LANG']['ERR']['unknown_function']              = 'Unbekannte Funktion oder Methode.';
 $GLOBALS['TL_LANG']['ERR']['64Bit_error']                   = 'Zahlen überlauf. Versuchen Sie bitte einen 64Bit Version von PHP.';
-
-// Client
 $GLOBALS['TL_LANG']['ERR']['maximum_filesize']              = 'Zu große Datei(en):';
 $GLOBALS['TL_LANG']['ERR']['call_directly']                 = 'Versuchen Sie nicht die Synchronisation direkt aufzurufen.';
 $GLOBALS['TL_LANG']['ERR']['client_set']                    = 'Kommunikation zwischen Server und Client fehlgeschlagen';

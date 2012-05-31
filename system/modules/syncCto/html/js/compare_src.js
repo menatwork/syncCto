@@ -33,6 +33,41 @@ window.addEvent("domready",function(){
         });	
     });
 
-   var myHtmlTable = new HtmlTable($('filelist'), {sortable: true, sortIndex: 3, sortReverse: true});
+    if(window.HtmlTable)
+    {
+        $$('body').addClass('table-sort');
+        
+        HtmlTable.defineParsers({
+            dimension: {
+                match: '.*(Bytes|kB|mB|gB)',
+                convert: function(){
+                    var strDimension = this.get('text').replace(/.*(\d|,| )/, '').toString().toLowerCase();
+                    var floatVal = this.get('text').replace(',', '.').toFloat();
+
+                    if(strDimension == "kb")
+                    {
+                        floatVal = floatVal * 1024;
+                    }
+                    else if(strDimension == "mb")
+                    {
+                        floatVal = floatVal*[Math.pow(1024,2)];
+                    }
+                    else if(strDimension == "gb")
+                    {
+                        floatVal = floatVal*[Math.pow(1024,3)];
+                    }
+
+                    return floatVal;
+                },
+                number: true
+            }
+        });    
+
+        var myHtmlTable = new HtmlTable($('filelist'), {
+                sortIndex: 0,
+                parsers: ['string', 'dimension', 'string'],
+                sortable: true
+        }).enableSort({sortable: true, sortIndex: 0});
+    }
 
 });

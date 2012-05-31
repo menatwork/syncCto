@@ -47,7 +47,7 @@
 	padding-left:9px;
   }
   
-  .comparelist th {
+  .table-sort .comparelist th {
 	background-image:url(../js/images/sorting.png);
 	background-repeat:no-repeat;
 	background-position:6px 10px;
@@ -75,7 +75,7 @@
 	background-position:6px -26px;
   }
   
-  th.checkbox {
+  .table-sort th.checkbox {
 	background-image:none;
     padding-left:0;
   }
@@ -104,7 +104,7 @@
     padding-left:9px;
   }
   
-  td.checkbox {
+  td.checkbox, th.checkbox {
 	text-align:center;
     padding-left:0;
   }
