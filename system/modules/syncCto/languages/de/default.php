@@ -80,7 +80,7 @@ $GLOBALS['TL_LANG']['MSC']['comparelist']                   = 'Vergleichsliste';
 $GLOBALS['TL_LANG']['MSC']['debug_mode']                    = 'Debugausgaben';
 
 /**
- * Filelist
+ * Compare list
  */
 $GLOBALS['TL_LANG']['MSC']['select_all_files']              = 'Alle Dateien auswählen';
 $GLOBALS['TL_LANG']['MSC']['sync_info']                     = 'Bitte schließen Sie während der gesamten Synchronisation nicht das aktuelle Fenster.';
@@ -95,10 +95,21 @@ $GLOBALS['TL_LANG']['MSC']['deleted_file']                  = 'Gelöscht';
 $GLOBALS['TL_LANG']['MSC']['big_files']                     = 'Groß';
 $GLOBALS['TL_LANG']['MSC']['skipped_files']                 = 'Übersprungen';
 $GLOBALS['TL_LANG']['MSC']['ignored_files']                 = 'Ignoriert';
-$GLOBALS['TL_LANG']['MSC']['submit_files']                  = 'Dateien transferieren';
-$GLOBALS['TL_LANG']['MSC']['delete_files']                  = 'Ausgewählte Dateien aus der Liste entfernen';
 $GLOBALS['TL_LANG']['MSC']['last_sync']                     = 'Die letzte Synchronisierung wurde um %s am %s von %s (%s) durchgeführt.';
 $GLOBALS['TL_LANG']['MSC']['disabled_cache']                = 'Aktuelle Einträge in der "initconfig.php" beeinträchtigen eine erfolgreiche Synchronisierung.';
+$GLOBALS['TL_LANG']['MSC']['submit_files']                  = 'Dateien transferieren';
+$GLOBALS['TL_LANG']['MSC']['delete_files']                  = 'Ausgewählte Dateien aus der Liste entfernen';
+$GLOBALS['TL_LANG']['MSC']['submit_database']               = 'Datenbank transferieren';
+$GLOBALS['TL_LANG']['MSC']['client']                        = 'Client';
+$GLOBALS['TL_LANG']['MSC']['server']                        = 'Server';
+$GLOBALS['TL_LANG']['MSC']['difference']                    = 'Differenz';
+$GLOBALS['TL_LANG']['MSC']['recom_tables']                  = 'Empfohlene Datenbank-Tabellen';
+$GLOBALS['TL_LANG']['MSC']['nonrecom_tables']               = 'Nicht empfohlene Datenbank-Tabellen';
+$GLOBALS['TL_LANG']['MSC']['db_entry']                      = ' Eintrag';
+$GLOBALS['TL_LANG']['MSC']['db_entries']                    = ' Einträge';
+$GLOBALS['TL_LANG']['MSC']['changed']                       = 'Geändert';
+$GLOBALS['TL_LANG']['MSC']['unchanged']                     = 'Nicht geändert';
+$GLOBALS['TL_LANG']['MSC']['changed_both']                  = 'Beide geändert';
 
 /**
  * Buttons

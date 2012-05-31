@@ -361,6 +361,14 @@ $GLOBALS["CTOCOM_FUNCTIONS"]["SYNCCTO_CHECK_DELETE_FILE"] = array(
     "parameter" => array("md5", "file"),
 );
 
+// Get client timestamp
+$GLOBALS["CTOCOM_FUNCTIONS"]["SYNCCTO_TIMESTAMP"] = array(
+    "class" => "SyncCtoHelper",
+    "function" => "getDatabaseTablesTimestamp",
+    "typ" => "POST",
+    "parameter" => array("TableList"),
+);
+
 // Load recommended tables from client
 $GLOBALS["CTOCOM_FUNCTIONS"]["SYNCCTO_RECOMMENDED_TABLES"] = array(
     "class" => "SyncCtoHelper",

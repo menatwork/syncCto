@@ -57,14 +57,14 @@ $GLOBALS['TL_DCA']['tl_syncCto_backup_db'] = array(
             'inputType' => 'checkbox',
             'exclude' => true,
             'eval' => array('multiple' => true),
-            'options_callback' => array('SyncCtoHelper', 'databaseTablesRecommended'),
+            'options_callback' => array('tl_syncCto_backup_db', 'databaseTablesRecommended'),
         ),
         'database_tables_none_recommended' => array(
             'label' => &$GLOBALS['TL_LANG']['tl_syncCto_backup_db']['database_tables_none_recommended'],
             'inputType' => 'checkbox',
             'exclude' => true,
             'eval' => array('multiple' => true),
-            'options_callback' => array('SyncCtoHelper', 'databaseTablesNoneRecommendedWithHidden'),
+            'options_callback' => array('tl_syncCto_backup_db', 'databaseTablesNoneRecommendedWithHidden'),
         )
     )
 );
@@ -74,6 +74,42 @@ $GLOBALS['TL_DCA']['tl_syncCto_backup_db'] = array(
  */
 class tl_syncCto_backup_db extends Backend
 {
+    
+    /**
+     * Get database tables recommended array
+     * 
+     * @return array 
+     */
+    public function databaseTablesRecommended()
+    {
+        $arrTableRecommended = SyncCtoHelper::getInstance()->databaseTablesRecommended();
+        
+        $arrStyledTableRecommended = array();
+        foreach($arrTableRecommended AS $strTableName => $arrTable)
+        {
+            $arrStyledTableRecommended[$strTableName] = SyncCtoHelper::getInstance()->getStyledTableMeta($arrTable);
+        }
+        
+        return $arrStyledTableRecommended;
+    }
+    
+    /**
+     * Get database tables none recommended with hidden array
+     * 
+     * @return array 
+     */    
+    public function databaseTablesNoneRecommendedWithHidden()
+    {
+        $arrTableRecommended = SyncCtoHelper::getInstance()->databaseTablesNoneRecommendedWithHidden();
+        
+        $arrStyledTableRecommended = array();
+        foreach($arrTableRecommended AS $strTableName => $arrTable)
+        {
+            $arrStyledTableRecommended[$strTableName] = SyncCtoHelper::getInstance()->getStyledTableMeta($arrTable);
+        }
+        
+        return $arrStyledTableRecommended;
+    }
 
     /**
      * Set new and remove old buttons
