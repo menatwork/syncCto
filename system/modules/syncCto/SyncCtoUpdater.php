@@ -59,7 +59,7 @@ class SyncCtoUpdater extends Backend
     protected $objSyncCtoErClient;
 
     /**
-     * @var ZipArchiveCto 
+     * @var ZipArchiveCto
      */
     protected $objZipArchive;
 
@@ -129,12 +129,12 @@ class SyncCtoUpdater extends Backend
         foreach ($this->arrFiles as $value)
         {
             $value['path'] = preg_replace("/^TL_ROOT\//i", "", $value['path'], 1);
-
+            
             if (file_exists(TL_ROOT . "/" . $value['path']))
             {
                 if (!$this->objZipArchive->addFile($value['path'], "FILES/" . $value['path']))
                 {
-                    throw new Exception("Could not at the file " . $value['path'] . " to the archive.");
+                    throw new Exception("Could not add the file " . $value['path'] . " to the archive.");
                 }
             }
         }
@@ -254,30 +254,27 @@ class SyncCtoUpdater extends Backend
 
         while (count($arrDependencies) != 0)
         {
-            $arrKeys = array_keys($arrDependencies);
-            $mixKey  = $arrKeys[0];
+            $arrEntry = array_pop($arrDependencies);
 
-            if (in_array($arrDependencies[$mixKey]['name'], $arrDependenciesDone))
+            if (in_array($arrEntry['name'], $arrDependenciesDone))
             {
-                unset($arrDependencies[$mixKey]);
                 continue;
             }
 
-            if (key_exists($arrDependencies[$mixKey]['name'], $arrInstalledExtensions))
+            if (key_exists($arrEntry['name'], $arrInstalledExtensions))
             {
-                $strExtensionName = $arrDependencies[$mixKey]['name'];
+                $strExtensionName = $arrEntry['name'];
 
                 $arrDependencies = array_merge($arrDependencies, $this->objSyncCtoErClient->getDependenciesFor($strExtensionName, $arrInstalledExtensions[$strExtensionName]['version']));
                 $this->arrFiles = array_merge($this->arrFiles, $this->objSyncCtoErClient->getFileListFor($strExtensionName, $arrInstalledExtensions[$strExtensionName]['version']));
             }
             else
             {
-                $arrDependencies = array_merge($arrDependencies, $this->objSyncCtoErClient->getDependenciesFor($arrDependencies[$mixKey]['name'], $arrDependencies[$mixKey]['version']));
-                $this->arrFiles = array_merge($this->arrFiles, $this->objSyncCtoErClient->getFileListFor($arrDependencies[$mixKey]['name'], $arrDependencies[$mixKey]['version']));
+                $arrDependencies = array_merge($arrDependencies, $this->objSyncCtoErClient->getDependenciesFor($arrEntry['name'], $arrEntry['version']));
+                $this->arrFiles = array_merge($this->arrFiles, $this->objSyncCtoErClient->getFileListFor($arrEntry['name'], $arrEntry['version']));
             }
 
-            $arrDependenciesDone[] = $arrDependencies[$mixKey]['name'];
-            unset($arrDependencies[$mixKey]);
+            $arrDependenciesDone[] = $arrEntry['name'];
         }
     }
 
@@ -300,7 +297,7 @@ class SyncCtoErClient extends RepositoryBackendModule
         $this->client = new SoapClient($this->strWSDL,
                         array(
                             'soap_version' => SOAP_1_2,
-                            'compression' => SOAP_COMPRESSION_ACCEPT | SOAP_COMPRESSION_GZIP | 1
+                            'compression' => SOAP_COMPRESSION_ACCEPT | ZLIB_ENCODING_GZIP | 1
                         )
         );
     }

@@ -1197,8 +1197,6 @@ class SyncCtoDatabase extends Backend
         // Get list of indicies
         $arrIndexes = $this->Database->prepare("SHOW INDEX FROM `$strTableName`")->executeUncached()->fetchAllAssoc();
 
-
-
         foreach ($fields as $field)
         {
             if ($field["type"] == "index")
