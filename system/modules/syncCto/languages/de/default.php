@@ -107,6 +107,9 @@ $GLOBALS['TL_LANG']['MSC']['recom_tables']                  = 'Empfohlene Datenb
 $GLOBALS['TL_LANG']['MSC']['nonrecom_tables']               = 'Nicht empfohlene Datenbank-Tabellen';
 $GLOBALS['TL_LANG']['MSC']['db_entry']                      = ' Eintrag';
 $GLOBALS['TL_LANG']['MSC']['db_entries']                    = ' Einträge';
+$GLOBALS['TL_LANG']['MSC']['changed']                       = 'Geändert';
+$GLOBALS['TL_LANG']['MSC']['unchanged']                     = 'Nicht geändert';
+$GLOBALS['TL_LANG']['MSC']['changed_both']                  = 'Beide geändert';
 
 /**
  * Buttons
