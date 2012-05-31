@@ -37,7 +37,7 @@ $GLOBALS['TL_LANG']['tl_syncCto_sync']['step_1']['description_2']   = 'Purge tem
 $GLOBALS['TL_LANG']['tl_syncCto_sync']['step_2']['description_1']   = 'Checking and transferring MD5 list.';
 $GLOBALS['TL_LANG']['tl_syncCto_sync']['step_2']['description_2']   = 'Search for deletable files.';
 $GLOBALS['TL_LANG']['tl_syncCto_sync']['step_2']['description_3']   = 'Compare MD5 list.';
-$GLOBALS['TL_LANG']['tl_syncCto_sync']['step_2']['description_4']   = '%s new, %s modified, %s deleted and %s not deliverable file(s) are found.';
+$GLOBALS['TL_LANG']['tl_syncCto_sync']['step_2']['description_4']   = '%s new, %s modified, %s deleted and %s not deliverable file(s) are found.<br />This results in a size of %s new, %s changed und %s deleted files.';
 $GLOBALS['TL_LANG']['tl_syncCto_sync']['step_2']['description_5']   = '%s large files are found.';
 
 $GLOBALS['TL_LANG']['tl_syncCto_sync']['step_3']['description_1']   = 'Process files.';

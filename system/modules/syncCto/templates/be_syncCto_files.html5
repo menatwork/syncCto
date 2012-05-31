@@ -10,20 +10,12 @@
         });
     </script>
     <?php else: ?>
-    <?php echo $this->text; ?>
+    <p class="tl_error"><?php echo $this->text; ?></p>
     <?php endif; ?>
 
 <?php else: ?>
 
-<h3><?php echo $GLOBALS['TL_LANG']['MSC']['totalsize']; ?></h3>
-
-<ul class="file">
-<li><?php echo $GLOBALS['TL_LANG']['MSC']['new_file']; ?>: ~ <?php echo $this->getReadableSize($this->totalsizeNew); ?></li>
-<li><?php echo $GLOBALS['TL_LANG']['MSC']['modified_file']; ?>: ~ <?php echo $this->getReadableSize($this->totalsizeChange); ?></li>
-<li><?php echo $GLOBALS['TL_LANG']['MSC']['deleted_file']; ?>: ~ <?php echo $this->getReadableSize($this->totalsizeDel); ?></li>
-</ul>
-
-<form id="syncCto_filelist_form" action="<?php echo $this->Environment->base; ?>contao/popupSyncFiles.php?id=<?php echo $this->id; ?>&amp;step=<?php echo $this->step; ?>" method="post">
+<form id="filelist_form" action="<?php echo $this->Environment->base; ?>contao/popupSyncFiles.php?id=<?php echo $this->id; ?>&amp;step=<?php echo $this->step; ?>" method="post">
     <div class="formbody">
         <input type="hidden" name="FORM_SUBMIT" value="<?php echo $this->formId; ?>" />        
         <input type="hidden" name="REQUEST_TOKEN" value="<?php echo REQUEST_TOKEN; ?>">
@@ -34,8 +26,16 @@
         <div class="submit_container">         
             <input class="tl_submit" name="delete" type="submit" value="<?php echo $GLOBALS['TL_LANG']['MSC']['delete_files']; ?>" />
         </div>
+        
+        <h3><?php echo $GLOBALS['TL_LANG']['MSC']['totalsize']; ?></h3>
 
-        <table id="syncCto_filelist">
+        <ul class="file">
+        <li><?php echo $GLOBALS['TL_LANG']['MSC']['new_file']; ?>: ~ <?php echo $this->getReadableSize($this->totalsizeNew); ?></li>
+        <li><?php echo $GLOBALS['TL_LANG']['MSC']['modified_file']; ?>: ~ <?php echo $this->getReadableSize($this->totalsizeChange); ?></li>
+        <li><?php echo $GLOBALS['TL_LANG']['MSC']['deleted_file']; ?>: ~ <?php echo $this->getReadableSize($this->totalsizeDel); ?></li>
+        </ul>
+
+        <table class="comparelist" id="filelist">
             <colgroup>
                 <col width="12%" />
                 <col width="15%" />
@@ -51,7 +51,7 @@
                 </tr>
                 <tr>
                     <td colspan="2">&nbsp;</td>
-                    <td class="checkbox"><input class="tl_checkbox" onclick="Backend.toggleCheckboxGroup(this, 'syncCto_filelist')" type="checkbox" /></td>
+                    <td class="checkbox"><input class="tl_checkbox" onclick="Backend.toggleCheckboxGroup(this, 'filelist')" type="checkbox" /></td>
                     <td class="last"><?php echo $GLOBALS['TL_LANG']['MSC']['select_all_files']; ?></td>
                 </tr>
             </thead>
@@ -73,7 +73,14 @@
                 </tr>
             <?php endforeach; ?>
             </tbody>
-        </table>    
+        </table> 
+ 
+        <div class="bottom submit_container">
+            <input class="tl_submit" name="transfer" type="submit" value="<?php echo $GLOBALS['TL_LANG']['MSC']['submit_files']; ?>" />
+        </div>
+        <div class="bottom submit_container">         
+            <input class="tl_submit" name="delete" type="submit" value="<?php echo $GLOBALS['TL_LANG']['MSC']['delete_files']; ?>" />
+        </div>
     </div>
 </form>
 

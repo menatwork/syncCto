@@ -68,7 +68,7 @@ class SyncCtoRPCFunctions extends Backend
     /* -------------------------------------------------------------------------
      * RPC Functions - Helper 
      */
-
+    
     /**
      * Send the version number of this syncCto
      * 

@@ -437,17 +437,12 @@ class SyncCtoModuleClient extends BackendModule
 
     protected function checkSyncDatabase()
     {
-        if (!key_exists('syncCto_SyncTables', $this->arrSyncSettings))
+        if (!key_exists('syncCto_SyncDatabase', $this->arrSyncSettings))
         {
             return false;
         }
 
-        if (count($this->arrSyncSettings['syncCto_SyncTables']) == 0)
-        {
-            return false;
-        }
-
-        return true;
+        return $this->arrSyncSettings['syncCto_SyncDatabase'];
     }
 
     /* -------------------------------------------------------------------------
@@ -1618,20 +1613,48 @@ class SyncCtoModuleClient extends BackendModule
                  * Init
                  */
                 case 1:
+                    
                     $this->objData->setState($GLOBALS['TL_LANG']['MSC']['progress']);
                     $this->objData->setTitle($GLOBALS['TL_LANG']['MSC']['step'] . " %s");
-                    $this->objData->setDescription($GLOBALS['TL_LANG']['tl_syncCto_sync']["step_4"]['description_1']);
+                    $this->objData->setDescription($GLOBALS['TL_LANG']['tl_syncCto_sync']['step_4']['description_1']);
                     $this->objStepPool->step++;
 
                     break;
-
+                
                 case 2:
                     
-                    // TODO DATABASE LIGHTBOX
-                    $this->objData->setState($GLOBALS['TL_LANG']['MSC']['progress']);
-                    $this->objData->setTitle("DATABASE");
-                    $this->objData->setDescription("DATABASE");                    
-                    $this->objStepPool->step++;
+                    if (key_exists("forward", $_POST) && count($this->arrSyncSettings['syncCto_SyncTables']) > 0)
+                    {
+                        $this->objData->setState($GLOBALS['TL_LANG']['MSC']['ok']);
+                        $this->objData->setHtml("");
+                        $this->booRefresh = true;
+                        $this->objStepPool->step++;
+                        
+                        break;
+                    } 
+                    else if (key_exists("skip", $_POST) || key_exists("forward", $_POST) && count($this->arrSyncSettings['syncCto_SyncTables']) == 0)
+                    {
+                        $this->objData->setState($GLOBALS['TL_LANG']['MSC']['skipped']);
+                        $this->objData->setHtml("");
+                        $this->booRefresh = true;
+                        $this->intStep++;
+                        
+                        break;
+                    }
+                    
+                    $objTemp = new BackendTemplate("be_syncCto_form");
+                    $objTemp->id = $this->intClientID;
+                    $objTemp->step = $this->intStep;
+                    $objTemp->direction = "To";
+                    $objTemp->headline = $GLOBALS['TL_LANG']['MSC']['totalsize'];
+                    $objTemp->cssId = 'syncCto_database_form';
+                    $objTemp->forwardValue = $GLOBALS['TL_LANG']['MSC']['submit_database'];
+                    $objTemp->popupClassName = 'popupSyncDB.php';
+
+                    // Build content 
+                    $this->objData->setDescription($GLOBALS['TL_LANG']['tl_syncCto_sync']['step_4']['description_1']);
+                    $this->objData->setHtml($objTemp->parse());
+                    $this->booRefresh = false;
                     
                     break;
                 
@@ -1639,10 +1662,10 @@ class SyncCtoModuleClient extends BackendModule
                  * Build SQL Zip File
                  */
                 case 3:
+                    
                     $this->objStepPool->zipname = $this->objSyncCtoDatabase->runDump($this->arrSyncSettings['syncCto_SyncTables'], true, true);
-                    $this->objStepPool->arrTableTimestamp = $this->objSyncCtoHelper->getDatabaseTablesTimestamp($this->arrSyncSettings['syncCto_SyncTables']);
 
-                    $this->objData->setDescription($GLOBALS['TL_LANG']['tl_syncCto_sync']["step_4"]['description_2']);
+                    $this->objData->setDescription($GLOBALS['TL_LANG']['tl_syncCto_sync']['step_4']['description_2']);
                     $this->objStepPool->step++;
 
                     break;
@@ -1651,6 +1674,7 @@ class SyncCtoModuleClient extends BackendModule
                  * Send file to client
                  */
                 case 4:
+                    
                     $arrResponse = $this->objSyncCtoCommunicationClient->sendFile($GLOBALS['SYC_PATH']['tmp'], $this->objStepPool->zipname, "", SyncCtoEnum::UPLOAD_SQL_TEMP);
 
                     // Check if the file was send and saved.
@@ -1659,7 +1683,7 @@ class SyncCtoModuleClient extends BackendModule
                         throw new Exception("Empty file list from client. Maybe file send was not complet.");
                     }
 
-                    $this->objData->setDescription($GLOBALS['TL_LANG']['tl_syncCto_sync']["step_4"]['description_3']);
+                    $this->objData->setDescription($GLOBALS['TL_LANG']['tl_syncCto_sync']['step_4']['description_3']);
                     $this->objStepPool->step++;
 
                     break;
@@ -1668,49 +1692,70 @@ class SyncCtoModuleClient extends BackendModule
                  * Import on client side
                  */
                 case 5:
+                    
                     // Import SQL zip 
                     $this->objSyncCtoCommunicationClient->runSQLImport($this->objSyncCtoHelper->standardizePath($this->arrClientInformation["folders"]["tmp"], "sql", $this->objStepPool->zipname));
-
-                    // Update Hash
-                    $mixLastTableTimestamp = $this->Database
-                            ->prepare("SELECT last_table_time FROM tl_synccto_clients WHERE id=?")
-                            ->limit(1)
-                            ->execute($this->intClientID)
-                            ->fetchAllAssoc();
-
-                    if (strlen($mixLastTableTimestamp[0]["last_table_time"]) != 0)
-                    {
-                        $arrLastTableTimestamp = deserialize($mixLastTableTimestamp[0]["last_table_time"]);
-                    }
-                    else
-                    {
-                        $arrLastTableTimestamp = array();
-                    }
-
-                    foreach ($this->objStepPool->arrTableTimestamp as $key => $value)
-                    {
-                        $arrLastTableTimestamp[$key] = $value;
-                    }
-                    
-                    // Search for old entries
-                    $arrTables = $this->Database->listTables();                    
-                    foreach ($arrLastTableTimestamp as $key => $value)
-                    {
-                        if(!in_array($key, $arrTables))
-                        {
-                            unset($arrLastTableTimestamp[$key]);
-                        }
-                    }
-
-                    $this->Database->prepare("UPDATE tl_synccto_clients SET last_table_time = ? WHERE id = ? ")
-                            ->execute(serialize($arrLastTableTimestamp), $this->intClientID);
                     
                     $this->objStepPool->step++;
 
+                    break;
+                
+                /**
+                 * Set timestamps 
+                 */
+                case 6:
+                    
+                    $arrTableTimestamp = array(
+                        'server' => $this->objSyncCtoHelper->getDatabaseTablesTimestamp($this->arrSyncSettings['syncCto_SyncTables']),
+                        'client' => $this->objSyncCtoCommunicationClient->getClientTimestamp($this->arrSyncSettings['syncCto_SyncTables'])
+                    );
+                    
+                    foreach($arrTableTimestamp AS $location => $arrTimeStamps)
+                    {
+                        // Update timestamp
+                        $mixLastTableTimestamp = $this->Database
+                                ->prepare("SELECT " . $location . "_timestamp FROM tl_synccto_clients WHERE id=?")
+                                ->limit(1)
+                                ->execute($this->intClientID)
+                                ->fetchAllAssoc();
+
+                        if (strlen($mixLastTableTimestamp[0][$location . "_timestamp"]) != 0)
+                        {
+                            $arrLastTableTimestamp = deserialize($mixLastTableTimestamp[0][$location . "_timestamp"]);
+                        }
+                        else
+                        {
+                            $arrLastTableTimestamp = array();
+                        }
+
+                        foreach ($arrTimeStamps as $key => $value)
+                        {
+                            $arrLastTableTimestamp[$key] = $value;
+                        }
+
+                        // Search for old entries
+                        $arrTables = $this->Database->listTables();                    
+                        foreach ($arrLastTableTimestamp as $key => $value)
+                        {
+                            if(!in_array($key, $arrTables))
+                            {
+                                unset($arrLastTableTimestamp[$key]);
+                            }
+                        }
+
+                        $this->Database
+                                ->prepare("UPDATE tl_synccto_clients SET " . $location . "_timestamp = ? WHERE id = ? ")
+                                ->execute(serialize($arrLastTableTimestamp), $this->intClientID);
+                    }
+                    
+                    $this->objStepPool->step++;
+                    
+                    break;
+                    
                 /**
                  * Hook for custom sql code
                  */
-                case 6:      
+                case 7:      
                     if (isset($GLOBALS['TL_HOOKS']['syncDBUpdate']) && is_array($GLOBALS['TL_HOOKS']['syncDBUpdate']))
                     {
                         $arrSQL = array();
@@ -1734,7 +1779,7 @@ class SyncCtoModuleClient extends BackendModule
                     
                     // Show step information
                     $this->objData->setState($GLOBALS['TL_LANG']['MSC']['ok']);
-                    $this->objData->setDescription($GLOBALS['TL_LANG']['tl_syncCto_sync']["step_4"]['description_4']);
+                    $this->objData->setDescription($GLOBALS['TL_LANG']['tl_syncCto_sync']['step_4']['description_4']);
 
                     $this->intStep++;
 
@@ -2840,32 +2885,59 @@ class SyncCtoModuleClient extends BackendModule
                  * Init
                  */
                 case 1:
+                    
                     $this->objData->setState($GLOBALS['TL_LANG']['MSC']['progress']);
                     $this->objData->setTitle($GLOBALS['TL_LANG']['MSC']['step'] . " %s");
-                    $this->objData->setDescription($GLOBALS['TL_LANG']['tl_syncCto_sync']["step_4"]['description_1']);
+                    $this->objData->setDescription($GLOBALS['TL_LANG']['tl_syncCto_sync']['step_4']['description_1']);
                     $this->objStepPool->step++;
 
                     break;
 
-
                 case 2:
                     
-                    // TODO DATABASE LIGHTBOX
-                    $this->objData->setState($GLOBALS['TL_LANG']['MSC']['progress']);
-                    $this->objData->setTitle("DATABASE");
-                    $this->objData->setDescription("DATABASE");                    
-                    $this->objStepPool->step++;
+                    if (key_exists("forward", $_POST) && count($this->arrSyncSettings['syncCto_SyncTables']) > 0)
+                    {
+                        $this->objData->setState($GLOBALS['TL_LANG']['MSC']['ok']);
+                        $this->objData->setHtml("");
+                        $this->booRefresh = true;
+                        $this->objStepPool->step++;
+                        
+                        break;
+                    } 
+                    else if (key_exists("skip", $_POST) || key_exists("forward", $_POST) && count($this->arrSyncSettings['syncCto_SyncTables']) == 0)
+                    {
+                        $this->objData->setState($GLOBALS['TL_LANG']['MSC']['skipped']);
+                        $this->objData->setHtml("");
+                        $this->booRefresh = true;
+                        $this->intStep++;
+                        
+                        break;
+                    }
                     
-                    break;                
+                    $objTemp = new BackendTemplate("be_syncCto_form");
+                    $objTemp->id = $this->intClientID;
+                    $objTemp->step = $this->intStep;
+                    $objTemp->direction = "From";
+                    $objTemp->headline = $GLOBALS['TL_LANG']['MSC']['totalsize'];
+                    $objTemp->cssId = 'syncCto_database_form';
+                    $objTemp->forwardValue = $GLOBALS['TL_LANG']['MSC']['submit_database'];
+                    $objTemp->popupClassName = 'popupSyncDB.php';
+
+                    // Build content 
+                    $this->objData->setDescription($GLOBALS['TL_LANG']['tl_syncCto_sync']['step_4']['description_1']);
+                    $this->objData->setHtml($objTemp->parse());
+                    $this->booRefresh = false;
+                    
+                    break;         
                 
                 /**
                  * Build SQL Zip File
                  */
                 case 3:
 
-                    $this->objStepPool->zipname = $this->objSyncCtoCommunicationClient->runDatabaseDump($this->arrSyncSettings['syncCto_SyncTables'], true, true);
+                    $this->objStepPool->zipname = $this->objSyncCtoCommunicationClient->runDatabaseDump($this->arrSyncSettings['syncCto_SyncTables'], true, true);                
 
-                    $this->objData->setDescription($GLOBALS['TL_LANG']['tl_syncCto_sync']["step_4"]['description_2']);
+                    $this->objData->setDescription($GLOBALS['TL_LANG']['tl_syncCto_sync']['step_4']['description_2']);
                     $this->objStepPool->step++;
 
                     break;
@@ -2874,6 +2946,7 @@ class SyncCtoModuleClient extends BackendModule
                  * Get file to client
                  */
                 case 4:
+                    
                     $strFrom     = $this->objSyncCtoHelper->standardizePath($this->arrClientInformation["folders"]['tmp'], $this->objStepPool->zipname);
                     $strTo       = $this->objSyncCtoHelper->standardizePath($GLOBALS['SYC_PATH']['tmp'], "sql", $this->objStepPool->zipname);
                     $booResponse = $this->objSyncCtoCommunicationClient->getFile($strFrom, $strTo);
@@ -2884,7 +2957,7 @@ class SyncCtoModuleClient extends BackendModule
                         throw new Exception(vsprintf($GLOBALS['TL_LANG']['ERR']['unknown_file'], $strFrom));
                     }
 
-                    $this->objData->setDescription($GLOBALS['TL_LANG']['tl_syncCto_sync']["step_4"]['description_3']);
+                    $this->objData->setDescription($GLOBALS['TL_LANG']['tl_syncCto_sync']['step_4']['description_3']);
                     $this->objStepPool->step++;
 
                     break;
@@ -2893,51 +2966,69 @@ class SyncCtoModuleClient extends BackendModule
                  * Import on server side
                  */
                 case 5:
+                    
                     $strSrc = $this->objSyncCtoHelper->standardizePath($GLOBALS['SYC_PATH']['tmp'], "sql", $this->objStepPool->zipname);
                     $this->objSyncCtoDatabase->runRestore($strSrc);
 
-                    // Update Hash
-                    $arrTableTimestamp = $this->objSyncCtoHelper->getDatabaseTablesTimestamp($this->arrSyncSettings['syncCto_SyncTables']);
-                    
-                    $mixLastTableTimestamp = $this->Database
-                            ->prepare("SELECT last_table_time FROM tl_synccto_clients WHERE id=?")
-                            ->limit(1)
-                            ->execute($this->intClientID)
-                            ->fetchAllAssoc();
+                    $this->objStepPool->step++;
 
-                    if (strlen($mixLastTableTimestamp[0]["last_table_time"]) != 0)
-                    {
-                        $arrLastTableTimestamp = deserialize($mixLastTableTimestamp[0]["last_table_time"]);
-                    }
-                    else
-                    {
-                        $arrLastTableTimestamp = array();
-                    }
-
-                    foreach ($arrTableTimestamp as $key => $value)
-                    {
-                        $arrLastTableTimestamp[$key] = $value;
-                    }
+                    break;
                     
-                    // Search for old entries
-                    $arrTables = $this->Database->listTables();                    
-                    foreach ($arrLastTableTimestamp as $key => $value)
+                /**
+                 * Set timestamps 
+                 */
+                case 6:
+                    
+                    $arrTableTimestamp = array(
+                        'server' => $this->objSyncCtoHelper->getDatabaseTablesTimestamp($this->arrSyncSettings['syncCto_SyncTables']),
+                        'client' => $this->objSyncCtoCommunicationClient->getClientTimestamp($this->arrSyncSettings['syncCto_SyncTables'])
+                    );                    
+                    
+                    foreach($arrTableTimestamp AS $location => $arrTimeStamps)
                     {
-                        if(!in_array($key, $arrTables))
+                        // Update Timestamp
+                        $mixLastTableTimestamp = $this->Database
+                                ->prepare("SELECT " . $location . "_timestamp FROM tl_synccto_clients WHERE id=?")
+                                ->limit(1)
+                                ->executeUncached($this->intClientID)
+                                ->fetchAllAssoc();
+
+                        if (strlen($mixLastTableTimestamp[0][$location . "_timestamp"]) != 0)
                         {
-                            unset($arrLastTableTimestamp[$key]);
+                            $arrLastTableTimestamp = deserialize($mixLastTableTimestamp[0][$location . "_timestamp"]);
                         }
+                        else
+                        {
+                            $arrLastTableTimestamp = array();
+                        }
+
+                        foreach ($arrTimeStamps as $key => $value)
+                        {
+                            $arrLastTableTimestamp[$key] = $value;
+                        }
+
+                        // Search for old entries
+                        $arrTables = $this->Database->listTables();                    
+                        foreach ($arrLastTableTimestamp as $key => $value)
+                        {
+                            if(!in_array($key, $arrTables))
+                            {
+                                unset($arrLastTableTimestamp[$key]);
+                            }
+                        }
+
+                        $this->Database
+                                ->prepare("UPDATE tl_synccto_clients SET " . $location . "_timestamp = ? WHERE id = ? ")
+                                ->execute(serialize($arrLastTableTimestamp), $this->intClientID);
                     }
-
-                    $this->Database->prepare("UPDATE tl_synccto_clients SET last_table_time = ? WHERE id = ? ")
-                            ->execute(serialize($arrLastTableTimestamp), $this->intClientID);
-
+                                        
+                    // Show step information
                     $this->objData->setState($GLOBALS['TL_LANG']['MSC']['ok']);
-                    $this->objData->setDescription($GLOBALS['TL_LANG']['tl_syncCto_sync']["step_4"]['description_4']);
+                    $this->objData->setDescription($GLOBALS['TL_LANG']['tl_syncCto_sync']['step_4']['description_4']);
 
                     $this->intStep++;
 
-                    break;
+                    break;                                   
             }
         }
         catch (Exception $exc)

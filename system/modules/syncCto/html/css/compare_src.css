@@ -1,5 +1,9 @@
 /* Copyright (c) MEN AT WORK 2012 :: LGPL license */
 
+  body {
+    overflow-y:scroll;
+  }
+
   #container {
     width:100%;
     margin:0 auto;
@@ -7,11 +11,22 @@
     overflow:hidden;
   }
   
+  #main {
+    width:97%;
+    margin-left:1.5%;
+  }
+  
  /*------------------------------------------------------------------------*/
 
-  #syncCto_filelist {
+  .comparelist, h3, 
+  form, .formbody {
 	clear:both;
 	width:100%;
+    overflow:hidden;
+  }
+  
+  #recommended {
+    margin-bottom:30px;
   }
   
   th, 
@@ -21,7 +36,7 @@
 	border:1px solid #fff;
   }
   
-  th, 
+  th,
   thead td {
 	background-color:#F0F0F0;
 	text-align:left;
@@ -29,11 +44,27 @@
   
   th {
 	font-weight:bold;
+	padding-left:9px;
+  }
+  
+  .comparelist th {
 	background-image:url(../js/images/sorting.png);
 	background-repeat:no-repeat;
 	background-position:6px 10px;
 	padding-left:19px;
 	cursor:pointer;
+  }
+  
+  #db_form th, 
+  #db_form th {
+	background-image:none;
+	padding-left:9px;
+	cursor:default;
+  }
+
+  #db_form th.checkbox, 
+  #db_form td.checkbox {
+	padding-left:4px;
   }
   
   th.table-th-sort {
@@ -46,6 +77,12 @@
   
   th.checkbox {
 	background-image:none;
+    padding-left:0;
+  }
+  
+  td img {
+	float:left;
+    margin-right:5px;
   }
   
   th span {
@@ -54,35 +91,79 @@
   
   td {
 	background-color:#F9F9F9;
+    padding-left:9px;
   }
   
-  td.checkbox, 
-  th.checkbox {
+  #db_form td.col_1, 
+  #db_form td.col_2 {
+    padding-left:5px;
+  }
+  
+  #db_form td.col_1.none, 
+  #db_form td.col_2.none {
+    padding-left:9px;
+  }
+  
+  td.checkbox {
 	text-align:center;
+    padding-left:0;
   }
   
-  #syncCto_filelist .tl_checkbox {
+  #filelist .tl_checkbox {
 	margin:0;
   }
   
   td.state {
-	padding-left:9px;
 	background-color:#F0F0F0;
   }
   
+  td.changed, p.changed {
+	background-color:#D8F9D8;
+  }
+  
+  td.changed-both, p.changed-both {
+	background-color:#F8F4A0;
+  }  
+
+  td.unchanged, p.unchanged {
+	background-color:#F9D8D8;
+  }
+  
+  td.diff, 
+  #db_form th.diff {
+	text-align:center;
+    padding:0;
+  }  
+  
   td.last {
 	text-align:left;
-	padding-left:9px;
 	padding-right:9px;
   }
   
   td.filesize {
 	text-align:right;
 	padding-right:10px;
+    padding-left:0;
+  }
+  
+  #legend {
+    float:right;
+    margin-top:6px;
+  }
+  
+  #legend p {
+    float:left;
+    margin-left:10px;
+    margin-bottom:0;
+    padding:2px 10px;
   }
   
   .submit_container {
 	float:left;
+  }
+  
+  .bottom.submit_container {
+	margin-top:10px;
   }
   
   .tl_submit {

@@ -40,7 +40,6 @@ $GLOBALS['TL_LANG']['SYC']['user_delete']                   = 'Deleted files';
 $GLOBALS['TL_LANG']['SYC']['configfiles']                   = 'Configuration files';
 $GLOBALS['TL_LANG']['SYC']['localconfig_update']            = 'Update all entries';
 $GLOBALS['TL_LANG']['SYC']['localconfig_errors']            = 'Display errors';
-$GLOBALS['TL_LANG']['SYC']['localconfig_refererCheck']      = 'Disable request tokens';
 // Maintenance options  
 $GLOBALS['TL_LANG']['SYC']['options']                       = 'Options';    
 $GLOBALS['TL_LANG']['SYC']['search_index']                  = 'Rebuild the search index';    
@@ -67,6 +66,8 @@ $GLOBALS['TL_LANG']['MSC']['ok']                            = 'OK';
 $GLOBALS['TL_LANG']['MSC']['progress']                      = 'In progress';
 $GLOBALS['TL_LANG']['MSC']['error']                         = 'Error';
 $GLOBALS['TL_LANG']['MSC']['skipped']                       = 'Skipped';
+$GLOBALS['TL_LANG']['MSC']['skip']                          = 'Skip';
+$GLOBALS['TL_LANG']['MSC']['popup']                         = 'Open compare list';
 $GLOBALS['TL_LANG']['MSC']['unknown_step']                  = 'Unknown step';
 
 /**
@@ -139,7 +140,6 @@ $GLOBALS['TL_LANG']['ERR']['maximum_filesize']              = 'To big file(s):';
 $GLOBALS['TL_LANG']['ERR']['call_directly']                 = 'Do not try to run the synchronization directly.';
 $GLOBALS['TL_LANG']['ERR']['client_set']                    = 'The communication between server and client is failed.';
 $GLOBALS['TL_LANG']['ERR']['unknown_client']                = 'Unknown client.';
-
 $GLOBALS['TL_LANG']['ERR']['referer']                       = 'The clients referer-check could not be deactivated.';
 $GLOBALS['TL_LANG']['ERR']['version']                       = 'Version conflict in %s. <br />Server: %s <br />Client: %s';
 $GLOBALS['TL_LANG']['ERR']['upload_ini']                    = 'No success with upload. Funktion is deactivated in the php.ini';

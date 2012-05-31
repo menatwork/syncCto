@@ -684,6 +684,18 @@ class SyncCtoCommunicationClient extends CtoCommunication
         return $this->runServer("SYNCCTO_EXECUTE_SQL", $arrData);
     }
 
+    public function getClientTimestamp($arrTableList)
+    {
+        $arrData = array(
+            array(
+                "name" => "TableList",
+                "value" => $arrTableList,
+            ),
+        );
+
+        return $this->runServer("SYNCCTO_TIMESTAMP", $arrData);
+    }    
+    
     /**
      * Returns a list without the hidden tables
      * 
