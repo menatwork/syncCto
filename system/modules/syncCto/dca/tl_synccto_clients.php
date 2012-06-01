@@ -88,6 +88,7 @@ $GLOBALS['TL_DCA']['tl_synccto_clients'] = array(
                 'label' => &$GLOBALS['TL_LANG']['tl_syncCto_clients']['syncFrom'],
                 'href' => '&table=tl_syncCto_clients_syncFrom&act=edit',
                 'icon' => 'system/modules/syncCto/html/iconSyncFrom.png',
+                'attributes' => 'onclick="if (!confirm(\'' . $GLOBALS['TL_LANG']['tl_syncCto_clients']['syncFromConfirm'] . '\')) return false; Backend.getScrollOffset();"',
                 'button_callback' => array('tl_synccto_clients', 'checkPermission_client_syncFrom'),
             ),
             'syncTo' => array(

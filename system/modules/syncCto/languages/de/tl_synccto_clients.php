@@ -38,6 +38,7 @@ $GLOBALS['TL_LANG']['tl_syncCto_clients']['delete']             = array('Client 
 $GLOBALS['TL_LANG']['tl_syncCto_clients']['show']               = array('Clientdetails', 'Details des Clients ID %s anzeigen');
 $GLOBALS['TL_LANG']['tl_syncCto_clients']['syncTo']             = array('Client synchronisieren', 'Client ID %s synchronisieren');
 $GLOBALS['TL_LANG']['tl_syncCto_clients']['syncFrom']           = array('Server synchronisieren', 'Server synchronisieren');
+$GLOBALS['TL_LANG']['tl_syncCto_clients']['syncFromConfirm']    = 'Soll der Server wirklich synchronisiert werden? Es werden hierbei Daten geändert, die Sie zurzeit verwenden.';
 
 /**
  * Legends
