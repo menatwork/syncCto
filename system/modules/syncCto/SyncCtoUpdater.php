@@ -114,11 +114,11 @@ class SyncCtoUpdater extends Backend
         if (($mixError = $this->objZipArchive->open($strZipPath, ZipArchiveCto::CREATE)) !== true)
         {
             throw new Exception($GLOBALS['TL_LANG']['MSC']['error'] . ": " . $this->objZipArchive->getErrorDescription($mixError));
-        }
-
-        $this->addFiles();
+        } 
+        
+        $this->addFiles();        
         $this->addDatabase();
-
+        
         $this->objZipArchive->close();
     }
 
@@ -129,7 +129,7 @@ class SyncCtoUpdater extends Backend
         foreach ($this->arrFiles as $value)
         {
             $value['path'] = preg_replace("/^TL_ROOT\//i", "", $value['path'], 1);
-            
+
             if (file_exists(TL_ROOT . "/" . $value['path']))
             {
                 if (!$this->objZipArchive->addFile($value['path'], "FILES/" . $value['path']))

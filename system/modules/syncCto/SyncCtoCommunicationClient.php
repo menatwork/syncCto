@@ -476,6 +476,61 @@ class SyncCtoCommunicationClient extends CtoCommunication
 
         return $this->runServer("SYNCCTO_SEND_FILE", $arrData);
     }
+    
+     /**
+     * Send a file to the client
+     *
+     * @param string $strFile File + path. Start from TL_ROOT.
+     * @return bool [true|false]
+     */
+    public function sendFileNewDestination($strSource, $strDestination, $strMD5 = "", $intTyp = 1, $strSplitname = "")
+    {
+        // 5 min. time out.
+        @set_time_limit(3600);
+
+        //Build path
+        $strSource = $this->objSyncCtoHelper->standardizePath($strSource);
+        $strDestination = $this->objSyncCtoHelper->standardizePath($strDestination);
+
+        // Check file exsist
+        if (!file_exists(TL_ROOT . "/" . $strSource) || !is_file(TL_ROOT . "/" . $strSource))
+        {
+            throw new Exception(vsprintf($GLOBALS['TL_LANG']['ERR']['unknown_file'], array($strSource)));
+        }
+
+        // MD5 file hash
+        if ($strMD5 == "")
+        {
+            $strMD5 = md5_file(TL_ROOT . "/" . $strSource);
+        }
+
+        // Contenttyp
+        $strMime = "application/octet-stream";
+
+        // Build array with informations
+        $arrData = array(
+            array(
+                "name" => $strMD5,
+                "filename" => $strFile,
+                "filepath" => TL_ROOT . "/" . $strSource,
+                "mime" => $strMime,
+            ),
+            array(
+                "name" => "metafiles",
+                "value" => array(
+                    $strMD5 => array(
+                        "folder" => dirname($strDestination),
+                        "file" => basename($strDestination),
+                        "MD5" => $strMD5,
+                        "splitname" => $strSplitname,
+                        "typ" => $intTyp
+                    )
+                )
+            ),
+        );
+
+        return $this->runServer("SYNCCTO_SEND_FILE", $arrData);
+    }
 
     /**
      * Import files from tempfolder

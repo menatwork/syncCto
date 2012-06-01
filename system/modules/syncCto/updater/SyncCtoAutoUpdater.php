@@ -32,8 +32,7 @@ class SyncCtoAutoUpdater extends Backend
     // Vars
     protected $booZipArchiveCto = false;
 
-    // Const  
-
+    // Const
     const MODULE_PATH   = "system/modules/zz_syncCto_updater";
     const TEMP_PATH     = "system/tmp/";
     const ZIP_FILE_PATH = "FILES";
@@ -132,8 +131,7 @@ class SyncCtoAutoUpdater extends Backend
         $arrFiles = array();
 
         // If ZipArchiveCto is installed, use it. If not use contao`s zipReader.
-        // if ($this->booZipArchiveCto)
-        if (false)
+        if ($this->booZipArchiveCto)
         {
             $arrFiles = $this->unzipBySyncCto($strZipPath);
         }
