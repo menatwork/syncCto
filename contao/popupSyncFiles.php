@@ -319,7 +319,12 @@ class PopupSyncFiles extends Backend
         // Set javascript
         $GLOBALS['TL_JAVASCRIPT'][] = TL_PLUGINS_URL . 'plugins/mootools/' . MOOTOOLS_CORE . '/mootools-core.js';
         $GLOBALS['TL_JAVASCRIPT'][] = 'contao/contao.js';
+        
+        if (version_compare(VERSION, '2.11', '=='))
+        {
         $GLOBALS['TL_JAVASCRIPT'][] = 'system/modules/syncCto/html/js/htmltable.js';
+        }
+        
         $GLOBALS['TL_JAVASCRIPT'][] = 'system/modules/syncCto/html/js/compare.js';
 
         // Set wrapper template information
