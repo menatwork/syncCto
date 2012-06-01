@@ -39,11 +39,11 @@ $GLOBALS['TL_DCA']['tl_syncCto_settings'] = array(
     'palettes' => array
         (
         '__selector__' => array('syncCto_custom_settings'),
-        'default' => '{blacklist_legend:hide},syncCto_folder_blacklist,syncCto_file_blacklist;{whitelist_legend:hide},syncCto_folder_whitelist;{local_blacklist_legend},syncCto_local_blacklist;{hidden_tables_legend:hide},syncCto_hidden_tables;{tables_legend},syncCto_database_tables;{custom_legend:hide},syncCto_debug_mode,syncCto_custom_settings;'
+        'default' => '{blacklist_legend:hide},syncCto_folder_blacklist,syncCto_file_blacklist;{whitelist_legend:hide},syncCto_folder_whitelist;{local_blacklist_legend},syncCto_local_blacklist;{tables_legend},syncCto_database_tables;{hidden_tables_legend:hide},syncCto_hidden_tables;{custom_legend:hide},syncCto_debug_mode,syncCto_custom_settings;'
     ),
     'subpalettes' => array
         (
-        'syncCto_custom_settings' => 'syncCto_wait_timeout,syncCto_interactive_timeout,syncCto_colored_db_view',
+        'syncCto_custom_settings' => 'syncCto_wait_timeout,syncCto_interactive_timeout',
     ),
     // Fields
     'fields' => array( 
@@ -155,41 +155,7 @@ $GLOBALS['TL_DCA']['tl_syncCto_settings'] = array(
             'inputType' => 'text',
             'exclude' => true,
             'eval' => array('tl_class' => 'w50'),
-        ),
-        'syncCto_colored_db_view' => array(
-            'label' => &$GLOBALS['TL_LANG']['tl_syncCto_settings']['colored_db_view'],
-            'exclude' => true,
-            'inputType' => 'multiColumnWizard',
-            'eval' => array(
-                'tl_class' => 'clr',
-                'columnFields' => array(
-                    'entries' => array(
-                        'label' => &$GLOBALS['TL_LANG']['tl_syncCto_settings']['entries'],
-                        'exclude' => true,
-                        'inputType' => 'text',                        
-                        'eval' => array('style' => 'width:185px')
-                    ),
-                    'unit' => array
-                    (
-                        'label' => &$GLOBALS['TL_LANG']['tl_syncCto_settings']['units'],
-                        'inputType' => 'select',
-                        'options' => array('kb', 'mb', 'entries'),
-                        'reference' => &$GLOBALS['TL_LANG']['tl_syncCto_settings']['units'],
-                        'eval' => array('includeBlankOption' => true)
-                    ),
-                    'color' => array(
-                        'label' => &$GLOBALS['TL_LANG']['tl_syncCto_settings']['color'],
-                        'exclude' => true,
-                        'inputType' => 'text',
-                        'eval' => array('style' => 'width:300px', 'maxlength' => 6, 'rgxp' => 'colorRgb'),
-                        'wizard' => array
-                        (
-                            array('tl_syncCto_settings', 'colorPicker')
-                        )                          
-                    )
-                )
-            )          
-        ),
+        )
     )
 );
 
@@ -210,28 +176,7 @@ class tl_syncCto_settings extends Backend
         parent::__construct();
 
         $this->objSyncCtoHelper = SyncCtoHelper::getInstance();
-    }
-
-    /**
-     * Return the color picker wizard
-     * 
-     * @param DataContainer
-     * @return string
-     */
-    public function colorPicker(DataContainer $dc)
-    {
-        return ' ' . $this->generateImage('pickcolor.gif', $GLOBALS['TL_LANG']['MSC']['colorpicker'], 'style="vertical-align:top;cursor:pointer" id="moo_'.$dc->field.'"') . 
-                '<script>
-                    new MooRainbow("moo_'.$dc->field.'", {
-                        id:"ctrl_' . $dc->field . '",
-                        startColor:((cl = $("ctrl_' . $dc->field . '").value.hexToRgb(true)) ? cl : [255, 0, 0]),
-                        imgPath:"plugins/colorpicker/images/",
-                        onComplete: function(color) {
-                            $("ctrl_' . $dc->field . '").value = color.hex.replace("#", "");
-                        }
-                    });
-                </script>';
-    }    
+    }  
     
     /**
      * Load localconfig entries

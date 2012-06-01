@@ -17,3 +17,8 @@
   * DC_Memory
   * http://www.contao.org/erweiterungsliste/view/DC_Memory.html
   */
+  
+ /*
+  * ZipArchiveCto
+  * http://www.contao.org/de/extension-list/view/ZipArchiveCto.html
+  */

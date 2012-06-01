@@ -40,8 +40,6 @@ class SyncCtoHelper extends Backend
     protected static $instance = null;
     // Objects   
     protected $objSyncCtoDatabase;
-    // Vars
-    protected $arrDbColorLimits;
 
     /* -------------------------------------------------------------------------
      * Core
@@ -60,23 +58,6 @@ class SyncCtoHelper extends Backend
 
         // Language
         $this->loadLanguageFile("default");
-
-        // Load color limits for db
-        $this->arrDbColorLimits = array();
-        $arrEntriesCount = array();
-
-        if ($GLOBALS['TL_CONFIG']['syncCto_colored_db_view'] != "")
-        {
-            $this->arrDbColorLimits = deserialize($GLOBALS['TL_CONFIG']['syncCto_colored_db_view']);
-
-            if (is_array($this->arrDbColorLimits))
-            {
-                foreach ($this->arrDbColorLimits as $key => $value)
-                {
-                    $arrEntriesCount[$key] = $value['entries'];
-                }
-            }
-        }
     }
 
     /**
@@ -91,17 +72,7 @@ class SyncCtoHelper extends Backend
         }
 
         return self::$instance;
-    }
-    
-    /**
-     * Return DbColorLimits
-     * 
-     * @return array
-     */
-    public function getDbColorLimits()
-    {
-        return $this->arrDbColorLimits;
-    }    
+    }   
 
     /* -------------------------------------------------------------------------
      * Config
@@ -374,7 +345,8 @@ class SyncCtoHelper extends Backend
 
             // required files
             $arrRequiredFiles = array(
-                'DC_Memory' => 'system/drivers/DC_Memory.php'
+                'DC_Memory' => 'system/drivers/DC_Memory.php',
+                'ZipArchiveCto' => 'system/libraries/ZipArchiveCto.php'
             );
 
             // check for required extensions
@@ -688,7 +660,7 @@ class SyncCtoHelper extends Backend
      */
     private function getTableMeta($strTableName)
     {
-        $objCount        = $this->Database->prepare("SELECT COUNT(*) as Count FROM $strTableName")->execute();
+        $objCount = $this->Database->prepare("SELECT COUNT(*) as Count FROM $strTableName")->execute();
         
         $arrTableMeta = array(
             'name' => $strTableName,
@@ -713,45 +685,6 @@ class SyncCtoHelper extends Backend
         
         $strColor = '666966';
 
-        if ($GLOBALS['TL_CONFIG']['syncCto_custom_settings'])
-        {
-            $booBreakLoop = false;
-            foreach (SyncCtoHelper::getInstance()->getDbColorLimits() AS $arrColorLimits)
-            {
-                switch ($arrColorLimits['unit'])
-                {
-                    case 'kb':
-                        if (($intEntriesSize / 1000) > $arrColorLimits['entries'])
-                        {
-                            $booBreakLoop = true;
-                        }
-                        break;
-
-                    case 'mb':
-                        if (($intEntriesSize / 1000 / 1000) > $arrColorLimits['entries'])
-                        {
-                            $booBreakLoop = true;
-                        }
-                        break;
-
-                    case 'entries':
-                        if ($intEntriesCount > $arrColorLimits['entries'])
-                        {
-                            $booBreakLoop = true;
-                        }
-                        break;
-                }
-
-                if ($booBreakLoop == true)
-                {
-                    if ($arrColorLimits != '')
-                    {
-                        $strColor  = $arrColorLimits['color'];
-                    }
-                    break;
-                }
-            }
-        }
         $strReturn = '<span style="color: #' . $strColor . '; padding-left: 3px;">';
         $strReturn .= $strTableName;
         $strReturn .= '<span style="color:#a3a3a3;padding-left: 3px;">';
@@ -893,6 +826,55 @@ class SyncCtoHelper extends Backend
                 break;
         }
         return false;
+    }
+    
+    /**
+     * Check if the post of the submited form is empty and set error or unset error 
+     * 
+     * @param array $arrCheckSubmit 
+     */
+    public function checkSubmit($arrCheckSubmit)
+    {   
+        $arrPostUnset = array('FORM_SUBMIT', 'FORM_FIELDS', 'REQUEST_TOKEN');
+        
+        if(is_array($arrCheckSubmit['postUnset']))
+        {
+            $arrPostUnset = array_merge($arrPostUnset, $arrCheckSubmit['postUnset']);
+        }
+        
+        $arrPost = $_POST;
+        
+        foreach($arrPostUnset AS $value)
+        {
+            if(array_key_exists($value, $arrPost))
+            {
+                unset($arrPost[$value]);
+            }
+        }
+        
+        if(count($arrPost) > 0)
+        {
+            if(is_array($_SESSION["TL_ERROR"]))
+            {
+                if (array_key_exists($arrCheckSubmit['error']['key'], $_SESSION["TL_ERROR"]))
+                {
+                    unset($_SESSION["TL_ERROR"][$arrCheckSubmit['error']['key']]);
+                }
+            }
+            $this->redirect($arrCheckSubmit['redirectUrl']);
+        }
+        else
+        {
+            if(!is_array($_SESSION["TL_ERROR"]))
+            {
+                $_SESSION["TL_ERROR"] = array();
+            }
+            
+            if(!array_key_exists($arrCheckSubmit['error']['key'], $_SESSION["TL_ERROR"]))
+            {
+                $_SESSION["TL_ERROR"][$arrCheckSubmit['error']['key']] = $arrCheckSubmit['error']['message'];
+            }
+        }
     }
     
 }

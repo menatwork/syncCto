@@ -266,32 +266,14 @@ class tl_syncCto_clients_syncTo extends Backend
         
         $this->Session->set("syncCto_SyncSettings_" . $dc->id, $arrSyncSettings);
 
-        $arrPostUnset = array('FORM_SUBMIT', 'FORM_FIELDS', 'REQUEST_TOKEN', 'start_sync');
-        $arrPost = $_POST;
-        
-        foreach($arrPostUnset AS $value)
-        {
-            if(array_key_exists($value, $arrPost))
-            {
-                unset($arrPost[$value]);
-            }
-        }
-        
-        if(count($arrPost) > 0)
-        {
-            if (array_key_exists('syncCto_submit_false', $_SESSION["TL_ERROR"]))
-            {
-                unset($_SESSION["TL_ERROR"]['syncCto_submit_false']);
-            }
-            $this->redirect($this->Environment->base . "contao/main.php?do=synccto_clients&amp;table=tl_syncCto_clients_syncTo&amp;act=start&amp;step=0&amp;id=" . $this->Input->get("id"));
-        }
-        else
-        {
-            if(!array_key_exists('syncCto_submit_false', $_SESSION["TL_ERROR"]))
-            {
-                $_SESSION["TL_ERROR"]['syncCto_submit_false'] = $GLOBALS['TL_LANG']['ERR']['missing_tables_selection'];
-            }
-        }
+        $this->objSyncCtoHelper->checkSubmit(array(
+            'postUnset' => array('start_sync'),
+            'error' => array(
+                'key' => 'syncCto_submit_false',
+                'message' => $GLOBALS['TL_LANG']['ERR']['missing_tables_selection']
+            ),
+            'redirectUrl' => $this->Environment->base . "contao/main.php?do=synccto_clients&amp;table=tl_syncCto_clients_syncTo&amp;act=start&amp;step=0&amp;id=" . $this->Input->get("id") 
+        ));
     }
 
 }

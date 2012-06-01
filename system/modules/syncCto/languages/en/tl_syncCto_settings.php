@@ -52,7 +52,6 @@ $GLOBALS['TL_LANG']['tl_syncCto_settings']['debug_mode']                = array(
 $GLOBALS['TL_LANG']['tl_syncCto_settings']['custom_settings']           = array('Activate expert settings', 'Click here if you know what you are doing.');
 $GLOBALS['TL_LANG']['tl_syncCto_settings']['wait_timeout']              = array('Configure "wait_timeout"', 'More informationen: http://goo.gl/rC5Y4');
 $GLOBALS['TL_LANG']['tl_syncCto_settings']['interactive_timeout']       = array('Configure "interactive_timeout"', 'More informationen: http://goo.gl/VHxRK');
-$GLOBALS['TL_LANG']['tl_syncCto_settings']['colored_db_view']           = array('Identification of database limits', 'Here you can limit database feature in color.');
 $GLOBALS['TL_LANG']['tl_syncCto_settings']['entries']                   = array('Value', '');
 $GLOBALS['TL_LANG']['tl_syncCto_settings']['color']                     = array('Color (Hexcode)', '');
 
