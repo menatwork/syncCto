@@ -477,7 +477,7 @@ class SyncCtoCommunicationClient extends CtoCommunication
         return $this->runServer("SYNCCTO_SEND_FILE", $arrData);
     }
     
-     /**
+    /**
      * Send a file to the client
      *
      * @param string $strFile File + path. Start from TL_ROOT.
@@ -511,7 +511,7 @@ class SyncCtoCommunicationClient extends CtoCommunication
         $arrData = array(
             array(
                 "name" => $strMD5,
-                "filename" => $strFile,
+                "filename" => basename($strSource),
                 "filepath" => TL_ROOT . "/" . $strSource,
                 "mime" => $strMime,
             ),
@@ -720,7 +720,7 @@ class SyncCtoCommunicationClient extends CtoCommunication
 
         return $this->runServer("SYNCCTO_RUN_DUMP", $arrData);
     }
-    
+
     /**
      * Exceute SQL commands on client side
      * 
@@ -734,8 +734,8 @@ class SyncCtoCommunicationClient extends CtoCommunication
                 "name" => "sql",
                 "value" => $arrSQL,
             )
-        );        
-                
+        );
+
         return $this->runServer("SYNCCTO_EXECUTE_SQL", $arrData);
     }
 
@@ -773,7 +773,7 @@ class SyncCtoCommunicationClient extends CtoCommunication
         // Load blacklist for localconfig
         $arrConfigBlacklist = $this->objSyncCtoHelper->getBlacklistLocalconfig();
         // Load localconfig
-        $arrConfig          = $this->objSyncCtoHelper->loadConfigs(SyncCtoEnum::LOADCONFIG_KEY_VALUE);
+        $arrConfig = $this->objSyncCtoHelper->loadConfigs(SyncCtoEnum::LOADCONFIG_KEY_VALUE);
 
         // Kick blacklist entries
         foreach ($arrConfig as $key => $value)
@@ -803,6 +803,36 @@ class SyncCtoCommunicationClient extends CtoCommunication
 
 
         return $this->runServer("SYNCCTO_GET_CONFIG", $arrData);
+    }
+
+    /* -------------------------------------------------------------------------
+     * Auto Updater
+     */
+
+    public function startAutoUpdater($strZipPath)
+    {
+        $arrData = array(
+            array(
+                "name" => "zipfile",
+                "value" => $strZipPath,
+            ),
+        );
+
+
+        return $this->runServer("SYNCCTO_AUTO_UPDATE", $arrData);
+    }
+
+    public function deleteAutoUpdater($strZipPath)
+    {
+        $arrData = array(
+            array(
+                "name" => "zipfile",
+                "value" => $strZipPath,
+            ),
+        );
+
+
+        return $this->runServer("SYNCCTO_AUTO_UPDATER_DELETE", $arrData);
     }
 
 }
