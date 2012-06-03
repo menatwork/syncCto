@@ -177,7 +177,7 @@ class SyncCtoAutoUpdater extends Backend
             }
 
             $movePath   = preg_replace("/^" . self::ZIP_FILE_PATH . "\//i", "", $filename);
-            $targetPath = self::TEMP_PATH . 'syncCtoAutoUpdate/' . $movePath;
+            $targetPath = self::TEMP_PATH . 'syncCtoAutoUpdate/';
 
             $arrMoveList[$targetPath] = $movePath;
 
@@ -198,7 +198,7 @@ class SyncCtoAutoUpdater extends Backend
      * @throws Exception 
      */
     protected function unzipByContao($strZipPath)
-    {
+    {        
         $arrMoveList = array();
 
         $objZipReader = new ZipReader($strZipPath);
@@ -251,7 +251,7 @@ class SyncCtoAutoUpdater extends Backend
 
             if ($objFiles->copy($key, $value) == false)
             {
-                throw new Exception("Could not move tmp file to destination.");
+                throw new Exception("Could not move tmp file to destination. $key TO $value");
             }
         }
     }
