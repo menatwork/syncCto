@@ -39,12 +39,4 @@ $GLOBALS["CTOCOM_FUNCTIONS"]["SYNCCTO_AUTO_UPDATE"] = array(
     "parameter" => array("zipfile"),
 );
 
-// Delete auto updater
-$GLOBALS["CTOCOM_FUNCTIONS"]["SYNCCTO_AUTO_UPDATER_DELETE"] = array(
-    "class" => "SyncCtoAutoUpdater",
-    "function" => "delete",
-    "typ" => "POST",
-    "parameter" => array("zipfile"),
-);
-
 ?>

@@ -588,19 +588,6 @@ class SyncCtoAutoUpdater extends Backend
         }
     }
 
-    /**
-     * Delete auto updater and update file
-     * 
-     * @param type $strZipPath Path to the Zip file
-     */
-    public function delete()
-    {
-        $objFiles = Files::getInstance();
-               
-        // Delete auto updater
-        $objFiles->rrdir(self::MODULE_PATH);
-    }
-
     // - Helper ----------------------------------------------------------------
 
     /**
