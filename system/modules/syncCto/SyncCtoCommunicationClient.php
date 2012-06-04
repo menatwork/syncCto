@@ -820,20 +820,7 @@ class SyncCtoCommunicationClient extends CtoCommunication
 
 
         return $this->runServer("SYNCCTO_AUTO_UPDATE", $arrData);
-    }
-
-    public function deleteAutoUpdater($strZipPath)
-    {
-        $arrData = array(
-            array(
-                "name" => "zipfile",
-                "value" => $strZipPath,
-            ),
-        );
-
-
-        return $this->runServer("SYNCCTO_AUTO_UPDATER_DELETE", $arrData);
-    }
+    }   
 
 }
 
