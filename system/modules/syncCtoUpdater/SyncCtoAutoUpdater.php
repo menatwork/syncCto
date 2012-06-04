@@ -22,9 +22,13 @@
  *
  * PHP version 5
  * @copyright  MEN AT WORK 2012 
- * @package    syncCto
+ * @package    SyncCtoAutoUpdater
  * @license    GNU/LGPL 
  * @filesource
+ */
+
+/**
+ * SyncCtoAutoUpdater 
  */
 class SyncCtoAutoUpdater extends Backend
 {
@@ -33,13 +37,13 @@ class SyncCtoAutoUpdater extends Backend
     protected $booZipArchiveCto = false;
 
     // Const
-    const MODULE_PATH   = "system/modules/zz_syncCto_updater";
+    const MODULE_PATH   = "system/modules/z_syncCto_updater";
     const TEMP_PATH     = "system/tmp/";
     const ZIP_FILE_PATH = "FILES";
     const ZIP_FILE_SQL  = "SQL";
 
     /**
-     * List of default ignore values
+     * List of default ignore values for database
      * 
      * @var array
      */
@@ -49,7 +53,7 @@ class SyncCtoAutoUpdater extends Backend
     );
 
     /**
-     * List of default ignore values
+     * List of default ignore values for database
      * 
      * @var array 
      */
@@ -108,6 +112,7 @@ class SyncCtoAutoUpdater extends Backend
 
         // Update database
         $mixResult = $this->updateDatabase($strZipPath);
+        
         if ($mixResult !== true && is_array($mixResult))
         {
             $arrErrors = array_merge($arrErrors, $mixResult);
@@ -171,16 +176,19 @@ class SyncCtoAutoUpdater extends Backend
         {
             $filename = $objZipArchive->getNameIndex($i);
 
+            // Check if the file part of the folder "FILES"
             if (!preg_match("/^" . self::ZIP_FILE_PATH . "\//i", $filename))
             {
                 continue;
             }
 
+            // Build path
             $movePath   = preg_replace("/^" . self::ZIP_FILE_PATH . "\//i", "", $filename);
             $targetPath = self::TEMP_PATH . 'syncCtoAutoUpdate/';
 
-            $arrMoveList[$targetPath] = $movePath;
+            $arrMoveList[$targetPath . $filename] = $movePath;
 
+            // Extract file
             if (!$objZipArchive->extractTo($targetPath, $filename))
             {
                 throw new Exception("Error by extract file: " . $filename);
@@ -198,7 +206,7 @@ class SyncCtoAutoUpdater extends Backend
      * @throws Exception 
      */
     protected function unzipByContao($strZipPath)
-    {        
+    {
         $arrMoveList = array();
 
         $objZipReader = new ZipReader($strZipPath);
@@ -208,6 +216,7 @@ class SyncCtoAutoUpdater extends Backend
 
         foreach ($objZipReader->getFileList() as $value)
         {
+            // Check if the file part of the folder "FILES"
             if (!preg_match("/^" . self::ZIP_FILE_PATH . "\//i", $value))
             {
                 continue;
@@ -218,6 +227,7 @@ class SyncCtoAutoUpdater extends Backend
 
             $arrMoveList[$targetPath] = $movePath;
 
+            // Write file
             $objZipReader->getFile($value);
             $objFile = new File($targetPath);
             $objFile->write($objZipReader->unzip());
@@ -272,9 +282,11 @@ class SyncCtoAutoUpdater extends Backend
             throw new Exception($GLOBALS['TL_LANG']['MSC']['error'] . ": " . $objZipArchive->getErrorDescription($mixError));
         }
 
+        // Read XML
         $xmlReader = new XMLReader();
         $xmlReader->XML($objZipArchive->getFromName("SQL/sql.xml"));
 
+        // Init tmp vars
         $strTableName = "";
         $arrFieldList = array();
         $arrDefList = array();
@@ -581,15 +593,12 @@ class SyncCtoAutoUpdater extends Backend
      * 
      * @param type $strZipPath Path to the Zip file
      */
-    public function delete($strZipPath)
+    public function delete()
     {
-        // Delete update zip
-        $objZipFile = new File($strZipPath);
-        $objZipFile->delete();
-
+        $objFiles = Files::getInstance();
+               
         // Delete auto updater
-        $objFolder = new Folder(self::MODULE_PATH);
-        $objFolder->delete();
+        $objFiles->rrdir(self::MODULE_PATH);
     }
 
     // - Helper ----------------------------------------------------------------

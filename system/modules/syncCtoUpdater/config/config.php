@@ -22,7 +22,7 @@
  *
  * PHP version 5
  * @copyright  MEN AT WORK 2012 
- * @package    syncCto
+ * @package    SyncCtoAutoUpdater
  * @license    GNU/LGPL 
  * @filesource
  */
@@ -31,7 +31,7 @@
  * RPC  
  */
 
-// Set the attention flag
+// Update syncCto
 $GLOBALS["CTOCOM_FUNCTIONS"]["SYNCCTO_AUTO_UPDATE"] = array(
     "class" => "SyncCtoAutoUpdater",
     "function" => "update",
@@ -39,7 +39,7 @@ $GLOBALS["CTOCOM_FUNCTIONS"]["SYNCCTO_AUTO_UPDATE"] = array(
     "parameter" => array("zipfile"),
 );
 
-// Set displayErrors Flag
+// Delete auto updater
 $GLOBALS["CTOCOM_FUNCTIONS"]["SYNCCTO_AUTO_UPDATER_DELETE"] = array(
     "class" => "SyncCtoAutoUpdater",
     "function" => "delete",
