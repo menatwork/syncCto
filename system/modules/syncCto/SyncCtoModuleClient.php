@@ -1,7 +1,4 @@
-<?php
-
-if (!defined('TL_ROOT'))
-    die('You cannot access this file directly!');
+<?php if (!defined('TL_ROOT')) die('You cannot access this file directly!');
 
 /**
  * Contao Open Source CMS
@@ -346,7 +343,7 @@ class SyncCtoModuleClient extends BackendModule
     {
         // Load Files
         $objFileList = new File($this->objSyncCtoHelper->standardizePath($GLOBALS['SYC_PATH']['tmp'], "syncfilelist-ID-" . $this->intClientID . ".txt"));
-        $strContent = $objFileList->getContent();
+        $strContent  = $objFileList->getContent();
         if (strlen($strContent) == 0)
         {
             $this->arrListFile = array();
@@ -358,7 +355,7 @@ class SyncCtoModuleClient extends BackendModule
         $objFileList->close();
 
         $objCompareList = new File($this->objSyncCtoHelper->standardizePath($GLOBALS['SYC_PATH']['tmp'], "synccomparelist-ID-" . $this->intClientID . ".txt"));
-        $strContent = $objCompareList->getContent();
+        $strContent     = $objCompareList->getContent();
         if (strlen($strContent) == 0)
         {
             $this->arrListCompare = array();
@@ -871,8 +868,8 @@ class SyncCtoModuleClient extends BackendModule
 
                     $intClientUploadLimit = intval(str_replace("M", "000000", $arrClientParameter['upload_max_filesize']));
                     $intClientMemoryLimit = intval(str_replace("M", "000000", $arrClientParameter['memory_limit']));
-                    $intClientPostLimit = intval(str_replace("M", "000000", $arrClientParameter['post_max_size']));
-                    $intLocalMemoryLimit = intval(str_replace("M", "000000", ini_get('memory_limit')));
+                    $intClientPostLimit   = intval(str_replace("M", "000000", $arrClientParameter['post_max_size']));
+                    $intLocalMemoryLimit  = intval(str_replace("M", "000000", ini_get('memory_limit')));
 
                     // Check if memory limit on server and client is enough for upload  
                     $intLimit = min($intClientUploadLimit, $intClientMemoryLimit, $intClientPostLimit, $intLocalMemoryLimit);
@@ -918,7 +915,7 @@ class SyncCtoModuleClient extends BackendModule
                  */
                 case 7:
                     $objSyncCtoUpdater = SyncCtoUpdater::getInstance();
-                    $strZipPath = $this->objSyncCtoHelper->standardizePath($GLOBALS['SYC_PATH']['tmp'], "autoupdater", "autoupdate_" . time() . ".zip");
+                    $strZipPath        = $this->objSyncCtoHelper->standardizePath($GLOBALS['SYC_PATH']['tmp'], "autoupdater", "autoupdate_" . time() . ".zip");
                     new Folder(dirname($strZipPath));
                     $objSyncCtoUpdater->buildUpdateZip($strZipPath);
 
@@ -927,21 +924,30 @@ class SyncCtoModuleClient extends BackendModule
 
                     break;
 
+                // Send files
                 case 8:
-                    $this->objSyncCtoCommunicationClient->sendFile(dirname($this->objStepPool->AutoUpdateZip), basename($this->objStepPool->AutoUpdateZip), "", SyncCtoEnum::UPLOAD_SYNC_TEMP);
-                    $this->objSyncCtoCommunicationClient->sendFileNewDestination("system/modules/syncCto/updater/SyncCtoAutoUpdater.php", "system/modules/z_syncCto_updater/SyncCtoAutoUpdater.php", "", SyncCtoEnum::UPLOAD_SYNC_TEMP);
-                    $this->objSyncCtoCommunicationClient->sendFileNewDestination("system/modules/syncCto/updater/config/config.php", "system/modules/z_syncCto_updater/config/config.php", "", SyncCtoEnum::UPLOAD_SYNC_TEMP);
-                    $this->objSyncCtoCommunicationClient->sendFileNewDestination("system/modules/syncCto/updater/config/.htaccess", "system/modules/z_syncCto_updater/config/.htaccess", "", SyncCtoEnum::UPLOAD_SYNC_TEMP);
+                    $arrFiles = array(
+                        "system/modules/syncCtoUpdater/SyncCtoAutoUpdater.php",
+                        "system/modules/syncCtoUpdater/config/config.php",
+                        "system/modules/syncCtoUpdater/config/.htaccess",
+                        $this->objStepPool->AutoUpdateZip
+                    );
+
+                    foreach ($arrFiles as $value)
+                    {
+                        $this->objSyncCtoCommunicationClient->sendFile(dirname($value), basename($value), "", SyncCtoEnum::UPLOAD_SYNC_TEMP);
+                    }
 
                     $this->objStepPool->step++;
 
                     break;
 
+                // Import files    
                 case 9:
                     $arrFiles = array(
-                        "system/modules/z_syncCto_updater/SyncCtoAutoUpdater.php",
-                        "system/modules/z_syncCto_updater/config/config.php",
-                        "system/modules/z_syncCto_updater/config/.htaccess",
+                        "system/modules/syncCtoUpdater/SyncCtoAutoUpdater.php",
+                        "system/modules/syncCtoUpdater/config/config.php",
+                        "system/modules/syncCtoUpdater/config/.htaccess",
                         $this->objStepPool->AutoUpdateZip
                     );
 
@@ -966,17 +972,13 @@ class SyncCtoModuleClient extends BackendModule
 
                     break;
 
+                // Start update
                 case 10:
                     $this->objSyncCtoCommunicationClient->startAutoUpdater($this->objStepPool->AutoUpdateZip);
                     $this->objStepPool->step++;
                     break;
 
                 case 11:
-                    $this->objSyncCtoCommunicationClient->deleteAutoUpdater($this->objStepPool->AutoUpdateZip);
-                    $this->objStepPool->step++;
-                    break;
-
-                case 12:
                     $this->objData->setDescription($GLOBALS['TL_LANG']['tl_syncCto_sync']["step_1"]['description_1']);
                     $this->objData->setState($GLOBALS['TL_LANG']['MSC']['ok']);
                     $this->intStep++;
@@ -1220,12 +1222,12 @@ class SyncCtoModuleClient extends BackendModule
 
                     // Counter
                     $intCountMissing = 0;
-                    $intCountNeed = 0;
+                    $intCountNeed    = 0;
                     $intCountIgnored = 0;
-                    $intCountDelete = 0;
+                    $intCountDelete  = 0;
 
-                    $intTotalSizeNew = 0;
-                    $intTotalSizeDel = 0;
+                    $intTotalSizeNew    = 0;
+                    $intTotalSizeDel    = 0;
                     $intTotalSizeChange = 0;
 
                     // Count files
@@ -1323,9 +1325,9 @@ class SyncCtoModuleClient extends BackendModule
         if (is_array($this->arrListCompare) && count($this->arrListCompare) != 0 && $this->arrListCompare != false)
         {
             $intSkippCount = 0;
-            $intSendCount = 0;
-            $intWaitCount = 0;
-            $intDelCount = 0;
+            $intSendCount  = 0;
+            $intWaitCount  = 0;
+            $intDelCount   = 0;
             $intSplitCount = 0;
 
             foreach ($this->arrListCompare as $value)
@@ -1464,7 +1466,7 @@ class SyncCtoModuleClient extends BackendModule
                  */
                 case 3:
                     $intCountSplit = 0;
-                    $intCount = 0;
+                    $intCount      = 0;
 
                     foreach ($this->arrListCompare as $key => $value)
                     {
@@ -1514,7 +1516,7 @@ class SyncCtoModuleClient extends BackendModule
                  */
                 case 4:
                     $intCountSplit = 0;
-                    $intCount = 0;
+                    $intCount      = 0;
 
                     foreach ($this->arrListCompare as $key => $value)
                     {
@@ -1590,7 +1592,7 @@ class SyncCtoModuleClient extends BackendModule
                  */
                 case 5:
                     $intCountSplit = 0;
-                    $intCount = 0;
+                    $intCount      = 0;
 
                     foreach ($this->arrListCompare as $key => $value)
                     {
@@ -2012,9 +2014,9 @@ class SyncCtoModuleClient extends BackendModule
                     if (is_array($this->arrListCompare) && count($this->arrListCompare) != 0 && $this->arrListCompare != false)
                     {
                         $intSkippCount = 0;
-                        $intSendCount = 0;
-                        $intWaitCount = 0;
-                        $intDelCount = 0;
+                        $intSendCount  = 0;
+                        $intWaitCount  = 0;
+                        $intDelCount   = 0;
                         $intSplitCount = 0;
 
                         foreach ($this->arrListCompare as $value)
@@ -2423,12 +2425,12 @@ class SyncCtoModuleClient extends BackendModule
 
                     // Counter
                     $intCountMissing = 0;
-                    $intCountNeed = 0;
+                    $intCountNeed    = 0;
                     $intCountIgnored = 0;
-                    $intCountDelete = 0;
+                    $intCountDelete  = 0;
 
-                    $intTotalSizeNew = 0;
-                    $intTotalSizeDel = 0;
+                    $intTotalSizeNew    = 0;
+                    $intTotalSizeDel    = 0;
                     $intTotalSizeChange = 0;
 
                     // Count files
@@ -2526,9 +2528,9 @@ class SyncCtoModuleClient extends BackendModule
         if (is_array($this->arrListCompare) && count($this->arrListCompare) != 0 && $this->arrListCompare != false)
         {
             $intSkippCount = 0;
-            $intSendCount = 0;
-            $intWaitCount = 0;
-            $intDelCount = 0;
+            $intSendCount  = 0;
+            $intWaitCount  = 0;
+            $intDelCount   = 0;
             $intSplitCount = 0;
 
             foreach ($this->arrListCompare as $value)
@@ -2674,7 +2676,7 @@ class SyncCtoModuleClient extends BackendModule
                  */
                 case 3:
                     $intCountSplit = 0;
-                    $intCount = 0;
+                    $intCount      = 0;
 
                     foreach ($this->arrListCompare as $key => $value)
                     {
@@ -2725,7 +2727,7 @@ class SyncCtoModuleClient extends BackendModule
                  */
                 case 4:
                     $intCountSplit = 0;
-                    $intCount = 0;
+                    $intCount      = 0;
 
                     foreach ($this->arrListCompare as $key => $value)
                     {
@@ -2807,7 +2809,7 @@ class SyncCtoModuleClient extends BackendModule
                  */
                 case 5:
                     $intCountSplit = 0;
-                    $intCount = 0;
+                    $intCount      = 0;
 
                     foreach ($this->arrListCompare as $key => $value)
                     {
@@ -2948,8 +2950,8 @@ class SyncCtoModuleClient extends BackendModule
                  * Get file to client
                  */
                 case 4:
-                    $strFrom = $this->objSyncCtoHelper->standardizePath($this->arrClientInformation["folders"]['tmp'], $this->objStepPool->zipname);
-                    $strTo = $this->objSyncCtoHelper->standardizePath($GLOBALS['SYC_PATH']['tmp'], "sql", $this->objStepPool->zipname);
+                    $strFrom     = $this->objSyncCtoHelper->standardizePath($this->arrClientInformation["folders"]['tmp'], $this->objStepPool->zipname);
+                    $strTo       = $this->objSyncCtoHelper->standardizePath($GLOBALS['SYC_PATH']['tmp'], "sql", $this->objStepPool->zipname);
                     $booResponse = $this->objSyncCtoCommunicationClient->getFile($strFrom, $strTo);
 
                     // Check if the file was send and saved.
@@ -3197,9 +3199,9 @@ class SyncCtoModuleClient extends BackendModule
                     if (is_array($this->arrListCompare) && count($this->arrListCompare) != 0 && $this->arrListCompare != false)
                     {
                         $intSkippCount = 0;
-                        $intSendCount = 0;
-                        $intWaitCount = 0;
-                        $intDelCount = 0;
+                        $intSendCount  = 0;
+                        $intWaitCount  = 0;
+                        $intDelCount   = 0;
                         $intSplitCount = 0;
 
                         foreach ($this->arrListCompare as $value)
