@@ -37,7 +37,6 @@ class SyncCtoAutoUpdater extends Backend
     protected $booZipArchiveCto = false;
 
     // Const
-    const MODULE_PATH   = "system/modules/z_syncCto_updater";
     const TEMP_PATH     = "system/tmp/";
     const ZIP_FILE_PATH = "FILES";
     const ZIP_FILE_SQL  = "SQL";
