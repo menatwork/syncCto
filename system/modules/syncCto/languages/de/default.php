@@ -46,7 +46,10 @@ $GLOBALS['TL_LANG']['SYC']['search_index']                  = 'Suchindex neu auf
 $GLOBALS['TL_LANG']['SYC']['temp_tables']                   = 'Temporäre DB-Tabellen leeren';    
 $GLOBALS['TL_LANG']['SYC']['temp_folders']                  = 'Temporäre Ordner leeren';    
 $GLOBALS['TL_LANG']['SYC']['css_create']                    = 'CSS-Dateien neu erstellen';    
-$GLOBALS['TL_LANG']['SYC']['xml_create']                    = 'XML-Dateien neu erstellen';   
+$GLOBALS['TL_LANG']['SYC']['xml_create']                    = 'XML-Dateien neu erstellen';    
+// Tables   
+$GLOBALS['TL_LANG']['SYC']['tables_no_changes']             = 'Keine Änderungen vorhanden';    
+$GLOBALS['TL_LANG']['SYC']['tables_changes']                = 'Geänderte Tabellen';     
 
 /**
  * Back end modules

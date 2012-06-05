@@ -42,7 +42,6 @@ CREATE TABLE `tl_synccto_clients` (
 CREATE TABLE `tl_user_group` (
   `syncCto_clients` blob NULL,
   `syncCto_clients_p` blob NULL,
-  `syncCto_sync_options` blob NULL,
   `syncCto_tables` blob NULL
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 
@@ -55,6 +54,5 @@ CREATE TABLE `tl_user_group` (
 CREATE TABLE `tl_user` (
   `syncCto_clients` blob NULL,
   `syncCto_clients_p` blob NULL,
-  `syncCto_sync_options` blob NULL,
   `syncCto_tables` blob NULL
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
