@@ -82,6 +82,7 @@ $GLOBALS['TL_HOOKS']['addCustomRegexp'][]       = array('SyncCtoHelper', 'custom
  */
 $GLOBALS['TL_PERMISSIONS'][] = 'syncCto_clients';
 $GLOBALS['TL_PERMISSIONS'][] = 'syncCto_clients_p';
+$GLOBALS['TL_PERMISSIONS'][] = 'syncCto_sync_options';
 $GLOBALS['TL_PERMISSIONS'][] = 'syncCto_tables';
 
 /**
@@ -184,6 +185,34 @@ $GLOBALS['SYC_CONFIG']['folder_whitelist'] = array(
     'system',
     'templates',
     'typolight',
+);
+
+/**
+* Sync options
+*/
+$GLOBALS['SYC_CONFIG']['sync_options'] = array(
+    'core' => array(
+        'core_change',
+        'core_delete',
+    ),
+    'user' => array(
+        'user_change',
+        'user_delete',
+    ),
+    'configfiles' => array(
+        'localconfig_update',
+        'localconfig_errors',
+    )
+);
+
+/**
+* Maintance options
+*/
+$GLOBALS['SYC_CONFIG']['maintance_options'] = array(
+    'temp_tables',
+    'temp_folders',
+    'css_create',
+    'xml_create',
 );
 
 /**

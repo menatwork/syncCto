@@ -38,7 +38,7 @@ $GLOBALS['TL_LANG']['tl_syncCto_clients_syncTo']['edit']                        
 /**
  * Fields
  */
-$GLOBALS['TL_LANG']['tl_syncCto_clients_syncTo']['sync_type']                           = array('Synchronize files', 'Here you can select which files should be synchronized.');
+$GLOBALS['TL_LANG']['tl_syncCto_clients_syncTo']['sync_options']                           = array('Synchronize files', 'Here you can select which files should be synchronized.');
 $GLOBALS['TL_LANG']['tl_syncCto_clients_syncTo']['database_check']                      = array('Synchronize database', 'Choose this option for database synchronization.');
 $GLOBALS['TL_LANG']['tl_syncCto_clients_syncTo']['database_tables_recommended']         = array('Recommended tables', 'Here you can select the recommended tables for synchronization.');
 $GLOBALS['TL_LANG']['tl_syncCto_clients_syncTo']['database_tables_none_recommended']    = array('Not recommended tables', 'Here you can select the not recommended tables for synchronization. Use at your own risk.');

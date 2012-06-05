@@ -42,7 +42,7 @@ $GLOBALS['TL_DCA']['tl_syncCto_clients_syncFrom'] = array(
     // Palettes
     'palettes' => array(
         '__selector__' => array('database_check', 'systemoperations_check'),
-        'default' => '{sync_legend},lastSync,disabledCache,sync_type;{table_legend},database_check;{systemoperations_legend},systemoperations_check,attentionFlag;',
+        'default' => '{sync_legend},lastSync,disabledCache,sync_options;{table_legend},database_check;{systemoperations_legend},systemoperations_check,attentionFlag;',
     ),
     // Sub Palettes
     'subpalettes' => array(
@@ -61,8 +61,8 @@ $GLOBALS['TL_DCA']['tl_syncCto_clients_syncFrom'] = array(
             'label' => " ",
             'inputType' => 'statictext',
         ),        
-        'sync_type' => array(
-            'label' => $GLOBALS['TL_LANG']['tl_syncCto_clients_syncFrom']['sync_type'],
+        'sync_options' => array(
+            'label' => $GLOBALS['TL_LANG']['tl_syncCto_clients_syncFrom']['sync_options'],
             'inputType' => 'checkbox',
             'exclude' => true,
             'reference' => &$GLOBALS['TL_LANG']['SYC'],
@@ -335,9 +335,9 @@ class tl_syncCto_clients_syncFrom extends Backend
         $arrSyncSettings = array();
         
         // Synchronization type
-        if (is_array($this->Input->post("sync_type")) && count($this->Input->post("sync_type")) != 0)
+        if (is_array($this->Input->post("sync_options")) && count($this->Input->post("sync_options")) != 0)
         {
-            $arrSyncSettings["syncCto_Type"] = $this->Input->post('sync_type');
+            $arrSyncSettings["syncCto_Type"] = $this->Input->post('sync_options');
         }
         else
         {
