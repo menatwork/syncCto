@@ -72,34 +72,4 @@ $GLOBALS['TL_DCA']['tl_user_group']['fields']['syncCto_tables'] = array
     'options_callback' => array('SyncCtoHelper', 'databaseTables'),
 );
 
-
-class SyncCto_tl_user extends Backend
-{
-
-    public function getSyncToOptions()
-    {
-        //$GLOBALS['TL_DCA']['tl_syncCto_clients_syncTest']['fields'][]
-        
-        
-        $arrReturn = array(
-            "Datei System" => array(
-                "Kern Installation - Verändert",
-                "Kern Installation - Löschne",
-                "Benutzer Daten    - Verändert",
-                "Benutzer Daten    - Löschne",
-            ),
-            "Systemwartung" => array(
-                "tl search neu aufbauen",
-                "Temp Tabellen", 
-                "Temp Ordner",
-                "Css Dateien",
-                "XML Dateien"
-            )            
-        );
-        
-        return $arrReturn;
-    }
-
-}
-
 ?>
