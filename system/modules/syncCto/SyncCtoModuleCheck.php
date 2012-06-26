@@ -203,16 +203,6 @@ class SyncCtoModuleCheck extends BackendModule
         $return .= '<td>' . $GLOBALS['TL_LANG']['tl_syncCto_check']['dst'][1] . '</td>';
         $return .= '</tr>';
 
-        // url_fopen
-        $allow_url_fopen = ini_get('allow_url_fopen');
-        $ok              = ($allow_url_fopen == 1 || $allow_url_fopen == 'On');
-        $return .= '<tr class="' . ($ok ? 'ok' : 'warning') . '">';
-        $return .= '<td>' . $GLOBALS['TL_LANG']['tl_syncCto_check']['fopen'][0] . '</td>';
-        $return .= '<td class="dot">' . ($ok ? '&nbsp;' : '&#149;') . '</td>';
-        $return .= '<td class="value">' . ($allow_url_fopen ? $GLOBALS['TL_LANG']['tl_syncCto_check']['on'] : $GLOBALS['TL_LANG']['tl_syncCto_check']['off']) . '</td>';
-        $return .= '<td>' . $GLOBALS['TL_LANG']['tl_syncCto_check']['fopen'][1] . '</td>';
-        $return .= '</tr>';
-
         // suhosin
         $suhosin = ini_get('suhosin.session.max_id_length');
         $ok      = ($suhosin == false);
