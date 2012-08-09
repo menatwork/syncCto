@@ -161,7 +161,7 @@ class SyncCtoModuleClient extends BackendModule
         // Load settings from dca
         $this->loadSyncSettings();
         $this->loadClientInformation();
-        
+
         // Set time out for database. Ticket #2653
         if ($GLOBALS['TL_CONFIG']['syncCto_custom_settings'] == true
                 && intval($GLOBALS['TL_CONFIG']['syncCto_wait_timeout']) > 0
@@ -797,17 +797,13 @@ class SyncCtoModuleClient extends BackendModule
                     $strVersion = $this->objSyncCtoCommunicationClient->getVersionSyncCto();
                     $this->arrClientInformation["version_SyncCto"] = $strVersion;
 
-                    $strClientVersion = substr($strVersion, 0, 1);
-                    $strServerVersion = substr($GLOBALS['SYC_VERSION'], 0, 1);
-                    
-                    if (!version_compare($strClientVersion, $strServerVersion, "="))
+                    if (version_compare($strVersion, $GLOBALS['SYC_VERSION'], "="))
                     {
-                        $this->log(vsprintf("Not the same version from syncCto on synchronization client ID %s. Serverversion: %s. Clientversion: %s", array($this->Input->get("id"), $GLOBALS['SYC_VERSION'], $strVersion)), __CLASS__ . " " . __FUNCTION__, "GENERAL");
-
-                        $this->objData->setState($GLOBALS['TL_LANG']['MSC']['error']);
-                        $this->booError = true;
-                        $this->strError = vsprintf($GLOBALS['TL_LANG']['ERR']['version'], array("syncCto", $GLOBALS['SYC_VERSION'], $strVersion));
-                        break;
+                        $this->objStepPool->autoUpdate = false;
+                    }
+                    else
+                    {
+                        $this->objStepPool->autoUpdate = true;
                     }
 
                     $strVersion = $this->objSyncCtoCommunicationClient->getVersionContao();
@@ -872,7 +868,7 @@ class SyncCtoModuleClient extends BackendModule
 
                     // Check if memory limit on server and client is enough for upload  
                     $intLimit = min($intClientUploadLimit, $intClientMemoryLimit, $intClientPostLimit, $intLocalMemoryLimit);
-                
+
                     // Limit
                     if ($intLimit > 1073741824)
                     { // 1GB
@@ -896,9 +892,91 @@ class SyncCtoModuleClient extends BackendModule
                     $this->arrClientInformation["upload_sizeLimit"] = $intLimit;
                     $this->arrClientInformation["upload_sizePercent"] = $intPercent;
 
+                    if ($this->objStepPool->autoUpdate == false)
+                    {
+                        $this->objData->setState($GLOBALS['TL_LANG']['MSC']['ok']);
+                        $this->intStep++;
+                    }
+                    else
+                    {
+                        $this->objData->setDescription($GLOBALS['TL_LANG']['tl_syncCto_sync']['step_1']['description_3']);
+                        $this->objStepPool->step++;
+                    }
+
+                    break;
+
+                /**
+                 * Auto Updater
+                 */
+                case 7:
+                    $objSyncCtoUpdater = SyncCtoUpdater::getInstance();
+                    $strZipPath        = $this->objSyncCtoHelper->standardizePath($GLOBALS['SYC_PATH']['tmp'], "autoupdater", "autoupdate_" . time() . ".zip");
+                    new Folder(dirname($strZipPath));
+                    $objSyncCtoUpdater->buildUpdateZip($strZipPath);
+
+                    $this->objStepPool->AutoUpdateZip = $strZipPath;
+                    $this->objStepPool->step++;
+
+                    break;
+
+                // Send files
+                case 8:
+                    $arrFiles = array(
+                        "system/modules/syncCtoUpdater/SyncCtoAutoUpdater.php",
+                        "system/modules/syncCtoUpdater/config/config.php",
+                        "system/modules/syncCtoUpdater/config/.htaccess",
+                        $this->objStepPool->AutoUpdateZip
+                    );
+
+                    foreach ($arrFiles as $value)
+                    {
+                        $this->objSyncCtoCommunicationClient->sendFile(dirname($value), basename($value), "", SyncCtoEnum::UPLOAD_SYNC_TEMP);
+                    }
+
+                    $this->objStepPool->step++;
+
+                    break;
+
+                // Import files    
+                case 9:
+                    $arrFiles = array(
+                        "system/modules/syncCtoUpdater/SyncCtoAutoUpdater.php",
+                        "system/modules/syncCtoUpdater/config/config.php",
+                        "system/modules/syncCtoUpdater/config/.htaccess",
+                        $this->objStepPool->AutoUpdateZip
+                    );
+
+                    $arrImport = array();
+
+                    foreach ($arrFiles as $value)
+                    {
+                        $strChecksum = md5(TL_ROOT . "/" . $value);
+
+                        $arrImport[$strChecksum] = array(
+                            "path" => $value,
+                            "checksum" => $strChecksum,
+                            "size" => 0,
+                            "state" => SyncCtoEnum::FILESTATE_FILE,
+                            "transmission" => SyncCtoEnum::FILETRANS_WAITING,
+                        );
+                    }
+
+                    $this->objSyncCtoCommunicationClient->runFileImport($arrImport);
+
+                    $this->objStepPool->step++;
+
+                    break;
+
+                // Start update
+                case 10:
+                    $this->objSyncCtoCommunicationClient->startAutoUpdater($this->objStepPool->AutoUpdateZip);
+                    $this->objStepPool->step++;
+                    break;
+
+                case 11:
+                    $this->objData->setDescription($GLOBALS['TL_LANG']['tl_syncCto_sync']["step_1"]['description_1']);
                     $this->objData->setState($GLOBALS['TL_LANG']['MSC']['ok']);
                     $this->intStep++;
-
                     break;
             }
         }
@@ -1123,7 +1201,7 @@ class SyncCtoModuleClient extends BackendModule
                         $this->intStep++;
 
                         $this->arrListCompare = array();
-                        
+
                         break;
                     }
                     else if (key_exists("forward", $_POST) && count($this->arrListCompare) != 0)
@@ -1133,7 +1211,7 @@ class SyncCtoModuleClient extends BackendModule
                         $this->objData->setHtml("");
                         $this->booRefresh = true;
                         $this->intStep++;
-                        
+
                         break;
                     }
 
@@ -1215,8 +1293,8 @@ class SyncCtoModuleClient extends BackendModule
                     // Build content 
                     $this->objData->setDescription(vsprintf($GLOBALS['TL_LANG']['tl_syncCto_sync']["step_2"]['description_4'], array($intCountMissing, $intCountNeed, $intCountDelete, $intCountIgnored, $this->getReadableSize($intTotalSizeNew), $this->getReadableSize($intTotalSizeChange), $this->getReadableSize($intTotalSizeDel))));
                     $this->objData->setHtml($objTemp->parse());
-                    $this->booRefresh = false;                      
-                    
+                    $this->booRefresh = false;
+
                     break;
             }
         }
@@ -1675,7 +1753,7 @@ class SyncCtoModuleClient extends BackendModule
                     $this->booRefresh = false;
                     
                     break;
-                
+
                 /**
                  * Build SQL Zip File
                  */
@@ -1782,19 +1860,19 @@ class SyncCtoModuleClient extends BackendModule
                         {
                             $this->import($callback[0]);
                             $mixReturn = $this->$callback[0]->$callback[1]($this->intClientID, $arrSQL);
-                            
-                            if(!empty($mixReturn) && is_array($mixReturn))
+
+                            if (!empty($mixReturn) && is_array($mixReturn))
                             {
                                 $arrSQL = $mixReturn;
-                            } 
+                            }
                         }
-                        
-                        if(count($arrSQL) != 0)
+
+                        if (count($arrSQL) != 0)
                         {
                             $this->objSyncCtoCommunicationClient->executeSQL($arrSQL);
                         }
                     }
-                    
+
                     // Show step information
                     $this->objData->setState($GLOBALS['TL_LANG']['MSC']['ok']);
                     $this->objData->setDescription($GLOBALS['TL_LANG']['tl_syncCto_sync']['step_4']['description_4']);
@@ -1948,7 +2026,7 @@ class SyncCtoModuleClient extends BackendModule
                 /**
                  * Import Config / Set referer check
                  */
-               case 6:
+                case 6:
                     if (is_array($this->arrSyncSettings["syncCto_Systemoperations_Maintenance"]) && count($this->arrSyncSettings["syncCto_Systemoperations_Maintenance"]) != 0)
                     {
                         $this->objSyncCtoCommunicationClient->runMaintenance($this->arrSyncSettings["syncCto_Systemoperations_Maintenance"]);
@@ -1961,7 +2039,7 @@ class SyncCtoModuleClient extends BackendModule
                     if ($this->arrSyncSettings["syncCto_AttentionFlag"] == true)
                     {
                         $this->objSyncCtoCommunicationClient->setAttentionFlag(false);
-                    }                    
+                    }
 
                     $this->objStepPool->step++;
                     $this->log(vsprintf("Successfully finishing of synchronization client ID %s.", array($this->Input->get("id"))), __CLASS__ . " " . __FUNCTION__, "INFO");
@@ -2085,7 +2163,7 @@ class SyncCtoModuleClient extends BackendModule
                             }
 
                             $skipreason = preg_replace("/(RPC Call:.*|\<br\>|\<br\/\>)/i", " ", $value["skipreason"]);
-                            
+
                             $arrSort[$skipreason][] = $value["path"];
                         }
 
@@ -2381,7 +2459,7 @@ class SyncCtoModuleClient extends BackendModule
 
                     $this->objStepPool->step++;
                     break;
-                    
+
                 /**
                  * Show files form
                  */
@@ -2394,7 +2472,7 @@ class SyncCtoModuleClient extends BackendModule
                         $this->intStep++;
 
                         $this->arrListCompare = array();
-                        
+
                         break;
                     }
                     else if (key_exists("forward", $_POST) && count($this->arrListCompare) != 0)
@@ -2404,7 +2482,7 @@ class SyncCtoModuleClient extends BackendModule
                         $this->objData->setHtml("");
                         $this->booRefresh = true;
                         $this->intStep++;
-                        
+
                         break;
                     }
 
@@ -2486,11 +2564,9 @@ class SyncCtoModuleClient extends BackendModule
                     // Build content 
                     $this->objData->setDescription(vsprintf($GLOBALS['TL_LANG']['tl_syncCto_sync']["step_2"]['description_4'], array($intCountMissing, $intCountNeed, $intCountDelete, $intCountIgnored, $this->getReadableSize($intTotalSizeNew), $this->getReadableSize($intTotalSizeChange), $this->getReadableSize($intTotalSizeDel))));
                     $this->objData->setHtml($objTemp->parse());
-                    $this->booRefresh = false;                      
-                    
-                    break;
+                    $this->booRefresh = false;
 
-                
+                    break;
             }
         }
         catch (Exception $exc)

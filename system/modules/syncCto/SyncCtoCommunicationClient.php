@@ -476,6 +476,61 @@ class SyncCtoCommunicationClient extends CtoCommunication
 
         return $this->runServer("SYNCCTO_SEND_FILE", $arrData);
     }
+    
+    /**
+     * Send a file to the client
+     *
+     * @param string $strFile File + path. Start from TL_ROOT.
+     * @return bool [true|false]
+     */
+    public function sendFileNewDestination($strSource, $strDestination, $strMD5 = "", $intTyp = 1, $strSplitname = "")
+    {
+        // 5 min. time out.
+        @set_time_limit(3600);
+
+        //Build path
+        $strSource = $this->objSyncCtoHelper->standardizePath($strSource);
+        $strDestination = $this->objSyncCtoHelper->standardizePath($strDestination);
+
+        // Check file exsist
+        if (!file_exists(TL_ROOT . "/" . $strSource) || !is_file(TL_ROOT . "/" . $strSource))
+        {
+            throw new Exception(vsprintf($GLOBALS['TL_LANG']['ERR']['unknown_file'], array($strSource)));
+        }
+
+        // MD5 file hash
+        if ($strMD5 == "")
+        {
+            $strMD5 = md5_file(TL_ROOT . "/" . $strSource);
+        }
+
+        // Contenttyp
+        $strMime = "application/octet-stream";
+
+        // Build array with informations
+        $arrData = array(
+            array(
+                "name" => $strMD5,
+                "filename" => basename($strSource),
+                "filepath" => TL_ROOT . "/" . $strSource,
+                "mime" => $strMime,
+            ),
+            array(
+                "name" => "metafiles",
+                "value" => array(
+                    $strMD5 => array(
+                        "folder" => dirname($strDestination),
+                        "file" => basename($strDestination),
+                        "MD5" => $strMD5,
+                        "splitname" => $strSplitname,
+                        "typ" => $intTyp
+                    )
+                )
+            ),
+        );
+
+        return $this->runServer("SYNCCTO_SEND_FILE", $arrData);
+    }
 
     /**
      * Import files from tempfolder
@@ -665,7 +720,7 @@ class SyncCtoCommunicationClient extends CtoCommunication
 
         return $this->runServer("SYNCCTO_RUN_DUMP", $arrData);
     }
-    
+
     /**
      * Exceute SQL commands on client side
      * 
@@ -679,8 +734,8 @@ class SyncCtoCommunicationClient extends CtoCommunication
                 "name" => "sql",
                 "value" => $arrSQL,
             )
-        );        
-                
+        );
+
         return $this->runServer("SYNCCTO_EXECUTE_SQL", $arrData);
     }
 
@@ -730,7 +785,7 @@ class SyncCtoCommunicationClient extends CtoCommunication
         // Load blacklist for localconfig
         $arrConfigBlacklist = $this->objSyncCtoHelper->getBlacklistLocalconfig();
         // Load localconfig
-        $arrConfig          = $this->objSyncCtoHelper->loadConfigs(SyncCtoEnum::LOADCONFIG_KEY_VALUE);
+        $arrConfig = $this->objSyncCtoHelper->loadConfigs(SyncCtoEnum::LOADCONFIG_KEY_VALUE);
 
         // Kick blacklist entries
         foreach ($arrConfig as $key => $value)
@@ -761,6 +816,23 @@ class SyncCtoCommunicationClient extends CtoCommunication
 
         return $this->runServer("SYNCCTO_GET_CONFIG", $arrData);
     }
+
+    /* -------------------------------------------------------------------------
+     * Auto Updater
+     */
+
+    public function startAutoUpdater($strZipPath)
+    {
+        $arrData = array(
+            array(
+                "name" => "zipfile",
+                "value" => $strZipPath,
+            ),
+        );
+
+
+        return $this->runServer("SYNCCTO_AUTO_UPDATE", $arrData);
+    }   
 
 }
 
