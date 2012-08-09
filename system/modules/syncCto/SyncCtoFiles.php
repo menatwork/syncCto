@@ -50,6 +50,7 @@ class SyncCtoFiles extends Backend
     // Objects 
     protected $objSyncCtoHelper;
     protected $objFiles;
+    
 
     /* -------------------------------------------------------------------------
      * Core
@@ -219,16 +220,17 @@ class SyncCtoFiles extends Backend
 
         return $arrChecksum;
     }
-
+    
     /**
      * Create a xml file with all files
      * 
      * @param string $strXMLFile Full filepath
+     * @param $intInformations $intSize The size
      * @param boolean $booCore Core scan
      * @param boolean $booFiles Files scan
      * @return boolean 
      */
-    public function getChecksumFilesAsXMLSmall($strXMLFile, $booCore = false, $booFiles = false)
+    protected function getChecksumFileAsXML($strXMLFile, $booCore = false, $booFiles = false, $intInformations = SyncCtoEnum::FILEINFORMATION_SMALL)
     {
         $strXMLFile = $this->objSyncCtoHelper->standardizePath($strXMLFile);
 
@@ -274,11 +276,22 @@ class SyncCtoFiles extends Backend
             }
             else
             {
-                $objXml->startElement('file');
-                $objXml->writeAttribute("id", md5($arrFiles[$i]));
-                $objXml->writeAttribute("ai", $i);
-                $objXml->text($arrFiles[$i]);
-                $objXml->endElement(); // End file
+                if ($intInformations == SyncCtoEnum::FILEINFORMATION_SMALL)
+                {
+                    $objXml->startElement('file');
+                    $objXml->writeAttribute("id", md5($arrFiles[$i]));
+                    $objXml->writeAttribute("ai", $i);
+                    $objXml->text($arrFiles[$i]);
+                    $objXml->endElement(); // End file
+                }
+                else  if ($intInformations == SyncCtoEnum::FILEINFORMATION_BIG)
+                {
+                    $objXml->startElement('file');
+                    $objXml->writeAttribute("id", md5($arrFiles[$i]));
+                    $objXml->writeAttribute("ai", $i);
+                    $objXml->text($arrFiles[$i]);
+                    $objXml->endElement(); // End file
+                }
             }
 
             if ($this->intMaxMemoryUsage < memory_get_usage(true))
@@ -296,6 +309,19 @@ class SyncCtoFiles extends Backend
 
         return true;
     }
+
+//    /**
+//     * Create a xml file with all files
+//     * 
+//     * @param string $strXMLFile Full filepath
+//     * @param boolean $booCore Core scan
+//     * @param boolean $booFiles Files scan
+//     * @return boolean 
+//     */
+//    public function getChecksumFilesAsXMLSmall($strXMLFile, $booCore = false, $booFiles = false)
+//    {
+//        
+//    }
 
     /**
      * Create a checksum list from contao core folders

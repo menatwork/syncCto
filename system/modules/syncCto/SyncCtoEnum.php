@@ -94,4 +94,12 @@ class SyncCtoEnum
      */
     
     const CODIFY_EMPTY = "empty";
+
+    /**
+     * Fileinformation size
+     */
+    
+    const FILEINFORMATION_SMALL = 1;
+    const FILEINFORMATION_BIG   = 2;
+
 }

@@ -76,7 +76,7 @@ class CronFileBackups extends Backend
             {
                 $booFirstRun = true;
 
-                if (!$this->objSyncCtoFile->getChecksumFilesAsXMLSmall($strXMLPath, true, true))
+                if (!$this->objSyncCtoFile->getChecksumFilesAsXML($strXMLPath, true, true, SyncCtoEnum::FILEINFORMATION_SMALL))
                 {
                     $this->log("Error by creating filelist.", __CLASS__ . " | " . __FUNCTION__, TL_CRON);
                 }
