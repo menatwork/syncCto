@@ -133,6 +133,9 @@ $GLOBALS['TL_LANG']['ERR']['cant_delete_file']              = 'Fehler beim Lösc
 $GLOBALS['TL_LANG']['ERR']['attention_headline']            = 'Achtung bei Änderungen am System';
 $GLOBALS['TL_LANG']['ERR']['attention_text']                = 'Es werden zurzeit Aktualisierungen im Hintergrund durchgeführt, die dazu führen könnten das Änderungen auf dieser Installation überschrieben werden.';
 $GLOBALS['TL_LANG']['ERR']['min_size_limit']                = 'Die minimale Dateigröße von s% wurde unterschritten.';
+$GLOBALS['TL_LANG']['ERR']['cant_extract_file']             = 'Fehler beim entpacken der Dateien.';
+
+// Database
 $GLOBALS['TL_LANG']['ERR']['missing_tables_selection']      = 'Es wurde(n) keine Tabell(en) ausgewählt.';
 $GLOBALS['TL_LANG']['ERR']['unknown_backup_method']         = 'Die gewählte Backup Methode ist nicht bekannt.';
 $GLOBALS['TL_LANG']['ERR']['unknown_function']              = 'Unbekannte Funktion oder Methode.';

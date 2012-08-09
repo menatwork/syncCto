@@ -37,10 +37,12 @@ class SyncCtoFiles extends Backend
      */
 
     // Singelten pattern
-    protected static $instance      = null;
+    protected static $instance         = null;
     // Vars
-    protected $strSuffixZipName     = "File-Backup.zip";
+    protected $strSuffixZipName = "File-Backup.zip";
     protected $strTimestampFormat;
+    protected $intMaxMemoryUsage;
+    protected $intMaxExecutionTime;
     // Lists
     protected $arrFolderBlacklist;
     protected $arrFileBlacklist;
@@ -61,14 +63,14 @@ class SyncCtoFiles extends Backend
         parent::__construct();
 
         // Init
-        $this->objSyncCtoHelper     = SyncCtoHelper::getInstance();
-        $this->objFiles             = Files::getInstance();
-        $this->strTimestampFormat   = standardize($GLOBALS['TL_CONFIG']['datimFormat']);
+        $this->objSyncCtoHelper = SyncCtoHelper::getInstance();
+        $this->objFiles = Files::getInstance();
+        $this->strTimestampFormat = standardize($GLOBALS['TL_CONFIG']['datimFormat']);
 
         // Load blacklists and whitelists
-        $this->arrFolderBlacklist   = $this->objSyncCtoHelper->getBlacklistFolder();
-        $this->arrFileBlacklist     = $this->objSyncCtoHelper->getBlacklistFile();
-        $this->arrRootFolderList    = $this->objSyncCtoHelper->getWhitelistFolder();
+        $this->arrFolderBlacklist = $this->objSyncCtoHelper->getBlacklistFolder();
+        $this->arrFileBlacklist = $this->objSyncCtoHelper->getBlacklistFile();
+        $this->arrRootFolderList = $this->objSyncCtoHelper->getWhitelistFolder();
 
         $arrSearch = array("\\", ".", "^", "?", "*", "/");
         $arrReplace = array("\\\\", "\\.", "\\^", ".?", ".*", "\\/");
@@ -82,6 +84,14 @@ class SyncCtoFiles extends Backend
         {
             $this->arrFileBlacklist[$key] = str_replace($arrSearch, $arrReplace, $value);
         }
+
+        // Get memory limit
+        $this->intMaxMemoryUsage = intval(str_replace(array("m", "M", "k", "K"), array("000000", "000000", "000", "000"), ini_get('memory_limit')));
+        $this->intMaxMemoryUsage = $this->intMaxMemoryUsage / 100 * 30;
+
+        // Get execution limit
+        $this->intMaxExecutionTime = intval(ini_get('max_execution_time'));
+        $this->intMaxExecutionTime = intval($this->intMaxExecutionTime / 100 * 25);
     }
 
     /**
@@ -208,6 +218,83 @@ class SyncCtoFiles extends Backend
         }
 
         return $arrChecksum;
+    }
+
+    /**
+     * Create a xml file with all files
+     * 
+     * @param string $strXMLFile Full filepath
+     * @param boolean $booCore Core scan
+     * @param boolean $booFiles Files scan
+     * @return boolean 
+     */
+    public function getChecksumFilesAsXMLSmall($strXMLFile, $booCore = false, $booFiles = false)
+    {
+        $strXMLFile = $this->objSyncCtoHelper->standardizePath($strXMLFile);
+
+        $objFile = new File($strXMLFile);
+        $objFile->delete();
+        $objFile->close();
+
+        $arrFiles = $this->getFileList($booCore, $booFiles);
+
+        if (count($arrFiles) == 0)
+        {
+            return false;
+        }
+
+        // Create XML File
+        $objXml = new XMLWriter();
+        $objXml->openMemory();
+        $objXml->setIndent(true);
+        $objXml->setIndentString("\t");
+
+        // XML Start
+        $objXml->startDocument('1.0', 'UTF-8');
+        $objXml->startElement('fileslist');
+
+        // Write meta (header)
+        $objXml->startElement('metatags');
+        $objXml->writeElement('version', $GLOBALS['SYC_VERSION']);
+        $objXml->writeElement('create_unix', time());
+        $objXml->writeElement('create_date', date('Y-m-d', time()));
+        $objXml->writeElement('create_time', date('H:i', time()));
+        $objXml->endElement(); // End metatags
+
+        $objXml->startElement('files');
+
+        for ($i = 0; $i < count($arrFiles); $i++)
+        {
+            // Get filesize
+            $intSize = filesize(TL_ROOT . "/" . $arrFiles[$i]);
+
+            if ($intSize < 0 && $intSize != 0)
+            {
+                continue;
+            }
+            else
+            {
+                $objXml->startElement('file');
+                $objXml->writeAttribute("id", md5($arrFiles[$i]));
+                $objXml->writeAttribute("ai", $i);
+                $objXml->text($arrFiles[$i]);
+                $objXml->endElement(); // End file
+            }
+
+            if ($this->intMaxMemoryUsage < memory_get_usage(true))
+            {
+                $objFile->append($objXml->flush(true), "");
+                $objFile->close();
+            }
+        }
+
+        $objXml->endElement(); // End files
+        $objXml->endElement(); // End fileslist
+
+        $objFile->append($objXml->flush(true), "");
+        $objFile->close();
+
+        return true;
     }
 
     /**
@@ -348,7 +435,7 @@ class SyncCtoFiles extends Backend
      * @return string Filename 
      */
     public function runDump($strZip = "", $booCore = false, $arrFiles = array())
-    {        
+    {
         if ($strZip == "")
         {
             $strFilename = date($this->strTimestampFormat) . "_" . $this->strSuffixZipName;
@@ -396,32 +483,171 @@ class SyncCtoFiles extends Backend
 
         return array("name" => $strFilename, "skipped" => $arrFileSkipped);
     }
-    
+
+    /**
+     * Make a incremental backup from a filelist
+     * 
+     * @param string $srtXMLFilelist  Path to XML filelist
+     * @param stirng $strZipFolder Path to the folder
+     * @param string $strZipFile Name of zipfile. If empty a filename will be create.
+     * @return array array{"folder"=>[string],"file"=>[string],"fullpath"=>[string],"xml"=>[string],"done"=>[boolean]}
+     * @throws Exception 
+     */
+    public function runIncrementalDump($srtXMLFilelist, $strZipFolder, $strZipFile = null, $intMaxFilesPerRun = 5)
+    {
+        $floatTimeStart = microtime(true);
+
+        // Check if filelist exists
+        if (!file_exists(TL_ROOT . "/" . $srtXMLFilelist))
+        {
+            throw new Exception("File not found: " + $srtXMLFilelist);
+        }
+
+        // Create, check zip name
+        if ($strZipFile == null || $strZipFile == "")
+        {
+            $strZipFile = date($this->strTimestampFormat) . "_" . $this->strSuffixZipName;
+        }
+        else
+        {
+            $strZipFile = str_replace(array(" "), array("_"), preg_replace("/\.zip\z/i", "", $strZipFile)) . ".zip";
+        }
+
+        // Build Path
+        $strZipFolder = $this->objSyncCtoHelper->standardizePath($strZipFolder);
+        $strZipPath   = $this->objSyncCtoHelper->standardizePath($strZipFolder, $strZipFile);
+
+        // Open XML Reader
+        $objXml = new DOMDocument("1.0", "UTF-8");
+        $objXml->load(TL_ROOT . "/" . $srtXMLFilelist);
+
+        // Check if we have some files
+        if ($objXml->getElementsByTagName("file")->length == 0)
+        {
+            return array(
+                "folder" => $strZipFolder,
+                "file" => $strZipFile,
+                "fullpath" => $strZipPath,
+                "xml" => $srtXMLFilelist,
+                "done" => true
+            );
+        }
+
+        // Open ZipArchive
+        $objZipArchive = new ZipArchiveCto();
+        if (($mixError      = $objZipArchive->open($strZipPath, ZipArchiveCto::CREATE)) !== true)
+        {
+            throw new Exception($GLOBALS['TL_LANG']['MSC']['error'] . ": " . $objZipArchive->getErrorDescription($mixError));
+        }
+
+        // Get all files
+        $objFilesList = $objXml->getElementsByTagName("file");
+        $objNodeFiles = $objXml->getElementsByTagName("files")->item(0);
+        $arrFinished  = array();
+        $intRuns = 0;
+
+        // Run throug each
+        foreach ($objFilesList as $file)
+        {
+            // Check if file exists
+            if (file_exists(TL_ROOT . "/" . $file->nodeValue))
+            {
+                $objZipArchive->addFile($file->nodeValue, $file->nodeValue);
+            }
+
+            // Add file to finished list
+            $arrFinished[] = $file;
+            $intRuns++;
+
+            // After 5 files add all to zip
+            if ($intRuns == $intMaxFilesPerRun)
+            {
+                $objZipArchive->close();
+                $objZipArchive->open($strZipPath, ZipArchiveCto::CREATE);
+                $intRuns = 0;
+            }
+
+            // Check time out
+            if ((microtime(true) - $floatTimeStart) > $this->intMaxExecutionTime)
+            {
+                break;
+            }
+        }
+
+        // Remove finished files from xml
+        foreach ($arrFinished as $value)
+        {
+            $objNodeFiles->removeChild($value);
+        }
+        
+        // Close XML and zip
+        $objXml->save(TL_ROOT . "/" . $srtXMLFilelist);
+        $objZipArchive->close();
+
+        if ($objXml->getElementsByTagName("file")->length == 0)
+        {
+            $booFinished = true;
+        }
+        else
+        {
+            $booFinished = false;
+        }
+
+        // Return informations
+        return array(
+            "folder" => $strZipFolder,
+            "file" => $strZipFile,
+            "fullpath" => $strZipPath,
+            "xml" => $srtXMLFilelist,
+            "done" => $booFinished
+        );
+    }
+
     /**
      * Unzip files
      * 
-     * @param string $strRestoreFile
-     * @return void 
+     * @param string $strRestoreFile Path to the zip file
+     * @return mixes True - If ervething is okay, Array - If some files could not be extract to a given path.
+     * @throws Exception if the zip file was not able to open.
      */
     public function runRestore($strRestoreFile)
-    {
+    {        
         $objZipArchive = new ZipArchiveCto();
-        
+
         if (($mixError = $objZipArchive->open($strRestoreFile)) !== true)
         {
             throw new Exception($GLOBALS['TL_LANG']['MSC']['error'] . ": " . $objZipArchive->getErrorDescription($mixError));
         }
         
-        if($objZipArchive->numFiles == 0)
+        if ($objZipArchive->numFiles == 0)
         {
             return;
         }
         
-        $objZipArchive->extractTo("");
-        
+       
+
+        $arrErrorFiles = array();
+
+        for ($i = 0; $i < $objZipArchive->numFiles; $i++)
+        {
+            $filename = $objZipArchive->getNameIndex($i);
+            
+            if (!$objZipArchive->extractTo("/", $filename))
+            {
+                $arrErrorFiles[] = $filename;
+            }
+        }
+
         $objZipArchive->close();
 
-        return;
+        if (count($arrErrorFiles) == 0)
+        {
+            return true;
+        }
+        else
+        {
+            return $arrErrorFiles;
+        }
     }
 
     /* -------------------------------------------------------------------------
@@ -792,9 +1018,9 @@ class SyncCtoFiles extends Backend
      */
     public function splitFiles($strSrcFile, $strDesFolder, $strDesFile, $intSizeLimit)
     {
-        @set_time_limit(3600);        
-        
-        if($intSizeLimit < 500*1024)
+        @set_time_limit(3600);
+
+        if ($intSizeLimit < 500 * 1024)
         {
             throw new Exception(vsprintf($GLOBALS['TL_LANG']['ERR']['min_size_limit'], array("500KiB")));
         }

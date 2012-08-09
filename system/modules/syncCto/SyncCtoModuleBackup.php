@@ -644,7 +644,25 @@ class SyncCtoModuleBackup extends BackendModule
             case 2:
                 try
                 {
-                    $this->objSyncCtoFiles->runRestore($this->arrBackupSettings['backup_file']);
+                    $mixResponse = $this->objSyncCtoFiles->runRestore($this->arrBackupSettings['backup_file']);
+
+                    if ($mixResponse !== true)
+                    {
+                        $strHTML = $GLOBALS['TL_LANG']['ERR']['cant_extract_file'];
+                        $strHTML .= "<br />";
+                        $strHTML .= "<ul>";
+                        foreach ($mixResponse as $value)
+                        {
+                            $strHTML .= "<li>" . $value . "</li>";
+                        }
+                        $strHTML .= "</ul>";
+
+                        $this->booError = true;
+                        $this->strError = $strHTML;
+                        $this->objData->setStep(1);
+                        $this->objData->setDescription($GLOBALS['TL_LANG']['ERR']['cant_extract_file']);
+                        break;
+                    }
 
                     $this->intStep++;
                     break;
