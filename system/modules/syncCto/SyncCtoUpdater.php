@@ -1,4 +1,7 @@
-<?php if (!defined('TL_ROOT')) die('You cannot access this file directly!');
+<?php
+
+if (!defined('TL_ROOT'))
+    die('You cannot access this file directly!');
 
 /**
  * Contao Open Source CMS
@@ -70,9 +73,8 @@ class SyncCtoUpdater extends Backend
     {
         parent::__construct();
 
-        $this->objSyncCtoFiles = SyncCtoFiles::getInstance();
+        $this->objSyncCtoFiles    = SyncCtoFiles::getInstance();
         $this->objSyncCtoDatabase = SyncCtoDatabase::getInstance();
-        $this->objSyncCtoErClient = new SyncCtoErClient();
     }
 
     /**
@@ -114,29 +116,56 @@ class SyncCtoUpdater extends Backend
         if (($mixError = $this->objZipArchive->open($strZipPath, ZipArchiveCto::CREATE)) !== true)
         {
             throw new Exception($GLOBALS['TL_LANG']['MSC']['error'] . ": " . $this->objZipArchive->getErrorDescription($mixError));
-        } 
-        
-        $this->addFiles();        
+        }
+
+        $this->addFiles();
         $this->addDatabase();
-        
+
         $this->objZipArchive->close();
+
     }
 
     protected function addFiles()
     {
-        $this->loadFileListFromEr();
-
-        foreach ($this->arrFiles as $value)
+        if (!file_exists(TL_ROOT . '/tl_files/syncCto_backups/dependencies.xml'))
         {
-            $value['path'] = preg_replace("/^TL_ROOT\//i", "", $value['path'], 1);
+            throw new Exception("Missing dependencies.xml for autoupdater.");
+        }
 
-            if (file_exists(TL_ROOT . "/" . $value['path']))
+        $objXMLReader = new XMLReader();
+        $objXMLReader->open(TL_ROOT . '/tl_files/syncCto_backups/dependencies.xml');
+
+        $strCurrentNode = "";
+
+        while ($objXMLReader->read())
+        {
+            switch ($objXMLReader->nodeType)
             {
-                if (!$this->objZipArchive->addFile($value['path'], "FILES/" . $value['path']))
-                {
-                    throw new Exception("Could not add the file " . $value['path'] . " to the archive.");
-                }
+                case XMLReader::ELEMENT:
+                    $strCurrentNode = $objXMLReader->localName;
+                    break;
+
+                case XMLReader::TEXT:
+                case XMLReader::CDATA:
+                    if ($strCurrentNode == "path")
+                    {
+                        $strPath = preg_replace("/^TL_ROOT\//i", "", $objXMLReader->value, 1);
+
+                        if (file_exists(TL_ROOT . "/" . $strPath))
+                        {
+                            if (!$this->objZipArchive->addFile($strPath, "FILES/" . $strPath))
+                            {
+                                throw new Exception("Could not add the file " . $strPath . " to the archive.");
+                            }
+                        }
+                    }
+                    break;
             }
+        }
+
+        if (!$this->objZipArchive->addFile('tl_files/syncCto_backups/dependencies.xml', "FILES/" . 'tl_files/syncCto_backups/dependencies.xml'))
+        {
+            throw new Exception('Could not add the file /tl_files/syncCto_backups/dependencies.xml to the archive.');
         }
     }
 
@@ -213,151 +242,6 @@ class SyncCtoUpdater extends Backend
         $objXml->endElement(); // End database
 
         $this->objZipArchive->addFromString("SQL/sql.xml", $objXml->flush(true));
-    }
-
-    // - Helper ----------------------------------------------------------------
-
-    protected function loadAllInstalledExtensions()
-    {
-        // Load installed extensions
-        $arrExtensions = $this->Database
-                ->prepare("SELECT * FROM tl_repository_installs")
-                ->execute()
-                ->fetchAllAssoc();
-
-        $arrSort = array();
-
-        foreach ($arrExtensions as $value)
-        {
-            $arrSort[$value["extension"]] = $value;
-        }
-
-        return $arrSort;
-    }
-
-    protected function loadFileListFromEr()
-    {
-        $arrInstalledExtensions = $this->loadAllInstalledExtensions();
-
-        if (!key_exists("syncCto", $arrInstalledExtensions))
-        {
-            throw new Exception("SyncCto is not installed over the ER, please only use the ER version.");
-        }
-
-        $arrDependencies   = $this->objSyncCtoErClient->getDependenciesFor($arrInstalledExtensions['syncCto']['extension'], $arrInstalledExtensions['syncCto']['version']);
-        $arrDependencies[] = array(
-            "name" => $arrInstalledExtensions['syncCto']['extension'],
-            "version" => $arrInstalledExtensions['syncCto']['version']
-        );
-
-        $arrDependenciesDone = array();
-
-        while (count($arrDependencies) != 0)
-        {
-            $arrEntry = array_pop($arrDependencies);
-
-            if (in_array($arrEntry['name'], $arrDependenciesDone))
-            {
-                continue;
-            }
-
-            if (key_exists($arrEntry['name'], $arrInstalledExtensions))
-            {
-                $strExtensionName = $arrEntry['name'];
-
-                $arrDependencies = array_merge($arrDependencies, $this->objSyncCtoErClient->getDependenciesFor($strExtensionName, $arrInstalledExtensions[$strExtensionName]['version']));
-                $this->arrFiles = array_merge($this->arrFiles, $this->objSyncCtoErClient->getFileListFor($strExtensionName, $arrInstalledExtensions[$strExtensionName]['version']));
-            }
-            else
-            {
-                $arrDependencies = array_merge($arrDependencies, $this->objSyncCtoErClient->getDependenciesFor($arrEntry['name'], $arrEntry['version']));
-                $this->arrFiles = array_merge($this->arrFiles, $this->objSyncCtoErClient->getFileListFor($arrEntry['name'], $arrEntry['version']));
-            }
-
-            $arrDependenciesDone[] = $arrEntry['name'];
-        }
-    }
-
-}
-
-class SyncCtoErClient extends RepositoryBackendModule
-{
-
-    protected $strWSDL;
-
-    /**
-     * Initialize object (do not remove)
-     */
-    public function __construct()
-    {
-        parent::__construct();
-
-        $this->strWSDL = trim($GLOBALS['TL_CONFIG']['repository_wsdl']);
-
-        $this->client = new SoapClient($this->strWSDL,
-                        array(
-                            'soap_version' => SOAP_1_2,
-                            'compression' => SOAP_COMPRESSION_ACCEPT | ZLIB_ENCODING_GZIP | 1
-                        )
-        );
-    }
-
-    /**
-     * Get a list with all files for one extension
-     * 
-     * @param string $strExtension Name of extension
-     * @param int $intVersion Version of the extension
-     */
-    public function getFileListFor($strExtension, $intVersion)
-    {
-        $arrReturn = array();
-
-        $options = array(
-            'name' => $strExtension,
-            'version' => $intVersion
-        );
-
-        $arrExtensionList = $this->client->getFileList($options);
-
-        foreach ($arrExtensionList as $key => $value)
-        {
-            $arrReturn[$key]["path"] = (string) $value->path;
-            $arrReturn[$key]["hash"] = (string) $value->hash;
-            $arrReturn[$key]["size"] = (string) $value->size;
-        }
-
-        return $arrReturn;
-    }
-
-    public function getDependenciesFor($strExtension, $intVersion)
-    {
-        $arrReturn = array();
-
-        $options = array(
-            'names' => $strExtension,
-            'versions' => $intVersion,
-            'sets' => 'dependencies'
-        );
-
-        $arrExtensionList = $this->client->getExtensionList($options);
-
-        foreach ($arrExtensionList as $key => $value)
-        {
-            if ($value->name == $strExtension && $value->version == $intVersion && is_array($value->dependencies))
-            {
-                $arrReturn = array();
-
-                foreach ($value->dependencies as $dependenciesKey => $dependenciesValue)
-                {
-                    $arrReturn[$dependenciesKey]["name"]    = (string) $dependenciesValue->extension;
-                    $arrReturn[$dependenciesKey]["version"] = (string) $dependenciesValue->maxversion;
-                }
-
-                return $arrReturn;
-            }
-        }
-
-        return array();
     }
 
 }
