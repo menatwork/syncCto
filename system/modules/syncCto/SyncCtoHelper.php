@@ -660,7 +660,7 @@ class SyncCtoHelper extends Backend
      */
     private function getTableMeta($strTableName)
     {
-        $objCount = $this->Database->prepare("SELECT COUNT(*) as Count FROM $strTableName")->execute();
+        $objCount = $this->Database->prepare("SELECT COUNT(*) as Count FROM $strTableName")->executeUncached();
         
         $arrTableMeta = array(
             'name' => $strTableName,
