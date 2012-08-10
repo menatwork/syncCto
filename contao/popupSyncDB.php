@@ -56,8 +56,8 @@ class PopupSyncFiles extends Backend
     protected $arrErrors = array();
     // defines
     const STEP_NORMAL_DB = 'nd';
-    const STEP_CLOSE_DB = 'cl';
-    const STEP_ERROR_DB = 'er';
+    const STEP_CLOSE_DB  = 'cl';
+    const STEP_ERROR_DB  = 'er';
 
     /**
      * Initialize the object
@@ -72,7 +72,7 @@ class PopupSyncFiles extends Backend
         $this->User->authenticate();
 
         $this->objSyncCtoCommunicationClient = SyncCtoCommunicationClient::getInstance();
-        $this->objSyncCtoHelper = SyncCtoHelper::getInstance();
+        $this->objSyncCtoHelper              = SyncCtoHelper::getInstance();
 
         $this->initGetParams();
     }
@@ -94,7 +94,7 @@ class PopupSyncFiles extends Backend
             catch (Exception $exc)
             {
                 $this->arrErrors[] = $exc->getMessage();
-                $this->mixStep = self::STEP_ERROR_DB;
+                $this->mixStep     = self::STEP_ERROR_DB;
             }
         }
 
@@ -120,23 +120,23 @@ class PopupSyncFiles extends Backend
         // Close functinality
         if (key_exists("transfer", $_POST))
         {
-            $arrSyncSettings = $this->Session->get("syncCto_SyncSettings_" . $this->intClientID);
+            $arrSyncSettings                       = $this->Session->get("syncCto_SyncSettings_" . $this->intClientID);
             $arrSyncSettings['syncCto_SyncTables'] = $this->Input->post('serverTables');
             $this->Session->set("syncCto_SyncSettings_" . $this->intClientID, $arrSyncSettings);
 
-            $this->mixStep = self::STEP_CLOSE_DB;            
+            $this->mixStep = self::STEP_CLOSE_DB;
             return;
         }
-
-        $this->Template = new BackendTemplate("be_syncCto_database");
-        $this->Template->headline = $GLOBALS['TL_LANG']['MSC']['comparelist'];
+        
+        $this->Template                       = new BackendTemplate("be_syncCto_database");
+        $this->Template->headline             = $GLOBALS['TL_LANG']['MSC']['comparelist'];
         $this->Template->arrStatesCompareList = $this->getFormatedCompareList(
                 array(
-            'recommended' => $this->objSyncCtoHelper->databaseTablesRecommended(),
+            'recommended'    => $this->objSyncCtoHelper->databaseTablesRecommended(),
             'nonRecommended' => $this->objSyncCtoHelper->databaseTablesNoneRecommended()
                 ), array(
-            'recommended' => $this->objSyncCtoCommunicationClient->getRecommendedTables(),
-            'nonRecommended' => $this->objSyncCtoCommunicationClient->getNoneRecommendedTables()
+            'recommended'          => $this->objSyncCtoCommunicationClient->getRecommendedTables(),
+            'nonRecommended'       => $this->objSyncCtoCommunicationClient->getNoneRecommendedTables()
                 )
         );
         $this->Template->close = FALSE;
@@ -148,10 +148,10 @@ class PopupSyncFiles extends Backend
      */
     public function showClose()
     {
-        $this->Template = new BackendTemplate("be_syncCto_database");
+        $this->Template           = new BackendTemplate("be_syncCto_database");
         $this->Template->headline = $GLOBALS['TL_LANG']['MSC']['backBT'];
-        $this->Template->close = TRUE;
-        $this->Template->error = FALSE;
+        $this->Template->close    = TRUE;
+        $this->Template->error    = FALSE;
     }
 
     /**
@@ -159,12 +159,12 @@ class PopupSyncFiles extends Backend
      */
     public function showError()
     {
-        $this->Template = new BackendTemplate("be_syncCto_database");
+        $this->Template           = new BackendTemplate("be_syncCto_database");
         $this->Template->headline = $GLOBALS['TL_LANG']['MSC']['error'];
         $this->Template->arrError = $this->arrErrors;
-        $this->Template->text = $GLOBALS['TL_LANG']['ERR']['general'];
-        $this->Template->close = FALSE;
-        $this->Template->error = TRUE;
+        $this->Template->text     = $GLOBALS['TL_LANG']['ERR']['general'];
+        $this->Template->close    = FALSE;
+        $this->Template->error    = TRUE;
     }
 
     /**
@@ -181,25 +181,25 @@ class PopupSyncFiles extends Backend
         // Set javascript
         $GLOBALS['TL_JAVASCRIPT'][] = TL_PLUGINS_URL . 'plugins/mootools/' . MOOTOOLS_CORE . '/mootools-core.js';
         $GLOBALS['TL_JAVASCRIPT'][] = 'contao/contao.js';
-        
+
         if (version_compare(VERSION, '2.11', '=='))
         {
             $GLOBALS['TL_JAVASCRIPT'][] = 'system/modules/syncCto/html/js/htmltable.js';
         }
-        
+
         $GLOBALS['TL_JAVASCRIPT'][] = 'system/modules/syncCto/html/js/compare.js';
 
         // Set wrapper template information
-        $this->popupTemplate = new BackendTemplate("be_syncCto_popup");
-        $this->popupTemplate->theme = $this->getTheme();
-        $this->popupTemplate->base = $this->Environment->base;
+        $this->popupTemplate           = new BackendTemplate("be_syncCto_popup");
+        $this->popupTemplate->theme    = $this->getTheme();
+        $this->popupTemplate->base     = $this->Environment->base;
         $this->popupTemplate->language = $GLOBALS['TL_LANGUAGE'];
-        $this->popupTemplate->title = $GLOBALS['TL_CONFIG']['websiteTitle'];
-        $this->popupTemplate->charset = $GLOBALS['TL_CONFIG']['characterSet'];
+        $this->popupTemplate->title    = $GLOBALS['TL_CONFIG']['websiteTitle'];
+        $this->popupTemplate->charset  = $GLOBALS['TL_CONFIG']['characterSet'];
         $this->popupTemplate->headline = basename(utf8_convert_encoding($this->strFile, $GLOBALS['TL_CONFIG']['characterSet']));
 
         // Set default information
-        $this->Template->id = $this->intClientID;
+        $this->Template->id   = $this->intClientID;
         $this->Template->step = $this->mixStep;
 
         // Output template
@@ -244,15 +244,27 @@ class PopupSyncFiles extends Backend
      * @return type 
      */
     protected function getFormatedCompareList($arrServerState, $arrClientState)
-    {               
+    {
         $arrAllTimeStamps = $this->getAllTimeStamps();
-        
+         
+        // Check user
+        if(!$this->User->isAdmin &&  $this->User->syncCto_tables == null)
+        {
+            // If we have no admin and no tables return a empty array
+            return array();
+        }
+        else
+        {
+            // Load allowed tables for this user
+            $arrAllowedTables = $this->User->syncCto_tables;
+        }
+
         $arrCompareList = array();
 
         foreach ($arrServerState AS $strState => $arrServerTables)
-        {
+        {            
             foreach ($arrServerTables AS $strTableName => $arrTable)
-            {                
+            {
                 $strClientState = '';
 
                 if (array_key_exists($strTableName, $arrClientState['recommended']))
@@ -267,30 +279,31 @@ class PopupSyncFiles extends Backend
                 {
                     $strClientState = FALSE;
                 }
-                
+
                 $strState = (($strState == 'nonRecommended' || $strClientState == 'nonRecommended') ? 'nonRecommended' : 'recommended');
-                
+
                 $arrTmpTable = array();
-                $arrClientTable = $arrClientState[$strClientState][$strTableName];
-                $arrTmpTable['server']['name'] = $arrTable['name'];
+                $arrClientTable                   = $arrClientState[$strClientState][$strTableName];
+                $arrTmpTable['server']['name']    = $arrTable['name'];
                 $arrTmpTable['server']['tooltip'] = $this->getReadableSize($arrTable['size']) . ', ' . $arrTable['count'] . (($arrTable['count'] == 1) ? $GLOBALS['TL_LANG']['MSC']['db_entry'] : $GLOBALS['TL_LANG']['MSC']['db_entries']);
 
                 if ($strClientState)
                 {
                     $arrTmpTable['client']['name'] = $arrClientTable['name'];
-                    $arrTmpTable['diff'] = $this->getDiff($arrServerTables[$strTableName], $arrClientTable);
+                    $arrTmpTable['diff']           = $this->getDiff($arrServerTables[$strTableName], $arrClientTable);
                     unset($arrClientState[$strClientState][$strTableName]);
                 }
                 else
                 {
-                    $arrTmpTable['diff'] = '-';
-                    $arrTmpTable['client']['name'] = '-';
+                    $arrTmpTable['diff']              = '-';
+                    $arrTmpTable['client']['name']    = '-';
                 }
-                $arrTmpTable['client']['tooltip'] = $this->getReadableSize($arrClientTable['size']) . ', ' . $arrClientTable['count'] . (($arrClientTable['count'] == 1) ? $GLOBALS['TL_LANG']['MSC']['db_entry'] : $GLOBALS['TL_LANG']['MSC']['db_entries']);                                
                 
-                foreach($arrAllTimeStamps AS $strLocation => $arrTimeStamps)
+                $arrTmpTable['client']['tooltip'] = $this->getReadableSize($arrClientTable['size']) . ', ' . $arrClientTable['count'] . (($arrClientTable['count'] == 1) ? $GLOBALS['TL_LANG']['MSC']['db_entry'] : $GLOBALS['TL_LANG']['MSC']['db_entries']);
+
+                foreach ($arrAllTimeStamps AS $strLocation => $arrTimeStamps)
                 {
-                    if(array_key_exists($strTableName, $arrTimeStamps['current']) && array_key_exists($strTableName, $arrTimeStamps['lastSync']))
+                    if (array_key_exists($strTableName, $arrTimeStamps['current']) && array_key_exists($strTableName, $arrTimeStamps['lastSync']))
                     {
                         $arrTmpTable[$strLocation]['class'] = (($arrTimeStamps['current'][$strTableName] == $arrTimeStamps['lastSync'][$strTableName]) ? 'unchanged' : 'changed');
                     }
@@ -299,43 +312,49 @@ class PopupSyncFiles extends Backend
                         $arrTmpTable[$strLocation]['class'] = 'no-sync';
                     }
                 }
-                
-                if($arrTmpTable['server']['class'] == 'changed' && $arrTmpTable['client']['class'] == 'changed')
+
+                if ($arrTmpTable['server']['class'] == 'changed' && $arrTmpTable['client']['class'] == 'changed')
                 {
                     $arrTmpTable['server']['class'] = 'changed-both';
                     $arrTmpTable['client']['class'] = 'changed-both';
                 }
-                else if($arrTmpTable['server']['name'] == '-')
+                else if ($arrTmpTable['server']['name'] == '-')
                 {
                     $arrTmpTable['server']['class'] = 'none';
                 }
-                else if($arrTmpTable['client']['name'] == '-')
+                else if ($arrTmpTable['client']['name'] == '-')
                 {
                     $arrTmpTable['client']['class'] = 'none';
                 }
-                
-                if($arrTmpTable['server']['class'] != 'unchanged' || $arrTmpTable['client']['class'] != 'unchanged')
-                {
+
+//                if ($arrTmpTable['server']['class'] != 'unchanged' || $arrTmpTable['client']['class'] != 'unchanged')
+//                {
                     $arrCompareList[$strState][$strTableName] = $arrTmpTable;
-                }
+//                }
             }
         }
-        
+
         // Check if client has tables that are unknowed on server
         foreach ($arrClientState AS $strState => $arrServerTables)
-        {        
+        {
             foreach ($arrServerTables AS $strTableName => $arrTable)
             {
+                // Skip tables which are not allowed
+                if (!in_array($strTableName, $arrAllowedTables))
+                {
+                    continue;
+                }
+                
                 if (count($arrTable) > 0)
                 {
-                    $arrCompareList[$strState][$strTableName]['client']['name'] = $arrTable['name'];
-                    $arrCompareList[$strState][$strTableName]['client']['tooltip'] = $this->getReadableSize($arrTable['size']) . ', ' . $arrTable['count'] . (($arrTable['count'] == 1) ? $GLOBALS['TL_LANG']['MSC']['db_entry'] : $GLOBALS['TL_LANG']['MSC']['db_entries']);                    
-                    $arrCompareList[$strState][$strTableName]['server']['name'] = '-';
-                    $arrCompareList[$strState][$strTableName]['diff'] = '-';
+                    $arrCompareList[$strState][$strTableName]['client']['name']    = $arrTable['name'];
+                    $arrCompareList[$strState][$strTableName]['client']['tooltip'] = $this->getReadableSize($arrTable['size']) . ', ' . $arrTable['count'] . (($arrTable['count'] == 1) ? $GLOBALS['TL_LANG']['MSC']['db_entry'] : $GLOBALS['TL_LANG']['MSC']['db_entries']);
+                    $arrCompareList[$strState][$strTableName]['server']['name']    = '-';
+                    $arrCompareList[$strState][$strTableName]['diff']              = '-';
                 }
             }
         }
-        
+
         return $arrCompareList;
     }
 
@@ -373,7 +392,7 @@ class PopupSyncFiles extends Backend
 
         return $intCount . (($intCount == 1) ? $GLOBALS['TL_LANG']['MSC']['db_entry'] : $GLOBALS['TL_LANG']['MSC']['db_entries']);
     }
-    
+
     /**
      * Return all timestamps from client and server from current and last sync
      * 
@@ -382,8 +401,8 @@ class PopupSyncFiles extends Backend
     protected function getAllTimeStamps()
     {
         $arrLocationLastTableTimstamp = array('server' => array(), 'client' => array());
-        
-        foreach($arrLocationLastTableTimstamp AS $location => $v)
+
+        foreach ($arrLocationLastTableTimstamp AS $location => $v)
         {
             $mixLastTableTimestamp = $this->Database
                     ->prepare("SELECT " . $location . "_timestamp FROM tl_synccto_clients WHERE id=?")
@@ -403,12 +422,12 @@ class PopupSyncFiles extends Backend
 
         return array(
             'server' => array(
-                'current'   => $this->objSyncCtoHelper->getDatabaseTablesTimestamp(),
-                'lastSync'  => $arrLocationLastTableTimstamp['server']
+                'current'  => $this->objSyncCtoHelper->getDatabaseTablesTimestamp(),
+                'lastSync' => $arrLocationLastTableTimstamp['server']
             ),
-            'client' => array(
-                'current'   => $this->objSyncCtoCommunicationClient->getClientTimestamp(array()),
-                'lastSync'  => $arrLocationLastTableTimstamp['client']
+            'client'   => array(
+                'current' => $this->objSyncCtoCommunicationClient->getClientTimestamp(array()),
+                'lastSync' => $arrLocationLastTableTimstamp['client']
             )
         );
     }
