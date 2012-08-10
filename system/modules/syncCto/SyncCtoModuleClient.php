@@ -918,6 +918,7 @@ class SyncCtoModuleClient extends BackendModule
                  * Check version
                  */
                 case 4:
+                    // Check syncCto
                     $strVersion                                    = $this->objSyncCtoCommunicationClient->getVersionSyncCto();
                     $this->arrClientInformation["version_SyncCto"] = $strVersion;
 
@@ -930,16 +931,22 @@ class SyncCtoModuleClient extends BackendModule
                         $this->objStepPool->autoUpdate = true;
                     }
 
+                    // Check Contao
                     $strVersion                                   = $this->objSyncCtoCommunicationClient->getVersionContao();
                     $this->arrClientInformation["version_Contao"] = $strVersion;
+                    $strVersion                                   = trimsplit(".", $strVersion);
+                    $strVersion                                   = $strVersion[0];
 
-                    if (!version_compare($strVersion, VERSION, "="))
+                    $strCurrentVersion = trimsplit(".", VERSION);
+                    $strCurrentVersion = $strCurrentVersion[0];
+
+                    if ($strVersion != $strCurrentVersion)
                     {
                         $this->log(vsprintf("Not the same version from contao on synchronization client ID %s. Serverversion: %s. Clientversion: %s", array($this->Input->get("id"), $GLOBALS['SYC_VERSION'], $strVersion)), __CLASS__ . " " . __FUNCTION__, "GENERAL");
 
                         $this->objData->setState($GLOBALS['TL_LANG']['MSC']['error']);
                         $this->booError = true;
-                        $this->strError = vsprintf($GLOBALS['TL_LANG']['ERR']['version'], array("Contao", VERSION, $strVersion));
+                        $this->strError = vsprintf($GLOBALS['TL_LANG']['ERR']['version'], array("Contao", $strCurrentVersion, $strVersion));
                         break;
                     }
 
