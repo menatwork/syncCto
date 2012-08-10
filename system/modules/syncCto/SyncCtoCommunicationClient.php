@@ -817,6 +817,16 @@ class SyncCtoCommunicationClient extends CtoCommunication
         return $this->runServer("SYNCCTO_GET_CONFIG", $arrData);
     }
 
+    public function getPhpFunctions()
+    {
+        return $this->runServer("SYNCCTO_GET_PHP_FUNCTIONS");
+    }
+
+    public function getPhpConfigurations()
+    {
+        return $this->runServer("SYNCCTO_GET_PHP_CONFIGURATION");
+    }
+
     /* -------------------------------------------------------------------------
      * Auto Updater
      */
@@ -825,11 +835,10 @@ class SyncCtoCommunicationClient extends CtoCommunication
     {
         $arrData = array(
             array(
-                "name" => "zipfile",
+                "name"  => "zipfile",
                 "value" => $strZipPath,
             ),
         );
-
 
         return $this->runServer("SYNCCTO_AUTO_UPDATE", $arrData);
     }   

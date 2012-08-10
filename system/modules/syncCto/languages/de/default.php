@@ -51,6 +51,7 @@ $GLOBALS['TL_LANG']['SYC']['xml_create']                    = 'XML-Dateien neu e
  */
 $GLOBALS['TL_LANG']['MSC']['edit']                          = 'Bearbeiten';
 $GLOBALS['TL_LANG']['MSC']['copy']                          = 'Duplizieren';
+$GLOBALS['TL_LANG']['MSC']['showExtern']                    = 'Client Systemcheck';
 $GLOBALS['TL_LANG']['MSC']['syncTo']                        = 'Client synchronisieren';
 $GLOBALS['TL_LANG']['MSC']['syncFrom']                      = 'Server synchronisieren';
 $GLOBALS['TL_LANG']['MSC']['restore_backup']                = 'Backup einspielen';

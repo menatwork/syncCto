@@ -48,7 +48,7 @@ $GLOBALS['TL_DCA']['tl_user_group']['fields']['syncCto_clients_p'] = array
     'label'     => &$GLOBALS['TL_LANG']['tl_user']['syncCto_clients_p'],
     'exclude'   => true,
     'inputType' => 'checkbox',
-    'options'   => array('create', 'edit', 'copy', 'delete', 'syncTo', 'syncFrom'),
+    'options'   => array('create', 'edit', 'copy', 'delete', 'showExtern', 'syncTo', 'syncFrom'),
     'reference' => &$GLOBALS['TL_LANG']['MSC'],
     'eval'      => array('multiple' => true)
 );

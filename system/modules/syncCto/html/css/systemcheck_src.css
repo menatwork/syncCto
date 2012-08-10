@@ -1,7 +1,11 @@
 /* Copyright (c) MEN AT WORK 2012 :: LGPL license */
 
-  #syncCto_check {
+  .syncCto_fullcheck {
 	margin:20px;
+  }
+  
+  .syncCto_smallcheck {
+	
   }
   
   #syncCto_check h1 {

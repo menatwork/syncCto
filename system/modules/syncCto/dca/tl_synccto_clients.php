@@ -84,6 +84,12 @@ $GLOBALS['TL_DCA']['tl_synccto_clients'] = array(
                 'icon' => 'show.gif',
                 'button_callback' => array('tl_synccto_clients', 'checkPermission_client_show'),
             ),
+            'showExtern' => array(
+                'label' => &$GLOBALS['TL_LANG']['tl_syncCto_clients']['showExtern'],
+                'href' => '&table=tl_syncCto_clients_showExtern&act=start', 
+                'icon' => 'system/modules/syncCto/html/iconCheck.png',
+                'button_callback' => array('tl_synccto_clients', 'checkPermission_client_showExtern'),
+            ),
             'syncFrom' => array(
                 'label' => &$GLOBALS['TL_LANG']['tl_syncCto_clients']['syncFrom'],
                 'href' => '&table=tl_syncCto_clients_syncFrom&act=edit',
@@ -254,9 +260,9 @@ class tl_synccto_clients extends Backend
             {
                 case 'syncTo' :
                 case 'syncFrom' :
+                case 'showExtern' :
                     return $this->generateImage(preg_replace('/\.png$/i', '_.png', $icon)) . ' ';
                     break;
-
 
                 default:
                     return $this->generateImage(preg_replace('/\.gif$/i', '_.gif', $icon)) . ' ';
