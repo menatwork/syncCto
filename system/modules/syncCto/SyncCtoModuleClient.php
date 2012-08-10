@@ -884,7 +884,7 @@ class SyncCtoModuleClient extends BackendModule
                     }
                     else
                     {
-                        $intPercent = 30;
+                        $intPercent = 80;
                     }
 
                     $intLimit = $intLimit / 100 * $intPercent;
