@@ -25,6 +25,13 @@
         <input type="hidden" name="FORM_SUBMIT" value="<?php echo $this->formId; ?>" />        
         <input type="hidden" name="REQUEST_TOKEN" value="<?php echo REQUEST_TOKEN; ?>">
 
+        <?php if(count($this->arrStatesCompareList) == 0): ?>   
+            <div><?php echo $GLOBALS['TL_LANG']['ERR']['missing_tables']; ?></div>  
+            <div class="submit_container">
+                <input class="tl_submit" name="transfer" type="submit" value="<?php echo $GLOBALS['TL_LANG']['MSC']['submit_database']; ?>" />
+            </div>
+        <?php else: ?>
+        
         <div class="submit_container">
             <input class="tl_submit" name="transfer" type="submit" value="<?php echo $GLOBALS['TL_LANG']['MSC']['submit_database']; ?>" />
         </div>
@@ -34,7 +41,7 @@
             <p class="unchanged"><?php echo $GLOBALS['TL_LANG']['MSC']['unchanged']; ?></p>
             <p class="changed-both"><?php echo $GLOBALS['TL_LANG']['MSC']['changed_both']; ?></p>
         </div>
-    
+        
         <?php foreach($this->arrStatesCompareList AS $strState => $arrCompareList): ?>
         <h3><?php echo ($strState == 'recommended') ? $GLOBALS['TL_LANG']['MSC']['recom_tables'] : $GLOBALS['TL_LANG']['MSC']['nonrecom_tables']; ?></h3>
         <table class="comparelist" id="<?php echo ($strState == 'recommended') ? 'recommended' : 'nonrecommended'; ?>">
@@ -74,6 +81,8 @@
         <div class="bottom submit_container">
             <input class="tl_submit" name="transfer" type="submit" value="<?php echo $GLOBALS['TL_LANG']['MSC']['submit_database']; ?>" />
         </div>
+        
+        <?php endif; ?>
     
     </div>
     

@@ -137,7 +137,7 @@ $GLOBALS['TL_LANG']['ERR']['min_size_limit']                = 'Die minimale Date
 $GLOBALS['TL_LANG']['ERR']['cant_extract_file']             = 'Fehler beim entpacken der Dateien.';
 
 // Database
-$GLOBALS['TL_LANG']['ERR']['missing_tables_selection']      = 'Es wurde(n) keine Tabell(en) ausgewählt.';
+$GLOBALS['TL_LANG']['ERR']['missing_tables']                = 'Es wurde(n) keine Tabell(en) gefunden.';
 $GLOBALS['TL_LANG']['ERR']['unknown_backup_method']         = 'Die gewählte Backup Methode ist nicht bekannt.';
 $GLOBALS['TL_LANG']['ERR']['unknown_function']              = 'Unbekannte Funktion oder Methode.';
 $GLOBALS['TL_LANG']['ERR']['64Bit_error']                   = 'Zahlen überlauf. Versuchen Sie bitte einen 64Bit Version von PHP.';
