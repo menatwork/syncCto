@@ -340,7 +340,7 @@ class PopupSyncFiles extends Backend
             foreach ($arrServerTables AS $strTableName => $arrTable)
             {
                 // Skip tables which are not allowed
-                if (!in_array($strTableName, $arrAllowedTables))
+                if ($arrAllowedTables != null && !in_array($strTableName, $arrAllowedTables))
                 {
                     continue;
                 }
