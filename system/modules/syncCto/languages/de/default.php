@@ -72,6 +72,7 @@ $GLOBALS['TL_LANG']['MSC']['unknown_step']                  = 'Unbekannter Schri
  * Headline
  */
 $GLOBALS['TL_LANG']['MSC']['step']                          = 'Schritt';
+$GLOBALS['TL_LANG']['MSC']['substep']                       = 'Zwischenschritt';
 $GLOBALS['TL_LANG']['MSC']['abort']                         = 'Abbruch!';
 $GLOBALS['TL_LANG']['MSC']['complete']                      = 'Fertig!';
 $GLOBALS['TL_LANG']['MSC']['comparelist']                   = 'Vergleichsliste';

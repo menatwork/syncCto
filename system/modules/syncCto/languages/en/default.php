@@ -74,6 +74,7 @@ $GLOBALS['TL_LANG']['MSC']['unknown_step']                  = 'Unknown step';
  * Headline
  */
 $GLOBALS['TL_LANG']['MSC']['step']                          = 'Step';
+$GLOBALS['TL_LANG']['MSC']['substep']                       = 'Substep';
 $GLOBALS['TL_LANG']['MSC']['abort']                         = "Abort!";
 $GLOBALS['TL_LANG']['MSC']['complete']                      = 'Completed!';
 $GLOBALS['TL_LANG']['MSC']['debug_mode']                    = 'Debug mode';

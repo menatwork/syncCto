@@ -67,11 +67,11 @@
 	padding-left:4px;
   }
   
-  th.table-th-sort {
+  .table-sort .comparelist th.table-th-sort {
 	background-position:6px center;
   }
   
-  th.table-th-sort-rev {
+  .table-sort .comparelist th.table-th-sort-rev {
 	background-position:6px -26px;
   }
   

@@ -46,8 +46,8 @@
                 <?php echo vsprintf($GLOBALS['TL_LANG']['MSC']['run_time'], array(number_format(microtime(true) - $this->start, 2))); ?><br />
                 <?php echo vsprintf($GLOBALS['TL_LANG']['MSC']['memory_limit'], array($this->getReadableSize(memory_get_peak_usage(true)))); ?><br />
                 <br />
-                Step: <?php echo $this->step; ?><br />
-                SubStep: <?php echo $this->subStep; ?>
+                <?php echo $GLOBALS['TL_LANG']['MSC']['step']; ?>: <?php echo $this->step; ?><br />
+                <?php echo $GLOBALS['TL_LANG']['MSC']['substep']; ?>: <?php echo $this->subStep; ?>
             </p>
         </div>
     <?php endif; ?>
