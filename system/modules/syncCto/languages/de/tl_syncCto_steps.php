@@ -35,7 +35,7 @@ $GLOBALS['TL_LANG']['tl_syncCto_sync']['step_1_show']['description_1']      = 'S
 
 $GLOBALS['TL_LANG']['tl_syncCto_sync']['step_1']['description_1']           = 'Vorbereitung des Clients.';
 $GLOBALS['TL_LANG']['tl_syncCto_sync']['step_1']['description_2']           = 'Temporäre Ordner leeren.';
-$GLOBALS['TL_LANG']['tl_syncCto_sync']['step_1']['description_3']           = 'Aktualisieren der entfernten Synchronisationssoftware.';
+$GLOBALS['TL_LANG']['tl_syncCto_sync']['step_1']['description_3']           = 'Aktualisierung der entfernten Synchronisationssoftware.';
 
 $GLOBALS['TL_LANG']['tl_syncCto_sync']['step_2']['description_1']           = 'Abgleich und Versand der Vergleichslisten.';
 $GLOBALS['TL_LANG']['tl_syncCto_sync']['step_2']['description_2']           = 'Nach löschbaren Dateien suchen.';
