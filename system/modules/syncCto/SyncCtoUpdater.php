@@ -35,10 +35,10 @@ class SyncCtoUpdater extends Backend
     // Single Files 
     protected $arrFiles = array();
     // Tables 
-    protected $arrTables = array(
-        "tl_synccto_clients",
-        "tl_requestcache",
-        "tl_ctocom_cache"
+    protected $arrTables = array();
+    //Blak files
+    protected $arrBlackFiles = array(
+        'TL_ROOT/system/modules/syncCto/config/runonce.php',        
     );
 
     /**
@@ -149,7 +149,18 @@ class SyncCtoUpdater extends Backend
                 case XMLReader::CDATA:
                     if ($strCurrentNode == "path")
                     {
+                        // Skip files in blacklist
+                        if(in_array($objXMLReader->value, $this->arrBlackFiles))
+                        {
+                            continue;
+                        }
+
                         $strPath = preg_replace("/^TL_ROOT\//i", "", $objXMLReader->value, 1);
+
+                        if (preg_match("/\.sql$/", $strPath))
+                        {
+                            $this->parseSQL($strPath);
+                        }
 
                         if (file_exists(TL_ROOT . "/" . $strPath))
                         {
@@ -166,6 +177,25 @@ class SyncCtoUpdater extends Backend
         if (!$this->objZipArchive->addFile('tl_files/syncCto_backups/dependencies.xml', "FILES/" . 'tl_files/syncCto_backups/dependencies.xml'))
         {
             throw new Exception('Could not add the file /tl_files/syncCto_backups/dependencies.xml to the archive.');
+        }
+    }
+    
+    protected function parseSQL($strPath)
+    {
+        if (!file_exists(TL_ROOT . "/" . $strPath))
+        {
+            return;
+        }
+
+        $objFile = new File($strPath);
+
+        foreach ($objFile->getContentAsArray() as $key => $value)
+        {
+            if (preg_match("/CREATE TABLE `.*` \(/", $value))
+            {
+                $arrCreate = preg_split("/(CREATE TABLE `|` \(.*)/", $value);
+                $this->arrTables[] = $arrCreate[1];
+            }
         }
     }
 
