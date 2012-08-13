@@ -76,8 +76,8 @@ class SyncCtoErClient extends RepositoryBackendModule
         }
         catch (Exception $exc)
         {
-            echo $exc->getMessage();
-            $this->log($exc->getMessage(), __CLASS__ . ' ' . __FUNCTION__, 'ERROR');
+            $this->log($exc->getMessage(), __CLASS__ . ' ' . __FUNCTION__, TL_ERROR);
+            $_SESSION['TL_ERROR'][] = $exc->getMessage();
         }
     }
 
@@ -134,7 +134,7 @@ class SyncCtoErClient extends RepositoryBackendModule
 
         if (!key_exists("syncCto", $arrInstalledExtensions))
         {
-            throw new Exception("syncCto is not installed via the Extension Repository, please only use the official version.");
+            throw new Exception('SyncCto is not installed via the Extension Repository, please only use the official version.');
         }
 
         $arrDependencies   = $this->getDependenciesFor($arrInstalledExtensions['syncCto']['extension'], $arrInstalledExtensions['syncCto']['version']);
