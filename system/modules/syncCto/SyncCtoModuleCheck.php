@@ -109,12 +109,13 @@ class SyncCtoModuleCheck extends BackendModule
         return array(
             'fsockopen'   => function_exists("fsockopen"),
             'zip_archive' => @class_exists('ZipArchive'),
-            'bcmath'      => function_exists('bcadd'),
+            'gmp'         => extension_loaded('gmp'),
+            'bcmath'      => extension_loaded('bcmath'),
             'xmlwriter'   => @class_exists('XMLWriter'),
             'xmlreader'   => @class_exists('XMLReader')
         );
     }
-    
+
     private function getSize($strValue)
     {
         return (int) str_replace(array("M", "G"), array("000000", "000000000"), $strValue);
@@ -310,6 +311,16 @@ class SyncCtoModuleCheck extends BackendModule
         $return .= '<td class="dot">' . ($ok ? '&nbsp;' : '&#149;') . '</td>';
         $return .= '<td class="value">' . ($bcmath ? $GLOBALS['TL_LANG']['tl_syncCto_check']['on'] : $GLOBALS['TL_LANG']['tl_syncCto_check']['off']) . '</td>';
         $return .= '<td>' . $GLOBALS['TL_LANG']['tl_syncCto_check']['bcmath'][1] . '</td>';
+        $return .= '</tr>';
+
+        // gmp
+        $gmp = $arrFunctions['gmp'];
+        $ok     = ($gmp == true);
+        $return .= '<tr class="' . ($ok ? 'ok' : 'warning') . '">';
+        $return .= '<td>' . $GLOBALS['TL_LANG']['tl_syncCto_check']['gmp'][0] . '</td>';
+        $return .= '<td class="dot">' . ($ok ? '&nbsp;' : '&#149;') . '</td>';
+        $return .= '<td class="value">' . ($gmp ? $GLOBALS['TL_LANG']['tl_syncCto_check']['on'] : $GLOBALS['TL_LANG']['tl_syncCto_check']['off']) . '</td>';
+        $return .= '<td>' . $GLOBALS['TL_LANG']['tl_syncCto_check']['gmp'][1] . '</td>';
         $return .= '</tr>';
 
         // XMLWriter
