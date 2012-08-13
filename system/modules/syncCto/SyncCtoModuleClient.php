@@ -776,7 +776,7 @@ class SyncCtoModuleClient extends BackendModule
         // Set content back to normale mode
         $this->strError = "";
         $this->booError = false;
-        $this->objData->setState($GLOBALS['TL_LANG']['MSC']['progress']);
+        $this->objData->setState(SyncCtoEnum::WORK_WORK);
 
         try
         {
@@ -788,7 +788,7 @@ class SyncCtoModuleClient extends BackendModule
                 case 1:
                     $this->objData->setTitle($GLOBALS['TL_LANG']['MSC']['step'] . " %s");
                     $this->objData->setDescription($GLOBALS['TL_LANG']['tl_syncCto_sync']["step_1_show"]['description_1']);
-                    $this->objData->setState($GLOBALS['TL_LANG']['MSC']['progress']);
+                    $this->objData->setState(SyncCtoEnum::WORK_WORK);
 
                     $this->objStepPool->step++;
                     break;
@@ -823,7 +823,7 @@ class SyncCtoModuleClient extends BackendModule
 
 
                     // Show information
-                    $this->objData->setState($GLOBALS['TL_LANG']['MSC']['ok']);
+                    $this->objData->setState(SyncCtoEnum::WORK_OK);
                     $this->objData->setHtml($objCheckTemplate->parse());
 
                     $this->booFinished           = true;
@@ -843,7 +843,7 @@ class SyncCtoModuleClient extends BackendModule
             $this->booError = true;
             $this->strError = $exc->getMessage();
 
-            $this->objData->setState($GLOBALS['TL_LANG']['MSC']['error']);
+            $this->objData->setState(SyncCtoEnum::WORK_ERROR);
         }
 
         // Save step pool for current step
@@ -868,7 +868,7 @@ class SyncCtoModuleClient extends BackendModule
         // Set content back to normale mode
         $this->strError = "";
         $this->booError = false;
-        $this->objData->setState($GLOBALS['TL_LANG']['MSC']['progress']);
+        $this->objData->setState(SyncCtoEnum::WORK_WORK);
 
         /* ---------------------------------------------------------------------
          * Run page
@@ -884,7 +884,7 @@ class SyncCtoModuleClient extends BackendModule
                 case 1:
                     $this->objData->setTitle($GLOBALS['TL_LANG']['MSC']['step'] . " %s");
                     $this->objData->setDescription($GLOBALS['TL_LANG']['tl_syncCto_sync']["step_1"]['description_1']);
-                    $this->objData->setState($GLOBALS['TL_LANG']['MSC']['progress']);
+                    $this->objData->setState(SyncCtoEnum::WORK_WORK);
 
                     $this->objStepPool->step++;
                     break;
@@ -904,7 +904,7 @@ class SyncCtoModuleClient extends BackendModule
                 case 3:
                     if (!$this->objSyncCtoCommunicationClient->referrerDisable())
                     {
-                        $this->objData->setState($GLOBALS['TL_LANG']['MSC']['error']);
+                        $this->objData->setState(SyncCtoEnum::WORK_ERROR);
                         $this->booError = true;
                         $this->strError = $GLOBALS['TL_LANG']['ERR']['referer'];
 
@@ -944,7 +944,7 @@ class SyncCtoModuleClient extends BackendModule
                     {
                         $this->log(vsprintf("Not the same version from contao on synchronization client ID %s. Serverversion: %s. Clientversion: %s", array($this->Input->get("id"), $GLOBALS['SYC_VERSION'], $strVersion)), __CLASS__ . " " . __FUNCTION__, "GENERAL");
 
-                        $this->objData->setState($GLOBALS['TL_LANG']['MSC']['error']);
+                        $this->objData->setState(SyncCtoEnum::WORK_ERROR);
                         $this->booError = true;
                         $this->strError = vsprintf($GLOBALS['TL_LANG']['ERR']['version'], array("Contao", $strCurrentVersion, $strVersion));
                         break;
@@ -985,7 +985,7 @@ class SyncCtoModuleClient extends BackendModule
                     // Check if everything is okay
                     if ($arrClientParameter['file_uploads'] != 1)
                     {
-                        $this->objData->setState($GLOBALS['TL_LANG']['MSC']['error']);
+                        $this->objData->setState(SyncCtoEnum::WORK_ERROR);
                         $this->booError = true;
                         $this->strError = $GLOBALS['TL_LANG']['ERR']['upload_ini'];
 
@@ -1025,7 +1025,7 @@ class SyncCtoModuleClient extends BackendModule
 
                     if ($this->objStepPool->autoUpdate == false)
                     {
-                        $this->objData->setState($GLOBALS['TL_LANG']['MSC']['ok']);
+                        $this->objData->setState(SyncCtoEnum::WORK_OK);
                         $this->intStep++;
                     }
                     else
@@ -1106,7 +1106,7 @@ class SyncCtoModuleClient extends BackendModule
 
                 case 11:
                     $this->objData->setDescription($GLOBALS['TL_LANG']['tl_syncCto_sync']["step_1"]['description_1']);
-                    $this->objData->setState($GLOBALS['TL_LANG']['MSC']['ok']);
+                    $this->objData->setState(SyncCtoEnum::WORK_OK);
                     $this->intStep++;
                     break;
             }
@@ -1118,7 +1118,7 @@ class SyncCtoModuleClient extends BackendModule
             $this->booError = true;
             $this->strError = $exc->getMessage();
 
-            $this->objData->setState($GLOBALS['TL_LANG']['MSC']['error']);
+            $this->objData->setState(SyncCtoEnum::WORK_ERROR);
         }
     }
 
@@ -1160,7 +1160,7 @@ class SyncCtoModuleClient extends BackendModule
             $this->intStep = 99;
 
             // Set last to skipped        
-            $this->objData->setState($GLOBALS['TL_LANG']['MSC']['skipped']);
+            $this->objData->setState(SyncCtoEnum::WORK_SKIPPED);
             $this->objData->setHtml("");
 
             // Set Abort information 
@@ -1189,7 +1189,7 @@ class SyncCtoModuleClient extends BackendModule
         // Set content back to normale mode
         $this->booError = false;
         $this->strError = "";
-        $this->objData->setState($GLOBALS['TL_LANG']['MSC']['progress']);
+        $this->objData->setState(SyncCtoEnum::WORK_WORK);
 
         // Run page
         try
@@ -1200,7 +1200,7 @@ class SyncCtoModuleClient extends BackendModule
                  * Show step
                  */
                 case 1:
-                    $this->objData->setState($GLOBALS['TL_LANG']['MSC']['progress']);
+                    $this->objData->setState(SyncCtoEnum::WORK_WORK);
                     $this->objData->setTitle($GLOBALS['TL_LANG']['MSC']['step'] . " %s");
                     $this->objData->setDescription($GLOBALS['TL_LANG']['tl_syncCto_sync']["step_2"]['description_1']);
                     $this->objStepPool->step++;
@@ -1326,7 +1326,7 @@ class SyncCtoModuleClient extends BackendModule
                 case 8:
                     if (count($this->arrListCompare) == 0 || key_exists("skip", $_POST))
                     {
-                        $this->objData->setState($GLOBALS['TL_LANG']['MSC']['skipped']);
+                        $this->objData->setState(SyncCtoEnum::WORK_SKIPPED);
                         $this->objData->setHtml("");
                         $this->booRefresh = true;
                         $this->intStep++;
@@ -1337,7 +1337,7 @@ class SyncCtoModuleClient extends BackendModule
                     }
                     else if (key_exists("forward", $_POST) && count($this->arrListCompare) != 0)
                     {
-                        $this->objData->setState($GLOBALS['TL_LANG']['MSC']['ok']);
+                        $this->objData->setState(SyncCtoEnum::WORK_OK);
                         $this->objData->setDescription($GLOBALS['TL_LANG']['tl_syncCto_sync']["step_2"]['description_1']);
                         $this->objData->setHtml("");
                         $this->booRefresh = true;
@@ -1394,7 +1394,7 @@ class SyncCtoModuleClient extends BackendModule
                     if ($intCountMissing == 0 && $intCountNeed == 0 && $intCountIgnored == 0 && $intCountDelete == 0)
                     {
                         // Set current step informations
-                        $this->objData->setState($GLOBALS['TL_LANG']['MSC']['skipped']);
+                        $this->objData->setState(SyncCtoEnum::WORK_SKIPPED);
                         $this->objData->setDescription($GLOBALS['TL_LANG']['tl_syncCto_sync']["step_2"]['description_1']);
                         $this->objData->setHtml("");
                         $this->booRefresh = true;
@@ -1436,7 +1436,7 @@ class SyncCtoModuleClient extends BackendModule
             $this->booError = true;
             $this->strError = $exc->getMessage();
 
-            $this->objData->setState($GLOBALS['TL_LANG']['MSC']['error']);
+            $this->objData->setState(SyncCtoEnum::WORK_ERROR);
         }
     }
 
@@ -1454,7 +1454,7 @@ class SyncCtoModuleClient extends BackendModule
         // Set content back to normale mode
         $this->booError = false;
         $this->strError = "";
-        $this->objData->setState($GLOBALS['TL_LANG']['MSC']['progress']);
+        $this->objData->setState(SyncCtoEnum::WORK_WORK);
 
         // Count files
         if (is_array($this->arrListCompare) && count($this->arrListCompare) != 0 && $this->arrListCompare != false)
@@ -1505,7 +1505,7 @@ class SyncCtoModuleClient extends BackendModule
                  * Show step
                  */
                 case 1:
-                    $this->objData->setState($GLOBALS['TL_LANG']['MSC']['progress']);
+                    $this->objData->setState(SyncCtoEnum::WORK_WORK);
                     $this->objData->setTitle($GLOBALS['TL_LANG']['MSC']['step'] . " %s");
                     $this->objData->setDescription($GLOBALS['TL_LANG']['tl_syncCto_sync']["step_3"]['description_1']);
 
@@ -1590,7 +1590,7 @@ class SyncCtoModuleClient extends BackendModule
                         }
 
                         $this->objData->setDescription($GLOBALS['TL_LANG']['tl_syncCto_sync']["step_3"]['description_1']);
-                        $this->objData->setState($GLOBALS['TL_LANG']['MSC']['ok']);
+                        $this->objData->setState(SyncCtoEnum::WORK_OK);
                         $this->intStep++;
                     }
 
@@ -1640,7 +1640,7 @@ class SyncCtoModuleClient extends BackendModule
                     else
                     {
                         $this->objStepPool->step++;
-                        $this->objData->setState($GLOBALS['TL_LANG']['MSC']['ok']);
+                        $this->objData->setState(SyncCtoEnum::WORK_OK);
                         $this->objData->setDescription(vsprintf($GLOBALS['TL_LANG']['tl_syncCto_sync']["step_3"]['description_4'], array($intCount, $intCountSplit)));
                     }
 
@@ -1716,7 +1716,7 @@ class SyncCtoModuleClient extends BackendModule
                     else
                     {
                         $this->objStepPool->step++;
-                        $this->objData->setState($GLOBALS['TL_LANG']['MSC']['ok']);
+                        $this->objData->setState(SyncCtoEnum::WORK_OK);
                         $this->objData->setDescription($GLOBALS['TL_LANG']['tl_syncCto_sync']["step_3"]['description_5']);
                     }
 
@@ -1776,7 +1776,7 @@ class SyncCtoModuleClient extends BackendModule
                     }
                     else
                     {
-                        $this->objData->setState($GLOBALS['TL_LANG']['MSC']['ok']);
+                        $this->objData->setState(SyncCtoEnum::WORK_OK);
                         $this->objData->setDescription($GLOBALS['TL_LANG']['tl_syncCto_sync']["step_3"]['description_1']);
 
                         $this->intStep++;
@@ -1791,7 +1791,7 @@ class SyncCtoModuleClient extends BackendModule
 
             $this->booError = TRUE;
             $this->strError = $exc->getMessage();
-            $this->objData->setState($GLOBALS['TL_LANG']['MSC']['error']);
+            $this->objData->setState(SyncCtoEnum::WORK_ERROR);
         }
     }
 
@@ -1814,7 +1814,7 @@ class SyncCtoModuleClient extends BackendModule
         {
             $this->booError = false;
             $this->strError = "";
-            $this->objData->setState($GLOBALS['TL_LANG']['MSC']['progress']);
+            $this->objData->setState(SyncCtoEnum::WORK_WORK);
 
             $this->objStepPool->step = 1;
         }
@@ -1832,7 +1832,7 @@ class SyncCtoModuleClient extends BackendModule
                  */
                 case 1:
 
-                    $this->objData->setState($GLOBALS['TL_LANG']['MSC']['progress']);
+                    $this->objData->setState(SyncCtoEnum::WORK_WORK);
                     $this->objData->setTitle($GLOBALS['TL_LANG']['MSC']['step'] . " %s");
                     $this->objData->setDescription($GLOBALS['TL_LANG']['tl_syncCto_sync']['step_4']['description_1']);
                     $this->objStepPool->step++;
@@ -1843,7 +1843,7 @@ class SyncCtoModuleClient extends BackendModule
 
                     if (key_exists("forward", $_POST) && count($this->arrSyncSettings['syncCto_SyncTables']) > 0)
                     {
-                        $this->objData->setState($GLOBALS['TL_LANG']['MSC']['ok']);
+                        $this->objData->setState(SyncCtoEnum::WORK_OK);
                         $this->objData->setHtml("");
                         $this->booRefresh = true;
                         $this->objStepPool->step++;
@@ -1852,7 +1852,7 @@ class SyncCtoModuleClient extends BackendModule
                     }
                     else if (key_exists("skip", $_POST) || key_exists("forward", $_POST) && count($this->arrSyncSettings['syncCto_SyncTables']) == 0)
                     {
-                        $this->objData->setState($GLOBALS['TL_LANG']['MSC']['skipped']);
+                        $this->objData->setState(SyncCtoEnum::WORK_SKIPPED);
                         $this->objData->setHtml("");
                         $this->booRefresh = true;
                         $this->intStep++;
@@ -2005,7 +2005,7 @@ class SyncCtoModuleClient extends BackendModule
                     }
 
                     // Show step information
-                    $this->objData->setState($GLOBALS['TL_LANG']['MSC']['ok']);
+                    $this->objData->setState(SyncCtoEnum::WORK_OK);
                     $this->objData->setDescription($GLOBALS['TL_LANG']['tl_syncCto_sync']['step_4']['description_4']);
 
                     $this->intStep++;
@@ -2019,7 +2019,7 @@ class SyncCtoModuleClient extends BackendModule
 
             $this->booError = true;
             $this->strError = $exc->getMessage();
-            $this->objData->setState($GLOBALS['TL_LANG']['MSC']['error']);
+            $this->objData->setState(SyncCtoEnum::WORK_ERROR);
         }
     }
 
@@ -2040,7 +2040,7 @@ class SyncCtoModuleClient extends BackendModule
         // Set content back to normale mode
         $this->booError = false;
         $this->strError = "";
-        $this->objData->setState($GLOBALS['TL_LANG']['MSC']['progress']);
+        $this->objData->setState(SyncCtoEnum::WORK_WORK);
 
         /* ---------------------------------------------------------------------
          * Run page
@@ -2054,7 +2054,7 @@ class SyncCtoModuleClient extends BackendModule
                  * Init
                  */
                 case 1:
-                    $this->objData->setState($GLOBALS['TL_LANG']['MSC']['progress']);
+                    $this->objData->setState(SyncCtoEnum::WORK_WORK);
                     $this->objData->setDescription($GLOBALS['TL_LANG']['tl_syncCto_sync']["step_5"]['description_1']);
                     $this->objData->setTitle($GLOBALS['TL_LANG']['MSC']['step'] . " %s");
                     $this->objStepPool->step++;
@@ -2249,7 +2249,7 @@ class SyncCtoModuleClient extends BackendModule
                     if (!is_array($this->arrListCompare) || count($this->arrListCompare) == 0)
                     {
                         $this->objData->setHtml("");
-                        $this->objData->setState($GLOBALS['TL_LANG']['MSC']['ok']);
+                        $this->objData->setState(SyncCtoEnum::WORK_OK);
                         $this->objData->setDescription($GLOBALS['TL_LANG']['tl_syncCto_sync']["step_5"]['description_1']);
                         $this->booFinished = true;
 
@@ -2274,7 +2274,7 @@ class SyncCtoModuleClient extends BackendModule
                     else if (is_array($this->arrListCompare) && count($this->arrListCompare) != 0)
                     {
                         $this->objData->setHtml("");
-                        $this->objData->setState($GLOBALS['TL_LANG']['MSC']['ok']);
+                        $this->objData->setState(SyncCtoEnum::WORK_OK);
                         $this->objData->setDescription(vsprintf($GLOBALS['TL_LANG']['tl_syncCto_sync']["step_3"]['description_2'], array($intSendCount, count($this->arrListCompare))));
                         $this->booFinished = true;
                     }
@@ -2430,7 +2430,7 @@ class SyncCtoModuleClient extends BackendModule
 
             $this->booError = true;
             $this->strError = $exc->getMessage();
-            $this->objData->setState($GLOBALS['TL_LANG']['MSC']['error']);
+            $this->objData->setState(SyncCtoEnum::WORK_ERROR);
         }
     }
 
@@ -2457,7 +2457,7 @@ class SyncCtoModuleClient extends BackendModule
         // Set content back to normale mode
         $this->booError = false;
         $this->strError = "";
-        $this->objData->setState($GLOBALS['TL_LANG']['MSC']['progress']);
+        $this->objData->setState(SyncCtoEnum::WORK_WORK);
 
         // Run page
         try
@@ -2468,7 +2468,7 @@ class SyncCtoModuleClient extends BackendModule
                  * Show step
                  */
                 case 1:
-                    $this->objData->setState($GLOBALS['TL_LANG']['MSC']['progress']);
+                    $this->objData->setState(SyncCtoEnum::WORK_WORK);
                     $this->objData->setTitle($GLOBALS['TL_LANG']['MSC']['step'] . " %s");
                     $this->objData->setDescription($GLOBALS['TL_LANG']['tl_syncCto_sync']["step_2"]['description_1']);
 
@@ -2597,7 +2597,7 @@ class SyncCtoModuleClient extends BackendModule
                 case 8:
                     if (count($this->arrListCompare) == 0 || key_exists("skip", $_POST))
                     {
-                        $this->objData->setState($GLOBALS['TL_LANG']['MSC']['skipped']);
+                        $this->objData->setState(SyncCtoEnum::WORK_SKIPPED);
                         $this->objData->setHtml("");
                         $this->booRefresh = true;
                         $this->intStep++;
@@ -2608,7 +2608,7 @@ class SyncCtoModuleClient extends BackendModule
                     }
                     else if (key_exists("forward", $_POST) && count($this->arrListCompare) != 0)
                     {
-                        $this->objData->setState($GLOBALS['TL_LANG']['MSC']['ok']);
+                        $this->objData->setState(SyncCtoEnum::WORK_OK);
                         $this->objData->setDescription($GLOBALS['TL_LANG']['tl_syncCto_sync']["step_2"]['description_1']);
                         $this->objData->setHtml("");
                         $this->booRefresh = true;
@@ -2665,7 +2665,7 @@ class SyncCtoModuleClient extends BackendModule
                     if ($intCountMissing == 0 && $intCountNeed == 0 && $intCountIgnored == 0 && $intCountDelete == 0)
                     {
                         // Set current step informations
-                        $this->objData->setState($GLOBALS['TL_LANG']['MSC']['skipped']);
+                        $this->objData->setState(SyncCtoEnum::WORK_SKIPPED);
                         $this->objData->setDescription($GLOBALS['TL_LANG']['tl_syncCto_sync']["step_2"]['description_1']);
                         $this->objData->setHtml("");
                         $this->booRefresh = true;
@@ -2707,7 +2707,7 @@ class SyncCtoModuleClient extends BackendModule
             $this->booError = true;
             $this->strError = $exc->getMessage();
 
-            $this->objData->setState($GLOBALS['TL_LANG']['MSC']['error']);
+            $this->objData->setState(SyncCtoEnum::WORK_ERROR);
         }
     }
 
@@ -2725,7 +2725,7 @@ class SyncCtoModuleClient extends BackendModule
         // Set content back to normale mode
         $this->booError = false;
         $this->strError = "";
-        $this->objData->setState($GLOBALS['TL_LANG']['MSC']['progress']);
+        $this->objData->setState(SyncCtoEnum::WORK_WORK);
 
         // Count files
         if (is_array($this->arrListCompare) && count($this->arrListCompare) != 0 && $this->arrListCompare != false)
@@ -2776,7 +2776,7 @@ class SyncCtoModuleClient extends BackendModule
                  * Show step
                  */
                 case 1:
-                    $this->objData->setState($GLOBALS['TL_LANG']['MSC']['progress']);
+                    $this->objData->setState(SyncCtoEnum::WORK_WORK);
                     $this->objData->setTitle($GLOBALS['TL_LANG']['MSC']['step'] . " %s");
                     $this->objData->setDescription($GLOBALS['TL_LANG']['tl_syncCto_sync']["step_3"]['description_1']);
 
@@ -2868,7 +2868,7 @@ class SyncCtoModuleClient extends BackendModule
                         }
 
                         $this->objData->setDescription($GLOBALS['TL_LANG']['tl_syncCto_sync']["step_3"]['description_1']);
-                        $this->objData->setState($GLOBALS['TL_LANG']['MSC']['ok']);
+                        $this->objData->setState(SyncCtoEnum::WORK_OK);
                         $this->intStep++;
                     }
 
@@ -3001,7 +3001,7 @@ class SyncCtoModuleClient extends BackendModule
                     else
                     {
                         $this->objStepPool->step++;
-                        $this->objData->setState($GLOBALS['TL_LANG']['MSC']['ok']);
+                        $this->objData->setState(SyncCtoEnum::WORK_OK);
                         $this->objData->setDescription($GLOBALS['TL_LANG']['tl_syncCto_sync']["step_3"]['description_5']);
                     }
 
@@ -3064,7 +3064,7 @@ class SyncCtoModuleClient extends BackendModule
                     }
                     else
                     {
-                        $this->objData->setState($GLOBALS['TL_LANG']['MSC']['ok']);
+                        $this->objData->setState(SyncCtoEnum::WORK_OK);
                         $this->objData->setDescription(vsprintf($GLOBALS['TL_LANG']['tl_syncCto_sync']["step_3"]['description_1'], array($intCount, $intCountSplit)));
 
                         $this->intStep++;
@@ -3079,7 +3079,7 @@ class SyncCtoModuleClient extends BackendModule
 
             $this->booError = TRUE;
             $this->strError = $exc->getMessage();
-            $this->objData->setState($GLOBALS['TL_LANG']['MSC']['error']);
+            $this->objData->setState(SyncCtoEnum::WORK_ERROR);
         }
     }
 
@@ -3102,7 +3102,7 @@ class SyncCtoModuleClient extends BackendModule
         {
             $this->booError = false;
             $this->strError = "";
-            $this->objData->setState($GLOBALS['TL_LANG']['MSC']['progress']);
+            $this->objData->setState(SyncCtoEnum::WORK_WORK);
 
             $this->objStepPool->step = 1;
         }
@@ -3120,7 +3120,7 @@ class SyncCtoModuleClient extends BackendModule
                  */
                 case 1:
 
-                    $this->objData->setState($GLOBALS['TL_LANG']['MSC']['progress']);
+                    $this->objData->setState(SyncCtoEnum::WORK_WORK);
                     $this->objData->setTitle($GLOBALS['TL_LANG']['MSC']['step'] . " %s");
                     $this->objData->setDescription($GLOBALS['TL_LANG']['tl_syncCto_sync']['step_4']['description_1']);
                     $this->objStepPool->step++;
@@ -3131,7 +3131,7 @@ class SyncCtoModuleClient extends BackendModule
 
                     if (key_exists("forward", $_POST) && count($this->arrSyncSettings['syncCto_SyncTables']) > 0)
                     {
-                        $this->objData->setState($GLOBALS['TL_LANG']['MSC']['ok']);
+                        $this->objData->setState(SyncCtoEnum::WORK_OK);
                         $this->objData->setHtml("");
                         $this->booRefresh = true;
                         $this->objStepPool->step++;
@@ -3140,7 +3140,7 @@ class SyncCtoModuleClient extends BackendModule
                     }
                     else if (key_exists("skip", $_POST) || key_exists("forward", $_POST) && count($this->arrSyncSettings['syncCto_SyncTables']) == 0)
                     {
-                        $this->objData->setState($GLOBALS['TL_LANG']['MSC']['skipped']);
+                        $this->objData->setState(SyncCtoEnum::WORK_SKIPPED);
                         $this->objData->setHtml("");
                         $this->booRefresh = true;
                         $this->intStep++;
@@ -3266,7 +3266,7 @@ class SyncCtoModuleClient extends BackendModule
                     }
 
                     // Show step information
-                    $this->objData->setState($GLOBALS['TL_LANG']['MSC']['ok']);
+                    $this->objData->setState(SyncCtoEnum::WORK_OK);
                     $this->objData->setDescription($GLOBALS['TL_LANG']['tl_syncCto_sync']['step_4']['description_4']);
 
                     $this->intStep++;
@@ -3280,7 +3280,7 @@ class SyncCtoModuleClient extends BackendModule
 
             $this->booError = true;
             $this->strError = $exc->getMessage();
-            $this->objData->setState($GLOBALS['TL_LANG']['MSC']['error']);
+            $this->objData->setState(SyncCtoEnum::WORK_ERROR);
         }
     }
 
@@ -3301,7 +3301,7 @@ class SyncCtoModuleClient extends BackendModule
         // Set content back to normale mode
         $this->booError = false;
         $this->strError = "";
-        $this->objData->setState($GLOBALS['TL_LANG']['MSC']['progress']);
+        $this->objData->setState(SyncCtoEnum::WORK_WORK);
 
         /* ---------------------------------------------------------------------
          * Run page
@@ -3315,7 +3315,7 @@ class SyncCtoModuleClient extends BackendModule
                  * Init
                  */
                 case 1:
-                    $this->objData->setState($GLOBALS['TL_LANG']['MSC']['progress']);
+                    $this->objData->setState(SyncCtoEnum::WORK_WORK);
                     $this->objData->setDescription($GLOBALS['TL_LANG']['tl_syncCto_sync']["step_5"]['description_1']);
                     $this->objData->setTitle($GLOBALS['TL_LANG']['MSC']['step'] . " %s");
                     $this->objStepPool->step++;
@@ -3498,7 +3498,7 @@ class SyncCtoModuleClient extends BackendModule
                     if (!is_array($this->arrListCompare) || count($this->arrListCompare) == 0)
                     {
                         $this->objData->setHtml("");
-                        $this->objData->setState($GLOBALS['TL_LANG']['MSC']['ok']);
+                        $this->objData->setState(SyncCtoEnum::WORK_OK);
                         $this->objData->setDescription($GLOBALS['TL_LANG']['tl_syncCto_sync']["step_5"]['description_1']);
                         $this->booFinished = true;
 
@@ -3523,7 +3523,7 @@ class SyncCtoModuleClient extends BackendModule
                     else if (is_array($this->arrListCompare) && count($this->arrListCompare) != 0)
                     {
                         $this->objData->setHtml("");
-                        $this->objData->setState($GLOBALS['TL_LANG']['MSC']['ok']);
+                        $this->objData->setState(SyncCtoEnum::WORK_OK);
                         $this->objData->setDescription(vsprintf($GLOBALS['TL_LANG']['tl_syncCto_sync']["step_3"]['description_2'], array($intSendCount, count($this->arrListCompare))));
                         $this->booFinished = true;
                     }
@@ -3685,7 +3685,7 @@ class SyncCtoModuleClient extends BackendModule
 
             $this->booError = true;
             $this->strError = $exc->getMessage();
-            $this->objData->setState($GLOBALS['TL_LANG']['MSC']['error']);
+            $this->objData->setState(SyncCtoEnum::WORK_ERROR);
         }
     }
 
