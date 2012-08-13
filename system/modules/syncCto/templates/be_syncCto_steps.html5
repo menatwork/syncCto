@@ -12,7 +12,10 @@
        
     <?php $i = 0; foreach ($this->data as $key => $value): $i++; ?>
         <div class="<?php echo ($key == 1) ? "tl_tbox" : "tl_box"; ?> block">
-            <h1 id="step<?php echo $key; ?>"><?php echo vsprintf($value["title"], array($i)) ?><?php if (strlen($value["state"]) != 0): ?> - <?php echo $value["state"]; ?><?php endif; ?></h1>
+            <?php if($value["state"] == SyncCtoEnum::WORK_WORK && $this->refresh == true && $this->error == false && $this->finished == false): ?>
+            <img style="margin-bottom:20px;" src="system/modules/syncCto/html/ajax-loader.gif" alt="" />
+            <?php endif; ?>
+            <h1 id="step<?php echo $key; ?>"><?php echo vsprintf($value["title"], array($i)) ?></h1>
             <p class="tl_help">
                 <?php echo $value["description"]; ?>
             </p>
@@ -29,7 +32,6 @@
    
     <?php if ($this->refresh == true && $this->error == false && $this->finished == false): ?>
         <meta http-equiv="refresh" content="1; URL=<?php echo $this->Environment->base; ?><?php echo $this->url; ?>&amp;step=<?php echo $this->step ?>" />
-        <img style="margin-bottom:20px;" src="system/modules/syncCto/html/ajax-loader.gif" alt="" />
     <?php endif; ?>
 
     <?php if ($this->error) : ?>
