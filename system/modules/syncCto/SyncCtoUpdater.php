@@ -1,7 +1,4 @@
-<?php
-
-if (!defined('TL_ROOT'))
-    die('You cannot access this file directly!');
+<?php if (!defined('TL_ROOT')) die('You cannot access this file directly!');
 
 /**
  * Contao Open Source CMS
@@ -36,9 +33,16 @@ class SyncCtoUpdater extends Backend
     protected $arrFiles = array();
     // Tables 
     protected $arrTables = array();
-    //Blak files
+   
+    /**
+     * Black filelist 
+     *  - All regex functions are working.
+     *  - User TL_ROOT for root folder.
+     *  
+     * @var array 
+     */
     protected $arrBlackFiles = array(
-        'TL_ROOT/system/modules/syncCto/config/runonce.php',        
+        '.*/runonce.php',        
     );
 
     /**
@@ -112,31 +116,40 @@ class SyncCtoUpdater extends Backend
     {
         // Open archive
         $this->objZipArchive = new ZipArchiveCto();
-
+        
         if (($mixError = $this->objZipArchive->open($strZipPath, ZipArchiveCto::CREATE)) !== true)
         {
             throw new Exception($GLOBALS['TL_LANG']['MSC']['error'] . ": " . $this->objZipArchive->getErrorDescription($mixError));
         }
 
+        // Add files
         $this->addFiles();
+        // Add db update file        
         $this->addDatabase();
 
         $this->objZipArchive->close();
-
     }
 
+    /**
+     * Read a xml file and add all files to archive
+     * 
+     * @throws Exception
+     */
     protected function addFiles()
     {
+        // Check if xml exists
         if (!file_exists(TL_ROOT . '/tl_files/syncCto_backups/dependencies.xml'))
         {
             throw new Exception("Missing dependencies.xml for autoupdater.");
         }
 
+        // Create a new reader
         $objXMLReader = new XMLReader();
         $objXMLReader->open(TL_ROOT . '/tl_files/syncCto_backups/dependencies.xml');
 
         $strCurrentNode = "";
 
+        // Run through each line
         while ($objXMLReader->read())
         {
             switch ($objXMLReader->nodeType)
@@ -149,19 +162,25 @@ class SyncCtoUpdater extends Backend
                 case XMLReader::CDATA:
                     if ($strCurrentNode == "path")
                     {
-                        // Skip files in blacklist
-                        if(in_array($objXMLReader->value, $this->arrBlackFiles))
+                        // Check if file is in blacklist
+                        foreach ($this->arrBlackFiles as $strBlackfile)
                         {
-                            continue;
+                            if (preg_match('^' . $strBlackfile . '^i', $objXMLReader->value))
+                            {
+                                continue;
+                            }
                         }
 
+                        // Remove the TL_ROOT and the first '/'
                         $strPath = preg_replace("/^TL_ROOT\//i", "", $objXMLReader->value, 1);
 
-                        if (preg_match("/\.sql$/", $strPath))
+                        // If we have a sql parse it
+                        if (preg_match("/\.sql$/i", $strPath))
                         {
                             $this->parseSQL($strPath);
                         }
 
+                        // If file exists add it to archive
                         if (file_exists(TL_ROOT . "/" . $strPath))
                         {
                             if (!$this->objZipArchive->addFile($strPath, "FILES/" . $strPath))
@@ -174,31 +193,45 @@ class SyncCtoUpdater extends Backend
             }
         }
 
+        // Add the dependencies.xml
         if (!$this->objZipArchive->addFile('tl_files/syncCto_backups/dependencies.xml', "FILES/" . 'tl_files/syncCto_backups/dependencies.xml'))
         {
             throw new Exception('Could not add the file /tl_files/syncCto_backups/dependencies.xml to the archive.');
         }
     }
     
+    /**
+     * Parse a sql file and try to get all table names
+     * 
+     * @param string $strPath Path to the SQL file
+     * @return void
+     */
     protected function parseSQL($strPath)
     {
+        // Check if exists
         if (!file_exists(TL_ROOT . "/" . $strPath))
         {
             return;
         }
 
+        // Open file and read each single line
         $objFile = new File($strPath);
 
         foreach ($objFile->getContentAsArray() as $key => $value)
         {
-            if (preg_match("/CREATE TABLE `.*` \(/", $value))
+            // Search for 'Create Table'
+            if (preg_match("/.*CREATE TABLE `.*` \(.*/", $value))
             {
-                $arrCreate = preg_split("/(CREATE TABLE `|` \(.*)/", $value);
-                $this->arrTables[] = $arrCreate[1];
+                $value = trim($value);                
+                $arrCreate = preg_split("/(.*CREATE TABLE `|` \(.*)/", $value);
+                $this->arrTables[] =  trim($arrCreate[1]);
             }
         }
     }
 
+    /**
+     * Create a xml file with table informations
+     */
     protected function addDatabase()
     {
         // Create XML File
