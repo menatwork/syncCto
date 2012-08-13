@@ -134,7 +134,7 @@ class SyncCtoErClient extends RepositoryBackendModule
 
         if (!key_exists("syncCto", $arrInstalledExtensions))
         {
-            throw new Exception('SyncCto is not installed via the Extension Repository, please only use the official version.');
+            throw new Exception('syncCto is not installed via the Extension Repository, please only use the official version.');
         }
 
         $arrDependencies   = $this->getDependenciesFor($arrInstalledExtensions['syncCto']['extension'], $arrInstalledExtensions['syncCto']['version']);
