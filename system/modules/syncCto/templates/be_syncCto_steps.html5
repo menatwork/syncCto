@@ -12,22 +12,11 @@
        
     <?php $i = 0; foreach ($this->data as $key => $value): $i++; ?>
         <div class="<?php echo ($key == 1) ? "tl_tbox" : "tl_box"; ?> block">
-            <h1 id="step<?php echo $key; ?>">
-                <?php if($value["state"] == SyncCtoEnum::WORK_WORK && $this->refresh == true && $this->error == false && $this->finished == false): ?>
-                    <img src="system/modules/syncCto/html/ajax-loader.gif" alt="" />
-                <?php elseif ($value["state"] == SyncCtoEnum::WORK_WORK && $this->refresh == false && $this->error == false && $this->finished == false): ?>
-                    <img src="system/modules/syncCto/html/ajax-loader.gif" alt="" />
-                <?php elseif ($value["state"] == SyncCtoEnum::WORK_SKIPPED): ?>
-                    <img src="system/modules/syncCto/html/ajax-loader.gif" alt="" />
-                <?php elseif ($value["state"] == SyncCtoEnum::WORK_ERROR): ?>
-                    <img src="system/modules/syncCto/html/ajax-loader.gif" alt="" />
-                <?php elseif ($value["state"] == SyncCtoEnum::WORK_OK): ?>
-                    <img src="system/modules/syncCto/html/ajax-loader.gif" alt="" />
-                <?php elseif ($value["state"] == "" || $value["state"] == null): ?>
-                    <img src="system/modules/syncCto/html/ajax-loader.gif" alt="" />
-                <?php endif; ?>
-                <?php echo vsprintf($value["title"], array($i)) ?>
+            <h1 id="step<?php echo $key; ?>" class="headline">
+                <img src="system/modules/syncCto/html/icons/steps/icon<?php echo $value["state"]; ?>.gif" alt="" />
+                <span><?php echo vsprintf($value["title"], array($i)) ?></span>
             </h1>
+            
             <p class="tl_help">
                 <?php echo $value["description"]; ?>
             </p>

@@ -3,7 +3,7 @@
 <div id="tl_listing" class="tl_listing_container">
 <?php if($this->close || $this->error): ?>
     <?php if($this->close): ?>
-    <img src="<?php echo $this->Environment->base; ?>system/modules/syncCto/html/ajax-loader.gif" alt="" />
+    <img src="<?php echo $this->Environment->base; ?>system/modules/syncCto/html/icons/steps/iconWork.gif" alt="" />
     <script>
         window.addEvent("domready",function(){
             window.parent.document.getElement('input[name=forward]').click();
@@ -64,11 +64,11 @@
                 <tr>
                     <td class="col_0 checkbox"><?php if($arrCompareTable['server'] != '-'): ?><input type="checkbox" class="tl_checkbox" name="serverTables[]" value="<?php echo $strTableName; ?>" /><?php endif; ?></td>
                     <td class="col_1 <?php echo $arrCompareTable['client']['class']; ?>">
-                        <?php if ($arrCompareTable['client']['name'] != '-'): ?><img src="<?php echo $this->Environment->base; ?>system/modules/syncCto/html/iconInformation.png" alt="tooltip" title="<?php echo $arrCompareTable['client']['tooltip']; ?>" /><?php endif; ?>
+                        <?php if ($arrCompareTable['client']['name'] != '-'): ?><img src="<?php echo $this->Environment->base; ?>system/modules/syncCto/html/icons/steps/iconInformation.png" alt="tooltip" title="<?php echo $arrCompareTable['client']['tooltip']; ?>" /><?php endif; ?>
                         <?php echo $arrCompareTable['client']['name']; ?>
                     </td>
                     <td class="col_2 <?php echo $arrCompareTable['server']['class']; ?>">
-                        <?php if ($arrCompareTable['server']['name'] != '-'): ?><img src="<?php echo $this->Environment->base; ?>system/modules/syncCto/html/iconInformation.png" alt="tooltip" title="<?php echo $arrCompareTable['server']['tooltip']; ?>" /><?php endif; ?>
+                        <?php if ($arrCompareTable['server']['name'] != '-'): ?><img src="<?php echo $this->Environment->base; ?>system/modules/syncCto/html/icons/steps/iconInformation.png" alt="tooltip" title="<?php echo $arrCompareTable['server']['tooltip']; ?>" /><?php endif; ?>
                         <?php echo $arrCompareTable['server']['name']; ?>
                     </td>
                     <td class="col_3 diff"><?php echo $arrCompareTable['diff']; ?></td>

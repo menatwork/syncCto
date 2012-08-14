@@ -43,21 +43,21 @@ $GLOBALS['BE_MOD'] = array_merge(
     'syncCto' => array(
         'syncCto_settings' => array(
             'tables' => array('tl_syncCto_settings'),
-            'icon' => 'system/modules/syncCto/html/iconSettings.png'
+            'icon' => 'system/modules/syncCto/html/icons/nav/iconSettings.png'
         ),
         'synccto_clients' => array(
             'tables' => array('tl_synccto_clients', 'tl_syncCto_clients_syncTo', 'tl_syncCto_clients_syncFrom', 'tl_syncCto_clients_showExtern' ),
-            'icon' => 'system/modules/syncCto/html/iconClients.png',
+            'icon' => 'system/modules/syncCto/html/icons/nav/iconClients.png',
             'callback' => 'SyncCtoModuleClient',
             'stylesheet' => 'system/modules/syncCto/html/css/systemcheck.css',
         ),
         'syncCto_backups' => array(
             'tables' => array('tl_syncCto_backup_file', 'tl_syncCto_backup_db', 'tl_syncCto_restore_file', 'tl_syncCto_restore_db'),
-            'icon' => 'system/modules/syncCto/html/iconBackups.png',
+            'icon' => 'system/modules/syncCto/html/icons/nav/iconBackups.png',
             'callback' => 'SyncCtoModuleBackup',
         ),
         'syncCto_check' => array(
-            'icon' => 'system/modules/syncCto/html/iconCheck.png',
+            'icon' => 'system/modules/syncCto/html/icons/nav/iconCheck.png',
             'callback' => 'SyncCtoModuleCheck',
             'stylesheet' => 'system/modules/syncCto/html/css/systemcheck.css',
         )

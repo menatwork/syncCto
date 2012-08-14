@@ -96,6 +96,9 @@ class SyncCtoModuleClient extends BackendModule
 
         // Load language 
         $this->loadLanguageFile("tl_syncCto_steps");
+        
+        // Load CSS
+        $GLOBALS['TL_CSS'][] = 'system/modules/syncCto/html/css/steps.css';
 
         // Import
         $this->import("Backenduser", "User");
@@ -1167,7 +1170,7 @@ class SyncCtoModuleClient extends BackendModule
             $this->objData->setStep(99);
             $this->objData->setTitle($GLOBALS['TL_LANG']['MSC']['abort']);
             $this->objData->setDescription($GLOBALS['TL_LANG']['tl_syncCto_sync']['abort']);
-            $this->objData->setState("");
+            $this->objData->setState(SyncCtoEnum::WORK_ERROR);
         }
     }
 
@@ -2266,7 +2269,7 @@ class SyncCtoModuleClient extends BackendModule
                         $this->objData->nextStep();
                         $this->objData->setTitle($GLOBALS['TL_LANG']['MSC']['complete']);
                         $this->objData->setDescription(vsprintf($GLOBALS['TL_LANG']['tl_syncCto_sync']['complete_client'], array($strLink, "</a>")));
-                        $this->objData->setState("");
+                        $this->objData->setState(SyncCtoEnum::WORK_OK);
 
                         break;
                     }
@@ -2419,7 +2422,7 @@ class SyncCtoModuleClient extends BackendModule
                     $this->objData->nextStep();
                     $this->objData->setTitle($GLOBALS['TL_LANG']['MSC']['complete']);
                     $this->objData->setDescription(vsprintf($GLOBALS['TL_LANG']['tl_syncCto_sync']['complete_client'], array($strLink, "</a>")));
-                    $this->objData->setState("");
+                    $this->objData->setState(SyncCtoEnum::WORK_OK);
 
                     break;
             }
@@ -3515,7 +3518,7 @@ class SyncCtoModuleClient extends BackendModule
                         $this->objData->nextStep();
                         $this->objData->setTitle($GLOBALS['TL_LANG']['MSC']['complete']);
                         $this->objData->setDescription(vsprintf($GLOBALS['TL_LANG']['tl_syncCto_sync']['complete_server'], array($strLink, "</a>")));
-                        $this->objData->setState("");
+                        $this->objData->setState(SyncCtoEnum::WORK_OK);
 
                         break;
                     }
@@ -3674,7 +3677,7 @@ class SyncCtoModuleClient extends BackendModule
                     $this->objData->nextStep();
                     $this->objData->setTitle($GLOBALS['TL_LANG']['MSC']['complete']);
                     $this->objData->setDescription(vsprintf($GLOBALS['TL_LANG']['tl_syncCto_sync']['complete_server'], array($strLink, "</a>")));
-                    $this->objData->setState("");
+                    $this->objData->setState(SyncCtoEnum::WORK_OK);
 
                     break;
             }

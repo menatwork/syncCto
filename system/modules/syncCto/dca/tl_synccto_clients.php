@@ -87,20 +87,20 @@ $GLOBALS['TL_DCA']['tl_synccto_clients'] = array(
             'showExtern' => array(
                 'label' => &$GLOBALS['TL_LANG']['tl_syncCto_clients']['showExtern'],
                 'href' => '&table=tl_syncCto_clients_showExtern&act=start', 
-                'icon' => 'system/modules/syncCto/html/iconCheck.png',
+                'icon' => 'system/modules/syncCto/html/icons/nav/iconCheck.png',
                 'button_callback' => array('tl_synccto_clients', 'checkPermission_client_showExtern'),
             ),
             'syncFrom' => array(
                 'label' => &$GLOBALS['TL_LANG']['tl_syncCto_clients']['syncFrom'],
                 'href' => '&table=tl_syncCto_clients_syncFrom&act=edit',
-                'icon' => 'system/modules/syncCto/html/iconSyncFrom.png',
+                'icon' => 'system/modules/syncCto/html/icons/nav/iconSyncFrom.png',
                 'attributes' => 'onclick="if (!confirm(\'' . $GLOBALS['TL_LANG']['tl_syncCto_clients']['syncFromConfirm'] . '\')) return false; Backend.getScrollOffset();"',
                 'button_callback' => array('tl_synccto_clients', 'checkPermission_client_syncFrom'),
             ),
             'syncTo' => array(
                 'label' => &$GLOBALS['TL_LANG']['tl_syncCto_clients']['syncTo'],
                 'href' => '&table=tl_syncCto_clients_syncTo&act=edit',
-                'icon' => 'system/modules/syncCto/html/iconSyncTo.png',
+                'icon' => 'system/modules/syncCto/html/icons/nav/iconSyncTo.png',
                 'button_callback' => array('tl_synccto_clients', 'checkPermission_client_syncTo'),
             ),
         )

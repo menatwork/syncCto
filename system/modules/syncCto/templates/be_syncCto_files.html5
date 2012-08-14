@@ -3,7 +3,7 @@
 <div id="tl_listing" class="tl_listing_container">
 <?php if($this->close || $this->error): ?>
     <?php if($this->close): ?>
-    <img src="system/modules/syncCto/html/ajax-loader.gif" alt="" />
+    <img src="system/modules/syncCto/html/icons/steps/iconWork.gif" alt="" />
     <script>    
         window.addEvent("domready",function(){
             window.parent.document.getElement('input[name=forward]').click();
