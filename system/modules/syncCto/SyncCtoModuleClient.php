@@ -1643,7 +1643,7 @@ class SyncCtoModuleClient extends BackendModule
                     else
                     {
                         $this->objStepPool->step++;
-                        $this->objData->setState(SyncCtoEnum::WORK_OK);
+                        $this->objData->setState(SyncCtoEnum::WORK_WORK);
                         $this->objData->setDescription(vsprintf($GLOBALS['TL_LANG']['tl_syncCto_sync']["step_3"]['description_4'], array($intCount, $intCountSplit)));
                     }
 
@@ -1719,7 +1719,7 @@ class SyncCtoModuleClient extends BackendModule
                     else
                     {
                         $this->objStepPool->step++;
-                        $this->objData->setState(SyncCtoEnum::WORK_OK);
+                        $this->objData->setState(SyncCtoEnum::WORK_WORK);
                         $this->objData->setDescription($GLOBALS['TL_LANG']['tl_syncCto_sync']["step_3"]['description_5']);
                     }
 
@@ -3004,7 +3004,7 @@ class SyncCtoModuleClient extends BackendModule
                     else
                     {
                         $this->objStepPool->step++;
-                        $this->objData->setState(SyncCtoEnum::WORK_OK);
+                        $this->objData->setState(SyncCtoEnum::WORK_WORK);
                         $this->objData->setDescription($GLOBALS['TL_LANG']['tl_syncCto_sync']["step_3"]['description_5']);
                     }
 
