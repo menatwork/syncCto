@@ -1846,7 +1846,7 @@ class SyncCtoModuleClient extends BackendModule
 
                     if (key_exists("forward", $_POST) && count($this->arrSyncSettings['syncCto_SyncTables']) > 0)
                     {
-                        $this->objData->setState(SyncCtoEnum::WORK_OK);
+                        $this->objData->setState(SyncCtoEnum::WORK_WORK);
                         $this->objData->setHtml("");
                         $this->booRefresh = true;
                         $this->objStepPool->step++;
@@ -3134,7 +3134,7 @@ class SyncCtoModuleClient extends BackendModule
 
                     if (key_exists("forward", $_POST) && count($this->arrSyncSettings['syncCto_SyncTables']) > 0)
                     {
-                        $this->objData->setState(SyncCtoEnum::WORK_OK);
+                        $this->objData->setState(SyncCtoEnum::WORK_WORK);
                         $this->objData->setHtml("");
                         $this->booRefresh = true;
                         $this->objStepPool->step++;
