@@ -13,3 +13,10 @@
  * Link         http://p.yusukekamiyamane.com/
  * License    	Creative Commons Attribution 3.0
  */
+ 
+/**
+ * Package    	Free Vector Web Icons
+ * Copyright  	August Interactive and lead UI designer Tomas Gajar 
+ * Author       August Interactive
+ * Link         http://www.augustinteractive.com/
+ */
