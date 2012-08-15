@@ -89,17 +89,10 @@ class SyncCtoHelper extends Backend
     {
         if (is_array($arrLocalconfig) && is_array($arrSyncCtoConfig))
         {
-            foreach ($arrLocalconfig as $value)
-            {
-                if ($value == "" || in_array($value, $arrSyncCtoConfig))
-                {
-                    continue;
-                }
+            $arrLocalconfig   = array_filter($arrLocalconfig, 'strlen');
+            $arrSyncCtoConfig = array_filter($arrSyncCtoConfig, 'strlen');
 
-                $arrSyncCtoConfig[] = $value;
-            }
-
-            return $arrSyncCtoConfig;
+            return array_values(array_flip(array_merge($arrLocalconfig, $arrSyncCtoConfig)));
         }
         else if (!is_array($arrLocalconfig) && is_array($arrSyncCtoConfig))
         {
@@ -189,6 +182,7 @@ class SyncCtoHelper extends Backend
     {
         $arrLocalconfig   = deserialize($GLOBALS['TL_CONFIG']['syncCto_folder_blacklist']);
         $arrSyncCtoConfig = $GLOBALS['SYC_CONFIG']['folder_blacklist'];
+        
         return $this->mergeConfigs($arrLocalconfig, $arrSyncCtoConfig);
     }
 
@@ -196,6 +190,7 @@ class SyncCtoHelper extends Backend
     {
         $arrLocalconfig   = deserialize($GLOBALS['TL_CONFIG']['syncCto_folder_whitelist']);
         $arrSyncCtoConfig = $GLOBALS['SYC_CONFIG']['folder_whitelist'];
+        
         return $this->mergeConfigs($arrLocalconfig, $arrSyncCtoConfig);
     }
 
@@ -203,6 +198,7 @@ class SyncCtoHelper extends Backend
     {
         $arrLocalconfig   = deserialize($GLOBALS['TL_CONFIG']['syncCto_file_blacklist']);
         $arrSyncCtoConfig = $GLOBALS['SYC_CONFIG']['file_blacklist'];
+        
         return $this->mergeConfigs($arrLocalconfig, $arrSyncCtoConfig);
     }
 
@@ -210,6 +206,7 @@ class SyncCtoHelper extends Backend
     {
         $arrLocalconfig   = deserialize($GLOBALS['TL_CONFIG']['syncCto_local_blacklist']);
         $arrSyncCtoConfig = $GLOBALS['SYC_CONFIG']['local_blacklist'];
+        
         return $this->mergeConfigs($arrLocalconfig, $arrSyncCtoConfig);
     }
 
@@ -217,6 +214,7 @@ class SyncCtoHelper extends Backend
     {
         $arrLocalconfig   = deserialize($GLOBALS['TL_CONFIG']['syncCto_hidden_tables']);
         $arrSyncCtoConfig = $GLOBALS['SYC_CONFIG']['table_hidden'];
+        
         return $this->mergeConfigs($arrLocalconfig, $arrSyncCtoConfig);
     }
 
@@ -494,23 +492,6 @@ class SyncCtoHelper extends Backend
         }
 
         return preg_replace("/^\//i", "", $strVar);
-    }
-
-    /**
-     * Returns a whole list of all tables in the database
-     * 
-     * @return array 
-     */
-    public function hiddenTables()
-    {
-        $arrTables = array();
-
-        foreach ($this->Database->listTables() as $key => $value)
-        {
-            $arrTables[] = $value;
-        }
-
-        return $arrTables;
     }
 
     /**
