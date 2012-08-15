@@ -1327,28 +1327,6 @@ class SyncCtoModuleClient extends BackendModule
                  * Show files form
                  */
                 case 8:
-                    if (count($this->arrListCompare) == 0 || key_exists("skip", $_POST))
-                    {
-                        $this->objData->setState(SyncCtoEnum::WORK_SKIPPED);
-                        $this->objData->setHtml("");
-                        $this->booRefresh = true;
-                        $this->intStep++;
-
-                        $this->arrListCompare = array();
-
-                        break;
-                    }
-                    else if (key_exists("forward", $_POST) && count($this->arrListCompare) != 0)
-                    {
-                        $this->objData->setState(SyncCtoEnum::WORK_OK);
-                        $this->objData->setDescription($GLOBALS['TL_LANG']['tl_syncCto_sync']["step_2"]['description_1']);
-                        $this->objData->setHtml("");
-                        $this->booRefresh = true;
-                        $this->intStep++;
-
-                        break;
-                    }
-
                     // Counter
                     $intCountMissing = 0;
                     $intCountNeed    = 0;
@@ -1399,6 +1377,28 @@ class SyncCtoModuleClient extends BackendModule
                         // Set current step informations
                         $this->objData->setState(SyncCtoEnum::WORK_SKIPPED);
                         $this->objData->setDescription($GLOBALS['TL_LANG']['tl_syncCto_sync']["step_2"]['description_1']);
+                        $this->objData->setHtml("");
+                        $this->booRefresh = true;
+                        $this->intStep++;
+
+                        break;
+                    }
+                    else if (count($this->arrListCompare) == 0 || key_exists("skip", $_POST))
+                    {
+                        $this->objData->setState(SyncCtoEnum::WORK_SKIPPED);
+                        $this->objData->setDescription($GLOBALS['TL_LANG']['tl_syncCto_sync']["step_2"]['description_1']);
+                        $this->objData->setHtml("");
+                        $this->booRefresh = true;
+                        $this->intStep++;
+
+                        $this->arrListCompare = array();
+
+                        break;
+                    }
+                    else if (key_exists("forward", $_POST) && count($this->arrListCompare) != 0)
+                    {
+                        $this->objData->setState(SyncCtoEnum::WORK_OK);
+                        $this->objData->setDescription(vsprintf($GLOBALS['TL_LANG']['tl_syncCto_sync']["step_2"]['description_4'], array($intCountMissing, $intCountNeed, $intCountDelete, $intCountIgnored, $this->getReadableSize($intTotalSizeNew), $this->getReadableSize($intTotalSizeChange), $this->getReadableSize($intTotalSizeDel))));
                         $this->objData->setHtml("");
                         $this->booRefresh = true;
                         $this->intStep++;
@@ -1843,9 +1843,9 @@ class SyncCtoModuleClient extends BackendModule
                     break;
 
                 case 2:
-
-                    if (key_exists("forward", $_POST) && count($this->arrSyncSettings['syncCto_SyncTables']) > 0)
-                    {
+                    
+                    if (key_exists("forward", $_POST) && (count($this->arrSyncSettings['syncCto_SyncTables']) > 0 || count($this->arrSyncSettings['syncCto_SyncDeleteTables']) > 0))
+                    {    
                         $this->objData->setState(SyncCtoEnum::WORK_WORK);
                         $this->objData->setHtml("");
                         $this->booRefresh = true;
@@ -1891,8 +1891,7 @@ class SyncCtoModuleClient extends BackendModule
                 /**
                  * Build SQL Zip File
                  */
-                case 3:
-
+                case 3:                    
                     $this->objStepPool->zipname = $this->objSyncCtoDatabase->runDump($this->arrSyncSettings['syncCto_SyncTables'], true, true);
 
                     $this->objData->setDescription($GLOBALS['TL_LANG']['tl_syncCto_sync']['step_4']['description_2']);
@@ -1983,9 +1982,25 @@ class SyncCtoModuleClient extends BackendModule
                     break;
 
                 /**
-                 * Hook for custom sql code
+                 * Drop Tables
                  */
                 case 7:
+                    if (isset($this->arrSyncSettings['syncCto_SyncDeleteTables']) && is_array($this->arrSyncSettings['syncCto_SyncDeleteTables']))
+                    {
+                        // ToDo Add drop remote call                        
+                    }
+
+                    // Show step information
+                    $this->objData->setDescription($GLOBALS['TL_LANG']['tl_syncCto_sync']['step_4']['description_4']);
+
+                    $this->objStepPool->step++;
+
+                    break;
+
+                /**
+                 * Hook for custom sql code
+                 */
+                case 8:
                     if (isset($GLOBALS['TL_HOOKS']['syncDBUpdate']) && is_array($GLOBALS['TL_HOOKS']['syncDBUpdate']))
                     {
                         $arrSQL = array();
@@ -2598,28 +2613,6 @@ class SyncCtoModuleClient extends BackendModule
                  * Show files form
                  */
                 case 8:
-                    if (count($this->arrListCompare) == 0 || key_exists("skip", $_POST))
-                    {
-                        $this->objData->setState(SyncCtoEnum::WORK_SKIPPED);
-                        $this->objData->setHtml("");
-                        $this->booRefresh = true;
-                        $this->intStep++;
-
-                        $this->arrListCompare = array();
-
-                        break;
-                    }
-                    else if (key_exists("forward", $_POST) && count($this->arrListCompare) != 0)
-                    {
-                        $this->objData->setState(SyncCtoEnum::WORK_OK);
-                        $this->objData->setDescription($GLOBALS['TL_LANG']['tl_syncCto_sync']["step_2"]['description_1']);
-                        $this->objData->setHtml("");
-                        $this->booRefresh = true;
-                        $this->intStep++;
-
-                        break;
-                    }
-
                     // Counter
                     $intCountMissing = 0;
                     $intCountNeed    = 0;
@@ -2670,6 +2663,28 @@ class SyncCtoModuleClient extends BackendModule
                         // Set current step informations
                         $this->objData->setState(SyncCtoEnum::WORK_SKIPPED);
                         $this->objData->setDescription($GLOBALS['TL_LANG']['tl_syncCto_sync']["step_2"]['description_1']);
+                        $this->objData->setHtml("");
+                        $this->booRefresh = true;
+                        $this->intStep++;
+
+                        break;
+                    }
+                    else if (count($this->arrListCompare) == 0 || key_exists("skip", $_POST))
+                    {
+                        $this->objData->setState(SyncCtoEnum::WORK_SKIPPED);
+                        $this->objData->setDescription($GLOBALS['TL_LANG']['tl_syncCto_sync']["step_2"]['description_1']);
+                        $this->objData->setHtml("");
+                        $this->booRefresh = true;
+                        $this->intStep++;
+
+                        $this->arrListCompare = array();
+
+                        break;
+                    }
+                    else if (key_exists("forward", $_POST) && count($this->arrListCompare) != 0)
+                    {
+                        $this->objData->setState(SyncCtoEnum::WORK_OK);
+                        $this->objData->setDescription(vsprintf($GLOBALS['TL_LANG']['tl_syncCto_sync']["step_2"]['description_4'], array($intCountMissing, $intCountNeed, $intCountDelete, $intCountIgnored, $this->getReadableSize($intTotalSizeNew), $this->getReadableSize($intTotalSizeChange), $this->getReadableSize($intTotalSizeDel))));
                         $this->objData->setHtml("");
                         $this->booRefresh = true;
                         $this->intStep++;
@@ -3130,8 +3145,7 @@ class SyncCtoModuleClient extends BackendModule
 
                     break;
 
-                case 2:
-
+                case 2:    
                     if (key_exists("forward", $_POST) && count($this->arrSyncSettings['syncCto_SyncTables']) > 0)
                     {
                         $this->objData->setState(SyncCtoEnum::WORK_WORK);

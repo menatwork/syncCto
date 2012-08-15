@@ -6,7 +6,7 @@
         <div class="m12 submit_container">
             <input class="tl_submit invisible" name="forward" type="submit" value="<?php echo $this->forwardValue; ?>" />
             <input class="tl_submit" name="skip" type="submit" value="<?php echo $GLOBALS['TL_LANG']['MSC']['skip']; ?>" />
-            <a class="tl_submit" <?php echo $this->lightboxAttr; ?> href="<?php echo $this->Environment->base; ?>contao/<?php echo $this->popupClassName; ?>?id=<?php echo $this->id; ?>"><?php echo $GLOBALS['TL_LANG']['MSC']['popup']; ?></a>
+            <a class="tl_submit" <?php echo $this->lightboxAttr; ?> href="<?php echo $this->Environment->base; ?>contao/<?php echo $this->popupClassName; ?>?id=<?php echo $this->id; ?>&amp;direction=<?php echo $this->direction; ?>"><?php echo $GLOBALS['TL_LANG']['MSC']['popup']; ?></a>
         </div>
     </div>
 </form>

@@ -60,10 +60,6 @@ $GLOBALS['TL_LANG']['MSC']['start_backup']                  = 'Backup starten';
 /**
  * Text
  */
-$GLOBALS['TL_LANG']['MSC']['ok']                            = 'OK';
-$GLOBALS['TL_LANG']['MSC']['progress']                      = 'In Bearbeitung';
-$GLOBALS['TL_LANG']['MSC']['error']                         = 'Fehler';
-$GLOBALS['TL_LANG']['MSC']['skipped']                       = 'Übersprungen';
 $GLOBALS['TL_LANG']['MSC']['skip']                          = 'Überspringen';
 $GLOBALS['TL_LANG']['MSC']['popup']                         = 'Vergleichsliste öffnen';
 $GLOBALS['TL_LANG']['MSC']['unknown_step']                  = 'Unbekannter Schritt';
@@ -85,10 +81,9 @@ $GLOBALS['TL_LANG']['MSC']['state']                         = 'Status';
 $GLOBALS['TL_LANG']['MSC']['filesize']                      = 'Dateigröße';
 $GLOBALS['TL_LANG']['MSC']['file']                          = 'Datei';
 $GLOBALS['TL_LANG']['MSC']['totalsize']                     = 'Größe aller Dateien:';
-$GLOBALS['TL_LANG']['MSC']['new_file']                      = 'Neu';
-$GLOBALS['TL_LANG']['MSC']['modified_file']                 = 'Verändert';
-$GLOBALS['TL_LANG']['MSC']['unknown_file']                  = 'Unbekannt';
-$GLOBALS['TL_LANG']['MSC']['deleted_file']                  = 'Gelöscht';
+$GLOBALS['TL_LANG']['MSC']['new_data']                      = 'Neu';
+$GLOBALS['TL_LANG']['MSC']['modified_data']                  = 'Verändert';
+$GLOBALS['TL_LANG']['MSC']['deleted_data']                  = 'Gelöscht';
 $GLOBALS['TL_LANG']['MSC']['big_files']                     = 'Groß';
 $GLOBALS['TL_LANG']['MSC']['skipped_files']                 = 'Übersprungen';
 $GLOBALS['TL_LANG']['MSC']['ignored_files']                 = 'Ignoriert';
@@ -102,6 +97,8 @@ $GLOBALS['TL_LANG']['MSC']['server']                        = 'Server';
 $GLOBALS['TL_LANG']['MSC']['difference']                    = 'Differenz';
 $GLOBALS['TL_LANG']['MSC']['recom_tables']                  = 'Empfohlene Datenbank-Tabellen';
 $GLOBALS['TL_LANG']['MSC']['nonrecom_tables']               = 'Nicht empfohlene Datenbank-Tabellen';
+$GLOBALS['TL_LANG']['MSC']['normal_files']                  = 'Normale Dateien';
+$GLOBALS['TL_LANG']['MSC']['big_files']                     = 'Große Dateien';
 $GLOBALS['TL_LANG']['MSC']['db_entry']                      = ' Eintrag';
 $GLOBALS['TL_LANG']['MSC']['db_entries']                    = ' Einträge';
 $GLOBALS['TL_LANG']['MSC']['changed']                       = 'Geändert';
