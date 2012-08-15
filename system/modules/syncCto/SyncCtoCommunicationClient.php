@@ -720,6 +720,29 @@ class SyncCtoCommunicationClient extends CtoCommunication
 
         return $this->runServer("SYNCCTO_RUN_DUMP", $arrData);
     }
+    
+    /**
+     * Drop tables on client site
+     * 
+     * @param array $arrTables
+     * @param boolean $blnBackup
+     * @return void
+     */
+    public function dropTable($arrTables, $blnBackup)
+    {
+        $arrData = array(
+            array(
+                "name" => "tablelist",
+                "value" => $arrTables,
+            ),
+            array(
+                "name" => "backup",
+                "value" => $blnBackup,
+            ),
+        );
+
+        return $this->runServer("SYNCCTO_DROP_TABLES", $arrData);
+    }
 
     /**
      * Exceute SQL commands on client side
@@ -769,6 +792,17 @@ class SyncCtoCommunicationClient extends CtoCommunication
     public function getNoneRecommendedTables()
     {
         return $this->runServer("SYNCCTO_NONERECOMMENDED_TABLES");
+    }
+    
+    
+    /**
+     * Returns a list without the hidden tables
+     * 
+     * @return array 
+     */
+    public function getHiddenTables()
+    {
+        return $this->runServer("SYNCCTO_HIDDEN_TABLES");
     }
 
     /* -------------------------------------------------------------------------

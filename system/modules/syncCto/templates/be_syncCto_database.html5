@@ -20,12 +20,13 @@
 
 <?php else: ?>
             
-<form id="db_form" action="<?php echo $this->Environment->base; ?>contao/popupSyncDB.php?id=<?php echo $this->id; ?>&amp;step=<?php echo $this->step; ?>" method="post">
+<form id="db_form" action="<?php echo $this->Environment->base; ?>contao/popupSyncDB.php?id=<?php echo $this->id; ?>&amp;step=<?php echo $this->step; ?>&amp;direction=<?php echo $this->direction ?>" method="post">
+    
     <div class="formbody">
         <input type="hidden" name="FORM_SUBMIT" value="<?php echo $this->formId; ?>" />        
         <input type="hidden" name="REQUEST_TOKEN" value="<?php echo REQUEST_TOKEN; ?>">
 
-        <?php if(count($this->arrStatesCompareList) == 0): ?>   
+        <?php if(count($this->arrCompareList) == 0): ?>   
             <div><?php echo $GLOBALS['TL_LANG']['ERR']['missing_tables']; ?></div>  
             <div class="submit_container">
                 <input class="tl_submit" name="transfer" type="submit" value="<?php echo $GLOBALS['TL_LANG']['MSC']['submit_database']; ?>" />
@@ -42,7 +43,7 @@
             <p class="changed-both"><?php echo $GLOBALS['TL_LANG']['MSC']['changed_both']; ?></p>
         </div>
         
-        <?php foreach($this->arrStatesCompareList AS $strState => $arrCompareList): ?>
+        <?php foreach($this->arrCompareList AS $strState => $arrCompareList): ?>
         <h3><?php echo ($strState == 'recommended') ? $GLOBALS['TL_LANG']['MSC']['recom_tables'] : $GLOBALS['TL_LANG']['MSC']['nonrecom_tables']; ?></h3>
         <table class="comparelist" id="<?php echo ($strState == 'recommended') ? 'recommended' : 'nonrecommended'; ?>">
         <colgroup>
@@ -62,7 +63,7 @@
         <tbody>
             <?php foreach($arrCompareList AS $strTableName => $arrCompareTable): ?>   
                 <tr>
-                    <td class="col_0 checkbox"><?php if($arrCompareTable['server'] != '-'): ?><input type="checkbox" class="tl_checkbox" name="serverTables[]" value="<?php echo $strTableName; ?>" /><?php endif; ?></td>
+                    <td class="col_0 checkbox"><?php if($arrCompareTable['server'] != '-'): ?><input type="checkbox" class="tl_checkbox" name="<?php echo ($arrCompareTable['del'] == true) ? 'serverDeleteTables[]' : 'serverTables[]';?>" value="<?php echo $strTableName; ?>" /><?php endif; ?></td>
                     <td class="col_1 <?php echo $arrCompareTable['client']['class']; ?>">
                         <?php if ($arrCompareTable['client']['name'] != '-'): ?><img src="<?php echo $this->Environment->base; ?>system/modules/syncCto/html/icons/steps/iconInformation.png" alt="tooltip" title="<?php echo $arrCompareTable['client']['tooltip']; ?>" /><?php endif; ?>
                         <?php echo $arrCompareTable['client']['name']; ?>

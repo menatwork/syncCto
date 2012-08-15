@@ -267,6 +267,14 @@ $GLOBALS["CTOCOM_FUNCTIONS"]["SYNCCTO_RECOMMENDED_TABLES"] = array(
     "parameter" => false,
 );
 
+// Load recommended tables from client
+$GLOBALS["CTOCOM_FUNCTIONS"]["SYNCCTO_HIDDEN_TABLES"] = array(
+    "class" => "SyncCtoHelper",
+    "function" => "getTablesHidden",
+    "typ" => "POST",
+    "parameter" => false,
+);
+
 // Get client timestamp
 $GLOBALS["CTOCOM_FUNCTIONS"]["SYNCCTO_TIMESTAMP"] = array(
     "class" => "SyncCtoHelper",
@@ -281,6 +289,14 @@ $GLOBALS["CTOCOM_FUNCTIONS"]["SYNCCTO_IMPORT_DATABASE"] = array(
     "function" => "runRestore",
     "typ" => "POST",
     "parameter" => array("filepath"),
+);
+
+// Drop tables
+$GLOBALS["CTOCOM_FUNCTIONS"]["SYNCCTO_DROP_TABLES"] = array(
+    "class" => "SyncCtoDatabase",
+    "function" => "dropTable",
+    "typ" => "POST",
+    "parameter" => array("tablelist", "backup"),
 );
 
 // - Files ---------------------------------------------------------------------

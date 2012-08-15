@@ -221,6 +221,35 @@ class SyncCtoDatabase extends Backend
     }
 
     /* -------------------------------------------------------------------------
+     * Delete functions
+     */
+    
+    /**
+     * Drop tables
+     * 
+     * @param array $arrTables List with tables
+     * @param boolean $blnBackup if true the system will make a bakup from all tables
+     */
+    public function dropTable($arrTables, $blnBackup = true)
+    {
+        if($blnBackup == true)
+        {
+            $this->strSuffixZipName = "AutoBackUp_Drop";            
+            $this->runDump($arrTables, false);
+        }
+        
+        $arrKnownTables = $this->Database->listTables();
+        
+        foreach ($arrTables as $value)
+        {
+            if(in_array($value, $arrKnownTables))
+            {
+                $this->Database->query("DROP $value");
+            }
+        }
+    }
+
+    /* -------------------------------------------------------------------------
      * Create functions
      */
 
