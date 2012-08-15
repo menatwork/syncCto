@@ -30,12 +30,27 @@
         <h3><?php echo $GLOBALS['TL_LANG']['MSC']['totalsize']; ?></h3>
 
         <ul class="file">
-        <li><?php echo $GLOBALS['TL_LANG']['MSC']['new_file']; ?>: ~ <?php echo $this->getReadableSize($this->totalsizeNew); ?></li>
-        <li><?php echo $GLOBALS['TL_LANG']['MSC']['modified_file']; ?>: ~ <?php echo $this->getReadableSize($this->totalsizeChange); ?></li>
-        <li><?php echo $GLOBALS['TL_LANG']['MSC']['deleted_file']; ?>: ~ <?php echo $this->getReadableSize($this->totalsizeDel); ?></li>
+        <li><?php echo $GLOBALS['TL_LANG']['MSC']['new_data']; ?>: ~ <?php echo $this->getReadableSize($this->totalsizeNew); ?></li>
+        <li><?php echo $GLOBALS['TL_LANG']['MSC']['modified_data'] ; ?>: ~ <?php echo $this->getReadableSize($this->totalsizeChange); ?></li>
+        <li><?php echo $GLOBALS['TL_LANG']['MSC']['deleted_data']; ?>: ~ <?php echo $this->getReadableSize($this->totalsizeDel); ?></li>
         </ul>
 
-        <table class="comparelist" id="filelist">
+        <?php 
+            for($i = 1 ; $i <= 2 ; $i++):
+            switch ($i)
+            {
+                case 1:
+                    $arrFileList = $this->normalFilelist;
+                    break;
+                case 2:
+                    $arrFileList = $this->bigFilelist;
+                    break;
+            }        
+        ?>
+        
+        <?php if(count($arrFileList) != 0): ?>        
+        <h3><?php echo $GLOBALS['TL_LANG']['MSC'][(($i == 1)? 'normal' : 'big') . '_files']; ?></h3>
+        <table class="comparelist" id="<?php echo ($i == 1)? 'normal' : 'big'; ?>filelist">
             <colgroup>
                 <col width="12%" />
                 <col width="15%" />
@@ -46,12 +61,12 @@
                 <tr class="head">
                     <th class="state"><?php echo $GLOBALS['TL_LANG']['MSC']['state']; ?></th>
                     <th class="filesize"><?php echo $GLOBALS['TL_LANG']['MSC']['filesize']; ?></th>
-                    <th class="checkbox table-th-nosort"><input class="tl_checkbox" onclick="Backend.toggleCheckboxGroup(this, 'filelist')" type="checkbox" /></th>
+                    <th class="checkbox table-th-nosort"><input class="tl_checkbox" onclick="Backend.toggleCheckboxGroup(this, '<?php echo ($i == 1)? 'normal' : 'big'; ?>filelist')" type="checkbox" /></th>
                     <th class="last"><?php echo $GLOBALS['TL_LANG']['MSC']['file']; ?></th>
                 </tr>
             </thead>
             <tbody>            
-            <?php foreach ($this->filelist as $key => $file): ?>
+            <?php foreach ($arrFileList as $key => $file): ?>
                 <tr>                    
                     <?php if($this->compare_complex  == 1 && !empty($file["css_big"])) : ?>
                         <td class="state <?php echo $file["css"]; ?>"><?php echo $GLOBALS['TL_LANG']['MSC'][$file["css_big"] . '_files']; ?></td>
@@ -64,11 +79,12 @@
                     <?php else: ?>
                         <td class="checkbox"><?php if (empty($file["css_big"])): ?><input class="tl_checkbox" type="checkbox" name="del-file-<?php echo $key; ?>" value="<?php echo $key; ?>" /><?php else: ?> X <?php endif; ?></td>  
                     <?php endif; ?>
-                    <td class="last" title="<?php echo $file["path"]; ?>"><?php echo (strlen($file["path"]) >= 60) ? substr($file["path"], 0, 30) . "[...]" . substr($file["path"], strlen($file["path"]) - 30, strlen($file["path"]) - 1) : $file["path"]; ?></td>
-                </tr>
+                    <td class="last" title="<?php echo $file["path"]; ?>"><?php echo (strlen($file["path"]) >= $this->maxLength) ? substr($file["path"], 0, ($this->maxLength / 2)) . "[...]" . substr($file["path"], strlen($file["path"]) - ($this->maxLength / 2), strlen($file["path"]) - 1) : $file["path"]; ?></td>
+               </tr>
             <?php endforeach; ?>
             </tbody>
         </table> 
+        <?php endif; endfor; ?>
  
         <div class="bottom submit_container">
             <input class="tl_submit" name="transfer" type="submit" value="<?php echo $GLOBALS['TL_LANG']['MSC']['submit_files']; ?>" />

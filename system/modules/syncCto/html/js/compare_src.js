@@ -63,11 +63,23 @@ window.addEvent("domready",function(){
             }
         });    
 
-        var myHtmlTable = new HtmlTable($('filelist'), {
-                sortIndex: 0,
-                parsers: ['string', 'dimension', 'string'],
-                sortable: true
-        }).enableSort({sortable: true, sortIndex: 0});
+        var myHtmlTableNormal = new HtmlTable($('normalfilelist'), {
+            sortIndex: 0,
+            parsers: ['string', 'dimension', 'string'],
+            sortable: true
+        }).enableSort({
+            sortable: true, 
+            sortIndex: 0
+        });
+        
+        var myHtmlTableBig = new HtmlTable($('bigfilelist'), {
+            sortIndex: 0,
+            parsers: ['string', 'dimension', 'string'],
+            sortable: true
+        }).enableSort({
+            sortable: true, 
+            sortIndex: 0
+        });
     }
 
 });
