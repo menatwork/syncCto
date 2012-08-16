@@ -90,7 +90,7 @@ $GLOBALS['TL_LANG']['MSC']['normal_files']                  = 'Normale Dateien';
 $GLOBALS['TL_LANG']['MSC']['big_files']                     = 'Große Dateien';
 $GLOBALS['TL_LANG']['MSC']['changed']                       = 'Geändert';
 $GLOBALS['TL_LANG']['MSC']['unchanged']                     = 'Nicht geändert';
-$GLOBALS['TL_LANG']['MSC']['changed_both']                  = 'Beide geändert';
+$GLOBALS['TL_LANG']['MSC']['both_changed']                  = 'Beide geändert';
 
 /**
  * Buttons
@@ -118,10 +118,10 @@ $GLOBALS['TL_LANG']['ERR']['cant_delete_file']              = 'Fehler beim Lösc
 $GLOBALS['TL_LANG']['ERR']['attention_headline']            = 'Achtung bei Änderungen am System';
 $GLOBALS['TL_LANG']['ERR']['attention_text']                = 'Es werden zurzeit Aktualisierungen im Hintergrund durchgeführt, die dazu führen könnten das Änderungen auf dieser Installation überschrieben werden.';
 $GLOBALS['TL_LANG']['ERR']['min_size_limit']                = 'Die minimale Dateigröße von s% wurde unterschritten.';
-$GLOBALS['TL_LANG']['ERR']['cant_extract_file']             = 'Fehler beim entpacken der Dateien.';
+$GLOBALS['TL_LANG']['ERR']['cant_extract_file']             = 'Fehler beim Entpacken der Dateien.';
 $GLOBALS['TL_LANG']['ERR']['missing_tables']                = 'Es wurde(n) keine Tabell(en) gefunden.';
 $GLOBALS['TL_LANG']['ERR']['unknown_function']              = 'Unbekannte Funktion oder Methode.';
-$GLOBALS['TL_LANG']['ERR']['64Bit_error']                   = 'Zahlen überlauf. Versuchen Sie bitte einen 64Bit Version von PHP.';
+$GLOBALS['TL_LANG']['ERR']['64Bit_error']                   = 'Zahlenüberlauf. Versuchen Sie bitte einen 64Bit Version von PHP.';
 $GLOBALS['TL_LANG']['ERR']['maximum_filesize']              = 'Zu große Datei(en):';
 $GLOBALS['TL_LANG']['ERR']['call_directly']                 = 'Versuchen Sie nicht die Synchronisation direkt aufzurufen.';
 $GLOBALS['TL_LANG']['ERR']['client_set']                    = 'Kommunikation zwischen Server und Client fehlgeschlagen';

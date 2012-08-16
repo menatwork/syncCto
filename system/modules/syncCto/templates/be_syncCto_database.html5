@@ -40,7 +40,7 @@
         <div id="legend">
             <p class="changed"><?php echo $GLOBALS['TL_LANG']['MSC']['changed']; ?></p>
             <p class="unchanged"><?php echo $GLOBALS['TL_LANG']['MSC']['unchanged']; ?></p>
-            <p class="changed-both"><?php echo $GLOBALS['TL_LANG']['MSC']['changed_both']; ?></p>
+            <p class="changed-both"><?php echo $GLOBALS['TL_LANG']['MSC']['both_changed']; ?></p>
         </div>
         
         <?php foreach($this->arrCompareList AS $strState => $arrCompareList): 

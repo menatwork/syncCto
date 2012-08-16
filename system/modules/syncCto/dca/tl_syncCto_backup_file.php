@@ -166,7 +166,7 @@ class tl_syncCto_backup_file extends Backend
             'postUnset' => array('start_backup'),
             'error' => array(
                 'key'         => 'syncCto_submit_false',
-                'message'     => $GLOBALS['TL_LANG']['ERR']['missing_tables_selection']
+                'message'     => $GLOBALS['TL_LANG']['ERR']['missing_tables']
             ),
             'redirectUrl' => $this->Environment->base . "contao/main.php?do=syncCto_backups&table=tl_syncCto_backup_file&act=start"
         ));
