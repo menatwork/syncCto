@@ -92,7 +92,7 @@ class SyncCtoHelper extends Backend
             $arrLocalconfig   = array_filter($arrLocalconfig, 'strlen');
             $arrSyncCtoConfig = array_filter($arrSyncCtoConfig, 'strlen');
 
-            return array_values(array_flip(array_merge($arrLocalconfig, $arrSyncCtoConfig)));
+            return array_keys(array_flip(array_merge($arrLocalconfig, $arrSyncCtoConfig)));
         }
         else if (!is_array($arrLocalconfig) && is_array($arrSyncCtoConfig))
         {
@@ -492,6 +492,23 @@ class SyncCtoHelper extends Backend
         }
 
         return preg_replace("/^\//i", "", $strVar);
+    }
+    
+    /**
+     * Returns a whole list of all tables in the database
+     * 
+     * @return array 
+     */
+    public function hiddenTables()
+    {
+        $arrTables = array();
+
+        foreach ($this->Database->listTables() as $key => $value)
+        {
+            $arrTables[] = $value;
+        }
+
+        return $arrTables;
     }
 
     /**

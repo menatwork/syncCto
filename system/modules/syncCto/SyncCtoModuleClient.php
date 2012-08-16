@@ -96,7 +96,7 @@ class SyncCtoModuleClient extends BackendModule
 
         // Load language 
         $this->loadLanguageFile("tl_syncCto_steps");
-        
+
         // Load CSS
         $GLOBALS['TL_CSS'][] = 'system/modules/syncCto/html/css/steps.css';
 
@@ -1843,9 +1843,10 @@ class SyncCtoModuleClient extends BackendModule
                     break;
 
                 case 2:
-                    
-                    if (key_exists("forward", $_POST) && (count($this->arrSyncSettings['syncCto_SyncTables']) > 0 || count($this->arrSyncSettings['syncCto_SyncDeleteTables']) > 0))
-                    {    
+
+                    if (key_exists("forward", $_POST) && !(count($this->arrSyncSettings['syncCto_SyncTables']) == 0 && count($this->arrSyncSettings['syncCto_SyncDeleteTables']) == 0))
+                    {
+                        // Go to next step
                         $this->objData->setState(SyncCtoEnum::WORK_WORK);
                         $this->objData->setHtml("");
                         $this->booRefresh = true;
@@ -1853,7 +1854,17 @@ class SyncCtoModuleClient extends BackendModule
 
                         break;
                     }
-                    else if (key_exists("skip", $_POST) || key_exists("forward", $_POST) && count($this->arrSyncSettings['syncCto_SyncTables']) == 0)
+                    else if (key_exists("forward", $_POST) && count($this->arrSyncSettings['syncCto_SyncTables']) == 0 && count($this->arrSyncSettings['syncCto_SyncDeleteTables']) == 0)
+                    {
+                        // Skip if no tables are selected
+                        $this->objData->setState(SyncCtoEnum::WORK_SKIPPED);
+                        $this->objData->setHtml("");
+                        $this->booRefresh = true;
+                        $this->intStep++;
+
+                        break;
+                    }
+                    else if (key_exists("skip", $_POST))
                     {
                         $this->objData->setState(SyncCtoEnum::WORK_SKIPPED);
                         $this->objData->setHtml("");
@@ -1892,10 +1903,17 @@ class SyncCtoModuleClient extends BackendModule
                  * Build SQL Zip File
                  */
                 case 3:                    
-                    $this->objStepPool->zipname = $this->objSyncCtoDatabase->runDump($this->arrSyncSettings['syncCto_SyncTables'], true, true);
+                    if (count($this->arrSyncSettings['syncCto_SyncTables']) != 0)
+                    {
+                        $this->objStepPool->zipname = $this->objSyncCtoDatabase->runDump($this->arrSyncSettings['syncCto_SyncTables'], true, true);
 
-                    $this->objData->setDescription($GLOBALS['TL_LANG']['tl_syncCto_sync']['step_4']['description_2']);
-                    $this->objStepPool->step++;
+                        $this->objData->setDescription($GLOBALS['TL_LANG']['tl_syncCto_sync']['step_4']['description_2']);
+                        $this->objStepPool->step++;
+                    }
+                    else
+                    {
+                        $this->objStepPool->step = 7;
+                    }
 
                     break;
 
@@ -1985,17 +2003,27 @@ class SyncCtoModuleClient extends BackendModule
                  * Drop Tables
                  */
                 case 7:
-                    if (isset($this->arrSyncSettings['syncCto_SyncDeleteTables']) && is_array($this->arrSyncSettings['syncCto_SyncDeleteTables']))
+                    
+                    if (count($this->arrSyncSettings['syncCto_SyncDeleteTables']) != 0)
                     {
-                        // ToDo Add drop remote call                        
+                        $arrKnownTables = $this->Database->listTables();
+
+                        foreach ($this->arrSyncSettings['syncCto_SyncDeleteTables'] as $key => $value)
+                        {
+                            if (in_array($value, $arrKnownTables))
+                            {
+                                unset($this->arrSyncSettings['syncCto_SyncDeleteTables'][$key]);
+                            }
+                        }
+
+                        $this->objSyncCtoCommunicationClient->dropTable($this->arrSyncSettings['syncCto_SyncDeleteTables'], true);
+
+                        // Show step information
+                        $this->objData->setDescription($GLOBALS['TL_LANG']['tl_syncCto_sync']['step_4']['description_4']);
+                        $this->objStepPool->step++;
+
+                        break;
                     }
-
-                    // Show step information
-                    $this->objData->setDescription($GLOBALS['TL_LANG']['tl_syncCto_sync']['step_4']['description_4']);
-
-                    $this->objStepPool->step++;
-
-                    break;
 
                 /**
                  * Hook for custom sql code
@@ -3145,9 +3173,11 @@ class SyncCtoModuleClient extends BackendModule
 
                     break;
 
-                case 2:    
-                    if (key_exists("forward", $_POST) && count($this->arrSyncSettings['syncCto_SyncTables']) > 0)
+                case 2:
+
+                    if (key_exists("forward", $_POST) && !(count($this->arrSyncSettings['syncCto_SyncTables']) == 0 && count($this->arrSyncSettings['syncCto_SyncDeleteTables']) == 0))
                     {
+                        // Go to next step
                         $this->objData->setState(SyncCtoEnum::WORK_WORK);
                         $this->objData->setHtml("");
                         $this->booRefresh = true;
@@ -3155,7 +3185,17 @@ class SyncCtoModuleClient extends BackendModule
 
                         break;
                     }
-                    else if (key_exists("skip", $_POST) || key_exists("forward", $_POST) && count($this->arrSyncSettings['syncCto_SyncTables']) == 0)
+                    else if (key_exists("forward", $_POST) && count($this->arrSyncSettings['syncCto_SyncTables']) == 0 && count($this->arrSyncSettings['syncCto_SyncDeleteTables']) == 0)
+                    {
+                        // Skip if no tables are selected
+                        $this->objData->setState(SyncCtoEnum::WORK_SKIPPED);
+                        $this->objData->setHtml("");
+                        $this->booRefresh = true;
+                        $this->intStep++;
+
+                        break;
+                    }
+                    else if (key_exists("skip", $_POST))
                     {
                         $this->objData->setState(SyncCtoEnum::WORK_SKIPPED);
                         $this->objData->setHtml("");
@@ -3193,13 +3233,19 @@ class SyncCtoModuleClient extends BackendModule
                 /**
                  * Build SQL Zip File
                  */
-                case 3:
+                case 3:                    
+                    if (count($this->arrSyncSettings['syncCto_SyncTables']) != 0)
+                    {
+                        $this->objStepPool->zipname = $this->objSyncCtoCommunicationClient->runDatabaseDump($this->arrSyncSettings['syncCto_SyncTables'], true, true);
 
-                    $this->objStepPool->zipname = $this->objSyncCtoCommunicationClient->runDatabaseDump($this->arrSyncSettings['syncCto_SyncTables'], true, true);
-
-                    $this->objData->setDescription($GLOBALS['TL_LANG']['tl_syncCto_sync']['step_4']['description_2']);
-                    $this->objStepPool->step++;
-
+                        $this->objData->setDescription($GLOBALS['TL_LANG']['tl_syncCto_sync']['step_4']['description_2']);
+                        $this->objStepPool->step++;
+                    }
+                    else
+                    {
+                        $this->objStepPool->step = 7;
+                    }
+                    
                     break;
 
                 /**
@@ -3280,6 +3326,19 @@ class SyncCtoModuleClient extends BackendModule
                         $this->Database
                                 ->prepare("UPDATE tl_synccto_clients SET " . $location . "_timestamp = ? WHERE id = ? ")
                                 ->execute(serialize($arrLastTableTimestamp), $this->intClientID);
+                    }
+
+                    $this->objStepPool->step++;
+
+                    break;
+
+                /**
+                 * Drop Tables
+                 */
+                case 7:                    
+                    if (count($this->arrSyncSettings['syncCto_SyncDeleteTables']) != 0)
+                    {
+                        $this->objSyncCtoDatabase->dropTable($this->arrSyncSettings['syncCto_SyncDeleteTables'], true);
                     }
 
                     // Show step information

@@ -43,7 +43,8 @@
             <p class="changed-both"><?php echo $GLOBALS['TL_LANG']['MSC']['changed_both']; ?></p>
         </div>
         
-        <?php foreach($this->arrCompareList AS $strState => $arrCompareList): ?>
+        <?php foreach($this->arrCompareList AS $strState => $arrCompareList): 
+                    if(count($arrCompareList) == 0) continue; ?>             
         <h3><?php echo ($strState == 'recommended') ? $GLOBALS['TL_LANG']['MSC']['recom_tables'] : $GLOBALS['TL_LANG']['MSC']['nonrecom_tables']; ?></h3>
         <table class="comparelist" id="<?php echo ($strState == 'recommended') ? 'recommended' : 'nonrecommended'; ?>">
         <colgroup>

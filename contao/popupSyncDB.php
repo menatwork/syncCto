@@ -187,7 +187,7 @@ class PopupSyncFiles extends Backend
                     break;
 
                 case 'From':
-                    $arrCompareList = $this->getFormatedCompareList($arrClientTables, $arrServerTables, $arrHiddenTables, $arrDesTS['client'], $arrAllTimeStamps['server'], $arrAllowedTables, 'client', 'server');
+                    $arrCompareList = $this->getFormatedCompareList($arrClientTables, $arrServerTables, $arrHiddenTables, $arrAllTimeStamps['client'], $arrAllTimeStamps['server'], $arrAllowedTables, 'client', 'server');
                     break;
             }
         }
@@ -315,7 +315,7 @@ class PopupSyncFiles extends Backend
      * @return string
      */
     protected function getFormatedCompareList($arrSourceTables, $arrDesTables, $arrHiddenTables, $arrSourceTS, $arrDesTS, $arrAllowedTables, $strSrcName, $strDesName)
-    {
+    {        
         // Remove hidden tables or tables without premission
         foreach ($arrSourceTables as $key => $value)
         {

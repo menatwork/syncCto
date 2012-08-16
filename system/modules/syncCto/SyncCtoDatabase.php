@@ -234,7 +234,7 @@ class SyncCtoDatabase extends Backend
     {
         if($blnBackup == true)
         {
-            $this->strSuffixZipName = "AutoBackUp_Drop";            
+            $this->strSuffixZipName = 'Auto-DB-Backup_RPC-Drop.zip';            
             $this->runDump($arrTables, false);
         }
         
@@ -244,7 +244,7 @@ class SyncCtoDatabase extends Backend
         {
             if(in_array($value, $arrKnownTables))
             {
-                $this->Database->query("DROP $value");
+                $this->Database->query("DROP TABLE $value");
             }
         }
     }

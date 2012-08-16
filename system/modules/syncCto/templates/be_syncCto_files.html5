@@ -69,9 +69,9 @@
             <?php foreach ($arrFileList as $key => $file): ?>
                 <tr>                    
                     <?php if($this->compare_complex  == 1 && !empty($file["css_big"])) : ?>
-                        <td class="state <?php echo $file["css"]; ?>"><?php echo $GLOBALS['TL_LANG']['MSC'][$file["css_big"] . '_files']; ?></td>
+                        <td class="state <?php echo $file["css"]; ?>"><?php echo $GLOBALS['TL_LANG']['MSC'][$file["css_big"] . '_data']; ?></td>
                     <?php else: ?>
-                        <td class="state <?php echo $file["css"]; ?>"><?php echo $GLOBALS['TL_LANG']['MSC'][$file["css"] . '_file']; ?></td>
+                        <td class="state <?php echo $file["css"]; ?>"><?php echo $GLOBALS['TL_LANG']['MSC'][$file["css"] . '_data']; ?></td>
                     <?php endif; ?>
                     <td class="filesize"><?php echo ($file["size"] == -1) ? "N.A." : $this->getReadableSize($file["size"]); ?></td>
                     <?php if($this->compare_complex == false): ?>
