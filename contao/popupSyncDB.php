@@ -345,11 +345,14 @@ class PopupSyncFiles extends Backend
             $strType = $arrSourceTables[$keySrcTables]['type'];
 
             $arrCompareList[$strType][$keySrcTables][$strSrcName]['name']    = $keySrcTables;
-            $arrCompareList[$strType][$keySrcTables][$strSrcName]['tooltip'] = $this->getReadableSize($arrSourceTables[$keySrcTables]['size']) . ', ' . $arrSourceTables[$keySrcTables]['count'] . (($arrSourceTables[$keySrcTables]['count'] == 1) ? $GLOBALS['TL_LANG']['MSC']['db_entry'] : $GLOBALS['TL_LANG']['MSC']['db_entries']);
-            $arrCompareList[$strType][$keySrcTables][$strSrcName]['class']   = 'none';
+            $arrCompareList[$strType][$keySrcTables][$strSrcName]['tooltip'] = $this->getReadableSize($arrSourceTables[$keySrcTables]['size'])
+                    . ', '
+                    . vsprintf((count($arrSourceTables[$keySrcTables]['count']) == 1) ? $GLOBALS['TL_LANG']['MSC']['entry'] : $GLOBALS['TL_LANG']['MSC']['entries'], array($arrSourceTables[$keySrcTables]['count']));
+
+            $arrCompareList[$strType][$keySrcTables][$strSrcName]['class'] = 'none';
 
             $arrCompareList[$strType][$keySrcTables][$strDesName]['name'] = '-';
-            $arrCompareList[$strType][$keySrcTables]['diff']           = $GLOBALS['TL_LANG']['MSC']['new_data'];
+            $arrCompareList[$strType][$keySrcTables]['diff']              = $GLOBALS['TL_LANG']['MSC']['create'];
 
             unset($arrSourceTables[$keySrcTables]);
         }
@@ -360,11 +363,14 @@ class PopupSyncFiles extends Backend
             $strType = $arrDesTables[$keyDesTables]['type'];
 
             $arrCompareList[$strType][$keyDesTables][$strDesName]['name']    = $keyDesTables;
-            $arrCompareList[$strType][$keyDesTables][$strDesName]['tooltip'] = $this->getReadableSize($arrDesTables[$keyDesTables]['size']) . ', ' . $arrDesTables[$keyDesTables]['count'] . (($arrDesTables[$keyDesTables]['count'] == 1) ? $GLOBALS['TL_LANG']['MSC']['db_entry'] : $GLOBALS['TL_LANG']['MSC']['db_entries']);
-            $arrCompareList[$strType][$keyDesTables][$strDesName]['class']   = 'none';
+            $arrCompareList[$strType][$keySrcTables][$strSrcName]['tooltip'] = $this->getReadableSize($arrDesTables[$keyDesTables]['size'])
+                    . ', '
+                    . vsprintf((count($arrDesTables[$keyDesTables]['count']) == 1) ? $GLOBALS['TL_LANG']['MSC']['entry'] : $GLOBALS['TL_LANG']['MSC']['entries'], array($arrDesTables[$keyDesTables]['count']));
+
+            $arrCompareList[$strType][$keyDesTables][$strDesName]['class'] = 'none';
 
             $arrCompareList[$strType][$keyDesTables][$strSrcName]['name'] = '-';
-            $arrCompareList[$strType][$keyDesTables]['diff']              = $GLOBALS['TL_LANG']['MSC']['deleted_data'];
+            $arrCompareList[$strType][$keyDesTables]['diff']              = $GLOBALS['TL_LANG']['MSC']['delete'];
             $arrCompareList[$strType][$keyDesTables]['del']               = true;
 
             unset($arrDesTables[$keyDesTables]);
@@ -376,17 +382,22 @@ class PopupSyncFiles extends Backend
             $strType = $valueSrcTable['type'];
 
             $arrCompareList[$strType][$keySrcTable][$strSrcName]['name']    = $keySrcTable;
-            $arrCompareList[$strType][$keySrcTable][$strSrcName]['tooltip'] = $this->getReadableSize($valueSrcTable['size']) . ', ' . $valueSrcTable['count'] . (($valueSrcTable['count'] == 1) ? $GLOBALS['TL_LANG']['MSC']['db_entry'] : $GLOBALS['TL_LANG']['MSC']['db_entries']);
+            $arrCompareList[$strType][$keySrcTable][$strSrcName]['tooltip'] = $this->getReadableSize($valueSrcTable['size'])
+                    . ', '
+                    . vsprintf((count($valueSrcTable['count']) == 1) ? $GLOBALS['TL_LANG']['MSC']['entry'] : $GLOBALS['TL_LANG']['MSC']['entries'], array($valueSrcTable['count']));
 
             $valueClientTable = $arrDesTables[$keySrcTable];
 
             $arrCompareList[$strType][$keySrcTable][$strDesName]['name']    = $keySrcTable;
-            $arrCompareList[$strType][$keySrcTable][$strDesName]['tooltip'] = $this->getReadableSize($valueClientTable['size']) . ', ' . $valueClientTable['count'] . (($valueClientTable['count'] == 1) ? $GLOBALS['TL_LANG']['MSC']['db_entry'] : $GLOBALS['TL_LANG']['MSC']['db_entries']);
+            $arrCompareList[$strType][$keySrcTable][$strDesName]['tooltip'] = $this->getReadableSize($valueClientTable['size'])
+                    . ', '
+                    . vsprintf((count($valueClientTable['count']) == 1) ? $GLOBALS['TL_LANG']['MSC']['entry'] : $GLOBALS['TL_LANG']['MSC']['entries'], array($valueClientTable['count']));
 
             $intDiff                                             = $this->getDiff($valueSrcTable, $valueClientTable);
+            
             // Add 'entry' or 'entries' to diff
             $arrCompareList[$strType][$keySrcTable]['diffCount'] = $intDiff;
-            $arrCompareList[$strType][$keySrcTable]['diff']      = $intDiff . (($intDiff == 1) ? $GLOBALS['TL_LANG']['MSC']['db_entry'] : $GLOBALS['TL_LANG']['MSC']['db_entries']);
+            $arrCompareList[$strType][$keySrcTable]['diff']      = vsprintf((count($intDiff) == 1) ? $GLOBALS['TL_LANG']['MSC']['entry'] : $GLOBALS['TL_LANG']['MSC']['entries'], array($intDiff));
 
             // Check timestamps
             if (key_exists($keySrcTable, $arrSourceTS['current']) && key_exists($keySrcTable, $arrSourceTS['lastSync']))
@@ -425,7 +436,7 @@ class PopupSyncFiles extends Backend
             if ($arrCompareList[$strType][$keySrcTable][$strSrcName]['class'] == 'changed' && $arrCompareList[$strType][$keySrcTable]['client']['class'] == 'changed')
             {
                 $arrCompareList[$strType][$keySrcTable][$strSrcName]['class'] = 'changed-both';
-                $arrCompareList[$strType][$keySrcTable][$strSrcName]['class'] = 'changed-both';
+                $arrCompareList[$strType][$keySrcTable][$strDesName]['class'] = 'changed-both';
             }
 
             // Check if we have some changes
