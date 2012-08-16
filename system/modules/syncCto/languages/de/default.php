@@ -39,10 +39,10 @@ $GLOBALS['TL_LANG']['SYC']['user_delete']                   = 'Gelöschte Dateie
 $GLOBALS['TL_LANG']['SYC']['configfiles']                   = 'Konfigurationsdateien';
 $GLOBALS['TL_LANG']['SYC']['localconfig_update']            = 'Alle Einträge aktualisieren';
 $GLOBALS['TL_LANG']['SYC']['localconfig_errors']            = 'Fehlermeldungen anzeigen';
-$GLOBALS['TL_LANG']['SYC']['temp_tables']                   = 'Temporäre DB-Tabellen leeren';
-$GLOBALS['TL_LANG']['SYC']['temp_folders']                  = 'Temporäre Ordner leeren';
-$GLOBALS['TL_LANG']['SYC']['css_create']                    = 'CSS-Dateien neu erstellen';
-$GLOBALS['TL_LANG']['SYC']['xml_create']                    = 'XML-Dateien neu erstellen';
+$GLOBALS['TL_LANG']['SYC']['temp_tables']                   = 'Temporäre DB-Tabellen';
+$GLOBALS['TL_LANG']['SYC']['temp_folders']                  = 'Temporäre Ordner';
+$GLOBALS['TL_LANG']['SYC']['css_create']                    = 'CSS-Dateien';
+$GLOBALS['TL_LANG']['SYC']['xml_create']                    = 'XML-Dateien';
   
 /**
  * Back end modules
