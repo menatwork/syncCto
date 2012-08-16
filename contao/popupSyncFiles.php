@@ -198,9 +198,20 @@ class PopupSyncFiles extends Backend
         uasort($arrBigFiles, array($this, 'sort'));
         uasort($arrNormalFiles, array($this, 'sort'));
 
+        // Language array for filestate
+        $arrLanguageTags = array();
+        $arrLanguageTags[SyncCtoEnum::FILESTATE_MISSING]         = $GLOBALS['TL_LANG']['MSC']['create'];
+        $arrLanguageTags[SyncCtoEnum::FILESTATE_NEED]            = $GLOBALS['TL_LANG']['MSC']['overrideSelected'];
+        $arrLanguageTags[SyncCtoEnum::FILESTATE_DELETE]          = $GLOBALS['TL_LANG']['MSC']['delete'];
+        $arrLanguageTags[SyncCtoEnum::FILESTATE_TOO_BIG_MISSING] = $GLOBALS['TL_LANG']['MSC']['skipped'];
+        $arrLanguageTags[SyncCtoEnum::FILESTATE_TOO_BIG_NEED]    = $GLOBALS['TL_LANG']['MSC']['skipped'];
+        $arrLanguageTags[SyncCtoEnum::FILESTATE_TOO_BIG_DELETE]  = $GLOBALS['TL_LANG']['MSC']['skipped'];
+        $arrLanguageTags[SyncCtoEnum::FILESTATE_BOMBASTIC_BIG]   = $GLOBALS['TL_LANG']['MSC']['ignored'];
+        
         // Set template
         $this->Template                  = new BackendTemplate('be_syncCto_files');
-        $this->Template->maxLength       = 80;
+        $this->Template->maxLength       = 70;
+        $this->Template->arrLangStates   = $arrLanguageTags;
         $this->Template->headline        = $GLOBALS['TL_LANG']['MSC']['comparelist'];
         $this->Template->normalFilelist  = $arrNormalFiles;
         $this->Template->bigFilelist     = $arrBigFiles;
@@ -250,7 +261,7 @@ class PopupSyncFiles extends Backend
         $GLOBALS['TL_JAVASCRIPT'][] = TL_PLUGINS_URL . 'plugins/mootools/' . MOOTOOLS_CORE . '/mootools-core.js';
         $GLOBALS['TL_JAVASCRIPT'][] = 'contao/contao.js';
 
-        if (version_compare(VERSION, '2.11', '=='))
+        if (version_compare(VERSION, '2.11', '>='))
         {
             $GLOBALS['TL_JAVASCRIPT'][] = 'system/modules/syncCto/html/js/htmltable.js';
         }
