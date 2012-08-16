@@ -1412,7 +1412,7 @@ class SyncCtoModuleClient extends BackendModule
                     $objTemp->direction      = "To";
                     $objTemp->headline       = $GLOBALS['TL_LANG']['MSC']['totalsize'];
                     $objTemp->cssId          = 'syncCto_filelist_form';
-                    $objTemp->forwardValue   = $GLOBALS['TL_LANG']['MSC']['submit_files'];
+                    $objTemp->forwardValue   = $GLOBALS['TL_LANG']['MSC']['apply'];
                     $objTemp->popupClassName = 'popupSyncFiles.php';
 
                     if (version_compare(VERSION, '2.11', '=='))
@@ -1880,7 +1880,7 @@ class SyncCtoModuleClient extends BackendModule
                     $objTemp->direction      = "To";
                     $objTemp->headline       = $GLOBALS['TL_LANG']['MSC']['totalsize'];
                     $objTemp->cssId          = 'syncCto_database_form';
-                    $objTemp->forwardValue   = $GLOBALS['TL_LANG']['MSC']['submit_database'];
+                    $objTemp->forwardValue   = $GLOBALS['TL_LANG']['MSC']['apply'];
                     $objTemp->popupClassName = 'popupSyncDB.php';
 
                     if (version_compare(VERSION, '2.11', '=='))
@@ -2726,7 +2726,7 @@ class SyncCtoModuleClient extends BackendModule
                     $objTemp->direction      = "To";
                     $objTemp->headline       = $GLOBALS['TL_LANG']['MSC']['totalsize'];
                     $objTemp->cssId          = 'syncCto_filelist_form';
-                    $objTemp->forwardValue   = $GLOBALS['TL_LANG']['MSC']['submit_files'];
+                    $objTemp->forwardValue   = $GLOBALS['TL_LANG']['MSC']['apply'];
                     $objTemp->popupClassName = 'popupSyncFiles.php';
 
                     if (version_compare(VERSION, '2.11', '=='))
@@ -3211,7 +3211,7 @@ class SyncCtoModuleClient extends BackendModule
                     $objTemp->direction      = "From";
                     $objTemp->headline       = $GLOBALS['TL_LANG']['MSC']['totalsize'];
                     $objTemp->cssId          = 'syncCto_database_form';
-                    $objTemp->forwardValue   = $GLOBALS['TL_LANG']['MSC']['submit_database'];
+                    $objTemp->forwardValue   = $GLOBALS['TL_LANG']['MSC']['apply'];
                     $objTemp->popupClassName = 'popupSyncDB.php';
 
                     if (version_compare(VERSION, '2.11', '=='))

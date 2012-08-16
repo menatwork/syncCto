@@ -47,6 +47,5 @@ $GLOBALS['TL_LANG']['tl_syncCto_backup_file']['filelist']                       
  */
 $GLOBALS['TL_LANG']['tl_syncCto_backup_file']['step1']                          = 'Contao-Installation / tl_files sichern.';
 $GLOBALS['TL_LANG']['tl_syncCto_backup_file']['complete']                       = 'Backup erstellt unter';
-$GLOBALS['TL_LANG']['tl_syncCto_backup_file']['download_backup']                = 'Backup herunterladen.';
 
 ?>

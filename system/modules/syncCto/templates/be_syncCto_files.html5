@@ -21,18 +21,18 @@
         <input type="hidden" name="REQUEST_TOKEN" value="<?php echo REQUEST_TOKEN; ?>">
         
         <div class="submit_container">
-            <input class="tl_submit" name="transfer" type="submit" value="<?php echo $GLOBALS['TL_LANG']['MSC']['submit_files']; ?>" />
+            <input class="tl_submit" name="transfer" type="submit" value="<?php echo $GLOBALS['TL_LANG']['MSC']['apply']; ?>" />
         </div>
         <div class="submit_container">         
-            <input class="tl_submit" name="delete" type="submit" value="<?php echo $GLOBALS['TL_LANG']['MSC']['delete_files']; ?>" />
+            <input class="tl_submit" name="delete" type="submit" value="<?php echo $GLOBALS['TL_LANG']['MSC']['delete']; ?>" />
         </div>
         
-        <h3><?php echo $GLOBALS['TL_LANG']['MSC']['totalsize']; ?></h3>
+        <h3><?php echo $GLOBALS['TL_LANG']['MSC']['totalSize']; ?></h3>
 
         <ul class="file">
-        <li><?php echo $GLOBALS['TL_LANG']['MSC']['new_data']; ?>: ~ <?php echo $this->getReadableSize($this->totalsizeNew); ?></li>
-        <li><?php echo $GLOBALS['TL_LANG']['MSC']['modified_data'] ; ?>: ~ <?php echo $this->getReadableSize($this->totalsizeChange); ?></li>
-        <li><?php echo $GLOBALS['TL_LANG']['MSC']['deleted_data']; ?>: ~ <?php echo $this->getReadableSize($this->totalsizeDel); ?></li>
+        <li><?php echo $GLOBALS['TL_LANG']['MSC']['create']; ?>: ~ <?php echo $this->getReadableSize($this->totalsizeNew); ?></li>
+        <li><?php echo $GLOBALS['TL_LANG']['MSC']['overrideSelected'] ; ?>: ~ <?php echo $this->getReadableSize($this->totalsizeChange); ?></li>
+        <li><?php echo $GLOBALS['TL_LANG']['MSC']['delete']; ?>: ~ <?php echo $this->getReadableSize($this->totalsizeDel); ?></li>
         </ul>
 
         <?php 
@@ -52,7 +52,7 @@
         <h3><?php echo $GLOBALS['TL_LANG']['MSC'][(($i == 1)? 'normal' : 'big') . '_files']; ?></h3>
         <table class="comparelist" id="<?php echo ($i == 1)? 'normal' : 'big'; ?>filelist">
             <colgroup>
-                <col width="12%" />
+                <col width="15%" />
                 <col width="15%" />
                 <col width="35" />
                 <col width="*" />
@@ -60,7 +60,7 @@
             <thead>
                 <tr class="head">
                     <th class="state"><?php echo $GLOBALS['TL_LANG']['MSC']['state']; ?></th>
-                    <th class="filesize"><?php echo $GLOBALS['TL_LANG']['MSC']['filesize']; ?></th>
+                    <th class="filesize"><?php echo $GLOBALS['TL_LANG']['MSC']['fileSize']; ?></th>
                     <th class="checkbox table-th-nosort"><input class="tl_checkbox" onclick="Backend.toggleCheckboxGroup(this, '<?php echo ($i == 1)? 'normal' : 'big'; ?>filelist')" type="checkbox" /></th>
                     <th class="last"><?php echo $GLOBALS['TL_LANG']['MSC']['file']; ?></th>
                 </tr>
@@ -68,11 +68,7 @@
             <tbody>            
             <?php foreach ($arrFileList as $key => $file): ?>
                 <tr>                    
-                    <?php if($this->compare_complex  == 1 && !empty($file["css_big"])) : ?>
-                        <td class="state <?php echo $file["css"]; ?>"><?php echo $GLOBALS['TL_LANG']['MSC'][$file["css_big"] . '_data']; ?></td>
-                    <?php else: ?>
-                        <td class="state <?php echo $file["css"]; ?>"><?php echo $GLOBALS['TL_LANG']['MSC'][$file["css"] . '_data']; ?></td>
-                    <?php endif; ?>
+                    <td class="state <?php echo $file["css"]; ?>"><?php echo $this->arrLangStates[$file["state"]]; ?></td>
                     <td class="filesize"><?php echo ($file["size"] == -1) ? "N.A." : $this->getReadableSize($file["size"]); ?></td>
                     <?php if($this->compare_complex == false): ?>
                         <td class="checkbox"><input class="tl_checkbox" type="checkbox" name="del-file-<?php echo $key; ?>" value="<?php echo $key; ?>" /></td>                   
@@ -87,10 +83,10 @@
         <?php endif; endfor; ?>
  
         <div class="bottom submit_container">
-            <input class="tl_submit" name="transfer" type="submit" value="<?php echo $GLOBALS['TL_LANG']['MSC']['submit_files']; ?>" />
+            <input class="tl_submit" name="transfer" type="submit" value="<?php echo $GLOBALS['TL_LANG']['MSC']['apply']; ?>" />
         </div>
         <div class="bottom submit_container">         
-            <input class="tl_submit" name="delete" type="submit" value="<?php echo $GLOBALS['TL_LANG']['MSC']['delete_files']; ?>" />
+            <input class="tl_submit" name="delete" type="submit" value="<?php echo $GLOBALS['TL_LANG']['MSC']['delete']; ?>" />
         </div>
     </div>
 </form>

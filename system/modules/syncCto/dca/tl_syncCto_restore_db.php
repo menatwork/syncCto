@@ -88,7 +88,7 @@ class tl_syncCto_restore_db extends Backend
             'formkey' => 'restore_backup',
             'class' => '',
             'accesskey' => 'g',
-            'value' => specialchars($GLOBALS['TL_LANG']['MSC']['restore_backup']),
+            'value' => specialchars($GLOBALS['TL_LANG']['MSC']['restore']),
             'button_callback' => array('tl_syncCto_restore_db', 'onsubmit_callback')
         );
 

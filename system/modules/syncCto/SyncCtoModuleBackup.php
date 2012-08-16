@@ -430,7 +430,7 @@ class SyncCtoModuleBackup extends BackendModule
                 $this->objData->setState(SyncCtoEnum::WORK_OK);
 
                 $strHTML = "<p class='tl_help'><br />";
-                $strHTML .= "<a rel='lightbox[details 600 300]' title='In einem neuen Fenster ansehen' href='contao/popup.php?src=" . base64_encode($GLOBALS['TL_CONFIG']['uploadPath'] . "/syncCto_backups/database/" . $this->objStepPool->zipname) . "'>" . $GLOBALS['TL_LANG']['tl_syncCto_backup_db']['download_backup'] . "</a>";
+                $strHTML .= "<a rel='lightbox[details 600 300]' title='In einem neuen Fenster ansehen' href='contao/popup.php?src=" . base64_encode($GLOBALS['TL_CONFIG']['uploadPath'] . "/syncCto_backups/database/" . $this->objStepPool->zipname) . "'>" . $GLOBALS['TL_LANG']['MSC']['fileDownload'] . "</a>";
                 $strHTML .= "</p>";
                 
                 $this->objData->setStep(2);
@@ -582,7 +582,7 @@ class SyncCtoModuleBackup extends BackendModule
                 $this->objData->setState(SyncCtoEnum::WORK_OK);
 
                 $strHTML = "<p class='tl_help'><br />";
-                $strHTML .= "<a rel='lightbox[details 600 300]' title='In einem neuen Fenster ansehen' href='contao/popup.php?src=" . base64_encode($GLOBALS['TL_CONFIG']['uploadPath'] . "/syncCto_backups/files/" . $this->objStepPool->zipname) . "'>" . $GLOBALS['TL_LANG']['tl_syncCto_backup_file']['download_backup'] . "</a>";
+                $strHTML .= "<a rel='lightbox[details 600 300]' title='In einem neuen Fenster ansehen' href='contao/popup.php?src=" . base64_encode($GLOBALS['TL_CONFIG']['uploadPath'] . "/syncCto_backups/files/" . $this->objStepPool->zipname) . "'>" . $GLOBALS['TL_LANG']['MSC']['fileDownload'] . "</a>";
                 $strHTML .= "</p>";
 
                 if (count($this->objStepPool->skippedfiles) != 0)

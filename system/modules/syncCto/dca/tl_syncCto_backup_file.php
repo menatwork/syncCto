@@ -121,7 +121,7 @@ class tl_syncCto_backup_file extends Backend
             'formkey'         => 'start_backup',
             'class'           => '',
             'accesskey'       => 'g',
-            'value'           => specialchars($GLOBALS['TL_LANG']['MSC']['start_backup']),
+            'value'           => specialchars($GLOBALS['TL_LANG']['MSC']['apply']),
             'button_callback' => array('tl_syncCto_backup_file', 'onsubmit_callback')
         );
 

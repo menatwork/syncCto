@@ -29,12 +29,12 @@
         <?php if(count($this->arrCompareList) == 0): ?>   
             <div><?php echo $GLOBALS['TL_LANG']['ERR']['missing_tables']; ?></div>  
             <div class="submit_container">
-                <input class="tl_submit" name="transfer" type="submit" value="<?php echo $GLOBALS['TL_LANG']['MSC']['submit_database']; ?>" />
+                <input class="tl_submit" name="transfer" type="submit" value="<?php echo $GLOBALS['TL_LANG']['MSC']['apply']; ?>" />
             </div>
         <?php else: ?>
         
         <div class="submit_container">
-            <input class="tl_submit" name="transfer" type="submit" value="<?php echo $GLOBALS['TL_LANG']['MSC']['submit_database']; ?>" />
+            <input class="tl_submit" name="transfer" type="submit" value="<?php echo $GLOBALS['TL_LANG']['MSC']['apply']; ?>" />
         </div>
         
         <div id="legend">
@@ -81,7 +81,7 @@
         <?php endforeach; ?> 
         
         <div class="bottom submit_container">
-            <input class="tl_submit" name="transfer" type="submit" value="<?php echo $GLOBALS['TL_LANG']['MSC']['submit_database']; ?>" />
+            <input class="tl_submit" name="transfer" type="submit" value="<?php echo $GLOBALS['TL_LANG']['MSC']['apply']; ?>" />
         </div>
         
         <?php endif; ?>
