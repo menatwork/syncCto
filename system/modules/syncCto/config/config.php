@@ -132,13 +132,13 @@ $GLOBALS['SYC_CONFIG']['folder_blacklist'] = array(
     'system/logs',
     'system/scripts',
     'system/tmp',
-    '*/syncCto_backups/*',
+    '*/syncCto_backups',
 );
 
 // Files only sync.
 $GLOBALS['SYC_CONFIG']['file_blacklist'] = array(
-    '.htaccess',
-    '*/localconfig.php',
+    'TL_ROOT/.htaccess',
+    'localconfig.php',
 );
 
 // Folders

@@ -310,19 +310,6 @@ class SyncCtoFiles extends Backend
         return true;
     }
 
-//    /**
-//     * Create a xml file with all files
-//     * 
-//     * @param string $strXMLFile Full filepath
-//     * @param boolean $booCore Core scan
-//     * @param boolean $booFiles Files scan
-//     * @return boolean 
-//     */
-//    public function getChecksumFilesAsXMLSmall($strXMLFile, $booCore = false, $booFiles = false)
-//    {
-//        
-//    }
-
     /**
      * Create a checksum list from contao core folders
      * 
@@ -688,13 +675,13 @@ class SyncCtoFiles extends Backend
      */
     protected function isInBlackFolder($strPath)
     {
-        $strPath = $this->objSyncCtoHelper->standardizePath($strPath);
+        $strPath = $this->objSyncCtoHelper->standardizePath($strPath); 
 
         foreach ($this->arrFolderBlacklist as $value)
         {
             // Search with preg for values            
             if (preg_match("/^" . $value . "/i", $strPath) != 0)
-            {
+            {                
                 return true;
             }
         }
@@ -714,13 +701,28 @@ class SyncCtoFiles extends Backend
 
         foreach ($this->arrFileBlacklist as $value)
         {
-            // Search with preg for values            
-            if (preg_match("/^" . $value . "/i", $strPath) != 0)
+            // Check if the preg starts with a TL_ROOT
+            if(preg_match("/^TL_ROOT/i", $value))
             {
-                return true;
+                // Remove the TL_ROOT
+                $value = preg_replace("/TL_ROOT\\\\\//i", "", $value);
+                
+                // Search with preg for values            
+                if (preg_match("/^" . $value . "$/i", $strPath) != 0)
+                {                    
+                    return true;
+                }
+            }
+            else
+            {
+                // Search with preg for values            
+                if (preg_match("/" . $value . "$/i", $strPath) != 0)
+                {                    
+                    return true;
+                }
             }
         }
-
+        
         return false;
     }
 
@@ -871,7 +873,7 @@ class SyncCtoFiles extends Backend
             if (is_dir(TL_ROOT . "/" . $strPath . "/" . $value))
             {
                 if ($this->isInBlackFolder($strPath . "/" . $value) == true)
-                {
+                {                    
                     continue;
                 }
 
