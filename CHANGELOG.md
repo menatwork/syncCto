@@ -2,8 +2,26 @@ syncCto Changelog
 =================
 
 
-Version 2.2.0 (2012-08-11)
+Version 2.2.0 (2012-08-17)
 --------------------------
+
+### Defect
+Optimierung der Beschreibungen (see #113).
+
+### Defect
+Filterregeln der DB-Tabellen optimieren (see #110).
+
+### Defect/Feature
+Zusammenfassung der normalen und zu großen Dateilisten (see #109).
+
+### Feature
+UI der Steps optimieren (see #108).
+
+### Defect
+runonce.php beim AutoUpdate nicht berücksichtigen (see #106).
+
+### Defect
+AutoUpdater legt keine neuen DB-Tabellen an (see #105).
 
 ### Defect
 Fehlermeldung beim Tabellenvergleich (see #104).
