@@ -31,7 +31,7 @@
  * List
  */
 
-$GLOBALS['TL_LANG']['tl_syncCto_sync']['step_1_show']['description_1']      = 'Getting systemcheck from client.';
+$GLOBALS['TL_LANG']['tl_syncCto_sync']['step_1_show']['description_1']      = 'Get systemcheck from client.';
 
 $GLOBALS['TL_LANG']['tl_syncCto_sync']['step_1']['description_1']           = 'Checking client.';
 $GLOBALS['TL_LANG']['tl_syncCto_sync']['step_1']['description_2']           = 'Purge temp folder.';
@@ -57,7 +57,7 @@ $GLOBALS['TL_LANG']['tl_syncCto_sync']['step_4']['description_2']           = 'C
 $GLOBALS['TL_LANG']['tl_syncCto_sync']['step_4']['description_3']           = 'Transferring sql scripts.';
 $GLOBALS['TL_LANG']['tl_syncCto_sync']['step_4']['description_4']           = 'The sql file was successfully transferred and imported.';
 
-$GLOBALS['TL_LANG']['tl_syncCto_sync']['step_5']['description_1']           = 'Process files.';
+$GLOBALS['TL_LANG']['tl_syncCto_sync']['step_5']['description_1']           = 'Import data.';
 $GLOBALS['TL_LANG']['tl_syncCto_sync']['step_5']['description_2']           = 'Import configuration files.';
 $GLOBALS['TL_LANG']['tl_syncCto_sync']['step_5']['description_3']           = ' file(s) skipped.';
 $GLOBALS['TL_LANG']['tl_syncCto_sync']['step_5']['description_4']           = ' file(s) sent.';
@@ -66,7 +66,7 @@ $GLOBALS['TL_LANG']['tl_syncCto_sync']['step_5']['description_6']           = 'T
 $GLOBALS['TL_LANG']['tl_syncCto_sync']['step_5']['description_7']           = 'Deleted files:';
 $GLOBALS['TL_LANG']['tl_syncCto_sync']['step_5']['description_8']           = 'Incorrect files:';
 
-$GLOBALS['TL_LANG']['tl_syncCto_sync']['abort']                             = 'Abort the synchronization and cleanup the client.';
+$GLOBALS['TL_LANG']['tl_syncCto_sync']['abort']                             = 'Abort the synchronization and clean up the client.';
 $GLOBALS['TL_LANG']['tl_syncCto_sync']['complete_client']                   = 'The synchronization of the %sclient%s was successfully completed.';
 $GLOBALS['TL_LANG']['tl_syncCto_sync']['complete_server']                   = 'The synchronization of the %sserver%s was successfully completed.';
 

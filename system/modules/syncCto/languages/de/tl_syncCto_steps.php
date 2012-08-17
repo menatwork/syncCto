@@ -57,7 +57,7 @@ $GLOBALS['TL_LANG']['tl_syncCto_sync']['step_4']['description_2']           = 'S
 $GLOBALS['TL_LANG']['tl_syncCto_sync']['step_4']['description_3']           = 'SQL-Scripte transferieren.';
 $GLOBALS['TL_LANG']['tl_syncCto_sync']['step_4']['description_4']           = 'SQL-Scripte wurden erfolgreich importiert.';
 
-$GLOBALS['TL_LANG']['tl_syncCto_sync']['step_5']['description_1']           = 'Dateien importieren.';
+$GLOBALS['TL_LANG']['tl_syncCto_sync']['step_5']['description_1']           = 'Daten importieren.';
 $GLOBALS['TL_LANG']['tl_syncCto_sync']['step_5']['description_2']           = 'Konfigurationsdateien importieren.';
 $GLOBALS['TL_LANG']['tl_syncCto_sync']['step_5']['description_3']           = ' Datei(en) übersprungen.';
 $GLOBALS['TL_LANG']['tl_syncCto_sync']['step_5']['description_4']           = ' Datei(en) gesendet.';
