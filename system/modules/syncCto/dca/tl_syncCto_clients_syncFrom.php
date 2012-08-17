@@ -42,7 +42,7 @@ $GLOBALS['TL_DCA']['tl_syncCto_clients_syncFrom'] = array(
     // Palettes
     'palettes' => array(
         '__selector__' => array('systemoperations_check'),
-        'default' => '{sync_legend},lastSync,disabledCache,sync_options;{table_legend},database_check;{systemoperations_legend},systemoperations_check,attentionFlag;',
+        'default' => '{sync_legend},lastSync,disabledCache,sync_options;{table_legend},database_check;{systemoperations_legend:hide},systemoperations_check,attentionFlag;',
     ),
     // Sub Palettes
     'subpalettes' => array(
