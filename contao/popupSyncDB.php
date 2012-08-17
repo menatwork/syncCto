@@ -48,11 +48,9 @@ class PopupSyncFiles extends Backend
     protected $intClientID;
     protected $strMode;
     // Helper Classes
-    protected $objSyncCtoCommunicationClient;
     protected $objSyncCtoHelper;
     // Temp data
-    protected $arrListFile;
-    protected $arrListCompare;
+    protected $arrSyncSettings = array();
     protected $arrErrors = array();
 
     // defines
@@ -73,7 +71,6 @@ class PopupSyncFiles extends Backend
 
         $this->User->authenticate();
 
-        $this->objSyncCtoCommunicationClient = SyncCtoCommunicationClient::getInstance();
         $this->objSyncCtoHelper              = SyncCtoHelper::getInstance();
 
         $this->initGetParams();
@@ -89,8 +86,12 @@ class PopupSyncFiles extends Backend
             // Set client for communication
             try
             {
-                $this->objSyncCtoCommunicationClient->setClientBy($this->intClientID);
+                $this->loadSyncSettings();
+
                 $this->showNormalDatabase();
+
+                $this->saveSyncSettings();
+
                 unset($_POST);
             }
             catch (Exception $exc)
@@ -119,89 +120,61 @@ class PopupSyncFiles extends Backend
      */
     public function showNormalDatabase()
     {
-        // Close functinality
-        if (key_exists("transfer", $_POST))
+        
+        // Delete functinality
+        if (key_exists("delete", $_POST))
         {
-            $arrSyncSettings                             = $this->Session->get("syncCto_SyncSettings_" . $this->intClientID);
-            $arrSyncSettings['syncCto_SyncTables']       = $this->Input->post('serverTables');
-            $arrSyncSettings['syncCto_SyncDeleteTables'] = $this->Input->post('serverDeleteTables');
-            $this->Session->set("syncCto_SyncSettings_" . $this->intClientID, $arrSyncSettings);
+            foreach ($_POST['serverTables'] as $value)
+            {
+                if(isset($this->arrSyncSettings['syncCto_CompareTables']['recommended']) && key_exists($value, $this->arrSyncSettings['syncCto_CompareTables']['recommended']))
+                {
+                     unset($this->arrSyncSettings['syncCto_CompareTables']['recommended'][$value]);
+                }
+                else if( isset($this->arrSyncSettings['syncCto_CompareTables']['none_recommended']) && key_exists($value, $this->arrSyncSettings['syncCto_CompareTables']['none_recommended']))
+                {
+                     unset($this->arrSyncSettings['syncCto_CompareTables']['none_recommended'][$value]);
+                }
+            }
+        }
+        // Close functinality
+        else if (key_exists("transfer", $_POST))
+        {
+            foreach ($this->arrSyncSettings['syncCto_CompareTables'] as $arrType)
+            {                
+                foreach ($arrType as $keyTable => $valueTable)
+                {
+                    if($valueTable['del'] == true)
+                    {
+                        $this->arrSyncSettings['syncCto_SyncDeleteTables'][] = $keyTable;
+                    }
+                    else
+                    {
+                        $this->arrSyncSettings['syncCto_SyncTables'][] = $keyTable;
+                    }
+                }
+            }
+            
+            unset($this->arrSyncSettings['syncCto_CompareTables']);            
 
             $this->mixStep = self::STEP_CLOSE_DB;
             return;
         }
-
-        $arrCompareList = array();
-
-        // Check user
-        if ($this->User->isAdmin || $this->User->syncCto_tables != null)
-        {
-            // Load allowed tables for this user
-            if (!$this->User->isAdmin)
-            {
-                $arrAllowedTables = true;
-            }
-            else
-            {
-                $arrAllowedTables = $this->User->syncCto_tables;
-            }
-
-            $arrServerTableR  = $this->objSyncCtoHelper->databaseTablesRecommended();
-            $arrServerTableNR = $this->objSyncCtoHelper->databaseTablesNoneRecommended();
-            $arrServerTableH  = $this->objSyncCtoHelper->getTablesHidden();
-
-            $arrClientTableR  = $this->objSyncCtoCommunicationClient->getRecommendedTables();
-            $arrClientTableNR = $this->objSyncCtoCommunicationClient->getNoneRecommendedTables();
-            $arrClientTableH  = $this->objSyncCtoCommunicationClient->getHiddenTables();
-
-            // Merge all together
-            foreach ($arrServerTableR as $key => $value)
-            {
-                $arrServerTableR[$key]['type'] = 'recommended';
-            }
-
-            foreach ($arrClientTableR as $key => $value)
-            {
-                $arrClientTableR[$key]['type'] = 'recommended';
-            }
-
-            foreach ($arrServerTableNR as $key => $value)
-            {
-                $arrServerTableNR[$key]['type'] = 'nonRecommended';
-            }
-
-            foreach ($arrClientTableNR as $key => $value)
-            {
-                $arrClientTableNR[$key]['type'] = 'nonRecommended';
-            }
-
-            $arrServerTables  = array_merge($arrServerTableR, $arrServerTableNR);
-            $arrClientTables  = array_merge($arrClientTableR, $arrClientTableNR);
-            $arrHiddenTables  = array_keys(array_flip(array_merge($arrServerTableH, $arrClientTableH)));
-            $arrAllTimeStamps = $this->getAllTimeStamps();
-
-            switch ($this->strMode)
-            {
-                case 'To':
-                    $arrCompareList = $this->getFormatedCompareList($arrServerTables, $arrClientTables, $arrHiddenTables, $arrAllTimeStamps['server'], $arrAllTimeStamps['client'], $arrAllowedTables, 'server', 'client');
-                    break;
-
-                case 'From':
-                    $arrCompareList = $this->getFormatedCompareList($arrClientTables, $arrServerTables, $arrHiddenTables, $arrAllTimeStamps['client'], $arrAllTimeStamps['server'], $arrAllowedTables, 'client', 'server');
-                    break;
-            }
-        }
         
         // If no table is found skip the view
-        if(count($arrCompareList['recommended']) == 0 && count($arrCompareList['none_recommended']) == 0)
+        if (count($this->arrSyncSettings['syncCto_CompareTables']['recommended']) == 0 
+                && count($this->arrSyncSettings['syncCto_CompareTables']['none_recommended']) == 0)
         {
+            unset($this->arrSyncSettings['syncCto_CompareTables']);
+            $this->arrSyncSettings['syncCto_SyncDeleteTables'] = array();
+            $this->arrSyncSettings['syncCto_SyncTables'] = array();
+
             $this->mixStep = self::STEP_CLOSE_DB;
             return;
         }
 
         $this->Template                 = new BackendTemplate("be_syncCto_database");
         $this->Template->headline       = $GLOBALS['TL_LANG']['MSC']['comparelist'];
-        $this->Template->arrCompareList = $arrCompareList;
+        $this->Template->arrCompareList = $this->arrSyncSettings['syncCto_CompareTables'];
         $this->Template->close          = FALSE;
         $this->Template->error          = FALSE;
     }
@@ -312,226 +285,24 @@ class PopupSyncFiles extends Backend
         }
     }
 
-    /**
-     * 
-     * @param type $arrSourceTables
-     * @param type $arrDesTables
-     * @param type $arrHiddenTables
-     * @param type $arrSourceTS
-     * @param type $arrDesTS
-     * @return string
-     */
-    protected function getFormatedCompareList($arrSourceTables, $arrDesTables, $arrHiddenTables, $arrSourceTS, $arrDesTS, $arrAllowedTables, $strSrcName, $strDesName)
-    {        
-        // Remove hidden tables or tables without premission
-        foreach ($arrSourceTables as $key => $value)
+    protected function loadSyncSettings()
+    {
+        $this->arrSyncSettings = $this->Session->get("syncCto_SyncSettings_" . $this->intClientID);
+
+        if (!is_array($this->arrSyncSettings))
         {
-            if (in_array($key, $arrHiddenTables) || (is_array($arrAllowedTables) && in_array($key, $arrAllowedTables)))
-            {
-                unset($arrSourceTables[$key]);
-            }
+            $this->arrSyncSettings = array();
         }
-
-        foreach ($arrDesTables as $key => $value)
-        {
-            if (in_array($key, $arrHiddenTables) || (is_array($arrAllowedTables) && in_array($key, $arrAllowedTables)))
-            {
-                unset($arrDesTables[$key]);
-            }
-        }
-
-        $arrCompareList = array();
-
-        // Make a diff
-        $arrMissingOnDes    = array_diff(array_keys($arrSourceTables), array_keys($arrDesTables));
-        $arrMissingOnSource = array_diff(array_keys($arrDesTables), array_keys($arrSourceTables));
-
-        // New Tables
-        foreach ($arrMissingOnDes as $keySrcTables)
-        {
-            $strType = $arrSourceTables[$keySrcTables]['type'];
-
-            $arrCompareList[$strType][$keySrcTables][$strSrcName]['name']    = $keySrcTables;
-            $arrCompareList[$strType][$keySrcTables][$strSrcName]['tooltip'] = $this->getReadableSize($arrSourceTables[$keySrcTables]['size'])
-                    . ', '
-                    . vsprintf(($arrSourceTables[$keySrcTables]['count'] == 1) ? $GLOBALS['TL_LANG']['MSC']['entry'] : $GLOBALS['TL_LANG']['MSC']['entries'], array($arrSourceTables[$keySrcTables]['count']));
-
-            $arrCompareList[$strType][$keySrcTables][$strSrcName]['class'] = 'none';
-
-            $arrCompareList[$strType][$keySrcTables][$strDesName]['name'] = '-';
-            $arrCompareList[$strType][$keySrcTables]['diff']              = $GLOBALS['TL_LANG']['MSC']['create'];
-
-            unset($arrSourceTables[$keySrcTables]);
-        }
-
-        // Del Tables
-        foreach ($arrMissingOnSource as $keyDesTables)
-        {
-            $strType = $arrDesTables[$keyDesTables]['type'];
-
-            $arrCompareList[$strType][$keyDesTables][$strDesName]['name']    = $keyDesTables;
-            $arrCompareList[$strType][$keySrcTables][$strSrcName]['tooltip'] = $this->getReadableSize($arrDesTables[$keyDesTables]['size'])
-                    . ', '
-                    . vsprintf(($arrDesTables[$keyDesTables]['count'] == 1) ? $GLOBALS['TL_LANG']['MSC']['entry'] : $GLOBALS['TL_LANG']['MSC']['entries'], array($arrDesTables[$keyDesTables]['count']));
-
-            $arrCompareList[$strType][$keyDesTables][$strDesName]['class'] = 'none';
-
-            $arrCompareList[$strType][$keyDesTables][$strSrcName]['name'] = '-';
-            $arrCompareList[$strType][$keyDesTables]['diff']              = $GLOBALS['TL_LANG']['MSC']['delete'];
-            $arrCompareList[$strType][$keyDesTables]['del']               = true;
-
-            unset($arrDesTables[$keyDesTables]);
-        }
-
-        // Tables which exsist on both systems
-        foreach ($arrSourceTables as $keySrcTable => $valueSrcTable)
-        {
-            $strType = $valueSrcTable['type'];
-
-            $arrCompareList[$strType][$keySrcTable][$strSrcName]['name']    = $keySrcTable;
-            $arrCompareList[$strType][$keySrcTable][$strSrcName]['tooltip'] = $this->getReadableSize($valueSrcTable['size'])
-                    . ', '
-                    . vsprintf(($valueSrcTable['count'] == 1) ? $GLOBALS['TL_LANG']['MSC']['entry'] : $GLOBALS['TL_LANG']['MSC']['entries'], array($valueSrcTable['count']));
-
-            $valueClientTable = $arrDesTables[$keySrcTable];
-
-            $arrCompareList[$strType][$keySrcTable][$strDesName]['name']    = $keySrcTable;
-            $arrCompareList[$strType][$keySrcTable][$strDesName]['tooltip'] = $this->getReadableSize($valueClientTable['size'])
-                    . ', '
-                    . vsprintf(($valueClientTable['count'] == 1) ? $GLOBALS['TL_LANG']['MSC']['entry'] : $GLOBALS['TL_LANG']['MSC']['entries'], array($valueClientTable['count']));
-
-            $intDiff                                             = $this->getDiff($valueSrcTable, $valueClientTable);
-            
-            // Add 'entry' or 'entries' to diff
-            $arrCompareList[$strType][$keySrcTable]['diffCount'] = $intDiff;
-            $arrCompareList[$strType][$keySrcTable]['diff']      = vsprintf(($intDiff == 1) ? $GLOBALS['TL_LANG']['MSC']['entry'] : $GLOBALS['TL_LANG']['MSC']['entries'], array($intDiff));
-
-            // Check timestamps
-            if (key_exists($keySrcTable, $arrSourceTS['current']) && key_exists($keySrcTable, $arrSourceTS['lastSync']))
-            {
-                if ($arrSourceTS['current'][$keySrcTable] == $arrSourceTS['lastSync'][$keySrcTable])
-                {
-                    $arrCompareList[$strType][$keySrcTable][$strSrcName]['class'] = 'unchanged';
-                }
-                else
-                {
-                    $arrCompareList[$strType][$keySrcTable][$strSrcName]['class'] = 'changed';
-                }
-            }
-            else
-            {
-                $arrCompareList[$strType][$keySrcTable][$strSrcName]['class'] = 'no-sync';
-            }
-
-            if (key_exists($keySrcTable, $arrDesTS['current']) && key_exists($keySrcTable, $arrDesTS['lastSync']))
-            {
-                if ($arrDesTS['current'][$keySrcTable] == $arrDesTS['lastSync'][$keySrcTable])
-                {
-                    $arrCompareList[$strType][$keySrcTable][$strDesName]['class'] = 'unchanged';
-                }
-                else
-                {
-                    $arrCompareList[$strType][$keySrcTable][$strDesName]['class'] = 'changed';
-                }
-            }
-            else
-            {
-                $arrCompareList[$strType][$keySrcTable][$strDesName]['class'] = 'no-sync';
-            }
-
-            // Check CSS
-            if ($arrCompareList[$strType][$keySrcTable][$strSrcName]['class'] == 'changed' && $arrCompareList[$strType][$keySrcTable]['client']['class'] == 'changed')
-            {
-                $arrCompareList[$strType][$keySrcTable][$strSrcName]['class'] = 'changed-both';
-                $arrCompareList[$strType][$keySrcTable][$strDesName]['class'] = 'changed-both';
-            }
-
-            // Check if we have some changes
-            if ($arrCompareList[$strType][$keySrcTable][$strSrcName]['class'] == 'unchanged'
-                    && $arrCompareList[$strType][$keySrcTable][$strDesName]['class'] == 'unchanged'
-                    && $arrCompareList[$strType][$keySrcTable]['diffCount'] == 0
-            )
-            {
-                unset($arrCompareList[$strType][$keySrcTable]);
-                continue;
-            }
-        }
-
-        return $arrCompareList;
     }
 
-    /**
-     * Get the calculated differenz between the to given arrays
-     * 
-     * @param array $arrServerTables
-     * @param array $arrClientTables
-     * @return string 
-     */
-    public function getDiff($arrServerTables, $arrClientTables)
+    protected function saveSyncSettings()
     {
-        $intCount = 0;
-
-        // Calculate count
-        if (count($arrServerTables) == 0)
+        if (!is_array($this->arrSyncSettings))
         {
-            $intCount = $arrClientTables['count'];
-        }
-        else if (count($arrClientTables) == 0)
-        {
-            $intCount = $arrServerTables['count'];
-        }
-        else
-        {
-            if ($arrServerTables['count'] > $arrClientTables['count'])
-            {
-                $intCount = $arrServerTables['count'] - $arrClientTables['count'];
-            }
-            else
-            {
-                $intCount = $arrClientTables['count'] - $arrServerTables['count'];
-            }
+            $this->arrSyncSettings = array();
         }
 
-        return $intCount;
-    }
-
-    /**
-     * Return all timestamps from client and server from current and last sync
-     * 
-     * @return array 
-     */
-    protected function getAllTimeStamps()
-    {
-        $arrLocationLastTableTimstamp = array('server' => array(), 'client' => array());
-
-        foreach ($arrLocationLastTableTimstamp AS $location => $v)
-        {
-            $mixLastTableTimestamp = $this->Database
-                    ->prepare("SELECT " . $location . "_timestamp FROM tl_synccto_clients WHERE id=?")
-                    ->limit(1)
-                    ->execute($this->intClientID)
-                    ->fetchAllAssoc();
-
-            if (strlen($mixLastTableTimestamp[0][$location . "_timestamp"]) != 0)
-            {
-                $arrLocationLastTableTimstamp[$location] = deserialize($mixLastTableTimestamp[0][$location . "_timestamp"]);
-            }
-            else
-            {
-                $arrLocationLastTableTimstamp[$location] = array();
-            }
-        }
-
-        return array(
-            'server' => array(
-                'current'  => $this->objSyncCtoHelper->getDatabaseTablesTimestamp(),
-                'lastSync' => $arrLocationLastTableTimstamp['server']
-            ),
-            'client'   => array(
-                'current' => $this->objSyncCtoCommunicationClient->getClientTimestamp(array()),
-                'lastSync' => $arrLocationLastTableTimstamp['client']
-            )
-        );
+        $this->Session->set("syncCto_SyncSettings_" . $this->intClientID, $this->arrSyncSettings);
     }
 
 }

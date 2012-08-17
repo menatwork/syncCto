@@ -2,11 +2,7 @@
 
 window.addEvent("domready",function(){
     
-    if ($('db_form')) {
-        $$('input[name=transfer]').set('disabled', true);
-    } else {
-        $$('input[name=delete]').set('disabled', true);
-    }
+    $$('input[name=delete]').set('disabled', true);
         
     $each($$('.checkbox input[type=checkbox]'), function(item){
         item.addEvents({
@@ -15,20 +11,11 @@ window.addEvent("domready",function(){
                 
                 if (blnFound == true){
                     $$('input[name=delete]').set('disabled', false);
-                    if ($('db_form')) {
-                        $$('input[name=transfer]').set('disabled', false);
-                    } else {
-                        $$('input[name=transfer]').set('disabled', true);
-                    }
+                    $$('input[name=transfer]').set('disabled', true);
                 } else {
                     $$('input[name=delete]').set('disabled', true);
-                    if ($('db_form')) {
-                        $$('input[name=transfer]').set('disabled', true);
-                    } else {
-                        $$('input[name=transfer]').set('disabled', false);
-                    }
+                    $$('input[name=transfer]').set('disabled', false);
                 }
-                
             }
         });	
     });

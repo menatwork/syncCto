@@ -216,6 +216,7 @@ class SyncCtoModuleClient extends BackendModule
         // Save content in session
         $this->saveContentData();
         $this->saveClientInformation();
+        $this->saveSyncSettings();
 
         // Set Vars for the template
         $this->setTemplateVars();
@@ -393,6 +394,16 @@ class SyncCtoModuleClient extends BackendModule
         {
             $this->arrSyncSettings = array();
         }
+    }
+
+    protected function saveSyncSettings()
+    {
+        if (!is_array($this->arrSyncSettings))
+        {
+            $this->arrSyncSettings = array();
+        }
+
+        $this->Session->set("syncCto_SyncSettings_" . $this->intClientID, $this->arrSyncSettings);
     }
 
     protected function loadClientInformation()
@@ -1415,15 +1426,6 @@ class SyncCtoModuleClient extends BackendModule
                     $objTemp->forwardValue   = $GLOBALS['TL_LANG']['MSC']['apply'];
                     $objTemp->popupClassName = 'popupSyncFiles.php';
 
-                    if (version_compare(VERSION, '2.11', '=='))
-                    {
-                        $objTemp->lightboxAttr = 'data-lightbox="850 80%"';
-                    }
-                    else
-                    {
-                        $objTemp->lightboxAttr = 'rel="lightbox[850 80%]"';
-                    }
-
                     // Build content 
                     $this->objData->setDescription(vsprintf($GLOBALS['TL_LANG']['tl_syncCto_sync']["step_2"]['description_4'], array($intCountMissing, $intCountNeed, $intCountDelete, $intCountIgnored, $this->getReadableSize($intTotalSizeNew), $this->getReadableSize($intTotalSizeChange), $this->getReadableSize($intTotalSizeDel))));
                     $this->objData->setHtml($objTemp->parse());
@@ -1843,8 +1845,81 @@ class SyncCtoModuleClient extends BackendModule
                     break;
 
                 case 2:
+                    // Check user
+                    if ($this->User->isAdmin || $this->User->syncCto_tables != null)
+                    {
+                        // Load allowed tables for this user
+                        if (!$this->User->isAdmin)
+                        {
+                            $arrAllowedTables = true;
+                        }
+                        else
+                        {
+                            $arrAllowedTables = $this->User->syncCto_tables;
+                        }
 
-                    if (key_exists("forward", $_POST) && !(count($this->arrSyncSettings['syncCto_SyncTables']) == 0 && count($this->arrSyncSettings['syncCto_SyncDeleteTables']) == 0))
+                        $arrClientTableR    = $this->objSyncCtoCommunicationClient->getRecommendedTables();
+                        $arrClientTableNR   = $this->objSyncCtoCommunicationClient->getNoneRecommendedTables();
+                        $arrClientTableH    = $this->objSyncCtoCommunicationClient->getHiddenTables();
+                        $arrClientTimestamp = $this->objSyncCtoCommunicationClient->getClientTimestamp(array());
+
+                        $arrServerTableR    = $this->objSyncCtoHelper->databaseTablesRecommended();
+                        $arrServerTableNR   = $this->objSyncCtoHelper->databaseTablesNoneRecommended();
+                        $arrServerTableH    = $this->objSyncCtoHelper->getTablesHidden();
+                        $arrServerTimestamp = $this->objSyncCtoHelper->getDatabaseTablesTimestamp();
+
+                        // Merge all together
+                        foreach ($arrServerTableR as $key => $value)
+                        {
+                            $arrServerTableR[$key]['type'] = 'recommended';
+                        }
+
+                        foreach ($arrClientTableR as $key => $value)
+                        {
+                            $arrClientTableR[$key]['type'] = 'recommended';
+                        }
+
+                        foreach ($arrServerTableNR as $key => $value)
+                        {
+                            $arrServerTableNR[$key]['type'] = 'nonRecommended';
+                        }
+
+                        foreach ($arrClientTableNR as $key => $value)
+                        {
+                            $arrClientTableNR[$key]['type'] = 'nonRecommended';
+                        }
+
+                        $arrServerTables  = array_merge($arrServerTableR, $arrServerTableNR);
+                        $arrClientTables  = array_merge($arrClientTableR, $arrClientTableNR);
+                        $arrHiddenTables  = array_keys(array_flip(array_merge($arrServerTableH, $arrClientTableH)));
+                        $arrAllTimeStamps = $this->objSyncCtoDatabase->getAllTimeStamps($arrServerTimestamp, $arrClientTimestamp, $this->intClientID);
+                        
+                        $arrCompareList = $this->objSyncCtoDatabase->getFormatedCompareList($arrServerTables, $arrClientTables, $arrHiddenTables, $arrAllTimeStamps['server'], $arrAllTimeStamps['client'], $arrAllowedTables, 'server', 'client');
+                             
+                        if(count($arrCompareList['recommended']) == 0 && count($arrCompareList['none_recommended']) == 0)
+                        {
+                            $this->objData->setState(SyncCtoEnum::WORK_SKIPPED);
+                            $this->objData->setHtml("");
+                            $this->intStep++;
+                            
+                            break;
+                        }
+                        
+                        $this->arrSyncSettings['syncCto_CompareTables'] =  $arrCompareList;
+                        
+                        $this->objStepPool->step++;
+                    }
+                    else
+                    {
+                        $this->objData->setState(SyncCtoEnum::WORK_SKIPPED);
+                        $this->objData->setHtml("");
+                        $this->intStep++;
+                    }
+
+                    break;
+
+                case 3:
+                     if (key_exists("forward", $_POST) && !(count($this->arrSyncSettings['syncCto_SyncTables']) == 0 && count($this->arrSyncSettings['syncCto_SyncDeleteTables']) == 0))
                     {
                         // Go to next step
                         $this->objData->setState(SyncCtoEnum::WORK_WORK);
@@ -1883,15 +1958,6 @@ class SyncCtoModuleClient extends BackendModule
                     $objTemp->forwardValue   = $GLOBALS['TL_LANG']['MSC']['apply'];
                     $objTemp->popupClassName = 'popupSyncDB.php';
 
-                    if (version_compare(VERSION, '2.11', '=='))
-                    {
-                        $objTemp->lightboxAttr = 'data-lightbox="850 80%"';
-                    }
-                    else
-                    {
-                        $objTemp->lightboxAttr = 'rel="lightbox[850 80%]"';
-                    }
-
                     // Build content 
                     $this->objData->setDescription($GLOBALS['TL_LANG']['tl_syncCto_sync']['step_4']['description_1']);
                     $this->objData->setHtml($objTemp->parse());
@@ -1902,7 +1968,7 @@ class SyncCtoModuleClient extends BackendModule
                 /**
                  * Build SQL Zip File
                  */
-                case 3:                    
+                case 4:                    
                     if (count($this->arrSyncSettings['syncCto_SyncTables']) != 0)
                     {
                         $this->objStepPool->zipname = $this->objSyncCtoDatabase->runDump($this->arrSyncSettings['syncCto_SyncTables'], true, true);
@@ -1912,7 +1978,7 @@ class SyncCtoModuleClient extends BackendModule
                     }
                     else
                     {
-                        $this->objStepPool->step = 7;
+                        $this->objStepPool->step = 8;
                     }
 
                     break;
@@ -1920,7 +1986,7 @@ class SyncCtoModuleClient extends BackendModule
                 /**
                  * Send file to client
                  */
-                case 4:
+                case 5:
 
                     $arrResponse = $this->objSyncCtoCommunicationClient->sendFile($GLOBALS['SYC_PATH']['tmp'], $this->objStepPool->zipname, "", SyncCtoEnum::UPLOAD_SQL_TEMP);
 
@@ -1938,7 +2004,7 @@ class SyncCtoModuleClient extends BackendModule
                 /**
                  * Import on client side
                  */
-                case 5:
+                case 6:
 
                     // Import SQL zip 
                     $this->objSyncCtoCommunicationClient->runSQLImport($this->objSyncCtoHelper->standardizePath($this->arrClientInformation["folders"]["tmp"], "sql", $this->objStepPool->zipname));
@@ -1950,7 +2016,7 @@ class SyncCtoModuleClient extends BackendModule
                 /**
                  * Set timestamps 
                  */
-                case 6:
+                case 7:
 
                     $arrTableTimestamp = array(
                         'server' => $this->objSyncCtoHelper->getDatabaseTablesTimestamp($this->arrSyncSettings['syncCto_SyncTables']),
@@ -2002,7 +2068,7 @@ class SyncCtoModuleClient extends BackendModule
                 /**
                  * Drop Tables
                  */
-                case 7:
+                case 8:
                     
                     if (count($this->arrSyncSettings['syncCto_SyncDeleteTables']) != 0)
                     {
@@ -2028,7 +2094,7 @@ class SyncCtoModuleClient extends BackendModule
                 /**
                  * Hook for custom sql code
                  */
-                case 8:
+                case 9:
                     if (isset($GLOBALS['TL_HOOKS']['syncDBUpdate']) && is_array($GLOBALS['TL_HOOKS']['syncDBUpdate']))
                     {
                         $arrSQL = array();
@@ -2729,15 +2795,6 @@ class SyncCtoModuleClient extends BackendModule
                     $objTemp->forwardValue   = $GLOBALS['TL_LANG']['MSC']['apply'];
                     $objTemp->popupClassName = 'popupSyncFiles.php';
 
-                    if (version_compare(VERSION, '2.11', '=='))
-                    {
-                        $objTemp->lightboxAttr = 'data-lightbox="850 80%"';
-                    }
-                    else
-                    {
-                        $objTemp->lightboxAttr = 'rel="lightbox[850 80%]"';
-                    }
-
                     // Build content 
                     $this->objData->setDescription(vsprintf($GLOBALS['TL_LANG']['tl_syncCto_sync']["step_2"]['description_4'], array($intCountMissing, $intCountNeed, $intCountDelete, $intCountIgnored, $this->getReadableSize($intTotalSizeNew), $this->getReadableSize($intTotalSizeChange), $this->getReadableSize($intTotalSizeDel))));
                     $this->objData->setHtml($objTemp->parse());
@@ -3172,8 +3229,82 @@ class SyncCtoModuleClient extends BackendModule
                     $this->objStepPool->step++;
 
                     break;
+                
+                 case 2:
+                    // Check user
+                    if ($this->User->isAdmin || $this->User->syncCto_tables != null)
+                    {
+                        // Load allowed tables for this user
+                        if (!$this->User->isAdmin)
+                        {
+                            $arrAllowedTables = true;
+                        }
+                        else
+                        {
+                            $arrAllowedTables = $this->User->syncCto_tables;
+                        }
 
-                case 2:
+                        $arrClientTableR    = $this->objSyncCtoCommunicationClient->getRecommendedTables();
+                        $arrClientTableNR   = $this->objSyncCtoCommunicationClient->getNoneRecommendedTables();
+                        $arrClientTableH    = $this->objSyncCtoCommunicationClient->getHiddenTables();
+                        $arrClientTimestamp = $this->objSyncCtoCommunicationClient->getClientTimestamp(array());
+
+                        $arrServerTableR    = $this->objSyncCtoHelper->databaseTablesRecommended();
+                        $arrServerTableNR   = $this->objSyncCtoHelper->databaseTablesNoneRecommended();
+                        $arrServerTableH    = $this->objSyncCtoHelper->getTablesHidden();
+                        $arrServerTimestamp = $this->objSyncCtoHelper->getDatabaseTablesTimestamp();
+
+                        // Merge all together
+                        foreach ($arrServerTableR as $key => $value)
+                        {
+                            $arrServerTableR[$key]['type'] = 'recommended';
+                        }
+
+                        foreach ($arrClientTableR as $key => $value)
+                        {
+                            $arrClientTableR[$key]['type'] = 'recommended';
+                        }
+
+                        foreach ($arrServerTableNR as $key => $value)
+                        {
+                            $arrServerTableNR[$key]['type'] = 'nonRecommended';
+                        }
+
+                        foreach ($arrClientTableNR as $key => $value)
+                        {
+                            $arrClientTableNR[$key]['type'] = 'nonRecommended';
+                        }
+
+                        $arrServerTables  = array_merge($arrServerTableR, $arrServerTableNR);
+                        $arrClientTables  = array_merge($arrClientTableR, $arrClientTableNR);
+                        $arrHiddenTables  = array_keys(array_flip(array_merge($arrServerTableH, $arrClientTableH)));
+                        $arrAllTimeStamps = $this->objSyncCtoDatabase->getAllTimeStamps($arrServerTimestamp, $arrClientTimestamp, $this->intClientID);
+                        
+                        $arrCompareList = $this->objSyncCtoDatabase->getFormatedCompareList($arrClientTables, $arrServerTables, $arrHiddenTables, $arrAllTimeStamps['client'], $arrAllTimeStamps['server'], $arrAllowedTables, 'client', 'server');
+                    
+                        if(count($arrCompareList['recommended']) == 0 && count($arrCompareList['none_recommended']) == 0)
+                        {
+                            $this->objData->setState(SyncCtoEnum::WORK_SKIPPED);
+                            $this->objData->setHtml("");
+                            $this->intStep++;
+                            
+                            break;
+                        }
+                        
+                        $this->arrSyncSettings['syncCto_CompareTables'] =  $arrCompareList;
+                        
+                        $this->objStepPool->step++;
+                    }
+                    else
+                    {
+                        $this->objData->setState(SyncCtoEnum::WORK_SKIPPED);
+                        $this->objData->setHtml("");
+                        $this->intStep++;
+                    }
+
+                    break;
+
+                case 3:
 
                     if (key_exists("forward", $_POST) && !(count($this->arrSyncSettings['syncCto_SyncTables']) == 0 && count($this->arrSyncSettings['syncCto_SyncDeleteTables']) == 0))
                     {
@@ -3214,15 +3345,6 @@ class SyncCtoModuleClient extends BackendModule
                     $objTemp->forwardValue   = $GLOBALS['TL_LANG']['MSC']['apply'];
                     $objTemp->popupClassName = 'popupSyncDB.php';
 
-                    if (version_compare(VERSION, '2.11', '=='))
-                    {
-                        $objTemp->lightboxAttr = 'data-lightbox="850 80%"';
-                    }
-                    else
-                    {
-                        $objTemp->lightboxAttr = 'rel="lightbox[850 80%]"';
-                    }
-
                     // Build content 
                     $this->objData->setDescription($GLOBALS['TL_LANG']['tl_syncCto_sync']['step_4']['description_1']);
                     $this->objData->setHtml($objTemp->parse());
@@ -3233,7 +3355,7 @@ class SyncCtoModuleClient extends BackendModule
                 /**
                  * Build SQL Zip File
                  */
-                case 3:                    
+                case 4:                    
                     if (count($this->arrSyncSettings['syncCto_SyncTables']) != 0)
                     {
                         $this->objStepPool->zipname = $this->objSyncCtoCommunicationClient->runDatabaseDump($this->arrSyncSettings['syncCto_SyncTables'], true, true);
@@ -3243,7 +3365,7 @@ class SyncCtoModuleClient extends BackendModule
                     }
                     else
                     {
-                        $this->objStepPool->step = 7;
+                        $this->objStepPool->step = 8;
                     }
                     
                     break;
@@ -3251,7 +3373,7 @@ class SyncCtoModuleClient extends BackendModule
                 /**
                  * Get file to client
                  */
-                case 4:
+                case 5:
 
                     $strFrom     = $this->objSyncCtoHelper->standardizePath($this->arrClientInformation["folders"]['tmp'], $this->objStepPool->zipname);
                     $strTo       = $this->objSyncCtoHelper->standardizePath($GLOBALS['SYC_PATH']['tmp'], "sql", $this->objStepPool->zipname);
@@ -3271,7 +3393,7 @@ class SyncCtoModuleClient extends BackendModule
                 /**
                  * Import on server side
                  */
-                case 5:
+                case 6:
 
                     $strSrc = $this->objSyncCtoHelper->standardizePath($GLOBALS['SYC_PATH']['tmp'], "sql", $this->objStepPool->zipname);
                     $this->objSyncCtoDatabase->runRestore($strSrc);
@@ -3283,7 +3405,7 @@ class SyncCtoModuleClient extends BackendModule
                 /**
                  * Set timestamps 
                  */
-                case 6:
+                case 7:
 
                     $arrTableTimestamp = array(
                         'server' => $this->objSyncCtoHelper->getDatabaseTablesTimestamp($this->arrSyncSettings['syncCto_SyncTables']),
@@ -3335,7 +3457,7 @@ class SyncCtoModuleClient extends BackendModule
                 /**
                  * Drop Tables
                  */
-                case 7:                    
+                case 8:                    
                     if (count($this->arrSyncSettings['syncCto_SyncDeleteTables']) != 0)
                     {
                         $this->objSyncCtoDatabase->dropTable($this->arrSyncSettings['syncCto_SyncDeleteTables'], true);

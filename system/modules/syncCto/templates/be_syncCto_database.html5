@@ -26,10 +26,11 @@
         <input type="hidden" name="FORM_SUBMIT" value="<?php echo $this->formId; ?>" />        
         <input type="hidden" name="REQUEST_TOKEN" value="<?php echo REQUEST_TOKEN; ?>">
 
-       
-        
         <div class="submit_container">
             <input class="tl_submit" name="transfer" type="submit" value="<?php echo $GLOBALS['TL_LANG']['MSC']['apply']; ?>" />
+        </div>
+        <div class="submit_container">         
+            <input class="tl_submit" name="delete" type="submit" value="<?php echo $GLOBALS['TL_LANG']['MSC']['delete']; ?>" />
         </div>
         
         <div id="legend">
@@ -78,7 +79,9 @@
         <div class="bottom submit_container">
             <input class="tl_submit" name="transfer" type="submit" value="<?php echo $GLOBALS['TL_LANG']['MSC']['apply']; ?>" />
         </div>
-    
+        <div class="bottom submit_container">         
+            <input class="tl_submit" name="delete" type="submit" value="<?php echo $GLOBALS['TL_LANG']['MSC']['delete']; ?>" />
+        </div>    
     </div>
     
 </form>

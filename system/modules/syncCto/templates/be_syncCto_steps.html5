@@ -16,15 +16,12 @@
                 <img src="system/modules/syncCto/html/icons/steps/icon<?php echo $value["state"]; ?>.gif" alt="" />
                 <span><?php echo vsprintf($value["title"], array($i)) ?></span>
             </h1>
-            
             <p class="tl_help">
                 <?php echo $value["description"]; ?>
             </p>
-
             <?php if (strlen($value["msg"])) : ?>
                 <p class="tl_help"><?php echo $value["msg"]; ?></p>
             <?php endif; ?>
-
             <?php if (strlen($value["html"]) != 0) : ?>
                 <?php echo $value["html"]; ?>
             <?php endif; ?>
