@@ -191,6 +191,13 @@ class PopupSyncFiles extends Backend
                     break;
             }
         }
+        
+        // If no table is found skip the view
+        if(count($arrCompareList['recommended']) == 0 && count($arrCompareList['none_recommended']) == 0)
+        {
+            $this->mixStep = self::STEP_CLOSE_DB;
+            return;
+        }
 
         $this->Template                 = new BackendTemplate("be_syncCto_database");
         $this->Template->headline       = $GLOBALS['TL_LANG']['MSC']['comparelist'];
@@ -347,7 +354,7 @@ class PopupSyncFiles extends Backend
             $arrCompareList[$strType][$keySrcTables][$strSrcName]['name']    = $keySrcTables;
             $arrCompareList[$strType][$keySrcTables][$strSrcName]['tooltip'] = $this->getReadableSize($arrSourceTables[$keySrcTables]['size'])
                     . ', '
-                    . vsprintf((count($arrSourceTables[$keySrcTables]['count']) == 1) ? $GLOBALS['TL_LANG']['MSC']['entry'] : $GLOBALS['TL_LANG']['MSC']['entries'], array($arrSourceTables[$keySrcTables]['count']));
+                    . vsprintf(($arrSourceTables[$keySrcTables]['count'] == 1) ? $GLOBALS['TL_LANG']['MSC']['entry'] : $GLOBALS['TL_LANG']['MSC']['entries'], array($arrSourceTables[$keySrcTables]['count']));
 
             $arrCompareList[$strType][$keySrcTables][$strSrcName]['class'] = 'none';
 
@@ -365,7 +372,7 @@ class PopupSyncFiles extends Backend
             $arrCompareList[$strType][$keyDesTables][$strDesName]['name']    = $keyDesTables;
             $arrCompareList[$strType][$keySrcTables][$strSrcName]['tooltip'] = $this->getReadableSize($arrDesTables[$keyDesTables]['size'])
                     . ', '
-                    . vsprintf((count($arrDesTables[$keyDesTables]['count']) == 1) ? $GLOBALS['TL_LANG']['MSC']['entry'] : $GLOBALS['TL_LANG']['MSC']['entries'], array($arrDesTables[$keyDesTables]['count']));
+                    . vsprintf(($arrDesTables[$keyDesTables]['count'] == 1) ? $GLOBALS['TL_LANG']['MSC']['entry'] : $GLOBALS['TL_LANG']['MSC']['entries'], array($arrDesTables[$keyDesTables]['count']));
 
             $arrCompareList[$strType][$keyDesTables][$strDesName]['class'] = 'none';
 
@@ -384,20 +391,20 @@ class PopupSyncFiles extends Backend
             $arrCompareList[$strType][$keySrcTable][$strSrcName]['name']    = $keySrcTable;
             $arrCompareList[$strType][$keySrcTable][$strSrcName]['tooltip'] = $this->getReadableSize($valueSrcTable['size'])
                     . ', '
-                    . vsprintf((count($valueSrcTable['count']) == 1) ? $GLOBALS['TL_LANG']['MSC']['entry'] : $GLOBALS['TL_LANG']['MSC']['entries'], array($valueSrcTable['count']));
+                    . vsprintf(($valueSrcTable['count'] == 1) ? $GLOBALS['TL_LANG']['MSC']['entry'] : $GLOBALS['TL_LANG']['MSC']['entries'], array($valueSrcTable['count']));
 
             $valueClientTable = $arrDesTables[$keySrcTable];
 
             $arrCompareList[$strType][$keySrcTable][$strDesName]['name']    = $keySrcTable;
             $arrCompareList[$strType][$keySrcTable][$strDesName]['tooltip'] = $this->getReadableSize($valueClientTable['size'])
                     . ', '
-                    . vsprintf((count($valueClientTable['count']) == 1) ? $GLOBALS['TL_LANG']['MSC']['entry'] : $GLOBALS['TL_LANG']['MSC']['entries'], array($valueClientTable['count']));
+                    . vsprintf(($valueClientTable['count'] == 1) ? $GLOBALS['TL_LANG']['MSC']['entry'] : $GLOBALS['TL_LANG']['MSC']['entries'], array($valueClientTable['count']));
 
             $intDiff                                             = $this->getDiff($valueSrcTable, $valueClientTable);
             
             // Add 'entry' or 'entries' to diff
             $arrCompareList[$strType][$keySrcTable]['diffCount'] = $intDiff;
-            $arrCompareList[$strType][$keySrcTable]['diff']      = vsprintf((count($intDiff) == 1) ? $GLOBALS['TL_LANG']['MSC']['entry'] : $GLOBALS['TL_LANG']['MSC']['entries'], array($intDiff));
+            $arrCompareList[$strType][$keySrcTable]['diff']      = vsprintf(($intDiff == 1) ? $GLOBALS['TL_LANG']['MSC']['entry'] : $GLOBALS['TL_LANG']['MSC']['entries'], array($intDiff));
 
             // Check timestamps
             if (key_exists($keySrcTable, $arrSourceTS['current']) && key_exists($keySrcTable, $arrSourceTS['lastSync']))

@@ -26,12 +26,7 @@
         <input type="hidden" name="FORM_SUBMIT" value="<?php echo $this->formId; ?>" />        
         <input type="hidden" name="REQUEST_TOKEN" value="<?php echo REQUEST_TOKEN; ?>">
 
-        <?php if(count($this->arrCompareList) == 0): ?>   
-            <div><?php echo $GLOBALS['TL_LANG']['ERR']['missing_tables']; ?></div>  
-            <div class="submit_container">
-                <input class="tl_submit" name="transfer" type="submit" value="<?php echo $GLOBALS['TL_LANG']['MSC']['apply']; ?>" />
-            </div>
-        <?php else: ?>
+       
         
         <div class="submit_container">
             <input class="tl_submit" name="transfer" type="submit" value="<?php echo $GLOBALS['TL_LANG']['MSC']['apply']; ?>" />
@@ -83,8 +78,6 @@
         <div class="bottom submit_container">
             <input class="tl_submit" name="transfer" type="submit" value="<?php echo $GLOBALS['TL_LANG']['MSC']['apply']; ?>" />
         </div>
-        
-        <?php endif; ?>
     
     </div>
     
