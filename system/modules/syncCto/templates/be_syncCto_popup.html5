@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html lang="<?php echo $this->language; ?>">
+<head>
+<meta charset="<?php echo $this->charset; ?>">
+<title><?php echo $this->title; ?> - Contao Open Source CMS <?php echo VERSION; ?></title>
+<base href="<?php echo $this->base; ?>">
+<?php echo $this->stylesheets; ?>
+<?php echo $this->javascripts; ?>
+</head>
+<body class="__ua__">
+
+<div id="container">
+    <div id="main"> 
+        <?php echo $this->content; ?>
+    </div>
+</div>
+
+</body>
+</html>

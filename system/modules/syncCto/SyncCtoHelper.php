@@ -40,8 +40,6 @@ class SyncCtoHelper extends Backend
     protected static $instance = null;
     // Objects   
     protected $objSyncCtoDatabase;
-    // Vars
-    protected $arrDbColorLimits;
 
     /* -------------------------------------------------------------------------
      * Core
@@ -60,23 +58,6 @@ class SyncCtoHelper extends Backend
 
         // Language
         $this->loadLanguageFile("default");
-
-        // Load color limits for db
-        $this->arrDbColorLimits = array();
-        $arrEntriesCount = array();
-
-        if ($GLOBALS['TL_CONFIG']['syncCto_colored_db_view'] != "")
-        {
-            $this->arrDbColorLimits = deserialize($GLOBALS['TL_CONFIG']['syncCto_colored_db_view']);
-
-            if (is_array($this->arrDbColorLimits))
-            {
-                foreach ($this->arrDbColorLimits as $key => $value)
-                {
-                    $arrEntriesCount[$key] = $value['entries'];
-                }
-            }
-        }
     }
 
     /**
@@ -91,7 +72,7 @@ class SyncCtoHelper extends Backend
         }
 
         return self::$instance;
-    }
+    }   
 
     /* -------------------------------------------------------------------------
      * Config
@@ -108,17 +89,10 @@ class SyncCtoHelper extends Backend
     {
         if (is_array($arrLocalconfig) && is_array($arrSyncCtoConfig))
         {
-            foreach ($arrLocalconfig as $value)
-            {
-                if ($value == "" || in_array($value, $arrSyncCtoConfig))
-                {
-                    continue;
-                }
+            $arrLocalconfig   = array_filter($arrLocalconfig, 'strlen');
+            $arrSyncCtoConfig = array_filter($arrSyncCtoConfig, 'strlen');
 
-                $arrSyncCtoConfig[] = $value;
-            }
-
-            return $arrSyncCtoConfig;
+            return array_keys(array_flip(array_merge($arrLocalconfig, $arrSyncCtoConfig)));
         }
         else if (!is_array($arrLocalconfig) && is_array($arrSyncCtoConfig))
         {
@@ -208,6 +182,7 @@ class SyncCtoHelper extends Backend
     {
         $arrLocalconfig   = deserialize($GLOBALS['TL_CONFIG']['syncCto_folder_blacklist']);
         $arrSyncCtoConfig = $GLOBALS['SYC_CONFIG']['folder_blacklist'];
+        
         return $this->mergeConfigs($arrLocalconfig, $arrSyncCtoConfig);
     }
 
@@ -215,6 +190,7 @@ class SyncCtoHelper extends Backend
     {
         $arrLocalconfig   = deserialize($GLOBALS['TL_CONFIG']['syncCto_folder_whitelist']);
         $arrSyncCtoConfig = $GLOBALS['SYC_CONFIG']['folder_whitelist'];
+        
         return $this->mergeConfigs($arrLocalconfig, $arrSyncCtoConfig);
     }
 
@@ -222,6 +198,7 @@ class SyncCtoHelper extends Backend
     {
         $arrLocalconfig   = deserialize($GLOBALS['TL_CONFIG']['syncCto_file_blacklist']);
         $arrSyncCtoConfig = $GLOBALS['SYC_CONFIG']['file_blacklist'];
+        
         return $this->mergeConfigs($arrLocalconfig, $arrSyncCtoConfig);
     }
 
@@ -229,6 +206,7 @@ class SyncCtoHelper extends Backend
     {
         $arrLocalconfig   = deserialize($GLOBALS['TL_CONFIG']['syncCto_local_blacklist']);
         $arrSyncCtoConfig = $GLOBALS['SYC_CONFIG']['local_blacklist'];
+        
         return $this->mergeConfigs($arrLocalconfig, $arrSyncCtoConfig);
     }
 
@@ -236,6 +214,7 @@ class SyncCtoHelper extends Backend
     {
         $arrLocalconfig   = deserialize($GLOBALS['TL_CONFIG']['syncCto_hidden_tables']);
         $arrSyncCtoConfig = $GLOBALS['SYC_CONFIG']['table_hidden'];
+        
         return $this->mergeConfigs($arrLocalconfig, $arrSyncCtoConfig);
     }
 
@@ -364,7 +343,8 @@ class SyncCtoHelper extends Backend
 
             // required files
             $arrRequiredFiles = array(
-                'DC_Memory' => 'system/drivers/DC_Memory.php'
+                'DC_Memory' => 'system/drivers/DC_Memory.php',
+                'ZipArchiveCto' => 'system/libraries/ZipArchiveCto.php'
             );
 
             // check for required extensions
@@ -513,7 +493,7 @@ class SyncCtoHelper extends Backend
 
         return preg_replace("/^\//i", "", $strVar);
     }
-
+    
     /**
      * Returns a whole list of all tables in the database
      * 
@@ -558,10 +538,9 @@ class SyncCtoHelper extends Backend
     /**
      * Returns a list with recommended database tables
      *
-     * @param array $arrTimestampLast A timestamp list for checking timestamp
      * @return array
      */
-    public function databaseTablesRecommended($arrTimestampLast = null)
+    public function databaseTablesRecommended()
     {
         // Recommended tables
         $arrBlacklist = deserialize($GLOBALS['TL_CONFIG']['syncCto_database_tables']);
@@ -572,7 +551,7 @@ class SyncCtoHelper extends Backend
 
         $arrTablesPermission = $this->BackendUser->syncCto_tables;
 
-        $arrTables = array('tables_changes' => array(), 'tables_no_changes' => array());
+        $arrTables = array();
 
         foreach ($this->databaseTables() as $key => $value)
         {
@@ -586,36 +565,7 @@ class SyncCtoHelper extends Backend
                 continue;
             }
 
-            if ($arrTimestampLast != null && is_array($arrTimestampLast))
-            {                
-                if ($arrTimestampLast[$value] == $this->getDatabaseTablesTimestamp($value))
-                {
-                    $arrTables["tables_no_changes"][$value] = $this->getTableMeta($value, true);
-                }
-                else
-                {
-                    $arrTables["tables_changes"][$value] = $this->getTableMeta($value, false);
-                }
-            }
-            else
-            {
-                $arrTables[$value] = $this->getTableMeta($value);
-            }
-        }
-
-        if ($arrTimestampLast != null && is_array($arrTimestampLast))
-        {
-            if (count($arrTables["tables_changes"]) == 0 || count($arrTables["tables_no_changes"]) == 0)
-            {
-                if (count($arrTables["tables_no_changes"]) == 0)
-                {
-                    return $arrTables["tables_changes"];
-                }
-                else
-                {
-                    return $arrTables["tables_no_changes"];
-                }
-            }
+            $arrTables[$value] = $this->getTableMeta($value);
         }
 
         return $arrTables;
@@ -624,10 +574,9 @@ class SyncCtoHelper extends Backend
     /**
      * Returns a list with none recommended database tables
      *
-     * @param array $arrTimestampLast A timestamp list for checking timestamp
      * @return array
      */
-    public function databaseTablesNoneRecommended($arrTimestampLast = null)
+    public function databaseTablesNoneRecommended()
     {
         // None recommended tables
         $arrBlacklist = deserialize($GLOBALS['TL_CONFIG']['syncCto_database_tables']);
@@ -638,7 +587,7 @@ class SyncCtoHelper extends Backend
 
         $arrTablesPermission = $this->BackendUser->syncCto_tables;
 
-        $arrTables = array('tables_changes' => array(), 'tables_no_changes' => array());
+        $arrTables = array();
 
         foreach ($this->databaseTables() as $key => $value)
         {
@@ -652,36 +601,7 @@ class SyncCtoHelper extends Backend
                 continue;
             }
 
-            if ($arrTimestampLast != null && is_array($arrTimestampLast))
-            {
-                if ($arrTimestampLast[$value] == $this->getDatabaseTablesTimestamp($value))
-                {
-                    $arrTables["tables_no_changes"][$value] = $this->getTableMeta($value, true);
-                }
-                else
-                {
-                    $arrTables["tables_changes"][$value] = $this->getTableMeta($value, false);
-                }
-            }
-            else
-            {
-                $arrTables[$value] = $this->getTableMeta($value);
-            }
-        }
-
-        if ($arrTimestampLast != null && is_array($arrTimestampLast))
-        {
-            if (count($arrTables["tables_changes"]) == 0 || count($arrTables["tables_no_changes"]) == 0)
-            {
-                if (count($arrTables["tables_no_changes"]) == 0)
-                {
-                    return $arrTables["tables_changes"];
-                }
-                else
-                {
-                    return $arrTables["tables_no_changes"];
-                }
-            }
+            $arrTables[$value] = $this->getTableMeta($value);
         }
 
         return $arrTables;
@@ -736,61 +656,41 @@ class SyncCtoHelper extends Backend
      * @param boolean $booHashSame
      * @return string 
      */
-    private function getTableMeta($strTableName, $booHashSame = null)
+    private function getTableMeta($strTableName)
     {
-        $objCount        = $this->Database->prepare("SELECT COUNT(*) as Count FROM $strTableName")->execute();
-        $intEntriesCount = $objCount->Count;
-        $intEntriesSize  = $this->Database->getSizeOf($strTableName);
-
+        $objCount = $this->Database->prepare("SELECT COUNT(*) as Count FROM $strTableName")->executeUncached();
+        
+        $arrTableMeta = array(
+            'name' => $strTableName,
+            'count' => $objCount->Count,
+            'size' => $this->Database->getSizeOf($strTableName)
+        );
+        
+        return $arrTableMeta;
+    }
+    
+    /**
+     * Set styles for the given array recommended table data and return it as string
+     * 
+     * @param array $arrTableMeta
+     * @return string 
+     */
+    public function getStyledTableMeta($arrTableMeta)
+    {
+        $strTableName = $arrTableMeta['name'];
+        $intEntriesCount = $arrTableMeta['count'];
+        $intEntriesSize = $arrTableMeta['size'];
+        
         $strColor = '666966';
 
-        if ($GLOBALS['TL_CONFIG']['syncCto_custom_settings'])
-        {
-            $booBreakLoop = false;
-            foreach ($this->arrDbColorLimits AS $arrColorLimits)
-            {
-                switch ($arrColorLimits['unit'])
-                {
-                    case 'kb':
-                        if (($intEntriesSize / 1000) > $arrColorLimits['entries'])
-                        {
-                            $booBreakLoop = true;
-                        }
-                        break;
-
-                    case 'mb':
-                        if (($intEntriesSize / 1000 / 1000) > $arrColorLimits['entries'])
-                        {
-                            $booBreakLoop = true;
-                        }
-                        break;
-
-                    case 'entries':
-                        if ($intEntriesCount > $arrColorLimits['entries'])
-                        {
-                            $booBreakLoop = true;
-                        }
-                        break;
-                }
-
-                if ($booBreakLoop == true)
-                {
-                    if ($arrColorLimits != '')
-                    {
-                        $strColor  = $arrColorLimits['color'];
-                    }
-                    break;
-                }
-            }
-        }
         $strReturn = '<span style="color: #' . $strColor . '; padding-left: 3px;">';
         $strReturn .= $strTableName;
-        $strReturn .= '<span style="padding-left: 3px;">';
+        $strReturn .= '<span style="color:#a3a3a3;padding-left: 3px;">';
         $strReturn .= '(' . $this->getReadableSize($intEntriesSize) . ', ' . vsprintf($GLOBALS['TL_LANG']['MSC']['entries'], array($intEntriesCount)) . ')';
         $strReturn .= '</span>';
         $strReturn .= '</span>';
-        return $strReturn;
-    }
+        return $strReturn;        
+    }    
 
     /**
      * Return a list with all timestamps form tables
@@ -815,7 +715,7 @@ class SyncCtoHelper extends Backend
         // Load all Tables
         $arrTables = $this->Database->listTables();
         
-        $objDBSchema = $this->Database->prepare("SELECT TABLE_NAME, UPDATE_TIME FROM information_schema.TABLES WHERE TABLE_SCHEMA = ?")->execute($GLOBALS['TL_CONFIG']['dbDatabase']);
+        $objDBSchema = $this->Database->prepare("SELECT TABLE_NAME, UPDATE_TIME FROM information_schema.TABLES WHERE TABLE_SCHEMA = ?")->executeUncached($GLOBALS['TL_CONFIG']['dbDatabase']);
         
         $arrDBSchema = array();
         while($objDBSchema->next())
@@ -925,83 +825,56 @@ class SyncCtoHelper extends Backend
         }
         return false;
     }
-
-    /* -------------------------------------------------------------------------
-     * Remote Calls
-     */
-
+    
     /**
-     * Returns a list with recommended database tables
+     * Check if the post of the submited form is empty and set error or unset error 
      * 
-     * @return array 
+     * @param array $arrCheckSubmit 
      */
-    public function getRecommendedDatabaseTablesClient()
-    {
-        // Build communication class
-        $objSyncCtoCommunicationClient = SyncCtoCommunicationClient::getInstance();
-        $objSyncCtoCommunicationClient->setClientBy($this->Input->get("id"));
-
-        try
+    public function checkSubmit($arrCheckSubmit)
+    {   
+        $arrPostUnset = array('FORM_SUBMIT', 'FORM_FIELDS', 'REQUEST_TOKEN');
+        
+        if(is_array($arrCheckSubmit['postUnset']))
         {
-            // Start connection
-            $objSyncCtoCommunicationClient->startConnection();
-            // Get Tables
-            $arrTablesClient = $objSyncCtoCommunicationClient->getRecommendedTables();
-
-            // Stop connection
-            $objSyncCtoCommunicationClient->stopConnection();
-
-            // Check if we have a array 
-            if (!is_array($arrTablesClient))
-            {
-                $arrTablesClient = array();
-            }
-
-            return $arrTablesClient;
+            $arrPostUnset = array_merge($arrPostUnset, $arrCheckSubmit['postUnset']);
         }
-        catch (Exception $exc)
+        
+        $arrPost = $_POST;
+        
+        foreach($arrPostUnset AS $value)
         {
-            $_SESSION["TL_ERROR"][] = $exc->getMessage();
-            return array();
+            if(array_key_exists($value, $arrPost))
+            {
+                unset($arrPost[$value]);
+            }
+        }
+        
+        if(count($arrPost) > 0)
+        {
+            if(is_array($_SESSION["TL_ERROR"]))
+            {
+                if (array_key_exists($arrCheckSubmit['error']['key'], $_SESSION["TL_ERROR"]))
+                {
+                    unset($_SESSION["TL_ERROR"][$arrCheckSubmit['error']['key']]);
+                }
+            }
+            $this->redirect($arrCheckSubmit['redirectUrl']);
+        }
+        else
+        {
+            if(!is_array($_SESSION["TL_ERROR"]))
+            {
+                $_SESSION["TL_ERROR"] = array();
+            }
+            
+            if(!array_key_exists($arrCheckSubmit['error']['key'], $_SESSION["TL_ERROR"]))
+            {
+                $_SESSION["TL_ERROR"][$arrCheckSubmit['error']['key']] = $arrCheckSubmit['error']['message'];
+            }
         }
     }
-
-    /**
-     * Returns a list with none recommended database tables
-     * 
-     * @return array 
-     */
-    public function getNoneRecommendedDatabaseTablesClient()
-    {
-        // Build communication class
-        $objSyncCtoCommunicationClient = SyncCtoCommunicationClient::getInstance();
-        $objSyncCtoCommunicationClient->setClientBy($this->Input->get("id"));
-
-        try
-        {
-            // Start connection
-            $objSyncCtoCommunicationClient->startConnection();
-            // Get Tables
-            $arrTablesClient = $objSyncCtoCommunicationClient->getNoneRecommendedTables();
-
-            // Stop connection
-            $objSyncCtoCommunicationClient->stopConnection();
-
-            // Check if we have a array 
-            if (!is_array($arrTablesClient))
-            {
-                $arrTablesClient = array();
-            }
-
-            return $arrTablesClient;
-        }
-        catch (Exception $exc)
-        {
-            $_SESSION["TL_ERROR"][] = $exc->getMessage();
-            return array();
-        }
-    }
-
+    
 }
 
 ?>

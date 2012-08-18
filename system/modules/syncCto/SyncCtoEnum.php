@@ -84,14 +84,22 @@ class SyncCtoEnum
      * Page State
      */
     
-    const WORK_OK      = 1;
-    const WORK_ERROR   = 2;
-    const WORK_WORK    = 3;
-    const WORK_SKIPPED = 4;
+    const WORK_OK      = 'Ok';
+    const WORK_ERROR   = 'Error';
+    const WORK_WORK    = 'Work';
+    const WORK_SKIPPED = 'Skipped';
 
     /**
      * Pre installed Codifyengines
      */
     
     const CODIFY_EMPTY = "empty";
+
+    /**
+     * Fileinformation size
+     */
+    
+    const FILEINFORMATION_SMALL = 1;
+    const FILEINFORMATION_BIG   = 2;
+
 }

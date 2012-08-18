@@ -30,7 +30,6 @@
 /**
  * Reference
  */
-// Sync
 $GLOBALS['TL_LANG']['SYC']['core']                          = 'Contao-Installation';
 $GLOBALS['TL_LANG']['SYC']['core_change']                   = 'Veränderte Dateien';
 $GLOBALS['TL_LANG']['SYC']['core_delete']                   = 'Gelöschte Dateien';
@@ -40,65 +39,58 @@ $GLOBALS['TL_LANG']['SYC']['user_delete']                   = 'Gelöschte Dateie
 $GLOBALS['TL_LANG']['SYC']['configfiles']                   = 'Konfigurationsdateien';
 $GLOBALS['TL_LANG']['SYC']['localconfig_update']            = 'Alle Einträge aktualisieren';
 $GLOBALS['TL_LANG']['SYC']['localconfig_errors']            = 'Fehlermeldungen anzeigen';
-// Maintenance options  
-$GLOBALS['TL_LANG']['SYC']['options']                       = 'Optionen';    
-$GLOBALS['TL_LANG']['SYC']['search_index']                  = 'Suchindex neu aufbauen';    
-$GLOBALS['TL_LANG']['SYC']['temp_tables']                   = 'Temporäre DB-Tabellen leeren';    
-$GLOBALS['TL_LANG']['SYC']['temp_folders']                  = 'Temporäre Ordner leeren';    
-$GLOBALS['TL_LANG']['SYC']['css_create']                    = 'CSS-Dateien neu erstellen';    
-$GLOBALS['TL_LANG']['SYC']['xml_create']                    = 'XML-Dateien neu erstellen';    
-// Tables   
-$GLOBALS['TL_LANG']['SYC']['tables_no_changes']             = 'Keine Änderungen vorhanden';    
-$GLOBALS['TL_LANG']['SYC']['tables_changes']                = 'Geänderte Tabellen';     
-
+$GLOBALS['TL_LANG']['SYC']['temp_tables']                   = 'Temporäre DB-Tabellen';
+$GLOBALS['TL_LANG']['SYC']['temp_folders']                  = 'Temporäre Ordner';
+$GLOBALS['TL_LANG']['SYC']['css_create']                    = 'CSS-Dateien';
+$GLOBALS['TL_LANG']['SYC']['xml_create']                    = 'XML-Dateien';
+  
 /**
  * Back end modules
  */
 $GLOBALS['TL_LANG']['MSC']['edit']                          = 'Bearbeiten';
 $GLOBALS['TL_LANG']['MSC']['copy']                          = 'Duplizieren';
+$GLOBALS['TL_LANG']['MSC']['showExtern']                    = 'Client Systemcheck';
+$GLOBALS['TL_LANG']['MSC']['sync']                          = 'Synchronisieren';
 $GLOBALS['TL_LANG']['MSC']['syncTo']                        = 'Client synchronisieren';
 $GLOBALS['TL_LANG']['MSC']['syncFrom']                      = 'Server synchronisieren';
-
-$GLOBALS['TL_LANG']['MSC']['restore_backup']                = 'Backup einspielen';
-$GLOBALS['TL_LANG']['MSC']['start_backup']                  = 'Backup starten';
 
 /**
  * Text
  */
-$GLOBALS['TL_LANG']['MSC']['ok']                            = 'OK';
-$GLOBALS['TL_LANG']['MSC']['progress']                      = 'In Bearbeitung';
-$GLOBALS['TL_LANG']['MSC']['error']                         = 'Fehler';
-$GLOBALS['TL_LANG']['MSC']['skipped']                       = 'Übersprungen';
+$GLOBALS['TL_LANG']['MSC']['skip']                          = 'Überspringen';
+$GLOBALS['TL_LANG']['MSC']['popup']                         = 'Vergleichsliste öffnen';
 $GLOBALS['TL_LANG']['MSC']['unknown_step']                  = 'Unbekannter Schritt';
+$GLOBALS['TL_LANG']['MSC']['last_sync']                     = 'Die letzte Synchronisierung wurde um %s am %s von %s (%s) durchgeführt.';
+$GLOBALS['TL_LANG']['MSC']['disabled_cache']                = 'Aktuelle Einträge in der "initconfig.php" beeinträchtigen eine erfolgreiche Synchronisierung.';
 
 /**
  * Headline
  */
 $GLOBALS['TL_LANG']['MSC']['step']                          = 'Schritt';
+$GLOBALS['TL_LANG']['MSC']['substep']                       = 'Zwischenschritt';
 $GLOBALS['TL_LANG']['MSC']['abort']                         = 'Abbruch!';
 $GLOBALS['TL_LANG']['MSC']['complete']                      = 'Fertig!';
+$GLOBALS['TL_LANG']['MSC']['comparelist']                   = 'Vergleichsliste';
 $GLOBALS['TL_LANG']['MSC']['debug_mode']                    = 'Debugausgaben';
 
 /**
- * Filelist
+ * Compare list
  */
-$GLOBALS['TL_LANG']['MSC']['select_all_files']              = 'Alle Dateien auswählen';
-$GLOBALS['TL_LANG']['MSC']['sync_info']                     = 'Bitte schließen Sie während der gesamten Synchronisation nicht das aktuelle Fenster.';
 $GLOBALS['TL_LANG']['MSC']['state']                         = 'Status';
-$GLOBALS['TL_LANG']['MSC']['filesize']                      = 'Dateigröße';
-$GLOBALS['TL_LANG']['MSC']['file']                          = 'Datei';
+$GLOBALS['TL_LANG']['MSC']['file']                          = 'Datei';               
 $GLOBALS['TL_LANG']['MSC']['totalsize']                     = 'Größe aller Dateien:';
-$GLOBALS['TL_LANG']['MSC']['new_file']                      = 'Neu';
-$GLOBALS['TL_LANG']['MSC']['modified_file']                 = 'Verändert';
-$GLOBALS['TL_LANG']['MSC']['unknown_file']                  = 'Unbekannt';
-$GLOBALS['TL_LANG']['MSC']['deleted_file']                  = 'Gelöscht';
-$GLOBALS['TL_LANG']['MSC']['big_files']                     = 'Groß';
-$GLOBALS['TL_LANG']['MSC']['skipped_files']                 = 'Übersprungen';
-$GLOBALS['TL_LANG']['MSC']['ignored_files']                 = 'Ignoriert';
-$GLOBALS['TL_LANG']['MSC']['submit_files']                  = 'Dateien transferieren';
-$GLOBALS['TL_LANG']['MSC']['delete_files']                  = 'Ausgewählte Dateien aus der Liste entfernen';
-$GLOBALS['TL_LANG']['MSC']['last_sync']                     = 'Die letzte Synchronisierung wurde um %s am %s von %s (%s) durchgeführt.';
-$GLOBALS['TL_LANG']['MSC']['disabled_cache']                = 'Aktuelle Einträge in der "initconfig.php" beeinträchtigen eine erfolgreiche Synchronisierung.';
+$GLOBALS['TL_LANG']['MSC']['skipped']                       = 'Übersprungen';
+$GLOBALS['TL_LANG']['MSC']['ignored']                       = 'Ignoriert';
+$GLOBALS['TL_LANG']['MSC']['client']                        = 'Client';
+$GLOBALS['TL_LANG']['MSC']['server']                        = 'Server';
+$GLOBALS['TL_LANG']['MSC']['difference']                    = 'Differenz';
+$GLOBALS['TL_LANG']['MSC']['recom_tables']                  = 'Empfohlene Datenbank-Tabellen';
+$GLOBALS['TL_LANG']['MSC']['nonrecom_tables']               = 'Nicht empfohlene Datenbank-Tabellen';
+$GLOBALS['TL_LANG']['MSC']['normal_files']                  = 'Normale Dateien';
+$GLOBALS['TL_LANG']['MSC']['big_files']                     = 'Große Dateien';
+$GLOBALS['TL_LANG']['MSC']['changed']                       = 'Geändert';
+$GLOBALS['TL_LANG']['MSC']['unchanged']                     = 'Nicht geändert';
+$GLOBALS['TL_LANG']['MSC']['both_changed']                  = 'Beide geändert';
 
 /**
  * Buttons
@@ -118,34 +110,25 @@ $GLOBALS['TL_LANG']['MSC']['memory_limit']                  = 'Auslastung: %s';
 $GLOBALS['TL_LANG']['ERR']['missing_file_selection']        = 'Es wurde(n) keine Datei(en) ausgewählt.';
 $GLOBALS['TL_LANG']['ERR']['missing_file_information']      = 'Es fehlt entweder eine Datei oder die Information zu einer Datei.';
 $GLOBALS['TL_LANG']['ERR']['unknown_file']                  = 'Die Datei %s konnte nicht gefunden werden.';
-$GLOBALS['TL_LANG']['ERR']['unknown_file_in_zip']           = 'Die Datei %s konnte nicht in der ZIP Datei gefunden werden.';
 $GLOBALS['TL_LANG']['ERR']['unknown_path']                  = 'Unbekannter Pfad.';
 $GLOBALS['TL_LANG']['ERR']['cant_open']                     = 'Datei %s kann nicht geöffnet werden.';
 $GLOBALS['TL_LANG']['ERR']['checksum_error']                = 'Fehler in den Prüfsummen.';
-$GLOBALS['TL_LANG']['ERR']['cant_move_file']                = 'Fehler beim verschieben der Datei %s nach %s.';
-$GLOBALS['TL_LANG']['ERR']['cant_delete_file']              = 'Fehler beim löschen der Datei.';
+$GLOBALS['TL_LANG']['ERR']['cant_move_file']                = 'Fehler beim Verschieben der Datei %s nach %s.';
+$GLOBALS['TL_LANG']['ERR']['cant_delete_file']              = 'Fehler beim Löschen der Datei.';
 $GLOBALS['TL_LANG']['ERR']['attention_headline']            = 'Achtung bei Änderungen am System';
 $GLOBALS['TL_LANG']['ERR']['attention_text']                = 'Es werden zurzeit Aktualisierungen im Hintergrund durchgeführt, die dazu führen könnten das Änderungen auf dieser Installation überschrieben werden.';
 $GLOBALS['TL_LANG']['ERR']['min_size_limit']                = 'Die minimale Dateigröße von s% wurde unterschritten.';
-
-// Database
-$GLOBALS['TL_LANG']['ERR']['missing_tables_selection']      = 'Es wurde(n) keine Tabell(en) ausgewählt.';
-
-// Functions
-$GLOBALS['TL_LANG']['ERR']['unknown_backup_method']         = 'Die gewählte Backup Methode ist nicht bekannt.';
+$GLOBALS['TL_LANG']['ERR']['cant_extract_file']             = 'Fehler beim Entpacken der Dateien.';
+$GLOBALS['TL_LANG']['ERR']['missing_tables']                = 'Es wurde(n) keine Tabell(en) gefunden.';
 $GLOBALS['TL_LANG']['ERR']['unknown_function']              = 'Unbekannte Funktion oder Methode.';
-$GLOBALS['TL_LANG']['ERR']['64Bit_error']                   = 'Zahlen überlauf. Versuchen Sie bitte einen 64Bit Version von PHP.';
-
-// Client
+$GLOBALS['TL_LANG']['ERR']['64Bit_error']                   = 'Zahlenüberlauf. Versuchen Sie bitte einen 64Bit Version von PHP.';
 $GLOBALS['TL_LANG']['ERR']['maximum_filesize']              = 'Zu große Datei(en):';
 $GLOBALS['TL_LANG']['ERR']['call_directly']                 = 'Versuchen Sie nicht die Synchronisation direkt aufzurufen.';
 $GLOBALS['TL_LANG']['ERR']['client_set']                    = 'Kommunikation zwischen Server und Client fehlgeschlagen';
 $GLOBALS['TL_LANG']['ERR']['unknown_client']                = 'Unbekannter Client.';
-
 $GLOBALS['TL_LANG']['ERR']['referer']                       = 'Konnte die Referer-Überprüfung des Clients nicht deaktivieren.';
 $GLOBALS['TL_LANG']['ERR']['version']                       = 'Versionskonflikt in %s. <br />Server: %s <br />Client: %s';
 $GLOBALS['TL_LANG']['ERR']['upload_ini']                    = 'Upload nicht erfolgreich. Funktion ist in der php.ini deaktiviert.';
 $GLOBALS['TL_LANG']['ERR']['rebuild']                       = 'Fehler beim Zusammenbau der Datei(en). Pfad: %s';
-$GLOBALS['TL_LANG']['ERR']['send']                          = 'Fehler beim Versand der Datei(en).';
 
 ?>

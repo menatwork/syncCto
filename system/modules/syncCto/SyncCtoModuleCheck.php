@@ -55,7 +55,7 @@ class SyncCtoModuleCheck extends BackendModule
     protected $safeModeHack      = false;
     protected $isWindows         = false;
     protected $folderPermissions = array();
-    protected $filePermissions   = array();
+    protected $filePermissions = array();
 
     /**
      * Constructor
@@ -73,8 +73,52 @@ class SyncCtoModuleCheck extends BackendModule
         $this->import('BackendUser', 'User');
         $this->Template->script = $this->Environment->script;
 
-        $this->Template->checkPhpConfiguration = $this->checkPhpConfiguration();
-        $this->Template->checkPhpFunctions = $this->checkPhpFunctions();
+        $this->Template->checkPhpConfiguration = $this->checkPhpConfiguration($this->getPhpConfigurations());
+        $this->Template->checkPhpFunctions     = $this->checkPhpFunctions($this->getPhpFunctions());
+        $this->Template->syc_version = $GLOBALS['SYC_VERSION'];
+    }
+
+    /**
+     * Get a list with informations about some php vars
+     * 
+     * @return array
+     */
+    public function getPhpConfigurations()
+    {
+        return array(
+            'safe_mode'              => ini_get('safe_mode'),
+            'max_execution_time'     => ini_get('max_execution_time'),
+            'memory_limit'           => $this->getSize(ini_get('memory_limit')),
+            'register_globals'       => ini_get('register_globals'),
+            'file_uploads'           => ini_get('file_uploads'),
+            'upload_max_filesize'    => $this->getSize(ini_get('upload_max_filesize')),
+            'post_max_size'          => $this->getSize(ini_get('post_max_size')),
+            'max_input_time'         => ini_get('max_input_time'),
+            'default_socket_timeout' => ini_get('default_socket_timeout'),
+            'suhosin'                => ini_get('suhosin.session.max_id_length')
+        );
+    }
+
+    /**
+     * Get a list with informations about the required functions
+     * 
+     * @return array
+     */
+    public function getPhpFunctions()
+    {
+        return array(
+            'fsockopen'   => function_exists("fsockopen"),
+            'zip_archive' => @class_exists('ZipArchive'),
+            'gmp'         => extension_loaded('gmp'),
+            'bcmath'      => extension_loaded('bcmath'),
+            'xmlwriter'   => @class_exists('XMLWriter'),
+            'xmlreader'   => @class_exists('XMLReader')
+        );
+    }
+
+    private function getSize($strValue)
+    {
+        return (int) str_replace(array("M", "G"), array("000000", "000000000"), $strValue);
     }
 
     /**
@@ -92,7 +136,7 @@ class SyncCtoModuleCheck extends BackendModule
      * 
      * @return string
      */
-    public function checkPhpConfiguration()
+    public function checkPhpConfiguration($arrConfigurations)
     {
         $return = '<table width="100%" cellspacing="0" cellpadding="0" class="extensions" summary="">';
         $return .= '<colgroup>';
@@ -109,7 +153,7 @@ class SyncCtoModuleCheck extends BackendModule
         $return .= '</tr>';
 
         // Safe mode
-        $safe_mode = ini_get('safe_mode');
+        $safe_mode = $arrConfigurations['safe_mode'];
         $ok        = ($safe_mode == '' || $safe_mode == 0 || $safe_mode == 'Off');
         $return .= '<tr class="' . ($ok ? 'ok' : 'warning') . '">';
         $return .= '<td>' . $GLOBALS['TL_LANG']['tl_syncCto_check']['safemode'][0] . '</td>';
@@ -124,7 +168,7 @@ class SyncCtoModuleCheck extends BackendModule
         }
 
         // Maximum execution time
-        $max_execution_time = ini_get('max_execution_time');
+        $max_execution_time = $arrConfigurations['max_execution_time'];
         $ok                 = ($max_execution_time >= 30 || $max_execution_time == 0);
         $return .= '<tr class="' . ($ok ? 'ok' : 'warning') . '">';
         $return .= '<td>' . $GLOBALS['TL_LANG']['tl_syncCto_check']['met'][0] . '</td>';
@@ -134,7 +178,7 @@ class SyncCtoModuleCheck extends BackendModule
         $return .= '</tr>';
 
         // Memory limit
-        $memory_limit = $this->getSize(ini_get('memory_limit'));
+        $memory_limit = $arrConfigurations['memory_limit'];
         $ok           = (intval($memory_limit) >= 128000000);
         $return .= '<tr class="' . ($ok ? 'ok' : 'warning') . '">';
         $return .= '<td>' . $GLOBALS['TL_LANG']['tl_syncCto_check']['memory_limit'][0] . '</td>';
@@ -144,7 +188,7 @@ class SyncCtoModuleCheck extends BackendModule
         $return .= '</tr>';
 
         // Register globals
-        $register_globals = ini_get('register_globals');
+        $register_globals = $arrConfigurations['register_globals'];
         $ok               = ($register_globals == '' || $register_globals == 0 || $register_globals == 'Off');
         $return .= '<tr class="' . ($ok ? 'ok' : 'warning') . '">';
         $return .= '<td>' . $GLOBALS['TL_LANG']['tl_syncCto_check']['register_globals'][0] . '</td>';
@@ -154,7 +198,7 @@ class SyncCtoModuleCheck extends BackendModule
         $return .= '</tr>';
 
         // File uploads
-        $file_uploads = ini_get('file_uploads');
+        $file_uploads = $arrConfigurations['file_uploads'];
         $ok           = ($file_uploads == 1 || $file_uploads == 'On');
         $return .= '<tr class="' . ($ok ? 'ok' : 'warning') . '">';
         $return .= '<td>' . $GLOBALS['TL_LANG']['tl_syncCto_check']['file_uploads'][0] . '</td>';
@@ -164,7 +208,7 @@ class SyncCtoModuleCheck extends BackendModule
         $return .= '</tr>';
 
         // Upload maximum filesize
-        $upload_max_filesize = $this->getSize(ini_get('upload_max_filesize'));
+        $upload_max_filesize = $arrConfigurations['upload_max_filesize'];
         $ok                  = (intval($upload_max_filesize) >= 8000000);
         $return .= '<tr class="' . ($ok ? 'ok' : 'warning') . '">';
         $return .= '<td>' . $GLOBALS['TL_LANG']['tl_syncCto_check']['umf'][0] . '</td>';
@@ -174,7 +218,7 @@ class SyncCtoModuleCheck extends BackendModule
         $return .= '</tr>';
 
         // Post maximum size
-        $post_max_size = $this->getSize(ini_get('post_max_size'));
+        $post_max_size = $arrConfigurations['post_max_size'];
         $ok            = (intval($post_max_size) >= 8000000);
         $return .= '<tr class="' . ($ok ? 'ok' : 'warning') . '">';
         $return .= '<td>' . $GLOBALS['TL_LANG']['tl_syncCto_check']['pms'][0] . '</td>';
@@ -184,7 +228,7 @@ class SyncCtoModuleCheck extends BackendModule
         $return .= '</tr>';
 
         // Maximum input time
-        $max_input_time = ini_get('max_input_time');
+        $max_input_time = $arrConfigurations['max_input_time'];
         $ok             = ($max_input_time == '-1' || (intval($max_input_time) >= 60));
         $return .= '<tr class="' . ($ok ? 'ok' : 'warning') . '">';
         $return .= '<td>' . $GLOBALS['TL_LANG']['tl_syncCto_check']['mit'][0] . '</td>';
@@ -194,7 +238,7 @@ class SyncCtoModuleCheck extends BackendModule
         $return .= '</tr>';
 
         // Default socket timeout
-        $default_socket_timeout = ini_get('default_socket_timeout');
+        $default_socket_timeout = $arrConfigurations['default_socket_timeout'];
         $ok                     = (intval($default_socket_timeout) >= 32);
         $return .= '<tr class="' . ($ok ? 'ok' : 'warning') . '">';
         $return .= '<td>' . $GLOBALS['TL_LANG']['tl_syncCto_check']['dst'][0] . '</td>';
@@ -203,18 +247,8 @@ class SyncCtoModuleCheck extends BackendModule
         $return .= '<td>' . $GLOBALS['TL_LANG']['tl_syncCto_check']['dst'][1] . '</td>';
         $return .= '</tr>';
 
-        // url_fopen
-        $allow_url_fopen = ini_get('allow_url_fopen');
-        $ok              = ($allow_url_fopen == 1 || $allow_url_fopen == 'On');
-        $return .= '<tr class="' . ($ok ? 'ok' : 'warning') . '">';
-        $return .= '<td>' . $GLOBALS['TL_LANG']['tl_syncCto_check']['fopen'][0] . '</td>';
-        $return .= '<td class="dot">' . ($ok ? '&nbsp;' : '&#149;') . '</td>';
-        $return .= '<td class="value">' . ($allow_url_fopen ? $GLOBALS['TL_LANG']['tl_syncCto_check']['on'] : $GLOBALS['TL_LANG']['tl_syncCto_check']['off']) . '</td>';
-        $return .= '<td>' . $GLOBALS['TL_LANG']['tl_syncCto_check']['fopen'][1] . '</td>';
-        $return .= '</tr>';
-
         // suhosin
-        $suhosin = ini_get('suhosin.session.max_id_length');
+        $suhosin = $arrConfigurations['$suhosin'];
         $ok      = ($suhosin == false);
         $return .= '<tr class="' . ($ok ? 'ok' : 'warning') . '">';
         $return .= '<td>' . $GLOBALS['TL_LANG']['tl_syncCto_check']['suhosin'][0] . '</td>';
@@ -227,13 +261,13 @@ class SyncCtoModuleCheck extends BackendModule
 
         return $return;
     }
-    
+
     /**
      * Check all PHP function/class and return the result as string
      * 
      * @return string
      */
-    public function checkPhpFunctions()
+    public function checkPhpFunctions($arrFunctions)
     {        
         $return = '<table width="100%" cellspacing="0" cellpadding="0" class="extensions" summary="">';
         $return .= '<colgroup>';
@@ -250,7 +284,7 @@ class SyncCtoModuleCheck extends BackendModule
         $return .= '</tr>';
 
         // fsockopen
-        $fsockopen = function_exists("fsockopen");
+        $fsockopen = $arrFunctions['fsockopen'];
         $ok        = ($fsockopen == true);
         $return .= '<tr class="' . ($ok ? 'ok' : 'warning') . '">';
         $return .= '<td>' . $GLOBALS['TL_LANG']['tl_syncCto_check']['fsocket'][0] . '</td>';
@@ -260,7 +294,7 @@ class SyncCtoModuleCheck extends BackendModule
         $return .= '</tr>';
 
         // ZipArchive
-        $zip_archive = @class_exists('ZipArchive');
+        $zip_archive = $arrFunctions['zip_archive'];
         $ok          = ($zip_archive == true);
         $return .= '<tr class="' . ($ok ? 'ok' : 'warning') . '">';
         $return .= '<td>' . $GLOBALS['TL_LANG']['tl_syncCto_check']['zip_archive'][0] . '</td>';
@@ -270,7 +304,7 @@ class SyncCtoModuleCheck extends BackendModule
         $return .= '</tr>';
 
         // bcmath
-        $bcmath = function_exists('bcadd');
+        $bcmath = $arrFunctions['bcmath'];
         $ok     = ($bcmath == true);
         $return .= '<tr class="' . ($ok ? 'ok' : 'warning') . '">';
         $return .= '<td>' . $GLOBALS['TL_LANG']['tl_syncCto_check']['bcmath'][0] . '</td>';
@@ -279,8 +313,18 @@ class SyncCtoModuleCheck extends BackendModule
         $return .= '<td>' . $GLOBALS['TL_LANG']['tl_syncCto_check']['bcmath'][1] . '</td>';
         $return .= '</tr>';
 
+        // gmp
+        $gmp = $arrFunctions['gmp'];
+        $ok     = ($gmp == true);
+        $return .= '<tr class="' . ($ok ? 'ok' : 'warning') . '">';
+        $return .= '<td>' . $GLOBALS['TL_LANG']['tl_syncCto_check']['gmp'][0] . '</td>';
+        $return .= '<td class="dot">' . ($ok ? '&nbsp;' : '&#149;') . '</td>';
+        $return .= '<td class="value">' . ($gmp ? $GLOBALS['TL_LANG']['tl_syncCto_check']['on'] : $GLOBALS['TL_LANG']['tl_syncCto_check']['off']) . '</td>';
+        $return .= '<td>' . $GLOBALS['TL_LANG']['tl_syncCto_check']['gmp'][1] . '</td>';
+        $return .= '</tr>';
+
         // XMLWriter
-        $xmlwriter = @class_exists('XMLWriter');
+        $xmlwriter = $arrFunctions['xmlwriter'];
         $ok        = ($xmlwriter == true);
         $return .= '<tr class="' . ($ok ? 'ok' : 'warning') . '">';
         $return .= '<td>' . $GLOBALS['TL_LANG']['tl_syncCto_check']['xmlwriter'][0] . '</td>';
@@ -290,7 +334,7 @@ class SyncCtoModuleCheck extends BackendModule
         $return .= '</tr>';
 
         // XMLReader
-        $xmlreader = @class_exists('XMLReader');
+        $xmlreader = $arrFunctions['xmlreader'];
         $ok        = ($xmlreader == true);
         $return .= '<tr class="' . ($ok ? 'ok' : 'warning') . '">';
         $return .= '<td>' . $GLOBALS['TL_LANG']['tl_syncCto_check']['xmlreader'][0] . '</td>';
@@ -302,11 +346,6 @@ class SyncCtoModuleCheck extends BackendModule
         $return .= '</table>';
 
         return $return;
-    }
-
-    private function getSize($strValue)
-    {
-        return (int) str_replace(array("M", "G"), array("000000", "000000000"), $strValue);
     }
 
 }

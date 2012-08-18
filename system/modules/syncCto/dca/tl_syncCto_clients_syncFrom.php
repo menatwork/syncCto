@@ -41,8 +41,8 @@ $GLOBALS['TL_DCA']['tl_syncCto_clients_syncFrom'] = array(
     ),
     // Palettes
     'palettes' => array(
-        '__selector__' => array('database_check', 'systemoperations_check'),
-        'default' => '{sync_legend},lastSync,disabledCache,sync_options;{table_legend},database_check;{systemoperations_legend},systemoperations_check,attentionFlag;',
+        '__selector__' => array('systemoperations_check'),
+        'default' => '{sync_legend},lastSync,disabledCache,sync_options;{table_legend},database_check;{systemoperations_legend:hide},systemoperations_check,attentionFlag;',
     ),
     // Sub Palettes
     'subpalettes' => array(
@@ -140,10 +140,8 @@ $GLOBALS['TL_DCA']['tl_syncCto_clients_syncFrom'] = array(
 class tl_syncCto_clients_syncFrom extends Backend
 {
 
-    /**
-     *
-     * @var SyncCtoCommunicationClient 
-     */
+    // Helper Classes
+    protected $objSyncCtoHelper;
     protected $objSyncCtoCommunicationClient = null;
 
     /**
@@ -152,6 +150,7 @@ class tl_syncCto_clients_syncFrom extends Backend
     public function __construct()
     {
         $this->BackendUser = BackendUser::getInstance();
+        $this->objSyncCtoHelper = SyncCtoHelper::getInstance();
 
         parent::__construct();
     }
@@ -208,7 +207,7 @@ class tl_syncCto_clients_syncFrom extends Backend
             'formkey' => 'start_sync',
             'class' => '',
             'accesskey' => 'g',
-            'value' => specialchars($GLOBALS['TL_LANG']['MSC']['syncFrom']),
+            'value' => specialchars($GLOBALS['TL_LANG']['MSC']['sync']),
             'button_callback' => array('tl_syncCto_clients_syncFrom', 'onsubmit_callback')
         );
 
@@ -395,7 +394,14 @@ class tl_syncCto_clients_syncFrom extends Backend
 
         $this->Session->set("syncCto_SyncSettings_" . $dc->id, $arrSyncSettings);
 
-        $this->redirect($this->Environment->base . "contao/main.php?do=synccto_clients&amp;table=tl_syncCto_clients_syncFrom&amp;act=start&amp;step=0&amp;id=" . $this->Input->get("id"));
+        $this->objSyncCtoHelper->checkSubmit(array(
+            'postUnset' => array('start_sync'),
+            'error' => array(
+                'key' => 'syncCto_submit_false',
+                'message' => $GLOBALS['TL_LANG']['ERR']['missing_tables']
+            ),
+            'redirectUrl' => $this->Environment->base . "contao/main.php?do=synccto_clients&amp;table=tl_syncCto_clients_syncFrom&amp;act=start&amp;step=0&amp;id=" . $this->Input->get("id")
+        ));        
     }
 
     public function checkPermission()

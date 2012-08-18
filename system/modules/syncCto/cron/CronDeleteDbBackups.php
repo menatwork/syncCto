@@ -69,7 +69,7 @@ class CronDeleteDbBackups extends Backend
 /**
  * Instantiate log purger
  */
-$objDeleteDatabaseBackups = new SyncCtoDeleteDbBackups();
+$objDeleteDatabaseBackups = new CronDeleteDbBackups();
 $objDeleteDatabaseBackups->run();
 
 ?>

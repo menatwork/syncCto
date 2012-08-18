@@ -1,0 +1,95 @@
+<h1 class="file"><strong><?php echo $this->headline; ?></strong></h1>
+
+<div id="tl_listing" class="tl_listing_container">
+<?php if($this->close || $this->error): ?>
+    <?php if($this->close): ?>
+    <img src="system/modules/syncCto/html/icons/steps/iconWork.gif" alt="" />
+    <script>    
+        window.addEvent("domready",function(){
+            window.parent.document.getElement('input[name=forward]').click();
+        });
+    </script>
+    <?php else: ?>
+    <p class="tl_error"><?php echo $this->text; ?></p>
+    <?php endif; ?>
+
+<?php else: ?>
+
+<form id="filelist_form" action="<?php echo $this->Environment->base; ?>contao/popupSyncFiles.php?id=<?php echo $this->id; ?>&amp;step=<?php echo $this->step; ?>" method="post">
+    <div class="formbody">
+        <input type="hidden" name="FORM_SUBMIT" value="<?php echo $this->formId; ?>" />        
+        <input type="hidden" name="REQUEST_TOKEN" value="<?php echo REQUEST_TOKEN; ?>">
+        
+        <div class="submit_container">
+            <input class="tl_submit" name="transfer" type="submit" value="<?php echo $GLOBALS['TL_LANG']['MSC']['apply']; ?>" />
+        </div>
+        <div class="submit_container">         
+            <input class="tl_submit" name="delete" type="submit" value="<?php echo $GLOBALS['TL_LANG']['MSC']['delete']; ?>" />
+        </div>
+        
+        <h3><?php echo $GLOBALS['TL_LANG']['MSC']['totalSize']; ?></h3>
+
+        <ul class="file">
+        <li><?php echo $GLOBALS['TL_LANG']['MSC']['create']; ?>: ~ <?php echo $this->getReadableSize($this->totalsizeNew); ?></li>
+        <li><?php echo $GLOBALS['TL_LANG']['MSC']['overrideSelected'] ; ?>: ~ <?php echo $this->getReadableSize($this->totalsizeChange); ?></li>
+        <li><?php echo $GLOBALS['TL_LANG']['MSC']['delete']; ?>: ~ <?php echo $this->getReadableSize($this->totalsizeDel); ?></li>
+        </ul>
+
+        <?php 
+            for($i = 1 ; $i <= 2 ; $i++):
+            switch ($i)
+            {
+                case 1:
+                    $arrFileList = $this->normalFilelist;
+                    break;
+                case 2:
+                    $arrFileList = $this->bigFilelist;
+                    break;
+            }        
+        ?>
+        
+        <?php if(count($arrFileList) != 0): ?>        
+        <h3><?php echo $GLOBALS['TL_LANG']['MSC'][(($i == 1)? 'normal' : 'big') . '_files']; ?></h3>
+        <table class="comparelist" id="<?php echo ($i == 1)? 'normal' : 'big'; ?>filelist">
+            <colgroup>
+                <col width="15%" />
+                <col width="15%" />
+                <col width="35" />
+                <col width="*" />
+            </colgroup>
+            <thead>
+                <tr class="head">
+                    <th class="state"><?php echo $GLOBALS['TL_LANG']['MSC']['state']; ?></th>
+                    <th class="filesize"><?php echo $GLOBALS['TL_LANG']['MSC']['fileSize']; ?></th>
+                    <th class="checkbox table-th-nosort"><input class="tl_checkbox" onclick="Backend.toggleCheckboxGroup(this, '<?php echo ($i == 1)? 'normal' : 'big'; ?>filelist')" type="checkbox" /></th>
+                    <th class="last"><?php echo $GLOBALS['TL_LANG']['MSC']['file']; ?></th>
+                </tr>
+            </thead>
+            <tbody>            
+            <?php foreach ($arrFileList as $key => $file): ?>
+                <tr>                    
+                    <td class="state <?php echo $file["css"]; ?>"><?php echo $this->arrLangStates[$file["state"]]; ?></td>
+                    <td class="filesize"><?php echo ($file["size"] == -1) ? "N.A." : $this->getReadableSize($file["size"]); ?></td>
+                    <?php if($this->compare_complex == false): ?>
+                        <td class="checkbox"><input class="tl_checkbox" type="checkbox" name="del-file-<?php echo $key; ?>" value="<?php echo $key; ?>" /></td>                   
+                    <?php else: ?>
+                        <td class="checkbox"><?php if (empty($file["css_big"])): ?><input class="tl_checkbox" type="checkbox" name="del-file-<?php echo $key; ?>" value="<?php echo $key; ?>" /><?php else: ?> X <?php endif; ?></td>  
+                    <?php endif; ?>
+                    <td class="last" title="<?php echo $file["path"]; ?>"><?php echo (strlen($file["path"]) >= $this->maxLength) ? substr($file["path"], 0, ($this->maxLength / 2)) . "[...]" . substr($file["path"], strlen($file["path"]) - ($this->maxLength / 2), strlen($file["path"]) - 1) : $file["path"]; ?></td>
+               </tr>
+            <?php endforeach; ?>
+            </tbody>
+        </table> 
+        <?php endif; endfor; ?>
+ 
+        <div class="bottom submit_container">
+            <input class="tl_submit" name="transfer" type="submit" value="<?php echo $GLOBALS['TL_LANG']['MSC']['apply']; ?>" />
+        </div>
+        <div class="bottom submit_container">         
+            <input class="tl_submit" name="delete" type="submit" value="<?php echo $GLOBALS['TL_LANG']['MSC']['delete']; ?>" />
+        </div>
+    </div>
+</form>
+
+<?php endif; ?>
+</div>

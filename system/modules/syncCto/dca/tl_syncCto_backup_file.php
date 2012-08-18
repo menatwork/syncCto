@@ -1,4 +1,7 @@
-<?php if (!defined('TL_ROOT')) die('You can not access this file directly!');
+<?php
+
+if (!defined('TL_ROOT'))
+    die('You can not access this file directly!');
 
 /**
  * Contao Open Source CMS
@@ -29,9 +32,9 @@
 $GLOBALS['TL_DCA']['tl_syncCto_backup_file'] = array(
     // Config
     'config' => array(
-        'dataContainer' => 'Memory',
-        'closed' => true,
-        'disableSubmit' => false,
+        'dataContainer'   => 'Memory',
+        'closed'          => true,
+        'disableSubmit'   => false,
         'onload_callback' => array(
             array('tl_syncCto_backup_file', 'onload_callback'),
         ),
@@ -48,38 +51,38 @@ $GLOBALS['TL_DCA']['tl_syncCto_backup_file'] = array(
     // Palettes
     'palettes' => array(
         '__selector__' => array('user_files'),
-        'default' => '{filelist_legend},core_files,user_files;{backup_legend},backup_name;',
+        'default'     => '{filelist_legend},core_files,user_files;{backup_legend},backup_name;',
     ),
     // Sub Palettes
     'subpalettes' => array(
         'user_files' => 'filelist'
     ),
     // Fields
-    'fields' => array(
+    'fields'     => array(
         'core_files' => array(
-            'label' => &$GLOBALS['TL_LANG']['tl_syncCto_backup_file']['core_files'],
-            'inputType' => 'checkbox',
-            'exclude' => true
+            'label'      => &$GLOBALS['TL_LANG']['tl_syncCto_backup_file']['core_files'],
+            'inputType'  => 'checkbox',
+            'exclude'    => true
         ),
         'user_files' => array(
-            'label' => &$GLOBALS['TL_LANG']['tl_syncCto_backup_file']['user_files'],
+            'label'     => &$GLOBALS['TL_LANG']['tl_syncCto_backup_file']['user_files'],
             'inputType' => 'checkbox',
-            'exclude' => true,
-            'eval' => array('submitOnChange' => true),
+            'exclude'   => true,
+            'eval'      => array('submitOnChange' => true),
         ),
-        'filelist' => array
+        'filelist'       => array
             (
-            'label' => &$GLOBALS['TL_LANG']['tl_syncCto_backup_file']['filelist'],
-            'exclude' => true,
+            'label'     => &$GLOBALS['TL_LANG']['tl_syncCto_backup_file']['filelist'],
+            'exclude'   => true,
             'inputType' => 'fileTreeMemory',
-            'eval' => array('fieldType' => 'checkbox', 'files' => true, 'filesOnly' => false, 'tl_class' => 'clr'),
+            'eval'      => array('fieldType'   => 'checkbox', 'files'       => true, 'filesOnly'   => false, 'tl_class'    => 'clr'),
         ),
         'backup_name' => array
             (
-            'label' => &$GLOBALS['TL_LANG']['tl_syncCto_backup_file']['backup_name'],
+            'label'     => &$GLOBALS['TL_LANG']['tl_syncCto_backup_file']['backup_name'],
             'inputType' => 'text',
-            'exclude' => true,
-            'eval' => array('maxlength' => 32),
+            'exclude'   => true,
+            'eval'      => array('maxlength' => 32),
         ),
     )
 );
@@ -89,6 +92,19 @@ $GLOBALS['TL_DCA']['tl_syncCto_backup_file'] = array(
  */
 class tl_syncCto_backup_file extends Backend
 {
+
+    // Vars
+    protected $objSyncCtoHelper;
+
+    /**
+     * Constructor
+     */
+    public function __construct()
+    {
+        $this->objSyncCtoHelper = SyncCtoHelper::getInstance();
+
+        parent::__construct();
+    }
 
     /**
      * Set new and remove old buttons
@@ -101,11 +117,11 @@ class tl_syncCto_backup_file extends Backend
         $dc->removeButton('saveNclose');
 
         $arrData = array(
-            'id' => 'start_backup',
-            'formkey' => 'start_backup',
-            'class' => '',
-            'accesskey' => 'g',
-            'value' => specialchars($GLOBALS['TL_LANG']['MSC']['start_backup']),
+            'id'              => 'start_backup',
+            'formkey'         => 'start_backup',
+            'class'           => '',
+            'accesskey'       => 'g',
+            'value'           => specialchars($GLOBALS['TL_LANG']['MSC']['apply']),
             'button_callback' => array('tl_syncCto_backup_file', 'onsubmit_callback')
         );
 
@@ -128,8 +144,8 @@ class tl_syncCto_backup_file extends Backend
         }
 
         // Check if we have a filelist for user files
-        if ($this->Input->post('core_files') != 1 
-                && $this->Input->post('user_files') == 1 
+        if ($this->Input->post('core_files') != 1
+                && $this->Input->post('user_files') == 1
                 && is_array($this->Input->post('filelist', true)) != true
                 && count($this->Input->post('filelist', true)) == 0)
         {
@@ -146,7 +162,14 @@ class tl_syncCto_backup_file extends Backend
 
         $this->Session->set("syncCto_BackupSettings", $arrBackupSettings);
 
-        $this->redirect($this->Environment->base . "contao/main.php?do=syncCto_backups&amp;table=tl_syncCto_backup_file&amp;act=start");
+        $this->objSyncCtoHelper->checkSubmit(array(
+            'postUnset' => array('start_backup'),
+            'error' => array(
+                'key'         => 'syncCto_submit_false',
+                'message'     => $GLOBALS['TL_LANG']['ERR']['missing_tables']
+            ),
+            'redirectUrl' => $this->Environment->base . "contao/main.php?do=syncCto_backups&table=tl_syncCto_backup_file&act=start"
+        ));
     }
 
     /**

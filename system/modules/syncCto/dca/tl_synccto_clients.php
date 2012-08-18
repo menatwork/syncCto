@@ -33,6 +33,7 @@ $GLOBALS['TL_DCA']['tl_synccto_clients'] = array(
         'dataContainer' => 'Table',
         'enableVersioning' => true,
         'onload_callback' => array(
+            array('tl_synccto_clients', 'checkClientStatus'),
             array('tl_synccto_clients', 'checkPermissionClient'),
             array('tl_synccto_clients', 'checkPermissionClientCreate'),
         ),
@@ -83,17 +84,23 @@ $GLOBALS['TL_DCA']['tl_synccto_clients'] = array(
                 'icon' => 'show.gif',
                 'button_callback' => array('tl_synccto_clients', 'checkPermission_client_show'),
             ),
+            'showExtern' => array(
+                'label' => &$GLOBALS['TL_LANG']['tl_syncCto_clients']['showExtern'],
+                'href' => '&table=tl_syncCto_clients_showExtern&act=start', 
+                'icon' => 'system/modules/syncCto/html/icons/nav/iconCheck.png',
+                'button_callback' => array('tl_synccto_clients', 'checkPermission_client_showExtern'),
+            ),
             'syncFrom' => array(
                 'label' => &$GLOBALS['TL_LANG']['tl_syncCto_clients']['syncFrom'],
                 'href' => '&table=tl_syncCto_clients_syncFrom&act=edit',
-                'icon' => 'system/modules/syncCto/html/iconSyncFrom.png',
+                'icon' => 'system/modules/syncCto/html/icons/nav/iconSyncFrom.png',
                 'attributes' => 'onclick="if (!confirm(\'' . $GLOBALS['TL_LANG']['tl_syncCto_clients']['syncFromConfirm'] . '\')) return false; Backend.getScrollOffset();"',
                 'button_callback' => array('tl_synccto_clients', 'checkPermission_client_syncFrom'),
             ),
             'syncTo' => array(
                 'label' => &$GLOBALS['TL_LANG']['tl_syncCto_clients']['syncTo'],
                 'href' => '&table=tl_syncCto_clients_syncTo&act=edit',
-                'icon' => 'system/modules/syncCto/html/iconSyncTo.png',
+                'icon' => 'system/modules/syncCto/html/icons/nav/iconSyncTo.png',
                 'button_callback' => array('tl_synccto_clients', 'checkPermission_client_syncTo'),
             ),
         )
@@ -220,6 +227,14 @@ class tl_synccto_clients extends Backend
             return $this->checkPermissionClientButton($arguments[0], $arguments[1], $arguments[2], $arguments[3], $arguments[4], $arguments[5], $arrSplitName[2]);
         }
     }
+    
+    /**
+     * Set the javascript file for client ping 
+     */
+    public function checkClientStatus()
+    {
+        $GLOBALS['TL_JAVASCRIPT'][] = 'system/modules/syncCto/html/js/ping.js';        
+    }
 
     /**
      * Permission check for the client overview page
@@ -245,9 +260,9 @@ class tl_synccto_clients extends Backend
             {
                 case 'syncTo' :
                 case 'syncFrom' :
+                case 'showExtern' :
                     return $this->generateImage(preg_replace('/\.png$/i', '_.png', $icon)) . ' ';
                     break;
-
 
                 default:
                     return $this->generateImage(preg_replace('/\.gif$/i', '_.gif', $icon)) . ' ';

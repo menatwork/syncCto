@@ -57,14 +57,14 @@ $GLOBALS['TL_DCA']['tl_syncCto_backup_db'] = array(
             'inputType' => 'checkbox',
             'exclude' => true,
             'eval' => array('multiple' => true),
-            'options_callback' => array('SyncCtoHelper', 'databaseTablesRecommended'),
+            'options_callback' => array('tl_syncCto_backup_db', 'databaseTablesRecommended'),
         ),
         'database_tables_none_recommended' => array(
             'label' => &$GLOBALS['TL_LANG']['tl_syncCto_backup_db']['database_tables_none_recommended'],
             'inputType' => 'checkbox',
             'exclude' => true,
             'eval' => array('multiple' => true),
-            'options_callback' => array('SyncCtoHelper', 'databaseTablesNoneRecommendedWithHidden'),
+            'options_callback' => array('tl_syncCto_backup_db', 'databaseTablesNoneRecommendedWithHidden'),
         )
     )
 );
@@ -74,6 +74,55 @@ $GLOBALS['TL_DCA']['tl_syncCto_backup_db'] = array(
  */
 class tl_syncCto_backup_db extends Backend
 {
+
+    // Vars
+    protected $objSyncCtoHelper;
+
+    /**
+     * Constructor
+     */
+    public function __construct()
+    {
+        $this->objSyncCtoHelper = SyncCtoHelper::getInstance();
+
+        parent::__construct();
+    }    
+    
+    /**
+     * Get database tables recommended array
+     * 
+     * @return array 
+     */
+    public function databaseTablesRecommended()
+    {
+        $arrTableRecommended = $this->objSyncCtoHelper->databaseTablesRecommended();
+        
+        $arrStyledTableRecommended = array();
+        foreach($arrTableRecommended AS $strTableName => $arrTable)
+        {
+            $arrStyledTableRecommended[$strTableName] = $this->objSyncCtoHelper->getStyledTableMeta($arrTable);
+        }
+        
+        return $arrStyledTableRecommended;
+    }
+    
+    /**
+     * Get database tables none recommended with hidden array
+     * 
+     * @return array 
+     */    
+    public function databaseTablesNoneRecommendedWithHidden()
+    {
+        $arrTableRecommended = $this->objSyncCtoHelper->databaseTablesNoneRecommendedWithHidden();
+        
+        $arrStyledTableRecommended = array();
+        foreach($arrTableRecommended AS $strTableName => $arrTable)
+        {
+            $arrStyledTableRecommended[$strTableName] = $this->objSyncCtoHelper->getStyledTableMeta($arrTable);
+        }
+        
+        return $arrStyledTableRecommended;
+    }
 
     /**
      * Set new and remove old buttons
@@ -91,7 +140,7 @@ class tl_syncCto_backup_db extends Backend
             'formkey' => 'start_backup',
             'class' => '',
             'accesskey' => 'g',
-            'value' => specialchars($GLOBALS['TL_LANG']['MSC']['start_backup']),
+            'value' => specialchars($GLOBALS['TL_LANG']['MSC']['apply']),
             'button_callback' => array('tl_syncCto_backup_db', 'onsubmit_callback')
         );
 
@@ -105,14 +154,7 @@ class tl_syncCto_backup_db extends Backend
      * @return array
      */
     public function onsubmit_callback(DataContainer $dc)
-    {    
-        // Check Table list
-        if ($this->Input->post("database_tables_recommended") == "" && $this->Input->post("database_tables_none_recommended") == "")
-        {
-            $_SESSION["TL_ERROR"][] = $GLOBALS['TL_LANG']['ERR']['missing_tables_selection'];
-            $this->redirect($this->Environment->base . "contao/main.php?do=syncCto_backups&table=tl_syncCto_backup_db");
-        }
-        
+    {        
         $arrBackupSettings = array();
 
         // Merge recommend and none recommend post arrays
@@ -130,8 +172,15 @@ class tl_syncCto_backup_db extends Backend
         }
 
         $this->Session->set("syncCto_BackupSettings", $arrBackupSettings);
-
-        $this->redirect($this->Environment->base . "contao/main.php?do=syncCto_backups&table=tl_syncCto_backup_db&act=start");
+        
+        $this->objSyncCtoHelper->checkSubmit(array(
+            'postUnset' => array('start_backup'),
+            'error' => array(
+                'key' => 'syncCto_submit_false',
+                'message' => $GLOBALS['TL_LANG']['ERR']['missing_tables']
+            ),
+            'redirectUrl' => $this->Environment->base . "contao/main.php?do=syncCto_backups&table=tl_syncCto_backup_db&act=start"
+        )); 
     }
 
     /**

@@ -42,7 +42,7 @@ $GLOBALS['TL_DCA']['tl_syncCto_clients_syncTo'] = array(
     // Palettes
     'palettes' => array(
         '__selector__' => array('database_check', 'systemoperations_check'),
-        'default' => '{sync_legend},lastSync,disabledCache,sync_options;{table_legend},database_check;{systemoperations_legend},systemoperations_check,attentionFlag;',
+        'default' => '{sync_legend},lastSync,disabledCache,sync_options;{table_legend},database_check;{systemoperations_legend:hide},systemoperations_check,attentionFlag;',
     ),
     // Sub Palettes
     'subpalettes' => array(
@@ -250,7 +250,7 @@ class tl_syncCto_clients_syncTo extends Backend
             'formkey' => 'start_sync',
             'class' => '',
             'accesskey' => 'g',
-            'value' => specialchars($GLOBALS['TL_LANG']['MSC']['syncTo']),
+            'value' => specialchars($GLOBALS['TL_LANG']['MSC']['sync']),
             'button_callback' => array('tl_syncCto_clients_syncTo', 'onsubmit_callback')
         );
 
@@ -291,7 +291,7 @@ class tl_syncCto_clients_syncTo extends Backend
      * @return array 
      */
     public function onsubmit_callback(DataContainer $dc)
-    {        
+    {               
         $arrSyncSettings = array();
 
         // Synchronization type
@@ -356,7 +356,14 @@ class tl_syncCto_clients_syncTo extends Backend
         
         $this->Session->set("syncCto_SyncSettings_" . $dc->id, $arrSyncSettings);
 
-        $this->redirect($this->Environment->base . "contao/main.php?do=synccto_clients&amp;table=tl_syncCto_clients_syncTo&amp;act=start&amp;step=0&amp;id=" . $this->Input->get("id"));
+        $this->objSyncCtoHelper->checkSubmit(array(
+            'postUnset' => array('start_sync'),
+            'error' => array(
+                'key' => 'syncCto_submit_false',
+                'message' => $GLOBALS['TL_LANG']['ERR']['missing_tables']
+            ),
+            'redirectUrl' => $this->Environment->base . "contao/main.php?do=synccto_clients&amp;table=tl_syncCto_clients_syncTo&amp;act=start&amp;step=0&amp;id=" . $this->Input->get("id") 
+        ));
     }
 
 }

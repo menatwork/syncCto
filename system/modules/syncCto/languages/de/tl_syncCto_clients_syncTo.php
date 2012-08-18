@@ -43,7 +43,7 @@ $GLOBALS['TL_LANG']['tl_syncCto_clients_syncTo']['database_check']              
 $GLOBALS['TL_LANG']['tl_syncCto_clients_syncTo']['database_tables_recommended']         = array('Empfohlene Tabellen', 'Hier können Sie die empfohlenen Tabellen für die Synchronisation auswählen.');
 $GLOBALS['TL_LANG']['tl_syncCto_clients_syncTo']['database_tables_none_recommended']    = array('Nicht empfohlene Tabellen', 'Hier können Sie die NICHT empfohlenen Tabellen für die Synchronisation auswählen. Benutzung auf eigene Gefahr.');
 $GLOBALS['TL_LANG']['tl_syncCto_clients_syncTo']['systemoperations_check']              = array('Systemwartung aktivieren', 'Wählen Sie diese Option, wenn die Systemwartung durchgeführt werden soll.');
-$GLOBALS['TL_LANG']['tl_syncCto_clients_syncTo']['systemoperations_maintenance']        = array('Client bereinigen', 'Hier können Sie die Systembereinigung auf dem Client konfigurieren.');
+$GLOBALS['TL_LANG']['tl_syncCto_clients_syncTo']['systemoperations_maintenance']        = array('Daten bereinigen', 'Bitte wählen Sie die zu bereinigenden Daten aus.');
 $GLOBALS['TL_LANG']['tl_syncCto_clients_syncTo']['attention_flag']                      = array('Warnhinweis deaktivieren', 'Wählen Sie diese Option, wenn der Warnhinweis auf dem Client deaktiviert werden soll.')
          
 ?>

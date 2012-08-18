@@ -1,114 +1,206 @@
 syncCto Changelog
 =================
 
+
+Version 2.2.0 (2012-08-17)
+--------------------------
+
+### Defect
+Optimierung der Beschreibungen (see #113).
+
+### Defect
+Filterregeln der DB-Tabellen optimieren (see #110).
+
+### Defect/Feature
+Zusammenfassung der normalen und zu großen Dateilisten (see #109).
+
+### Feature
+UI der Steps optimieren (see #108).
+
+### Defect
+runonce.php beim AutoUpdate nicht berücksichtigen (see #106).
+
+### Defect
+AutoUpdater legt keine neuen DB-Tabellen an (see #105).
+
+### Defect
+Fehlermeldung beim Tabellenvergleich (see #104).
+
+### Defect
+Große Dateien syncen nicht möglich (see #101).
+
+### Feature
+Autoloader mit ER koppeln (see #95).
+
+### Feature
+DB-Tabellen erst in den Steps auswählen (see #94).
+
+### Feature
+Auslagerung der Vergleichsliste in eine Lightbox (see #93).
+
+
 Version 2.1.0 (2012-05-09)
 --------------------------
 
-### Fixed
+### Defect
+Anpassung der Rechte (see #92).
+
+### Feature
 Tabellen mit großen Datenmengen rot hinterlegen (see #89).
 
-### Fixed
+### Feature
 Kompatibilität für Contao 2.11 (see #88).
 
-### Fixed
+### Feature
 Optionaler Warnhinweis für BE-User im Client (see #87).
 
-### Fixed
+### Feature
 DCA für SyncTo und SyncFrom anpassen (see #86).
 
-### Fixed
+### Feature
 Konfiguration der Handshake Funktion (see #84).
 
-### Fixed
-Erweiterung der Blacklist Funktion (see #83).
+### Defect
+Korrektur der Blacklist Funktion (see #83).
 
-### Fixed
+### Feature
 Deaktivierung der kritischen Einstellungen nach dem Sync (see #53).
 
-### Fixed
+### Feature
 HOOK: Nach dem Synchronisieren die DB manipulieren (see #50).
 
-### Fixed
+### Feature
 Filecache aktivieren (see #49).
 
+### Defect
+Zu große Datenbanken sprengen das Limit (see #3).
 
-Version 2.1.0 (2012-02-01)
+### Defect
+Die Synchronisation des Clients wurde erfolgreich abgeschlossen (see #2).
+
+
+Version 2.0.0 (2012-02-01)
 --------------------------
 
-### Fixed
+### Feature
 Optimierung und Zusammenfassung der Backup-Templates (see #79).
 
-### Fixed
+### Feature
 Ermittlung der maximalen Bandbreite (see #77).
 
-### Fixed
+### Feature
 Besseres Exception Handling (see #76).
 
-### Fixed
+### Feature
 Optimierung der Klassen (see #75).
 
-### Fixed
+### Feature
 Referrer-Prüfung erweitern (see #74).
 
-### Fixed
+### Feature
 SMH berücksichtigen um Debugfiles schreiben zu können (see #71).
 
-### Fixed
+### Feature
 Vorbereitung für Contao 2.10.x (see #61).
 
-### Fixed
+### Feature
 Backup versteckter Tabellen (see #60).
 
-### Fixed
+### Feature
 Auth Daten verarbeiten (htacces) (see #59).
 
-### Fixed
+### Feature
 Abbrechen Button (see #58).
 
-### Fixed
+### Feature
 Übersetzung auf Französisch (see #57).
 
-### Fixed
+### Feature
 Verlinkung der Client-URL nach erfolgreicher Synchronisation (see #56).
 
-### Fixed
+### Defect
 Syncronisation schlägt fehl (see #43).
 
-### Fixed
+### Defect
 syncFrom wieder aktivieren (see #42).
 
-### Fixed
+### Defect
 Error by sending XML to Server. Server answer with 500, Internal (see #35).
 
-### Fixed
+### Defect
 Filelist Template entschlacken (see #29).
 
-### Fixed
+### Defect
 Optimierung der Sync Templates (see #28).
 
-### Fixed
+### Defect
 MaxRequestLen in den Systemcheck integrieren (see #27).
 
-### Fixed
+### Defect
 Suhosin in den Systemcheck integrieren (see #26).
 
-### Fixed
+### Defect
 Backupscript prüfen (see #24).
 
-### Fixed
+### Defect
 Filelist Template für große Dateien fertigstellen (see #23).
 
-### Fixed
+### Defect
 Datumsformat aus dem Core (see #22).
 
-### Fixed
+### Defect
 Säuberung der Klassen (see #21).
 
-### Fixed
+### Defect
 Request Token verhindert den Client Ping (see #20).
 
-### Fixed
+### Defect
 Dateidownload bei den Backups geht nicht (see #19).
+
+### Defect
+API-Key Verwaltung vereinfachen (see #18).
+
+### Defect
+Filecache nach der Synchronisation anschubsen (see #17).
+
+### Defect
+Im Debugmodus leere Informationen nicht anzeigen (see #16).
+
+### Defect
+Löschen von Ordnern (see #15).
+
+### Defect
+Filelisten für große Dateien angleichen (see #14).
+
+### Defect
+Synchronisation wird nicht korrekt abgeschlossen (see #13).
+
+### Defect
+Systemcheck fehlerhafter Wertevergleich (see #12).
+
+### Defect
+Fehlermeldung bei Verschlüsselung (see #11).
+
+### Defect
+Umlaute im Debugmodus zerschossen (see #10).
+
+### Defect
+Mcrypt Verschlüsselung prüfen (see #9).
+
+### Defect
+Datenbank Export/Import - Memory Limit (see #8).
+
+### Defect
+MySQL Session richtig konfigurieren (see #7).
+
+### Defect
+DB importer (see #6).
+
+### Defect	
+DB-Tabellen werden nicht korrekt importiert (see #5).
+
+### Defect
+Umlaute der gelöschten Dateien (see #4).
 
 
 Version 1.1.5 (2012-01-01)

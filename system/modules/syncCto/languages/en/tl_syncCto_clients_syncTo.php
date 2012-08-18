@@ -43,7 +43,7 @@ $GLOBALS['TL_LANG']['tl_syncCto_clients_syncTo']['database_check']              
 $GLOBALS['TL_LANG']['tl_syncCto_clients_syncTo']['database_tables_recommended']         = array('Recommended tables', 'Here you can select the recommended tables for synchronization.');
 $GLOBALS['TL_LANG']['tl_syncCto_clients_syncTo']['database_tables_none_recommended']    = array('Not recommended tables', 'Here you can select the not recommended tables for synchronization. Use at your own risk.');
 $GLOBALS['TL_LANG']['tl_syncCto_clients_syncTo']['systemoperations_check']              = array('Activate maintenance', 'Choose these options to activate the system maintenance.');
-$GLOBALS['TL_LANG']['tl_syncCto_clients_syncTo']['systemoperations_maintenance']        = array('Purge client', 'Choose this option to configure the maintenance settings on the client.');
+$GLOBALS['TL_LANG']['tl_syncCto_clients_syncTo']['systemoperations_maintenance']        = array('Purge data', 'Please select the data you want to purge.');
 $GLOBALS['TL_LANG']['tl_syncCto_clients_syncTo']['attention_flag']                      = array('Deactivate warning notice', 'Choose this option to deactivate the syncronisation warning on the client.');
              
 ?>

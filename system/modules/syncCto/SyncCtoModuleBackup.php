@@ -89,7 +89,10 @@ class SyncCtoModuleBackup extends BackendModule
         // Load language 
         $this->loadLanguageFile('tl_syncCto_backup');
         $this->loadLanguageFile('tl_syncCto_steps');
-
+        
+        // Load CSS
+        $GLOBALS['TL_CSS'][] = 'system/modules/syncCto/html/css/steps.css';
+               
         // Import
         $this->import('BackendUser', 'User');
 
@@ -388,7 +391,7 @@ class SyncCtoModuleBackup extends BackendModule
         $this->booError = false;
         $this->strError = "";
         $this->objData->setStep(1);
-        $this->objData->setState($GLOBALS['TL_LANG']['MSC']['progress']);
+        $this->objData->setState(SyncCtoEnum::WORK_WORK);
 
         switch ($this->intStep)
         {
@@ -396,7 +399,7 @@ class SyncCtoModuleBackup extends BackendModule
             case 1:
                 $this->objData->setTitle($GLOBALS['TL_LANG']['MSC']['step'] . " %s");
                 $this->objData->setDescription($GLOBALS['TL_LANG']['tl_syncCto_backup_db']['step1']);
-                $this->objData->setState($GLOBALS['TL_LANG']['MSC']['progress']);
+                $this->objData->setState(SyncCtoEnum::WORK_WORK);
 
                 $this->intStep++;
                 break;
@@ -414,7 +417,7 @@ class SyncCtoModuleBackup extends BackendModule
                     $this->booError = true;
                     $this->strError = $exc->getMessage();
                     $this->objData->setStep(1);
-                    $this->objData->setState($GLOBALS['TL_LANG']['MSC']['error']);
+                    $this->objData->setState(SyncCtoEnum::WORK_ERROR);
                     break;
                 }
 
@@ -424,16 +427,17 @@ class SyncCtoModuleBackup extends BackendModule
                 $this->booRefresh = false;
 
                 $this->objData->setStep(1);
-                $this->objData->setState($GLOBALS['TL_LANG']['MSC']['ok']);
+                $this->objData->setState(SyncCtoEnum::WORK_OK);
 
                 $strHTML = "<p class='tl_help'><br />";
-                $strHTML .= "<a rel='lightbox[details 600 300]' title='In einem neuen Fenster ansehen' href='contao/popup.php?src=" . base64_encode($GLOBALS['TL_CONFIG']['uploadPath'] . "/syncCto_backups/database/" . $this->objStepPool->zipname) . "'>" . $GLOBALS['TL_LANG']['tl_syncCto_backup_db']['download_backup'] . "</a>";
+                $strHTML .= "<a rel='lightbox[details 600 300]' title='In einem neuen Fenster ansehen' href='contao/popup.php?src=" . base64_encode($GLOBALS['TL_CONFIG']['uploadPath'] . "/syncCto_backups/database/" . $this->objStepPool->zipname) . "'>" . $GLOBALS['TL_LANG']['MSC']['fileDownload'] . "</a>";
                 $strHTML .= "</p>";
                 
                 $this->objData->setStep(2);
                 $this->objData->setTitle($GLOBALS['TL_LANG']['MSC']['complete']);
                 $this->objData->setDescription($GLOBALS['TL_LANG']['tl_syncCto_backup_db']['complete'] . " " . $this->objStepPool->zipname);
                 $this->objData->setHtml($strHTML);
+                $this->objData->setState(SyncCtoEnum::WORK_OK);
                 break;
         }
     }
@@ -471,14 +475,14 @@ class SyncCtoModuleBackup extends BackendModule
         $this->booError = false;
         $this->strError = "";
         $this->objData->setStep(1);
-        $this->objData->setState($GLOBALS['TL_LANG']['MSC']['progress']);
+        $this->objData->setState(SyncCtoEnum::WORK_WORK);
 
         switch ($this->intStep)
         {
             case 1:
                 $this->objData->setTitle($GLOBALS['TL_LANG']['MSC']['step'] . " %s");
                 $this->objData->setDescription($GLOBALS['TL_LANG']['tl_syncCto_restore_db']['step1']);
-                $this->objData->setState($GLOBALS['TL_LANG']['MSC']['progress']);
+                $this->objData->setState(SyncCtoEnum::WORK_WORK);
                 $this->intStep++;
                 break;
 
@@ -494,7 +498,7 @@ class SyncCtoModuleBackup extends BackendModule
                     $this->booError = true;
                     $this->strError = $exc->getMessage();
                     $this->objData->setStep(1);
-                    $this->objData->setState($GLOBALS['TL_LANG']['MSC']['error']);
+                    $this->objData->setState(SyncCtoEnum::WORK_ERROR);
                     break;
                 }
 
@@ -503,11 +507,12 @@ class SyncCtoModuleBackup extends BackendModule
                 $this->booRefresh = false;
 
                 $this->objData->setStep(1);
-                $this->objData->setState($GLOBALS['TL_LANG']['MSC']['ok']);
+                $this->objData->setState(SyncCtoEnum::WORK_OK);
 
                 $this->objData->setStep(2);
                 $this->objData->setTitle($GLOBALS['TL_LANG']['MSC']['complete']);
                 $this->objData->setDescription($GLOBALS['TL_LANG']['tl_syncCto_restore_db']['complete'] . " " . $this->objStepPool->zipname);
+                $this->objData->setState(SyncCtoEnum::WORK_OK);
                 break;
         }
     }
@@ -545,14 +550,14 @@ class SyncCtoModuleBackup extends BackendModule
         $this->booError = false;
         $this->strError = "";
         $this->objData->setStep(1);
-        $this->objData->setState($GLOBALS['TL_LANG']['MSC']['progress']);
+        $this->objData->setState(SyncCtoEnum::WORK_WORK);
         
         switch ($this->intStep)
         {
             case 1:
                 $this->objData->setTitle($GLOBALS['TL_LANG']['MSC']['step'] . " %s");
                 $this->objData->setDescription($GLOBALS['TL_LANG']['tl_syncCto_backup_file']['step1']);
-                $this->objData->setState($GLOBALS['TL_LANG']['MSC']['progress']);
+                $this->objData->setState(SyncCtoEnum::WORK_WORK);
 
                 $this->objStepPool->zipname = "";
                 $this->objStepPool->skippedfiles = array();
@@ -574,10 +579,10 @@ class SyncCtoModuleBackup extends BackendModule
                 $this->booRefresh = false;
 
                 $this->objData->setStep(1);
-                $this->objData->setState($GLOBALS['TL_LANG']['MSC']['ok']);
+                $this->objData->setState(SyncCtoEnum::WORK_OK);
 
                 $strHTML = "<p class='tl_help'><br />";
-                $strHTML .= "<a rel='lightbox[details 600 300]' title='In einem neuen Fenster ansehen' href='contao/popup.php?src=" . base64_encode($GLOBALS['TL_CONFIG']['uploadPath'] . "/syncCto_backups/files/" . $this->objStepPool->zipname) . "'>" . $GLOBALS['TL_LANG']['tl_syncCto_backup_file']['download_backup'] . "</a>";
+                $strHTML .= "<a rel='lightbox[details 600 300]' title='In einem neuen Fenster ansehen' href='contao/popup.php?src=" . base64_encode($GLOBALS['TL_CONFIG']['uploadPath'] . "/syncCto_backups/files/" . $this->objStepPool->zipname) . "'>" . $GLOBALS['TL_LANG']['MSC']['fileDownload'] . "</a>";
                 $strHTML .= "</p>";
 
                 if (count($this->objStepPool->skippedfiles) != 0)
@@ -596,6 +601,7 @@ class SyncCtoModuleBackup extends BackendModule
                 $this->objData->setTitle($GLOBALS['TL_LANG']['MSC']['complete']);
                 $this->objData->setDescription($GLOBALS['TL_LANG']['tl_syncCto_backup_file']['complete'] . " " . $this->objStepPool->zipname);
                 $this->objData->setHtml($strHTML);
+                $this->objData->setState(SyncCtoEnum::WORK_OK);
                 break;
         }
     }
@@ -630,21 +636,39 @@ class SyncCtoModuleBackup extends BackendModule
         $this->booError = false;
         $this->strError = "";
         $this->objData->setStep(1);
-        $this->objData->setState($GLOBALS['TL_LANG']['MSC']['progress']);
+        $this->objData->setState(SyncCtoEnum::WORK_WORK);
 
         switch ($this->intStep)
         {
             case 1:
                 $this->objData->setTitle($GLOBALS['TL_LANG']['MSC']['step'] . " %s");
                 $this->objData->setDescription($GLOBALS['TL_LANG']['tl_syncCto_restore_file']['step1']);
-                $this->objData->setState($GLOBALS['TL_LANG']['MSC']['progress']);
+                $this->objData->setState(SyncCtoEnum::WORK_WORK);
                 $this->intStep++;
                 break;
 
             case 2:
                 try
                 {
-                    $this->objSyncCtoFiles->runRestore($this->arrBackupSettings['backup_file']);
+                    $mixResponse = $this->objSyncCtoFiles->runRestore($this->arrBackupSettings['backup_file']);
+
+                    if ($mixResponse !== true)
+                    {
+                        $strHTML = $GLOBALS['TL_LANG']['ERR']['cant_extract_file'];
+                        $strHTML .= "<br />";
+                        $strHTML .= "<ul>";
+                        foreach ($mixResponse as $value)
+                        {
+                            $strHTML .= "<li>" . $value . "</li>";
+                        }
+                        $strHTML .= "</ul>";
+
+                        $this->booError = true;
+                        $this->strError = $strHTML;
+                        $this->objData->setStep(1);
+                        $this->objData->setDescription($GLOBALS['TL_LANG']['ERR']['cant_extract_file']);
+                        break;
+                    }
 
                     $this->intStep++;
                     break;
@@ -654,7 +678,7 @@ class SyncCtoModuleBackup extends BackendModule
                     $this->booError = true;
                     $this->strError = $exc->getMessage();
                     $this->objData->setStep(1);
-                    $this->objData->setState($GLOBALS['TL_LANG']['MSC']['error']);
+                    $this->objData->setState(SyncCtoEnum::WORK_ERROR);
                     break;
                 }
 
@@ -665,11 +689,12 @@ class SyncCtoModuleBackup extends BackendModule
                 $this->booRefresh = false;
 
                 $this->objData->setStep(1);
-                $this->objData->setState($GLOBALS['TL_LANG']['MSC']['ok']);
+                $this->objData->setState(SyncCtoEnum::WORK_OK);
                 
                 $this->objData->setStep(2);
                 $this->objData->setTitle($GLOBALS['TL_LANG']['MSC']['complete']);
                 $this->objData->setDescription(vsprintf($GLOBALS['TL_LANG']['tl_syncCto_restore_file']['complete'], array($this->arrBackupSettings['backup_file'], $objDate->time, $objDate->date)));
+                $this->objData->setState(SyncCtoEnum::WORK_OK);
                 break;
         }
     }

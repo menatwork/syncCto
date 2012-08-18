@@ -70,7 +70,7 @@ class CronDeleteFileBackups extends Backend
 /**
  * Instantiate log purger
  */
-$objDeleteFileBackups = new SyncCtoDeleteFileBackups();
+$objDeleteFileBackups = new CronDeleteFileBackups();
 $objDeleteFileBackups->run();
 
 ?>
