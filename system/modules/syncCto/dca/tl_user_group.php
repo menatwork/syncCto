@@ -55,12 +55,12 @@ $GLOBALS['TL_DCA']['tl_user_group']['fields']['syncCto_clients_p'] = array
 
 $GLOBALS['TL_DCA']['tl_user_group']['fields']['syncCto_sync_options'] = array
     (
-    'label' => &$GLOBALS['TL_LANG']['tl_user']['syncCto_sync_options'],
-    'exclude' => true,
+    'label'     => &$GLOBALS['TL_LANG']['tl_user']['syncCto_sync_options'],
+    'exclude'   => true,
     'inputType' => 'checkbox',
     'reference' => &$GLOBALS['TL_LANG']['SYC'],
     'options_callback' => array('SyncCtoHelper', 'getFileSyncOptions'),
-    'eval' => array('multiple' => true)
+    'eval'      => array('multiple' => true)
 );
 
 $GLOBALS['TL_DCA']['tl_user_group']['fields']['syncCto_tables'] = array
@@ -68,7 +68,7 @@ $GLOBALS['TL_DCA']['tl_user_group']['fields']['syncCto_tables'] = array
     'label'     => &$GLOBALS['TL_LANG']['tl_user']['syncCto_tables'],
     'inputType' => 'checkboxWizard',
     'exclude'   => true,
-    'eval'      => array('multiple'         => true),
+    'eval'      => array('multiple' => true),
     'options_callback' => array('SyncCtoHelper', 'databaseTables'),
 );
 

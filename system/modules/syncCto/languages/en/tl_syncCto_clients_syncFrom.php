@@ -38,10 +38,8 @@ $GLOBALS['TL_LANG']['tl_syncCto_clients_syncFrom']['edit']                      
 /**
  * Fields
  */
-$GLOBALS['TL_LANG']['tl_syncCto_clients_syncFrom']['sync_options']                         = array('Synchronize files', 'Here you can select which files should be synchronized.');
+$GLOBALS['TL_LANG']['tl_syncCto_clients_syncFrom']['sync_options']                      = array('Synchronize files', 'Here you can select which files should be synchronized.');
 $GLOBALS['TL_LANG']['tl_syncCto_clients_syncFrom']['database_check']                    = array('Synchronize database', 'Choose this option for database synchronization.');
-$GLOBALS['TL_LANG']['tl_syncCto_clients_syncFrom']['database_tables_recommended']       = array('Recommended tables', 'Here you can select the recommended tables for synchronization.');
-$GLOBALS['TL_LANG']['tl_syncCto_clients_syncFrom']['database_tables_none_recommended']  = array('Not recommended tables', 'Here you can select the not recommended tables for synchronization. Use at your own risk.');
 $GLOBALS['TL_LANG']['tl_syncCto_clients_syncFrom']['systemoperations_check']            = array('Activate maintenance', 'Choose these options to activate the system maintenance.');
 $GLOBALS['TL_LANG']['tl_syncCto_clients_syncFrom']['systemoperations_maintenance']      = array('Purge data', 'Please select the data you want to purge.');
 $GLOBALS['TL_LANG']['tl_syncCto_clients_syncFrom']['attention_flag']                    = array('Activate warning notice', 'Choose this option to activate the syncronisation warning on the client.');

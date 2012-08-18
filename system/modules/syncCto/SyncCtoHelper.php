@@ -416,7 +416,7 @@ class SyncCtoHelper extends Backend
      * @return array 
      */
     public function getFileSyncOptions()
-    {
+    {        
         if($this->BackendUser->isAdmin)
         {
             return $GLOBALS['SYC_CONFIG']['sync_options'];
@@ -438,11 +438,11 @@ class SyncCtoHelper extends Backend
                         }
                         
                         $arrSyncOption[$fileType][] = $strRight;
-                    }
+                    }                            
                 }
-            }
+            }       
             return $arrSyncOption;
-        }
+        }            
     }
 
     /**
@@ -450,7 +450,7 @@ class SyncCtoHelper extends Backend
      * @return array 
      */
     public function getMaintanceOptions()
-    {
+    {       
         return $GLOBALS['SYC_CONFIG']['maintance_options'];
     }
 

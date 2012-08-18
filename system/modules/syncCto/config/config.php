@@ -66,11 +66,6 @@ $GLOBALS['BE_MOD'] = array_merge(
 );
 
 /**
- * Form fields
- */
-$GLOBALS['BE_FFL']['syncctocheckbox'] = 'SyncCtoCheckBox';
-
-/**
  * Hooks
  */
 $GLOBALS['TL_HOOKS']['executePreActions'][]     = array('SyncCtoHelper', 'pingClientStatus');
@@ -104,15 +99,8 @@ if ($strDo == 'synccto_clients' && $strAct != 'start' && in_array($strTable, arr
 }
 
 /**
- * CSS / JS
+ * Include attention CSS
  */
-if (($objInput->get("table") == 'tl_syncCto_clients_syncTo' || $objInput->get("table") == 'tl_syncCto_clients_syncFrom') && TL_MODE == 'BE')
-{
-    $GLOBALS['TL_CSS'][]        = 'system/modules/syncCto/html/css/filelist.css';
-    $GLOBALS['TL_JAVASCRIPT'][] = 'system/modules/syncCto/html/js/htmltable.js';
-    $GLOBALS['TL_JAVASCRIPT'][] = 'system/modules/syncCto/html/js/filelist.js';
-}
-
 if($GLOBALS['TL_CONFIG']['syncCto_attentionFlag'] == true)
 {
     $GLOBALS['TL_CSS'][] = 'system/modules/syncCto/html/css/attention.css';
@@ -154,8 +142,7 @@ $GLOBALS['SYC_CONFIG']['file_blacklist'] = array(
 );
 
 // Folders
-$GLOBALS['SYC_CONFIG']['local_blacklist'] = array(
-    // Contao core
+$GLOBALS['SYC_CONFIG']['local_blacklist'] = array(   
     'websitePath',
     'installPassword',
     'disableRefererCheck',
@@ -189,8 +176,8 @@ $GLOBALS['SYC_CONFIG']['folder_whitelist'] = array(
 );
 
 /**
-* Sync options
-*/
+ * Sync options
+ */
 $GLOBALS['SYC_CONFIG']['sync_options'] = array(
     'core' => array(
         'core_change',
@@ -207,8 +194,8 @@ $GLOBALS['SYC_CONFIG']['sync_options'] = array(
 );
 
 /**
-* Maintance options
-*/
+ * Maintance options
+ */
 $GLOBALS['SYC_CONFIG']['maintance_options'] = array(
     'temp_tables',
     'temp_folders',
@@ -346,7 +333,7 @@ $GLOBALS["CTOCOM_FUNCTIONS"]["SYNCCTO_REBUILD_SPLITFILE"] = array(
     "parameter" => array("splitname", "splitcount", "movepath", "md5"),
 );
 
-// split a file
+// Split a file
 $GLOBALS["CTOCOM_FUNCTIONS"]["SYNCCTO_SPLITFILE"] = array(
     "class" => "SyncCtoFiles",
     "function" => "splitFiles",

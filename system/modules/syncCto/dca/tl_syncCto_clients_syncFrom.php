@@ -46,7 +46,6 @@ $GLOBALS['TL_DCA']['tl_syncCto_clients_syncFrom'] = array(
     ),
     // Sub Palettes
     'subpalettes' => array(
-        'database_check' => 'database_tables_recommended,database_tables_none_recommended',
         'systemoperations_check' => 'systemoperations_maintenance',
     ),
     // Fields
@@ -75,32 +74,6 @@ $GLOBALS['TL_DCA']['tl_syncCto_clients_syncFrom'] = array(
             'label' => &$GLOBALS['TL_LANG']['tl_syncCto_clients_syncFrom']['database_check'],
             'inputType' => 'checkbox',
             'exclude' => true,
-            'eval' => array(
-                'submitOnChange' => true,
-                'tl_class' => 'clr',
-            ),
-        ),
-        'database_tables_recommended' => array(
-            'label' => &$GLOBALS['TL_LANG']['tl_syncCto_clients_syncFrom']['database_tables_recommended'],
-            'inputType' => 'checkbox',
-            'exclude' => true,
-            'eval' => array(
-                'multiple' => true
-            ),
-            'options_callback' => array('tl_syncCto_clients_syncFrom', 'databaseTablesRecommended'),
-            'reference' => &$GLOBALS['TL_LANG']['SYC'],
-            'explanation' => 'syncCto_database',
-        ),
-        'database_tables_none_recommended' => array(
-            'label' => &$GLOBALS['TL_LANG']['tl_syncCto_clients_syncFrom']['database_tables_none_recommended'],
-            'inputType' => 'checkbox',
-            'exclude' => true,
-            'eval' => array(
-                'multiple' => true
-            ),
-            'options_callback' => array('tl_syncCto_clients_syncFrom', 'databaseTablesNoneRecommended'),
-            'reference' => &$GLOBALS['TL_LANG']['SYC'],
-            'explanation' => 'syncCto_database',
         ),
         'systemoperations_check' => array(
             'label' => &$GLOBALS['TL_LANG']['tl_syncCto_clients_syncFrom']['systemoperations_check'],
@@ -166,7 +139,7 @@ class tl_syncCto_clients_syncFrom extends Backend
      * @param DataContainer $dc 
      */
     public function onload_callback(DataContainer $dc)
-    {
+    {        
         $strInitFilePath = '/system/config/initconfig.php';
 
         if(file_exists(TL_ROOT . $strInitFilePath))
@@ -273,56 +246,6 @@ class tl_syncCto_clients_syncFrom extends Backend
         }
     }
 
-    public function databaseTablesNoneRecommended()
-    {
-        try
-        {
-            // Check connection
-            $this->startConnection();
-
-            // Get Tables
-            $arrTablesClient = $this->objSyncCtoCommunicationClient->getNoneRecommendedTables();
-
-            // Check if we have a array 
-            if (!is_array($arrTablesClient))
-            {
-                $arrTablesClient = array();
-            }
-
-            return $arrTablesClient;
-        }
-        catch (Exception $exc)
-        {
-            $_SESSION["TL_ERROR"][] = $exc->getMessage();
-            return array();
-        }
-    }
-
-    public function databaseTablesRecommended()
-    {
-        try
-        {
-            // Check connection
-            $this->startConnection();
-
-            // Get Tables
-            $arrTablesClient = $this->objSyncCtoCommunicationClient->getRecommendedTables();
-
-            // Check if we have a array 
-            if (!is_array($arrTablesClient))
-            {
-                $arrTablesClient = array();
-            }
-
-            return $arrTablesClient;
-        }
-        catch (Exception $exc)
-        {
-            $_SESSION["TL_ERROR"][] = $exc->getMessage();
-            return array();
-        }
-    }
-
     /**
      * Handle syncFrom configurations
      * 
@@ -342,28 +265,15 @@ class tl_syncCto_clients_syncFrom extends Backend
         {
             $arrSyncSettings["syncCto_Type"] = array();
         }
-
-        // Synchronization for database
+        
         if ($this->Input->post("database_check") == 1)
         {
-            $arrTables = array();
-
-            if (is_array($this->Input->post("database_tables_recommended")) && count($this->Input->post("database_tables_recommended")) != 0)
-            {
-                $arrTables = $this->Input->post("database_tables_recommended");
-            }
-
-            if (is_array($this->Input->post("database_tables_none_recommended")) && count($this->Input->post("database_tables_none_recommended")) != 0)
-            {
-                $arrTables = array_merge($arrTables, $this->Input->post("database_tables_none_recommended"));
-            }
-
-            $arrSyncSettings["syncCto_SyncTables"] = $arrTables;
+            $arrSyncSettings["syncCto_SyncDatabase"] = true;
         }
         else
         {
-            $arrSyncSettings["syncCto_SyncTables"] = array();
-        }
+            $arrSyncSettings["syncCto_SyncDatabase"] = false;
+        }        
 
         // Systemoperation execute
         if ($this->Input->post("systemoperations_check") == 1)

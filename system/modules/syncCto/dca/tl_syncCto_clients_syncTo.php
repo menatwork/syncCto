@@ -46,7 +46,6 @@ $GLOBALS['TL_DCA']['tl_syncCto_clients_syncTo'] = array(
     ),
     // Sub Palettes
     'subpalettes' => array(
-        'database_check' => 'database_tables_recommended,database_tables_none_recommended',
         'systemoperations_check' => 'systemoperations_maintenance',
     ),
     // Fields
@@ -75,32 +74,6 @@ $GLOBALS['TL_DCA']['tl_syncCto_clients_syncTo'] = array(
             'label' => &$GLOBALS['TL_LANG']['tl_syncCto_clients_syncTo']['database_check'],
             'inputType' => 'checkbox',
             'exclude' => true,
-            'eval' => array(
-                'submitOnChange' => true,
-                'tl_class' => 'clr',
-            ),
-        ),
-        'database_tables_recommended' => array(
-            'label' => &$GLOBALS['TL_LANG']['tl_syncCto_clients_syncTo']['database_tables_recommended'],
-            'inputType' => 'syncctocheckbox',
-            'exclude' => true,
-            'eval' => array(
-                'multiple' => true,
-                'state' => array(1 => 0)
-            ),
-            'options_callback' => array('tl_syncCto_clients_syncTo', 'databaseTablesRecommended'),
-            'reference' => &$GLOBALS['TL_LANG']['SYC']
-        ),
-        'database_tables_none_recommended' => array(
-            'label' => &$GLOBALS['TL_LANG']['tl_syncCto_clients_syncTo']['database_tables_none_recommended'],
-            'inputType' => 'syncctocheckbox',
-            'exclude' => true,
-            'eval' => array(
-                'multiple' => true,
-                'state' => array(1 => 0)
-            ),
-            'options_callback' => array('tl_syncCto_clients_syncTo', 'databaseTablesNoneRecommended'),
-            'reference' => &$GLOBALS['TL_LANG']['SYC']
         ),
         'systemoperations_check' => array(
             'label' => &$GLOBALS['TL_LANG']['tl_syncCto_clients_syncTo']['systemoperations_check'],
@@ -151,55 +124,6 @@ class tl_syncCto_clients_syncTo extends Backend
         $this->objSyncCtoHelper = SyncCtoHelper::getInstance();
 
         parent::__construct();
-    }
-
-    public function databaseTablesNoneRecommended()
-    {
-        $objLastHash = $this->Database->prepare("SELECT last_table_time FROM tl_synccto_clients WHERE id=?")->execute(intval($this->Input->get("id")));
-        // Check if we have a client
-        if ($objLastHash->numRows == 0)
-        {
-            return $this->objSyncCtoHelper->databaseTablesNoneRecommended();
-        }
-        // Check if we have some timestamps
-        if ($objLastHash->last_table_time == "")
-        {
-            return $this->objSyncCtoHelper->databaseTablesNoneRecommended();
-        }
-        // Rebuild array
-        if (is_array(deserialize($objLastHash->last_table_time)) == false)
-        {
-            $this->log("Could not rebuild last timestamp list for client " . $this->Input->get("id"), __CLASS__ . " | " . __FUNCTION__, "Show last changes");
-            return $this->objSyncCtoHelper->databaseTablesNoneRecommended();
-        }
-
-        return $this->objSyncCtoHelper->databaseTablesNoneRecommended(deserialize($objLastHash->last_table_time));
-    }
-
-    public function databaseTablesRecommended()
-    {
-        $objLastHash = $this->Database->prepare("SELECT last_table_time FROM tl_synccto_clients WHERE id=?")->execute(intval($this->Input->get("id")));
-
-        // Check if we have a client
-        if ($objLastHash->numRows == 0)
-        {
-            return $this->objSyncCtoHelper->databaseTablesRecommended();
-        }
-
-        // Check if we have some timestamps
-        if ($objLastHash->last_table_time == "")
-        {
-            return $this->objSyncCtoHelper->databaseTablesRecommended();
-        }
-
-        // Rebuild array
-        if (is_array(deserialize($objLastHash->last_table_time)) == false)
-        {
-            $this->log("Could not rebuild last timestamp list for client " . $this->Input->get("id"), __CLASS__ . " | " . __FUNCTION__, TL_ERROR);
-            return $this->objSyncCtoHelper->databaseTablesRecommended();
-        }
-
-        return $this->objSyncCtoHelper->databaseTablesRecommended(deserialize($objLastHash->last_table_time));
     }
 
     /**
@@ -304,27 +228,13 @@ class tl_syncCto_clients_syncTo extends Backend
             $arrSyncSettings["syncCto_Type"] = array();
         }
 
-        // Synchronization for database
         if ($this->Input->post("database_check") == 1)
         {
-            $arrTables = array();
-
-            if (is_array($this->Input->post("database_tables_recommended")) && count($this->Input->post("database_tables_recommended")) != 0)
-            {
-                $arrTables = $this->Input->post("database_tables_recommended");
-            }
-
-            if (is_array($this->Input->post("database_tables_none_recommended")) && count($this->Input->post("database_tables_none_recommended")) != 0)
-            {                
-                $arrTables = array_merge($arrTables, $this->Input->post("database_tables_none_recommended"));
-               
-            }
-
-            $arrSyncSettings["syncCto_SyncTables"] = $arrTables;
+            $arrSyncSettings["syncCto_SyncDatabase"] = true;
         }
         else
         {
-            $arrSyncSettings["syncCto_SyncTables"] = array();
+            $arrSyncSettings["syncCto_SyncDatabase"] = false;
         }
 
         // Systemoperation execute
