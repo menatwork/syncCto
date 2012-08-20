@@ -1127,7 +1127,7 @@ class SyncCtoModuleClient extends BackendModule
         }
         catch (Exception $exc)
         {
-            $this->log(vsprintf("Error on synchronization client ID %s", array($this->Input->get("id"))), __CLASS__ . " " . __FUNCTION__, "ERROR");
+            $this->log(vsprintf("Error on synchronization client ID %s with msg: %s", array($this->Input->get("id"),$exc->getMessage())), __CLASS__ . " " . __FUNCTION__, "ERROR");
 
             $this->booError = true;
             $this->strError = $exc->getMessage();
@@ -1436,12 +1436,19 @@ class SyncCtoModuleClient extends BackendModule
         }
         catch (Exception $exc)
         {
-            $this->log(vsprintf("Error on synchronization client ID %s", array($this->Input->get("id"))), __CLASS__ . " " . __FUNCTION__, "ERROR");
+            // If an error occurs skip the whole step
+            $this->arrListCompare = array();
 
-            $this->booError = true;
-            $this->strError = $exc->getMessage();
+            $objErrTemplate              = new BackendTemplate('be_syncCto_error');
+            $objErrTemplate->strErrorMsg = $exc->getMessage();
 
-            $this->objData->setState(SyncCtoEnum::WORK_ERROR);
+            $this->objData->setState(SyncCtoEnum::WORK_SKIPPED);
+            $this->objData->setDescription($GLOBALS['TL_LANG']['tl_syncCto_sync']["step_2"]['description_1']);
+            $this->objData->setHtml($objErrTemplate->parse());
+            $this->booRefresh = true;
+            $this->intStep++;
+
+            $this->log(vsprintf("Error on synchronization client ID %s with msg: %s", array($this->Input->get("id"), $exc->getMessage())), __CLASS__ . " " . __FUNCTION__, "ERROR");
         }
     }
 
@@ -1792,11 +1799,17 @@ class SyncCtoModuleClient extends BackendModule
         }
         catch (Exception $exc)
         {
-            $this->log(vsprintf("Error on synchronization client ID %s", array($this->Input->get("id"))), __CLASS__ . " " . __FUNCTION__, "ERROR");
+            // If an error occurs skip the whole step
+            $objErrTemplate              = new BackendTemplate('be_syncCto_error');
+            $objErrTemplate->strErrorMsg = $exc->getMessage();
 
-            $this->booError = TRUE;
-            $this->strError = $exc->getMessage();
-            $this->objData->setState(SyncCtoEnum::WORK_ERROR);
+            $this->objData->setState(SyncCtoEnum::WORK_SKIPPED);
+            $this->objData->setDescription($GLOBALS['TL_LANG']['tl_syncCto_sync']["step_3"]['description_1']);
+            $this->objData->setHtml($objErrTemplate->parse());
+            $this->booRefresh = true;
+            $this->intStep++;
+
+            $this->log(vsprintf("Error on synchronization client ID %s with msg: %s", array($this->Input->get("id"), $exc->getMessage())), __CLASS__ . " " . __FUNCTION__, "ERROR");
         }
     }
 
@@ -1811,16 +1824,6 @@ class SyncCtoModuleClient extends BackendModule
 
         if ($this->objStepPool->step == null)
         {
-            $this->objStepPool->step = 1;
-        }
-
-        // Set content back to normale mode
-        if ($this->booError == true && $this->objStepPool->step != 5)
-        {
-            $this->booError = false;
-            $this->strError = "";
-            $this->objData->setState(SyncCtoEnum::WORK_WORK);
-
             $this->objStepPool->step = 1;
         }
 
@@ -1893,20 +1896,20 @@ class SyncCtoModuleClient extends BackendModule
                         $arrClientTables  = array_merge($arrClientTableR, $arrClientTableNR);
                         $arrHiddenTables  = array_keys(array_flip(array_merge($arrServerTableH, $arrClientTableH)));
                         $arrAllTimeStamps = $this->objSyncCtoDatabase->getAllTimeStamps($arrServerTimestamp, $arrClientTimestamp, $this->intClientID);
-                        
+
                         $arrCompareList = $this->objSyncCtoDatabase->getFormatedCompareList($arrServerTables, $arrClientTables, $arrHiddenTables, $arrAllTimeStamps['server'], $arrAllTimeStamps['client'], $arrAllowedTables, 'server', 'client');
-                             
-                        if(count($arrCompareList['recommended']) == 0 && count($arrCompareList['none_recommended']) == 0)
+
+                        if (count($arrCompareList['recommended']) == 0 && count($arrCompareList['none_recommended']) == 0)
                         {
                             $this->objData->setState(SyncCtoEnum::WORK_SKIPPED);
                             $this->objData->setHtml("");
                             $this->intStep++;
-                            
+
                             break;
                         }
-                        
-                        $this->arrSyncSettings['syncCto_CompareTables'] =  $arrCompareList;
-                        
+
+                        $this->arrSyncSettings['syncCto_CompareTables'] = $arrCompareList;
+
                         $this->objStepPool->step++;
                     }
                     else
@@ -1919,7 +1922,7 @@ class SyncCtoModuleClient extends BackendModule
                     break;
 
                 case 3:
-                     if (key_exists("forward", $_POST) && !(count($this->arrSyncSettings['syncCto_SyncTables']) == 0 && count($this->arrSyncSettings['syncCto_SyncDeleteTables']) == 0))
+                    if (key_exists("forward", $_POST) && !(count($this->arrSyncSettings['syncCto_SyncTables']) == 0 && count($this->arrSyncSettings['syncCto_SyncDeleteTables']) == 0))
                     {
                         // Go to next step
                         $this->objData->setState(SyncCtoEnum::WORK_WORK);
@@ -1968,7 +1971,7 @@ class SyncCtoModuleClient extends BackendModule
                 /**
                  * Build SQL Zip File
                  */
-                case 4:                    
+                case 4:
                     if (count($this->arrSyncSettings['syncCto_SyncTables']) != 0)
                     {
                         $this->objStepPool->zipname = $this->objSyncCtoDatabase->runDump($this->arrSyncSettings['syncCto_SyncTables'], true, true);
@@ -2069,7 +2072,7 @@ class SyncCtoModuleClient extends BackendModule
                  * Drop Tables
                  */
                 case 8:
-                    
+
                     if (count($this->arrSyncSettings['syncCto_SyncDeleteTables']) != 0)
                     {
                         $arrKnownTables = $this->Database->listTables();
@@ -2127,16 +2130,25 @@ class SyncCtoModuleClient extends BackendModule
         }
         catch (Exception $exc)
         {
-            $this->log(vsprintf("Error on synchronization client ID %s. %s", array($this->Input->get("id"), $exc->getMessage())), __CLASS__ . " " . __FUNCTION__, "ERROR");
+            // If an error occurs skip the whole step
+            $this->arrSyncSettings['syncCto_SyncDeleteTables'] = array();
+            $this->arrSyncSettings['syncCto_CompareTables'] = array();
 
-            $this->booError = true;
-            $this->strError = $exc->getMessage();
-            $this->objData->setState(SyncCtoEnum::WORK_ERROR);
+            $objErrTemplate              = new BackendTemplate('be_syncCto_error');
+            $objErrTemplate->strErrorMsg = $exc->getMessage();
+
+            $this->objData->setState(SyncCtoEnum::WORK_SKIPPED);
+            $this->objData->setDescription($GLOBALS['TL_LANG']['tl_syncCto_sync']["step_4"]['description_1']);
+            $this->objData->setHtml($objErrTemplate->parse());
+            $this->booRefresh = true;
+            $this->intStep++;
+
+            $this->log(vsprintf("Error on synchronization client ID %s with msg: %s", array($this->Input->get("id"), $exc->getMessage())), __CLASS__ . " " . __FUNCTION__, "ERROR");
         }
     }
 
     /**
-     * 
+     * Last Step
      */
     private function pageSyncToShowStep5()
     {
@@ -2229,13 +2241,11 @@ class SyncCtoModuleClient extends BackendModule
                                 $this->arrListCompare[$key] = $value;
                             }
                         }
-
-                        $this->objData->setDescription($GLOBALS['TL_LANG']['tl_syncCto_sync']["step_5"]['description_2']);
-                        $this->objStepPool->step++;
-                        break;
                     }
 
+                    $this->objData->setDescription($GLOBALS['TL_LANG']['tl_syncCto_sync']["step_5"]['description_2']);
                     $this->objStepPool->step++;
+                    break;
 
                 /**
                  * Import Config
@@ -2254,15 +2264,7 @@ class SyncCtoModuleClient extends BackendModule
                  * Import Config / Set show error
                  */
                 case 5:
-                    if (in_array("localconfig_errors", $this->arrSyncSettings["syncCto_Type"]))
-                    {
-                        $this->objSyncCtoCommunicationClient->setDisplayErrors(true);
-                    }
-                    else
-                    {
-                        $this->objSyncCtoCommunicationClient->setDisplayErrors(false);
-                    }
-
+                    $this->objSyncCtoCommunicationClient->setDisplayErrors($this->arrSyncSettings["syncCto_ShowError"]);
                     $this->objStepPool->step++;
                     break;
 
@@ -2284,7 +2286,9 @@ class SyncCtoModuleClient extends BackendModule
                         $this->objSyncCtoCommunicationClient->setAttentionFlag(false);
                     }
 
+                    $this->objData->setDescription($GLOBALS['TL_LANG']['tl_syncCto_sync']['step_1']['description_2']);
                     $this->objStepPool->step++;
+
                     $this->log(vsprintf("Successfully finishing of synchronization client ID %s.", array($this->Input->get("id"))), __CLASS__ . " " . __FUNCTION__, "INFO");
                     break;
 
@@ -2538,11 +2542,9 @@ class SyncCtoModuleClient extends BackendModule
         }
         catch (Exception $exc)
         {
-            $this->log(vsprintf("Error on synchronization client ID %s", array($this->Input->get("id"))), __CLASS__ . " " . __FUNCTION__, "ERROR");
+            $this->objStepPool->step++;
 
-            $this->booError = true;
-            $this->strError = $exc->getMessage();
-            $this->objData->setState(SyncCtoEnum::WORK_ERROR);
+            $this->log(vsprintf("Error on synchronization client ID %s with msg: %s", array($this->Input->get("id"), $exc->getMessage())), __CLASS__ . " " . __FUNCTION__, "ERROR");
         }
     }
 
@@ -2805,12 +2807,19 @@ class SyncCtoModuleClient extends BackendModule
         }
         catch (Exception $exc)
         {
-            $this->log(vsprintf("Error on synchronization client ID %s", array($this->Input->get("id"))), __CLASS__ . " " . __FUNCTION__, "ERROR");
+            // If an error occurs skip the whole step
+            $this->arrListCompare = array();
 
-            $this->booError = true;
-            $this->strError = $exc->getMessage();
+            $objErrTemplate              = new BackendTemplate('be_syncCto_error');
+            $objErrTemplate->strErrorMsg = $exc->getMessage();
 
-            $this->objData->setState(SyncCtoEnum::WORK_ERROR);
+            $this->objData->setState(SyncCtoEnum::WORK_SKIPPED);
+            $this->objData->setDescription($GLOBALS['TL_LANG']['tl_syncCto_sync']["step_2"]['description_1']);
+            $this->objData->setHtml($objErrTemplate->parse());
+            $this->booRefresh = true;
+            $this->intStep++;
+
+            $this->log(vsprintf("Error on synchronization client ID %s with msg: %s", array($this->Input->get("id"), $exc->getMessage())), __CLASS__ . " " . __FUNCTION__, "ERROR");
         }
     }
 
@@ -3178,11 +3187,18 @@ class SyncCtoModuleClient extends BackendModule
         }
         catch (Exception $exc)
         {
-            $this->log(vsprintf("Error on synchronization client ID %s", array($this->Input->get("id"))), __CLASS__ . " " . __FUNCTION__, "ERROR");
 
-            $this->booError = TRUE;
-            $this->strError = $exc->getMessage();
-            $this->objData->setState(SyncCtoEnum::WORK_ERROR);
+            // If an error occurs skip the whole step
+            $objErrTemplate              = new BackendTemplate('be_syncCto_error');
+            $objErrTemplate->strErrorMsg = $exc->getMessage();
+
+            $this->objData->setState(SyncCtoEnum::WORK_SKIPPED);
+            $this->objData->setDescription($GLOBALS['TL_LANG']['tl_syncCto_sync']["step_3"]['description_1']);
+            $this->objData->setHtml($objErrTemplate->parse());
+            $this->booRefresh = true;
+            $this->intStep++;
+
+            $this->log(vsprintf("Error on synchronization client ID %s with msg: %s", array($this->Input->get("id"), $exc->getMessage())), __CLASS__ . " " . __FUNCTION__, "ERROR");
         }
     }
 
@@ -3229,8 +3245,8 @@ class SyncCtoModuleClient extends BackendModule
                     $this->objStepPool->step++;
 
                     break;
-                
-                 case 2:
+
+                case 2:
                     // Check user
                     if ($this->User->isAdmin || $this->User->syncCto_tables != null)
                     {
@@ -3279,20 +3295,20 @@ class SyncCtoModuleClient extends BackendModule
                         $arrClientTables  = array_merge($arrClientTableR, $arrClientTableNR);
                         $arrHiddenTables  = array_keys(array_flip(array_merge($arrServerTableH, $arrClientTableH)));
                         $arrAllTimeStamps = $this->objSyncCtoDatabase->getAllTimeStamps($arrServerTimestamp, $arrClientTimestamp, $this->intClientID);
-                        
+
                         $arrCompareList = $this->objSyncCtoDatabase->getFormatedCompareList($arrClientTables, $arrServerTables, $arrHiddenTables, $arrAllTimeStamps['client'], $arrAllTimeStamps['server'], $arrAllowedTables, 'client', 'server');
-                    
-                        if(count($arrCompareList['recommended']) == 0 && count($arrCompareList['none_recommended']) == 0)
+
+                        if (count($arrCompareList['recommended']) == 0 && count($arrCompareList['none_recommended']) == 0)
                         {
                             $this->objData->setState(SyncCtoEnum::WORK_SKIPPED);
                             $this->objData->setHtml("");
                             $this->intStep++;
-                            
+
                             break;
                         }
-                        
-                        $this->arrSyncSettings['syncCto_CompareTables'] =  $arrCompareList;
-                        
+
+                        $this->arrSyncSettings['syncCto_CompareTables'] = $arrCompareList;
+
                         $this->objStepPool->step++;
                     }
                     else
@@ -3355,7 +3371,7 @@ class SyncCtoModuleClient extends BackendModule
                 /**
                  * Build SQL Zip File
                  */
-                case 4:                    
+                case 4:
                     if (count($this->arrSyncSettings['syncCto_SyncTables']) != 0)
                     {
                         $this->objStepPool->zipname = $this->objSyncCtoCommunicationClient->runDatabaseDump($this->arrSyncSettings['syncCto_SyncTables'], true, true);
@@ -3367,7 +3383,7 @@ class SyncCtoModuleClient extends BackendModule
                     {
                         $this->objStepPool->step = 8;
                     }
-                    
+
                     break;
 
                 /**
@@ -3457,7 +3473,7 @@ class SyncCtoModuleClient extends BackendModule
                 /**
                  * Drop Tables
                  */
-                case 8:                    
+                case 8:
                     if (count($this->arrSyncSettings['syncCto_SyncDeleteTables']) != 0)
                     {
                         $this->objSyncCtoDatabase->dropTable($this->arrSyncSettings['syncCto_SyncDeleteTables'], true);
@@ -3474,11 +3490,20 @@ class SyncCtoModuleClient extends BackendModule
         }
         catch (Exception $exc)
         {
-            $this->log(vsprintf("Error on synchronization client ID %s", array($this->Input->get("id"))), __CLASS__ . " " . __FUNCTION__, "ERROR");
+            // If an error occurs skip the whole step
+            $this->arrSyncSettings['syncCto_SyncDeleteTables'] = array();
+            $this->arrSyncSettings['syncCto_CompareTables'] = array();
 
-            $this->booError = true;
-            $this->strError = $exc->getMessage();
-            $this->objData->setState(SyncCtoEnum::WORK_ERROR);
+            $objErrTemplate              = new BackendTemplate('be_syncCto_error');
+            $objErrTemplate->strErrorMsg = $exc->getMessage();
+
+            $this->objData->setState(SyncCtoEnum::WORK_SKIPPED);
+            $this->objData->setDescription($GLOBALS['TL_LANG']['tl_syncCto_sync']['step_4']['description_1']);
+            $this->objData->setHtml($objErrTemplate->parse());
+            $this->booRefresh = true;
+            $this->intStep++;
+
+            $this->log(vsprintf("Error on synchronization client ID %s with msg: %s", array($this->Input->get("id"), $exc->getMessage())), __CLASS__ . " " . __FUNCTION__, "ERROR");
         }
     }
 
@@ -3576,13 +3601,11 @@ class SyncCtoModuleClient extends BackendModule
                                 $this->arrListCompare[$key] = $value;
                             }
                         }
-
-                        $this->objData->setDescription($GLOBALS['TL_LANG']['tl_syncCto_sync']["step_5"]['description_2']);
-                        $this->objStepPool->step++;
-                        break;
                     }
 
+                    $this->objData->setDescription($GLOBALS['TL_LANG']['tl_syncCto_sync']["step_5"]['description_2']);
                     $this->objStepPool->step++;
+                    break;
 
                 /**
                  * Import Config
@@ -3879,11 +3902,9 @@ class SyncCtoModuleClient extends BackendModule
         }
         catch (Exception $exc)
         {
-            $this->log(vsprintf("Error on synchronization client ID %s", array($this->Input->get("id"))), __CLASS__ . " " . __FUNCTION__, "ERROR");
+            $this->objStepPool->step++;
 
-            $this->booError = true;
-            $this->strError = $exc->getMessage();
-            $this->objData->setState(SyncCtoEnum::WORK_ERROR);
+            $this->log(vsprintf("Error on synchronization client ID %s with msg: %s", array($this->Input->get("id"), $exc->getMessage())), __CLASS__ . " " . __FUNCTION__, "ERROR");
         }
     }
 

@@ -29,9 +29,9 @@
 $GLOBALS['TL_DCA']['tl_syncCto_clients_syncTo'] = array(
     // Config
     'config' => array(
-        'dataContainer' => 'Memory',
-        'closed' => true,
-        'disableSubmit' => false,
+        'dataContainer'   => 'Memory',
+        'closed'          => true,
+        'disableSubmit'   => false,
         'onload_callback' => array(
             array('tl_syncCto_clients_syncTo', 'onload_callback')
         ),
@@ -42,68 +42,67 @@ $GLOBALS['TL_DCA']['tl_syncCto_clients_syncTo'] = array(
     // Palettes
     'palettes' => array(
         '__selector__' => array('database_check', 'systemoperations_check'),
-        'default' => '{sync_legend},lastSync,disabledCache,sync_options;{table_legend},database_check;{systemoperations_legend:hide},systemoperations_check,attentionFlag;',
+        'default'     => '{sync_legend},lastSync,disabledCache,sync_options;{table_legend},database_check;{systemoperations_legend:hide},systemoperations_check,attentionFlag,localconfig_error;',
     ),
     // Sub Palettes
     'subpalettes' => array(
         'systemoperations_check' => 'systemoperations_maintenance',
     ),
     // Fields
-    'fields' => array(
-        'lastSync' => array
-            (
-            'label' => " ",
-            'inputType' => 'statictext',
+    'fields'                 => array(
+        'lastSync' => array(
+            'label'         => " ",
+            'inputType'     => 'statictext',
         ),
-        'disabledCache' => array
-            (
-            'label' => " ",
-            'inputType' => 'statictext',
+        'disabledCache' => array(
+            'label'        => " ",
+            'inputType'    => 'statictext',
         ),
         'sync_options' => array(
-            'label' => $GLOBALS['TL_LANG']['tl_syncCto_clients_syncTo']['sync_options'],
-            'inputType' => 'checkbox',
-            'exclude' => true,
-            'reference' => &$GLOBALS['TL_LANG']['SYC'],
+            'label'            => $GLOBALS['TL_LANG']['tl_syncCto_clients_syncTo']['sync_options'],
+            'inputType'        => 'checkbox',
+            'exclude'          => true,
+            'reference'        => &$GLOBALS['TL_LANG']['SYC'],
             'options_callback' => array('SyncCtoHelper', 'getFileSyncOptions'),
             'eval' => array(
-                'multiple' => true
+                'multiple'       => true
             ),
         ),
         'database_check' => array(
-            'label' => &$GLOBALS['TL_LANG']['tl_syncCto_clients_syncTo']['database_check'],
-            'inputType' => 'checkbox',
-            'exclude' => true,
+            'label'                  => &$GLOBALS['TL_LANG']['tl_syncCto_clients_syncTo']['database_check'],
+            'inputType'              => 'checkbox',
+            'exclude'                => true,
         ),
         'systemoperations_check' => array(
-            'label' => &$GLOBALS['TL_LANG']['tl_syncCto_clients_syncTo']['systemoperations_check'],
+            'label'     => &$GLOBALS['TL_LANG']['tl_syncCto_clients_syncTo']['systemoperations_check'],
             'inputType' => 'checkbox',
-            'exclude' => true,
-            'eval' => array(
-                'submitOnChange' => true,
-                'tl_class' => 'clr'
+            'exclude'   => true,
+            'eval'      => array(
+                'submitOnChange'               => true,
+                'tl_class'                     => 'clr'
             ),
         ),
         'systemoperations_maintenance' => array(
-            'label' => &$GLOBALS['TL_LANG']['tl_syncCto_clients_syncTo']['systemoperations_maintenance'],
+            'label'     => &$GLOBALS['TL_LANG']['tl_syncCto_clients_syncTo']['systemoperations_maintenance'],
             'inputType' => 'checkbox',
-            'exclude' => true,
+            'exclude'   => true,
             'reference' => &$GLOBALS['TL_LANG']['SYC'],
-            'eval' => array(
-                'multiple' => true,
-                'checkAll' => true
+            'eval'      => array(
+                'multiple'         => true,
+                'checkAll'         => true
             ),
             'options_callback' => array('SyncCtoHelper', 'getMaintanceOptions'),
         ),
-        'attentionFlag' => array
-            (
-            'label' => &$GLOBALS['TL_LANG']['tl_syncCto_clients_syncTo']['attention_flag'],
+        'attentionFlag' => array(
+            'label'              => &$GLOBALS['TL_LANG']['tl_syncCto_clients_syncTo']['attention_flag'],
+            'inputType'          => 'checkbox',
+            'exclude'            => true
+        ),
+        'localconfig_error' => array(
+            'label'     => &$GLOBALS['TL_LANG']['tl_syncCto_clients_syncTo']['localconfig_error'],
             'inputType' => 'checkbox',
-            'exclude' => true,
-            'eval' => array(
-                'multiple' => false
-            ),
-        )      
+            'exclude'   => true
+        )
     )
 );
 
@@ -135,26 +134,26 @@ class tl_syncCto_clients_syncTo extends Backend
     {
         $strInitFilePath = '/system/config/initconfig.php';
 
-        if(file_exists(TL_ROOT . $strInitFilePath))
+        if (file_exists(TL_ROOT . $strInitFilePath))
         {
-            $strFile = new File($strInitFilePath);
+            $strFile        = new File($strInitFilePath);
             $arrFileContent = $strFile->getContentAsArray();
-            $booLocated = FALSE;
-            foreach($arrFileContent AS $strContent)
+            $booLocated     = FALSE;
+            foreach ($arrFileContent AS $strContent)
             {
-                if(!preg_match("/(\/\*|\*|\*\/|\/\/)/", $strContent))
-                {                                
+                if (!preg_match("/(\/\*|\*|\*\/|\/\/)/", $strContent))
+                {
                     //system/tmp
-                    if(preg_match("/system\/tmp/", $strContent))
-                    {                            
+                    if (preg_match("/system\/tmp/", $strContent))
+                    {
                         // Set data
-                        $dc->setData("disabledCache", "<p class='tl_info'>" . $GLOBALS['TL_LANG']['MSC']['disabled_cache'] . "</p>");                                    
+                        $dc->setData("disabledCache", "<p class='tl_info'>" . $GLOBALS['TL_LANG']['MSC']['disabled_cache'] . "</p>");
                         $booLocated = TRUE;
                     }
                 }
             }
-            
-            if(!$booLocated)
+
+            if (!$booLocated)
             {
                 $GLOBALS['TL_DCA']['tl_syncCto_clients_syncTo']['palettes']['default'] = str_replace(",disabledCache", "", $GLOBALS['TL_DCA']['tl_syncCto_clients_syncTo']['palettes']['default']);
             }
@@ -170,11 +169,11 @@ class tl_syncCto_clients_syncTo extends Backend
 
         $arrData = array
             (
-            'id' => 'start_sync',
-            'formkey' => 'start_sync',
-            'class' => '',
-            'accesskey' => 'g',
-            'value' => specialchars($GLOBALS['TL_LANG']['MSC']['sync']),
+            'id'              => 'start_sync',
+            'formkey'         => 'start_sync',
+            'class'           => '',
+            'accesskey'       => 'g',
+            'value'           => specialchars($GLOBALS['TL_LANG']['MSC']['sync']),
             'button_callback' => array('tl_syncCto_clients_syncTo', 'onsubmit_callback')
         );
 
@@ -215,7 +214,7 @@ class tl_syncCto_clients_syncTo extends Backend
      * @return array 
      */
     public function onsubmit_callback(DataContainer $dc)
-    {               
+    {
         $arrSyncSettings = array();
 
         // Synchronization type
@@ -262,17 +261,28 @@ class tl_syncCto_clients_syncTo extends Backend
         else
         {
             $arrSyncSettings["syncCto_AttentionFlag"] = false;
+        }      
+      
+        // Error msg
+        if ($this->Input->post("localconfig_error") == 1)
+        {
+            $arrSyncSettings["syncCto_ShowError"] = true;
         }
-        
+        else
+        {
+            $arrSyncSettings["syncCto_ShowError"] = false;
+        }
+
+        // Save Session
         $this->Session->set("syncCto_SyncSettings_" . $dc->id, $arrSyncSettings);
 
         $this->objSyncCtoHelper->checkSubmit(array(
             'postUnset' => array('start_sync'),
             'error' => array(
-                'key' => 'syncCto_submit_false',
-                'message' => $GLOBALS['TL_LANG']['ERR']['missing_tables']
+                'key'         => 'syncCto_submit_false',
+                'message'     => $GLOBALS['TL_LANG']['ERR']['missing_tables']
             ),
-            'redirectUrl' => $this->Environment->base . "contao/main.php?do=synccto_clients&amp;table=tl_syncCto_clients_syncTo&amp;act=start&amp;step=0&amp;id=" . $this->Input->get("id") 
+            'redirectUrl' => $this->Environment->base . "contao/main.php?do=synccto_clients&amp;table=tl_syncCto_clients_syncTo&amp;act=start&amp;step=0&amp;id=" . $this->Input->get("id")
         ));
     }
 
