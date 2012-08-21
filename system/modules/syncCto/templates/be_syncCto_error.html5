@@ -1,0 +1,4 @@
+<br />
+<p class="tl_help">
+    <?php echo $this->strErrorMsg; ?>
+</p>

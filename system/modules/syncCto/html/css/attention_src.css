@@ -1,33 +1,8 @@
 /* Copyright (c) MEN AT WORK 2012 :: LGPL license */
 
 #attention {
-    background:none repeat scroll 0 0 #FFFFFF;
-    border:1px solid #BBBBBB;
-    margin:18px auto;
-    text-align:left;
-    width:938px;
-}
-
-#attention h1 {
-	background: #ad4848;
-	background: -moz-linear-gradient(top,  #ad4848 0%, #cc5555 100%);
-	background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,#ad4848), color-stop(100%,#cc5555));
-	background: -webkit-linear-gradient(top,  #ad4848 0%,#cc5555 100%);
-	background: -o-linear-gradient(top,  #ad4848 0%,#cc5555 100%); 
-	background: -ms-linear-gradient(top,  #ad4848 0%,#cc5555 100%);
-	background: linear-gradient(top,  #ad4848 0%,#cc5555 100%);
-	filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#ad4848', endColorstr='#cc5555',GradientType=0 );
-    color:#FFFFFF;
-    margin:1px;
-    padding:2px 0 4px 6px;
-}
-
-#attention div {
-    color:#666966;
+    background-image:none;
+    border-top:1px solid #CCCCCC;
     margin:0;
-    padding:6px 11px 8px;
-}
-
-#attention p {
-	background-color:transparent;
+    padding:8px 12px 10px;
 }

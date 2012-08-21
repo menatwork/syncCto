@@ -384,7 +384,7 @@ class SyncCtoHelper extends Backend
     }
 
     /**
-     * Insert a warning msg if SycnFrom was activate
+     * Insert a warning msg if the attention flag is active
      * 
      * @param string $strContent
      * @param string $strTemplate
@@ -396,9 +396,11 @@ class SyncCtoHelper extends Backend
         {
             $objTemplate = new BackendTemplate("be_syncCto_attention");
 
-            $strNewContent = preg_replace("/<div.*id=\"container\".*>/", $objTemplate->parse() . "\n$0", $strContent, 1);
-
-            if ($strNewContent == "")
+            preg_match('/<div.*id=\"header\".*>/i', $strContent, $arrHeader);
+            preg_match('{<div\s+id="header"\s*>((?:(?:(?!<div[^>]*>|</div>).)++|<div[^>]*>(?1)</div>)*)</div>}si', $strContent, $arrInnderDiv);
+            $strNew = $arrHeader[0].$arrInnderDiv[1].$objTemplate->parse().'</div>';
+            $strNewContent = preg_replace('{<div\s+id="header"\s*>((?:(?:(?!<div[^>]*>|</div>).)++|<div[^>]*>(?1)</div>)*)</div>}si', $strNew, $strContent, 1);
+            if ($strNewContent == "" && $arrInnderDiv[1] !='' && $arrHeader[0] !='')
             {
                 return $strContent;
             }

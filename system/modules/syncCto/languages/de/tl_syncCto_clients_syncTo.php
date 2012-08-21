@@ -42,6 +42,7 @@ $GLOBALS['TL_LANG']['tl_syncCto_clients_syncTo']['sync_options']                
 $GLOBALS['TL_LANG']['tl_syncCto_clients_syncTo']['database_check']                      = array('Datenbank synchronisieren', 'Wählen Sie diese Option, wenn Sie die Datenbank synchronisieren wollen.');
 $GLOBALS['TL_LANG']['tl_syncCto_clients_syncTo']['systemoperations_check']              = array('Systemwartung aktivieren', 'Wählen Sie diese Option, wenn die Systemwartung durchgeführt werden soll.');
 $GLOBALS['TL_LANG']['tl_syncCto_clients_syncTo']['systemoperations_maintenance']        = array('Daten bereinigen', 'Bitte wählen Sie die zu bereinigenden Daten aus.');
-$GLOBALS['TL_LANG']['tl_syncCto_clients_syncTo']['attention_flag']                      = array('Warnhinweis deaktivieren', 'Wählen Sie diese Option, wenn der Warnhinweis auf dem Client deaktiviert werden soll.')
-         
+$GLOBALS['TL_LANG']['tl_syncCto_clients_syncTo']['attention_flag']                      = array('Warnhinweis deaktivieren', 'Wählen Sie diese Option, wenn der Warnhinweis auf dem Client deaktiviert werden soll.');
+$GLOBALS['TL_LANG']['tl_syncCto_clients_syncTo']['localconfig_error']                   = array('Fehlermeldungen anzeigen', 'Fehlermeldungen auf dem Bildschirm ausgeben (nicht empfohlen für produktive Seiten).');
+
 ?>
