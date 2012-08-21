@@ -6,7 +6,16 @@ Version 2.2.0 (2012-08-17)
 --------------------------
 
 ### Defect
+Fehlerhafte Texte während der Synchronisation (see #115).
+
+### Defect
+Falsche Platzierung in den Konfigurationen (see #114).
+
+### Defect
 Optimierung der Beschreibungen (see #113).
+
+### Defect
+Abbruch bei unbekannten RPC's (see #112).
 
 ### Defect
 Filterregeln der DB-Tabellen optimieren (see #110).
