@@ -66,7 +66,7 @@ class SyncCtoFiles extends Backend
         // Init
         $this->objSyncCtoHelper = SyncCtoHelper::getInstance();
         $this->objFiles = Files::getInstance();
-        $this->strTimestampFormat = standardize($GLOBALS['TL_CONFIG']['datimFormat']);
+        $this->strTimestampFormat = str_replace(array(':', ' '), array('','_'), $GLOBALS['TL_CONFIG']['datimFormat']);
 
         // Load blacklists and whitelists
         $this->arrFolderBlacklist = $this->objSyncCtoHelper->getBlacklistFolder();
