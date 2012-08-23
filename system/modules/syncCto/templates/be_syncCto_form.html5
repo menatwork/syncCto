@@ -1,12 +1,23 @@
+<script>    
+    function openMediaBox()
+    {
+        Mediabox.open('<?php echo $this->Environment->base; ?>contao/<?php echo $this->popupClassName; ?>?id=<?php echo $this->id; ?>&amp;direction=<?php echo $this->direction; ?>', '', '850 80%');   
+    }
+    
+    window.addEvent("domready",function(){
+        openMediaBox();
+    });
+</script>
+
 <form id="<?php echo $this->cssId; ?>" action="<?php echo $this->Environment->base; ?>contao/main.php?do=synccto_clients&amp;table=tl_syncCto_clients_sync<?php echo $this->direction; ?>&amp;act=start&amp;step=<?php echo $this->step; ?>&amp;id=<?php echo $this->id; ?>" method="post">
     <div class="formbody">
         <input type="hidden" name="FORM_SUBMIT" value="<?php echo $this->formId; ?>" />        
         <input type="hidden" name="REQUEST_TOKEN" value="<?php echo REQUEST_TOKEN; ?>">
-        
+
         <div class="m12 submit_container">
             <input class="tl_submit invisible" name="forward" type="submit" value="<?php echo $this->forwardValue; ?>" />
             <input class="tl_submit" name="skip" type="submit" value="<?php echo $GLOBALS['TL_LANG']['MSC']['skip']; ?>" />
-            <input type="button" class="tl_submit" value="<?php echo $GLOBALS['TL_LANG']['MSC']['popup']; ?>" onClick="Mediabox.open('<?php echo $this->Environment->base; ?>contao/<?php echo $this->popupClassName; ?>?id=<?php echo $this->id; ?>&amp;direction=<?php echo $this->direction; ?>', '', '850 80%');"/>
+            <input type="button" class="tl_submit" value="<?php echo $GLOBALS['TL_LANG']['MSC']['popup']; ?>" onClick="openMediaBox(); return false;"/>
         </div>
     </div>
 </form>
