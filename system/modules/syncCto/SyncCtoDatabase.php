@@ -117,10 +117,10 @@ class SyncCtoDatabase extends Backend
         parent::__construct();
 
         // Init some vars
-        $this->arrBackupTables = array();
-        $this->strTimestampFormat = standardize($GLOBALS['TL_CONFIG']['datimFormat']);
-        $this->intMaxMemoryUsage = intval(str_replace(array("m", "M", "k", "K"), array("000000", "000000", "000", "000"), ini_get('memory_limit')));
-        $this->intMaxMemoryUsage = $this->intMaxMemoryUsage / 100 * 80;
+        $this->arrBackupTables    = array();
+        $this->strTimestampFormat = str_replace(array(':', ' '), array('', '_'), $GLOBALS['TL_CONFIG']['datimFormat']);
+        $this->intMaxMemoryUsage  = intval(str_replace(array("m", "M", "k", "K"), array("000000", "000000", "000", "000"), ini_get('memory_limit')));
+        $this->intMaxMemoryUsage  = $this->intMaxMemoryUsage / 100 * 80;
 
         // Load hidden tables
         $this->arrHiddenTables = deserialize($GLOBALS['SYC_CONFIG']['table_hidden']);

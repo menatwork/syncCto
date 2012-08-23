@@ -262,18 +262,6 @@ class PopupSyncFiles extends Backend
             return;
         }
 
-        // Get 
-        // Get Client id
-        if (strlen($this->Input->get('direction')) != 0)
-        {
-            $this->strMode = $this->Input->get('direction');
-        }
-        else
-        {
-            $this->mixStep = self::STEP_ERROR_DB;
-            return;
-        }
-
         // Get next step
         if (strlen($this->Input->get('step')) != 0)
         {
