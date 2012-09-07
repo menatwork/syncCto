@@ -119,8 +119,7 @@ class PopupSyncFiles extends Backend
      * Show database server and client compare list
      */
     public function showNormalDatabase()
-    {
-        
+    {        
         // Delete functinality
         if (key_exists("delete", $_POST))
         {
@@ -130,9 +129,9 @@ class PopupSyncFiles extends Backend
                 {
                      unset($this->arrSyncSettings['syncCto_CompareTables']['recommended'][$value]);
                 }
-                else if( isset($this->arrSyncSettings['syncCto_CompareTables']['none_recommended']) && key_exists($value, $this->arrSyncSettings['syncCto_CompareTables']['none_recommended']))
+                else if( isset($this->arrSyncSettings['syncCto_CompareTables']['nonRecommended']) && key_exists($value, $this->arrSyncSettings['syncCto_CompareTables']['nonRecommended']))
                 {
-                     unset($this->arrSyncSettings['syncCto_CompareTables']['none_recommended'][$value]);
+                     unset($this->arrSyncSettings['syncCto_CompareTables']['nonRecommended'][$value]);
                 }
             }
         }
@@ -162,7 +161,7 @@ class PopupSyncFiles extends Backend
         
         // If no table is found skip the view
         if (count($this->arrSyncSettings['syncCto_CompareTables']['recommended']) == 0 
-                && count($this->arrSyncSettings['syncCto_CompareTables']['none_recommended']) == 0)
+                && count($this->arrSyncSettings['syncCto_CompareTables']['nonRecommended']) == 0)
         {
             unset($this->arrSyncSettings['syncCto_CompareTables']);
             $this->arrSyncSettings['syncCto_SyncDeleteTables'] = array();
