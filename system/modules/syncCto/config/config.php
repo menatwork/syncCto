@@ -287,7 +287,7 @@ $GLOBALS["CTOCOM_FUNCTIONS"]["SYNCCTO_IMPORT_DATABASE"] = array(
     "class" => "SyncCtoDatabase",
     "function" => "runRestore",
     "typ" => "POST",
-    "parameter" => array("filepath"),
+    "parameter" => array("filepath", "additionalSQL"),
 );
 
 // Drop tables

@@ -37,20 +37,18 @@ class SyncCtoDatabase extends Backend
      */
 
     // Singelten pattern
-    protected static $instance    = null;
-    
+    protected static $instance = null;
     // Vars 
     protected $arrBackupTables;
     protected $arrHiddenTables;
-    protected $strSuffixZipName   = "DB-Backup.zip";
+    protected $strSuffixZipName = "DB-Backup.zip";
     protected $strFilenameSyncCto = "DB-Backup.synccto";
-    protected $strFilenameSQL     = "DB-Backup.sql";
+    protected $strFilenameSQL = "DB-Backup.sql";
     protected $strTimestampFormat;
     protected $intMaxMemoryUsage;
-    
     // Objects 
     protected $objSyncCtoHelper;
-    
+
     /**
      * @var XMLReader 
      */
@@ -117,10 +115,10 @@ class SyncCtoDatabase extends Backend
         parent::__construct();
 
         // Init some vars
-        $this->arrBackupTables    = array();
+        $this->arrBackupTables = array();
         $this->strTimestampFormat = str_replace(array(':', ' '), array('', '_'), $GLOBALS['TL_CONFIG']['datimFormat']);
-        $this->intMaxMemoryUsage  = intval(str_replace(array("m", "M", "k", "K"), array("000000", "000000", "000", "000"), ini_get('memory_limit')));
-        $this->intMaxMemoryUsage  = $this->intMaxMemoryUsage / 100 * 80;
+        $this->intMaxMemoryUsage = intval(str_replace(array("m", "M", "k", "K"), array("000000", "000000", "000", "000"), ini_get('memory_limit')));
+        $this->intMaxMemoryUsage = $this->intMaxMemoryUsage / 100 * 80;
 
         // Load hidden tables
         $this->arrHiddenTables = deserialize($GLOBALS['SYC_CONFIG']['table_hidden']);
@@ -223,7 +221,7 @@ class SyncCtoDatabase extends Backend
     /* -------------------------------------------------------------------------
      * Delete functions
      */
-    
+
     /**
      * Drop tables
      * 
@@ -232,17 +230,17 @@ class SyncCtoDatabase extends Backend
      */
     public function dropTable($arrTables, $blnBackup = true)
     {
-        if($blnBackup == true)
+        if ($blnBackup == true)
         {
-            $this->strSuffixZipName = 'Auto-DB-Backup_RPC-Drop.zip';            
+            $this->strSuffixZipName = 'Auto-DB-Backup_RPC-Drop.zip';
             $this->runDump($arrTables, false);
         }
-        
+
         $arrKnownTables = $this->Database->listTables();
-        
+
         foreach ($arrTables as $value)
         {
-            if(in_array($value, $arrKnownTables))
+            if (in_array($value, $arrKnownTables))
             {
                 $this->Database->query("DROP TABLE $value");
             }
@@ -465,7 +463,7 @@ class SyncCtoDatabase extends Backend
                     {
                         $objXml->startElement('field');
                         $objXml->writeAttribute("name", $field_key);
-                        
+
                         if (!isset($field_data))
                         {
                             $objXml->writeAttribute("type", "null");
@@ -523,7 +521,7 @@ class SyncCtoDatabase extends Backend
                                 case 'set':
                                     $objXml->writeAttribute("type", "text");
                                     $objXml->writeCdata(base64_encode(str_replace($this->arrSearchFor, $this->arrReplaceWith, $field_data)));
-                                   
+
                                     break;
 
                                 default:
@@ -560,7 +558,7 @@ class SyncCtoDatabase extends Backend
         {
             // Write header for sql file
             $today = date("Y-m-d");
-            $time  = date("H:i:s");
+            $time = date("H:i:s");
 
             // Write Header
             $string .= "-- syncCto SQL Dump\r\n";
@@ -625,7 +623,7 @@ class SyncCtoDatabase extends Backend
                 }
 
                 $intElementsPerRequest = 500;
-                $booFirstEntry         = true;
+                $booFirstEntry = true;
 
                 for ($i = 0; true; $i++)
                 {
@@ -779,9 +777,9 @@ class SyncCtoDatabase extends Backend
         $arrTables = array();
 
         // Current Values
-        $strCurrentTable         = "";
+        $strCurrentTable = "";
         $strCurrentNodeAttribute = "";
-        $strCurrentNodeName      = "";
+        $strCurrentNodeName = "";
 
         while ($this->objXMLReader->read())
         {
@@ -870,12 +868,12 @@ class SyncCtoDatabase extends Backend
         $arrFields = array();
 
         // Current Values
-        $strCurrentTable             = "";
+        $strCurrentTable = "";
         $strCurrentNodeAttributeName = "";
         $strCurrentNodeAttributeType = "";
-        $strCurrentNodeName          = "";
-        $intCounter                  = 0;
-       
+        $strCurrentNodeName = "";
+        $intCounter = 0;
+
         while ($this->objXMLReader->read())
         {
             switch ($this->objXMLReader->nodeType)
@@ -885,7 +883,7 @@ class SyncCtoDatabase extends Backend
                     switch ($strCurrentNodeName)
                     {
                         case "field":
-                            if($strCurrentNodeAttributeType == "text" || $strCurrentNodeAttributeType == "default")
+                            if ($strCurrentNodeAttributeType == "text" || $strCurrentNodeAttributeType == "default")
                             {
                                 $arrValues[$intCounter][$strCurrentNodeAttributeName] = "'" . base64_decode($this->objXMLReader->value) . "'";
                             }
@@ -893,7 +891,7 @@ class SyncCtoDatabase extends Backend
                             {
                                 $arrValues[$intCounter][$strCurrentNodeAttributeName] = $this->objXMLReader->value;
                             }
-                            
+
                             break;
                     }
                     break;
@@ -982,7 +980,7 @@ class SyncCtoDatabase extends Backend
                     }
                     break;
             }
-        }        
+        }
     }
 
     /**
@@ -992,7 +990,7 @@ class SyncCtoDatabase extends Backend
      * @param bool $booTruncate 
      * @return type 
      */
-    public function runRestore($strRestoreFile)
+    public function runRestore($strRestoreFile, $arrSuffixSQL = null)
     {
         // Set time out for database. Ticket #2653
         if ($GLOBALS['TL_CONFIG']['syncCto_custom_settings'] == true
@@ -1034,7 +1032,17 @@ class SyncCtoDatabase extends Backend
                 throw new Exception("Not supportet or Unknown file type.");
                 break;
         }
-        
+
+        // After insert, call some SQL
+        if (is_array($arrSuffixSQL))
+        {
+            foreach ($arrSuffixSQL as $key => $value)
+            {
+                $mixDatabase = $this->Database->prepare($value['prepare']);
+                call_user_func_array(array($mixDatabase, "execute"), $value["execute"]);
+            }
+        }
+
         // Rename temp tables
         foreach ($arrRestoreTables as $key => $value)
         {
@@ -1051,7 +1059,7 @@ class SyncCtoDatabase extends Backend
             }
         }
 
-        return;
+        return 'asdf';
     }
 
     protected function runRestoreFromXML($strRestoreFile)
@@ -1098,7 +1106,7 @@ class SyncCtoDatabase extends Backend
                     break;
             }
         }
-        
+
         $objXMLFile->delete();
 
         return $arrRestoreTables;
@@ -1106,8 +1114,8 @@ class SyncCtoDatabase extends Backend
 
     protected function runRestoreFromSer($strRestoreFile)
     {
-        $objZipArchive    = new ZipArchiveCto();
-        $objTempfile      = tmpfile();
+        $objZipArchive = new ZipArchiveCto();
+        $objTempfile = tmpfile();
         $arrRestoreTables = array();
 
         try
@@ -1162,7 +1170,7 @@ class SyncCtoDatabase extends Backend
             // Set pointer on position zero
             rewind($objTempfile);
 
-            $i       = 0;
+            $i = 0;
             while ($mixLine = fgets($objTempfile))
             {
                 $i++;
@@ -1206,12 +1214,12 @@ class SyncCtoDatabase extends Backend
             throw $exc;
         }
     }
-    
+
     /* -------------------------------------------------------------------------
      * Diff function
      */
-    
-     /**
+
+    /**
      * 
      * @param type $arrSourceTables
      * @param type $arrDesTables
@@ -1221,7 +1229,7 @@ class SyncCtoDatabase extends Backend
      * @return string
      */
     public function getFormatedCompareList($arrSourceTables, $arrDesTables, $arrHiddenTables, $arrSourceTS, $arrDesTS, $arrAllowedTables, $strSrcName, $strDesName)
-    {        
+    {
         // Remove hidden tables or tables without premission
         foreach ($arrSourceTables as $key => $value)
         {
@@ -1242,7 +1250,7 @@ class SyncCtoDatabase extends Backend
         $arrCompareList = array();
 
         // Make a diff
-        $arrMissingOnDes    = array_diff(array_keys($arrSourceTables), array_keys($arrDesTables));
+        $arrMissingOnDes = array_diff(array_keys($arrSourceTables), array_keys($arrDesTables));
         $arrMissingOnSource = array_diff(array_keys($arrDesTables), array_keys($arrSourceTables));
 
         // New Tables
@@ -1250,7 +1258,7 @@ class SyncCtoDatabase extends Backend
         {
             $strType = $arrSourceTables[$keySrcTables]['type'];
 
-            $arrCompareList[$strType][$keySrcTables][$strSrcName]['name']    = $keySrcTables;
+            $arrCompareList[$strType][$keySrcTables][$strSrcName]['name'] = $keySrcTables;
             $arrCompareList[$strType][$keySrcTables][$strSrcName]['tooltip'] = $this->getReadableSize($arrSourceTables[$keySrcTables]['size'])
                     . ', '
                     . vsprintf(($arrSourceTables[$keySrcTables]['count'] == 1) ? $GLOBALS['TL_LANG']['MSC']['entry'] : $GLOBALS['TL_LANG']['MSC']['entries'], array($arrSourceTables[$keySrcTables]['count']));
@@ -1258,7 +1266,7 @@ class SyncCtoDatabase extends Backend
             $arrCompareList[$strType][$keySrcTables][$strSrcName]['class'] = 'none';
 
             $arrCompareList[$strType][$keySrcTables][$strDesName]['name'] = '-';
-            $arrCompareList[$strType][$keySrcTables]['diff']              = $GLOBALS['TL_LANG']['MSC']['create'];
+            $arrCompareList[$strType][$keySrcTables]['diff'] = $GLOBALS['TL_LANG']['MSC']['create'];
 
             unset($arrSourceTables[$keySrcTables]);
         }
@@ -1268,7 +1276,7 @@ class SyncCtoDatabase extends Backend
         {
             $strType = $arrDesTables[$keyDesTables]['type'];
 
-            $arrCompareList[$strType][$keyDesTables][$strDesName]['name']    = $keyDesTables;
+            $arrCompareList[$strType][$keyDesTables][$strDesName]['name'] = $keyDesTables;
             $arrCompareList[$strType][$keySrcTables][$strSrcName]['tooltip'] = $this->getReadableSize($arrDesTables[$keyDesTables]['size'])
                     . ', '
                     . vsprintf(($arrDesTables[$keyDesTables]['count'] == 1) ? $GLOBALS['TL_LANG']['MSC']['entry'] : $GLOBALS['TL_LANG']['MSC']['entries'], array($arrDesTables[$keyDesTables]['count']));
@@ -1276,8 +1284,8 @@ class SyncCtoDatabase extends Backend
             $arrCompareList[$strType][$keyDesTables][$strDesName]['class'] = 'none';
 
             $arrCompareList[$strType][$keyDesTables][$strSrcName]['name'] = '-';
-            $arrCompareList[$strType][$keyDesTables]['diff']              = $GLOBALS['TL_LANG']['MSC']['delete'];
-            $arrCompareList[$strType][$keyDesTables]['del']               = true;
+            $arrCompareList[$strType][$keyDesTables]['diff'] = $GLOBALS['TL_LANG']['MSC']['delete'];
+            $arrCompareList[$strType][$keyDesTables]['del'] = true;
 
             unset($arrDesTables[$keyDesTables]);
         }
@@ -1287,23 +1295,23 @@ class SyncCtoDatabase extends Backend
         {
             $strType = $valueSrcTable['type'];
 
-            $arrCompareList[$strType][$keySrcTable][$strSrcName]['name']    = $keySrcTable;
+            $arrCompareList[$strType][$keySrcTable][$strSrcName]['name'] = $keySrcTable;
             $arrCompareList[$strType][$keySrcTable][$strSrcName]['tooltip'] = $this->getReadableSize($valueSrcTable['size'])
                     . ', '
                     . vsprintf(($valueSrcTable['count'] == 1) ? $GLOBALS['TL_LANG']['MSC']['entry'] : $GLOBALS['TL_LANG']['MSC']['entries'], array($valueSrcTable['count']));
 
             $valueClientTable = $arrDesTables[$keySrcTable];
 
-            $arrCompareList[$strType][$keySrcTable][$strDesName]['name']    = $keySrcTable;
+            $arrCompareList[$strType][$keySrcTable][$strDesName]['name'] = $keySrcTable;
             $arrCompareList[$strType][$keySrcTable][$strDesName]['tooltip'] = $this->getReadableSize($valueClientTable['size'])
                     . ', '
                     . vsprintf(($valueClientTable['count'] == 1) ? $GLOBALS['TL_LANG']['MSC']['entry'] : $GLOBALS['TL_LANG']['MSC']['entries'], array($valueClientTable['count']));
 
-            $intDiff                                             = $this->getDiff($valueSrcTable, $valueClientTable);
-            
+            $intDiff = $this->getDiff($valueSrcTable, $valueClientTable);
+
             // Add 'entry' or 'entries' to diff
             $arrCompareList[$strType][$keySrcTable]['diffCount'] = $intDiff;
-            $arrCompareList[$strType][$keySrcTable]['diff']      = vsprintf(($intDiff == 1) ? $GLOBALS['TL_LANG']['MSC']['entry'] : $GLOBALS['TL_LANG']['MSC']['entries'], array($intDiff));
+            $arrCompareList[$strType][$keySrcTable]['diff'] = vsprintf(($intDiff == 1) ? $GLOBALS['TL_LANG']['MSC']['entry'] : $GLOBALS['TL_LANG']['MSC']['entries'], array($intDiff));
 
             // Check timestamps
             if (key_exists($keySrcTable, $arrSourceTS['current']) && key_exists($keySrcTable, $arrSourceTS['lastSync']))
@@ -1423,10 +1431,10 @@ class SyncCtoDatabase extends Backend
 
         return array(
             'server' => array(
-                'current'  => $arrTimestampServer,
+                'current' => $arrTimestampServer,
                 'lastSync' => $arrLocationLastTableTimstamp['server']
             ),
-            'client'   => array(
+            'client' => array(
                 'current' => $arrTimestampClient,
                 'lastSync' => $arrLocationLastTableTimstamp['client']
             )
@@ -1491,7 +1499,7 @@ class SyncCtoDatabase extends Backend
 
             unset($field['index']);
 
-            $name          = $field['name'];
+            $name = $field['name'];
             $field['name'] = '`' . $field['name'] . '`';
 
             // Field type

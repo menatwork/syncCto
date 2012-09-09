@@ -677,7 +677,7 @@ class SyncCtoCommunicationClient extends CtoCommunication
             array(
                 "name" => "name",
                 "value" => $strName,
-            ),
+            )
         );
 
         return $this->runServer("SYNCCTO_GET_PATHLIST", $arrData);
@@ -693,12 +693,16 @@ class SyncCtoCommunicationClient extends CtoCommunication
      * @param type $filename
      * @return type 
      */
-    public function runSQLImport($filename)
+    public function runSQLImport($filename, $additionalSQL)
     {
         $arrData = array(
             array(
                 "name" => "filepath",
                 "value" => $filename,
+            ),
+            array(
+                "name" => "additionalSQL",
+                "value" => $additionalSQL,
             ),
         );
 
