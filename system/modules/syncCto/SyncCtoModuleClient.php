@@ -2011,9 +2011,9 @@ class SyncCtoModuleClient extends BackendModule
                     
                     $arrSQL = array();
                                       
-                    if (isset($GLOBALS['TL_HOOKS']['syncDBUpdate_BeforeDrop']) && is_array($GLOBALS['TL_HOOKS']['syncDBUpdate_BeforeDrop']))
+                    if (isset($GLOBALS['TL_HOOKS']['syncDBUpdateBeforeDrop']) && is_array($GLOBALS['TL_HOOKS']['syncDBUpdateBeforeDrop']))
                     {
-                        foreach ($GLOBALS['TL_HOOKS']['syncDBUpdate_BeforeDrop'] as $callback)
+                        foreach ($GLOBALS['TL_HOOKS']['syncDBUpdateBeforeDrop'] as $callback)
                         {
                             $this->import($callback[0]);
                             $mixReturn = $this->$callback[0]->$callback[1]($this->intClientID, $this->arrSyncSettings['syncCto_SyncTables'], $arrSQL);
