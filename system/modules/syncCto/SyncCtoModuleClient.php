@@ -1127,7 +1127,7 @@ class SyncCtoModuleClient extends BackendModule
         }
         catch (Exception $exc)
         {
-            $this->log(vsprintf("Error on synchronization client ID %s with msg: %s", array($this->Input->get("id"),$exc->getMessage())), __CLASS__ . " " . __FUNCTION__, "ERROR");
+            $this->log(vsprintf("Error on synchronization client ID %s with msg: %s", array($this->Input->get("id"), $exc->getMessage())), __CLASS__ . " " . __FUNCTION__, "ERROR");
 
             $this->booError = true;
             $this->strError = $exc->getMessage();
@@ -1852,7 +1852,7 @@ class SyncCtoModuleClient extends BackendModule
                     if ($this->User->isAdmin || $this->User->syncCto_tables != null)
                     {
                         // Load allowed tables for this user
-                        if (!$this->User->isAdmin)
+                        if ($this->User->isAdmin)
                         {
                             $arrAllowedTables = true;
                         }
@@ -1871,6 +1871,58 @@ class SyncCtoModuleClient extends BackendModule
                         $arrServerTableH    = $this->objSyncCtoHelper->getTablesHidden();
                         $arrServerTimestamp = $this->objSyncCtoHelper->getDatabaseTablesTimestamp();
 
+                        // clean up tables. Use user rights.
+                        if ($arrAllowedTables !== true)
+                        {
+                            foreach ($arrClientTableR as $key => $value)
+                            {
+                                if (!in_array($value['name'], $arrAllowedTables))
+                                {
+                                    unset($arrClientTableR[$key]);
+                                }
+                            }
+
+                            foreach ($arrClientTableNR as $key => $value)
+                            {
+                                if (!in_array($value['name'], $arrAllowedTables))
+                                {
+                                    unset($arrClientTableNR[$key]);
+                                }
+                            }
+
+                            foreach ($arrClientTableH as $key => $value)
+                            {
+                                if (!in_array($value['name'], $arrAllowedTables))
+                                {
+                                    unset($arrClientTableH[$key]);
+                                }
+                            }
+
+                            foreach ($arrServerTableR as $key => $value)
+                            {
+                                if (!in_array($value['name'], $arrAllowedTables))
+                                {
+                                    unset($arrServerTableR[$key]);
+                                }
+                            }
+
+                            foreach ($arrServerTableNR as $key => $value)
+                            {
+                                if (!in_array($value['name'], $arrAllowedTables))
+                                {
+                                    unset($arrServerTableNR[$key]);
+                                }
+                            }
+
+                            foreach ($arrServerTableH as $key => $value)
+                            {
+                                if (!in_array($value['name'], $arrAllowedTables))
+                                {
+                                    unset($arrServerTableH[$key]);
+                                }
+                            }
+                        }
+                        
                         // Merge all together
                         foreach ($arrServerTableR as $key => $value)
                         {
@@ -1891,7 +1943,7 @@ class SyncCtoModuleClient extends BackendModule
                         {
                             $arrClientTableNR[$key]['type'] = 'nonRecommended';
                         }
-
+                        
                         $arrServerTables  = array_merge($arrServerTableR, $arrServerTableNR);
                         $arrClientTables  = array_merge($arrClientTableR, $arrClientTableNR);
                         $arrHiddenTables  = array_keys(array_flip(array_merge($arrServerTableH, $arrClientTableH)));
@@ -3251,7 +3303,7 @@ class SyncCtoModuleClient extends BackendModule
                     if ($this->User->isAdmin || $this->User->syncCto_tables != null)
                     {
                         // Load allowed tables for this user
-                        if (!$this->User->isAdmin)
+                        if ($this->User->isAdmin)
                         {
                             $arrAllowedTables = true;
                         }
@@ -3270,6 +3322,58 @@ class SyncCtoModuleClient extends BackendModule
                         $arrServerTableH    = $this->objSyncCtoHelper->getTablesHidden();
                         $arrServerTimestamp = $this->objSyncCtoHelper->getDatabaseTablesTimestamp();
 
+                         // clean up tables. Use user rights.
+                        if ($arrAllowedTables !== true)
+                        {
+                            foreach ($arrClientTableR as $key => $value)
+                            {
+                                if (!in_array($value['name'], $arrAllowedTables))
+                                {
+                                    unset($arrClientTableR[$key]);
+                                }
+                            }
+
+                            foreach ($arrClientTableNR as $key => $value)
+                            {
+                                if (!in_array($value['name'], $arrAllowedTables))
+                                {
+                                    unset($arrClientTableNR[$key]);
+                                }
+                            }
+
+                            foreach ($arrClientTableH as $key => $value)
+                            {
+                                if (!in_array($value['name'], $arrAllowedTables))
+                                {
+                                    unset($arrClientTableH[$key]);
+                                }
+                            }
+
+                            foreach ($arrServerTableR as $key => $value)
+                            {
+                                if (!in_array($value['name'], $arrAllowedTables))
+                                {
+                                    unset($arrServerTableR[$key]);
+                                }
+                            }
+
+                            foreach ($arrServerTableNR as $key => $value)
+                            {
+                                if (!in_array($value['name'], $arrAllowedTables))
+                                {
+                                    unset($arrServerTableNR[$key]);
+                                }
+                            }
+
+                            foreach ($arrServerTableH as $key => $value)
+                            {
+                                if (!in_array($value['name'], $arrAllowedTables))
+                                {
+                                    unset($arrServerTableH[$key]);
+                                }
+                            }
+                        }
+                        
                         // Merge all together
                         foreach ($arrServerTableR as $key => $value)
                         {

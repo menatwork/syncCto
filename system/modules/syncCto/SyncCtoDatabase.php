@@ -1,4 +1,7 @@
-<?php if (!defined('TL_ROOT')) die('You cannot access this file directly!');
+<?php
+
+if (!defined('TL_ROOT'))
+    die('You cannot access this file directly!');
 
 /**
  * Contao Open Source CMS
@@ -37,8 +40,7 @@ class SyncCtoDatabase extends Backend
      */
 
     // Singelten pattern
-    protected static $instance    = null;
-    
+    protected static $instance           = null;
     // Vars 
     protected $arrBackupTables;
     protected $arrHiddenTables;
@@ -47,10 +49,9 @@ class SyncCtoDatabase extends Backend
     protected $strFilenameSQL     = "DB-Backup.sql";
     protected $strTimestampFormat;
     protected $intMaxMemoryUsage;
-    
     // Objects 
     protected $objSyncCtoHelper;
-    
+
     /**
      * @var XMLReader 
      */
@@ -117,10 +118,10 @@ class SyncCtoDatabase extends Backend
         parent::__construct();
 
         // Init some vars
-        $this->arrBackupTables    = array();
+        $this->arrBackupTables = array();
         $this->strTimestampFormat = str_replace(array(':', ' '), array('', '_'), $GLOBALS['TL_CONFIG']['datimFormat']);
-        $this->intMaxMemoryUsage  = intval(str_replace(array("m", "M", "k", "K"), array("000000", "000000", "000", "000"), ini_get('memory_limit')));
-        $this->intMaxMemoryUsage  = $this->intMaxMemoryUsage / 100 * 80;
+        $this->intMaxMemoryUsage = intval(str_replace(array("m", "M", "k", "K"), array("000000", "000000", "000", "000"), ini_get('memory_limit')));
+        $this->intMaxMemoryUsage = $this->intMaxMemoryUsage / 100 * 80;
 
         // Load hidden tables
         $this->arrHiddenTables = deserialize($GLOBALS['SYC_CONFIG']['table_hidden']);
@@ -223,7 +224,7 @@ class SyncCtoDatabase extends Backend
     /* -------------------------------------------------------------------------
      * Delete functions
      */
-    
+
     /**
      * Drop tables
      * 
@@ -232,17 +233,17 @@ class SyncCtoDatabase extends Backend
      */
     public function dropTable($arrTables, $blnBackup = true)
     {
-        if($blnBackup == true)
+        if ($blnBackup == true)
         {
-            $this->strSuffixZipName = 'Auto-DB-Backup_RPC-Drop.zip';            
+            $this->strSuffixZipName = 'Auto-DB-Backup_RPC-Drop.zip';
             $this->runDump($arrTables, false);
         }
-        
+
         $arrKnownTables = $this->Database->listTables();
-        
+
         foreach ($arrTables as $value)
         {
-            if(in_array($value, $arrKnownTables))
+            if (in_array($value, $arrKnownTables))
             {
                 $this->Database->query("DROP TABLE $value");
             }
@@ -465,7 +466,7 @@ class SyncCtoDatabase extends Backend
                     {
                         $objXml->startElement('field');
                         $objXml->writeAttribute("name", $field_key);
-                        
+
                         if (!isset($field_data))
                         {
                             $objXml->writeAttribute("type", "null");
@@ -523,7 +524,7 @@ class SyncCtoDatabase extends Backend
                                 case 'set':
                                     $objXml->writeAttribute("type", "text");
                                     $objXml->writeCdata(base64_encode(str_replace($this->arrSearchFor, $this->arrReplaceWith, $field_data)));
-                                   
+
                                     break;
 
                                 default:
@@ -875,7 +876,7 @@ class SyncCtoDatabase extends Backend
         $strCurrentNodeAttributeType = "";
         $strCurrentNodeName          = "";
         $intCounter                  = 0;
-       
+
         while ($this->objXMLReader->read())
         {
             switch ($this->objXMLReader->nodeType)
@@ -885,7 +886,7 @@ class SyncCtoDatabase extends Backend
                     switch ($strCurrentNodeName)
                     {
                         case "field":
-                            if($strCurrentNodeAttributeType == "text" || $strCurrentNodeAttributeType == "default")
+                            if ($strCurrentNodeAttributeType == "text" || $strCurrentNodeAttributeType == "default")
                             {
                                 $arrValues[$intCounter][$strCurrentNodeAttributeName] = "'" . base64_decode($this->objXMLReader->value) . "'";
                             }
@@ -893,7 +894,7 @@ class SyncCtoDatabase extends Backend
                             {
                                 $arrValues[$intCounter][$strCurrentNodeAttributeName] = $this->objXMLReader->value;
                             }
-                            
+
                             break;
                     }
                     break;
@@ -904,7 +905,7 @@ class SyncCtoDatabase extends Backend
                     {
                         case "table":
                             $strCurrentTable = $this->objXMLReader->getAttribute("name");
-                            $arrValues = array();
+                            $arrValues       = array();
                             $arrFields = array();
                             $intCounter = 0;
                             break;
@@ -982,7 +983,7 @@ class SyncCtoDatabase extends Backend
                     }
                     break;
             }
-        }        
+        }
     }
 
     /**
@@ -1034,7 +1035,7 @@ class SyncCtoDatabase extends Backend
                 throw new Exception("Not supportet or Unknown file type.");
                 break;
         }
-        
+
         // Rename temp tables
         foreach ($arrRestoreTables as $key => $value)
         {
@@ -1098,7 +1099,7 @@ class SyncCtoDatabase extends Backend
                     break;
             }
         }
-        
+
         $objXMLFile->delete();
 
         return $arrRestoreTables;
@@ -1206,12 +1207,12 @@ class SyncCtoDatabase extends Backend
             throw $exc;
         }
     }
-    
+
     /* -------------------------------------------------------------------------
      * Diff function
      */
-    
-     /**
+
+    /**
      * 
      * @param type $arrSourceTables
      * @param type $arrDesTables
@@ -1221,21 +1222,25 @@ class SyncCtoDatabase extends Backend
      * @return string
      */
     public function getFormatedCompareList($arrSourceTables, $arrDesTables, $arrHiddenTables, $arrSourceTS, $arrDesTS, $arrAllowedTables, $strSrcName, $strDesName)
-    {        
-        // Remove hidden tables or tables without premission
-        foreach ($arrSourceTables as $key => $value)
-        {
-            if (in_array($key, $arrHiddenTables) || (is_array($arrAllowedTables) && in_array($key, $arrAllowedTables)))
-            {
-                unset($arrSourceTables[$key]);
-            }
-        }
+    {
 
-        foreach ($arrDesTables as $key => $value)
+        // Remove hidden tables or tables without premission
+        if (is_array($arrHiddenTables) && count($arrHiddenTables) != 0)
         {
-            if (in_array($key, $arrHiddenTables) || (is_array($arrAllowedTables) && in_array($key, $arrAllowedTables)))
+            foreach ($arrSourceTables as $key => $value)
             {
-                unset($arrDesTables[$key]);
+                if (in_array($key, $arrHiddenTables) || (is_array($arrAllowedTables) && in_array($key, $arrAllowedTables)))
+                {
+                    unset($arrSourceTables[$key]);
+                }
+            }
+
+            foreach ($arrDesTables as $key => $value)
+            {
+                if (in_array($key, $arrHiddenTables) || (is_array($arrAllowedTables) && in_array($key, $arrAllowedTables)))
+                {
+                    unset($arrDesTables[$key]);
+                }
             }
         }
 
@@ -1299,8 +1304,8 @@ class SyncCtoDatabase extends Backend
                     . ', '
                     . vsprintf(($valueClientTable['count'] == 1) ? $GLOBALS['TL_LANG']['MSC']['entry'] : $GLOBALS['TL_LANG']['MSC']['entries'], array($valueClientTable['count']));
 
-            $intDiff                                             = $this->getDiff($valueSrcTable, $valueClientTable);
-            
+            $intDiff = $this->getDiff($valueSrcTable, $valueClientTable);
+
             // Add 'entry' or 'entries' to diff
             $arrCompareList[$strType][$keySrcTable]['diffCount'] = $intDiff;
             $arrCompareList[$strType][$keySrcTable]['diff']      = vsprintf(($intDiff == 1) ? $GLOBALS['TL_LANG']['MSC']['entry'] : $GLOBALS['TL_LANG']['MSC']['entries'], array($intDiff));
@@ -1427,7 +1432,7 @@ class SyncCtoDatabase extends Backend
                 'lastSync' => $arrLocationLastTableTimstamp['server']
             ),
             'client'   => array(
-                'current' => $arrTimestampClient,
+                'current'  => $arrTimestampClient,
                 'lastSync' => $arrLocationLastTableTimstamp['client']
             )
         );
