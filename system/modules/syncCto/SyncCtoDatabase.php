@@ -1246,19 +1246,22 @@ class SyncCtoDatabase extends Backend
     public function getFormatedCompareList($arrSourceTables, $arrDesTables, $arrHiddenTables, $arrSourceTS, $arrDesTS, $arrAllowedTables, $strSrcName, $strDesName)
     {
         // Remove hidden tables or tables without premission
-        foreach ($arrSourceTables as $key => $value)
+        if (is_array($arrHiddenTables) && count($arrHiddenTables) != 0)
         {
-            if (in_array($key, $arrHiddenTables) || (is_array($arrAllowedTables) && in_array($key, $arrAllowedTables)))
+            foreach ($arrSourceTables as $key => $value)
             {
-                unset($arrSourceTables[$key]);
+                if (in_array($key, $arrHiddenTables) || (is_array($arrAllowedTables) && in_array($key, $arrAllowedTables)))
+                {
+                    unset($arrSourceTables[$key]);
+                }
             }
-        }
 
-        foreach ($arrDesTables as $key => $value)
-        {
-            if (in_array($key, $arrHiddenTables) || (is_array($arrAllowedTables) && in_array($key, $arrAllowedTables)))
+            foreach ($arrDesTables as $key => $value)
             {
-                unset($arrDesTables[$key]);
+                if (in_array($key, $arrHiddenTables) || (is_array($arrAllowedTables) && in_array($key, $arrAllowedTables)))
+                {
+                    unset($arrDesTables[$key]);
+                }
             }
         }
 
