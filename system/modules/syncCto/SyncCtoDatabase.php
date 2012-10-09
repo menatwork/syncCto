@@ -1295,7 +1295,7 @@ class SyncCtoDatabase extends Backend
             $strType = $arrDesTables[$keyDesTables]['type'];
 
             $arrCompareList[$strType][$keyDesTables][$strDesName]['name']    = $keyDesTables;
-            $arrCompareList[$strType][$keySrcTables][$strSrcName]['tooltip'] = $this->getReadableSize($arrDesTables[$keyDesTables]['size'])
+            $arrCompareList[$strType][$keyDesTables][$strSrcName]['tooltip'] = $this->getReadableSize($arrDesTables[$keyDesTables]['size'])
                     . ', '
                     . vsprintf(($arrDesTables[$keyDesTables]['count'] == 1) ? $GLOBALS['TL_LANG']['MSC']['entry'] : $GLOBALS['TL_LANG']['MSC']['entries'], array($arrDesTables[$keyDesTables]['count']));
 
