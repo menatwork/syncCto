@@ -1,4 +1,7 @@
-<?php if (!defined('TL_ROOT')) die('You cannot access this file directly!');
+<?php
+
+if (!defined('TL_ROOT'))
+    die('You cannot access this file directly!');
 
 /**
  * Contao Open Source CMS
@@ -68,6 +71,11 @@ class SyncCtoModuleCheck extends BackendModule
         $this->loadLanguageFile('tl_syncCto_check');
     }
 
+    public function generate()
+    {
+        return parent::generate();
+    }
+
     protected function compile()
     {
         $this->import('BackendUser', 'User');
@@ -75,7 +83,7 @@ class SyncCtoModuleCheck extends BackendModule
 
         $this->Template->checkPhpConfiguration = $this->checkPhpConfiguration($this->getPhpConfigurations());
         $this->Template->checkPhpFunctions     = $this->checkPhpFunctions($this->getPhpFunctions());
-        $this->Template->syc_version = $GLOBALS['SYC_VERSION'];
+        $this->Template->syc_version           = $GLOBALS['SYC_VERSION'];
     }
 
     /**
@@ -112,7 +120,8 @@ class SyncCtoModuleCheck extends BackendModule
             'gmp'         => extension_loaded('gmp'),
             'bcmath'      => extension_loaded('bcmath'),
             'xmlwriter'   => @class_exists('XMLWriter'),
-            'xmlreader'   => @class_exists('XMLReader')
+            'xmlreader'   => @class_exists('XMLReader'),
+            'mcrypt'      => extension_loaded('mcrypt'),
         );
     }
 
@@ -268,7 +277,7 @@ class SyncCtoModuleCheck extends BackendModule
      * @return string
      */
     public function checkPhpFunctions($arrFunctions)
-    {        
+    {
         $return = '<table width="100%" cellspacing="0" cellpadding="0" class="extensions" summary="">';
         $return .= '<colgroup>';
         $return .= '<col width="25%" />';
@@ -315,12 +324,22 @@ class SyncCtoModuleCheck extends BackendModule
 
         // gmp
         $gmp = $arrFunctions['gmp'];
-        $ok     = ($gmp == true);
+        $ok  = ($gmp == true);
         $return .= '<tr class="' . ($ok ? 'ok' : 'warning') . '">';
         $return .= '<td>' . $GLOBALS['TL_LANG']['tl_syncCto_check']['gmp'][0] . '</td>';
         $return .= '<td class="dot">' . ($ok ? '&nbsp;' : '&#149;') . '</td>';
         $return .= '<td class="value">' . ($gmp ? $GLOBALS['TL_LANG']['tl_syncCto_check']['on'] : $GLOBALS['TL_LANG']['tl_syncCto_check']['off']) . '</td>';
         $return .= '<td>' . $GLOBALS['TL_LANG']['tl_syncCto_check']['gmp'][1] . '</td>';
+        $return .= '</tr>';
+
+        // mcrypt
+        $mcrypt = $arrFunctions['mcrypt'];
+        $ok  = ($mcrypt == true);
+        $return .= '<tr class="' . ($ok ? 'ok' : 'warning') . '">';
+        $return .= '<td>' . $GLOBALS['TL_LANG']['tl_syncCto_check']['mcrypt'][0] . '</td>';
+        $return .= '<td class="dot">' . ($ok ? '&nbsp;' : '&#149;') . '</td>';
+        $return .= '<td class="value">' . ($mcrypt ? $GLOBALS['TL_LANG']['tl_syncCto_check']['on'] : $GLOBALS['TL_LANG']['tl_syncCto_check']['off']) . '</td>';
+        $return .= '<td>' . $GLOBALS['TL_LANG']['tl_syncCto_check']['mcrypt'][1] . '</td>';
         $return .= '</tr>';
 
         // XMLWriter

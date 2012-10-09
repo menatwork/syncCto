@@ -54,6 +54,7 @@ $GLOBALS['TL_LANG']['tl_syncCto_check']['dst']                      = array('Def
 $GLOBALS['TL_LANG']['tl_syncCto_check']['fsocket']                  = array('Fsockopen', 'Recommended setting is On.');
 $GLOBALS['TL_LANG']['tl_syncCto_check']['bcmath']                   = array('BC Math', 'Recommended setting is On.');
 $GLOBALS['TL_LANG']['tl_syncCto_check']['gmp']                      = array('GMP', 'Recommended setting is On.');
+$GLOBALS['TL_LANG']['tl_syncCto_check']['mcrypt']                   = array('Mcrypt', 'Recommended setting is On. (Alternative phpseclib AES)');
 $GLOBALS['TL_LANG']['tl_syncCto_check']['zip_archive']              = array('ZipArchive', 'Recommended setting is On.');
 $GLOBALS['TL_LANG']['tl_syncCto_check']['xmlreader']                = array('XMLReader', 'Recommended setting is On.');
 $GLOBALS['TL_LANG']['tl_syncCto_check']['xmlwriter']                = array('XMLWriter', 'Recommended setting is On.');
