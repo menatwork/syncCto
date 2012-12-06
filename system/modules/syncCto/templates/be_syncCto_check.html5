@@ -1,10 +1,15 @@
 <h1 id="tl_welcome">syncCto <?php echo $this->syc_version; ?> <?php echo $GLOBALS['TL_LANG']['tl_syncCto_check']['check']; ?></h1>
 
 <div id="syncCto_check" class="syncCto_fullcheck">
-    <h2><?php echo $GLOBALS['TL_LANG']['tl_syncCto_check']['configuration']; ?></h2>
-    <?php echo $this->checkPhpConfiguration; ?> 
-    <h2><?php echo $GLOBALS['TL_LANG']['tl_syncCto_check']['functions']; ?></h2>
-    <?php echo $this->checkPhpFunctions; ?> 
+    <h2><?php echo $GLOBALS['TL_LANG']['tl_syncCto_check']['configuration']; ?></h2>    
+	<?php echo $this->checkPhpConfiguration; ?> 
+    
+	<h2><?php echo $GLOBALS['TL_LANG']['tl_syncCto_check']['functions']; ?></h2>   
+	<?php echo $this->checkPhpFunctions; ?> 
+	
+	<h2><?php echo $GLOBALS['TL_LANG']['tl_syncCto_check']['specialFunctions']; ?></h2>
+    <?php echo $this->checkSpecialPhpFunctions; ?> 
+	
     <?php if ($this->safeModeHack): ?>
         <p class="warn"><?php echo $GLOBALS['TL_LANG']['tl_syncCto_check']['safemodehack']; ?></p>
     <?php endif; ?>

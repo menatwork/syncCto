@@ -833,6 +833,7 @@ class SyncCtoModuleClient extends BackendModule
                     $objCheckTemplate = new BackendTemplate('be_syncCto_smallCheck');
                     $objCheckTemplate->checkPhpConfiguration = $objCheck->checkPhpConfiguration($arrConfigurations);
                     $objCheckTemplate->checkPhpFunctions = $objCheck->checkPhpFunctions($arrFunctions);
+                    $objCheckTemplate->checkSpecialPhpFunctions = $objCheck->checkSpecialPhpFunctions($arrFunctions);
                     $objCheckTemplate->syc_version = $strVersion;
 
 

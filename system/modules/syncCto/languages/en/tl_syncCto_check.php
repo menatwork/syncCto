@@ -33,7 +33,8 @@
 $GLOBALS['TL_LANG']['tl_syncCto_check']['check']                    = 'System check';
 $GLOBALS['TL_LANG']['tl_syncCto_check']['configuration']            = 'PHP configuration';
 $GLOBALS['TL_LANG']['tl_syncCto_check']['functions']                = 'PHP functions';
- 
+$GLOBALS['TL_LANG']['tl_syncCto_check']['specialFunctions']         = 'PHP special functions';
+
 /**
  * Table
  */
@@ -52,8 +53,8 @@ $GLOBALS['TL_LANG']['tl_syncCto_check']['pms']                      = array('Pos
 $GLOBALS['TL_LANG']['tl_syncCto_check']['mit']                      = array('Maximum input time', 'Recommended setting is -1, 60 or greater.'); 
 $GLOBALS['TL_LANG']['tl_syncCto_check']['dst']                      = array('Default socket timeout', 'Recommended setting is 30 or greater.');
 $GLOBALS['TL_LANG']['tl_syncCto_check']['fsocket']                  = array('Fsockopen', 'Recommended setting is On.');
-$GLOBALS['TL_LANG']['tl_syncCto_check']['bcmath']                   = array('BC Math', 'Recommended setting is On.');
-$GLOBALS['TL_LANG']['tl_syncCto_check']['gmp']                      = array('GMP', 'Recommended setting is On.');
+$GLOBALS['TL_LANG']['tl_syncCto_check']['bcmath']                   = array('BC Math', 'Recommended setting is On or GMP On.');
+$GLOBALS['TL_LANG']['tl_syncCto_check']['gmp']                      = array('GMP', 'Recommended setting is On or BC Math On.');
 $GLOBALS['TL_LANG']['tl_syncCto_check']['mcrypt']                   = array('Mcrypt', 'Recommended setting is On. (Alternative phpseclib AES)');
 $GLOBALS['TL_LANG']['tl_syncCto_check']['zip_archive']              = array('ZipArchive', 'Recommended setting is On.');
 $GLOBALS['TL_LANG']['tl_syncCto_check']['xmlreader']                = array('XMLReader', 'Recommended setting is On.');
