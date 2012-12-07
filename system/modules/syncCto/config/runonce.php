@@ -45,7 +45,7 @@ class SyncCtoErClient extends RepositoryBackendModule
         try
         {
             parent::__construct();
-            
+
             $this->strWSDL = trim($GLOBALS['TL_CONFIG']['repository_wsdl']);
 
             $this->client = new SoapClient($this->strWSDL,
@@ -56,7 +56,7 @@ class SyncCtoErClient extends RepositoryBackendModule
             );
         }
         catch (Exception $exc)
-        {            
+        {
             $this->log($exc->getMessage(), __CLASS__ . ' ' . __FUNCTION__, 'ERROR');
             $this->blnNoError = false;
         }
@@ -64,8 +64,8 @@ class SyncCtoErClient extends RepositoryBackendModule
 
     public function run()
     {
-		$this->checkFolders();
-		
+        $this->checkFolders();
+
         if ($this->blnNoError == false)
         {
             return;
@@ -82,42 +82,42 @@ class SyncCtoErClient extends RepositoryBackendModule
             $_SESSION['TL_ERROR'][] = $exc->getMessage();
         }
     }
-	
-	protected function checkFolders()
-	{
-		// Get folders from config
-		$strBackupDB	 = $this->standardizePath($GLOBALS['SYC_PATH']['db']);
-		$strBackupFile	 = $this->standardizePath($GLOBALS['SYC_PATH']['file']);
-		$strTemp		 = $this->standardizePath($GLOBALS['SYC_PATH']['tmp']);
 
-		$objHt	 = new File('system/modules/syncCto/config/.htaccess');
-		$strHT	 = $objHt->getContent();
-		$objHt->close();
+    protected function checkFolders()
+    {
+        // Get folders from config
+        $strBackupDB   = $this->standardizePath($GLOBALS['SYC_PATH']['db']);
+        $strBackupFile = $this->standardizePath($GLOBALS['SYC_PATH']['file']);
+        $strTemp       = $this->standardizePath($GLOBALS['SYC_PATH']['tmp']);
 
-		// Check each one 
-		if (!file_exists(TL_ROOT . '/' . $strBackupDB))
-		{
-			new Folder($strBackupDB);
+        $objHt = new File('system/modules/syncCto/config/.htaccess');
+        $strHT = $objHt->getContent();
+        $objHt->close();
 
-			$objFile = new File($strBackupDB . '/' . '.htaccess');
-			$objFile->write($strHT);
-			$objFile->close();
-		}
+        // Check each one 
+        if (!file_exists(TL_ROOT . '/' . $strBackupDB))
+        {
+            new Folder($strBackupDB);
 
-		if (!file_exists(TL_ROOT . '/' . $strBackupFile))
-		{
-			new Folder($strBackupFile);
+            $objFile = new File($strBackupDB . '/' . '.htaccess');
+            $objFile->write($strHT);
+            $objFile->close();
+        }
 
-			$objFile = new File($strBackupFile . '/' . '.htaccess');
-			$objFile->write($strHT);
-			$objFile->close();
-		}
+        if (!file_exists(TL_ROOT . '/' . $strBackupFile))
+        {
+            new Folder($strBackupFile);
 
-		if (!file_exists(TL_ROOT . '/' . $strTemp))
-		{
-			new Folder($strTemp);
-		}
-	}
+            $objFile = new File($strBackupFile . '/' . '.htaccess');
+            $objFile->write($strHT);
+            $objFile->close();
+        }
+
+        if (!file_exists(TL_ROOT . '/' . $strTemp))
+        {
+            new Folder($strTemp);
+        }
+    }
 
     protected function writeXML()
     {
@@ -163,7 +163,7 @@ class SyncCtoErClient extends RepositoryBackendModule
 
         $objFile = new File('tl_files/syncCto_backups/dependencies.xml');
         $objFile->write($objXml->flush());
-        $objFile->close();        
+        $objFile->close();
     }
 
     protected function loadFilelist()
@@ -288,48 +288,47 @@ class SyncCtoErClient extends RepositoryBackendModule
 
         return $arrSort;
     }
-	
-	// Helper
 
-	/**
-	 * Standardize path for folder
-	 * No TL_ROOT, No starting /
-	 * 
-	 * @return string the normalized path
-	 */
-	public function standardizePath()
-	{
-		$arrPath = func_get_args();
+    // Helper
 
-		if (count($arrPath) == 0 || $arrPath == null || $arrPath == "")
-		{
-			return "";
-		}
+    /**
+     * Standardize path for folder
+     * No TL_ROOT, No starting /
+     * 
+     * @return string the normalized path
+     */
+    public function standardizePath()
+    {
+        $arrPath = func_get_args();
 
-		$strVar = "";
+        if (count($arrPath) == 0 || $arrPath == null || $arrPath == "")
+        {
+            return "";
+        }
 
-		foreach ($arrPath as $itPath)
-		{
-			$itPath = str_replace(array(TL_ROOT, "\\"), array("", "/"), $itPath);
-			$itPath = explode("/", $itPath);
+        $strVar = "";
 
-			foreach ($itPath as $itFolder)
-			{
-				if ($itFolder == "" || $itFolder == "." || $itFolder == "..")
-				{
-					continue;
-				}
+        foreach ($arrPath as $itPath)
+        {
+            $itPath = str_replace(array(TL_ROOT, "\\"), array("", "/"), $itPath);
+            $itPath = explode("/", $itPath);
 
-				$strVar .= "/" . $itFolder;
-			}
-		}
+            foreach ($itPath as $itFolder)
+            {
+                if ($itFolder == "" || $itFolder == "." || $itFolder == "..")
+                {
+                    continue;
+                }
 
-		return preg_replace("/^\//i", "", $strVar);
-	}
+                $strVar .= "/" . $itFolder;
+            }
+        }
+
+        return preg_replace("/^\//i", "", $strVar);
+    }
 
 }
 
 $objSyncCtoErClient = new SyncCtoErClient();
 $objSyncCtoErClient->run();
-
 ?>
