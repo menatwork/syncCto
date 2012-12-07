@@ -926,7 +926,7 @@ class SyncCtoFiles extends Backend
 	 */
 	public function runMaintenance($arrSetings)
 	{
-		$arrRetrun = array(
+		$arrReturn = array(
 			"success"	 => false,
 			"info_msg"	 => array()
 		);
@@ -986,7 +986,7 @@ class SyncCtoFiles extends Backend
 						}
 						catch (Exception $exc)
 						{
-							$arrRetrun["info_msg"][] = "Error by: $value with Msg: " . $exc->getMessage();
+							$arrReturn["info_msg"][] = "Error by: $value with Msg: " . $exc->getMessage();
 						}
 
 						try
@@ -1000,7 +1000,7 @@ class SyncCtoFiles extends Backend
 						}
 						catch (Exception $exc)
 						{
-							$arrRetrun["info_msg"][] = "Error by: $value with Msg: " . $exc->getMessage();
+							$arrReturn["info_msg"][] = "Error by: $value with Msg: " . $exc->getMessage();
 						}
 
 						try
@@ -1014,7 +1014,7 @@ class SyncCtoFiles extends Backend
 						}
 						catch (Exception $exc)
 						{
-							$arrRetrun["info_msg"][] = "Error by: $value with Msg: " . $exc->getMessage();
+							$arrReturn["info_msg"][] = "Error by: $value with Msg: " . $exc->getMessage();
 						}
 					default:
 						break;
@@ -1022,7 +1022,7 @@ class SyncCtoFiles extends Backend
 			}
 			catch (Exception $exc)
 			{
-				$arrRetrun["info_msg"][] = "Error by: $value with Msg: " . $exc->getMessage();
+				$arrReturn["info_msg"][] = "Error by: $value with Msg: " . $exc->getMessage();
 			}
 		}
 
@@ -1038,14 +1038,14 @@ class SyncCtoFiles extends Backend
 				}
 				catch (Exception $exc)
 				{
-					$arrRetrun["info_msg"][] = "Error by: TL_HOOK $callback[0] | $callback[1] with Msg: " . $exc->getMessage();
+					$arrReturn["info_msg"][] = "Error by: TL_HOOK $callback[0] | $callback[1] with Msg: " . $exc->getMessage();
 				}
 			}
 		}
 
-		if(count($arrRetrun["info_msg"]) != 0)
+		if(count($arrReturn["info_msg"]) != 0)
 		{
-			return $arrRetrun;
+			return $arrReturn;
 		}
 		else
 		{
