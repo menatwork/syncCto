@@ -33,227 +33,303 @@
 class SyncCtoErClient extends RepositoryBackendModule
 {
 
-    protected $strWSDL;
-    protected $arrFiles = array();
-    protected $blnNoError = true;
+	protected $strWSDL;
+	protected $arrFiles = array();
+	protected $blnNoError = true;
 
-    /**
-     * Initialize object (do not remove)
-     */
-    public function __construct()
-    {
-        try
-        {
-            parent::__construct();
-            
-            $this->strWSDL = trim($GLOBALS['TL_CONFIG']['repository_wsdl']);
+	/**
+	 * Initialize object (do not remove)
+	 */
+	public function __construct()
+	{
+		try
+		{
+			parent::__construct();
 
-            $this->client = new SoapClient($this->strWSDL,
-                            array(
-                                'soap_version' => SOAP_1_2,
-                                'compression'  => SOAP_COMPRESSION_ACCEPT | ZLIB_ENCODING_GZIP | 1
-                            )
-            );
-        }
-        catch (Exception $exc)
-        {            
-            $this->log($exc->getMessage(), __CLASS__ . ' ' . __FUNCTION__, 'ERROR');
-            $this->blnNoError = false;
-        }
-    }
+			$this->strWSDL = trim($GLOBALS['TL_CONFIG']['repository_wsdl']);
 
-    public function run()
-    {
-        if ($this->blnNoError == false)
-        {
-            return;
-        }
+			$this->client = new SoapClient($this->strWSDL,
+							array(
+								'soap_version'	 => SOAP_1_2,
+								'compression'	 => SOAP_COMPRESSION_ACCEPT | ZLIB_ENCODING_GZIP | 1
+							)
+			);
+		}
+		catch (Exception $exc)
+		{
+			$this->log($exc->getMessage(), __CLASS__ . ' ' . __FUNCTION__, 'ERROR');
+			$this->blnNoError = false;
+		}
+	}
 
-        try
-        {
-            $this->loadFilelist();
-            $this->writeXML();
-        }
-        catch (Exception $exc)
-        {
-            $this->log($exc->getMessage(), __CLASS__ . ' ' . __FUNCTION__, TL_ERROR);
-            $_SESSION['TL_ERROR'][] = $exc->getMessage();
-        }
-    }
+	public function run()
+	{
+		$this->checkFolders();
 
-    protected function writeXML()
-    {
-        // Create XML File
-        $objXml = new XMLWriter();
-        $objXml->openMemory();
-        $objXml->setIndent(true);
-        $objXml->setIndentString("\t");
 
-        // XML Start
-        $objXml->startDocument('1.0', 'UTF-8');
-        $objXml->startElement('dependencies_filelist');
+		if ($this->blnNoError == false)
+		{
+			return;
+		}
 
-        // Write meta (header)
-        $objXml->startElement('metatags');
-        $objXml->writeElement('version', $GLOBALS['SYC_VERSION']);
-        $objXml->writeElement('create_unix', time());
-        $objXml->writeElement('create_date', date('Y-m-d', time()));
-        $objXml->writeElement('create_time', date('H:i', time()));
-        $objXml->endElement(); // End metatags
+		try
+		{
+			$this->loadFilelist();
+			$this->writeXML();
+		}
+		catch (Exception $exc)
+		{
+			$this->log($exc->getMessage(), __CLASS__ . ' ' . __FUNCTION__, TL_ERROR);
+			$_SESSION['TL_ERROR'][] = $exc->getMessage();
+		}
+	}
 
-        foreach ($this->arrFiles as $strDependencies => $arrFiles)
-        {
-            $objXml->startElement('dependency');
-            $objXml->writeAttribute('name', $strDependencies);
+	protected function checkFolders()
+	{
+		// Get folders from config
+		$strBackupDB	 = $this->standardizePath($GLOBALS['SYC_PATH']['db']);
+		$strBackupFile	 = $this->standardizePath($GLOBALS['SYC_PATH']['file']);
+		$strTemp		 = $this->standardizePath($GLOBALS['SYC_PATH']['tmp']);
 
-            foreach ($arrFiles as $arrFile)
-            {
-                $objXml->startElement('file');
-                $objXml->writeAttribute('id', $arrFile['hash']);
+		$objHt	 = new File('system/modules/syncCto/config/.htaccess');
+		$strHT	 = $objHt->getContent();
+		$objHt->close();
 
-                $objXml->writeElement('path', $arrFile['path']);
-                $objXml->writeElement('size', $arrFile['size']);
-                $objXml->writeElement('hash', $arrFile['hash']);
+		// Check each one 
+		if (!file_exists(TL_ROOT . '/' . $strBackupDB))
+		{
+			new Folder($strBackupDB);
 
-                $objXml->endElement(); // End file
-            }
+			$objFile = new File($strBackupDB . '/' . '.htaccess');
+			$objFile->write($strHT);
+			$objFile->close();
+		}
 
-            $objXml->endElement(); // End dependency
-        }
+		if (!file_exists(TL_ROOT . '/' . $strBackupFile))
+		{
+			new Folder($strBackupFile);
 
-        $objXml->endElement(); // End doc
+			$objFile = new File($strBackupFile . '/' . '.htaccess');
+			$objFile->write($strHT);
+			$objFile->close();
+		}
 
-        $objFile = new File('tl_files/syncCto_backups/dependencies.xml');
-        $objFile->write($objXml->flush());
-        $objFile->close();        
-    }
+		if (!file_exists(TL_ROOT . '/' . $strTemp))
+		{
+			new Folder($strTemp);
+		}
+	}
 
-    protected function loadFilelist()
-    {
-        $arrInstalledExtensions = $this->loadAllInstalledExtensions();
+	protected function writeXML()
+	{
+		// Create XML File
+		$objXml = new XMLWriter();
+		$objXml->openMemory();
+		$objXml->setIndent(true);
+		$objXml->setIndentString("\t");
 
-        if (!key_exists("syncCto", $arrInstalledExtensions))
-        {
-            throw new Exception('syncCto is not installed via the Extension Repository, please only use the official version.');
-        }
+		// XML Start
+		$objXml->startDocument('1.0', 'UTF-8');
+		$objXml->startElement('dependencies_filelist');
 
-        $arrDependencies   = $this->getDependenciesFor($arrInstalledExtensions['syncCto']['extension'], $arrInstalledExtensions['syncCto']['version']);
-        $arrDependencies[] = array(
-            "name"    => $arrInstalledExtensions['syncCto']['extension'],
-            "version" => $arrInstalledExtensions['syncCto']['version']
-        );
+		// Write meta (header)
+		$objXml->startElement('metatags');
+		$objXml->writeElement('version', $GLOBALS['SYC_VERSION']);
+		$objXml->writeElement('create_unix', time());
+		$objXml->writeElement('create_date', date('Y-m-d', time()));
+		$objXml->writeElement('create_time', date('H:i', time()));
+		$objXml->endElement(); // End metatags
 
-        $arrDependenciesDone = array();
+		foreach ($this->arrFiles as $strDependencies => $arrFiles)
+		{
+			$objXml->startElement('dependency');
+			$objXml->writeAttribute('name', $strDependencies);
 
-        while (count($arrDependencies) != 0)
-        {
-            $arrEntry = array_pop($arrDependencies);
+			foreach ($arrFiles as $arrFile)
+			{
+				$objXml->startElement('file');
+				$objXml->writeAttribute('id', $arrFile['hash']);
 
-            if (in_array($arrEntry['name'], $arrDependenciesDone))
-            {
-                continue;
-            }
+				$objXml->writeElement('path', $arrFile['path']);
+				$objXml->writeElement('size', $arrFile['size']);
+				$objXml->writeElement('hash', $arrFile['hash']);
 
-            if (key_exists($arrEntry['name'], $arrInstalledExtensions))
-            {
-                $strExtensionName = $arrEntry['name'];
+				$objXml->endElement(); // End file
+			}
 
-                $arrDependencies                   = array_merge($arrDependencies, $this->getDependenciesFor($strExtensionName, $arrInstalledExtensions[$strExtensionName]['version']));
-                $this->arrFiles[$strExtensionName] = $this->getFileListFor($strExtensionName, $arrInstalledExtensions[$strExtensionName]['version']);
-            }
-            else
-            {
-                $strExtensionName = $arrEntry['name'];
+			$objXml->endElement(); // End dependency
+		}
 
-                $arrDependencies                   = array_merge($arrDependencies, $this->getDependenciesFor($strExtensionName, $arrEntry['version']));
-                $this->arrFiles[$strExtensionName] = $this->getFileListFor($strExtensionName, $arrEntry['version']);
-            }
+		$objXml->endElement(); // End doc
 
-            $arrDependenciesDone[] = $arrEntry['name'];
-        }
-    }
+		$objFile = new File('tl_files/syncCto_backups/dependencies.xml');
+		$objFile->write($objXml->flush());
+		$objFile->close();
+	}
 
-    // - Helper ----------------------------------------------------------------
+	protected function loadFilelist()
+	{
+		$arrInstalledExtensions = $this->loadAllInstalledExtensions();
 
-    /**
-     * Get a list with all files for one extension
-     * 
-     * @param string $strExtension Name of extension
-     * @param int $intVersion Version of the extension
-     */
-    public function getFileListFor($strExtension, $intVersion)
-    {
-        $arrReturn = array();
+		if (!key_exists("syncCto", $arrInstalledExtensions))
+		{
+			throw new Exception('syncCto is not installed via the Extension Repository, please only use the official version.');
+		}
 
-        $options = array(
-            'name'    => $strExtension,
-            'version' => $intVersion
-        );
+		$arrDependencies	 = $this->getDependenciesFor($arrInstalledExtensions['syncCto']['extension'], $arrInstalledExtensions['syncCto']['version']);
+		$arrDependencies[]	 = array(
+			"name"		 => $arrInstalledExtensions['syncCto']['extension'],
+			"version"	 => $arrInstalledExtensions['syncCto']['version']
+		);
 
-        $arrExtensionList = $this->client->getFileList($options);
+		$arrDependenciesDone = array();
 
-        foreach ($arrExtensionList as $key => $value)
-        {
-            $arrReturn[$key]["path"] = (string) $value->path;
-            $arrReturn[$key]["hash"] = (string) $value->hash;
-            $arrReturn[$key]["size"] = (string) $value->size;
-        }
+		while (count($arrDependencies) != 0)
+		{
+			$arrEntry = array_pop($arrDependencies);
 
-        return $arrReturn;
-    }
+			if (in_array($arrEntry['name'], $arrDependenciesDone))
+			{
+				continue;
+			}
 
-    public function getDependenciesFor($strExtension, $intVersion)
-    {
-        $arrReturn = array();
+			if (key_exists($arrEntry['name'], $arrInstalledExtensions))
+			{
+				$strExtensionName = $arrEntry['name'];
 
-        $options = array(
-            'names'    => $strExtension,
-            'versions' => $intVersion,
-            'sets'     => 'dependencies'
-        );
+				$arrDependencies					 = array_merge($arrDependencies, $this->getDependenciesFor($strExtensionName, $arrInstalledExtensions[$strExtensionName]['version']));
+				$this->arrFiles[$strExtensionName]	 = $this->getFileListFor($strExtensionName, $arrInstalledExtensions[$strExtensionName]['version']);
+			}
+			else
+			{
+				$strExtensionName = $arrEntry['name'];
 
-        $arrExtensionList = $this->client->getExtensionList($options);
+				$arrDependencies					 = array_merge($arrDependencies, $this->getDependenciesFor($strExtensionName, $arrEntry['version']));
+				$this->arrFiles[$strExtensionName]	 = $this->getFileListFor($strExtensionName, $arrEntry['version']);
+			}
 
-        foreach ($arrExtensionList as $key => $value)
-        {
-            if ($value->name == $strExtension && $value->version == $intVersion && is_array($value->dependencies))
-            {
-                $arrReturn = array();
+			$arrDependenciesDone[] = $arrEntry['name'];
+		}
+	}
 
-                foreach ($value->dependencies as $dependenciesKey => $dependenciesValue)
-                {
-                    $arrReturn[$dependenciesKey]["name"]    = (string) $dependenciesValue->extension;
-                    $arrReturn[$dependenciesKey]["version"] = (string) $dependenciesValue->maxversion;
-                }
+	// - Helper ----------------------------------------------------------------
 
-                return $arrReturn;
-            }
-        }
+	/**
+	 * Get a list with all files for one extension
+	 * 
+	 * @param string $strExtension Name of extension
+	 * @param int $intVersion Version of the extension
+	 */
+	public function getFileListFor($strExtension, $intVersion)
+	{
+		$arrReturn = array();
 
-        return array();
-    }
+		$options = array(
+			'name'		 => $strExtension,
+			'version'	 => $intVersion
+		);
 
-    protected function loadAllInstalledExtensions()
-    {
-        // Load installed extensions
-        $arrExtensions = $this->Database
-                ->prepare("SELECT * FROM tl_repository_installs")
-                ->execute()
-                ->fetchAllAssoc();
+		$arrExtensionList = $this->client->getFileList($options);
 
-        $arrSort = array();
+		foreach ($arrExtensionList as $key => $value)
+		{
+			$arrReturn[$key]["path"] = (string) $value->path;
+			$arrReturn[$key]["hash"] = (string) $value->hash;
+			$arrReturn[$key]["size"] = (string) $value->size;
+		}
 
-        foreach ($arrExtensions as $value)
-        {
-            $arrSort[$value["extension"]] = $value;
-        }
+		return $arrReturn;
+	}
 
-        return $arrSort;
-    }
+	public function getDependenciesFor($strExtension, $intVersion)
+	{
+		$arrReturn = array();
+
+		$options = array(
+			'names'		 => $strExtension,
+			'versions'	 => $intVersion,
+			'sets'		 => 'dependencies'
+		);
+
+		$arrExtensionList = $this->client->getExtensionList($options);
+
+		foreach ($arrExtensionList as $key => $value)
+		{
+			if ($value->name == $strExtension && $value->version == $intVersion && is_array($value->dependencies))
+			{
+				$arrReturn = array();
+
+				foreach ($value->dependencies as $dependenciesKey => $dependenciesValue)
+				{
+					$arrReturn[$dependenciesKey]["name"]	 = (string) $dependenciesValue->extension;
+					$arrReturn[$dependenciesKey]["version"]	 = (string) $dependenciesValue->maxversion;
+				}
+
+				return $arrReturn;
+			}
+		}
+
+		return array();
+	}
+
+	protected function loadAllInstalledExtensions()
+	{
+		// Load installed extensions
+		$arrExtensions = $this->Database
+				->prepare("SELECT * FROM tl_repository_installs")
+				->execute()
+				->fetchAllAssoc();
+
+		$arrSort = array();
+
+		foreach ($arrExtensions as $value)
+		{
+			$arrSort[$value["extension"]] = $value;
+		}
+
+		return $arrSort;
+	}
+	
+	// Helper
+
+	/**
+	 * Standardize path for folder
+	 * No TL_ROOT, No starting /
+	 * 
+	 * @return string the normalized path
+	 */
+	public function standardizePath()
+	{
+		$arrPath = func_get_args();
+
+		if (count($arrPath) == 0 || $arrPath == null || $arrPath == "")
+		{
+			return "";
+		}
+
+		$strVar = "";
+
+		foreach ($arrPath as $itPath)
+		{
+			$itPath = str_replace(array(TL_ROOT, "\\"), array("", "/"), $itPath);
+			$itPath = explode("/", $itPath);
+
+			foreach ($itPath as $itFolder)
+			{
+				if ($itFolder == "" || $itFolder == "." || $itFolder == "..")
+				{
+					continue;
+				}
+
+				$strVar .= "/" . $itFolder;
+			}
+		}
+
+		return preg_replace("/^\//i", "", $strVar);
+	}
 
 }
 
 $objSyncCtoErClient = new SyncCtoErClient();
 $objSyncCtoErClient->run();
-
 ?>
