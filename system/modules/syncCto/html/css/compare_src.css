@@ -134,7 +134,7 @@
   }
 
   td.unchanged, p.unchanged {
-	background-color:#F9D8D8;
+	background-color:#F9F9F9;
   }
   
   p.changed, p.changed-both, p.unchanged {
@@ -151,7 +151,7 @@
   }
 
   p.unchanged {
-	border-color:#F9D8D8;
+	border-color:#DDD;
   }
   
   td.diff, 
