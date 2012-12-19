@@ -26,6 +26,7 @@
  * @license    GNU/GPL 2
  * @filesource
  */
+
 /**
  * Initialize the system
  */
@@ -54,7 +55,6 @@ class PopupSyncFiles extends Backend
     protected $arrErrors = array();
 
     // defines
-
     const STEP_NORMAL_DB = 'nd';
     const STEP_CLOSE_DB  = 'cl';
     const STEP_ERROR_DB  = 'er';
@@ -71,7 +71,7 @@ class PopupSyncFiles extends Backend
 
         $this->User->authenticate();
 
-        $this->objSyncCtoHelper              = SyncCtoHelper::getInstance();
+        $this->objSyncCtoHelper = SyncCtoHelper::getInstance();
 
         $this->initGetParams();
     }
@@ -119,19 +119,19 @@ class PopupSyncFiles extends Backend
      * Show database server and client compare list
      */
     public function showNormalDatabase()
-    {        
+    {
         // Delete functinality
         if (key_exists("delete", $_POST))
         {
             foreach ($_POST['serverTables'] as $value)
             {
-                if(isset($this->arrSyncSettings['syncCto_CompareTables']['recommended']) && key_exists($value, $this->arrSyncSettings['syncCto_CompareTables']['recommended']))
+                if (isset($this->arrSyncSettings['syncCto_CompareTables']['recommended']) && key_exists($value, $this->arrSyncSettings['syncCto_CompareTables']['recommended']))
                 {
-                     unset($this->arrSyncSettings['syncCto_CompareTables']['recommended'][$value]);
+                    unset($this->arrSyncSettings['syncCto_CompareTables']['recommended'][$value]);
                 }
-                else if( isset($this->arrSyncSettings['syncCto_CompareTables']['nonRecommended']) && key_exists($value, $this->arrSyncSettings['syncCto_CompareTables']['nonRecommended']))
+                else if (isset($this->arrSyncSettings['syncCto_CompareTables']['nonRecommended']) && key_exists($value, $this->arrSyncSettings['syncCto_CompareTables']['nonRecommended']))
                 {
-                     unset($this->arrSyncSettings['syncCto_CompareTables']['nonRecommended'][$value]);
+                    unset($this->arrSyncSettings['syncCto_CompareTables']['nonRecommended'][$value]);
                 }
             }
         }
@@ -139,10 +139,10 @@ class PopupSyncFiles extends Backend
         else if (key_exists("transfer", $_POST))
         {
             foreach ($this->arrSyncSettings['syncCto_CompareTables'] as $arrType)
-            {                
+            {
                 foreach ($arrType as $keyTable => $valueTable)
                 {
-                    if($valueTable['del'] == true)
+                    if ($valueTable['del'] == true)
                     {
                         $this->arrSyncSettings['syncCto_SyncDeleteTables'][] = $keyTable;
                     }
@@ -152,15 +152,15 @@ class PopupSyncFiles extends Backend
                     }
                 }
             }
-            
-            unset($this->arrSyncSettings['syncCto_CompareTables']);            
+
+            unset($this->arrSyncSettings['syncCto_CompareTables']);
 
             $this->mixStep = self::STEP_CLOSE_DB;
             return;
         }
-        
+
         // If no table is found skip the view
-        if (count($this->arrSyncSettings['syncCto_CompareTables']['recommended']) == 0 
+        if (count($this->arrSyncSettings['syncCto_CompareTables']['recommended']) == 0
                 && count($this->arrSyncSettings['syncCto_CompareTables']['nonRecommended']) == 0)
         {
             unset($this->arrSyncSettings['syncCto_CompareTables']);
@@ -176,6 +176,13 @@ class PopupSyncFiles extends Backend
         $this->Template->arrCompareList = $this->arrSyncSettings['syncCto_CompareTables'];
         $this->Template->close          = FALSE;
         $this->Template->error          = FALSE;
+
+        $objExtern = $this->Database
+                ->prepare('SELECT address, path FROM tl_synccto_clients')
+                ->execute();
+
+        $this->Template->clientPath = $objExtern->address . $objExtern->path;
+        $this->Template->serverPath = $this->Environment->base;
     }
 
     /**

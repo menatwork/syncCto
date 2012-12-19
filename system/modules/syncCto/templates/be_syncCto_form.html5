@@ -1,7 +1,7 @@
 <script>    
     function openMediaBox()
     {
-        Mediabox.open('<?php echo $this->Environment->base; ?>contao/<?php echo $this->popupClassName; ?>?id=<?php echo $this->id; ?>&amp;direction=<?php echo $this->direction; ?>', '', '850 80%');   
+        Mediabox.open('<?php echo $this->Environment->base; ?>contao/<?php echo $this->popupClassName; ?>?id=<?php echo $this->id; ?>&direction=<?php echo $this->direction; ?>', '', '850 80%');   
     }
     
     window.addEvent("domready",function(){
