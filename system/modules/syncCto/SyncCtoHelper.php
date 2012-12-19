@@ -52,6 +52,7 @@ class SyncCtoHelper extends Backend
     {
         // Import
         $this->import("BackendUser");
+        $this->import("String");
 
         // Parent
         parent::__construct();
@@ -72,7 +73,7 @@ class SyncCtoHelper extends Backend
         }
 
         return self::$instance;
-    }   
+    }
 
     /* -------------------------------------------------------------------------
      * Config
@@ -182,7 +183,7 @@ class SyncCtoHelper extends Backend
     {
         $arrLocalconfig   = deserialize($GLOBALS['TL_CONFIG']['syncCto_folder_blacklist']);
         $arrSyncCtoConfig = $GLOBALS['SYC_CONFIG']['folder_blacklist'];
-        
+
         return $this->mergeConfigs($arrLocalconfig, $arrSyncCtoConfig);
     }
 
@@ -190,7 +191,7 @@ class SyncCtoHelper extends Backend
     {
         $arrLocalconfig   = deserialize($GLOBALS['TL_CONFIG']['syncCto_folder_whitelist']);
         $arrSyncCtoConfig = $GLOBALS['SYC_CONFIG']['folder_whitelist'];
-        
+
         return $this->mergeConfigs($arrLocalconfig, $arrSyncCtoConfig);
     }
 
@@ -198,7 +199,7 @@ class SyncCtoHelper extends Backend
     {
         $arrLocalconfig   = deserialize($GLOBALS['TL_CONFIG']['syncCto_file_blacklist']);
         $arrSyncCtoConfig = $GLOBALS['SYC_CONFIG']['file_blacklist'];
-        
+
         return $this->mergeConfigs($arrLocalconfig, $arrSyncCtoConfig);
     }
 
@@ -206,7 +207,7 @@ class SyncCtoHelper extends Backend
     {
         $arrLocalconfig   = deserialize($GLOBALS['TL_CONFIG']['syncCto_local_blacklist']);
         $arrSyncCtoConfig = $GLOBALS['SYC_CONFIG']['local_blacklist'];
-        
+
         return $this->mergeConfigs($arrLocalconfig, $arrSyncCtoConfig);
     }
 
@@ -214,7 +215,7 @@ class SyncCtoHelper extends Backend
     {
         $arrLocalconfig   = deserialize($GLOBALS['TL_CONFIG']['syncCto_hidden_tables']);
         $arrSyncCtoConfig = $GLOBALS['SYC_CONFIG']['table_hidden'];
-        
+
         return $this->mergeConfigs($arrLocalconfig, $arrSyncCtoConfig);
     }
 
@@ -238,7 +239,7 @@ class SyncCtoHelper extends Backend
 
                 try
                 {
-                    $arrReturn = array("success" => false, "value" => 0, "error" => "", "token" => REQUEST_TOKEN);
+                    $arrReturn = array("success" => false, "value"   => 0, "error"   => "", "token"   => REQUEST_TOKEN);
 
                     // Load Client from database
                     $objClient = $this->Database->prepare("SELECT * FROM tl_synccto_clients WHERE id = %s")
@@ -336,14 +337,14 @@ class SyncCtoHelper extends Backend
 
             // required extensions
             $arrRequiredExtensions = array(
-                'ctoCommunication' => 'ctoCommunication',
+                'ctoCommunication'  => 'ctoCommunication',
                 'MultiColumnWizard' => 'multicolumnwizard',
-                '3CFramework' => '3cframework'
+                '3CFramework'       => '3cframework'
             );
 
             // required files
             $arrRequiredFiles = array(
-                'DC_Memory' => 'system/drivers/DC_Memory.php',
+                'DC_Memory'     => 'system/drivers/DC_Memory.php',
                 'ZipArchiveCto' => 'system/libraries/ZipArchiveCto.php'
             );
 
@@ -398,9 +399,9 @@ class SyncCtoHelper extends Backend
 
             preg_match('/<div.*id=\"header\".*>/i', $strContent, $arrHeader);
             preg_match('{<div\s+id="header"\s*>((?:(?:(?!<div[^>]*>|</div>).)++|<div[^>]*>(?1)</div>)*)</div>}si', $strContent, $arrInnderDiv);
-            $strNew = $arrHeader[0].$arrInnderDiv[1].$objTemplate->parse().'</div>';
+            $strNew        = $arrHeader[0] . $arrInnderDiv[1] . $objTemplate->parse() . '</div>';
             $strNewContent = preg_replace('{<div\s+id="header"\s*>((?:(?:(?!<div[^>]*>|</div>).)++|<div[^>]*>(?1)</div>)*)</div>}si', $strNew, $strContent, 1);
-            if ($strNewContent == "" && $arrInnderDiv[1] !='' && $arrHeader[0] !='')
+            if ($strNewContent == "" && $arrInnderDiv[1] != '' && $arrHeader[0] != '')
             {
                 return $strContent;
             }
@@ -418,33 +419,33 @@ class SyncCtoHelper extends Backend
      * @return array 
      */
     public function getFileSyncOptions()
-    {        
-        if($this->BackendUser->isAdmin)
+    {
+        if ($this->BackendUser->isAdmin)
         {
             return $GLOBALS['SYC_CONFIG']['sync_options'];
         }
         else
         {
             $arrUserSyncOptions = $this->BackendUser->syncCto_sync_options;
-            
+
             $arrSyncOption = array();
-            foreach($GLOBALS['SYC_CONFIG']['sync_options'] AS $fileType => $arrValue)
+            foreach ($GLOBALS['SYC_CONFIG']['sync_options'] AS $fileType => $arrValue)
             {
-                foreach($arrValue AS $strRight)
+                foreach ($arrValue AS $strRight)
                 {
-                    if(in_array($strRight, $arrUserSyncOptions))
+                    if (in_array($strRight, $arrUserSyncOptions))
                     {
-                        if(!array_key_exists($fileType, $arrSyncOption))
+                        if (!array_key_exists($fileType, $arrSyncOption))
                         {
                             $arrSyncOption[$fileType] = array();
                         }
-                        
+
                         $arrSyncOption[$fileType][] = $strRight;
-                    }                            
+                    }
                 }
-            }       
+            }
             return $arrSyncOption;
-        }            
+        }
     }
 
     /**
@@ -452,7 +453,7 @@ class SyncCtoHelper extends Backend
      * @return array 
      */
     public function getMaintanceOptions()
-    {       
+    {
         return $GLOBALS['SYC_CONFIG']['maintance_options'];
     }
 
@@ -495,7 +496,7 @@ class SyncCtoHelper extends Backend
 
         return preg_replace("/^\//i", "", $strVar);
     }
-    
+
     /**
      * Returns a whole list of all tables in the database
      * 
@@ -661,16 +662,16 @@ class SyncCtoHelper extends Backend
     private function getTableMeta($strTableName)
     {
         $objCount = $this->Database->prepare("SELECT COUNT(*) as Count FROM $strTableName")->executeUncached();
-        
+
         $arrTableMeta = array(
-            'name' => $strTableName,
+            'name'  => $strTableName,
             'count' => $objCount->Count,
-            'size' => $this->Database->getSizeOf($strTableName)
+            'size'  => $this->Database->getSizeOf($strTableName)
         );
-        
+
         return $arrTableMeta;
     }
-    
+
     /**
      * Set styles for the given array recommended table data and return it as string
      * 
@@ -679,10 +680,10 @@ class SyncCtoHelper extends Backend
      */
     public function getStyledTableMeta($arrTableMeta)
     {
-        $strTableName = $arrTableMeta['name'];
+        $strTableName    = $arrTableMeta['name'];
         $intEntriesCount = $arrTableMeta['count'];
-        $intEntriesSize = $arrTableMeta['size'];
-        
+        $intEntriesSize  = $arrTableMeta['size'];
+
         $strColor = '666966';
 
         $strReturn = '<span style="color: #' . $strColor . '; padding-left: 3px;">';
@@ -691,8 +692,8 @@ class SyncCtoHelper extends Backend
         $strReturn .= '(' . $this->getReadableSize($intEntriesSize) . ', ' . vsprintf($GLOBALS['TL_LANG']['MSC']['entries'], array($intEntriesCount)) . ')';
         $strReturn .= '</span>';
         $strReturn .= '</span>';
-        return $strReturn;        
-    }    
+        return $strReturn;
+    }
 
     /**
      * Return a list with all timestamps form tables
@@ -716,15 +717,15 @@ class SyncCtoHelper extends Backend
 
         // Load all Tables
         $arrTables = $this->Database->listTables();
-        
+
         $objDBSchema = $this->Database->prepare("SELECT TABLE_NAME, UPDATE_TIME FROM information_schema.TABLES WHERE TABLE_SCHEMA = ?")->executeUncached($GLOBALS['TL_CONFIG']['dbDatabase']);
-        
+
         $arrDBSchema = array();
-        while($objDBSchema->next())
+        while ($objDBSchema->next())
         {
             $arrDBSchema[$objDBSchema->TABLE_NAME] = strtotime($objDBSchema->UPDATE_TIME);
         }
-        
+
         foreach ($arrTables as $strTable)
         {
             // Skip hidden tables
@@ -827,34 +828,34 @@ class SyncCtoHelper extends Backend
         }
         return false;
     }
-    
+
     /**
      * Check if the post of the submited form is empty and set error or unset error 
      * 
      * @param array $arrCheckSubmit 
      */
     public function checkSubmit($arrCheckSubmit)
-    {   
+    {
         $arrPostUnset = array('FORM_SUBMIT', 'FORM_FIELDS', 'REQUEST_TOKEN');
-        
-        if(is_array($arrCheckSubmit['postUnset']))
+
+        if (is_array($arrCheckSubmit['postUnset']))
         {
             $arrPostUnset = array_merge($arrPostUnset, $arrCheckSubmit['postUnset']);
         }
-        
+
         $arrPost = $_POST;
-        
-        foreach($arrPostUnset AS $value)
+
+        foreach ($arrPostUnset AS $value)
         {
-            if(array_key_exists($value, $arrPost))
+            if (array_key_exists($value, $arrPost))
             {
                 unset($arrPost[$value]);
             }
         }
-        
-        if(count($arrPost) > 0)
+
+        if (count($arrPost) > 0)
         {
-            if(is_array($_SESSION["TL_ERROR"]))
+            if (is_array($_SESSION["TL_ERROR"]))
             {
                 if (array_key_exists($arrCheckSubmit['error']['key'], $_SESSION["TL_ERROR"]))
                 {
@@ -865,18 +866,18 @@ class SyncCtoHelper extends Backend
         }
         else
         {
-            if(!is_array($_SESSION["TL_ERROR"]))
+            if (!is_array($_SESSION["TL_ERROR"]))
             {
                 $_SESSION["TL_ERROR"] = array();
             }
-            
-            if(!array_key_exists($arrCheckSubmit['error']['key'], $_SESSION["TL_ERROR"]))
+
+            if (!array_key_exists($arrCheckSubmit['error']['key'], $_SESSION["TL_ERROR"]))
             {
                 $_SESSION["TL_ERROR"][$arrCheckSubmit['error']['key']] = $arrCheckSubmit['error']['message'];
             }
         }
     }
-    
+
 }
 
 ?>
