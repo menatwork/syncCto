@@ -1,3 +1,5 @@
+<?php $this->import('String'); ?>
+
 <h1 class="file"><strong><?php echo $this->headline; ?></strong></h1>
 
 <div id="tl_listing" class="tl_listing_container">
@@ -52,8 +54,8 @@
         <thead>
             <tr class="head">
                 <th class="checkbox"><input class="tl_checkbox" onclick="Backend.toggleCheckboxGroup(this, '<?php echo ($strState == 'recommended') ? 'recommended' : 'nonrecommended'; ?>')" type="checkbox" /></th>
-                <th class="client"><?php echo $GLOBALS['TL_LANG']['MSC']['client']; ?> - <span title="<?php echo $this->clientPath; ?>"><?php echo (strlen($this->clientPath) > 32)? substr($this->clientPath, 0, 32) . '...' : $this->clientPath; ?></span></th>
-                <th class="server"><?php echo $GLOBALS['TL_LANG']['MSC']['server']; ?> - <span title="<?php echo $this->serverPath; ?>"><?php echo (strlen($this->serverPath) > 32)? substr($this->serverPath, 0, 32) . '...' : $this->serverPath; ?></span></th>
+                <th class="client"><?php echo $GLOBALS['TL_LANG']['MSC']['client']; ?> - <span title="<?php echo $this->clientPath; ?>"><?php echo $this->String->substr($this->clientPath, 32); ?></span></th>
+                <th class="server"><?php echo $GLOBALS['TL_LANG']['MSC']['server']; ?> - <span title="<?php echo $this->serverPath; ?>"><?php echo $this->String->substr($this->serverPath, 32); ?></span></th>
                 <th class="diff"><?php echo $GLOBALS['TL_LANG']['MSC']['difference']; ?></th>
             </tr>
         </thead>
