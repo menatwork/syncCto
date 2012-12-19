@@ -1,4 +1,7 @@
-<?php if (!defined('TL_ROOT')) die('You cannot access this file directly!');
+<?php
+
+if (!defined('TL_ROOT'))
+    die('You cannot access this file directly!');
 
 /**
  * Contao Open Source CMS
@@ -460,6 +463,93 @@ class SyncCtoHelper extends Backend
     /* -------------------------------------------------------------------------
      * Helper Functions
      */
+
+    /**
+     * Shorten a string to a certain number of characters
+     *
+     * Shortens a string to a given number of characters preserving words
+     * (therefore it might be a bit shorter or longer than the number of
+     * characters specified). Stips all tags.
+     * @param string
+     * @param integer
+     * @param string
+     * @return string
+     */
+    public function substrCenter($strString, $intNumberOfChars, $strEllipsis = ' […] ')
+    {
+        $strString = preg_replace('/[\t\n\r]+/', ' ', $strString);
+        $strString = strip_tags($strString);
+
+        if (utf8_strlen($strString) <= $intNumberOfChars)
+        {
+            return $strString;
+        }
+
+        $intCharCount = 0;
+        $arrWords     = array();
+        $arrChunks      = preg_split('/\s+/', $strString);
+        $blnAddEllipsis = false;
+
+        //first part
+        foreach ($arrChunks as $chunkKey => $strChunk)
+        {
+            $intCharCount += utf8_strlen($this->String->decodeEntities($strChunk));
+
+            if ($intCharCount++ <= $intNumberOfChars / 2)
+            {
+                // if we add the whole word remove it from list
+                unset($arrChunks[$chunkKey]);
+
+                $arrWords[] = $strChunk;
+                continue;
+            }
+
+            // If the first word is longer than $intNumberOfChars already, shorten it
+            // with utf8_substr() so the method does not return an empty string.
+            if (empty($arrWords))
+            {
+                $arrWords[] = utf8_substr($strChunk, 0, $intNumberOfChars / 2);
+            }
+
+            if ($strEllipsis !== false)
+            {
+                $blnAddEllipsis = true;
+            }
+
+            break;
+        }
+
+        // Backwards compatibility
+        if ($strEllipsis === true)
+        {
+            $strEllipsis = ' […] ';
+        }
+        
+        $intCharCount = 0;
+        $arrWordsPt2 = array();
+
+        // Second path
+        foreach (array_reverse($arrChunks) as $strChunk)
+        {
+            $intCharCount += utf8_strlen($this->String->decodeEntities($strChunk));
+
+            if ($intCharCount++ <= $intNumberOfChars / 2)
+            {
+                $arrWordsPt2[] = $strChunk;
+                continue;
+            }
+
+            // If the first word is longer than $intNumberOfChars already, shorten it
+            // with utf8_substr() so the method does not return an empty string.
+            if (empty($arrWordsPt2))
+            {
+                $arrWordsPt2[] = utf8_substr($strChunk, utf8_strlen($strChunk) - ($intNumberOfChars / 2), utf8_strlen($strChunk));
+            }
+            break;
+        }
+
+        return implode(' ', $arrWords) . ($blnAddEllipsis ? $strEllipsis : '') . implode(' ', array_reverse($arrWordsPt2));
+    }
 
     /**
      * Standardize path for folder
