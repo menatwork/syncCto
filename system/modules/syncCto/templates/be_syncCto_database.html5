@@ -54,8 +54,8 @@
         <thead>
             <tr class="head">
                 <th class="checkbox"><input class="tl_checkbox" onclick="Backend.toggleCheckboxGroup(this, '<?php echo ($strState == 'recommended') ? 'recommended' : 'nonrecommended'; ?>')" type="checkbox" /></th>
-                <th class="client"><?php echo $GLOBALS['TL_LANG']['MSC']['client']; ?> - <span title="<?php echo $this->clientPath; ?>"><?php echo $this->String->substr($this->clientPath, 32); ?></span></th>
-                <th class="server"><?php echo $GLOBALS['TL_LANG']['MSC']['server']; ?> - <span title="<?php echo $this->serverPath; ?>"><?php echo $this->String->substr($this->serverPath, 32); ?></span></th>
+                <th class="client"><?php echo $GLOBALS['TL_LANG']['MSC']['client']; ?> (<span title="<?php echo $this->clientPath; ?>"><?php echo $this->String->substr($this->clientPath, 28); ?></span>)</th>
+                <th class="server"><?php echo $GLOBALS['TL_LANG']['MSC']['server']; ?> (<span title="<?php echo $this->serverPath; ?>"><?php echo $this->String->substr($this->serverPath, 28); ?></span>)</th>
                 <th class="diff"><?php echo $GLOBALS['TL_LANG']['MSC']['difference']; ?></th>
             </tr>
         </thead>
