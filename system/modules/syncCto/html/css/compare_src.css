@@ -63,14 +63,13 @@
 	cursor:pointer;
   }
   
-  #db_form th, 
   #db_form th {
 	background-image:none;
-	padding-left:9px;
+	padding-left:5px;
 	cursor:default;
   }
 
-  #db_form th.checkbox, 
+  #db_form th.checkbox,
   #db_form td.checkbox {
 	padding-left:4px;
   }
@@ -88,7 +87,7 @@
     padding-left:0;
   }
   
-  td img {
+  td img, th img {
 	float:left;
     margin-right:5px;
   }
