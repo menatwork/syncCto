@@ -68,6 +68,10 @@ class PopupSyncFiles extends Backend
         $this->import('BackendUser', 'User');
 
         parent::__construct();
+        
+        // Load language
+        $this->loadLanguageFile("modules");
+        $this->loadLanguageFile("tl_syncCto_database");
 
         $this->User->authenticate();
 
@@ -171,6 +175,19 @@ class PopupSyncFiles extends Backend
             return;
         }
 
+        // Make a look up
+        foreach ($this->arrSyncSettings['syncCto_CompareTables']['recommended'] as $strKey => $arrValueA)
+        {
+            $this->arrSyncSettings['syncCto_CompareTables']['recommended'][$strKey]['server']['tname'] = $this->lookUpName($arrValueA['server']['name']);
+            $this->arrSyncSettings['syncCto_CompareTables']['recommended'][$strKey]['client']['tname'] = $this->lookUpName($arrValueA['client']['name']);
+        }
+
+        foreach ($this->arrSyncSettings['syncCto_CompareTables']['nonRecommended'] as $strKey => $arrValueA)
+        {
+            $this->arrSyncSettings['syncCto_CompareTables']['nonRecommended'][$strKey]['server']['tname'] = $this->lookUpName($arrValueA['server']['name']);
+            $this->arrSyncSettings['syncCto_CompareTables']['nonRecommended'][$strKey]['client']['tname'] = $this->lookUpName($arrValueA['client']['name']);
+        }
+
         $this->Template                 = new BackendTemplate("be_syncCto_database");
         $this->Template->headline       = $GLOBALS['TL_LANG']['MSC']['comparelist'];
         $this->Template->arrCompareList = $this->arrSyncSettings['syncCto_CompareTables'];
@@ -178,11 +195,53 @@ class PopupSyncFiles extends Backend
         $this->Template->error          = FALSE;
 
         $objExtern = $this->Database
-                ->prepare('SELECT address, path FROM tl_synccto_clients')
-                ->execute();
+                ->prepare('SELECT address, path FROM tl_synccto_clients WHERE id=?')
+                ->execute($this->intClientID);
 
         $this->Template->clientPath = $objExtern->address . $objExtern->path;
         $this->Template->serverPath = $this->Environment->base;
+    }
+
+    /**
+     * Make a lookup for a human readable table name.
+     * 
+     * @param string $strName Name of table
+     * @return string
+     */
+    public function lookUpName($strName)
+    {
+        $strBase = str_replace('tl_', "", $strName);
+
+        if ($strName == '-')
+        {
+            return '-';
+        }
+
+        if (is_array($GLOBALS['TL_LANG']['tl_syncCto_database']) && key_exists($strName, $GLOBALS['TL_LANG']['tl_syncCto_database']))
+        {
+            if (is_array($GLOBALS['TL_LANG']['tl_syncCto_database'][$strName]))
+            {
+                return $GLOBALS['TL_LANG']['tl_syncCto_database'][$strName][0];
+            }
+            else
+            {
+                return $GLOBALS['TL_LANG']['tl_syncCto_database'][$strName];
+            }
+        }
+
+        if (key_exists($strBase, $GLOBALS['TL_LANG']['MOD']))
+        {
+            if (is_array($GLOBALS['TL_LANG']['MOD'][$strBase]))
+            {
+                return $GLOBALS['TL_LANG']['MOD'][$strBase][0];
+            }
+            else
+            {
+                return $GLOBALS['TL_LANG']['MOD'][$strBase];
+            }
+        }
+
+        return $strName;
     }
 
     /**
