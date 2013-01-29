@@ -83,7 +83,7 @@
             <input class="tl_submit" name="transfer" type="submit" value="<?php echo $GLOBALS['TL_LANG']['MSC']['apply']; ?>" />
         </div>
         <div class="bottom submit_container">         
-            <input class="tl_submit" name="delete" type="submit" value="<?php echo $GLOBALS['TL_LANG']['MSC']['delete']; ?>" />
+            <input class="tl_submit" name="delete" type="submit" value="<?php echo $GLOBALS['TL_LANG']['MSC']['updateRemove']; ?>" />
         </div>    
     </div>
     
