@@ -160,6 +160,7 @@ class PopupSyncFiles extends Backend
 
                 case SyncCtoEnum::FILESTATE_TOO_BIG_DELETE :
                 case SyncCtoEnum::FILESTATE_DELETE:
+                case SyncCtoEnum::FILESTATE_FOLDER_DELETE:
                     $intCountDelete++;
                     $intTotalSizeDel += $value["size"];
                     break;
@@ -175,9 +176,7 @@ class PopupSyncFiles extends Backend
                         SyncCtoEnum::FILESTATE_TOO_BIG_NEED,
                         SyncCtoEnum::FILESTATE_TOO_BIG_SAME,
                         SyncCtoEnum::FILESTATE_BOMBASTIC_BIG
-                            )
-                    )
-            )
+            )))
             {
                 $arrBigFiles[$key] = $value;
             }
@@ -203,6 +202,7 @@ class PopupSyncFiles extends Backend
         $arrLanguageTags[SyncCtoEnum::FILESTATE_MISSING]         = $GLOBALS['TL_LANG']['MSC']['create'];
         $arrLanguageTags[SyncCtoEnum::FILESTATE_NEED]            = $GLOBALS['TL_LANG']['MSC']['overrideSelected'];
         $arrLanguageTags[SyncCtoEnum::FILESTATE_DELETE]          = $GLOBALS['TL_LANG']['MSC']['delete'];
+        $arrLanguageTags[SyncCtoEnum::FILESTATE_FOLDER_DELETE]   = $GLOBALS['TL_LANG']['MSC']['delete'];
         $arrLanguageTags[SyncCtoEnum::FILESTATE_TOO_BIG_MISSING] = $GLOBALS['TL_LANG']['MSC']['skipped'];
         $arrLanguageTags[SyncCtoEnum::FILESTATE_TOO_BIG_NEED]    = $GLOBALS['TL_LANG']['MSC']['skipped'];
         $arrLanguageTags[SyncCtoEnum::FILESTATE_TOO_BIG_DELETE]  = $GLOBALS['TL_LANG']['MSC']['skipped'];
@@ -210,7 +210,7 @@ class PopupSyncFiles extends Backend
         
         // Set template
         $this->Template                  = new BackendTemplate('be_syncCto_files');
-        $this->Template->maxLength       = 70;
+        $this->Template->maxLength       = 60;
         $this->Template->arrLangStates   = $arrLanguageTags;
         $this->Template->headline        = $GLOBALS['TL_LANG']['MSC']['comparelist'];
         $this->Template->normalFilelist  = $arrNormalFiles;
