@@ -65,6 +65,7 @@ $GLOBALS['TL_LANG']['tl_syncCto_sync']['step_5']['description_5']           = ' 
 $GLOBALS['TL_LANG']['tl_syncCto_sync']['step_5']['description_6']           = 'Übertragende Dateien:';
 $GLOBALS['TL_LANG']['tl_syncCto_sync']['step_5']['description_7']           = 'Gelöschte Dateien:';
 $GLOBALS['TL_LANG']['tl_syncCto_sync']['step_5']['description_8']           = 'Fehlerhafte Dateien:';
+$GLOBALS['TL_LANG']['tl_syncCto_sync']['step_5']['description_9']           = 'Gelöschte Ordner:';
 
 $GLOBALS['TL_LANG']['tl_syncCto_sync']['abort']                             = 'Abbruch der Synchronisation und Säuberung des Clients.';
 $GLOBALS['TL_LANG']['tl_syncCto_sync']['complete_client']                   = 'Die Synchronisation des %sClients%s wurde erfolgreich abgeschlossen.';
