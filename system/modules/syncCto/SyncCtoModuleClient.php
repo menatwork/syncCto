@@ -1368,6 +1368,7 @@ class SyncCtoModuleClient extends BackendModule
                                 break;
 
                             case SyncCtoEnum::FILESTATE_DELETE:
+                            case SyncCtoEnum::FILESTATE_FOLDER_DELETE:
                                 $intCountDelete++;
                                 $intTotalSizeDel += $value["size"];
                                 break;
