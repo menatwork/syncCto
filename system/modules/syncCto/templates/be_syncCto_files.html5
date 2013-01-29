@@ -24,7 +24,7 @@
             <input class="tl_submit" name="transfer" type="submit" value="<?php echo $GLOBALS['TL_LANG']['MSC']['apply']; ?>" />
         </div>
         <div class="submit_container">         
-            <input class="tl_submit" name="delete" type="submit" value="<?php echo $GLOBALS['TL_LANG']['MSC']['delete']; ?>" />
+            <input class="tl_submit" name="delete" type="submit" value="<?php echo $GLOBALS['TL_LANG']['MSC']['updateRemove']; ?>" />
         </div>
         
         <h3><?php echo $GLOBALS['TL_LANG']['MSC']['totalSize']; ?></h3>
@@ -75,7 +75,10 @@
                     <?php else: ?>
                         <td class="checkbox"><?php if (empty($file["css_big"])): ?><input class="tl_checkbox" type="checkbox" name="del-file-<?php echo $key; ?>" value="<?php echo $key; ?>" /><?php else: ?> X <?php endif; ?></td>  
                     <?php endif; ?>
-                        <td class="last" title="<?php echo $file["path"]; ?>"><?php echo SyncCtoHelper::getInstance()->substrCenter($file["path"], $this->maxLength); ?></td>
+                        <td class="last" title="<?php echo $file["path"]; ?>">
+                            <?php echo ($file['state'] > 99)? $this->generateImage('folderC.gif') : $this->generateImage('iconPLAIN.gif'); ?>
+                            <?php echo SyncCtoHelper::getInstance()->substrCenter($file["path"], $this->maxLength); ?>
+                        </td>
                </tr>
             <?php endforeach; ?>
             </tbody>

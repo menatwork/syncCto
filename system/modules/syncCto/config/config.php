@@ -32,7 +32,7 @@ $objInput = Input::getInstance();
 /**
  * Current syncCto version
  */
-$GLOBALS['SYC_VERSION'] = '2.2.0';
+$GLOBALS['SYC_VERSION'] = '2.3.0';
 
 /**
  * Back end modules
@@ -119,6 +119,8 @@ $GLOBALS['SYC_CONFIG']['table_hidden'] = array(
     'tl_log',
     'tl_lock',
     'tl_session',
+    'tl_search',
+    'tl_search_index',
     'tl_undo',
     'tl_version',
     'tl_synccto_clients',
@@ -209,6 +211,19 @@ $GLOBALS['SYC_PATH']['db'] = $GLOBALS['TL_CONFIG']['uploadPath'] . '/syncCto_bac
 $GLOBALS['SYC_PATH']['file'] = $GLOBALS['TL_CONFIG']['uploadPath'] . '/syncCto_backups/files/';
 $GLOBALS['SYC_PATH']['debug'] = $GLOBALS['TL_CONFIG']['uploadPath'] . '/syncCto_backups/debug/';
 $GLOBALS['SYC_PATH']['tmp'] = "system/tmp/";
+
+/**
+ * Language mapping for database lookup
+ */
+$GLOBALS['SYC_CONFIG']['database_mapping'] = array(
+    'tl_module'                 => 'modules',
+    'tl_member_group'           => 'mgroup',
+    'tl_user_group'             => 'group',
+    'tl_repository_installs'    => 'repository_manager',
+    'tl_task'                   => 'tasks',
+    'tl_theme'                  => 'themes',
+    'tl_style_sheet'            => 'css'
+);
 
 /**
  * CtoCommunication RPC Calls
@@ -380,12 +395,28 @@ $GLOBALS["CTOCOM_FUNCTIONS"]["SYNCCTO_CHECKSUM_FILES"] = array(
     "parameter" => FALSE,
 );
 
-// Get filelist of file
-$GLOBALS["CTOCOM_FUNCTIONS"]["SYNCCTO_CHECKSUM_FOLDERS"] = array(
+// Get folderlist
+$GLOBALS["CTOCOM_FUNCTIONS"]["SYNCCTO_CHECKSUM_FOLDERS_CORE"] = array(
     "class" => "SyncCtoFiles",
-    "function" => "runChecksumFolders",
+    "function" => "runChecksumFolderCore",
     "typ" => "POST",
-    "parameter" => array("files"),
+    "parameter" => FALSE,
+);
+
+// Get folderlist
+$GLOBALS["CTOCOM_FUNCTIONS"]["SYNCCTO_CHECKSUM_FOLDERS_FILES"] = array(
+    "class" => "SyncCtoFiles",
+    "function" => "runChecksumFolderFiles",
+    "typ" => "POST",
+    "parameter" => FALSE,
+);
+
+// Search folders which could delete
+$GLOBALS["CTOCOM_FUNCTIONS"]["SYNCCTO_SEARCH_DELETE_FOLDERS"] = array(
+    "class" => "SyncCtoRPCFunctions",
+    "function" => "searchDeleteFolders",
+    "typ" => "POST",
+    "parameter" => array("md5", "file"),
 );
 
 // Run a file backup

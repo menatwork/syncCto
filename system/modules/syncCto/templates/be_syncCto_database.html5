@@ -32,7 +32,7 @@
             <input class="tl_submit" name="transfer" type="submit" value="<?php echo $GLOBALS['TL_LANG']['MSC']['apply']; ?>" />
         </div>
         <div class="submit_container">         
-            <input class="tl_submit" name="delete" type="submit" value="<?php echo $GLOBALS['TL_LANG']['MSC']['delete']; ?>" />
+            <input class="tl_submit" name="delete" type="submit" value="<?php echo $GLOBALS['TL_LANG']['MSC']['updateRemove']; ?>" />
         </div>
         
         <div id="legend">
@@ -48,14 +48,16 @@
         <colgroup>
             <col width="20px" />
             <col width="40%" />
+            <col width="30px" />
             <col width="40%" />
             <col width="*" />
         </colgroup>
         <thead>
             <tr class="head">
                 <th class="checkbox"><input class="tl_checkbox" onclick="Backend.toggleCheckboxGroup(this, '<?php echo ($strState == 'recommended') ? 'recommended' : 'nonrecommended'; ?>')" type="checkbox" /></th>
-                <th class="client"><img src="<?php echo $this->Environment->base; ?>system/modules/syncCto/html/icons/steps/iconInformation.png" alt="tooltip" title="<?php echo $this->clientPath; ?>" /> <?php echo $GLOBALS['TL_LANG']['MSC']['sync_target']; ?></th>
-                <th class="server"><img src="<?php echo $this->Environment->base; ?>system/modules/syncCto/html/icons/steps/iconInformation.png" alt="tooltip" title="<?php echo $this->serverPath; ?>" /> <?php echo $GLOBALS['TL_LANG']['MSC']['sync_source']; ?></th>
+                <th class="server" title="<?php echo $this->serverPath; ?>"><?php echo $GLOBALS['TL_LANG']['MSC']['server']; ?></th>
+                <th class="direction"><img src="<?php echo $this->Environment->base; ?>system/modules/syncCto/html/icons/steps/iconSync<?php echo $this->direction; ?>.png" alt="" /></th>
+                <th class="client" title="<?php echo $this->clientPath; ?>"><?php echo $GLOBALS['TL_LANG']['MSC']['client']; ?></th>
                 <th class="diff"><?php echo $GLOBALS['TL_LANG']['MSC']['difference']; ?></th>
             </tr>
         </thead>
@@ -63,15 +65,14 @@
             <?php foreach($arrCompareList AS $strTableName => $arrCompareTable): ?>   
                 <tr>
                     <td class="col_0 checkbox"><?php if($arrCompareTable['server'] != '-'): ?><input type="checkbox" class="tl_checkbox" name="<?php echo ($arrCompareTable['del'] == true) ? 'serverDeleteTables[]' : 'serverTables[]';?>" value="<?php echo $strTableName; ?>" /><?php endif; ?></td>
-                    <td class="col_1 <?php echo $arrCompareTable['client']['class']; ?>">
-                        <?php if ($arrCompareTable['client']['name'] != '-'): ?><img src="<?php echo $this->Environment->base; ?>system/modules/syncCto/html/icons/steps/iconInformation.png" alt="tooltip" title="<?php echo $arrCompareTable['client']['tooltip']; ?>" /><?php endif; ?>
-                        <?php echo $arrCompareTable['client']['name']; ?>
+                    <td class="col_1 <?php echo $arrCompareTable['server']['class']; ?>" title="<?php echo $arrCompareTable['server']['name']; ?> (<?php echo $arrCompareTable['server']['tooltip']; ?>)">
+                        <?php echo $arrCompareTable['server']['tname']; ?>
                     </td>
-                    <td class="col_2 <?php echo $arrCompareTable['server']['class']; ?>">
-                        <?php if ($arrCompareTable['server']['name'] != '-'): ?><img src="<?php echo $this->Environment->base; ?>system/modules/syncCto/html/icons/steps/iconInformation.png" alt="tooltip" title="<?php echo $arrCompareTable['server']['tooltip']; ?>" /><?php endif; ?>
-                        <?php echo $arrCompareTable['server']['name']; ?>
+                    <td class="col_2"></td>
+                    <td class="col_3 <?php echo $arrCompareTable['client']['class']; ?>" title="<?php echo $arrCompareTable['client']['name']; ?> (<?php echo $arrCompareTable['client']['tooltip']; ?>)">
+                        <?php echo $arrCompareTable['client']['tname']; ?>
                     </td>
-                    <td class="col_3 diff"><?php echo $arrCompareTable['diff']; ?></td>
+                    <td class="col_4 diff"><?php echo $arrCompareTable['diff']; ?></td>
                 </tr>
             <?php endforeach; ?>        
         </tbody>

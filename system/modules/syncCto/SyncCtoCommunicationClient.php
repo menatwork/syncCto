@@ -364,23 +364,23 @@ class SyncCtoCommunicationClient extends CtoCommunication
     }
 
     /**
-     * Get a list with folder from contao core/files
+     * Get a list with folder from contao core
      * 
      * @return type 
      */
-    public function getChecksumFolder($booFiles = false)
+    public function getChecksumFolderCore()
     {
-        $arrData = array(
-            array(
-                "name" => "files",
-                "value" => $booFiles,
-            ),
-        );
-
-        // Set no codify engine
-        $this->setCodifyEngine(SyncCtoEnum::CODIFY_EMPTY);
-
-        return $this->runServer("SYNCCTO_CHECKSUM_FOLDERS", $arrData);
+        return $this->runServer("SYNCCTO_CHECKSUM_FOLDERS_CORE");
+    }
+    
+    /**
+     * Get a list with folder from contao core
+     * 
+     * @return type 
+     */
+    public function getChecksumFolderFiles()
+    {
+        return $this->runServer("SYNCCTO_CHECKSUM_FOLDERS_FILES");
     }
 
     /**
@@ -421,6 +421,46 @@ class SyncCtoCommunicationClient extends CtoCommunication
         );
 
         return $this->runServer("SYNCCTO_CHECK_DELETE_FILE", $arrData);
+    }
+    
+    /**
+     * Check for deleted files
+     * 
+     * @param array $arrFilelist
+     * @return array 
+     */
+    public function searchDeleteFolders($arrChecksumList)
+    {
+        if (!is_array($arrChecksumList))
+        {
+            throw new Exception("Filelist is not a array.");
+        }
+
+        $strPath = $this->objSyncCtoHelper->standardizePath($GLOBALS['SYC_PATH']['tmp'], "syncFolderList.syncCto");
+        $strMime = "application/octet-stream";
+
+        $objFile = new File($strPath);
+        $objFile->write(serialize($arrChecksumList));
+        $objFile->close();
+
+        $arrData = array(
+            array(
+                "name"  => "md5",
+                "value" => md5_file(TL_ROOT . "/" . $strPath),
+            ),
+            array(
+                "name"  => "file",
+                "value" => md5($strPath),
+            ),
+            array(
+                "name"     => md5($strPath),
+                "filename" => "syncFolderList.syncCto",
+                "filepath" => TL_ROOT . "/" . $strPath,
+                "mime"     => $strMime,
+            )
+        );
+
+        return $this->runServer("SYNCCTO_SEARCH_DELETE_FOLDERS", $arrData);
     }
 
     /**

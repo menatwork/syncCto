@@ -33,7 +33,7 @@
 class SyncCtoEnum
 {
     /**
-     * FileState
+     * File/Folder state
      */
 
     const FILESTATE_FILE            = 0;
@@ -47,6 +47,9 @@ class SyncCtoEnum
     const FILESTATE_TOO_BIG_NEED    = 13;
     const FILESTATE_TOO_BIG_DELETE  = 14;
     const FILESTATE_BOMBASTIC_BIG   = 99;
+    
+    const FILESTATE_FOLDER          = 100;
+    const FILESTATE_FOLDER_DELETE   = 104;
 
     /**
      * File Transmission

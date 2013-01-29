@@ -68,6 +68,10 @@ class PopupSyncFiles extends Backend
         $this->import('BackendUser', 'User');
 
         parent::__construct();
+        
+        // Load language
+        $this->loadLanguageFile("modules");
+        $this->loadLanguageFile("tl_syncCto_database");
 
         $this->User->authenticate();
 
@@ -171,6 +175,19 @@ class PopupSyncFiles extends Backend
             return;
         }
 
+        // Make a look up
+        foreach ((array) $this->arrSyncSettings['syncCto_CompareTables']['recommended'] as $strKey => $arrValueA)
+        {
+            $this->arrSyncSettings['syncCto_CompareTables']['recommended'][$strKey]['server']['tname'] = $this->lookUpName($arrValueA['server']['name']);
+            $this->arrSyncSettings['syncCto_CompareTables']['recommended'][$strKey]['client']['tname'] = $this->lookUpName($arrValueA['client']['name']);
+        }
+
+        foreach ((array) $this->arrSyncSettings['syncCto_CompareTables']['nonRecommended'] as $strKey => $arrValueA)
+        {
+            $this->arrSyncSettings['syncCto_CompareTables']['nonRecommended'][$strKey]['server']['tname'] = $this->lookUpName($arrValueA['server']['name']);
+            $this->arrSyncSettings['syncCto_CompareTables']['nonRecommended'][$strKey]['client']['tname'] = $this->lookUpName($arrValueA['client']['name']);
+        }
+
         $this->Template                 = new BackendTemplate("be_syncCto_database");
         $this->Template->headline       = $GLOBALS['TL_LANG']['MSC']['comparelist'];
         $this->Template->arrCompareList = $this->arrSyncSettings['syncCto_CompareTables'];
@@ -178,11 +195,89 @@ class PopupSyncFiles extends Backend
         $this->Template->error          = FALSE;
 
         $objExtern = $this->Database
-                ->prepare('SELECT address, path FROM tl_synccto_clients')
-                ->execute();
+                ->prepare('SELECT address, path FROM tl_synccto_clients WHERE id=?')
+                ->execute($this->intClientID);
 
         $this->Template->clientPath = $objExtern->address . $objExtern->path;
         $this->Template->serverPath = $this->Environment->base;
+    }
+
+    /**
+     * Make a lookup for a human readable table name.
+     * First syncCto language
+     * Second the mapping for mod language
+     * Last the mod language
+     * 
+     * @param string $strName Name of table
+     * @return string
+     */
+    public function lookUpName($strName)
+    {
+        $strBase = str_replace('tl_', "", $strName);
+
+        if ($strName == '-')
+        {
+            return '-';
+        }
+
+        // Make a lookup in synccto language files
+        if (is_array($GLOBALS['TL_LANG']['tl_syncCto_database']) && key_exists($strName, $GLOBALS['TL_LANG']['tl_syncCto_database']))
+        {
+            if (is_array($GLOBALS['TL_LANG']['tl_syncCto_database'][$strName]))
+            {
+                return $GLOBALS['TL_LANG']['tl_syncCto_database'][$strName][0];
+            }
+            else
+            {
+                return $GLOBALS['TL_LANG']['tl_syncCto_database'][$strName];
+            }
+        }
+        
+        // Get MM name
+        if (in_array('metamodels', $this->Config->getActiveModules()) && preg_match("/^mm_/i", $strName))
+        {
+            try
+            {
+                if (!is_null(MetaModelFactory::byTableName($strName)))
+                {
+                    return MetaModelFactory::byTableName($strName)->getName();
+                }
+            }
+            catch (Exception $exc)
+            {
+                // Nothing to do;
+            }
+        }
+
+        // Little mapping for names        
+        if (is_array($GLOBALS['SYC_CONFIG']['database_mapping']) && key_exists($strName, $GLOBALS['SYC_CONFIG']['database_mapping']))
+        {
+            $strRealSystemName = $GLOBALS['SYC_CONFIG']['database_mapping'][$strName];
+
+            if (is_array($GLOBALS['TL_LANG']['MOD'][$strRealSystemName]))
+            {
+                return $GLOBALS['TL_LANG']['MOD'][$strRealSystemName][0];
+            }
+            else
+            {
+                return $GLOBALS['TL_LANG']['MOD'][$strRealSystemName];
+            }
+        }
+
+        // Search in mod language array for a translation
+        if (key_exists($strBase, $GLOBALS['TL_LANG']['MOD']))
+        {
+            if (is_array($GLOBALS['TL_LANG']['MOD'][$strBase]))
+            {
+                return $GLOBALS['TL_LANG']['MOD'][$strBase][0];
+            }
+            else
+            {
+                return $GLOBALS['TL_LANG']['MOD'][$strBase];
+            }
+        }
+
+        return $strName;
     }
 
     /**
@@ -240,6 +335,7 @@ class PopupSyncFiles extends Backend
         $this->popupTemplate->charset  = $GLOBALS['TL_CONFIG']['characterSet'];
         $this->popupTemplate->headline = basename(utf8_convert_encoding($this->strFile, $GLOBALS['TL_CONFIG']['characterSet']));
 
+        
         // Set default information
         $this->Template->id        = $this->intClientID;
         $this->Template->step      = $this->mixStep;
@@ -277,6 +373,13 @@ class PopupSyncFiles extends Backend
         {
             $this->mixStep = self::STEP_NORMAL_DB;
         }
+        
+        // Get direction
+        if (strlen($this->Input->get('direction')) != 0)
+        {
+           $this->strMode = $this->Input->get('direction');
+        }
+        
     }
 
     protected function loadSyncSettings()

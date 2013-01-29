@@ -229,6 +229,40 @@ class SyncCtoRPCFunctions extends Backend
 
         return $this->objSyncCtoFiles->checkDeleteFiles($arrChecksumList);
     }
+    
+    /**
+     * Get file and rebuild the array for checking delete files
+     * 
+     * @param string $strMD5
+     * @param string $strFilename
+     * @return mixed 
+     */
+    public function searchDeleteFolders($strMD5, $strFilename)
+    {
+        if (!key_exists($strFilename, $_FILES))
+        {
+            throw new Exception(vsprintf($GLOBALS['TL_LANG']['ERR']['unknown_file'], array($strFilename)));
+        }
+
+        if (md5_file($_FILES[$strFilename]["tmp_name"]) != $strMD5)
+        {
+            throw new Exception($GLOBALS['TL_LANG']['ERR']['checksum_error']);
+        }
+
+        $objFiles = Files::getInstance();
+        $objFiles->move_uploaded_file($_FILES[$strFilename]["tmp_name"], $this->objSyncCtoHelper->standardizePath($GLOBALS['SYC_PATH']['tmp'], "syncFolderListInc.syncCto"));
+
+        $objFile         = new File($this->objSyncCtoHelper->standardizePath($GLOBALS['SYC_PATH']['tmp'], "syncFolderListInc.syncCto"));
+        $arrChecksumList = deserialize($objFile->getContent());
+        $objFile->close();
+
+        if (!is_array($arrChecksumList))
+        {
+            throw new Exception("Could not rebuild array.");
+        }
+
+        return $this->objSyncCtoFiles->searchDeleteFolders($arrChecksumList);
+    }
 
     /**
      * Get filelist and rebuild the array and run checksum compare.
