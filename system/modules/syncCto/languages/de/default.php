@@ -31,11 +31,11 @@
  * Reference
  */
 $GLOBALS['TL_LANG']['SYC']['core']                          = 'Contao-Installation';
-$GLOBALS['TL_LANG']['SYC']['core_change']                   = 'Veränderte Dateien';
-$GLOBALS['TL_LANG']['SYC']['core_delete']                   = 'Gelöschte Dateien';
-$GLOBALS['TL_LANG']['SYC']['user']                          = 'Persönliche Dateien (tl_files)';
-$GLOBALS['TL_LANG']['SYC']['user_change']                   = 'Veränderte Dateien';
-$GLOBALS['TL_LANG']['SYC']['user_delete']                   = 'Gelöschte Dateien';
+$GLOBALS['TL_LANG']['SYC']['core_change']                   = 'Veränderte Daten';
+$GLOBALS['TL_LANG']['SYC']['core_delete']                   = 'Gelöschte Daten';
+$GLOBALS['TL_LANG']['SYC']['user']                          = 'Persönliche Daten (tl_files)';
+$GLOBALS['TL_LANG']['SYC']['user_change']                   = 'Veränderte Daten';
+$GLOBALS['TL_LANG']['SYC']['user_delete']                   = 'Gelöschte Daten';
 $GLOBALS['TL_LANG']['SYC']['configfiles']                   = 'Konfigurationsdateien';
 $GLOBALS['TL_LANG']['SYC']['localconfig_update']            = 'Alle Einträge aktualisieren';
 $GLOBALS['TL_LANG']['SYC']['localconfig_errors']            = 'Fehlermeldungen anzeigen';
