@@ -222,7 +222,7 @@ class PopupSyncFiles extends Backend
 
                     $strReturn = MetaModelFactory::byTableName($strName)->getName();
 
-                    foreach ($arrBackendcaption as $value)
+                    foreach ((array) $arrBackendcaption as $value)
                     {
                         if ($value['langcode'] == $GLOBALS['TL_LANGUAGE'])
                         {
