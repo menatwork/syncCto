@@ -439,6 +439,38 @@ class SyncCtoHelper extends Backend
         return $GLOBALS['SYC_CONFIG']['maintance_options'];
     }
 
+    /**
+     * Execute some operations at last step
+     */
+    public function executeFinalOperations()
+    {
+        $arrReturn = array();
+
+        // HOOK: do some last operations
+        if (isset($GLOBALS['TL_HOOKS']['syncExecuteFinalOperations']) && is_array($GLOBALS['TL_HOOKS']['syncExecuteFinalOperations']))
+        {
+            foreach ($GLOBALS['TL_HOOKS']['syncExecuteFinalOperations'] as $callback)
+            {
+                try
+                {
+                    $this->import($callback[0]);
+                    $this->$callback[0]->$callback[1]();
+                }
+                catch (Exception $exc)
+                {
+                    $arrReturn [] = array(
+                        'callback' => implode("|", $callback),
+                        'info_msg' => "Error by: TL_HOOK $callback[0] | $callback[1] with Msg: " . $exc->getMessage()
+                    );
+                    
+                    $this->log("Error by: TL_HOOK $callback[0] | $callback[1] with Msg: " . $exc->getMessage(), __CLASS__ . "|" . __FUNCTION__, TL_ERROR);
+                }
+            }
+        }
+
+        return $arrReturn;
+    }
+
     /* -------------------------------------------------------------------------
      * Helper Functions
      */

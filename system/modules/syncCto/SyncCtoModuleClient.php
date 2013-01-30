@@ -2385,12 +2385,20 @@ class SyncCtoModuleClient extends BackendModule
 
                     $this->objStepPool->step++;
 
+                /**
+                 * Call the final operations hook
+                 */
                 case 9:
-                    $this->objSyncCtoCommunicationClient->referrerEnable();
+                    $arrResponse = $this->objSyncCtoCommunicationClient->runFinalOperations();
                     $this->objStepPool->step++;
                     break;
 
                 case 10:
+                    $this->objSyncCtoCommunicationClient->referrerEnable();
+                    $this->objStepPool->step++;
+                    break;
+
+                case 11:
                     $this->objSyncCtoCommunicationClient->stopConnection();
                     $this->objStepPool->step++;
                     break;
@@ -2398,7 +2406,7 @@ class SyncCtoModuleClient extends BackendModule
                 /**
                  * Show information
                  */
-                case 11:
+                case 12:
                     // Count files
                     if (is_array($this->arrListCompare) && count($this->arrListCompare) != 0 && $this->arrListCompare != false)
                     {
@@ -3865,21 +3873,29 @@ class SyncCtoModuleClient extends BackendModule
                     $this->objSyncCtoFiles->purgeTemp();
                     $this->objStepPool->step++;
                     break;
-
+                
+                /**
+                 * Call the final operations hook
+                 */
                 case 8:
-                    $this->objSyncCtoCommunicationClient->referrerEnable();
+                    $arrResponse = $this->objSyncCtoHelper->executeFinalOperations();
                     $this->objStepPool->step++;
                     break;
 
                 case 9:
-                    $this->objSyncCtoCommunicationClient->stopConnection();
+                    $this->objSyncCtoCommunicationClient->referrerEnable();
                     $this->objStepPool->step++;
                     break;
 
+                case 10:
+                    $this->objSyncCtoCommunicationClient->stopConnection();
+                    $this->objStepPool->step++;
+                    break;
+                
                 /**
                  * Show information
                  */
-                case 10:
+                case 11:
                     // Count files
                     if (is_array($this->arrListCompare) && count($this->arrListCompare) != 0 && $this->arrListCompare != false)
                     {

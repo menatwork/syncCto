@@ -14,7 +14,7 @@ $objInput = Input::getInstance();
 /**
  * Current syncCto version
  */
-$GLOBALS['SYC_VERSION'] = '2.3.0';
+$GLOBALS['SYC_VERSION'] = '2.3.0 rc2';
 
 /**
  * Back end modules
@@ -441,6 +441,14 @@ $GLOBALS["CTOCOM_FUNCTIONS"]["SYNCCTO_MAINTENANCE"] = array(
     "function" => "runMaintenance",
     "typ" => "POST",
     "parameter" => array("options"),
+);
+
+// Execute last step operations
+$GLOBALS["CTOCOM_FUNCTIONS"]["SYNCCTO_EXECUTE_FINAL_OPERATIONS"] = array(
+    "class" => "SyncCtoHelper",
+    "function" => "executeFinalOperations",
+    "typ" => "GET",
+    "parameter" => FALSE,
 );
 
 // - Informations --------------------------------------------------------------

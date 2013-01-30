@@ -266,6 +266,16 @@ class SyncCtoCommunicationClient extends CtoCommunication
 
         return $this->runServer("SYNCCTO_MAINTENANCE", $arrData);
     }
+    
+    /**
+     * Call the last operations on client side.
+     * 
+     * @return array with informations. 
+     */
+    public function runFinalOperations()
+    {
+        return $this->runServer("SYNCCTO_EXECUTE_FINAL_OPERATIONS");
+    }
 
     /* -------------------------------------------------------------------------
      * File Operations
