@@ -216,7 +216,22 @@ class PopupSyncFiles extends Backend
             {
                 if (!is_null(MetaModelFactory::byTableName($strName)))
                 {
-                    return MetaModelFactory::byTableName($strName)->getName();
+                    $objDCABuilder     = MetaModelDcaBuilder::getInstance();
+                    $arrDCA            = $objDCABuilder->getDca(MetaModelFactory::byTableName($strName)->get('id'));
+                    $arrBackendcaption = deserialize($arrDCA['backendcaption']);
+
+                    $strReturn = MetaModelFactory::byTableName($strName)->getName();
+
+                    foreach ($arrBackendcaption as $value)
+                    {
+                        if ($value['langcode'] == $GLOBALS['TL_LANGUAGE'])
+                        {
+                            $strReturn = $value['label'];
+                            break;
+                        }
+                    }
+
+                    return $strReturn;
                 }
             }
             catch (Exception $exc)
