@@ -1246,7 +1246,7 @@ class SyncCtoDatabase extends Backend
                 }
             }
         }
-
+        
         $arrCompareList = array();
 
         // Make a diff
@@ -1270,7 +1270,7 @@ class SyncCtoDatabase extends Backend
 
             unset($arrSourceTables[$keySrcTables]);
         }
-
+        
         // Del Tables
         foreach ($arrMissingOnSource as $keyDesTables)
         {
@@ -1429,6 +1429,7 @@ class SyncCtoDatabase extends Backend
             }
         }
 
+        // Return the arrays
         return array(
             'server' => array(
                 'current'  => $arrTimestampServer,
