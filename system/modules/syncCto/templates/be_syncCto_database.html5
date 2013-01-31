@@ -65,11 +65,11 @@
             <?php foreach($arrCompareList AS $strTableName => $arrCompareTable): ?>   
                 <tr>
                     <td class="col_0 checkbox"><?php if($arrCompareTable['server'] != '-'): ?><input type="checkbox" class="tl_checkbox" name="<?php echo ($arrCompareTable['del'] == true) ? 'serverDeleteTables[]' : 'serverTables[]';?>" value="<?php echo $strTableName; ?>" /><?php endif; ?></td>
-                    <td class="col_1 <?php echo $arrCompareTable['server']['class']; ?>" title="<?php echo $arrCompareTable['server']['name']; ?> (<?php echo $arrCompareTable['server']['tooltip']; ?>)">
+                    <td class="col_1 <?php echo $arrCompareTable['server']['class']; ?>" title="<?php echo $arrCompareTable['server']['iname']; ?> (<?php echo $arrCompareTable['server']['tooltip']; ?>)">
                         <?php echo $arrCompareTable['server']['tname']; ?>
                     </td>
                     <td class="col_2"></td>
-                    <td class="col_3 <?php echo $arrCompareTable['client']['class']; ?>" title="<?php echo $arrCompareTable['client']['name']; ?> (<?php echo $arrCompareTable['client']['tooltip']; ?>)">
+                    <td class="col_3 <?php echo $arrCompareTable['client']['class']; ?>" title="<?php echo $arrCompareTable['client']['iname']; ?> (<?php echo $arrCompareTable['client']['tooltip']; ?>)">
                         <?php echo $arrCompareTable['client']['tname']; ?>
                     </td>
                     <td class="col_4 diff"><?php echo $arrCompareTable['diff']; ?></td>

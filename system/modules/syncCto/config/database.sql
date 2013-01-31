@@ -58,4 +58,5 @@ CREATE TABLE `tl_user` (
   `syncCto_clients_p` blob NULL,
   `syncCto_sync_options` blob NULL,
   `syncCto_tables` blob NULL
+  `syncCto_useTranslatedNames` char(1) NOT NULL default '',
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;

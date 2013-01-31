@@ -17,7 +17,7 @@ window.addEvent("domready",function(){
                     $$('input[name=transfer]').set('disabled', false);
                 }
             }
-        });	
+        });    
     });
 
     if(window.HtmlTable)
@@ -51,21 +51,21 @@ window.addEvent("domready",function(){
         });    
 
         var myHtmlTableNormal = new HtmlTable($('normalfilelist'), {
-            sortIndex: 0,
+            sortIndex: 3,
             parsers: ['string', 'dimension', 'string'],
             sortable: true
         }).enableSort({
             sortable: true, 
-            sortIndex: 0
+            sortIndex: 3
         });
         
         var myHtmlTableBig = new HtmlTable($('bigfilelist'), {
-            sortIndex: 0,
+            sortIndex: 3,
             parsers: ['string', 'dimension', 'string'],
             sortable: true
         }).enableSort({
             sortable: true, 
-            sortIndex: 0
+            sortIndex: 3
         });
     }
 

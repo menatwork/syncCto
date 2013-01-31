@@ -154,14 +154,24 @@ class PopupSyncFiles extends Backend
         // Make a look up
         foreach ((array) $this->arrSyncSettings['syncCto_CompareTables']['recommended'] as $strKey => $arrValueA)
         {
-            $this->arrSyncSettings['syncCto_CompareTables']['recommended'][$strKey]['server']['tname'] = $this->lookUpName($arrValueA['server']['name']);
-            $this->arrSyncSettings['syncCto_CompareTables']['recommended'][$strKey]['client']['tname'] = $this->lookUpName($arrValueA['client']['name']);
+            $arrTransServer = $this->lookUpName($arrValueA['server']['name']);
+            $arrTransClient = $this->lookUpName($arrValueA['client']['name']);
+            
+            $this->arrSyncSettings['syncCto_CompareTables']['recommended'][$strKey]['server']['tname'] = $arrTransServer['tname'];
+            $this->arrSyncSettings['syncCto_CompareTables']['recommended'][$strKey]['server']['iname'] = $arrTransServer['iname'];
+            $this->arrSyncSettings['syncCto_CompareTables']['recommended'][$strKey]['client']['tname'] = $arrTransClient['tname'];
+            $this->arrSyncSettings['syncCto_CompareTables']['recommended'][$strKey]['client']['iname'] = $arrTransClient['iname'];
         }
 
         foreach ((array) $this->arrSyncSettings['syncCto_CompareTables']['nonRecommended'] as $strKey => $arrValueA)
         {
-            $this->arrSyncSettings['syncCto_CompareTables']['nonRecommended'][$strKey]['server']['tname'] = $this->lookUpName($arrValueA['server']['name']);
-            $this->arrSyncSettings['syncCto_CompareTables']['nonRecommended'][$strKey]['client']['tname'] = $this->lookUpName($arrValueA['client']['name']);
+            $arrTransServer = $this->lookUpName($arrValueA['server']['name']);
+            $arrTransClient = $this->lookUpName($arrValueA['client']['name']);
+
+            $this->arrSyncSettings['syncCto_CompareTables']['nonRecommended'][$strKey]['server']['tname'] = $arrTransServer['tname'];
+            $this->arrSyncSettings['syncCto_CompareTables']['nonRecommended'][$strKey]['server']['iname'] = $arrTransServer['iname'];
+            $this->arrSyncSettings['syncCto_CompareTables']['nonRecommended'][$strKey]['client']['tname'] = $arrTransClient['tname'];
+            $this->arrSyncSettings['syncCto_CompareTables']['nonRecommended'][$strKey]['client']['iname'] = $arrTransClient['iname'];
         }
 
         $this->Template                 = new BackendTemplate("be_syncCto_database");
@@ -201,11 +211,11 @@ class PopupSyncFiles extends Backend
         {
             if (is_array($GLOBALS['TL_LANG']['tl_syncCto_database'][$strName]))
             {
-                return $GLOBALS['TL_LANG']['tl_syncCto_database'][$strName][0];
+                return $this->formateLookUpName($strName, $GLOBALS['TL_LANG']['tl_syncCto_database'][$strName][0]);
             }
             else
             {
-                return $GLOBALS['TL_LANG']['tl_syncCto_database'][$strName];
+                return $this->formateLookUpName($strName, $GLOBALS['TL_LANG']['tl_syncCto_database'][$strName]);
             }
         }
         
@@ -224,14 +234,14 @@ class PopupSyncFiles extends Backend
 
                     foreach ((array) $arrBackendcaption as $value)
                     {
-                        if ($value['langcode'] == $GLOBALS['TL_LANGUAGE'])
+                        if ($value['langcode'] == $this->User->language)
                         {
                             $strReturn = $value['label'];
                             break;
                         }
                     }
-
-                    return $strReturn;
+                    
+                    return $this->formateLookUpName($strName, $strReturn);
                 }
             }
             catch (Exception $exc)
@@ -247,11 +257,11 @@ class PopupSyncFiles extends Backend
 
             if (is_array($GLOBALS['TL_LANG']['MOD'][$strRealSystemName]))
             {
-                return $GLOBALS['TL_LANG']['MOD'][$strRealSystemName][0];
+                return $this->formateLookUpName($strName, $GLOBALS['TL_LANG']['MOD'][$strRealSystemName][0]);
             }
             else
             {
-                return $GLOBALS['TL_LANG']['MOD'][$strRealSystemName];
+                return $this->formateLookUpName($strName, $GLOBALS['TL_LANG']['MOD'][$strRealSystemName]);
             }
         }
 
@@ -260,15 +270,42 @@ class PopupSyncFiles extends Backend
         {
             if (is_array($GLOBALS['TL_LANG']['MOD'][$strBase]))
             {
-                return $GLOBALS['TL_LANG']['MOD'][$strBase][0];
+                return $this->formateLookUpName($strName, $GLOBALS['TL_LANG']['MOD'][$strBase][0]);
             }
             else
             {
-                return $GLOBALS['TL_LANG']['MOD'][$strBase];
+                return $this->formateLookUpName($strName, $GLOBALS['TL_LANG']['MOD'][$strBase]);
             }
         }
 
-        return $strName;
+        return $this->formateLookUpName($strName, $strName);
+    }
+    
+    /**
+     * Return a array with tahble names
+     * 
+     * @param string $strTableName real name like 'tl_contetn'
+     * @param string $strReadableName readable name like 'Conten Elements'
+     * 
+     * @return array('tname' => [for table], 'iname' => [for title/info])
+     */
+    protected function formateLookUpName($strTableName, $strReadableName)
+    {
+        // Check if the function is activate
+        if($this->User->syncCto_useTranslatedNames)
+        {
+            return array(
+                'tname' => $strReadableName,
+                'iname' => $strTableName
+            );
+        }
+        else
+        {
+            return array(
+                'tname' => $strTableName,
+                'iname' => $strReadableName
+            );
+        }
     }
 
     /**

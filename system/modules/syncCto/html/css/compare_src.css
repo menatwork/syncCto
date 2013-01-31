@@ -153,6 +153,7 @@
   td.last {
     text-align:left;
     padding-right:9px;
+    padding-left:5px;
   }
   
   td.filesize {
