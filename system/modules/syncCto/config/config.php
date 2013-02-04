@@ -97,7 +97,7 @@ $GLOBALS['SYC_SIZE']['limit_ignore'] = 838860800;
  * Blacklists
  */
 // Tables
-$GLOBALS['SYC_CONFIG']['table_hidden'] = array(
+$GLOBALS['SYC_CONFIG']['table_hidden'] = array_merge( (array) $GLOBALS['SYC_CONFIG']['table_hidden'], array(
     'tl_log',
     'tl_lock',
     'tl_session',
@@ -108,25 +108,25 @@ $GLOBALS['SYC_CONFIG']['table_hidden'] = array(
     'tl_synccto_clients',
     'tl_ctocom_cache',
     'tl_requestcache',
-);
+));
 
 // Folders
-$GLOBALS['SYC_CONFIG']['folder_blacklist'] = array(
+$GLOBALS['SYC_CONFIG']['folder_blacklist'] = array_merge( (array) $GLOBALS['SYC_CONFIG']['table_hidden'], array(
     'system/html',
     'system/logs',
     'system/scripts',
     'system/tmp',
     '*/syncCto_backups',
-);
+));
 
 // Files only sync.
-$GLOBALS['SYC_CONFIG']['file_blacklist'] = array(
+$GLOBALS['SYC_CONFIG']['file_blacklist'] = array_merge( (array) $GLOBALS['SYC_CONFIG']['file_blacklist'], array(
     'TL_ROOT/.htaccess',
     'localconfig.php',
-);
+));
 
 // Folders
-$GLOBALS['SYC_CONFIG']['local_blacklist'] = array(   
+$GLOBALS['SYC_CONFIG']['local_blacklist'] = array_merge( (array) $GLOBALS['SYC_CONFIG']['local_blacklist'], array(   
     'websitePath',
     'installPassword',
     'disableRefererCheck',
@@ -146,45 +146,40 @@ $GLOBALS['SYC_CONFIG']['local_blacklist'] = array(
     'ctoCom_handshake',
     'syncCto_debug_mode',
     'syncCto_attentionFlag'
-);
+));
 
 /**
  * Whitelist
  */
-$GLOBALS['SYC_CONFIG']['folder_whitelist'] = array(
+$GLOBALS['SYC_CONFIG']['folder_whitelist'] = array_merge( (array) $GLOBALS['SYC_CONFIG']['folder_whitelist'], array(
     'contao',
     'plugins',
     'system',
     'templates',
     'typolight',
-);
+));
 
 /**
  * Sync options
  */
-$GLOBALS['SYC_CONFIG']['sync_options'] = array(
-    'core' => array(
-        'core_change',
-        'core_delete'
-    ),
-    'user' => array(
-        'user_change',
-        'user_delete'
-    ),
-    'configfiles' => array(
-        'localconfig_update'
-    )
-);
+// Core
+$GLOBALS['SYC_CONFIG']['sync_options']['core'][] =  'core_change';
+$GLOBALS['SYC_CONFIG']['sync_options']['core'][] =  'core_delete';
+// User
+$GLOBALS['SYC_CONFIG']['sync_options']['user'][] =  'user_change';
+$GLOBALS['SYC_CONFIG']['sync_options']['user'][] =  'user_delete';
+// User
+$GLOBALS['SYC_CONFIG']['sync_options']['configfiles'][] =  'localconfig_update';
 
 /**
  * Maintance options
  */
-$GLOBALS['SYC_CONFIG']['maintance_options'] = array(
+$GLOBALS['SYC_CONFIG']['maintance_options'] = array_merge( (array) $GLOBALS['SYC_CONFIG']['maintance_options'], array(
     'temp_tables',
     'temp_folders',
     'css_create',
     'xml_create',
-);
+));
 
 /**
  * Global configuration
@@ -197,7 +192,7 @@ $GLOBALS['SYC_PATH']['tmp'] = "system/tmp/";
 /**
  * Language mapping for database lookup
  */
-$GLOBALS['SYC_CONFIG']['database_mapping'] = array(
+$GLOBALS['SYC_CONFIG']['database_mapping'] = array_merge( (array) $GLOBALS['SYC_CONFIG']['database_mapping'], array(
     'tl_module'                 => 'modules',
     'tl_member_group'           => 'mgroup',
     'tl_user_group'             => 'group',
@@ -205,7 +200,7 @@ $GLOBALS['SYC_CONFIG']['database_mapping'] = array(
     'tl_task'                   => 'tasks',
     'tl_theme'                  => 'themes',
     'tl_style_sheet'            => 'css'
-);
+));
 
 /**
  * CtoCommunication RPC Calls
