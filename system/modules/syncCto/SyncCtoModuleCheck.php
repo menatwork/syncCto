@@ -345,10 +345,10 @@ class SyncCtoModuleCheck extends BackendModule
 		$return .= '<th>' . $GLOBALS['TL_LANG']['tl_syncCto_check']['value'] . '</th>';
 		$return .= '<th>' . $GLOBALS['TL_LANG']['tl_syncCto_check']['description'] . '</th>';
 		$return .= '</tr>';
-
-		$gmp	 = !$arrFunctions['gmp'];
+        
+		$gmp	 = $arrFunctions['gmp'];
 		$bcmath	 = $arrFunctions['bcmath'];
-
+        
 		// bcmath
 		$ok = ($bcmath == true || ($bcmath == false && $gmp == true));
 		$return .= '<tr class="' . ($ok ? 'ok' : 'warning') . '">';
