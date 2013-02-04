@@ -106,8 +106,6 @@ $GLOBALS['SYC_CONFIG']['table_hidden'] = array_merge( (array) $GLOBALS['SYC_CONF
     'tl_undo',
     'tl_version',
     'tl_synccto_clients',
-    'tl_ctocom_cache',
-    'tl_requestcache',
 ));
 
 // Folders
