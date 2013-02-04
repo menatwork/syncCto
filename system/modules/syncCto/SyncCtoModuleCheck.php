@@ -84,15 +84,47 @@ class SyncCtoModuleCheck extends BackendModule
 			'post_max_size'			 => $this->getSize(ini_get('post_max_size')),
 			'max_input_time'		 => ini_get('max_input_time'),
 			'default_socket_timeout' => ini_get('default_socket_timeout'),
-			'suhosin'				 => ini_get('suhosin.session.max_id_length')
+			'suhosin'				 => $this->checkSuhosin()
 		);
 	}
+    
+    public function checkSuhosin()
+    {
+        $blnIsActive = false;
 
-	/**
-	 * Get a list with informations about the required functions
-	 * 
-	 * @return array
-	 */
+        // Check as apache modules
+        try
+        {
+            if (in_array('mod_security', @apache_get_modules()))
+            {
+                $blnIsActive = true;
+            }
+        }
+        catch (Exception $exc)
+        {
+            
+        }
+        
+        // Check php ini
+        if(ini_get('suhosin.session.max_id_length'))
+        {
+            $blnIsActive = true;
+        }
+        
+        // Check patch
+        if(constant("SUHOSIN_PATCH"))
+        {
+            $blnIsActive = true;
+        }
+        
+        return $blnIsActive;
+    }
+
+    /**
+     * Get a list with informations about the required functions
+     * 
+     * @return array
+     */
 	public function getPhpFunctions()
 	{
 		return array(
@@ -238,7 +270,7 @@ class SyncCtoModuleCheck extends BackendModule
 		$return .= '</tr>';
 
 		// suhosin
-		$suhosin = $arrConfigurations['$suhosin'];
+		$suhosin = $arrConfigurations['suhosin'];
 		$ok		 = ($suhosin == false);
 		$return .= '<tr class="' . ($ok ? 'ok' : 'warning') . '">';
 		$return .= '<td>' . $GLOBALS['TL_LANG']['tl_syncCto_check']['suhosin'][0] . '</td>';
@@ -346,30 +378,36 @@ class SyncCtoModuleCheck extends BackendModule
 		$return .= '<th>' . $GLOBALS['TL_LANG']['tl_syncCto_check']['description'] . '</th>';
 		$return .= '</tr>';
         
-		$gmp	 = $arrFunctions['gmp'];
-		$bcmath	 = $arrFunctions['bcmath'];
-        
-		// bcmath
-		$ok = ($bcmath == true || ($bcmath == false && $gmp == true));
-		$return .= '<tr class="' . ($ok ? 'ok' : 'warning') . '">';
-		$return .= '<td>' . $GLOBALS['TL_LANG']['tl_syncCto_check']['bcmath'][0] . '</td>';
-		$return .= '<td class="dot">' . ($ok ? '&nbsp;' : '&#149;') . '</td>';
-		$return .= '<td class="value">' . ($bcmath ? $GLOBALS['TL_LANG']['tl_syncCto_check']['on'] : $GLOBALS['TL_LANG']['tl_syncCto_check']['off']) . '</td>';
-		$return .= '<td>' . $GLOBALS['TL_LANG']['tl_syncCto_check']['bcmath'][1] . '</td>';
-		$return .= '</tr>';
+		$gmp    = $arrFunctions['gmp'];
+        $bcmath = $arrFunctions['bcmath'];
 
-		// gmp
-		$ok = ($gmp == true || ($bcmath == true && $gmp == false));
-		$return .= '<tr class="' . ($ok ? 'ok' : 'warning') . '">';
-		$return .= '<td>' . $GLOBALS['TL_LANG']['tl_syncCto_check']['gmp'][0] . '</td>';
-		$return .= '<td class="dot">' . ($ok ? '&nbsp;' : '&#149;') . '</td>';
-		$return .= '<td class="value">' . ($gmp ? $GLOBALS['TL_LANG']['tl_syncCto_check']['on'] : $GLOBALS['TL_LANG']['tl_syncCto_check']['off']) . '</td>';
-		$return .= '<td>' . $GLOBALS['TL_LANG']['tl_syncCto_check']['gmp'][1] . '</td>';
-		$return .= '</tr>';
+        // bcmath
+        if ($bcmath == true || ($bcmath == false && $gmp == false))
+        {
+            $ok = ($bcmath == true);
+            $return .= '<tr class="' . ($ok ? 'ok' : 'warning') . '">';
+            $return .= '<td>' . $GLOBALS['TL_LANG']['tl_syncCto_check']['bcmath'][0] . '</td>';
+            $return .= '<td class="dot">' . ($ok ? '&nbsp;' : '&#149;') . '</td>';
+            $return .= '<td class="value">' . ($bcmath ? $GLOBALS['TL_LANG']['tl_syncCto_check']['on'] : $GLOBALS['TL_LANG']['tl_syncCto_check']['off']) . '</td>';
+            $return .= '<td>' . $GLOBALS['TL_LANG']['tl_syncCto_check']['bcmath'][1] . '</td>';
+            $return .= '</tr>';
+        }
 
-		$return .= '</table>';
+        // gmp
+        if ($gmp == true || ($bcmath == false && $gmp == false))
+        {
+            $ok = ($gmp == true);
+            $return .= '<tr class="' . ($ok ? 'ok' : 'warning') . '">';
+            $return .= '<td>' . $GLOBALS['TL_LANG']['tl_syncCto_check']['gmp'][0] . '</td>';
+            $return .= '<td class="dot">' . ($ok ? '&nbsp;' : '&#149;') . '</td>';
+            $return .= '<td class="value">' . ($gmp ? $GLOBALS['TL_LANG']['tl_syncCto_check']['on'] : $GLOBALS['TL_LANG']['tl_syncCto_check']['off']) . '</td>';
+            $return .= '<td>' . $GLOBALS['TL_LANG']['tl_syncCto_check']['gmp'][1] . '</td>';
+            $return .= '</tr>';
+        }
 
-		return $return;
+        $return .= '</table>';
+
+        return $return;
 	}
 
 }
