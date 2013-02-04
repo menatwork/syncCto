@@ -1,4 +1,4 @@
-<?php if (!defined('TL_ROOT')) die('You cannot access this file directly!');
+<?php if (!defined('TL_ROOT')) die('You cannot access this file directly!'); 
 
 /**
  * Contao Open Source CMS
@@ -576,6 +576,13 @@ class SyncCtoModuleClient extends BackendModule
                 $this->pageSyncToShowStep5();
                 $this->saveTempLists();
                 break;
+            
+             // Cleanup | Show informations
+            case 6:
+                $this->loadTempLists();
+                $this->pageSyncToShowStep6();
+                $this->saveTempLists();
+                break;
 
             default:
                 $_SESSION["TL_ERROR"] = array("Unknown step for sync.");
@@ -713,6 +720,13 @@ class SyncCtoModuleClient extends BackendModule
             case 5:
                 $this->loadTempLists();
                 $this->pageSyncFromShowStep5();
+                $this->saveTempLists();
+                break;
+
+            // Show informations
+            case 6:
+                $this->loadTempLists();
+                $this->pageSyncFromShowStep6();
                 $this->saveTempLists();
                 break;
 
@@ -2227,7 +2241,7 @@ class SyncCtoModuleClient extends BackendModule
     }
 
     /**
-     * Last Step
+     * Last Steps for all functions
      */
     private function pageSyncToShowStep5()
     {
@@ -2365,11 +2379,7 @@ class SyncCtoModuleClient extends BackendModule
                         $this->objSyncCtoCommunicationClient->setAttentionFlag(false);
                     }
 
-                    $this->objData->setDescription($GLOBALS['TL_LANG']['tl_syncCto_sync']['step_1']['description_2']);
-                    $this->objStepPool->step++;
-
                     $this->log(vsprintf("Successfully finishing of synchronization client ID %s.", array($this->Input->get("id"))), __CLASS__ . " " . __FUNCTION__, "INFO");
-                    break;
 
                 /**
                  * Cleanup
@@ -2379,26 +2389,77 @@ class SyncCtoModuleClient extends BackendModule
                     {
                         $this->objSyncCtoCommunicationClient->purgeTempFolder();
                         $this->objSyncCtoFiles->purgeTemp();
-                        $this->objStepPool->step++;
-                        break;
                     }
 
                     $this->objStepPool->step++;
+                    $this->objData->setState(SyncCtoEnum::WORK_OK);
+                    $this->objData->setDescription($GLOBALS['TL_LANG']['tl_syncCto_sync']['step_1']['description_2']);
+                    $this->objData->setHtml("");
+                    $this->booRefresh = true;
+                    $this->intStep++;
+
+                    break;
+            }
+        }
+        catch (Exception $exc)
+        {
+            $this->objStepPool->step++;
+
+            $this->log(vsprintf("Error on synchronization client ID %s with msg: %s", array($this->Input->get("id"), $exc->getMessage())), __CLASS__ . " " . __FUNCTION__, "ERROR");
+        }
+    }
+
+    /**
+     * Last Step
+     */
+    private function pageSyncToShowStep6()
+    {
+        /* ---------------------------------------------------------------------
+         * Init
+         */
+
+        if ($this->objStepPool->step == null)
+        {
+            $this->objStepPool->step = 1;
+        }
+
+        // Set content back to normale mode
+        $this->booError = false;
+        $this->strError = "";
+        $this->objData->setState(SyncCtoEnum::WORK_WORK);
+
+        /* ---------------------------------------------------------------------
+         * Run page
+         */
+
+        try
+        {
+            switch ($this->objStepPool->step)
+            {
+                /**
+                 * Init
+                 */
+                case 1:
+                    $this->objData->setState(SyncCtoEnum::WORK_WORK);
+                    $this->objData->setDescription($GLOBALS['TL_LANG']['tl_syncCto_sync']["step_5"]['description_1']);
+                    $this->objData->setTitle($GLOBALS['TL_LANG']['MSC']['step'] . " %s");
+                    $this->objStepPool->step++;
+                    break;
 
                 /**
                  * Call the final operations hook
                  */
-                case 9:
+                case 2:
                     $arrResponse = $this->objSyncCtoCommunicationClient->runFinalOperations();
                     $this->objStepPool->step++;
                     break;
 
-                case 10:
+                case 3:
                     $this->objSyncCtoCommunicationClient->referrerEnable();
                     $this->objStepPool->step++;
                     break;
 
-                case 11:
+                case 4:
                     $this->objSyncCtoCommunicationClient->stopConnection();
                     $this->objStepPool->step++;
                     break;
@@ -2406,7 +2467,7 @@ class SyncCtoModuleClient extends BackendModule
                 /**
                  * Show information
                  */
-                case 12:
+                case 5:
                     // Count files
                     if (is_array($this->arrListCompare) && count($this->arrListCompare) != 0 && $this->arrListCompare != false)
                     {
@@ -2755,7 +2816,7 @@ class SyncCtoModuleClient extends BackendModule
                         {
                             $this->arrListCompare = array_merge($this->arrListCompare, $arrChecksumClient);
                         }
-                        
+
                         $this->objStepPool->step++;
                         break;
                     }
@@ -2864,7 +2925,7 @@ class SyncCtoModuleClient extends BackendModule
                 /**
                  * Show files form
                  */
-                case 10:                    
+                case 10:
                     // Counter
                     $intCountMissing = 0;
                     $intCountNeed    = 0;
@@ -2923,7 +2984,7 @@ class SyncCtoModuleClient extends BackendModule
                         break;
                     }
                     else if (count($this->arrListCompare) == 0 || key_exists("skip", $_POST))
-                    {                        
+                    {
                         $this->objData->setState(SyncCtoEnum::WORK_SKIPPED);
                         $this->objData->setDescription($GLOBALS['TL_LANG']['tl_syncCto_sync']["step_2"]['description_1']);
                         $this->objData->setHtml("");
@@ -2935,7 +2996,7 @@ class SyncCtoModuleClient extends BackendModule
                         break;
                     }
                     else if (key_exists("forward", $_POST) && count($this->arrListCompare) != 0)
-                    {                        
+                    {
                         $this->objData->setState(SyncCtoEnum::WORK_OK);
                         $this->objData->setDescription(vsprintf($GLOBALS['TL_LANG']['tl_syncCto_sync']["step_2"]['description_4'], array($intCountMissing, $intCountNeed, $intCountDelete, $intCountIgnored, $this->getReadableSize($intTotalSizeNew), $this->getReadableSize($intTotalSizeChange), $this->getReadableSize($intTotalSizeDel))));
                         $this->objData->setHtml("");
@@ -3861,41 +3922,90 @@ class SyncCtoModuleClient extends BackendModule
                         $this->objSyncCtoCommunicationClient->setAttentionFlag(false);
                     }
 
-                    $this->objStepPool->step++;
                     $this->log(vsprintf("Successfully finishing of synchronization client ID %s.", array($this->Input->get("id"))), __CLASS__ . " " . __FUNCTION__, "INFO");
+                    
+                    $this->objData->setState(SyncCtoEnum::WORK_OK);
+                    $this->objData->setDescription($GLOBALS['TL_LANG']['tl_syncCto_sync']["step_5"]['description_1']);
+                    $this->objData->setHtml("");
+                    $this->booRefresh = true;
+                    $this->intStep++;
+            }
+        }
+        catch (Exception $exc)
+        {
+            $this->objStepPool->step++;
+
+            $this->log(vsprintf("Error on synchronization client ID %s with msg: %s", array($this->Input->get("id"), $exc->getMessage())), __CLASS__ . " " . __FUNCTION__, "ERROR");
+        }
+    }
+    /**
+     * File send part have fun, much todo here so let`s play a round :P
+     */
+    private function pageSyncFromShowStep6()
+    {
+        /* ---------------------------------------------------------------------
+         * Init
+         */
+
+        if ($this->objStepPool->step == null)
+        {
+            $this->objStepPool->step = 1;
+        }
+
+        // Set content back to normale mode
+        $this->booError = false;
+        $this->strError = "";
+        $this->objData->setState(SyncCtoEnum::WORK_WORK);
+
+        /* ---------------------------------------------------------------------
+         * Run page
+         */
+
+        try
+        {
+            switch ($this->objStepPool->step)
+            {
+                /**
+                 * Init
+                 */
+                case 1:
+                    $this->objData->setState(SyncCtoEnum::WORK_WORK);
+                    $this->objData->setDescription($GLOBALS['TL_LANG']['tl_syncCto_sync']["step_5"]['description_1']);
+                    $this->objData->setTitle($GLOBALS['TL_LANG']['MSC']['step'] . " %s");
+                    $this->objStepPool->step++;
                     break;
 
                 /**
                  * Cleanup
                  */
-                case 7:
+                case 2:
                     $this->objSyncCtoCommunicationClient->purgeTempFolder();
                     $this->objSyncCtoFiles->purgeTemp();
                     $this->objStepPool->step++;
                     break;
-                
+
                 /**
                  * Call the final operations hook
                  */
-                case 8:
+                case 3:
                     $arrResponse = $this->objSyncCtoHelper->executeFinalOperations();
                     $this->objStepPool->step++;
                     break;
 
-                case 9:
+                case 4:
                     $this->objSyncCtoCommunicationClient->referrerEnable();
                     $this->objStepPool->step++;
                     break;
 
-                case 10:
+                case 5:
                     $this->objSyncCtoCommunicationClient->stopConnection();
                     $this->objStepPool->step++;
                     break;
-                
+
                 /**
                  * Show information
                  */
-                case 11:
+                case 6:
                     // Count files
                     if (is_array($this->arrListCompare) && count($this->arrListCompare) != 0 && $this->arrListCompare != false)
                     {
@@ -4026,7 +4136,7 @@ class SyncCtoModuleClient extends BackendModule
                                         continue;
                                     }
 
-                                    if ($value["state"] == SyncCtoEnum::FILESTATE_DELETE)
+                                    if (in_array($value["state"], array(SyncCtoEnum::FILESTATE_DELETE, SyncCtoEnum::FILESTATE_FOLDER_DELETE)))
                                     {
                                         continue;
                                     }
