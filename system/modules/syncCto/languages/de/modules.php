@@ -1,4 +1,4 @@
-<?php if (!defined('TL_ROOT')) die('You cannot access this file directly!');
+<?php
 
 /**
  * Contao Open Source CMS
@@ -8,7 +8,6 @@
  * @license    GNU/LGPL 
  * @filesource
  */
-
 
 /**
  * Back end modules
