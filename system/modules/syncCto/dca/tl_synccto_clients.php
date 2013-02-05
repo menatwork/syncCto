@@ -314,7 +314,7 @@ class tl_synccto_clients extends Backend
                 }
 
                 $title = implode("\n", $arrNotices);
-                return '<a href="' . $this->addToUrl($href . '&amp;id=' . $row['id']) . '" title="' . specialchars($title) . '"' . $attributes . '>' . $this->generateImage($icon, $label) . '</a> ';
+                return '<a class="user-history" href="' . $this->addToUrl($href . '&amp;id=' . $row['id']) . '" title="' . specialchars($title) . '"' . $attributes . '>' . $this->generateImage($icon, $label) . '</a> ';
             }
             else
             {
