@@ -255,6 +255,12 @@ class tl_syncCto_clients_syncTo extends Backend
         {
             $arrSyncSettings["syncCto_ShowError"] = false;
         }
+        
+        // Write all data
+        foreach ($_POST as $key => $value)
+        {
+            $arrSyncSettings["post_data"][$key] = $this->Input->post($key);
+        }
 
         // Save Session
         $this->Session->set("syncCto_SyncSettings_" . $dc->id, $arrSyncSettings);

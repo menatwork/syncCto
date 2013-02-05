@@ -648,7 +648,7 @@ class SyncCtoModuleClient extends BackendModule
             $this->log(vsprintf("Start synchronization client ID %s.", array($this->Input->get("id"))), __CLASS__ . " " . __FUNCTION__, "INFO");
 
             // Reset some Sessions
-            $this->resetStepPoolByID(array(1, 2, 3, 4, 5, 6));
+            $this->resetStepPoolByID(array(1, 2, 3, 4, 5, 6, 7));
             $this->resetClientInformation();
 
             $this->Session->set("SyncCto_FileLock_ID" . $this->intClientID, array("lock" => false));
@@ -703,6 +703,29 @@ class SyncCtoModuleClient extends BackendModule
                 {
                     break;
                 }
+
+            // Check if we have pro features
+            case 5:
+                if (in_array('syncCtoPro', Config::getInstance()->getActiveModules()))
+                {
+                    $objStepPro = SyncCtoStepPagesSelection::getInstance();
+                    $objStepPro->setSyncCto($this);
+                    
+                    if (!$objStepPro->checkSyncTo())
+                    {
+                        $this->intStep++;
+                        $this->objData->nextStep();
+                    }
+                    else
+                    {
+                        break;                        
+                    }
+                }
+                else
+                {
+                    $this->intStep++;
+                    $this->objData->nextStep();
+                }
         }
 
         // Load step pool for current step
@@ -734,18 +757,23 @@ class SyncCtoModuleClient extends BackendModule
             case 4:
                 $this->pageSyncToShowStep4();
                 break;
+            
+            // Run pro features
+            case 5:
+                $this->pageSyncToShowStepPro();
+                break;
 
             // Import Files | Import Config | etc.
-            case 5:
+            case 6:
                 $this->loadTempLists();
-                $this->pageSyncToShowStep5();
+                $this->pageSyncToShowStep6();
                 $this->saveTempLists();
                 break;
             
              // Cleanup | Show informations
-            case 6:
+            case 7:
                 $this->loadTempLists();
-                $this->pageSyncToShowStep6();
+                $this->pageSyncToShowStep7();
                 $this->saveTempLists();
                 break;
 
@@ -1350,6 +1378,16 @@ class SyncCtoModuleClient extends BackendModule
     /* -------------------------------------------------------------------------
      * Start SyncCto syncTo
      */
+    
+    /**
+     * Build checksum list and ask client
+     */
+    private function pageSyncToShowStepPro()
+    {
+        $objStepPro = SyncCtoStepPagesSelection::getInstance();
+        $objStepPro->setSyncCto($this);        
+        $objStepPro->syncTo();        
+    }
 
     /**
      * Build checksum list and ask client
@@ -2408,7 +2446,7 @@ class SyncCtoModuleClient extends BackendModule
     /**
      * Last Steps for all functions
      */
-    private function pageSyncToShowStep5()
+    private function pageSyncToShowStep6()
     {
         /* ---------------------------------------------------------------------
          * Init
@@ -2577,7 +2615,7 @@ class SyncCtoModuleClient extends BackendModule
     /**
      * Last Step
      */
-    private function pageSyncToShowStep6()
+    private function pageSyncToShowStep7()
     {
         /* ---------------------------------------------------------------------
          * Init
