@@ -9,6 +9,9 @@
  * @filesource
  */
 
+// Get language from get
+$_POST['language'] = $_GET['language'];
+
 /**
  * Initialize the system
  */
@@ -249,7 +252,7 @@ class PopupSyncFiles extends Backend
                 // Nothing to do;
             }
         }
-
+        
         // Little mapping for names        
         if (is_array($GLOBALS['SYC_CONFIG']['database_mapping']) && key_exists($strName, $GLOBALS['SYC_CONFIG']['database_mapping']))
         {
@@ -267,7 +270,7 @@ class PopupSyncFiles extends Backend
 
         // Search in mod language array for a translation
         if (key_exists($strBase, $GLOBALS['TL_LANG']['MOD']))
-        {
+        {            
             if (is_array($GLOBALS['TL_LANG']['MOD'][$strBase]))
             {
                 return $this->formateLookUpName($strName, $GLOBALS['TL_LANG']['MOD'][$strBase][0]);
