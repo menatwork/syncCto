@@ -58,6 +58,171 @@ class SyncCtoModuleClient extends BackendModule
     protected $objStepPool;
 
     /* -------------------------------------------------------------------------
+     * Getter / Setter 
+     */
+
+    /**
+     * @return int
+     */
+    public function getClientID()
+    {
+        return $this->intClientID;
+    }
+
+    /**
+     * @return array
+     */
+    public function getSyncSettings()
+    {
+        return $this->arrSyncSettings;
+    }
+
+    /**
+     * @return StepPool
+     */
+    public function getStepPool()
+    {
+        return $this->objStepPool;
+    }
+
+    /**
+     * @return ContentData
+     */
+    public function getData()
+    {
+        return $this->objData;
+    }
+
+    /**
+     * Get the client informations
+     * 
+     * @return array
+     */
+    public function getClientInformation()
+    {
+        return $this->arrClientInformation;
+    }
+
+    // Template getter / setter ------------------------------------------------
+
+    public function isError()
+    {
+        return $this->booError;
+    }
+
+    public function setError($booError)
+    {
+        $this->booError = $booError;
+    }
+
+    public function isAbort()
+    {
+        return $this->booAbort;
+    }
+
+    public function setAbort($booAbort)
+    {
+        $this->booAbort = $booAbort;
+    }
+
+    public function isFinished()
+    {
+        return $this->booFinished;
+    }
+
+    public function setFinished($booFinished)
+    {
+        $this->booFinished = $booFinished;
+    }
+
+    public function isRefresh()
+    {
+        return $this->booRefresh;
+    }
+
+    public function setRefresh($booRefresh)
+    {
+        $this->booRefresh = $booRefresh;
+    }
+
+    public function getErrorMsg()
+    {
+        return $this->strError;
+    }
+
+    public function setErrorMsg($strError)
+    {
+        $this->strError = $strError;
+    }
+
+    public function getUrl()
+    {
+        return $this->strUrl;
+    }
+
+    public function setUrl($strUrl)
+    {
+        $this->strUrl = $strUrl;
+    }
+
+    public function getGoBack()
+    {
+        return $this->strGoBack;
+    }
+
+    public function setGoBack($strGoBack)
+    {
+        $this->strGoBack = $strGoBack;
+    }
+
+    public function getHeadline()
+    {
+        return $this->strHeadline;
+    }
+
+    public function setHeadline($strHeadline)
+    {
+        $this->strHeadline = $strHeadline;
+    }
+
+    public function getInformation()
+    {
+        return $this->strInformation;
+    }
+
+    public function setInformation($strInformation)
+    {
+        $this->strInformation = $strInformation;
+    }
+
+    public function getStep()
+    {
+        return $this->intStep;
+    }
+
+    public function setStep($intStep)
+    {
+        $this->intStep = $intStep;
+    }
+
+    public function getStart()
+    {
+        return $this->floStart;
+    }
+
+    public function setStart($floStart)
+    {
+        $this->floStart = $floStart;
+    }
+
+    // Special getter / setter -------------------------------------------------
+
+    public function addStep()
+    {
+        $this->intStep++;
+    }
+
+    /* -------------------------------------------------------------------------
      * Core Functions
      */
 
