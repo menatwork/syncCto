@@ -286,7 +286,7 @@ class tl_synccto_clients extends Backend
                         if($blnFoundOne == true)
                         {
                             $blnUserIsWorking = true;
-                            $arrNotices[] = sprintf($GLOBALS['TL_LANG']['MSC']['editwarning'], $objResult->username,  date($GLOBALS['TL_CONFIG']['timeFormat'], $objResult->tstamp));
+                            $arrNotices[] = sprintf($GLOBALS['TL_LANG']['MSC']['editWarning'], $objResult->username,  date($GLOBALS['TL_CONFIG']['timeFormat'], $objResult->tstamp));
                         }
                     }
                 }
@@ -313,7 +313,7 @@ class tl_synccto_clients extends Backend
                         break;
                 }
 
-                $title = implode("\n", $arrNotices);
+                $title = implode("<br/>", $arrNotices);
                 return '<a class="user-history" href="' . $this->addToUrl($href . '&amp;id=' . $row['id']) . '" title="' . specialchars($title) . '"' . $attributes . '>' . $this->generateImage($icon, $label) . '</a> ';
             }
             else
