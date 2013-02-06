@@ -2596,7 +2596,6 @@ class SyncCtoModuleClient extends BackendModule
 
                     $this->objStepPool->step++;
                     $this->objData->setState(SyncCtoEnum::WORK_OK);
-                    $this->objData->setDescription($GLOBALS['TL_LANG']['tl_syncCto_sync']['step_1']['description_2']);
                     $this->objData->setHtml("");
                     $this->booRefresh = true;
                     $this->intStep++;
@@ -2644,7 +2643,7 @@ class SyncCtoModuleClient extends BackendModule
                  */
                 case 1:
                     $this->objData->setState(SyncCtoEnum::WORK_WORK);
-                    $this->objData->setDescription($GLOBALS['TL_LANG']['tl_syncCto_sync']["step_5"]['description_1']);
+                    $this->objData->setDescription($GLOBALS['TL_LANG']['tl_syncCto_sync']['step_1']['description_2']);
                     $this->objData->setTitle($GLOBALS['TL_LANG']['MSC']['step'] . " %s");
                     $this->objStepPool->step++;
                     break;
