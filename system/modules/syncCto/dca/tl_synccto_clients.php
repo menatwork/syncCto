@@ -286,7 +286,7 @@ class tl_synccto_clients extends Backend
                         if($blnFoundOne == true)
                         {
                             $blnUserIsWorking = true;
-                            $arrNotices[] = sprintf($GLOBALS['TL_LANG']['MSC']['editWarning'], $objResult->username,  date($GLOBALS['TL_CONFIG']['timeFormat'], $objResult->tstamp));
+                            $arrNotices[] = sprintf($GLOBALS['TL_LANG']['MSC']['editWarning'], $objResult->username,  date($GLOBALS['TL_CONFIG']['timeFormat'], $objResult->tstamp), $row['id']);
                         }
                     }
                 }
