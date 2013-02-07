@@ -877,6 +877,30 @@ class SyncCtoModuleClient extends BackendModule
                 {
                     break;
                 }
+
+
+            // Check if we have pro features
+            case 5:
+                if (in_array('syncCtoPro', Config::getInstance()->getActiveModules()))
+                {
+                    $objStepPro = SyncCtoStepPagesSelection::getInstance();
+                    $objStepPro->setSyncCto($this);
+
+                    if (!$objStepPro->checkSyncTo())
+                    {
+                        $this->intStep++;
+                        $this->objData->nextStep();
+                    }
+                    else
+                    {
+                        break;
+                    }
+                }
+                else
+                {
+                    $this->intStep++;
+                    $this->objData->nextStep();
+                }
         }
 
         // Load step pool for current step
@@ -909,17 +933,27 @@ class SyncCtoModuleClient extends BackendModule
                 $this->pageSyncFromShowStep4();
                 break;
 
-            // Import Files | Import Config | etc.
+            // Database
             case 5:
-                $this->loadTempLists();
                 $this->pageSyncFromShowStep5();
+                break;
+
+            // Run pro features
+            case 5:
+                $this->pageSyncFromShowStepPro();
+                break;
+
+            // Import Files | Import Config | etc.
+            case 6:
+                $this->loadTempLists();
+                $this->pageSyncFromShowStep6();
                 $this->saveTempLists();
                 break;
 
             // Show informations
-            case 6:
+            case 7:
                 $this->loadTempLists();
-                $this->pageSyncFromShowStep6();
+                $this->pageSyncFromShowStep7();
                 $this->saveTempLists();
                 break;
 
@@ -1378,15 +1412,25 @@ class SyncCtoModuleClient extends BackendModule
     /* -------------------------------------------------------------------------
      * Start SyncCto syncTo
      */
-    
+
     /**
-     * Build checksum list and ask client
+     * Pro Version - Sync To
      */
     private function pageSyncToShowStepPro()
     {
         $objStepPro = SyncCtoStepPagesSelection::getInstance();
-        $objStepPro->setSyncCto($this);        
-        $objStepPro->syncTo();        
+        $objStepPro->setSyncCto($this);
+        $objStepPro->syncTo();
+    }
+
+    /**
+     * Pro Version - Sync From
+     */
+    private function pageSyncFromShowStepPro()
+    {
+        $objStepPro = SyncCtoStepPagesSelection::getInstance();
+        $objStepPro->setSyncCto($this);
+        $objStepPro->syncFrom();
     }
 
     /**
@@ -3987,7 +4031,7 @@ class SyncCtoModuleClient extends BackendModule
     /**
      * File send part have fun, much todo here so let`s play a round :P
      */
-    private function pageSyncFromShowStep5()
+    private function pageSyncFromShowStep6()
     {
         /* ---------------------------------------------------------------------
          * Init
@@ -4143,7 +4187,7 @@ class SyncCtoModuleClient extends BackendModule
     /**
      * File send part have fun, much todo here so let`s play a round :P
      */
-    private function pageSyncFromShowStep6()
+    private function pageSyncFromShowStep7()
     {
         /* ---------------------------------------------------------------------
          * Init
