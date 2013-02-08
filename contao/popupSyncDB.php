@@ -9,9 +9,6 @@
  * @filesource
  */
 
-// Get language from get
-$_POST['language'] = $_GET['language'];
-
 /**
  * Initialize the system
  */
@@ -21,7 +18,7 @@ require_once('../system/initialize.php');
 /**
  * Class SyncCtoPopup
  */
-class PopupSyncFiles extends Backend
+class popupSyncDB extends Backend
 {
 
     // Vars
@@ -38,21 +35,35 @@ class PopupSyncFiles extends Backend
     const STEP_CLOSE_DB  = 'cl';
     const STEP_ERROR_DB  = 'er';
 
+    
     /**
      * Initialize the object
      */
     public function __construct()
-    {
+    {   
+        // Imports
         $this->import('Input');
         $this->import('BackendUser', 'User');
 
         parent::__construct();
-        
+
+        // Check user auth
+        $this->User->authenticate();
+
+        // Set language from get or user
+        if ($this->Input->get('language') != '')
+        {
+            $GLOBALS['TL_LANGUAGE'] = $this->Input->get('language');
+        }
+        else
+        {
+            $GLOBALS['TL_LANGUAGE'] = $this->User->language;
+        }
+
         // Load language
+        $this->loadLanguageFile('default');
         $this->loadLanguageFile("modules");
         $this->loadLanguageFile("tl_syncCto_database");
-
-        $this->User->authenticate();
 
         $this->objSyncCtoHelper = SyncCtoHelper::getInstance();
 
@@ -438,6 +449,6 @@ class PopupSyncFiles extends Backend
 /**
  * Instantiate controller
  */
-$objPopup = new PopupSyncFiles();
+$objPopup = new popupSyncDB();
 $objPopup->run();
 ?>
