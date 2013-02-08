@@ -710,7 +710,7 @@ class SyncCtoModuleClient extends BackendModule
                 {
                     $objStepPro = SyncCtoStepPagesSelection::getInstance();
                     $objStepPro->setSyncCto($this);
-                    
+
                     if (!$objStepPro->checkSyncTo())
                     {
                         $this->intStep++;
@@ -718,13 +718,31 @@ class SyncCtoModuleClient extends BackendModule
                     }
                     else
                     {
-                        break;                        
+                        break;
                     }
                 }
                 else
                 {
                     $this->intStep++;
                     $this->objData->nextStep();
+                }
+
+            // Check uf we have to run the import step
+            case 6:
+                if (count((array) $this->arrListCompare) == 0
+                        && !in_array("localconfig_update", $this->arrSyncSettings["syncCto_Type"])
+                        && $this->arrSyncSettings["syncCto_ShowError"] != true
+                        && $this->arrSyncSettings["syncCto_AttentionFlag"] != true
+                        && count((array) $this->arrSyncSettings["syncCto_Systemoperations_Maintenance"]) == 0
+                        && !in_array("temp_folders", $this->arrSyncSettings["syncCto_Systemoperations_Maintenance"])
+                )
+                {
+                    $this->intStep++;
+                    $this->objData->nextStep();
+                }
+                else
+                {
+                    break;
                 }
         }
 
@@ -757,7 +775,7 @@ class SyncCtoModuleClient extends BackendModule
             case 4:
                 $this->pageSyncToShowStep4();
                 break;
-            
+
             // Run pro features
             case 5:
                 $this->pageSyncToShowStepPro();
@@ -769,8 +787,8 @@ class SyncCtoModuleClient extends BackendModule
                 $this->pageSyncToShowStep6();
                 $this->saveTempLists();
                 break;
-            
-             // Cleanup | Show informations
+
+            // Cleanup | Show informations
             case 7:
                 $this->loadTempLists();
                 $this->pageSyncToShowStep7();
@@ -900,6 +918,23 @@ class SyncCtoModuleClient extends BackendModule
                 {
                     $this->intStep++;
                     $this->objData->nextStep();
+                }
+
+            // Check uf we have to run the import step
+            case 6:
+                if (count((array) $this->arrListCompare) == 0
+                        && !in_array("localconfig_update", $this->arrSyncSettings["syncCto_Type"])
+                        && $this->arrSyncSettings["syncCto_AttentionFlag"] != true
+                        && count((array) $this->arrSyncSettings["syncCto_Systemoperations_Maintenance"]) == 0
+                        && !in_array("temp_folders", $this->arrSyncSettings["syncCto_Systemoperations_Maintenance"])
+                )
+                {
+                    $this->intStep++;
+                    $this->objData->nextStep();
+                }
+                else
+                {
+                    break;
                 }
         }
 
@@ -4169,7 +4204,7 @@ class SyncCtoModuleClient extends BackendModule
                     }
 
                     $this->log(vsprintf("Successfully finishing of synchronization client ID %s.", array($this->Input->get("id"))), __CLASS__ . " " . __FUNCTION__, "INFO");
-                    
+
                     $this->objData->setState(SyncCtoEnum::WORK_OK);
                     $this->objData->setDescription($GLOBALS['TL_LANG']['tl_syncCto_sync']["step_5"]['description_1']);
                     $this->objData->setHtml("");
@@ -4184,6 +4219,7 @@ class SyncCtoModuleClient extends BackendModule
             $this->log(vsprintf("Error on synchronization client ID %s with msg: %s", array($this->Input->get("id"), $exc->getMessage())), __CLASS__ . " " . __FUNCTION__, "ERROR");
         }
     }
+
     /**
      * File send part have fun, much todo here so let`s play a round :P
      */
@@ -4219,6 +4255,8 @@ class SyncCtoModuleClient extends BackendModule
                     $this->objData->setDescription($GLOBALS['TL_LANG']['tl_syncCto_sync']['step_1']['description_2']);
                     $this->objData->setTitle($GLOBALS['TL_LANG']['MSC']['step'] . " %s");
                     $this->objStepPool->step++;
+                    
+                    exit();
                     break;
 
                 /**
