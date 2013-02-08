@@ -109,7 +109,7 @@ $GLOBALS['SYC_CONFIG']['table_hidden'] = array_merge( (array) $GLOBALS['SYC_CONF
 ));
 
 // Folders
-$GLOBALS['SYC_CONFIG']['folder_blacklist'] = array_merge( (array) $GLOBALS['SYC_CONFIG']['table_hidden'], array(
+$GLOBALS['SYC_CONFIG']['folder_blacklist'] = array_merge( (array) $GLOBALS['SYC_CONFIG']['folder_blacklist'], array(
     'system/html',
     'system/logs',
     'system/scripts',
