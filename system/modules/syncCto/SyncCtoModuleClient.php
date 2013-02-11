@@ -4255,8 +4255,6 @@ class SyncCtoModuleClient extends BackendModule
                     $this->objData->setDescription($GLOBALS['TL_LANG']['tl_syncCto_sync']['step_1']['description_2']);
                     $this->objData->setTitle($GLOBALS['TL_LANG']['MSC']['step'] . " %s");
                     $this->objStepPool->step++;
-                    
-                    exit();
                     break;
 
                 /**
