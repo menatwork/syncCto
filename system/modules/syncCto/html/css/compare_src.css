@@ -145,6 +145,11 @@
     padding:0;
   }
 
+  td.diff img {
+    float:none;
+    margin:0;
+  }
+
   #db_form th.direction {
     padding-left:1px;
     text-align:center;
