@@ -76,6 +76,14 @@ class SyncCtoModuleClient extends BackendModule
     {
         return $this->arrSyncSettings;
     }
+    
+   /**
+    * @param array $arrSyncSettings
+    */
+    public function setSyncSettings($arrSyncSettings)
+    {
+        $this->arrSyncSettings = $arrSyncSettings;
+    }
 
     /**
      * @return StepPool
@@ -729,6 +737,8 @@ class SyncCtoModuleClient extends BackendModule
 
             // Check uf we have to run the import step
             case 6:
+                $this->loadTempLists();
+                
                 if (count((array) $this->arrListCompare) == 0
                         && !in_array("localconfig_update", $this->arrSyncSettings["syncCto_Type"])
                         && $this->arrSyncSettings["syncCto_ShowError"] != true
@@ -736,7 +746,7 @@ class SyncCtoModuleClient extends BackendModule
                         && count((array) $this->arrSyncSettings["syncCto_Systemoperations_Maintenance"]) == 0
                         && !in_array("temp_folders", $this->arrSyncSettings["syncCto_Systemoperations_Maintenance"])
                 )
-                {
+                {                    
                     $this->intStep++;
                     $this->objData->nextStep();
                 }
@@ -968,11 +978,6 @@ class SyncCtoModuleClient extends BackendModule
                 $this->pageSyncFromShowStep4();
                 break;
 
-            // Database
-            case 5:
-                $this->pageSyncFromShowStep5();
-                break;
-
             // Run pro features
             case 5:
                 $this->pageSyncFromShowStepPro();
@@ -1028,7 +1033,7 @@ class SyncCtoModuleClient extends BackendModule
             $this->initTempLists();
 
             // Reset some Sessions
-            $this->resetStepPoolByID(array(1, 2, 3, 4, 5, 6));
+            $this->resetStepPoolByID(array(1, 2, 3, 4, 5, 6, 7));
             $this->resetClientInformation();
         }
 
@@ -1081,19 +1086,19 @@ class SyncCtoModuleClient extends BackendModule
                     // Get infomations
                     $arrConfigurations = $this->objSyncCtoCommunicationClient->getPhpConfigurations();
                     $arrFunctions      = $this->objSyncCtoCommunicationClient->getPhpFunctions();
+                    $arrProFunctions   = $this->objSyncCtoCommunicationClient->getProFunctions();
                     $strVersion        = $this->objSyncCtoCommunicationClient->getVersionSyncCto();
 
                     // Stop connection
                     $this->objSyncCtoCommunicationClient->stopConnection();
-
+                    
                     // Load module for html
                     $objCheck                                   = new SyncCtoModuleCheck();
                     $objCheckTemplate                           = new BackendTemplate('be_syncCto_smallCheck');
                     $objCheckTemplate->checkPhpConfiguration    = $objCheck->checkPhpConfiguration($arrConfigurations);
                     $objCheckTemplate->checkPhpFunctions        = $objCheck->checkPhpFunctions($arrFunctions);
-                    $objCheckTemplate->checkSpecialPhpFunctions = $objCheck->checkSpecialPhpFunctions($arrFunctions);
-                    $objCheckTemplate->syc_version              = $strVersion;
-
+                    $objCheckTemplate->checkProFunctions        = $objCheck->checkProFunctions($arrProFunctions);
+                    $objCheckTemplate->syc_version              = $strVersion;                    
 
                     // Show information
                     $this->objData->setState(SyncCtoEnum::WORK_OK);
