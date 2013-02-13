@@ -13,9 +13,9 @@
  * Headline
  */
 $GLOBALS['TL_LANG']['tl_syncCto_check']['check']                    = 'Systemcheck';
-$GLOBALS['TL_LANG']['tl_syncCto_check']['configuration']            = 'PHP Konfiguration';
+$GLOBALS['TL_LANG']['tl_syncCto_check']['configuration']            = 'PHP Konfigurationen';
 $GLOBALS['TL_LANG']['tl_syncCto_check']['functions']                = 'PHP Funktionen';
-$GLOBALS['TL_LANG']['tl_syncCto_check']['specialFunctions']         = 'PHP Spezial Funktionen';
+$GLOBALS['TL_LANG']['tl_syncCto_check']['proFunctions']             = 'Pro Funktionen';
  
 /**
  * Table
@@ -25,33 +25,32 @@ $GLOBALS['TL_LANG']['tl_syncCto_check']['value']                    = 'Wert';
 $GLOBALS['TL_LANG']['tl_syncCto_check']['description']              = 'Beschreibung';
 $GLOBALS['TL_LANG']['tl_syncCto_check']['on']                       = 'An';
 $GLOBALS['TL_LANG']['tl_syncCto_check']['off']                      = 'Aus';
-$GLOBALS['TL_LANG']['tl_syncCto_check']['safemode']                 = array('Safe mode', 'Die empfohlene Einstellung ist Aus.');
+$GLOBALS['TL_LANG']['tl_syncCto_check']['safemode']                 = 'Safe mode';
 $GLOBALS['TL_LANG']['tl_syncCto_check']['met']                      = array('Maximum execution time', 'Die empfohlene Einstellung ist 0, 30 oder höher.');
-$GLOBALS['TL_LANG']['tl_syncCto_check']['memory_limit']             = array('Memory limit', 'Die empfohlene Einstellung ist 128,0 MB oder höher.');
-$GLOBALS['TL_LANG']['tl_syncCto_check']['register_globals']         = array('Register globals', 'Die empfohlene Einstellung ist Aus.');
-$GLOBALS['TL_LANG']['tl_syncCto_check']['file_uploads']             = array('File uploads', 'Die empfohlene Einstellung ist An.');
-$GLOBALS['TL_LANG']['tl_syncCto_check']['umf']                      = array('Upload maximum filesize', 'Die empfohlene Einstellung ist 8,0 MB oder höher.');
-$GLOBALS['TL_LANG']['tl_syncCto_check']['pms']                      = array('Post maximum size', 'Die empfohlene Einstellung ist 8,0 MB oder höher.');
+$GLOBALS['TL_LANG']['tl_syncCto_check']['memory_limit']             = array('Memory limit', 'Die empfohlene Einstellung ist 128,0 MiB oder höher.');
+$GLOBALS['TL_LANG']['tl_syncCto_check']['register_globals']         = 'Register globals';
+$GLOBALS['TL_LANG']['tl_syncCto_check']['file_uploads']             = 'File uploads';
+$GLOBALS['TL_LANG']['tl_syncCto_check']['umf']                      = array('Upload maximum filesize', 'Die empfohlene Einstellung ist 8,0 MiB oder höher.');
+$GLOBALS['TL_LANG']['tl_syncCto_check']['pms']                      = array('Post maximum size', 'Die empfohlene Einstellung ist 8,0 MiB oder höher.');
 $GLOBALS['TL_LANG']['tl_syncCto_check']['mit']                      = array('Maximum input time', 'Die empfohlene Einstellung ist -1, 60 oder höher.');
 $GLOBALS['TL_LANG']['tl_syncCto_check']['dst']                      = array('Default socket timeout', 'Die empfohlene Einstellung ist 30 oder höher.');
-$GLOBALS['TL_LANG']['tl_syncCto_check']['fsocket']                  = array('Fsockopen', 'Die empfohlene Einstellung ist An.');
-$GLOBALS['TL_LANG']['tl_syncCto_check']['zip_archive']              = array('ZipArchive', 'Die empfohlene Einstellung ist An.');
-$GLOBALS['TL_LANG']['tl_syncCto_check']['bcmath']                   = array('BC Math', 'Die empfohlene Einstellung ist An.');
-$GLOBALS['TL_LANG']['tl_syncCto_check']['gmp']                      = array('GMP', 'Die empfohlene Einstellung ist An.');
-$GLOBALS['TL_LANG']['tl_syncCto_check']['mcrypt']                    = array('Mcrypt', 'Die empfohlene Einstellung ist An. (Alternativ phpseclib AES)');
-$GLOBALS['TL_LANG']['tl_syncCto_check']['xmlreader']                = array('XMLReader', 'Die empfohlene Einstellung ist An.');
-$GLOBALS['TL_LANG']['tl_syncCto_check']['xmlwriter']                = array('XMLWriter', 'Die empfohlene Einstellung ist An.');
-$GLOBALS['TL_LANG']['tl_syncCto_check']['suhosin']                  = array('Suhosin', 'Die empfohlene Einstellung ist Aus.');
+$GLOBALS['TL_LANG']['tl_syncCto_check']['fsocket']                  = 'Fsockopen';
+$GLOBALS['TL_LANG']['tl_syncCto_check']['zip_archive']              = 'ZipArchive';
+$GLOBALS['TL_LANG']['tl_syncCto_check']['bcmath']                   = 'BC Math';
+$GLOBALS['TL_LANG']['tl_syncCto_check']['gmp']                      = 'GMP';
+$GLOBALS['TL_LANG']['tl_syncCto_check']['mcrypt']                   = 'Mcrypt';
+$GLOBALS['TL_LANG']['tl_syncCto_check']['xmlreader']                = 'XMLReader';
+$GLOBALS['TL_LANG']['tl_syncCto_check']['xmlwriter']                = 'XMLWriter';
+$GLOBALS['TL_LANG']['tl_syncCto_check']['suhosin']                  = 'Suhosin';
+$GLOBALS['TL_LANG']['tl_syncCto_check']['trigger']                  = 'MySQL Trigger';
+$GLOBALS['TL_LANG']['tl_syncCto_check']['trigger_information']      = 'Für mehr Informationen schauen Sie bitte in die <a href="contao/main.php?do=log">Systemlog</a> im Backend.';
+
+$GLOBALS['TL_LANG']['tl_syncCto_check']['setting_off']              = 'Die empfohlene Einstellung ist Aus.';
+$GLOBALS['TL_LANG']['tl_syncCto_check']['setting_on']               = 'Die empfohlene Einstellung ist An.';
 
 /**
  * Text
  */
-$GLOBALS['TL_LANG']['tl_syncCto_check']['other_sync_issues']        = 'Weitere Problemfälle';
-$GLOBALS['TL_LANG']['tl_syncCto_check']['explanation_sync_issues']  = 'In machen Fällen kann eine Synchronisation trotz eines positiven Systemchecks nicht ausgeführt werden.';
-$GLOBALS['TL_LANG']['tl_syncCto_check']['known_issues']             = 'Folgende fehlerhafte Konfigurationen sind bekannt:';
-$GLOBALS['TL_LANG']['tl_syncCto_check']['suhosin_issue']            = 'Suhosin verhindert die Synchronisation';
-$GLOBALS['TL_LANG']['tl_syncCto_check']['mrl_issue']                = 'Der MaxRequestLen ist zu gering';
-
 $GLOBALS['TL_LANG']['tl_syncCto_check']['safemodehack']             = 'syncCto kann aufgrund fehlender Schreibrechte nicht ausgeführt werden.';
 
 ?>

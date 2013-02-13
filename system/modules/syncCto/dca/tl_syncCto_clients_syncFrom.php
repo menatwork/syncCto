@@ -8,7 +8,6 @@
  * @license    GNU/LGPL 
  * @filesource
  */
-
 $GLOBALS['TL_DCA']['tl_syncCto_clients_syncFrom'] = array(
     // Config
     'config' => array(
@@ -79,9 +78,9 @@ $GLOBALS['TL_DCA']['tl_syncCto_clients_syncFrom'] = array(
             'options_callback' => array('SyncCtoHelper', 'getMaintanceOptions'),
         ),
         'attentionFlag' => array(
-            'label'             => &$GLOBALS['TL_LANG']['tl_syncCto_clients_syncFrom']['attention_flag'],
-            'inputType'         => 'checkbox',
-            'exclude'           => true
+            'label'     => &$GLOBALS['TL_LANG']['tl_syncCto_clients_syncFrom']['attention_flag'],
+            'inputType' => 'checkbox',
+            'exclude'   => true
         )
     )
 );
@@ -281,6 +280,12 @@ class tl_syncCto_clients_syncFrom extends Backend
             $arrSyncSettings["syncCto_AttentionFlag"] = false;
         }
 
+        // Write all data
+        foreach ($_POST as $key => $value)
+        {
+            $arrSyncSettings["post_data"][$key] = $this->Input->post($key);
+        }
+
         $this->Session->set("syncCto_SyncSettings_" . $dc->id, $arrSyncSettings);
 
         $this->objSyncCtoHelper->checkSubmit(array(
@@ -292,6 +297,7 @@ class tl_syncCto_clients_syncFrom extends Backend
             'redirectUrl' => $this->Environment->base . "contao/main.php?do=synccto_clients&amp;table=tl_syncCto_clients_syncFrom&amp;act=start&amp;step=0&amp;id=" . $this->Input->get("id")
         ));
     }
+
 }
 
 ?>

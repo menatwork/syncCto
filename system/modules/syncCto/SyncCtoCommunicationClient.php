@@ -891,6 +891,11 @@ class SyncCtoCommunicationClient extends CtoCommunication
     {
         return $this->runServer("SYNCCTO_GET_PHP_FUNCTIONS");
     }
+    
+    public function getProFunctions()
+    {
+        return $this->runServer("SYNCCTO_GET_PRO_FUNCTIONS");
+    }
 
     public function getPhpConfigurations()
     {

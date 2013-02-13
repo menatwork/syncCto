@@ -460,6 +460,13 @@ $GLOBALS["CTOCOM_FUNCTIONS"]["SYNCCTO_GET_PHP_FUNCTIONS"] = array(
     "parameter" => null,
 );
 
+$GLOBALS["CTOCOM_FUNCTIONS"]["SYNCCTO_GET_PRO_FUNCTIONS"] = array(
+    "class" => "SyncCtoModuleCheck",
+    "function" => "getMySqlFunctions",
+    "typ" => "get",
+    "parameter" => null,
+);
+
 // Get folder path list
 $GLOBALS["CTOCOM_FUNCTIONS"]["SYNCCTO_GET_PATHLIST"] = array(
     "class" => "SyncCtoRPCFunctions",
