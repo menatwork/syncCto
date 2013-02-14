@@ -76,10 +76,10 @@ class SyncCtoModuleClient extends BackendModule
     {
         return $this->arrSyncSettings;
     }
-    
-   /**
-    * @param array $arrSyncSettings
-    */
+
+    /**
+     * @param array $arrSyncSettings
+     */
     public function setSyncSettings($arrSyncSettings)
     {
         $this->arrSyncSettings = $arrSyncSettings;
@@ -738,7 +738,7 @@ class SyncCtoModuleClient extends BackendModule
             // Check uf we have to run the import step
             case 6:
                 $this->loadTempLists();
-                
+
                 if (count((array) $this->arrListCompare) == 0
                         && !in_array("localconfig_update", $this->arrSyncSettings["syncCto_Type"])
                         && $this->arrSyncSettings["syncCto_ShowError"] != true
@@ -746,7 +746,7 @@ class SyncCtoModuleClient extends BackendModule
                         && count((array) $this->arrSyncSettings["syncCto_Systemoperations_Maintenance"]) == 0
                         && !in_array("temp_folders", $this->arrSyncSettings["syncCto_Systemoperations_Maintenance"])
                 )
-                {                    
+                {
                     $this->intStep++;
                     $this->objData->nextStep();
                 }
@@ -850,7 +850,7 @@ class SyncCtoModuleClient extends BackendModule
             $this->log(vsprintf("Start synchronization server with client ID %s.", array($this->Input->get("id"))), __CLASS__ . " " . __FUNCTION__, "INFO");
 
             // Reset some Sessions
-            $this->resetStepPoolByID(array(1, 2, 3, 4, 5, 6));
+            $this->resetStepPoolByID(array(1, 2, 3, 4, 5, 6, 7));
             $this->resetClientInformation();
 
             $this->Session->set("SyncCto_FileLock_ID" . $this->intClientID, array("lock" => false));
@@ -930,8 +930,10 @@ class SyncCtoModuleClient extends BackendModule
                     $this->objData->nextStep();
                 }
 
-            // Check uf we have to run the import step
+            // Check if we have to run the import step
             case 6:
+                $this->loadTempLists();                
+
                 if (count((array) $this->arrListCompare) == 0
                         && !in_array("localconfig_update", $this->arrSyncSettings["syncCto_Type"])
                         && $this->arrSyncSettings["syncCto_AttentionFlag"] != true
@@ -1091,14 +1093,14 @@ class SyncCtoModuleClient extends BackendModule
 
                     // Stop connection
                     $this->objSyncCtoCommunicationClient->stopConnection();
-                    
+
                     // Load module for html
-                    $objCheck                                   = new SyncCtoModuleCheck();
-                    $objCheckTemplate                           = new BackendTemplate('be_syncCto_smallCheck');
-                    $objCheckTemplate->checkPhpConfiguration    = $objCheck->checkPhpConfiguration($arrConfigurations);
-                    $objCheckTemplate->checkPhpFunctions        = $objCheck->checkPhpFunctions($arrFunctions);
-                    $objCheckTemplate->checkProFunctions        = $objCheck->checkProFunctions($arrProFunctions);
-                    $objCheckTemplate->syc_version              = $strVersion;                    
+                    $objCheck                                = new SyncCtoModuleCheck();
+                    $objCheckTemplate                        = new BackendTemplate('be_syncCto_smallCheck');
+                    $objCheckTemplate->checkPhpConfiguration = $objCheck->checkPhpConfiguration($arrConfigurations);
+                    $objCheckTemplate->checkPhpFunctions     = $objCheck->checkPhpFunctions($arrFunctions);
+                    $objCheckTemplate->checkProFunctions     = $objCheck->checkProFunctions($arrProFunctions);
+                    $objCheckTemplate->syc_version           = $strVersion;
 
                     // Show information
                     $this->objData->setState(SyncCtoEnum::WORK_OK);
