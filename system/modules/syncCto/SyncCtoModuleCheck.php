@@ -8,15 +8,14 @@
  * @license    GNU/LGPL 
  * @filesource
  */
+
 // Workaround for missing posix_getpwuid function
 if (!function_exists('posix_getpwuid'))
 {
-
     function posix_getpwuid($int)
     {
         return array('name' => $int);
     }
-
 }
 
 /**
@@ -96,9 +95,9 @@ class SyncCtoModuleCheck extends BackendModule
         {
             $blnIsActive = true;
         }
-
+        
         // Check patch
-        if (constant("SUHOSIN_PATCH"))
+        if (defined("SUHOSIN_PATCH") && @constant("SUHOSIN_PATCH"))
         {
             $blnIsActive = true;
         }
