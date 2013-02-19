@@ -932,7 +932,7 @@ class SyncCtoModuleClient extends BackendModule
 
             // Check if we have to run the import step
             case 6:
-                $this->loadTempLists();                
+                $this->loadTempLists();
 
                 if (count((array) $this->arrListCompare) == 0
                         && !in_array("localconfig_update", $this->arrSyncSettings["syncCto_Type"])
@@ -2339,7 +2339,33 @@ class SyncCtoModuleClient extends BackendModule
                  */
                 case 4:
                     if (count($this->arrSyncSettings['syncCto_SyncTables']) != 0)
-                    {
+                    {          
+                        if ($this->arrSyncSettings['post_data']['database_pages_check'] == true)
+                        {
+                            if (($mixKey = array_search('tl_page', $this->arrSyncSettings['syncCto_SyncTables'])) !== false)
+                            {
+                                unset($this->arrSyncSettings['syncCto_SyncTables'][$mixKey]);
+                                $this->arrSyncSettings['syncCtoPro_tables_checked'][] = 'tl_page';
+                            }
+
+                            if (($mixKey = array_search('tl_article', $this->arrSyncSettings['syncCto_SyncTables'])) !== false)
+                            {
+                                unset($this->arrSyncSettings['syncCto_SyncTables'][$mixKey]);
+                                $this->arrSyncSettings['syncCtoPro_tables_checked'][] = 'tl_article';
+                            }
+
+                            if (($mixKey = array_search('tl_content', $this->arrSyncSettings['syncCto_SyncTables'])) !== false)
+                            {
+                                unset($this->arrSyncSettings['syncCto_SyncTables'][$mixKey]);
+                                $this->arrSyncSettings['syncCtoPro_tables_checked'][] = 'tl_content';
+                            }
+                        }
+                        
+                        if (count($this->arrSyncSettings['syncCto_SyncTables']) == 0)
+                        {
+                            $this->objStepPool->step = 8;
+                        }
+
                         $this->objStepPool->zipname = $this->objSyncCtoDatabase->runDump($this->arrSyncSettings['syncCto_SyncTables'], true, true);
 
                         $this->objData->setDescription($GLOBALS['TL_LANG']['tl_syncCto_sync']['step_4']['description_2']);
