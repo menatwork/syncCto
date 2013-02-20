@@ -716,7 +716,7 @@ class SyncCtoModuleClient extends BackendModule
             case 5:
                 if (in_array('syncCtoPro', Config::getInstance()->getActiveModules()))
                 {
-                    $objStepPro = SyncCtoStepPagesSelection::getInstance();
+                    $objStepPro = SyncCtoStepDatabaseDiff::getInstance();
                     $objStepPro->setSyncCto($this);
 
                     if (!$objStepPro->checkSyncTo())
@@ -911,7 +911,7 @@ class SyncCtoModuleClient extends BackendModule
             case 5:
                 if (in_array('syncCtoPro', Config::getInstance()->getActiveModules()))
                 {
-                    $objStepPro = SyncCtoStepPagesSelection::getInstance();
+                    $objStepPro = SyncCtoStepDatabaseDiff::getInstance();
                     $objStepPro->setSyncCto($this);
 
                     if (!$objStepPro->checkSyncTo())
@@ -1460,7 +1460,7 @@ class SyncCtoModuleClient extends BackendModule
      */
     private function pageSyncToShowStepPro()
     {
-        $objStepPro = SyncCtoStepPagesSelection::getInstance();
+        $objStepPro = SyncCtoStepDatabaseDiff::getInstance();
         $objStepPro->setSyncCto($this);
         $objStepPro->syncTo();
     }
@@ -1470,7 +1470,7 @@ class SyncCtoModuleClient extends BackendModule
      */
     private function pageSyncFromShowStepPro()
     {
-        $objStepPro = SyncCtoStepPagesSelection::getInstance();
+        $objStepPro = SyncCtoStepDatabaseDiff::getInstance();
         $objStepPro->setSyncCto($this);
         $objStepPro->syncFrom();
     }
