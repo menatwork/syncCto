@@ -1368,7 +1368,7 @@ class SyncCtoDatabase extends Backend
     }
 
     /**
-     * Get the calculated differenz between the to given arrays
+     * Get the calculated difference between the two given arrays
      * 
      * @param array $arrServerTables
      * @param array $arrClientTables
@@ -1376,30 +1376,7 @@ class SyncCtoDatabase extends Backend
      */
     public function getDiff($arrSrcTables, $arrDesTables)
     {
-        $intCount = 0;
-
-        // Calculate count
-        if (count($arrSrcTables) == 0)
-        {
-            $intCount = $arrDesTables['count'];
-        }
-        else if (count($arrDesTables) == 0)
-        {
-            $intCount = $arrSrcTables['count'];
-        }
-        else
-        {
-            if ($arrSrcTables['count'] > $arrDesTables['count'])
-            {
-                $intCount = $arrSrcTables['count'] - $arrDesTables['count'];
-            }
-            else
-            {
-                $intCount = $arrDesTables['count'] - $arrSrcTables['count'];
-            }
-        }
-
-        return $intCount;
+        return abs(intval($arrSrcTables['count']) - intval($arrDesTables['count']));        
     }
 
     /**
