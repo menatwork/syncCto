@@ -25,6 +25,8 @@ class SyncCtoCommunicationClient extends CtoCommunication
     // Objects
     protected $objSyncCtoFiles;
     protected $objSyncCtoHelper;
+    // Vars
+    protected $arrClientData = array();
 
     /* -------------------------------------------------------------------------
      * Core
@@ -97,7 +99,7 @@ class SyncCtoCommunicationClient extends CtoCommunication
         {
             $this->import("Encryption");
 
-            $this->strHTTPUser = $objClient->http_username;
+            $this->strHTTPUser     = $objClient->http_username;
             $this->strHTTPPassword = $this->Encryption->decrypt($objClient->http_password);
         }
 
@@ -111,14 +113,27 @@ class SyncCtoCommunicationClient extends CtoCommunication
             $this->setFileMeasurement($this->objSyncCtoHelper->standardizePath($GLOBALS['SYC_PATH']['debug'], "CtoComMeasurement.txt"));
         }
 
-        return array(
-            "title" => $objClient->title,
+        $this->arrClientData = array(
+            "title"   => $objClient->title,
             "address" => $objClient->address,
-            "path" => $objClient->path,
-            "port" => $objClient->port
+            "path"    => $objClient->path,
+            "port"    => $objClient->port
         );
+
+        return $this->arrClientData;
+    }
+    
+    /**
+     * Return a list with basic client informations
+     * 
+     * @return array {title, address, path, port}
+     */
+    public function getClientData()
+    {
+        return $this->arrClientData;
     }
 
+    
     /* -------------------------------------------------------------------------
      * Security Function
      */
