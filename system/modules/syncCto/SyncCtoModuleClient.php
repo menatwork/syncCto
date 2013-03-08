@@ -2288,6 +2288,28 @@ class SyncCtoModuleClient extends BackendModule
                     break;
 
                 case 3:
+                    // Unset some tables for pro feature
+                    if (key_exists("forward", $_POST) && $this->arrSyncSettings['post_data']['database_pages_check'] == true)
+                    {
+                        if (($mixKey = array_search('tl_page', $this->arrSyncSettings['syncCto_SyncTables'])) !== false)
+                        {
+                            unset($this->arrSyncSettings['syncCto_SyncTables'][$mixKey]);
+                            $this->arrSyncSettings['syncCtoPro_tables_checked'][] = 'tl_page';
+                        }
+
+                        if (($mixKey = array_search('tl_article', $this->arrSyncSettings['syncCto_SyncTables'])) !== false)
+                        {
+                            unset($this->arrSyncSettings['syncCto_SyncTables'][$mixKey]);
+                            $this->arrSyncSettings['syncCtoPro_tables_checked'][] = 'tl_article';
+                        }
+
+                        if (($mixKey = array_search('tl_content', $this->arrSyncSettings['syncCto_SyncTables'])) !== false)
+                        {
+                            unset($this->arrSyncSettings['syncCto_SyncTables'][$mixKey]);
+                            $this->arrSyncSettings['syncCtoPro_tables_checked'][] = 'tl_content';
+                        }
+                    }
+
                     if (key_exists("forward", $_POST) && !(count($this->arrSyncSettings['syncCto_SyncTables']) == 0 && count($this->arrSyncSettings['syncCto_SyncDeleteTables']) == 0))
                     {
                         // Go to next step
@@ -2339,33 +2361,7 @@ class SyncCtoModuleClient extends BackendModule
                  */
                 case 4:
                     if (count($this->arrSyncSettings['syncCto_SyncTables']) != 0)
-                    {          
-                        if ($this->arrSyncSettings['post_data']['database_pages_check'] == true)
-                        {
-                            if (($mixKey = array_search('tl_page', $this->arrSyncSettings['syncCto_SyncTables'])) !== false)
-                            {
-                                unset($this->arrSyncSettings['syncCto_SyncTables'][$mixKey]);
-                                $this->arrSyncSettings['syncCtoPro_tables_checked'][] = 'tl_page';
-                            }
-
-                            if (($mixKey = array_search('tl_article', $this->arrSyncSettings['syncCto_SyncTables'])) !== false)
-                            {
-                                unset($this->arrSyncSettings['syncCto_SyncTables'][$mixKey]);
-                                $this->arrSyncSettings['syncCtoPro_tables_checked'][] = 'tl_article';
-                            }
-
-                            if (($mixKey = array_search('tl_content', $this->arrSyncSettings['syncCto_SyncTables'])) !== false)
-                            {
-                                unset($this->arrSyncSettings['syncCto_SyncTables'][$mixKey]);
-                                $this->arrSyncSettings['syncCtoPro_tables_checked'][] = 'tl_content';
-                            }
-                        }
-                        
-                        if (count($this->arrSyncSettings['syncCto_SyncTables']) == 0)
-                        {
-                            $this->objStepPool->step = 8;
-                        }
-
+                    {
                         $this->objStepPool->zipname = $this->objSyncCtoDatabase->runDump($this->arrSyncSettings['syncCto_SyncTables'], true, true);
 
                         $this->objData->setDescription($GLOBALS['TL_LANG']['tl_syncCto_sync']['step_4']['description_2']);
