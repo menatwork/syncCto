@@ -121,6 +121,7 @@ $GLOBALS['SYC_CONFIG']['folder_blacklist'] = array_merge( (array) $GLOBALS['SYC_
 $GLOBALS['SYC_CONFIG']['file_blacklist'] = array_merge( (array) $GLOBALS['SYC_CONFIG']['file_blacklist'], array(
     'TL_ROOT/.htaccess',
     'localconfig.php',
+    'pathconfig.php',
 ));
 
 // Folders
