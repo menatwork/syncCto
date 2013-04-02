@@ -1305,8 +1305,7 @@ class SyncCtoModuleClient extends BackendModule
 
                     if ($this->objStepPool->autoUpdate == false)
                     {
-                        $this->objData->setState(SyncCtoEnum::WORK_OK);
-                        $this->intStep++;
+                        $this->objStepPool->step = 11;
                     }
                     else
                     {
@@ -1382,9 +1381,18 @@ class SyncCtoModuleClient extends BackendModule
                 case 10:
                     $this->objSyncCtoCommunicationClient->startAutoUpdater($this->objStepPool->AutoUpdateZip);
                     $this->objStepPool->step++;
-                    break;
+					break;
 
-                case 11:
+				// Check pathconfig for contao 2.11.10 =<
+				case 11:					
+					if(version_compare(VERSION . '.' . BUILD, '2.11.10', '>='))
+					{
+						$this->objSyncCtoCommunicationClient->createPathconfig();
+						$this->objStepPool->step++;
+						break;
+					}
+
+                case 12:
                     $this->objData->setDescription($GLOBALS['TL_LANG']['tl_syncCto_sync']["step_1"]['description_1']);
                     $this->objData->setState(SyncCtoEnum::WORK_OK);
                     $this->intStep++;

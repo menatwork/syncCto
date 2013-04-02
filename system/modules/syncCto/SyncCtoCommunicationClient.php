@@ -916,6 +916,17 @@ class SyncCtoCommunicationClient extends CtoCommunication
     {
         return $this->runServer("SYNCCTO_GET_PHP_CONFIGURATION");
     }
+	
+	/**
+	 * Create a file which contains the relative path
+	 * 
+	 * @throws Exception
+	 * @return boolean 
+	 */
+	public function createPathconfig()
+	{
+		return $this->runServer("SYNCCTO_CREATE_PATHCONFIG");
+	}
 
     /* -------------------------------------------------------------------------
      * Auto Updater

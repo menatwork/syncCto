@@ -14,7 +14,7 @@ $objInput = Input::getInstance();
 /**
  * Current syncCto version
  */
-$GLOBALS['SYC_VERSION'] = '2.3.0';
+$GLOBALS['SYC_VERSION'] = '2.3.1';
 
 /**
  * Back end modules
@@ -221,6 +221,14 @@ $GLOBALS["CTOCOM_FUNCTIONS"]["SYNCCTO_GET_CONFIG"] = array(
     "function" => "getLocalConfig",
     "typ" => "POST",
     "parameter" => array("ConfigBlacklist"),
+);
+
+// Get config
+$GLOBALS["CTOCOM_FUNCTIONS"]["SYNCCTO_CREATE_PATHCONFIG"] = array(
+    "class" => "SyncCtoHelper",
+    "function" => "createPathconfig",
+    "typ" => "GET",
+    "parameter" => false,
 );
 
 // - Database ------------------------------------------------------------------

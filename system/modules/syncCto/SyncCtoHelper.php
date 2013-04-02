@@ -156,6 +156,63 @@ class SyncCtoHelper extends Backend
 
         return $arrData;
     }
+	
+	/**
+	 * Store the relative path
+	 *
+	 * Only store this value if the temp directory is writable and the local
+	 * configuration file exists, otherwise it will initialize a Files object and
+	 * prevent the install tool from loading the Safe Mode Hack (see #3215).
+	 * 
+	 * @throws Exception
+	 * @return boolean 
+	 */
+	public function createPathconfig()
+	{
+		// Check if we have the file
+		if (file_exists(TL_ROOT . '/system/config/pathconfig.php'))
+		{
+			return true;
+		}
+		
+		// Check localconfig
+		if(!file_exists(TL_ROOT . '/system/config/localconfig.php'))
+		{
+			throw new Exception('Missing localconfig.php');
+		}
+		
+		// Check tmp
+		if(!is_writable(TL_ROOT . '/system/tmp'))
+		{
+			throw new Exception('"/system/tmp" is not writable.');
+		}
+
+		// Write file
+		try
+		{
+			$objFile = new File('system/config/pathconfig.php');
+			
+			// Check if we have the path
+			if(TL_PATH === null || TL_PATH == "")
+			{	
+				$objFile->write("<?php\n\n// Relative path to the installation\nreturn '" . preg_replace('/\/ctoCommunication.php\?.*$/i', '', Environment::getInstance()->requestUri) . "';\n");				
+			}
+			else
+			{
+				$objFile->write("<?php\n\n// Relative path to the installation\nreturn '" . TL_PATH . "';\n");
+			}
+			
+			$objFile->close();
+		}
+		catch (Exception $e)
+		{
+			log_message($e->getMessage());
+			throw $e;
+		}
+		
+		// All done
+		return true;
+	}
 
     /* -------------------------------------------------------------------------
      * Black and Whitelists
