@@ -2441,12 +2441,67 @@ class SyncCtoModuleClient extends BackendModule
                     $this->objStepPool->step++;
 
                     break;
-
+               
                 /**
-                 * Set timestamps 
+                 * Drop Tables
                  */
                 case 7:
 
+                    if (count($this->arrSyncSettings['syncCto_SyncDeleteTables']) != 0)
+                    {
+                        $arrKnownTables = $this->Database->listTables();
+
+                        foreach ($this->arrSyncSettings['syncCto_SyncDeleteTables'] as $key => $value)
+                        {
+                            if (in_array($value, $arrKnownTables))
+                            {
+                                unset($this->arrSyncSettings['syncCto_SyncDeleteTables'][$key]);
+                            }
+                        }
+
+                        $this->objSyncCtoCommunicationClient->dropTable($this->arrSyncSettings['syncCto_SyncDeleteTables'], true);
+
+                        // Show step information
+                        $this->objData->setDescription($GLOBALS['TL_LANG']['tl_syncCto_sync']['step_4']['description_4']);
+                        $this->objStepPool->step++;
+
+                        break;
+                    }
+
+                /**
+                 * Hook for custom sql code
+                 */
+                case 8:
+                    
+                    if (isset($GLOBALS['TL_HOOKS']['syncDBUpdate']) && is_array($GLOBALS['TL_HOOKS']['syncDBUpdate']))
+                    {
+                        $arrSQL = array();
+
+                        foreach ($GLOBALS['TL_HOOKS']['syncDBUpdate'] as $callback)
+                        {
+                            $this->import($callback[0]);
+                            $mixReturn = $this->$callback[0]->$callback[1]($this->intClientID, $arrSQL);
+
+                            if (!empty($mixReturn) && is_array($mixReturn))
+                            {
+                                $arrSQL = $mixReturn;
+                            }
+                        }
+
+                        if (count($arrSQL) != 0)
+                        {
+                            $this->objSyncCtoCommunicationClient->executeSQL($arrSQL);
+                        }
+                    }
+
+                    $this->objStepPool->step++;
+
+                    break;
+                    
+                /**
+                 * Set timestamps 
+                 */
+                case 9:
                     $arrTableTimestamp = array(
                         'server' => $this->objSyncCtoHelper->getDatabaseTablesTimestamp($this->arrSyncSettings['syncCto_SyncTables']),
                         'client' => $this->objSyncCtoCommunicationClient->getClientTimestamp($this->arrSyncSettings['syncCto_SyncTables'])
@@ -2489,62 +2544,7 @@ class SyncCtoModuleClient extends BackendModule
                                 ->prepare("UPDATE tl_synccto_clients SET " . $location . "_timestamp = ? WHERE id = ? ")
                                 ->execute(serialize($arrLastTableTimestamp), $this->intClientID);
                     }
-
-                    $this->objStepPool->step++;
-
-                    break;
-
-                /**
-                 * Drop Tables
-                 */
-                case 8:
-
-                    if (count($this->arrSyncSettings['syncCto_SyncDeleteTables']) != 0)
-                    {
-                        $arrKnownTables = $this->Database->listTables();
-
-                        foreach ($this->arrSyncSettings['syncCto_SyncDeleteTables'] as $key => $value)
-                        {
-                            if (in_array($value, $arrKnownTables))
-                            {
-                                unset($this->arrSyncSettings['syncCto_SyncDeleteTables'][$key]);
-                            }
-                        }
-
-                        $this->objSyncCtoCommunicationClient->dropTable($this->arrSyncSettings['syncCto_SyncDeleteTables'], true);
-
-                        // Show step information
-                        $this->objData->setDescription($GLOBALS['TL_LANG']['tl_syncCto_sync']['step_4']['description_4']);
-                        $this->objStepPool->step++;
-
-                        break;
-                    }
-
-                /**
-                 * Hook for custom sql code
-                 */
-                case 9:
-                    if (isset($GLOBALS['TL_HOOKS']['syncDBUpdate']) && is_array($GLOBALS['TL_HOOKS']['syncDBUpdate']))
-                    {
-                        $arrSQL = array();
-
-                        foreach ($GLOBALS['TL_HOOKS']['syncDBUpdate'] as $callback)
-                        {
-                            $this->import($callback[0]);
-                            $mixReturn = $this->$callback[0]->$callback[1]($this->intClientID, $arrSQL);
-
-                            if (!empty($mixReturn) && is_array($mixReturn))
-                            {
-                                $arrSQL = $mixReturn;
-                            }
-                        }
-
-                        if (count($arrSQL) != 0)
-                        {
-                            $this->objSyncCtoCommunicationClient->executeSQL($arrSQL);
-                        }
-                    }
-
+                    
                     // Show step information
                     $this->objData->setState(SyncCtoEnum::WORK_OK);
                     $this->objData->setDescription($GLOBALS['TL_LANG']['tl_syncCto_sync']['step_4']['description_4']);
@@ -2552,6 +2552,7 @@ class SyncCtoModuleClient extends BackendModule
                     $this->intStep++;
 
                     break;
+
             }
         }
         catch (Exception $exc)
