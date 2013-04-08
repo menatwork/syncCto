@@ -251,6 +251,7 @@ class SyncCtoModuleClient extends BackendModule
 
         // Load language 
         $this->loadLanguageFile("tl_syncCto_steps");
+        $this->loadLanguageFile("tl_syncCto_check");
 
         // Load CSS
         $GLOBALS['TL_CSS'][] = 'system/modules/syncCto/html/css/steps.css';
@@ -396,6 +397,19 @@ class SyncCtoModuleClient extends BackendModule
         $this->Template->headline    = $this->strHeadline;
         $this->Template->information = $this->strInformation;
         $this->Template->finished    = $this->booFinished;
+        
+        if ($this->Input->get('table') == 'tl_syncCto_clients_syncTo')
+        {
+            $this->Template->direction = 'to';
+        }
+        else if ($this->Input->get('table') == 'tl_syncCto_clients_syncFrom')
+        {
+            $this->Template->direction = 'from';
+        }
+        else
+        {
+            $this->Template->direction = 'na';
+        }
     }
 
     /**
@@ -638,12 +652,12 @@ class SyncCtoModuleClient extends BackendModule
             $this->booRefresh     = true;
             $this->strUrl         = "contao/main.php?do=synccto_clients&amp;table=tl_syncCto_clients_syncTo&amp;act=start&amp;id=" . $this->intClientID;
             $this->strGoBack      = $this->Environment->base . "contao/main.php?do=synccto_clients";
-            $this->strHeadline    = $GLOBALS['TL_LANG']['tl_syncCto_clients_syncTo']['edit'];
+            $this->strHeadline    = $GLOBALS['TL_LANG']['tl_syncCto_sync']['edit'];
             $this->strInformation = "";
             $this->intStep        = 1;
             $this->floStart       = microtime(true);
             $this->objData        = new ContentData(array(), $this->intStep);
-
+            
             // Init tmep files
             $this->initTempLists();
 
@@ -832,7 +846,7 @@ class SyncCtoModuleClient extends BackendModule
             $this->booRefresh     = true;
             $this->strUrl         = "contao/main.php?do=synccto_clients&amp;table=tl_syncCto_clients_syncFrom&amp;act=start&amp;id=" . $this->intClientID;
             $this->strGoBack      = $this->Environment->base . "contao/main.php?do=synccto_clients";
-            $this->strHeadline    = $GLOBALS['TL_LANG']['tl_syncCto_clients_syncFrom']['edit'];
+            $this->strHeadline    = $GLOBALS['TL_LANG']['tl_syncCto_sync']['edit'];
             $this->strInformation = "";
             $this->intStep        = 1;
             $this->floStart       = microtime(true);
@@ -1025,7 +1039,7 @@ class SyncCtoModuleClient extends BackendModule
             $this->booRefresh     = true;
             $this->strUrl         = "contao/main.php?do=synccto_clients&amp;table=tl_syncCto_clients_showExtern&amp;act=start&amp;id=" . $this->intClientID;
             $this->strGoBack      = $this->Environment->base . "contao/main.php?do=synccto_clients";
-            $this->strHeadline    = $GLOBALS['TL_LANG']['tl_syncCto_clients_showExtern']['edit'];
+            $this->strHeadline    = $GLOBALS['TL_LANG']['tl_syncCto_check']['check'];
             $this->strInformation = "";
             $this->intStep        = 1;
             $this->floStart       = microtime(true);

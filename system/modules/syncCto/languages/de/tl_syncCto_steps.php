@@ -10,6 +10,11 @@
  */
 
 /**
+ * Headline
+ */
+$GLOBALS['TL_LANG']['tl_syncCto_sync']['edit']                              = 'Synchronisation: Server ';
+
+/**
  * List
  */
 $GLOBALS['TL_LANG']['tl_syncCto_sync']['step_1_show']['description_1']      = 'Systemcheck des Clients verarbeiten.';

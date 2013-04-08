@@ -2,7 +2,7 @@
     <a onclick="Backend.getScrollOffset();" accesskey="b" title="<?php echo $GLOBALS['TL_LANG']['MSC']['backBT']; ?>" class="header_back" href="<?php echo $this->goBack; ?>"><?php echo $GLOBALS['TL_LANG']['MSC']['backBT']; ?></a>
 </div>
 
-<h2 class="sub_headline"><?php echo $this->headline; ?><?php echo(strlen($this->clientName))? " - " . $this->clientName : ''; ?></h2>
+<h2 class="sub_headline"><?php echo $this->headline; ?> <?php echo (($this->direction == 'to')? '->' : (($this->direction == 'from')? '<-' : ' - ')); ?> <?php echo $this->clientName ?></h2>
 
 <div class="tl_formbody_edit">
 
