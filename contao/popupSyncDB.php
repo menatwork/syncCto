@@ -117,7 +117,21 @@ class popupSyncDB extends Backend
         // Delete functinality
         if (key_exists("delete", $_POST))
         {
-            foreach ($_POST['serverTables'] as $value)
+            // Make a array from 'serverTables' and 'serverDeleteTables'
+            $arrRemoveTables = array();
+            
+            if (is_array($this->Input->post('serverTables')) && count($this->Input->post('serverTables')) != 0)
+            {
+                $arrRemoveTables = $this->Input->post('serverTables');
+            }
+            
+            if (is_array($this->Input->post('serverDeleteTables')) && count($this->Input->post('serverDeleteTables')) != 0)
+            {
+                $arrRemoveTables = array_merge($arrRemoveTables, $this->Input->post('serverDeleteTables'));
+            }
+            
+            // Remove tables from the list.
+            foreach ($arrRemoveTables as $value)
             {
                 if (isset($this->arrSyncSettings['syncCto_CompareTables']['recommended']) && key_exists($value, $this->arrSyncSettings['syncCto_CompareTables']['recommended']))
                 {
