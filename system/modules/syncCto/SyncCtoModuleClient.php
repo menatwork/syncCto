@@ -2780,19 +2780,64 @@ class SyncCtoModuleClient extends BackendModule
                     break;
 
                 /**
-                 * Call the final operations hook
+                 * Call the final operations hook for client
                  */
                 case 2:
                     $arrResponse = $this->objSyncCtoCommunicationClient->runFinalOperations();
                     $this->objStepPool->step++;
                     break;
+                
+                /**
+                 * Call some functions on the server.
+                 */
+                case 3:                      
+                    $mixCurrentAdditionalStep = $this->objStepPool->additionalStep;
+                                        
+                    if(empty($mixCurrentAdditionalStep))
+                    {
+                        $mixCurrentAdditionalStep = 0;
+                    }
+                    
+                    // HOOK: do some last operations
+                    if (isset($GLOBALS['TL_HOOKS']['syncAdditionalFunctions']) && is_array($GLOBALS['TL_HOOKS']['syncAdditionalFunctions']))
+                    {
+                        $arrKeys = array_keys($GLOBALS['TL_HOOKS']['syncAdditionalFunctions']);
+                                                
+                        if(($mixCurrentAdditionalStep + 1) > count($arrKeys))
+                        {
+                            $this->objData->setDescription($GLOBALS['TL_LANG']['tl_syncCto_sync']['step_1']['description_2']);
+                            $this->objStepPool->step++;
+                            break;
+                        }
 
-                case 3:
+                        $mixCurrentKey      = $arrKeys[$mixCurrentAdditionalStep];
+                        $arrCurrentFunction = $GLOBALS['TL_HOOKS']['syncAdditionalFunctions'][$mixCurrentKey];
+                        
+                        try
+                        {
+                            $this->import($arrCurrentFunction[0]);
+                            $this->$arrCurrentFunction[0]->$arrCurrentFunction[1]($this, $this->intClientID);
+                        }
+                        catch (Exception $exc)
+                        {
+                            $this->log("Error by: TL_HOOK $arrCurrentFunction[0] | $arrCurrentFunction[1] with Msg: " . $exc->getMessage(), __CLASS__ . "|" . __FUNCTION__, TL_ERROR);
+                        }
+                        
+                        $this->objStepPool->additionalStep = $mixCurrentAdditionalStep + 1;
+                    }
+                    else
+                    {
+                        $this->objStepPool->step++;
+                    }
+                   
+                    break;
+
+                case 4:
                     $this->objSyncCtoCommunicationClient->referrerEnable();
                     $this->objStepPool->step++;
                     break;
 
-                case 4:
+                case 5:
                     $this->objSyncCtoCommunicationClient->stopConnection();
                     $this->objStepPool->step++;
                     break;
@@ -2800,7 +2845,7 @@ class SyncCtoModuleClient extends BackendModule
                 /**
                  * Show information
                  */
-                case 5:
+                case 6:
                     // Count files
                     if (is_array($this->arrListCompare) && count($this->arrListCompare) != 0 && $this->arrListCompare != false)
                     {
@@ -2809,7 +2854,7 @@ class SyncCtoModuleClient extends BackendModule
                         $intWaitCount  = 0;
                         $intDelCount   = 0;
                         $intSplitCount = 0;
-
+                
                         foreach ($this->arrListCompare as $value)
                         {
                             switch ($value["transmission"])
@@ -4673,7 +4718,7 @@ class StepPool
         }
         else
         {
-            throw new Exception("Unknown key in step pool.");
+            return null;
         }
     }
 
