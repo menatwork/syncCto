@@ -121,14 +121,14 @@ class SyncCtoUpdater extends Backend
     protected function addFiles()
     {
         // Check if xml exists
-        if (!file_exists(TL_ROOT . '/tl_files/syncCto_backups/dependencies.xml'))
+        if (!file_exists(TL_ROOT . '/' . $GLOBALS['TL_CONFIG']['uploadPath'] . '/syncCto_backups/dependencies.xml'))
         {
             throw new Exception("Missing dependencies.xml for autoupdater.");
         }
 
         // Create a new reader
         $objXMLReader = new XMLReader();
-        $objXMLReader->open(TL_ROOT . '/tl_files/syncCto_backups/dependencies.xml');
+        $objXMLReader->open(TL_ROOT . '/' . $GLOBALS['TL_CONFIG']['uploadPath'] . '/syncCto_backups/dependencies.xml');
 
         $strCurrentNode = "";
 
@@ -177,9 +177,9 @@ class SyncCtoUpdater extends Backend
         }
 
         // Add the dependencies.xml
-        if (!$this->objZipArchive->addFile('tl_files/syncCto_backups/dependencies.xml', "FILES/" . 'tl_files/syncCto_backups/dependencies.xml'))
+        if (!$this->objZipArchive->addFile($GLOBALS['TL_CONFIG']['uploadPath'] . '/syncCto_backups/dependencies.xml', "FILES/" . $GLOBALS['TL_CONFIG']['uploadPath'] . '/syncCto_backups/dependencies.xml'))
         {
-            throw new Exception('Could not add the file /tl_files/syncCto_backups/dependencies.xml to the archive.');
+            throw new Exception('Could not add the file /' . $GLOBALS['TL_CONFIG']['uploadPath'] . '/syncCto_backups/dependencies.xml to the archive.');
         }
     }
     

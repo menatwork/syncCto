@@ -143,7 +143,7 @@ class SyncCtoErClient extends RepositoryBackendModule
 
         $objXml->endElement(); // End doc
 
-        $objFile = new File('tl_files/syncCto_backups/dependencies.xml');
+        $objFile = new File($GLOBALS['TL_CONFIG']['uploadPath'] . '/syncCto_backups/dependencies.xml');
         $objFile->write($objXml->flush());
         $objFile->close();
     }
