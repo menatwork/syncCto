@@ -378,13 +378,13 @@ class SyncCtoHelper extends Backend
             $arrRequiredExtensions = array(
                 'ctoCommunication'  => 'ctoCommunication',
                 'MultiColumnWizard' => 'multicolumnwizard',
-                '3CFramework'       => '3cframework'
+                '3CFramework'       => '3cframework',
+                'ZipArchiveCto'     => 'ZipArchiveCto'
             );
 
             // required files
             $arrRequiredFiles = array(
                 'DC_Memory'     => 'system/drivers/DC_Memory.php',
-                'ZipArchiveCto' => 'system/libraries/ZipArchiveCto.php'
             );
 
             // check for required extensions

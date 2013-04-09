@@ -67,7 +67,7 @@ class SyncCtoAutoUpdater extends Backend
      */
     protected function checkExtensions()
     {
-        if (file_exists(TL_ROOT . "/system/libraries/ZipArchiveCto.php"))
+        if (file_exists(TL_ROOT . "/system/modules/ZipArchiveCto/ZipArchiveCto.php"))
         {
             $this->booZipArchiveCto = true;
         }
@@ -699,5 +699,3 @@ class SyncCtoAutoUpdater extends Backend
     }
 
 }
-
-?>

@@ -3,20 +3,17 @@
 /**
  * Contao Open Source CMS
  *
- * Copyright (c) 2005-2013 Leo Feyer
- *
- * @package SyncCto
- * @link    https://contao.org
- * @license http://www.gnu.org/licenses/lgpl-3.0.html LGPL
+ * @copyright  MEN AT WORK 2013 
+ * @package    syncCto
+ * @license    GNU/LGPL 
+ * @filesource
  */
-
 
 /**
  * Register the classes
  */
 ClassLoader::addClasses(array
 (
-	// Cron
 	'CronDeleteDbBackups'        => 'system/modules/syncCto/cron/CronDeleteDbBackups.php',
 	'CronFileBackups'            => 'system/modules/syncCto/cron/CronFileBackups.php',
 	'CronDeleteFileBackups'      => 'system/modules/syncCto/cron/CronDeleteFileBackups.php',
