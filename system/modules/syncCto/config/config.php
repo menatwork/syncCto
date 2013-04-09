@@ -14,14 +14,14 @@ $objInput = Input::getInstance();
 /**
  * Current syncCto version
  */
-$GLOBALS['SYC_VERSION'] = '2.3.1';
+$GLOBALS['SYC_VERSION'] = '2.4.0';
 
 /**
  * Back end modules
  */
-$i = array_search('profile', array_keys($GLOBALS['BE_MOD']));
-$GLOBALS['BE_MOD'] = array_merge(
-        array_slice($GLOBALS['BE_MOD'], 0, $i), array(
+$i = array_search('system', array_keys($GLOBALS['BE_MOD']));
+array_insert($GLOBALS['BE_MOD'], $i + 1, array
+(
     'syncCto' => array(
         'syncCto_settings' => array(
             'tables' => array('tl_syncCto_settings'),
@@ -44,8 +44,7 @@ $GLOBALS['BE_MOD'] = array_merge(
             'stylesheet' => 'system/modules/syncCto/html/css/systemcheck.css',
         )
     )
-        ), array_slice($GLOBALS['BE_MOD'], $i)
-);
+));
 
 /**
  * Hooks
