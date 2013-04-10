@@ -16,7 +16,7 @@
 			"email":"heimes@men-at-work.de",
 			"homepage":"http://www.men-at-work.de",
 			"role":"Developer"
-		},
+		}
 	],
 	"require":{
 		"php":">=5.3",
