@@ -73,14 +73,14 @@ $GLOBALS['TL_DCA']['tl_synccto_clients'] = array(
             ),
             'syncFrom' => array(
                 'label'           => &$GLOBALS['TL_LANG']['tl_syncCto_clients']['syncFrom'],
-                'href'            => '&table=tl_syncCto_clients_syncFrom&act=edit',
+                'href'            => '&table=tl_syncCto_clients_syncFrom&act=create',
                 'icon'            => 'system/modules/syncCto/html/icons/nav/iconSyncFrom.png',
                 'attributes'      => 'onclick="if (!confirm(\'' . $GLOBALS['TL_LANG']['tl_syncCto_clients']['syncFromConfirm'] . '\')) return false; Backend.getScrollOffset();"',
                 'button_callback' => array('tl_synccto_clients', 'checkPermission_client_syncFrom'),
             ),
             'syncTo' => array(
                 'label'           => &$GLOBALS['TL_LANG']['tl_syncCto_clients']['syncTo'],
-                'href'            => '&table=tl_syncCto_clients_syncTo&act=edit',
+                'href'            => '&table=tl_syncCto_clients_syncTo&act=create',
                 'icon'            => 'system/modules/syncCto/html/icons/nav/iconSyncTo.png',
                 'button_callback' => array('tl_synccto_clients', 'checkPermission_client_syncTo'),
             ),

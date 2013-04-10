@@ -12,7 +12,7 @@
 $GLOBALS['TL_DCA']['tl_syncCto_clients_showExtern'] = array(
     // Config
     'config' => array(
-        'dataContainer' => 'Memory',
+        'dataContainer' => 'General',
         'closed' => true,
         'disableSubmit' => false
     )

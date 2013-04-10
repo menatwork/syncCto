@@ -11,7 +11,7 @@
 $GLOBALS['TL_DCA']['tl_syncCto_clients_syncFrom'] = array(
     // Config
     'config' => array(
-        'dataContainer'   => 'Memory',
+        'dataContainer'   => 'General',
         'closed'          => true,
         'disableSubmit'   => false,
         'onload_callback' => array(
@@ -20,6 +20,14 @@ $GLOBALS['TL_DCA']['tl_syncCto_clients_syncFrom'] = array(
         'onsubmit_callback' => array(
             array('tl_syncCto_clients_syncFrom', 'onsubmit_callback'),
         )
+    ),
+    'dca_config'  => array(
+        'data_provider' => array(
+            'default' => array(
+                'class'  => 'GeneralDataSyncCto',
+                'source' => 'tl_syncCto_clients_syncTo'
+            ),
+        ),
     ),
     // Palettes
     'palettes' => array(

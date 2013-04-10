@@ -12,7 +12,7 @@
 $GLOBALS['TL_DCA']['tl_syncCto_restore_db'] = array(
     // Config
     'config' => array(
-        'dataContainer' => 'Memory',
+        'dataContainer' => 'Gneral',
         'closed' => true,
         'disableSubmit' => false,
         'onload_callback' => array(

@@ -69,7 +69,7 @@ $strDo = $objInput->get("do");
 $strTable = $objInput->get("table");
 $strAct = $objInput->get("act");
 
-if ($strDo == 'syncCto_backups' && $strTable != '' && ($strAct == '' || $strAct == 'edit') && TL_MODE == 'BE')
+if ($strDo == 'syncCto_backups' && $strTable != '' && ($strAct == '' || $strAct == 'edit' || $strAct == 'create') && TL_MODE == 'BE')
 {
     unset($GLOBALS['BE_MOD']['syncCto']['syncCto_backups']['callback']);
 }

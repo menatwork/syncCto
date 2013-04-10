@@ -367,6 +367,7 @@ class SyncCtoHelper extends Backend
      */
     public function checkExtensions($strContent, $strTemplate)
     {
+        
         if ($strTemplate == 'be_main')
         {
             if (!is_array($_SESSION["TL_INFO"]))
@@ -378,13 +379,12 @@ class SyncCtoHelper extends Backend
             $arrRequiredExtensions = array(
                 'ctoCommunication'  => 'ctoCommunication',
                 'MultiColumnWizard' => 'multicolumnwizard',
-                '3CFramework'       => '3cframework',
                 'ZipArchiveCto'     => 'ZipArchiveCto'
             );
 
             // required files
             $arrRequiredFiles = array(
-                'DC_Memory'     => 'system/drivers/DC_Memory.php',
+                'DC_General'     => 'system/drivers/DC_General.php',
             );
 
             // check for required extensions

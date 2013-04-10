@@ -12,20 +12,23 @@
 $GLOBALS['TL_DCA']['tl_syncCto_backup_file'] = array(
     // Config
     'config' => array(
-        'dataContainer'   => 'Memory',
-        'closed'          => true,
-        'disableSubmit'   => false,
-        'onload_callback' => array(
+        'dataContainer'    => 'General',
+//        'closed'          => true,
+        'disableSubmit'    => false,
+        'enableVersioning' => false,
+        'onload_callback'  => array(
             array('tl_syncCto_backup_file', 'onload_callback'),
         ),
         'onsubmit_callback' => array(
             array('tl_syncCto_backup_file', 'onsubmit_callback'),
-        ),
-        'dcMemory_show_callback' => array(
-            array('tl_syncCto_backup_file', 'show_all')
-        ),
-        'dcMemory_showAll_callback' => array(
-            array('tl_syncCto_backup_file', 'show_all')
+        ),        
+    ),
+    'dca_config'  => array(
+        'data_provider' => array(
+            'default' => array(
+                'class'  => 'GeneralDataSyncCto',
+                'source' => 'tl_syncCto_clients_syncTo'
+            ),
         ),
     ),
     // Palettes
@@ -117,17 +120,17 @@ class tl_syncCto_backup_file extends Backend
     public function onsubmit_callback(DataContainer $dc)
     {
         // Check if core or user backup is selected
-        if ($this->Input->post('core_files') != 1 && $this->Input->post('user_files') != 1)
+        if ($this->Input->post('core_files_b') != 1 && $this->Input->post('user_files_b') != 1)
         {
             $_SESSION["TL_ERROR"][] = $GLOBALS['TL_LANG']['ERR']['missing_file_selection'];
             $this->redirect($this->Environment->base . "contao/main.php?do=syncCto_backups&table=tl_syncCto_backup_file");
         }
 
         // Check if we have a filelist for user files
-        if ($this->Input->post('core_files') != 1
-                && $this->Input->post('user_files') == 1
-                && is_array($this->Input->post('filelist', true)) != true
-                && count($this->Input->post('filelist', true)) == 0)
+        if ($this->Input->post('core_files_b') != 1
+                && $this->Input->post('user_files_b') == 1
+                && is_array($this->Input->post('filelist_b', true)) != true
+                && count($this->Input->post('filelist_b', true)) == 0)
         {
             $_SESSION["TL_ERROR"][] = $GLOBALS['TL_LANG']['ERR']['missing_file_selection'];
             $this->redirect($this->Environment->base . "contao/main.php?do=syncCto_backups&table=tl_syncCto_backup_file");
@@ -135,10 +138,10 @@ class tl_syncCto_backup_file extends Backend
 
         $arrBackupSettings = array();
 
-        $arrBackupSettings['core_files']    = $this->Input->post('core_files');
-        $arrBackupSettings['user_files']    = $this->Input->post('user_files');
-        $arrBackupSettings['user_filelist'] = $this->Input->post('filelist', true);
-        $arrBackupSettings['backup_name']   = $this->Input->post('backup_name', true);
+        $arrBackupSettings['core_files']    = $this->Input->post('core_files_b');
+        $arrBackupSettings['user_files']    = $this->Input->post('user_files_b');
+        $arrBackupSettings['user_filelist'] = $this->Input->post('filelist_b', true);
+        $arrBackupSettings['backup_name']   = $this->Input->post('backup_name_b', true);
 
         $this->Session->set("syncCto_BackupSettings", $arrBackupSettings);
 
