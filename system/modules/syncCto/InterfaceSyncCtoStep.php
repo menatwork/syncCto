@@ -38,6 +38,5 @@ interface InterfaceSyncCtoStep
      * @param SyncCtoModuleClient $syncCtoClient
      */
     public function setSyncCto(SyncCtoModuleClient $syncCtoClient);
-}
 
-?>
+}

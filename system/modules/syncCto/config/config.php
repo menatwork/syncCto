@@ -498,5 +498,3 @@ $GLOBALS["CTOCOM_FUNCTIONS"]["SYNCCTO_PARAMETER"] = array(
     "typ" => "GET",
     "parameter" => FALSE,
 );
-
-?>

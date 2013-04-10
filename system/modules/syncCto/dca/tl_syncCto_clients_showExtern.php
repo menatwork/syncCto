@@ -17,5 +17,3 @@ $GLOBALS['TL_DCA']['tl_syncCto_clients_showExtern'] = array(
         'disableSubmit' => false
     )
 );
-
-?>

@@ -14,5 +14,3 @@
  */
 $GLOBALS['TL_LANG']['tl_user_group']['syncCto_legend']              = 'Client permissions';
 $GLOBALS['TL_LANG']['tl_user_group']['syncCto_tables_legend']       = 'Allowed tables';
-
-?>

@@ -12,7 +12,7 @@
 $GLOBALS['TL_DCA']['tl_syncCto_restore_db'] = array(
     // Config
     'config' => array(
-        'dataContainer' => 'Gneral',
+        'dataContainer' => 'General',
         'closed' => true,
         'disableSubmit' => false,
         'onload_callback' => array(
@@ -20,12 +20,6 @@ $GLOBALS['TL_DCA']['tl_syncCto_restore_db'] = array(
         ),
         'onsubmit_callback' => array(
             array('tl_syncCto_restore_db', 'onsubmit_callback'),
-        ),
-        'dcMemory_show_callback' => array(
-            array('tl_syncCto_restore_db', 'show_all')
-        ),
-        'dcMemory_showAll_callback' => array(
-            array('tl_syncCto_restore_db', 'show_all')
         ),
     ),
     // Palettes
@@ -109,16 +103,4 @@ class tl_syncCto_restore_db extends Backend
         $this->redirect($this->Environment->base . "contao/main.php?do=syncCto_backups&table=tl_syncCto_restore_db&act=start");
     }
 
-    /**
-     * Change active mode to edit
-     * 
-     * @return string 
-     */
-    public function show_all($dc, $strReturn)
-    {
-        return $strReturn . $dc->edit();
-    }
-
 }
-
-?>

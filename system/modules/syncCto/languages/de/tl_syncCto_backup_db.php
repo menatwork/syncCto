@@ -27,5 +27,3 @@ $GLOBALS['TL_LANG']['tl_syncCto_backup_db']['database_tables_none_recommended'] 
  */
 $GLOBALS['TL_LANG']['tl_syncCto_backup_db']['step1']                            = 'SQL-Scripte und Inserts für syncCto erstellen.';
 $GLOBALS['TL_LANG']['tl_syncCto_backup_db']['complete']                         = 'Backup erstellt unter';
-
-?>

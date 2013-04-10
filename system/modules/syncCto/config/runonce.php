@@ -313,4 +313,3 @@ class SyncCtoErClient extends RepositoryBackendModule
 
 $objSyncCtoErClient = new SyncCtoErClient();
 $objSyncCtoErClient->run();
-?>

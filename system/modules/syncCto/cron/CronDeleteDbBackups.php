@@ -54,5 +54,3 @@ class CronDeleteDbBackups extends Backend
  */
 $objDeleteDatabaseBackups = new CronDeleteDbBackups();
 $objDeleteDatabaseBackups->run();
-
-?>

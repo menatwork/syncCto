@@ -52,5 +52,3 @@ $GLOBALS['TL_LANG']['tl_syncCto_check']['setting_on']               = 'Recommend
  * Text
  */
 $GLOBALS['TL_LANG']['tl_syncCto_check']['safemodehack']             = 'syncCto cannot be used because of missing write permissions.';
-
-?>

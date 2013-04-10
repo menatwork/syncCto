@@ -58,7 +58,12 @@ $GLOBALS['TL_DCA']['tl_syncCto_backup_file'] = array(
             'label'     => &$GLOBALS['TL_LANG']['tl_syncCto_backup_file']['filelist'],
             'exclude'   => true,
             'inputType' => 'fileTreeMemory',
-            'eval'      => array('fieldType'   => 'checkbox', 'files'       => true, 'filesOnly'   => false, 'tl_class'    => 'clr'),
+            'eval'      => array(
+                'fieldType'  => 'checkbox',
+                'files'      => true,
+                'filesOnly'  => false,
+                'tl_class'   => 'clr'
+            ),
         ),
         'backup_name' => array
             (
@@ -166,5 +171,3 @@ class tl_syncCto_backup_file extends Backend
     }
 
 }
-
-?>

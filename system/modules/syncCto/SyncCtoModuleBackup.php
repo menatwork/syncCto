@@ -595,6 +595,7 @@ class SyncCtoModuleBackup extends BackendModule
         {
             // Init content
             $this->booError = false;
+
             $this->booAbort = false;
             $this->booFinished = false;
             $this->strError = "";
@@ -844,5 +845,3 @@ class ContentData
     }
 
 }
-
-?>

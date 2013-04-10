@@ -45,5 +45,3 @@ $GLOBALS['TL_LANG']['tl_syncCto_clients']['codifyengine']       = array('Verschl
 $GLOBALS['TL_LANG']['tl_syncCto_clients']['http_auth']          = array('HTTP-Authentifizierung aktivieren', 'Wählen Sie diese Option, wenn Sie die HTTP-Anmeldung aktivieren möchten.');
 $GLOBALS['TL_LANG']['tl_syncCto_clients']['http_username']      = array('Benutzername', 'Geben Sie hier bitte den Benutzernamen zur Anmeldung ein.');
 $GLOBALS['TL_LANG']['tl_syncCto_clients']['http_password']      = array('Passwort', 'Geben Sie hier bitte das Passwort zur Anmeldung ein.');
-
-?>

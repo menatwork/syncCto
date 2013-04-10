@@ -25,5 +25,3 @@ $GLOBALS['TL_LANG']['tl_syncCto_clients_syncFrom']['database_check']            
 $GLOBALS['TL_LANG']['tl_syncCto_clients_syncFrom']['systemoperations_check']            = array('Systemwartung aktivieren', 'Wählen Sie diese Option, wenn die Systemwartung durchgeführt werden soll.');
 $GLOBALS['TL_LANG']['tl_syncCto_clients_syncFrom']['systemoperations_maintenance']      = array('Daten bereinigen', 'Bitte wählen Sie die zu bereinigenden Daten aus.');
 $GLOBALS['TL_LANG']['tl_syncCto_clients_syncFrom']['attention_flag']                    = array('Warnhinweis aktivieren', 'Wählen Sie diese Option, wenn der Warnhinweis auf dem Client aktiviert werden soll.');
-
-?>

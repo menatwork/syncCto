@@ -178,5 +178,3 @@ class tl_syncCto_backup_db extends Backend
     }
 
 }
-
-?>

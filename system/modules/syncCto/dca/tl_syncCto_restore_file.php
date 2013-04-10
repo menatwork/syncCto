@@ -21,12 +21,6 @@ $GLOBALS['TL_DCA']['tl_syncCto_restore_file'] = array(
         'onsubmit_callback' => array(
             array('tl_syncCto_restore_file', 'onsubmit_callback'),
         ),
-        'dcMemory_show_callback' => array(
-            array('tl_syncCto_restore_file', 'show_all')
-        ),
-        'dcMemory_showAll_callback' => array(
-            array('tl_syncCto_restore_file', 'show_all')
-        ),
     ),
     // Palettes
     'palettes' => array(
@@ -99,16 +93,4 @@ class tl_syncCto_restore_file extends Backend
         $this->redirect($this->Environment->base . "contao/main.php?do=syncCto_backups&amp;table=tl_syncCto_restore_file&amp;act=start");
     }
 
-    /**
-     * Change active mode to edit
-     * 
-     * @return string 
-     */
-    public function show_all($dc, $strReturn)
-    {
-        return $strReturn . $dc->edit();
-    }
-
 }
-
-?>

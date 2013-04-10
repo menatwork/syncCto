@@ -13,5 +13,3 @@
  * Legends
  */
 $GLOBALS['TL_LANG']['tl_syncCto_clients_showExtern']['edit'] = 'Systemcheck des Clients';
-
-?>

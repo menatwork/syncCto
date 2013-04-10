@@ -307,5 +307,3 @@ class tl_syncCto_clients_syncFrom extends Backend
     }
 
 }
-
-?>

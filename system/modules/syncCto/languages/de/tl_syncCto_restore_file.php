@@ -25,5 +25,3 @@ $GLOBALS['TL_LANG']['tl_syncCto_restore_file']['filelist']              = array(
  */
 $GLOBALS['TL_LANG']['tl_syncCto_restore_file']['step1']                 = 'ZIP-Datei entpacken.';
 $GLOBALS['TL_LANG']['tl_syncCto_restore_file']['complete']              = 'Das Backup %s wurde erfolgreich um %s am %s eingespielt.';
-
-?>

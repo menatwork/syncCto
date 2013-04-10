@@ -25,5 +25,3 @@ $GLOBALS['TL_LANG']['tl_syncCto_restore_file']['filelist']              = array(
  */
 $GLOBALS['TL_LANG']['tl_syncCto_restore_file']['step1']                 = 'Extract zip file.';
 $GLOBALS['TL_LANG']['tl_syncCto_restore_file']['complete']              = 'Backup %s was successfully imported at %s %s.';
-
-?>

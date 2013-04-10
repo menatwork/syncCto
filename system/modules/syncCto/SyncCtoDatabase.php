@@ -1591,5 +1591,3 @@ class SyncCtoDatabase extends Backend
     }
 
 }
-
-?>

@@ -23,5 +23,3 @@ $GLOBALS['TL_LANG']['tl_user']['syncCto_useTranslatedNames']    = array('Verstä
  */
 $GLOBALS['TL_LANG']['tl_user']['syncCto_legend']                = 'Client-Rechte';
 $GLOBALS['TL_LANG']['tl_user']['syncCto_tables_legend']         = 'Erlaubte Tabellen';
-
-?>

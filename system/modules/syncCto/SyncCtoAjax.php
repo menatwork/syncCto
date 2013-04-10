@@ -131,5 +131,3 @@ class SyncCtoAjax extends SyncCtoCommunicationClient
     }
 
 }
-
-?>

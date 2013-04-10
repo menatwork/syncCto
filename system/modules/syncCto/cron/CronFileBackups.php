@@ -119,4 +119,3 @@ class CronFileBackups extends Backend
  */
 $objFileBackups = new CronFileBackups();
 $objFileBackups->run();
-?>

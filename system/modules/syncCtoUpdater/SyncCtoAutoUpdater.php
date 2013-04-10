@@ -4,7 +4,7 @@
  * Contao Open Source CMS
  *
  * @copyright  MEN AT WORK 2013 
- * @package    SyncCtoAutoUpdater
+ * @package    syncCtoUpdater
  * @license    GNU/LGPL 
  * @filesource
  */
@@ -166,6 +166,7 @@ class SyncCtoAutoUpdater extends Backend
             // Build path
             $movePath   = preg_replace("/^" . self::ZIP_FILE_PATH . "\//i", "", $filename);
             $targetPath = self::TEMP_PATH . 'syncCtoAutoUpdate/';
+
 
             $arrMoveList[$targetPath . $filename] = $movePath;
 

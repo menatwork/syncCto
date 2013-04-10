@@ -55,5 +55,3 @@ class CronDeleteFileBackups extends Backend
  */
 $objDeleteFileBackups = new CronDeleteFileBackups();
 $objDeleteFileBackups->run();
-
-?>

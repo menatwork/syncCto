@@ -23,5 +23,3 @@ $GLOBALS['TL_LANG']['tl_user']['syncCto_useTranslatedNames']    = array('Use hum
  */
 $GLOBALS['TL_LANG']['tl_user']['syncCto_legend']                = 'Client permissions';
 $GLOBALS['TL_LANG']['tl_user']['syncCto_tables_legend']         = 'Allowed tables';
-
-?>

@@ -23,5 +23,3 @@ $GLOBALS['TL_LANG']['tl_syncCto_backup']['db_backup']       = array('Create data
 $GLOBALS['TL_LANG']['tl_syncCto_backup']['file_backup']     = array('Create file backup', 'Here you can create a backup of the files.'); 
 $GLOBALS['TL_LANG']['tl_syncCto_backup']['db_restore']      = array('Import database backup', 'Here you can import a backup of the database.');
 $GLOBALS['TL_LANG']['tl_syncCto_backup']['file_restore']    = array('Import file backup', 'Here you can import a backup of the files.'); 
-
-?>

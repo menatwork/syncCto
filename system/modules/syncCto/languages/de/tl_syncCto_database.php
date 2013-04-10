@@ -18,5 +18,3 @@ $GLOBALS['TL_LANG']['tl_syncCto_database']['tl_newsletter_channel']       = 'New
 $GLOBALS['TL_LANG']['tl_syncCto_database']['tl_newsletter_recipients']    = 'Newsletterabonnenten';
 $GLOBALS['TL_LANG']['tl_syncCto_database']['tl_repository_instfiles']     = 'Erweiterungsverwaltung (Dateien)';
 $GLOBALS['TL_LANG']['tl_syncCto_database']['tl_task_status']              = 'Task-Center Status';
-
-?>

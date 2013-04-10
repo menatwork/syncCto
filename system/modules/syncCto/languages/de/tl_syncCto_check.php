@@ -52,5 +52,3 @@ $GLOBALS['TL_LANG']['tl_syncCto_check']['setting_on']               = 'Die empfo
  * Text
  */
 $GLOBALS['TL_LANG']['tl_syncCto_check']['safemodehack']             = 'syncCto kann aufgrund fehlender Schreibrechte nicht ausgeführt werden.';
-
-?>

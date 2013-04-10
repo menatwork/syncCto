@@ -224,6 +224,7 @@ class tl_syncCto_clients_syncTo extends Backend
             $arrSyncSettings["syncCto_Type"] = array();
         }
 
+
         if ($this->Input->post("database_check") == 1)
         {
             $arrSyncSettings["syncCto_SyncDatabase"] = true;
@@ -290,5 +291,3 @@ class tl_syncCto_clients_syncTo extends Backend
     }
 
 }
-
-?>

@@ -16,7 +16,7 @@ class SyncCtoUpdater extends Backend
     protected $arrFiles = array();
     // Tables 
     protected $arrTables = array();
-   
+
     /**
      * Black filelist 
      *  - All regex functions are working.
@@ -25,7 +25,7 @@ class SyncCtoUpdater extends Backend
      * @var array 
      */
     protected $arrBlackFiles = array(
-        '.*/runonce.php',        
+        '.*/runonce.php',
     );
 
     /**
@@ -291,5 +291,3 @@ class SyncCtoUpdater extends Backend
     }
 
 }
-
-?>

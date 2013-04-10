@@ -25,5 +25,3 @@ $GLOBALS['TL_LANG']['tl_syncCto_restore_db']['filelist']                = array(
  */
 $GLOBALS['TL_LANG']['tl_syncCto_restore_db']['step1']                   = 'Datenbank importieren.';
 $GLOBALS['TL_LANG']['tl_syncCto_restore_db']['complete']                = 'Die Datenbank wurde erfolgreich importiert.';
-
-?>

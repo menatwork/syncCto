@@ -267,5 +267,3 @@ class tl_syncCto_settings extends Backend
     }
 
 }
-
-?>

@@ -306,5 +306,3 @@ class SyncCtoRPCFunctions extends Backend
     }
 
 }
-
-?>

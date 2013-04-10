@@ -25,5 +25,3 @@ $GLOBALS['TL_LANG']['tl_syncCto_clients_syncFrom']['database_check']            
 $GLOBALS['TL_LANG']['tl_syncCto_clients_syncFrom']['systemoperations_check']            = array('Activate maintenance', 'Choose these options to activate the system maintenance.');
 $GLOBALS['TL_LANG']['tl_syncCto_clients_syncFrom']['systemoperations_maintenance']      = array('Purge data', 'Please select the data you want to purge.');
 $GLOBALS['TL_LANG']['tl_syncCto_clients_syncFrom']['attention_flag']                    = array('Activate warning notice', 'Choose this option to activate the syncronisation warning on the client.');
-
-?>

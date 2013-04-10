@@ -56,5 +56,3 @@ $GLOBALS['TL_LANG']['tl_syncCto_sync']['step_5']['description_9']           = 'D
 $GLOBALS['TL_LANG']['tl_syncCto_sync']['abort']                             = 'Abort the synchronization and clean up the client.';
 $GLOBALS['TL_LANG']['tl_syncCto_sync']['complete_client']                   = 'The synchronization of the %sclient%s was successfully completed.';
 $GLOBALS['TL_LANG']['tl_syncCto_sync']['complete_server']                   = 'The synchronization of the %sserver%s was successfully completed.';
-
-?>

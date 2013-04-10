@@ -1399,5 +1399,3 @@ class SyncCtoFiles extends Backend
     }
 
 }
-
-?>

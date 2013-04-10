@@ -389,6 +389,7 @@ class tl_synccto_clients extends Backend
         foreach ($GLOBALS["CTOCOM_ENGINE"] as $key => $value)
         {
             if ($value["invisible"] == TRUE)
+
             {
                 continue;
             }
@@ -428,5 +429,3 @@ class tl_synccto_clients extends Backend
     }
 
 }
-
-?>
