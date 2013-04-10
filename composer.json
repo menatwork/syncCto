@@ -1,0 +1,42 @@
+{
+	"name":"menatwork/syncCto",
+	"description":"Synchronize multiple contao installations with each other",
+	"keywords":["backup", "synchronization", "management", "diff"],
+	"type":"contao-module",
+	"license":"LGPL-3.0+",
+	"authors":[
+		{
+			"name":"Andreas Isaak",
+			"email":"isaak@men-at-work.de",
+			"homepage":"http://www.men-at-work.de",
+			"role":"Project leader"
+		},
+		{
+			"name":"Stefan Heimes",
+			"email":"heimes@men-at-work.de",
+			"homepage":"http://www.men-at-work.de",
+			"role":"Developer"
+		},
+	],
+	"require":{
+		"php":">=5.3",
+		"contao":">=2.11,<3.0"
+	},
+	"autoload":{
+		"classmap":["contao/", "system/"]
+	},
+	"extra":{
+		"contao": {
+			"symlinks":{
+				"contao/popupSyncDB.php": "contao/popupSyncDB.php",
+				"contao/popupSyncFiles.php": "contao/popupSyncFiles.php",
+				"system/modules/syncCto": "system/modules/syncCto",
+				"system/modules/syncCtoUpdater": "system/modules/syncCtoUpdater"
+			},
+			"runonce":[
+				"system/runonce.php",
+				"system/modules/syncCto/config/runonce.php",
+			]
+		}
+	}
+}
