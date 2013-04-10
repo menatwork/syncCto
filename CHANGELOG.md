@@ -1,8 +1,56 @@
 syncCto Changelog
 =================
 
+Version 2.3.x (2013-03-02)
+--------------------------
 
-Version 2.2.0 (2012-08-17)
+### Defect
+Fehlende Version und Build Nummer (see #141).
+
+### Defect
+Sync wird nicht durchgeführt nur für Contao-Installation > Gelöschte Dateien (see #139).
+
+### Defect
+Leere Steps beim syncFrom (see #136).
+
+### Defect
+Suhosin Überprüfung 2.3.0. rc3 Build18 wirft Fehlermeldung (see #135).
+
+### Defect
+Entfernter Systemcheck funktioniert nicht mehr (see #134).
+
+### Feature
+Blacklist von extern befüllen (see #133).
+
+### Defect
+Daten anderer Clients im DB Popup (see #130).
+
+### Defect
+Verzeichnisse werden nicht entfernt (see #127).
+
+### Feature
+Systemcheck > Warnung das GMP nicht aktiviert ist...  (see #126).
+
+### Feature
+Letzter Step  (see #125).
+
+### Defect
+Datenbank Strukturvergleich  (see #124).
+
+### Defect
+ModSecurity Regelverletzung in syncCto (see #119).
+
+### Defect
+Suhosin wird nicht korrekt geprüft im Systemcheck (see #118).
+
+### Feature
+Neuer Hook bevor die alten Tabellen gelöscht werden (see #117).
+
+### Feature
+Nur eine Synchronisation gleichzeitig pro Installation (see #52).
+
+
+Version 2.2.x (2012-08-17)
 --------------------------
 
 ### Defect
@@ -48,7 +96,7 @@ DB-Tabellen erst in den Steps auswählen (see #94).
 Auslagerung der Vergleichsliste in eine Lightbox (see #93).
 
 
-Version 2.1.0 (2012-05-09)
+Version 2.1.x (2012-05-09)
 --------------------------
 
 ### Defect
