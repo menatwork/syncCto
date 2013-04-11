@@ -57,7 +57,7 @@ $GLOBALS['TL_DCA']['tl_syncCto_backup_file'] = array(
             (
             'label'     => &$GLOBALS['TL_LANG']['tl_syncCto_backup_file']['filelist'],
             'exclude'   => true,
-            'inputType' => 'fileTreeMemory',
+            'inputType' => 'fileTree',
             'eval'      => array(
                 'fieldType'  => 'checkbox',
                 'files'      => true,
@@ -124,18 +124,20 @@ class tl_syncCto_backup_file extends Backend
      */
     public function onsubmit_callback(DataContainer $dc)
     {
+        $strWidgetID     = $dc->getWidgetID();
+        
         // Check if core or user backup is selected
-        if ($this->Input->post('core_files_b') != 1 && $this->Input->post('user_files_b') != 1)
+        if ($this->Input->post('core_files_' . $strWidgetID) != 1 && $this->Input->post('user_files_' . $strWidgetID) != 1)
         {
             $_SESSION["TL_ERROR"][] = $GLOBALS['TL_LANG']['ERR']['missing_file_selection'];
             $this->redirect($this->Environment->base . "contao/main.php?do=syncCto_backups&table=tl_syncCto_backup_file");
         }
 
         // Check if we have a filelist for user files
-        if ($this->Input->post('core_files_b') != 1
-                && $this->Input->post('user_files_b') == 1
-                && is_array($this->Input->post('filelist_b', true)) != true
-                && count($this->Input->post('filelist_b', true)) == 0)
+        if ($this->Input->post('core_files_' . $strWidgetID) != 1
+                && $this->Input->post('user_files_' . $strWidgetID) == 1
+                && is_array($this->Input->post('filelist_' . $strWidgetID, true)) != true
+                && count($this->Input->post('filelist_' . $strWidgetID, true)) == 0)
         {
             $_SESSION["TL_ERROR"][] = $GLOBALS['TL_LANG']['ERR']['missing_file_selection'];
             $this->redirect($this->Environment->base . "contao/main.php?do=syncCto_backups&table=tl_syncCto_backup_file");
@@ -143,10 +145,10 @@ class tl_syncCto_backup_file extends Backend
 
         $arrBackupSettings = array();
 
-        $arrBackupSettings['core_files']    = $this->Input->post('core_files_b');
-        $arrBackupSettings['user_files']    = $this->Input->post('user_files_b');
-        $arrBackupSettings['user_filelist'] = $this->Input->post('filelist_b', true);
-        $arrBackupSettings['backup_name']   = $this->Input->post('backup_name_b', true);
+        $arrBackupSettings['core_files']    = $this->Input->post('core_files_' . $strWidgetID);
+        $arrBackupSettings['user_files']    = $this->Input->post('user_files_' . $strWidgetID);
+        $arrBackupSettings['user_filelist'] = $this->Input->post('filelist_' . $strWidgetID, true);
+        $arrBackupSettings['backup_name']   = $this->Input->post('backup_name_' . $strWidgetID, true);
 
         $this->Session->set("syncCto_BackupSettings", $arrBackupSettings);
 
@@ -158,16 +160,6 @@ class tl_syncCto_backup_file extends Backend
             ),
             'redirectUrl' => $this->Environment->base . "contao/main.php?do=syncCto_backups&table=tl_syncCto_backup_file&act=start"
         ));
-    }
-
-    /**
-     * Change active mode to edit
-     * 
-     * @return string 
-     */
-    public function show_all($dc, $strReturn)
-    {
-        return $strReturn . $dc->edit();
     }
 
 }

@@ -12,7 +12,6 @@ $GLOBALS['TL_DCA']['tl_syncCto_clients_syncFrom'] = array(
     // Config
     'config' => array(
         'dataContainer'   => 'General',
-        'closed'          => true,
         'disableSubmit'   => false,
         'onload_callback' => array(
             array('tl_syncCto_clients_syncFrom', 'onload_callback')
@@ -141,7 +140,7 @@ class tl_syncCto_clients_syncFrom extends Backend
                     if (preg_match("/system\/tmp/", $strContent))
                     {
                         // Set data
-                        $dc->setData("disabledCache", "<p class='tl_info'>" . $GLOBALS['TL_LANG']['MSC']['disabled_cache'] . "</p>");
+//                        $dc->setData("disabledCache", "<p class='tl_info'>" . $GLOBALS['TL_LANG']['MSC']['disabled_cache'] . "</p>");
                         $booLocated = TRUE;
                     }
                 }
@@ -191,7 +190,7 @@ class tl_syncCto_clients_syncFrom extends Backend
             );
 
             // Set data
-            $dc->setData("lastSync", "<p class='tl_info'>" . $strLastSync . "</p>");
+//            $dc->setData("lastSync", "<p class='tl_info'>" . $strLastSync . "</p>");
         }
         else
         {
@@ -240,19 +239,20 @@ class tl_syncCto_clients_syncFrom extends Backend
      */
     public function onsubmit_callback(DataContainer $dc)
     {
+        $strWidgetID     = $dc->getWidgetID();
         $arrSyncSettings = array();
 
         // Synchronization type
-        if (is_array($this->Input->post("sync_options")) && count($this->Input->post("sync_options")) != 0)
+        if (is_array($this->Input->post("sync_options_" . $strWidgetID)) && count($this->Input->post("sync_options_" . $strWidgetID)) != 0)
         {
-            $arrSyncSettings["syncCto_Type"] = $this->Input->post('sync_options');
+            $arrSyncSettings["syncCto_Type"] = $this->Input->post('sync_options_' . $strWidgetID);
         }
         else
         {
             $arrSyncSettings["syncCto_Type"] = array();
         }
 
-        if ($this->Input->post("database_check") == 1)
+        if ($this->Input->post("database_check_" . $strWidgetID) == 1)
         {
             $arrSyncSettings["syncCto_SyncDatabase"] = true;
         }
@@ -262,11 +262,11 @@ class tl_syncCto_clients_syncFrom extends Backend
         }
 
         // Systemoperation execute
-        if ($this->Input->post("systemoperations_check") == 1)
+        if ($this->Input->post("systemoperations_check_" . $strWidgetID) == 1)
         {
-            if (is_array($this->Input->post("systemoperations_maintenance")) && count($this->Input->post("systemoperations_maintenance")) != 0)
+            if (is_array($this->Input->post("systemoperations_maintenance_" . $strWidgetID)) && count($this->Input->post("systemoperations_maintenance_" . $strWidgetID)) != 0)
             {
-                $arrSyncSettings["syncCto_Systemoperations_Maintenance"] = $this->Input->post("systemoperations_maintenance");
+                $arrSyncSettings["syncCto_Systemoperations_Maintenance"] = $this->Input->post("systemoperations_maintenance_" . $strWidgetID);
             }
             else
             {
@@ -279,7 +279,7 @@ class tl_syncCto_clients_syncFrom extends Backend
         }
 
         // Attention flag
-        if ($this->Input->post("attentionFlag") == 1)
+        if ($this->Input->post("attentionFlag_" . $strWidgetID) == 1)
         {
             $arrSyncSettings["syncCto_AttentionFlag"] = true;
         }
@@ -291,7 +291,8 @@ class tl_syncCto_clients_syncFrom extends Backend
         // Write all data
         foreach ($_POST as $key => $value)
         {
-            $arrSyncSettings["post_data"][$key] = $this->Input->post($key);
+            $strClearKey                                = str_replace("_" . $strWidgetID, "", $key);
+            $arrSyncSettings["post_data"][$strClearKey] = $this->Input->post($key);
         }
 
         $this->Session->set("syncCto_SyncSettings_" . $dc->id, $arrSyncSettings);

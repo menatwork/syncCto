@@ -13,13 +13,20 @@ $GLOBALS['TL_DCA']['tl_syncCto_restore_file'] = array(
     // Config
     'config' => array(
         'dataContainer' => 'General',
-        'closed' => true,
         'disableSubmit' => false,
         'onload_callback' => array(
             array('tl_syncCto_restore_file', 'onload_callback'),
         ),
         'onsubmit_callback' => array(
             array('tl_syncCto_restore_file', 'onsubmit_callback'),
+        ),
+    ),
+    'dca_config'  => array(
+        'data_provider' => array(
+            'default' => array(
+                'class'  => 'GeneralDataSyncCto',
+                'source' => 'tl_syncCto_restore_file'
+            ),
         ),
     ),
     // Palettes
@@ -30,7 +37,7 @@ $GLOBALS['TL_DCA']['tl_syncCto_restore_file'] = array(
     'fields' => array(
         'filelist' => array(
             'label' => &$GLOBALS['TL_LANG']['tl_syncCto_restore_file']['filelist'],
-            'inputType' => 'fileTreeMemory',
+            'inputType' => 'fileTree',
             'eval' => array(
                 'files' => true,
                 'filesOnly' => true,
@@ -79,15 +86,17 @@ class tl_syncCto_restore_file extends Backend
      */
     public function onsubmit_callback(DataContainer $dc)
     {
+        $strWidgetID     = $dc->getWidgetID();
+        
         // Check if a file was selected
-        if ($this->Input->post("filelist") == "")
+        if ($this->Input->post("filelist_" . $strWidgetID) == "")
         {
             $_SESSION["TL_ERROR"] = array(vsprintf($GLOBALS['TL_LANG']['ERR']['unknown_file'], array($this->Input->post("filelist"))));
             $this->redirect($this->Environment->base . "contao/main.php?do=syncCto_backups&table=tl_syncCto_restore_file");
         }
 
         $arrBackupSettings = array();
-        $arrBackupSettings['backup_file'] = $this->Input->post("filelist");
+        $arrBackupSettings['backup_file'] = $this->Input->post("filelist_" . $strWidgetID);
         $this->Session->set("syncCto_BackupSettings", $arrBackupSettings);
 
         $this->redirect($this->Environment->base . "contao/main.php?do=syncCto_backups&amp;table=tl_syncCto_restore_file&amp;act=start");

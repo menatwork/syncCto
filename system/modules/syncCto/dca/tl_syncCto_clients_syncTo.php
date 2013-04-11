@@ -212,20 +212,20 @@ class tl_syncCto_clients_syncTo extends Backend
      */
     public function onsubmit_callback(DataContainer $dc)
     {
+        $strWidgetID     = $dc->getWidgetID();
         $arrSyncSettings = array();
 
         // Synchronization type
-        if (is_array($this->Input->post("sync_options")) && count($this->Input->post("sync_options")) != 0)
+        if (is_array($this->Input->post("sync_options_" . $strWidgetID)) && count($this->Input->post("sync_options_" . $strWidgetID)) != 0)
         {
-            $arrSyncSettings["syncCto_Type"] = $this->Input->post('sync_options');
+            $arrSyncSettings["syncCto_Type"] = $this->Input->post('sync_options_' . $strWidgetID);
         }
         else
         {
             $arrSyncSettings["syncCto_Type"] = array();
         }
 
-
-        if ($this->Input->post("database_check") == 1)
+        if ($this->Input->post("database_check_" . $strWidgetID) == 1)
         {
             $arrSyncSettings["syncCto_SyncDatabase"] = true;
         }
@@ -235,11 +235,11 @@ class tl_syncCto_clients_syncTo extends Backend
         }
 
         // Systemoperation execute
-        if ($this->Input->post("systemoperations_check") == 1)
+        if ($this->Input->post("systemoperations_check_" . $strWidgetID) == 1)
         {
-            if (is_array($this->Input->post("systemoperations_maintenance")) && count($this->Input->post("systemoperations_maintenance")) != 0)
+            if (is_array($this->Input->post("systemoperations_maintenance_" . $strWidgetID)) && count($this->Input->post("systemoperations_maintenance_" . $strWidgetID)) != 0)
             {
-                $arrSyncSettings["syncCto_Systemoperations_Maintenance"] = $this->Input->post("systemoperations_maintenance");
+                $arrSyncSettings["syncCto_Systemoperations_Maintenance"] = $this->Input->post("systemoperations_maintenance_" . $strWidgetID);
             }
             else
             {
@@ -252,17 +252,17 @@ class tl_syncCto_clients_syncTo extends Backend
         }
 
         // Attention flag
-        if ($this->Input->post("attentionFlag") == 1)
+        if ($this->Input->post("attentionFlag_" . $strWidgetID) == 1)
         {
             $arrSyncSettings["syncCto_AttentionFlag"] = true;
         }
         else
         {
             $arrSyncSettings["syncCto_AttentionFlag"] = false;
-        }      
-      
+        }
+
         // Error msg
-        if ($this->Input->post("localconfig_error") == 1)
+        if ($this->Input->post("localconfig_error_" . $strWidgetID) == 1)
         {
             $arrSyncSettings["syncCto_ShowError"] = true;
         }
@@ -270,21 +270,22 @@ class tl_syncCto_clients_syncTo extends Backend
         {
             $arrSyncSettings["syncCto_ShowError"] = false;
         }
-        
+
         // Write all data
         foreach ($_POST as $key => $value)
         {
-            $arrSyncSettings["post_data"][$key] = $this->Input->post($key);
+            $strClearKey                                = str_replace("_" . $strWidgetID, "", $key);
+            $arrSyncSettings["post_data"][$strClearKey] = $this->Input->post($key);
         }
 
         // Save Session
         $this->Session->set("syncCto_SyncSettings_" . $dc->id, $arrSyncSettings);
 
         $this->objSyncCtoHelper->checkSubmit(array(
-            'postUnset' => array('start_sync'),
-            'error' => array(
-                'key'         => 'syncCto_submit_false',
-                'message'     => $GLOBALS['TL_LANG']['ERR']['missing_tables']
+            'postUnset'   => array('start_sync'),
+            'error'       => array(
+                'key'     => 'syncCto_submit_false',
+                'message' => $GLOBALS['TL_LANG']['ERR']['missing_tables']
             ),
             'redirectUrl' => $this->Environment->base . "contao/main.php?do=synccto_clients&amp;table=tl_syncCto_clients_syncTo&amp;act=start&amp;step=0&amp;id=" . $this->Input->get("id")
         ));

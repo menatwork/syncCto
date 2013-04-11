@@ -13,13 +13,20 @@ $GLOBALS['TL_DCA']['tl_syncCto_restore_db'] = array(
     // Config
     'config' => array(
         'dataContainer' => 'General',
-        'closed' => true,
         'disableSubmit' => false,
         'onload_callback' => array(
             array('tl_syncCto_restore_db', 'onload_callback'),
         ),
         'onsubmit_callback' => array(
             array('tl_syncCto_restore_db', 'onsubmit_callback'),
+        ),
+    ),
+    'dca_config'  => array(
+        'data_provider' => array(
+            'default' => array(
+                'class'  => 'GeneralDataSyncCto',
+                'source' => 'tl_syncCto_restore_db'
+            ),
         ),
     ),
     // Palettes
@@ -30,7 +37,7 @@ $GLOBALS['TL_DCA']['tl_syncCto_restore_db'] = array(
     'fields' => array(
         'filelist' => array(
             'label' => &$GLOBALS['TL_LANG']['tl_syncCto_restore_db']['filelist'],
-            'inputType' => 'fileTreeMemory',
+            'inputType' => 'fileTree',
             'eval' => array(
                 'files' => true,
                 'filesOnly' => true,
@@ -79,7 +86,8 @@ class tl_syncCto_restore_db extends Backend
      */
     public function onsubmit_callback(DataContainer $dc)
     {
-        $strFile = $this->Input->post("filelist");
+        $strWidgetID     = $dc->getWidgetID();
+        $strFile = $this->Input->post("filelist_" . $strWidgetID);
 
         // Check if a file is selected
         if ($strFile == "")

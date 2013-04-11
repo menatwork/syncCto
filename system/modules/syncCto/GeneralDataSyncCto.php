@@ -180,7 +180,7 @@ class GeneralDataSyncCto implements InterfaceGeneralData
      */
     public function getVersions($mixID, $blnOnlyActve = false)
     {
-        return $this->getEmptyCollection();
+        return false;
     }
 
     public function saveVersion(InterfaceGeneralModel $objModel, $strUsername) { }

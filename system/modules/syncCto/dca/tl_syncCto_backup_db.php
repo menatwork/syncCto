@@ -13,7 +13,6 @@ $GLOBALS['TL_DCA']['tl_syncCto_backup_db'] = array(
     // Config
     'config' => array(
         'dataContainer' => 'General',
-//        'closed' => true,
         'disableSubmit' => false,
         'onload_callback' => array(
             array('tl_syncCto_backup_db', 'onload_callback'),
@@ -26,7 +25,7 @@ $GLOBALS['TL_DCA']['tl_syncCto_backup_db'] = array(
         'data_provider' => array(
             'default' => array(
                 'class'  => 'GeneralDataSyncCto',
-                'source' => 'tl_syncCto_clients_syncTo'
+                'source' => 'tl_syncCto_backup_db'
             ),
         ),
     ),
@@ -119,7 +118,7 @@ class tl_syncCto_backup_db extends Backend
         $dc->removeButton('saveNclose');
 
         $arrData = array
-            (
+        (
             'id' => 'start_backup',
             'formkey' => 'start_backup',
             'class' => '',
@@ -139,20 +138,21 @@ class tl_syncCto_backup_db extends Backend
      */
     public function onsubmit_callback(DataContainer $dc)
     {   
+        $strWidgetID     = $dc->getWidgetID();
         $arrBackupSettings = array();
 
         // Merge recommend and none recommend post arrays
-        if ($this->Input->post("database_tables_recommended_b") != "" && $this->Input->post("database_tables_none_recommended_b") != "")
+        if ($this->Input->post("database_tables_recommended_" . $strWidgetID) != "" && $this->Input->post("database_tables_none_recommended_" . $strWidgetID) != "")
         {
-            $arrBackupSettings["syncCto_BackupTables"] = array_merge($this->Input->post("database_tables_recommended_b"), $this->Input->post("database_tables_none_recommended_b"));
+            $arrBackupSettings["syncCto_BackupTables"] = array_merge($this->Input->post("database_tables_recommended_" . $strWidgetID), $this->Input->post("database_tables_none_recommended_" . $strWidgetID));
         }
-        else if ($this->Input->post("database_tables_recommended_b"))
+        else if ($this->Input->post("database_tables_recommended_" . $strWidgetID))
         {
-            $arrBackupSettings["syncCto_BackupTables"] = $this->Input->post("database_tables_recommended_b");
+            $arrBackupSettings["syncCto_BackupTables"] = $this->Input->post("database_tables_recommended_" . $strWidgetID);
         }
-        else if ($this->Input->post("database_tables_none_recommended_b"))
+        else if ($this->Input->post("database_tables_none_recommended_" . $strWidgetID))
         {
-            $arrBackupSettings["syncCto_BackupTables"] = $this->Input->post("database_tables_none_recommended_b");
+            $arrBackupSettings["syncCto_BackupTables"] = $this->Input->post("database_tables_none_recommended_" . $strWidgetID);
         }
         
         $this->Session->set("syncCto_BackupSettings", $arrBackupSettings);
