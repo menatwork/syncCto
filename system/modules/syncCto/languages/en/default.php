@@ -91,6 +91,7 @@ $GLOBALS['TL_LANG']['MSC']['memory_limit']                  = 'Memory limit: %s'
 /**
  * Errors
  */
+$GLOBALS['TL_LANG']['ERR']['missing_file_folder']           = 'Missing file/forlder "%s".';
 $GLOBALS['TL_LANG']['ERR']['missing_file_selection']        = 'No file(s) is/are selected.';
 $GLOBALS['TL_LANG']['ERR']['missing_file_information']      = 'Missing file or file information.';
 $GLOBALS['TL_LANG']['ERR']['unknown_file']                  = 'The file %s could not be found.';

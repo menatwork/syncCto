@@ -370,57 +370,64 @@ class SyncCtoModuleBackup extends BackendModule
         $this->loadStepPool();
 
         // Set content back to normale mode
-        $this->booError = false;
-        $this->strError = "";
+        $this->booRefresh = true;
+
         $this->objData->setStep(1);
         $this->objData->setState(SyncCtoEnum::WORK_WORK);
+        $this->objData->setHtml("");
 
-        switch ($this->intStep)
+        try
         {
-            // Init Page 
-            case 1:
-                $this->objData->setTitle($GLOBALS['TL_LANG']['MSC']['step'] . " %s");
-                $this->objData->setDescription($GLOBALS['TL_LANG']['tl_syncCto_backup_db']['step1']);
-                $this->objData->setState(SyncCtoEnum::WORK_WORK);
+            switch ($this->intStep)
+            {
+                // Init Page 
+                case 1:
+                    $this->objData->setTitle($GLOBALS['TL_LANG']['MSC']['step'] . " %s");
+                    $this->objData->setDescription($GLOBALS['TL_LANG']['tl_syncCto_backup_db']['step1']);
+                    $this->objData->setState(SyncCtoEnum::WORK_WORK);
 
-                $this->intStep++;
-                break;
+                    $this->intStep++;
+                    break;
 
-            // Run Dump
-            case 2:
-                try
-                {
+                // Run Dump
+                case 2:
+                    if(!file_exists(TL_ROOT . '/' . SyncCtoHelper::getInstance()->standardizePath($GLOBALS['SYC_PATH']['db'])))
+                    {
+                        throw new Exception(sprintf($GLOBALS['TL_LANG']['ERR']['missing_file_folder'] , SyncCtoHelper::getInstance()->standardizePath($GLOBALS['SYC_PATH']['db'])));
+                    }
+                    
                     $this->objStepPool->zipname = $this->objSyncCtoDatabase->runDump($this->arrBackupSettings['syncCto_BackupTables'], false, false);
                     $this->intStep++;
                     break;
-                }
-                catch (Exception $exc)
-                {
-                    $this->booError = true;
-                    $this->strError = $exc->getMessage();
+
+                // Show last page
+                case 3:
+                    $this->booFinished = true;
+                    $this->booRefresh  = false;
+
                     $this->objData->setStep(1);
-                    $this->objData->setState(SyncCtoEnum::WORK_ERROR);
+                    $this->objData->setState(SyncCtoEnum::WORK_OK);
+
+                    $strHTML = "<p class='tl_help'><br />";
+                    $strHTML .= "<a" . ((version_compare(VERSION, '2.11', '==')) ? ' data-lightbox="600 300"' : ' rel="lightbox[600 300]"') . " href='contao/popup.php?src=" . base64_encode($GLOBALS['TL_CONFIG']['uploadPath'] . "/syncCto_backups/database/" . $this->objStepPool->zipname) . "'>" . $GLOBALS['TL_LANG']['MSC']['fileDownload'] . "</a>";
+                    $strHTML .= "</p>";
+
+                    $this->objData->setStep(2);
+                    $this->objData->setTitle($GLOBALS['TL_LANG']['MSC']['complete']);
+                    $this->objData->setDescription($GLOBALS['TL_LANG']['tl_syncCto_backup_db']['complete'] . " " . $this->objStepPool->zipname);
+                    $this->objData->setHtml($strHTML);
+                    $this->objData->setState(SyncCtoEnum::WORK_OK);
                     break;
-                }
-
-            // Show last page
-            case 3:
-                $this->booFinished = true;
-                $this->booRefresh = false;
-
-                $this->objData->setStep(1);
-                $this->objData->setState(SyncCtoEnum::WORK_OK);
-
-                $strHTML = "<p class='tl_help'><br />";
-                $strHTML .= "<a" . ((version_compare(VERSION, '2.11', '==')) ? ' data-lightbox="600 300"' : ' rel="lightbox[600 300]"') ." href='contao/popup.php?src=" . base64_encode($GLOBALS['TL_CONFIG']['uploadPath'] . "/syncCto_backups/database/" . $this->objStepPool->zipname) . "'>" . $GLOBALS['TL_LANG']['MSC']['fileDownload'] . "</a>";
-                $strHTML .= "</p>";
-                
-                $this->objData->setStep(2);
-                $this->objData->setTitle($GLOBALS['TL_LANG']['MSC']['complete']);
-                $this->objData->setDescription($GLOBALS['TL_LANG']['tl_syncCto_backup_db']['complete'] . " " . $this->objStepPool->zipname);
-                $this->objData->setHtml($strHTML);
-                $this->objData->setState(SyncCtoEnum::WORK_OK);
-                break;
+            }
+        }
+        catch (Exception $exc)
+        {
+            $objErrTemplate              = new BackendTemplate('be_syncCto_error');
+            $objErrTemplate->strErrorMsg = $exc->getMessage();
+            
+            $this->booRefresh = false;
+            $this->objData->setState(SyncCtoEnum::WORK_ERROR);
+            $this->objData->setHtml($objErrTemplate->parse());
         }
     }
 
@@ -454,48 +461,50 @@ class SyncCtoModuleBackup extends BackendModule
         $this->loadStepPool();
 
         // Set content back to normale mode
-        $this->booError = false;
-        $this->strError = "";
+        $this->booRefresh = true;
+
         $this->objData->setStep(1);
         $this->objData->setState(SyncCtoEnum::WORK_WORK);
+        $this->objData->setHtml("");
 
-        switch ($this->intStep)
+        try
         {
-            case 1:
-                $this->objData->setTitle($GLOBALS['TL_LANG']['MSC']['step'] . " %s");
-                $this->objData->setDescription($GLOBALS['TL_LANG']['tl_syncCto_restore_db']['step1']);
-                $this->objData->setState(SyncCtoEnum::WORK_WORK);
-                $this->intStep++;
-                break;
+            switch ($this->intStep)
+            {
+                case 1:
+                    $this->objData->setTitle($GLOBALS['TL_LANG']['MSC']['step'] . " %s");
+                    $this->objData->setDescription($GLOBALS['TL_LANG']['tl_syncCto_restore_db']['step1']);
+                    $this->objData->setState(SyncCtoEnum::WORK_WORK);
+                    $this->intStep++;
+                    break;
 
-            case 2:
-                try
-                {
+                case 2:
                     $this->objSyncCtoDatabase->runRestore($this->arrBackupSettings['syncCto_restoreFile']);
                     $this->intStep++;
                     break;
-                }
-                catch (Exception $exc)
-                {
-                    $this->booError = true;
-                    $this->strError = $exc->getMessage();
+
+                case 3:
+                    $this->booFinished = true;
+                    $this->booRefresh  = false;
+
                     $this->objData->setStep(1);
-                    $this->objData->setState(SyncCtoEnum::WORK_ERROR);
+                    $this->objData->setState(SyncCtoEnum::WORK_OK);
+
+                    $this->objData->setStep(2);
+                    $this->objData->setTitle($GLOBALS['TL_LANG']['MSC']['complete']);
+                    $this->objData->setDescription($GLOBALS['TL_LANG']['tl_syncCto_restore_db']['complete'] . " " . $this->objStepPool->zipname);
+                    $this->objData->setState(SyncCtoEnum::WORK_OK);
                     break;
-                }
+            }
+        }
+        catch (Exception $exc)
+        {
+            $objErrTemplate              = new BackendTemplate('be_syncCto_error');
+            $objErrTemplate->strErrorMsg = $exc->getMessage();
 
-            case 3:
-                $this->booFinished = true;
-                $this->booRefresh = false;
-
-                $this->objData->setStep(1);
-                $this->objData->setState(SyncCtoEnum::WORK_OK);
-
-                $this->objData->setStep(2);
-                $this->objData->setTitle($GLOBALS['TL_LANG']['MSC']['complete']);
-                $this->objData->setDescription($GLOBALS['TL_LANG']['tl_syncCto_restore_db']['complete'] . " " . $this->objStepPool->zipname);
-                $this->objData->setState(SyncCtoEnum::WORK_OK);
-                break;
+            $this->booRefresh = false;
+            $this->objData->setState(SyncCtoEnum::WORK_ERROR);
+            $this->objData->setHtml($objErrTemplate->parse());
         }
     }
 
@@ -529,62 +538,81 @@ class SyncCtoModuleBackup extends BackendModule
         $this->loadStepPool();
 
         // Set content back to normale mode
-        $this->booError = false;
-        $this->strError = "";
+        $this->booRefresh = true;
+        
         $this->objData->setStep(1);
         $this->objData->setState(SyncCtoEnum::WORK_WORK);
-        
-        switch ($this->intStep)
+        $this->objData->setHtml("");
+
+        try
         {
-            case 1:
-                $this->objData->setTitle($GLOBALS['TL_LANG']['MSC']['step'] . " %s");
-                $this->objData->setDescription($GLOBALS['TL_LANG']['tl_syncCto_backup_file']['step1']);
-                $this->objData->setState(SyncCtoEnum::WORK_WORK);
+            switch ($this->intStep)
+            {
+                case 1:
+                    $this->objData->setTitle($GLOBALS['TL_LANG']['MSC']['step'] . " %s");
+                    $this->objData->setDescription($GLOBALS['TL_LANG']['tl_syncCto_backup_file']['step1']);
+                    $this->objData->setState(SyncCtoEnum::WORK_WORK);
 
-                $this->objStepPool->zipname = "";
-                $this->objStepPool->skippedfiles = array();
+                    $this->objStepPool->zipname      = "";
+                    $this->objStepPool->skippedfiles = array();
 
-                $this->intStep++;
-                break;
+                    $this->intStep++;
+                    break;
 
-            case 2:
-                $arrResult = $this->objSyncCtoFiles->runDump($this->arrBackupSettings['backup_name'], $this->arrBackupSettings['core_files'], $this->arrBackupSettings['user_filelist']);
-                $this->objStepPool->zipname = $arrResult["name"];
-                $this->objStepPool->skippedfiles = $arrResult["skipped"];
-
-                $this->intStep++;
-                break;
-
-
-            case 3:
-                $this->booFinished = true;
-                $this->booRefresh = false;
-
-                $this->objData->setStep(1);
-                $this->objData->setState(SyncCtoEnum::WORK_OK);
-
-                $strHTML = "<p class='tl_help'><br />";
-                $strHTML .= "<a" . ((version_compare(VERSION, '2.11', '==')) ? ' data-lightbox="600 300"' : ' rel="lightbox[600 300]"') ." href='contao/popup.php?src=" . base64_encode($GLOBALS['TL_CONFIG']['uploadPath'] . "/syncCto_backups/files/" . $this->objStepPool->zipname) . "'>" . $GLOBALS['TL_LANG']['MSC']['fileDownload'] . "</a>";
-                $strHTML .= "</p>";
-
-                if (count($this->objStepPool->skippedfiles) != 0)
-                {
-                    $strHTML = '<br /><p class="tl_help">' . count($arrStepPool["skippedfiles"]) . $GLOBALS['TL_LANG']['MSC']['skipped_files'] . '</p>';
-
-                    $strHTML .= '<ul class="fileinfo">';
-                    foreach ($this->objStepPool->skippedfiles as $value)
+                case 2:
+                    if(!file_exists(TL_ROOT . '/' . SyncCtoHelper::getInstance()->standardizePath($GLOBALS['SYC_PATH']['file'])))
                     {
-                        $strHTML .= "<li>" . $value . "</li>";
+                        throw new Exception(sprintf($GLOBALS['TL_LANG']['ERR']['missing_file_folder'] , SyncCtoHelper::getInstance()->standardizePath($GLOBALS['SYC_PATH']['file'])));
                     }
-                    $strHTML .= "</ul>";
-                }
+                    
+                    $arrResult                       = $this->objSyncCtoFiles->runDump($this->arrBackupSettings['backup_name'], $this->arrBackupSettings['core_files'], $this->arrBackupSettings['user_filelist']);
+                    $this->objStepPool->zipname      = $arrResult["name"];
+                    $this->objStepPool->skippedfiles = $arrResult["skipped"];
 
-                $this->objData->setStep(2);
-                $this->objData->setTitle($GLOBALS['TL_LANG']['MSC']['complete']);
-                $this->objData->setDescription($GLOBALS['TL_LANG']['tl_syncCto_backup_file']['complete'] . " " . $this->objStepPool->zipname);
-                $this->objData->setHtml($strHTML);
-                $this->objData->setState(SyncCtoEnum::WORK_OK);
-                break;
+                    $this->intStep++;
+                    break;
+
+
+                case 3:
+                    $this->booFinished = true;
+                    $this->booRefresh  = false;
+
+                    $this->objData->setStep(1);
+                    $this->objData->setState(SyncCtoEnum::WORK_OK);
+
+                    $strHTML = "<p class='tl_help'><br />";
+                    $strHTML .= "<a" . ((version_compare(VERSION, '2.11', '==')) ? ' data-lightbox="600 300"' : ' rel="lightbox[600 300]"') . " href='contao/popup.php?src=" . base64_encode($GLOBALS['TL_CONFIG']['uploadPath'] . "/syncCto_backups/files/" . $this->objStepPool->zipname) . "'>" . $GLOBALS['TL_LANG']['MSC']['fileDownload'] . "</a>";
+                    $strHTML .= "</p>";
+
+                    if (count($this->objStepPool->skippedfiles) != 0)
+                    {
+                        $strHTML = '<br /><p class="tl_help">' . count($arrStepPool["skippedfiles"]) . $GLOBALS['TL_LANG']['MSC']['skipped_files'] . '</p>';
+
+                        $strHTML .= '<ul class="fileinfo">';
+                        foreach ($this->objStepPool->skippedfiles as $value)
+                        {
+                            $strHTML .= "<li>" . $value . "</li>";
+                        }
+                        $strHTML .= "</ul>";
+                    }
+
+                    $this->objData->setStep(2);
+                    $this->objData->setTitle($GLOBALS['TL_LANG']['MSC']['complete']);
+                    $this->objData->setDescription($GLOBALS['TL_LANG']['tl_syncCto_backup_file']['complete'] . " " . $this->objStepPool->zipname);
+                    $this->objData->setHtml($strHTML);
+                    $this->objData->setState(SyncCtoEnum::WORK_OK);
+                    break;
+            }
+        }
+        catch (Exception $exc)
+        {
+            $objErrTemplate              = new BackendTemplate('be_syncCto_error');
+            $objErrTemplate->strErrorMsg = $exc->getMessage();
+            
+            $this->booRefresh = false;
+            $this->objData->setState(SyncCtoEnum::WORK_ERROR);
+            $this->objData->setHtml($objErrTemplate->parse());
+            
         }
     }
 
@@ -615,70 +643,83 @@ class SyncCtoModuleBackup extends BackendModule
         // Load step pool
         $this->loadStepPool();
 
-        // Set content back to normale mode
-        $this->booError = false;
-        $this->strError = "";
+		// Set content back to normale mode
+        $this->booRefresh = true;
+
         $this->objData->setStep(1);
         $this->objData->setState(SyncCtoEnum::WORK_WORK);
+        $this->objData->setHtml("");
 
-        switch ($this->intStep)
+        try
         {
-            case 1:
-                $this->objData->setTitle($GLOBALS['TL_LANG']['MSC']['step'] . " %s");
-                $this->objData->setDescription($GLOBALS['TL_LANG']['tl_syncCto_restore_file']['step1']);
-                $this->objData->setState(SyncCtoEnum::WORK_WORK);
-                $this->intStep++;
-                break;
+            switch ($this->intStep)
+            {
+                case 1:
+                    $this->objData->setTitle($GLOBALS['TL_LANG']['MSC']['step'] . " %s");
+                    $this->objData->setDescription($GLOBALS['TL_LANG']['tl_syncCto_restore_file']['step1']);
+                    $this->objData->setState(SyncCtoEnum::WORK_WORK);
+                    $this->intStep++;
+                    break;
 
-            case 2:
-                try
-                {
-                    $mixResponse = $this->objSyncCtoFiles->runRestore($this->arrBackupSettings['backup_file']);
-
-                    if ($mixResponse !== true)
+                case 2:
+                    try
                     {
-                        $strHTML = $GLOBALS['TL_LANG']['ERR']['cant_extract_file'];
-                        $strHTML .= "<br />";
-                        $strHTML .= "<ul>";
-                        foreach ($mixResponse as $value)
-                        {
-                            $strHTML .= "<li>" . $value . "</li>";
-                        }
-                        $strHTML .= "</ul>";
+                        $mixResponse = $this->objSyncCtoFiles->runRestore($this->arrBackupSettings['backup_file']);
 
+                        if ($mixResponse !== true)
+                        {
+                            $strHTML = $GLOBALS['TL_LANG']['ERR']['cant_extract_file'];
+                            $strHTML .= "<br />";
+                            $strHTML .= "<ul>";
+                            foreach ($mixResponse as $value)
+                            {
+                                $strHTML .= "<li>" . $value . "</li>";
+                            }
+                            $strHTML .= "</ul>";
+
+                            $this->booError = true;
+                            $this->strError = $strHTML;
+                            $this->objData->setStep(1);
+                            $this->objData->setDescription($GLOBALS['TL_LANG']['ERR']['cant_extract_file']);
+                            break;
+                        }
+
+                        $this->intStep++;
+                        break;
+                    }
+                    catch (Exception $exc)
+                    {
                         $this->booError = true;
-                        $this->strError = $strHTML;
+                        $this->strError = $exc->getMessage();
                         $this->objData->setStep(1);
-                        $this->objData->setDescription($GLOBALS['TL_LANG']['ERR']['cant_extract_file']);
+                        $this->objData->setState(SyncCtoEnum::WORK_ERROR);
                         break;
                     }
 
-                    $this->intStep++;
-                    break;
-                }
-                catch (Exception $exc)
-                {
-                    $this->booError = true;
-                    $this->strError = $exc->getMessage();
+                case 3:
+                    $objDate = new Date();
+
+                    $this->booFinished = true;
+                    $this->booRefresh  = false;
+
                     $this->objData->setStep(1);
-                    $this->objData->setState(SyncCtoEnum::WORK_ERROR);
+                    $this->objData->setState(SyncCtoEnum::WORK_OK);
+
+                    $this->objData->setStep(2);
+                    $this->objData->setTitle($GLOBALS['TL_LANG']['MSC']['complete']);
+                    $this->objData->setDescription(vsprintf($GLOBALS['TL_LANG']['tl_syncCto_restore_file']['complete'], array($this->arrBackupSettings['backup_file'], $objDate->time, $objDate->date)));
+                    $this->objData->setState(SyncCtoEnum::WORK_OK);
                     break;
-                }
+            }
+        }
+        catch (Exception $exc)
+        {
+            $objErrTemplate              = new BackendTemplate('be_syncCto_error');
+            $objErrTemplate->strErrorMsg = $exc->getMessage();
 
-            case 3:
-                $objDate = new Date();
-
-                $this->booFinished = true;
-                $this->booRefresh = false;
-
-                $this->objData->setStep(1);
-                $this->objData->setState(SyncCtoEnum::WORK_OK);
-                
-                $this->objData->setStep(2);
-                $this->objData->setTitle($GLOBALS['TL_LANG']['MSC']['complete']);
-                $this->objData->setDescription(vsprintf($GLOBALS['TL_LANG']['tl_syncCto_restore_file']['complete'], array($this->arrBackupSettings['backup_file'], $objDate->time, $objDate->date)));
-                $this->objData->setState(SyncCtoEnum::WORK_OK);
-                break;
+            $this->booRefresh = false;
+            $this->objData->setState(SyncCtoEnum::WORK_ERROR);
+            $this->objData->setHtml($objErrTemplate->parse());
         }
     }
 
