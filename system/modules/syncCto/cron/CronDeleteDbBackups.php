@@ -1,4 +1,4 @@
-<?php if (!defined('TL_ROOT')) die('You cannot access this file directly!');
+<?php
 
 /**
  * Contao Open Source CMS
@@ -12,7 +12,7 @@
 /**
  * Initialize the system
  */
-define('TL_MODE', 'BE');
+define('TL_MODE', 'BACKUP');
 require_once('../../initialize.php');
 
 /**
@@ -20,6 +20,7 @@ require_once('../../initialize.php');
  */
 class CronDeleteDbBackups extends Backend
 {
+
     /**
      * Initialize the controller
      */

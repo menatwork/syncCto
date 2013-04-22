@@ -1,4 +1,4 @@
-<?php if (!defined('TL_ROOT')) die('You cannot access this file directly!');
+<?php
 
 /**
  * Contao Open Source CMS
@@ -12,7 +12,7 @@
 /**
  * Initialize the system
  */
-define('TL_MODE', 'BE');
+define('TL_MODE', 'BACKUP');
 require_once('../../initialize.php');
 
 /**
@@ -36,10 +36,10 @@ class CronDeleteFileBackups extends Backend
     {
         $this->import('Files');
 		
-        $files = scan(TL_ROOT . $GLOBALS['TL_CONFIG']['uploadPath'] . '/syncCto_backups/files');
+        $files = scan(TL_ROOT . $GLOBALS['SYC_PATH']['file']);
         foreach ($files as $file)
         {
-            $f = new File($GLOBALS['TL_CONFIG']['uploadPath'] . '/syncCto_backups/files/' . $file);
+            $f = new File($GLOBALS['SYC_PATH']['file'] . $file);
 
             if (strtolower($f->__get('extension')) == "zip")
             {
