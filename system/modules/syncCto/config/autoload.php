@@ -14,6 +14,7 @@
  */
 ClassLoader::addClasses(array
 (
+	'CronDbBackups'              => 'system/modules/syncCto/cron/CronDbBackups.php',
 	'CronDeleteDbBackups'        => 'system/modules/syncCto/cron/CronDeleteDbBackups.php',
 	'CronFileBackups'            => 'system/modules/syncCto/cron/CronFileBackups.php',
 	'CronDeleteFileBackups'      => 'system/modules/syncCto/cron/CronDeleteFileBackups.php',
@@ -30,6 +31,7 @@ ClassLoader::addClasses(array
 	'SyncCtoHelper'              => 'system/modules/syncCto/SyncCtoHelper.php',
 	'SyncCtoRPCFunctions'        => 'system/modules/syncCto/SyncCtoRPCFunctions.php',
 	'SyncCtoModuleBackup'        => 'system/modules/syncCto/SyncCtoModuleBackup.php',
+	'SyncCtoStats'               => 'system/modules/syncCto/SyncCtoStats.php',
 ));
 
 

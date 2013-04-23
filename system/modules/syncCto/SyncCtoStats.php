@@ -216,5 +216,3 @@ class SyncCtoStats extends Backend
     }
 
 }
-
-?>
