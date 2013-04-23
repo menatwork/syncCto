@@ -34,6 +34,24 @@ CREATE TABLE `tl_synccto_clients` (
     PRIMARY KEY  (`id`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 
+--
+-- Table `tl_synccto_stats`
+--
+
+CREATE TABLE `tl_synccto_stats` (
+    `id` int(10) unsigned NOT NULL auto_increment,    
+    `tstamp` int(10) unsigned NOT NULL default '0',
+    `client_id` varchar(64) NOT NULL default '',
+    `sync_user` varchar(64) NOT NULL default '',
+    `sync_start` int(10) unsigned NOT NULL default '0',
+    `sync_end` int(10) unsigned NOT NULL default '0',  
+    `sync_abort` int(10) unsigned NOT NULL default '0',  
+    `sync_abort_step` varchar(10) NOT NULL default '',  
+    `sync_direction` int(10) unsigned NOT NULL default '0', 
+    `sync_options` blob NULL,
+    PRIMARY KEY  (`id`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+
 -- --------------------------------------------------------
 
 --

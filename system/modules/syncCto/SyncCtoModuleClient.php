@@ -665,6 +665,9 @@ class SyncCtoModuleClient extends BackendModule
             $this->Database->prepare("UPDATE `tl_synccto_clients` %s WHERE `tl_synccto_clients`.`id` = ?")
                     ->set(array("syncTo_user"   => $this->User->id, "syncTo_tstamp" => time()))
                     ->execute($this->intClientID);
+            
+            // Add stats
+            SyncCtoStats::getInstance()->addStartStat($this->User->id, $this->intClientID, time(), $this->arrSyncSettings, SyncCtoStats::SYNCDIRECTION_TO);
 
             // Write log
             $this->log(vsprintf("Start synchronization client ID %s.", array($this->Input->get("id"))), __CLASS__ . " " . __FUNCTION__, "INFO");
@@ -859,6 +862,9 @@ class SyncCtoModuleClient extends BackendModule
             $this->Database->prepare("UPDATE `tl_synccto_clients` %s WHERE `tl_synccto_clients`.`id` = ?")
                     ->set(array("syncFrom_user"   => $this->User->id, "syncFrom_tstamp" => time()))
                     ->execute($this->intClientID);
+            
+            // Add stats
+            SyncCtoStats::getInstance()->addStartStat($this->User->id, $this->intClientID, time(), $this->arrSyncSettings, SyncCtoStats::SYNCDIRECTION_FROM);
 
             // Write log
             $this->log(vsprintf("Start synchronization server with client ID %s.", array($this->Input->get("id"))), __CLASS__ . " " . __FUNCTION__, "INFO");
@@ -1047,6 +1053,9 @@ class SyncCtoModuleClient extends BackendModule
 
             // Init tmep files
             $this->initTempLists();
+            
+            // Add stats
+            SyncCtoStats::getInstance()->addStartStat($this->User->id, $this->intClientID, time(), array(), SyncCtoStats::SYNCDIRECTION_CHECK);
 
             // Reset some Sessions
             $this->resetStepPoolByID(array(1, 2, 3, 4, 5, 6, 7));
@@ -1107,6 +1116,7 @@ class SyncCtoModuleClient extends BackendModule
 
                     // Stop connection
                     $this->objSyncCtoCommunicationClient->stopConnection();
+                    SyncCtoStats::getInstance()->addEndStat(time());
 
                     // Load module for html
                     $objCheck                                = new SyncCtoModuleCheck();
@@ -1457,6 +1467,9 @@ class SyncCtoModuleClient extends BackendModule
             {
                 // Nothing to do 
             }
+            
+            // Set stats
+            SyncCtoStats::getInstance()->addAbortStat(time(), $this->intStep);
 
             // Set stepe
             $this->intStep = 99;
@@ -2839,6 +2852,7 @@ class SyncCtoModuleClient extends BackendModule
 
                 case 5:
                     $this->objSyncCtoCommunicationClient->stopConnection();
+                    SyncCtoStats::getInstance()->addEndStat(time());
                     $this->objStepPool->step++;
                     break;
 
@@ -4378,6 +4392,7 @@ class SyncCtoModuleClient extends BackendModule
 
                 case 5:
                     $this->objSyncCtoCommunicationClient->stopConnection();
+                    SyncCtoStats::getInstance()->addEndStat(time());
                     $this->objStepPool->step++;
                     break;
 
