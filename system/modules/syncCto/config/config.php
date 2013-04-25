@@ -105,6 +105,7 @@ $GLOBALS['SYC_CONFIG']['table_hidden'] = array_merge( (array) $GLOBALS['SYC_CONF
     'tl_undo',
     'tl_version',
     'tl_synccto_clients',
+    'tl_synccto_stats',
 ));
 
 // Folders
@@ -123,7 +124,7 @@ $GLOBALS['SYC_CONFIG']['file_blacklist'] = array_merge( (array) $GLOBALS['SYC_CO
     'pathconfig.php',
 ));
 
-// Folders
+// Local config
 $GLOBALS['SYC_CONFIG']['local_blacklist'] = array_merge( (array) $GLOBALS['SYC_CONFIG']['local_blacklist'], array(   
     'websitePath',
     'installPassword',
