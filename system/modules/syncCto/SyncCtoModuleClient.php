@@ -4077,9 +4077,24 @@ class SyncCtoModuleClient extends BackendModule
                  * Import on server side
                  */
                 case 6:
+                    $arrSQL = array();
 
-                    $strSrc = $this->objSyncCtoHelper->standardizePath($GLOBALS['SYC_PATH']['tmp'], "sql", $this->objStepPool->zipname);
-                    $this->objSyncCtoDatabase->runRestore($strSrc);
+                    if (isset($GLOBALS['TL_HOOKS']['syncDBUpdateBeforeDrop']) && is_array($GLOBALS['TL_HOOKS']['syncDBUpdateBeforeDrop']))
+                    {
+                        foreach ($GLOBALS['TL_HOOKS']['syncDBUpdateBeforeDrop'] as $callback)
+                        {
+                            $this->import($callback[0]);
+                            $mixReturn = $this->$callback[0]->$callback[1]($this->intClientID, $this->arrSyncSettings['syncCto_SyncTables'], $arrSQL);
+
+                            if (!empty($mixReturn) && is_array($mixReturn))
+                            {
+                                $arrSQL = $mixReturn;
+                            }
+                        }
+                    }
+                              
+                    $strSrc = $this->objSyncCtoHelper->standardizePath($GLOBALS['SYC_PATH']['tmp'], "sql", $this->objStepPool->zipname);                    
+                    $this->objSyncCtoDatabase->runRestore($strSrc, $arrSQL);
 
                     $this->objStepPool->step++;
 
