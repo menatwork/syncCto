@@ -104,7 +104,7 @@ class GeneralDataSyncCto implements InterfaceGeneralData
      *
      * @return InterfaceGeneralModel
      */
-    public function fetch(GeneralDataConfigDefault $objConfig)
+    public function fetch(InterfaceGeneralDataConfig $objConfig)
     {
         return  $this->getEmptyModel();
     }
@@ -116,7 +116,25 @@ class GeneralDataSyncCto implements InterfaceGeneralData
      *
      * @return InterfaceGeneralCollection
      */
-    public function fetchAll(GeneralDataConfigDefault $objConfig)
+    public function fetchAll(InterfaceGeneralDataConfig $objConfig)
+    {
+        return $this->getEmptyCollection();
+    }
+    
+    /**
+	 * Retrieve all unique values for the given property.
+	 *
+	 * The result set will be an array containing all unique values contained in the data provider.
+	 * Note: this only re-ensembles really used values for at least one data set.
+	 *
+	 * The only information being interpreted from the passed config object is the first property to fetch and the
+	 * filter definition.
+	 *
+	 * @param InterfaceGeneralDataConfig $objConfig   The filter config options.
+	 *
+	 * @return InterfaceGeneralCollection
+	 */
+	public function getFilterOptions(InterfaceGeneralDataConfig $objConfig)
     {
         return $this->getEmptyCollection();
     }
@@ -128,7 +146,7 @@ class GeneralDataSyncCto implements InterfaceGeneralData
      *
      * @return int
      */
-    public function getCount(GeneralDataConfigDefault $objConfig)
+    public function getCount(InterfaceGeneralDataConfig $objConfig)
     {
         return 0;
     }
