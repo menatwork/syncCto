@@ -49,10 +49,11 @@ array_insert($GLOBALS['BE_MOD'], $i + 1, array
 /**
  * Hooks
  */
-$GLOBALS['TL_HOOKS']['executePreActions'][]     = array('SyncCtoHelper', 'pingClientStatus');
-$GLOBALS['TL_HOOKS']['parseBackendTemplate'][]  = array('SyncCtoHelper', 'checkExtensions');
-$GLOBALS['TL_HOOKS']['parseBackendTemplate'][]  = array('SyncCtoHelper', 'checkLockStatus');
-$GLOBALS['TL_HOOKS']['addCustomRegexp'][]       = array('SyncCtoHelper', 'customRegexp');
+$GLOBALS['TL_HOOKS']['executePreActions'][]          = array('SyncCtoHelper', 'pingClientStatus');
+$GLOBALS['TL_HOOKS']['parseBackendTemplate'][]       = array('SyncCtoHelper', 'checkExtensions');
+$GLOBALS['TL_HOOKS']['parseBackendTemplate'][]       = array('SyncCtoHelper', 'checkLockStatus');
+$GLOBALS['TL_HOOKS']['addCustomRegexp'][]            = array('SyncCtoHelper', 'customRegexp');
+$GLOBALS['TL_HOOKS']['syncExecuteFinalOperations'][] = array('SyncCtoDatabaseUpdater', 'runAutoUpdate');
 
 /**
  * Permissions
@@ -144,7 +145,8 @@ $GLOBALS['SYC_CONFIG']['local_blacklist'] = array_merge( (array) $GLOBALS['SYC_C
     'ctoCom_responseLength',
     'ctoCom_handshake',
     'syncCto_debug_mode',
-    'syncCto_attentionFlag'
+    'syncCto_attentionFlag',
+    'syncCto_auto_db_updater'
 ));
 
 /**

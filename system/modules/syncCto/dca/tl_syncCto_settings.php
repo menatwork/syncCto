@@ -21,7 +21,7 @@ $GLOBALS['TL_DCA']['tl_syncCto_settings'] = array(
     'palettes' => array
         (
         '__selector__' => array('syncCto_custom_settings'),
-        'default' => '{blacklist_legend:hide},syncCto_folder_blacklist,syncCto_file_blacklist;{whitelist_legend:hide},syncCto_folder_whitelist;{local_blacklist_legend},syncCto_local_blacklist;{tables_legend},syncCto_database_tables;{hidden_tables_legend:hide},syncCto_hidden_tables;{custom_legend:hide},syncCto_debug_mode,syncCto_custom_settings;'
+        'default' => '{blacklist_legend:hide},syncCto_folder_blacklist,syncCto_file_blacklist;{whitelist_legend:hide},syncCto_folder_whitelist;{local_blacklist_legend},syncCto_local_blacklist;{tables_legend},syncCto_database_tables;{hidden_tables_legend:hide},syncCto_hidden_tables;{custom_legend:hide},syncCto_debug_mode,syncCto_custom_settings,syncCto_auto_db_updater;'
     ),
     'subpalettes' => array
         (
@@ -132,11 +132,27 @@ $GLOBALS['TL_DCA']['tl_syncCto_settings'] = array(
             'exclude' => true,
             'eval' => array('tl_class' => 'w50'),
         ),
-        'syncCto_interactive_timeout' => array(
+        'syncCto_interactive_timeout' => array
+            (
             'label' => &$GLOBALS['TL_LANG']['tl_syncCto_settings']['interactive_timeout'],
             'inputType' => 'text',
-            'exclude' => true,
-            'eval' => array('tl_class' => 'w50'),
+            'exclude'   => true,
+            'eval'      => array('tl_class' => 'w50'),
+        ),
+        'syncCto_auto_db_updater'     => array
+            (
+            'label'     => &$GLOBALS['TL_LANG']['tl_syncCto_settings']['syncCto_auto_db_updater'],
+            'inputType' => 'checkbox',
+            'exclude'   => true,
+            'eval'      => array('tl_class' => 'clr', 'multiple' => true),
+            'reference' => $GLOBALS['TL_LANG']['tl_syncCto_settings'],
+            'options'   => array(
+                'CREATE',
+                'DROP',
+                'ALTER_ADD',
+                'ALTER_CHANGE',
+                'ALTER_DROP',
+            ),
         )
     )
 );

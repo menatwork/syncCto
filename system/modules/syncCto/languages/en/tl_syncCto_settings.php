@@ -34,3 +34,13 @@ $GLOBALS['TL_LANG']['tl_syncCto_settings']['debug_mode']                = array(
 $GLOBALS['TL_LANG']['tl_syncCto_settings']['custom_settings']           = array('Activate expert settings', 'Click here if you know what you are doing.');
 $GLOBALS['TL_LANG']['tl_syncCto_settings']['wait_timeout']              = array('Configure "wait_timeout"', 'More informationen: http://goo.gl/rC5Y4');
 $GLOBALS['TL_LANG']['tl_syncCto_settings']['interactive_timeout']       = array('Configure "interactive_timeout"', 'More informationen: http://goo.gl/VHxRK');
+$GLOBALS['TL_LANG']['tl_syncCto_settings']['syncCto_auto_db_updater']   = array('Automatic updating of the database', 'Here you can choose the actions for the automatic database update, after the synchronization is finished.');
+
+/**
+ * Updater
+ */
+$GLOBALS['TL_LANG']['tl_syncCto_settings']['CREATE']                    = 'Create new tables';
+$GLOBALS['TL_LANG']['tl_syncCto_settings']['ALTER_ADD']                 = 'Add new columns';
+$GLOBALS['TL_LANG']['tl_syncCto_settings']['ALTER_CHANGE']              = 'Change existing columns';
+$GLOBALS['TL_LANG']['tl_syncCto_settings']['ALTER_DROP']                = 'Drop existing columns';
+$GLOBALS['TL_LANG']['tl_syncCto_settings']['DROP']                      = 'Drop existing tables';
