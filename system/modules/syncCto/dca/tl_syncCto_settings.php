@@ -183,7 +183,23 @@ class tl_syncCto_settings extends Backend
      */
     public function localconfigEntries()
     {
-        return $this->objSyncCtoHelper->loadConfigs(SyncCtoEnum::LOADCONFIG_KEYS_ONLY);
+        // Get entries from localconfig.
+        $arrLocalconfig = $this->objSyncCtoHelper->loadConfigs(SyncCtoEnum::LOADCONFIG_KEYS_ONLY);
+
+        // Load all fields for tl_settings.
+        if (empty($GLOBALS['TL_DCA']['tl_settings']))
+        {
+            $this->loadDataContainer('tl_settings');
+        }
+        $arrDcaFields = array_keys($GLOBALS['TL_DCA']['tl_settings']['fields']);
+
+        // Merge all.
+        $arrReturn = array_keys(array_flip(array_merge($arrLocalconfig, $arrDcaFields)));
+
+        // Sort.
+        natcasesort($arrReturn);
+
+        return array_values($arrReturn);
     }
 
     /**
