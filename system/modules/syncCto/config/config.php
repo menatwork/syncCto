@@ -66,9 +66,9 @@ $GLOBALS['TL_PERMISSIONS'][] = 'syncCto_tables';
 /**
  * Callbacks are only used for overview screen
  */
-$strDo = $objInput->get("do");
+$strDo    = $objInput->get("do");
 $strTable = $objInput->get("table");
-$strAct = $objInput->get("act");
+$strAct   = $objInput->get("act");
 
 if ($strDo == 'syncCto_backups' && $strTable != '' && ($strAct == 'edit' || $strAct == 'create') && TL_MODE == 'BE')
 {
@@ -185,10 +185,10 @@ $GLOBALS['SYC_CONFIG']['maintance_options'] = array_merge( (array) $GLOBALS['SYC
 /**
  * Global configuration
  */
-$GLOBALS['SYC_PATH']['db'] = $GLOBALS['TL_CONFIG']['uploadPath'] . '/syncCto_backups/database/';
-$GLOBALS['SYC_PATH']['file'] = $GLOBALS['TL_CONFIG']['uploadPath'] . '/syncCto_backups/files/';
+$GLOBALS['SYC_PATH']['db']    = $GLOBALS['TL_CONFIG']['uploadPath'] . '/syncCto_backups/database/';
+$GLOBALS['SYC_PATH']['file']  = $GLOBALS['TL_CONFIG']['uploadPath'] . '/syncCto_backups/files/';
 $GLOBALS['SYC_PATH']['debug'] = $GLOBALS['TL_CONFIG']['uploadPath'] . '/syncCto_backups/debug/';
-$GLOBALS['SYC_PATH']['tmp'] = "system/tmp/";
+$GLOBALS['SYC_PATH']['tmp']   = "system/tmp/";
 
 /**
  * Language mapping for database lookup
@@ -202,6 +202,23 @@ $GLOBALS['SYC_CONFIG']['database_mapping'] = array_merge( (array) $GLOBALS['SYC_
     'tl_theme'                  => 'themes',
     'tl_style_sheet'            => 'css'
 ));
+
+/**
+ * Folder/Files replacement
+ */
+// Default
+$GLOBALS['SYC_CONFIG']['folder_file_replacement'][' ']  = '_';
+// Windows / Unix
+$GLOBALS['SYC_CONFIG']['folder_file_replacement']['/']  = '-';
+// Windows only
+$GLOBALS['SYC_CONFIG']['folder_file_replacement']['\\'] = '-';
+$GLOBALS['SYC_CONFIG']['folder_file_replacement'][':']  = '';
+$GLOBALS['SYC_CONFIG']['folder_file_replacement']['*']  = '';
+$GLOBALS['SYC_CONFIG']['folder_file_replacement']['?']  = '';
+$GLOBALS['SYC_CONFIG']['folder_file_replacement']['"']  = '';
+$GLOBALS['SYC_CONFIG']['folder_file_replacement']['<']  = '';
+$GLOBALS['SYC_CONFIG']['folder_file_replacement']['>']  = '';
+$GLOBALS['SYC_CONFIG']['folder_file_replacement']['|']  = '_';
 
 /**
  * CtoCommunication RPC Calls

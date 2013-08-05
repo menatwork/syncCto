@@ -477,7 +477,10 @@ class SyncCtoFiles extends Backend
         {
             $strFilename = standardize(str_replace(array(" "), array("_"), preg_replace("/\.zip\z/i", "", $strZip))) . ".zip";
         }
-
+        
+        // Replace special chars from the filename..
+        $strFilename = str_replace(array_keys($GLOBALS['SYC_CONFIG']['folder_file_replacement']), array_values($GLOBALS['SYC_CONFIG']['folder_file_replacement']), $strFilename);
+        
         $strPath = $this->objSyncCtoHelper->standardizePath($GLOBALS['SYC_PATH']['file'], $strFilename);
 
         $objZipArchive = new ZipArchiveCto();
