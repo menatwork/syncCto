@@ -81,6 +81,7 @@ $GLOBALS['TL_LANG']['MSC']['both_changed']                  = 'Beide geändert';
  */
 $GLOBALS['TL_LANG']['MSC']['abort_sync']                    = array('Abbrechen', 'In Arbeit');
 $GLOBALS['TL_LANG']['MSC']['repeat_sync']                   = array('Wiederholen', 'In Arbeit');
+$GLOBALS['TL_LANG']['MSC']['next_sync']                     = array('Nächster Client', 'In Arbeit');
 
 /**
  * Debug mode

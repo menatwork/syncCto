@@ -22,6 +22,7 @@ class SyncCtoModuleClient extends BackendModule
     protected $strTemplate = 'be_syncCto_steps';
     protected $objTemplateContent;
     protected $intClientID;
+    protected $blnAllMode = false;
     // Helper Classes
     protected $objSyncCtoCommunicationClient;
     protected $objSyncCtoDatabase;
@@ -46,6 +47,7 @@ class SyncCtoModuleClient extends BackendModule
     // Config
     protected $arrSyncSettings;
     protected $arrClientInformation;
+    protected $arrModeAll;
 
     /**
      * @var ContentData 
@@ -259,6 +261,8 @@ class SyncCtoModuleClient extends BackendModule
         // Import
         $this->import("Backenduser", "User");
     }
+    
+   
 
     /**
      * Generate page
@@ -282,21 +286,33 @@ class SyncCtoModuleClient extends BackendModule
             $this->intStep = intval($this->Input->get("step"));
         }
 
-        // Get Client id
-        if (strlen($this->Input->get("id")) != 0)
+        // Get Client id or check if we in allmode
+        if (strlen($this->Input->get("id")) != 0 && $this->Input->get("mode") != 'all')
         {
             $this->intClientID = intval($this->Input->get("id"));
+        }
+        else if (strlen($this->Input->get("id")) != 0 && $this->Input->get("mode") == 'all' && $this->Input->get("next") != '1')
+        {
+            $this->blnAllMode = true;
+            $this->intClientID = intval($this->Input->get("id"));
+        }
+        else if ($this->Input->get("mode") == 'all')
+        {
+            $this->blnAllMode = true;
+            $this->initModeAll();            
         }
         else
         {
             $_SESSION["TL_ERROR"] = array($GLOBALS['TL_LANG']['ERR']['call_directly']);
             $this->redirect("contao/main.php?do=synccto_clients");
         }
+        
+        var_dump( $this->blnAllMode);
 
         // Set client for communication
         try
         {
-            $arrClientInformations      = $this->objSyncCtoCommunicationClient->setClientBy(intval($this->Input->get("id")));
+            $arrClientInformations      = $this->objSyncCtoCommunicationClient->setClientBy(intval($this->intClientID));
             $this->Template->clientName = $arrClientInformations["title"];
         }
         catch (Exception $exc)
@@ -307,9 +323,10 @@ class SyncCtoModuleClient extends BackendModule
         }
 
         // Set template
-        $this->Template->showControl  = true;
-        $this->Template->tryAgainLink = $this->Environment->requestUri;
-        $this->Template->abortLink    = $this->Environment->requestUri . "&abort=true";
+        $this->Template->showControl    = true;
+        $this->Template->tryAgainLink   = $this->Environment->requestUri . ($this->blnAllMode) ? '&mode=all': '';
+        $this->Template->abortLink      = $this->Environment->requestUri . "&abort=true" . ($this->blnAllMode) ? '&mode=all': '';
+        $this->Template->nextClientLink = $this->Environment->requestUri . "&abort=true" . ($this->blnAllMode) ? '&mode=all&next=1': '';
 
         // Load content from session
         if ($this->intStep != 0)
@@ -373,9 +390,76 @@ class SyncCtoModuleClient extends BackendModule
         $this->saveContentData();
         $this->saveClientInformation();
         $this->saveSyncSettings();
+        
+        // Save the informations for mode all.
+        if ($this->Input->get("mode") == 'all')
+        {
+            $this->saveStepPoolAll();  
+        }
 
         // Set Vars for the template
         $this->setTemplateVars();
+    }
+
+    /**
+     * Init the data array for syncAll or load it from session.
+     * 
+     * @return void
+     */
+    protected function initModeAll()
+    {
+        $this->arrModeAll = array(
+            'clientIds' => array(),
+            'index'     => -1,
+            'count'     => 0,
+        );
+        
+        // Check if we have a init call.
+        if ($this->Input->get('init') == 1)
+        {
+            // Get a list with all client.
+            $objClients = $this->Database->query('SELECT id FROM tl_synccto_clients');
+
+            // ToDo: Add a check for premissions.
+
+            $this->arrModeAll = array(
+                'clientIds' => $objClients->fetchEach('id'),
+                'index'     => -1,
+                'count'     => 0,
+            );
+        }
+        // Or load all from Session.
+        else
+        {
+            // Load from Session.
+            $this->loadStepPoolAll();
+        }
+
+        // Set client id.
+        if ($this->arrModeAll['index'] == -1)
+        {
+            $this->intClientID         = $this->arrModeAll['clientIds'][0];
+            $this->arrModeAll['count'] = 0;
+            $this->arrModeAll['index'] = 0;
+        }
+         // Set client id.
+        else if ($this->Input->get('next') == 1)
+        {
+            // Increase everything.
+            $this->arrModeAll['index']++;
+            $this->arrModeAll['count']++;
+
+            // Set new Client and step to 0 for init.
+            $this->intClientID = $this->arrModeAll['clientIds'][0];
+            $this->intStep     = 0;
+        }
+        else
+        {
+            $this->intClientID = $this->arrModeAll['clientIds'][$this->arrModeAll['index']];
+        }
+
+        // Save all to session 
+        $this->saveStepPoolAll();
     }
 
     /* -------------------------------------------------------------------------
@@ -397,6 +481,7 @@ class SyncCtoModuleClient extends BackendModule
         $this->Template->headline    = $this->strHeadline;
         $this->Template->information = $this->strInformation;
         $this->Template->finished    = $this->booFinished;
+        $this->Template->allMode     = $this->blnAllMode;
         
         if ($this->Input->get('table') == 'tl_syncCto_clients_syncTo')
         {
@@ -502,6 +587,23 @@ class SyncCtoModuleClient extends BackendModule
         {
             $this->Session->set("syncCto_" . $this->intClientID . "_StepPool" . $value, FALSE);
         }
+    }
+
+    protected function saveStepPoolAll()
+    {
+        $this->Session->set("syncCto_All_StepPool", $this->arrModeAll);
+    }
+
+    protected function loadStepPoolAll()
+    {
+        $arrStepPool = $this->Session->get("syncCto_All_StepPool");
+
+        if ($arrStepPool == false || !is_array($arrStepPool))
+        {
+            $arrStepPool = array();
+        }
+
+        $this->arrModeAll = $arrStepPool;
     }
 
     protected function initTempLists()
@@ -640,7 +742,7 @@ class SyncCtoModuleClient extends BackendModule
      * Setup for page syncTo
      */
     private function pageSyncTo()
-    {
+    {        
         // Init | Set Step to 1
         if ($this->intStep == 0)
         {
@@ -657,6 +759,12 @@ class SyncCtoModuleClient extends BackendModule
             $this->intStep        = 1;
             $this->floStart       = microtime(true);
             $this->objData        = new ContentData(array(), $this->intStep);
+            
+            // If mode all, add it to url.
+            if($this->blnAllMode)
+            {
+                 $this->strUrl .= '&amp;mode=all';
+            }
             
             // Init tmep files
             $this->initTempLists();
@@ -752,7 +860,7 @@ class SyncCtoModuleClient extends BackendModule
                     $this->objData->nextStep();
                 }
 
-            // Check uf we have to run the import step
+            // Check if we have to run the import step
             case 6:
                 $this->loadTempLists();
 
@@ -2899,7 +3007,8 @@ class SyncCtoModuleClient extends BackendModule
                     }
 
                     // Hide control div
-                    $this->Template->showControl = false;
+                    $this->Template->showControl     = false;
+                    $this->Template->showNextControl = true;
 
                     // If no files are send show success msg
                     if (!is_array($this->arrListCompare) || count($this->arrListCompare) == 0)
