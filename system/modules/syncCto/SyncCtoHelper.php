@@ -56,6 +56,28 @@ class SyncCtoHelper extends Backend
 
         return self::$instance;
     }
+    
+    /* -------------------------------------------------------------------------
+     * Contao 2.xx and 3.xx helper
+     */
+    
+    /**
+     * Check if we have a version from contao 3 or higher.
+     * @return boolean
+     */
+    static public function isContao31()
+    {
+        return version_compare(VERSION, '3.1', '>=');
+    }
+    
+    /**
+     * Check if we have a version from contao 2 or lower.
+     * @return boolean
+     */
+    static public function isContao2()
+    {
+        return version_compare(VERSION, '3', '<');
+    }
 
     /* -------------------------------------------------------------------------
      * Config

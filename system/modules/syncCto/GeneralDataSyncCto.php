@@ -1,5 +1,15 @@
 <?php
 
+// Interfaces
+use DcGeneral\Data\DriverInterface as DriverInterface;
+use DcGeneral\Data\ConfigInterface as ConfigInterface;
+use DcGeneral\Data\ModelInterface as ModelInterface;
+use DcGeneral\Data\CollectionInterface as CollectionInterface;
+// Classes
+use DcGeneral\Data\DefaultConfig as DefaultConfig;
+use DcGeneral\Data\DefaultModel as DefaultModel;
+use DcGeneral\Data\DefaultCollection as DefaultCollection;
+
 /**
  * Contao Open Source CMS
  *
@@ -9,8 +19,7 @@
  * @license    GNU/LGPL 
  * @filesource
  */
-
-class GeneralDataSyncCto implements InterfaceGeneralData
+class GeneralDataSyncCto implements DriverInterface
 {
     /* /////////////////////////////////////////////////////////////////////
      * ---------------------------------------------------------------------
@@ -36,7 +45,10 @@ class GeneralDataSyncCto implements InterfaceGeneralData
      * ---------------------------------------------------------------------
      * ////////////////////////////////////////////////////////////////// */
 
-    public function __construct() { }
+    public function __construct()
+    {
+        
+    }
 
     /* /////////////////////////////////////////////////////////////////////
      * ---------------------------------------------------------------------
@@ -50,7 +62,10 @@ class GeneralDataSyncCto implements InterfaceGeneralData
      * @param array $arrConfig
      * @throws Exception
      */
-    public function setBaseConfig(array $arrConfig) { }
+    public function setBaseConfig(array $arrConfig)
+    {
+        
+    }
 
     /**
      * Return empty config object
@@ -59,7 +74,7 @@ class GeneralDataSyncCto implements InterfaceGeneralData
      */
     public function getEmptyConfig()
     {
-        return GeneralDataConfigDefault::init();
+        return DefaultConfig::init();
     }
 
     /**
@@ -69,7 +84,7 @@ class GeneralDataSyncCto implements InterfaceGeneralData
      */
     public function getEmptyModel()
     {
-        $objModel = new GeneralModelDefault();
+        $objModel = new DefaultModel();
         $objModel->setProviderName($this->strSource);
         return $objModel;
     }
@@ -81,7 +96,7 @@ class GeneralDataSyncCto implements InterfaceGeneralData
      */
     public function getEmptyCollection()
     {
-        return new GeneralCollectionDefault();
+        return new DefaultCollection();
     }
 
     /* /////////////////////////////////////////////////////////////////////
@@ -95,7 +110,10 @@ class GeneralDataSyncCto implements InterfaceGeneralData
      *
      * @param int|string|InterfaceGeneralModel Id or the object itself, to delete
      */
-    public function delete($item) { }
+    public function delete($item)
+    {
+        
+    }
 
     /**
      * Fetch a single/first record by id/filter.
@@ -104,9 +122,9 @@ class GeneralDataSyncCto implements InterfaceGeneralData
      *
      * @return InterfaceGeneralModel
      */
-    public function fetch(InterfaceGeneralDataConfig $objConfig)
+    public function fetch(ConfigInterface $objConfig)
     {
-        return  $this->getEmptyModel();
+        return $this->getEmptyModel();
     }
 
     /**
@@ -116,25 +134,25 @@ class GeneralDataSyncCto implements InterfaceGeneralData
      *
      * @return InterfaceGeneralCollection
      */
-    public function fetchAll(InterfaceGeneralDataConfig $objConfig)
+    public function fetchAll(ConfigInterface $objConfig)
     {
         return $this->getEmptyCollection();
     }
-    
+
     /**
-	 * Retrieve all unique values for the given property.
-	 *
-	 * The result set will be an array containing all unique values contained in the data provider.
-	 * Note: this only re-ensembles really used values for at least one data set.
-	 *
-	 * The only information being interpreted from the passed config object is the first property to fetch and the
-	 * filter definition.
-	 *
-	 * @param InterfaceGeneralDataConfig $objConfig   The filter config options.
-	 *
-	 * @return InterfaceGeneralCollection
-	 */
-	public function getFilterOptions(InterfaceGeneralDataConfig $objConfig)
+     * Retrieve all unique values for the given property.
+     *
+     * The result set will be an array containing all unique values contained in the data provider.
+     * Note: this only re-ensembles really used values for at least one data set.
+     *
+     * The only information being interpreted from the passed config object is the first property to fetch and the
+     * filter definition.
+     *
+     * @param InterfaceGeneralDataConfig $objConfig   The filter config options.
+     *
+     * @return InterfaceGeneralCollection
+     */
+    public function getFilterOptions(ConfigInterface $objConfig)
     {
         return $this->getEmptyCollection();
     }
@@ -146,27 +164,30 @@ class GeneralDataSyncCto implements InterfaceGeneralData
      *
      * @return int
      */
-    public function getCount(InterfaceGeneralDataConfig $objConfig)
+    public function getCount(ConfigInterface $objConfig)
     {
         return 0;
     }
 
     public function isUniqueValue($strField, $varNew, $intId = null)
-    {       
+    {
         return false;
     }
 
     public function resetFallback($strField)
     {
-        $this->objDatabase->query('UPDATE ' . $this->strSource . ' SET ' . $strField . ' = \'\'');
+        return;
     }
 
-    public function save(InterfaceGeneralModel $objItem, $recursive = false)
+    public function save(ModelInterface $objItem, $recursive = false)
     {
         return $this->getEmptyModel();
     }
 
-    public function saveEach(InterfaceGeneralCollection $objItems, $recursive = false) { }
+    public function saveEach(CollectionInterface $objItems, $recursive = false)
+    {
+        
+    }
 
     /**
      * Check if the value exists in the table
@@ -201,7 +222,10 @@ class GeneralDataSyncCto implements InterfaceGeneralData
         return false;
     }
 
-    public function saveVersion(InterfaceGeneralModel $objModel, $strUsername) { }
+    public function saveVersion(ModelInterface $objModel, $strUsername)
+    {
+        
+    }
 
     /**
      * Set a Version as active.
@@ -209,7 +233,10 @@ class GeneralDataSyncCto implements InterfaceGeneralData
      * @param mix $mixID The ID of record
      * @param mix $mixVersion The ID of the Version
      */
-    public function setVersionActive($mixID, $mixVersion) { }
+    public function setVersionActive($mixID, $mixVersion)
+    {
+        
+    }
 
     /**
      * Return the active version from a record
@@ -218,7 +245,10 @@ class GeneralDataSyncCto implements InterfaceGeneralData
      *
      * @return mix Version ID
      */
-    public function getActiveVersion($mixID) { }
+    public function getActiveVersion($mixID)
+    {
+        
+    }
 
     /**
      * Check if two models have the same properties
@@ -239,6 +269,9 @@ class GeneralDataSyncCto implements InterfaceGeneralData
      * ---------------------------------------------------------------------
      * ////////////////////////////////////////////////////////////////// */
 
-    protected function insertUndo($strSourceSQL, $strSaveSQL, $strTable) { }
+    protected function insertUndo($strSourceSQL, $strSaveSQL, $strTable)
+    {
+        
+    }
 
 }
