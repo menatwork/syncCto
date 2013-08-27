@@ -42,14 +42,6 @@ $GLOBALS['TL_DCA']['tl_syncCto_clients_syncTo'] = array(
     ),
     // Fields
     'fields'                 => array(
-//        'lastSync' => array(
-//            'label'         => " ",
-//            'inputType'     => 'statictext',
-//        ),
-//        'disabledCache' => array(
-//            'label'        => " ",
-//            'inputType'    => 'statictext',
-//        ),
         'sync_options' => array(
             'label'            => $GLOBALS['TL_LANG']['tl_syncCto_clients_syncTo']['sync_options'],
             'inputType'        => 'checkbox',
@@ -140,10 +132,10 @@ class tl_syncCto_clients_syncTo extends Backend
             {
                 if (!preg_match("/(\/\*|\*|\*\/|\/\/)/", $strContent))
                 {
-                    //system/tmp
+                    //system/tmp.
                     if (preg_match("/system\/tmp/", $strContent))
                     {                        
-                        // Set data
+                        // Set data.
                         $this->addInfoMessage($GLOBALS['TL_LANG']['MSC']['disabled_cache']);
                         $booLocated = TRUE;
                     }
@@ -151,7 +143,7 @@ class tl_syncCto_clients_syncTo extends Backend
             }
         }
 
-        // Add/Remove some buttons
+        // Add/Remove some buttons.
         $dc->removeButton('save');
         $dc->removeButton('saveNclose');
 
@@ -163,11 +155,15 @@ class tl_syncCto_clients_syncTo extends Backend
                 $GLOBALS['TL_DCA']['tl_syncCto_clients_syncTo']['fields'][$key]['eval']['disabled'] = true;
             }
             
+            // Remove some fields.
+            unset($GLOBALS['TL_DCA']['tl_syncCto_clients_syncTo']['fields']['attentionFlag']);
+            unset($GLOBALS['TL_DCA']['tl_syncCto_clients_syncTo']['fields']['localconfig_error']);
+            
             $this->addErrorMessage($GLOBALS['TL_LANG']['ERR']['contao3'] );
             
             // If C3, use the syncAll settings.
             $arrData = array
-                (
+            (
                 'id'              => 'start_sync_all',
                 'formkey'         => 'start_sync_all',
                 'class'           => '',
@@ -182,7 +178,7 @@ class tl_syncCto_clients_syncTo extends Backend
         {
             // If C2, use the normal sync settings.
             $arrData = array
-                (
+            (
                 'id'              => 'start_sync',
                 'formkey'         => 'start_sync',
                 'class'           => '',
@@ -230,11 +226,14 @@ class tl_syncCto_clients_syncTo extends Backend
 		{
 			return;
 		}
-        
+
         $strWidgetID     = $dc->getWidgetID();
         $arrSyncSettings = array();
 
-        // Synchronization type
+        // Automode off.
+        $arrSyncSettings["automode"] = false;
+
+        // Synchronization type.
         if (is_array($this->Input->post("sync_options_" . $strWidgetID)) && count($this->Input->post("sync_options_" . $strWidgetID)) != 0)
         {
             $arrSyncSettings["syncCto_Type"] = $this->Input->post('sync_options_' . $strWidgetID);
@@ -253,7 +252,7 @@ class tl_syncCto_clients_syncTo extends Backend
             $arrSyncSettings["syncCto_SyncDatabase"] = false;
         }
 
-        // Systemoperation execute
+        // Systemoperation execute.
         if ($this->Input->post("systemoperations_check_" . $strWidgetID) == 1)
         {
             if (is_array($this->Input->post("systemoperations_maintenance_" . $strWidgetID)) && count($this->Input->post("systemoperations_maintenance_" . $strWidgetID)) != 0)
@@ -270,7 +269,7 @@ class tl_syncCto_clients_syncTo extends Backend
             $arrSyncSettings["syncCto_Systemoperations_Maintenance"] = array();
         }
 
-        // Attention flag
+        // Attention flag.
         if ($this->Input->post("attentionFlag_" . $strWidgetID) == 1)
         {
             $arrSyncSettings["syncCto_AttentionFlag"] = true;
@@ -280,7 +279,7 @@ class tl_syncCto_clients_syncTo extends Backend
             $arrSyncSettings["syncCto_AttentionFlag"] = false;
         }
 
-        // Error msg
+        // Error msg.
         if ($this->Input->post("localconfig_error_" . $strWidgetID) == 1)
         {
             $arrSyncSettings["syncCto_ShowError"] = true;
@@ -290,14 +289,14 @@ class tl_syncCto_clients_syncTo extends Backend
             $arrSyncSettings["syncCto_ShowError"] = false;
         }
 
-        // Write all data
+        // Write all data.
         foreach ($_POST as $key => $value)
         {
             $strClearKey                                = str_replace("_" . $strWidgetID, "", $key);
             $arrSyncSettings["post_data"][$strClearKey] = $this->Input->post($key);
         }
 
-        // Save Session
+        // Save Session.
         $this->Session->set("syncCto_SyncSettings_" . $dc->id, $arrSyncSettings);
 
         $this->objSyncCtoHelper->checkSubmit(array(
@@ -311,7 +310,7 @@ class tl_syncCto_clients_syncTo extends Backend
     }
     
     /**
-     * Handle syncTo configurations
+     * Handle syncTo configurations.
      * 
      * @param DataContainer $dc
      * @return array 
@@ -326,8 +325,17 @@ class tl_syncCto_clients_syncTo extends Backend
         $strWidgetID     = $dc->getWidgetID();
         $arrSyncSettings = array();
 
-        $arrSyncSettings["syncCto_Type"]                         = 'all';
-        $arrSyncSettings["syncCto_SyncDatabase"]                 = 'all';
+        // Set array.
+        $arrSyncSettings["automode"]                             = true;
+        $arrSyncSettings["syncCto_Type"]                         = array(
+            'core_change',
+            'core_delete',
+            'user_change',
+            'user_delete',
+            'localconfig_update'
+        );
+        $arrSyncSettings["syncCto_SyncDatabase"]                 = true;
+        $arrSyncSettings["syncCto_Systemoperations_Maintenance"] = array();
         $arrSyncSettings["syncCto_AttentionFlag"]                = false;
         $arrSyncSettings["syncCto_ShowError"]                    = false;
 

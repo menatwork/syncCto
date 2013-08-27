@@ -53,7 +53,10 @@ $GLOBALS['TL_HOOKS']['executePreActions'][]          = array('SyncCtoHelper', 'p
 $GLOBALS['TL_HOOKS']['parseBackendTemplate'][]       = array('SyncCtoHelper', 'checkExtensions');
 $GLOBALS['TL_HOOKS']['parseBackendTemplate'][]       = array('SyncCtoHelper', 'checkLockStatus');
 $GLOBALS['TL_HOOKS']['addCustomRegexp'][]            = array('SyncCtoHelper', 'customRegexp');
-$GLOBALS['TL_HOOKS']['syncExecuteFinalOperations'][] = array('SyncCtoDatabaseUpdater', 'runAutoUpdate');
+if(SyncCtoHelper::isContao2())
+    $GLOBALS['TL_HOOKS']['syncExecuteFinalOperations'][] = array('SyncCtoDatabaseUpdater', 'runAutoUpdate');    
+//else
+//    $GLOBALS['TL_HOOKS']['syncExecuteFinalOperations'][] = array('SyncCtoDatabaseUpdater3', 'runAutoUpdate');    
 
 /**
  * Permissions
