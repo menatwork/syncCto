@@ -367,7 +367,6 @@ class SyncCtoHelper extends Backend
      */
     public function checkExtensions($strContent, $strTemplate)
     {
-        
         if ($strTemplate == 'be_main')
         {
             if (!is_array($_SESSION["TL_INFO"]))
@@ -397,6 +396,15 @@ class SyncCtoHelper extends Backend
                         unset($_SESSION["TL_INFO"][$val]);
                     }
                 }
+            }
+            
+            // Check syncCtoPro, if not set remove triggers.
+            if(!in_array('syncCtoPro', $this->Config->getActiveModules()) 
+                    && ($this->hasTrigger('tl_page') || $this->hasTrigger('tl_article') || $this->hasTrigger('tl_content')))
+            {                
+                $this->dropTrigger('tl_page');
+                $this->dropTrigger('tl_article');
+                $this->dropTrigger('tl_content');
             }
         }
 
@@ -1013,6 +1021,55 @@ class SyncCtoHelper extends Backend
             {
                 $_SESSION["TL_ERROR"][$arrCheckSubmit['error']['key']] = $arrCheckSubmit['error']['message'];
             }
+        }
+    }
+    
+    /* -------------------------------------------------------------------------
+     * Trigger functions
+     */
+    
+    /**
+     * Drop triggers for table XXX.
+     * 
+     * @param string $strTable
+     */
+    public function dropTrigger($strTable)
+    {
+        // Drop Update.
+        $strQuery = "DROP TRIGGER IF EXISTS `" . $strTable . "_AfterUpdateHashRefresh`";
+        $this->Database->query($strQuery);
+
+        // Drop Insert.
+        $strQuery = "DROP TRIGGER IF EXISTS `" . $strTable . "_AfterInsertHashRefresh`";
+        $this->Database->query($strQuery);
+
+        // Drop Delete.
+        $strQuery = "DROP TRIGGER IF EXISTS `" . $strTable . "_AfterDeleteHashRefresh`";
+        $this->Database->query($strQuery);
+    }
+    
+    /**
+     * Check if a trigger is set on one of the tables.
+     * 
+     * @return boolean True = we have some triggers | False = no trigger are set.
+     */
+    public function hasTrigger($strTable)
+    {
+        $arrTriggers = $this->Database->query('SHOW TRIGGERS')->fetchEach('Trigger');
+        
+        if(in_array($strTable . "_AfterUpdateHashRefresh", $arrTriggers))
+        {
+            return true;
+        }
+        
+        if(in_array($strTable . "_AfterInsertHashRefresh", $arrTriggers))
+        {
+            return true;
+        }
+        
+        if(in_array($strTable . "_AfterDeleteHashRefresh", $arrTriggers))
+        {
+            return true;
         }
     }
 
