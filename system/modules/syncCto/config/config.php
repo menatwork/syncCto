@@ -121,6 +121,7 @@ $GLOBALS['SYC_CONFIG']['folder_blacklist'] = array_merge( (array) $GLOBALS['SYC_
 // Files only sync.
 $GLOBALS['SYC_CONFIG']['file_blacklist'] = array_merge( (array) $GLOBALS['SYC_CONFIG']['file_blacklist'], array(
     'TL_ROOT/.htaccess',
+    'TL_ROOT/.htpasswd',
     'localconfig.php',
     'pathconfig.php',
 ));
@@ -153,8 +154,10 @@ $GLOBALS['SYC_CONFIG']['local_blacklist'] = array_merge( (array) $GLOBALS['SYC_C
  * Whitelist
  */
 $GLOBALS['SYC_CONFIG']['folder_whitelist'] = array_merge( (array) $GLOBALS['SYC_CONFIG']['folder_whitelist'], array(
+    'assets',
     'contao',
     'plugins',
+    'share',
     'system',
     'templates',
     'typolight',
