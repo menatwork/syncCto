@@ -63,15 +63,20 @@ function sendNextRequest(_strToken, _objElements, _intIndex)
     }).send();
 }
 
-window.addEvent("domready",function(){
-    
-    if(typeof(REQUEST_TOKEN) == "undefined")
+window.addEvent("domready", function() {
+
+    if (Contao.request_token)
+    {
+        REQUEST_TOKEN = Contao.request_token;
+    }
+
+    if (typeof(REQUEST_TOKEN) == "undefined")
     {
         REQUEST_TOKEN = 0;
     }
-    
-    if($$('img.ping').length != 0)
+
+    if ($$('img.ping').length != 0)
     {
-        sendNextRequest(REQUEST_TOKEN, $$('img.ping'), 0);   
+        sendNextRequest(REQUEST_TOKEN, $$('img.ping'), 0);
     }
 });
