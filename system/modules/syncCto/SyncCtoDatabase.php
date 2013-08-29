@@ -9,8 +9,6 @@
  * @filesource
  */
 
-use Contao\Database as Database;
-
 /**
  * Core class for database operation
  */
