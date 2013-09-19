@@ -2348,7 +2348,7 @@ class SyncCtoModuleClient extends BackendModule
 
                 case 3:
                     // Unset some tables for pro feature
-                    if (key_exists("forward", $_POST) && $this->arrSyncSettings['post_data']['database_pages_check'] == true)
+                    if (($this->arrSyncSettings["automode"] && in_array('syncCtoPro', Config::getInstance()->getActiveModules())) || (key_exists("forward", $_POST) && $this->arrSyncSettings['post_data']['database_pages_check'] == true))
                     {
                         if (($mixKey = array_search('tl_page', $this->arrSyncSettings['syncCto_SyncTables'])) !== false)
                         {
