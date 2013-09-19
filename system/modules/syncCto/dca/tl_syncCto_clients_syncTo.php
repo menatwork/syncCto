@@ -9,6 +9,14 @@
  * @filesource
  */
 
+if (SyncCtoHelper::isDcGeneralC3Version())
+{
+    $strDataProvider = 'GeneralDataSyncCto';
+}
+else
+{
+    $strDataProvider = 'GeneralDataSyncCtoC2';
+}
 
 $GLOBALS['TL_DCA']['tl_syncCto_clients_syncTo'] = array(
     // Config
@@ -26,7 +34,7 @@ $GLOBALS['TL_DCA']['tl_syncCto_clients_syncTo'] = array(
     'dca_config'  => array(
         'data_provider' => array(
             'default' => array(
-                'class'  => 'GeneralDataSyncCto',
+                'class'  => $strDataProvider,
                 'source' => 'tl_syncCto_clients_syncTo'
             ),
         ),
@@ -34,7 +42,7 @@ $GLOBALS['TL_DCA']['tl_syncCto_clients_syncTo'] = array(
     // Palettes
     'palettes' => array(
         '__selector__' => array('database_check', 'systemoperations_check'),
-        'default'     => '{sync_legend},lastSync,disabledCache,sync_options;{table_legend},database_check;{systemoperations_legend:hide},systemoperations_check,attentionFlag,localconfig_error;',
+        'default'     => '{sync_legend},sync_options;{table_legend},database_check;{systemoperations_legend:hide},systemoperations_check,attentionFlag,localconfig_error;',
     ),
     // Sub Palettes
     'subpalettes' => array(
@@ -42,14 +50,6 @@ $GLOBALS['TL_DCA']['tl_syncCto_clients_syncTo'] = array(
     ),
     // Fields
     'fields'                 => array(
-        'lastSync' => array(
-            'label'         => " ",
-            'inputType'     => 'statictext',
-        ),
-        'disabledCache' => array(
-            'label'        => " ",
-            'inputType'    => 'statictext',
-        ),
         'sync_options' => array(
             'label'            => $GLOBALS['TL_LANG']['tl_syncCto_clients_syncTo']['sync_options'],
             'inputType'        => 'checkbox',
@@ -123,8 +123,8 @@ class tl_syncCto_clients_syncTo extends Backend
      * @param DataContainer $dc 
      */
     public function onload_callback(DataContainer $dc)
-    {
-		if(Input::getInstance()->get('act') == 'start')
+    {        
+		if(Input::getInstance()->get('act') == 'start' || get_class($dc) != 'DC_General')
 		{
 			return;
 		}
@@ -140,42 +140,66 @@ class tl_syncCto_clients_syncTo extends Backend
             {
                 if (!preg_match("/(\/\*|\*|\*\/|\/\/)/", $strContent))
                 {
-                    //system/tmp
+                    //system/tmp.
                     if (preg_match("/system\/tmp/", $strContent))
-                    {
-                        // Set data
-                        $dc->setData("disabledCache", "<p class='tl_info'>" . $GLOBALS['TL_LANG']['MSC']['disabled_cache'] . "</p>");
+                    {                        
+                        // Set data.
+                        $this->addInfoMessage($GLOBALS['TL_LANG']['MSC']['disabled_cache']);
                         $booLocated = TRUE;
                     }
                 }
             }
-
-            if (!$booLocated)
-            {
-                $GLOBALS['TL_DCA']['tl_syncCto_clients_syncTo']['palettes']['default'] = str_replace(",disabledCache", "", $GLOBALS['TL_DCA']['tl_syncCto_clients_syncTo']['palettes']['default']);
-            }
-        }
-        else
-        {
-            $GLOBALS['TL_DCA']['tl_syncCto_clients_syncTo']['palettes']['default'] = str_replace(",disabledCache", "", $GLOBALS['TL_DCA']['tl_syncCto_clients_syncTo']['palettes']['default']);
         }
 
-        // Add/Remove some buttons
+        // Add/Remove some buttons.
         $dc->removeButton('save');
         $dc->removeButton('saveNclose');
 
-        $arrData = array
+        // First check for Contao 3.1
+        if (SyncCtoHelper::isContao31())
+        {
+            // Disable all fields for this version.
+            foreach (array_keys($GLOBALS['TL_DCA']['tl_syncCto_clients_syncTo']['fields']) as $key)
+            {
+                $GLOBALS['TL_DCA']['tl_syncCto_clients_syncTo']['fields'][$key]['eval']['disabled'] = true;
+            }
+            
+            // Remove some fields.
+            unset($GLOBALS['TL_DCA']['tl_syncCto_clients_syncTo']['fields']['attentionFlag']);
+            unset($GLOBALS['TL_DCA']['tl_syncCto_clients_syncTo']['fields']['localconfig_error']);
+            
+            $this->addErrorMessage($GLOBALS['TL_LANG']['ERR']['contao3'] );
+            
+            // If C3, use the syncAll settings.
+            $arrData = array
             (
-            'id'              => 'start_sync',
-            'formkey'         => 'start_sync',
-            'class'           => '',
-            'accesskey'       => 'g',
-            'value'           => specialchars($GLOBALS['TL_LANG']['MSC']['sync']),
-            'button_callback' => array('tl_syncCto_clients_syncTo', 'onsubmit_callback')
-        );
+                'id'              => 'start_sync_all',
+                'formkey'         => 'start_sync_all',
+                'class'           => '',
+                'accesskey'       => 'g',
+                'value'           => specialchars($GLOBALS['TL_LANG']['MSC']['syncAll']),
+                'button_callback' => array('tl_syncCto_clients_syncTo', 'onsubmit_callback_all')
+            );
 
-        $dc->addButton('start_sync', $arrData);
+            $dc->addButton('start_sync_all', $arrData);
+        }
+        // Finaly run as normal mode for Contao < 3.0 or > 3.1 
+        else
+        {
+            // If C2, use the normal sync settings.
+            $arrData = array
+            (
+                'id'              => 'start_sync',
+                'formkey'         => 'start_sync',
+                'class'           => '',
+                'accesskey'       => 'g',
+                'value'           => specialchars($GLOBALS['TL_LANG']['MSC']['sync']),
+                'button_callback' => array('tl_syncCto_clients_syncTo', 'onsubmit_callback')
+            );
 
+            $dc->addButton('start_sync', $arrData);
+        }
+            
         // Update a field with last sync information
         $objSyncTime = $this->Database
                 ->prepare("SELECT cl.syncTo_tstamp as syncTo_tstamp, user.name as syncTo_user, user.username as syncTo_alias
@@ -194,13 +218,9 @@ class tl_syncCto_clients_syncTo extends Backend
                 $objSyncTime->syncTo_user,
                 $objSyncTime->syncTo_alias)
             );
-
+            
             // Set data
-//            $dc->setData("lastSync", "<p class='tl_info'>" . $strLastSync . "</p>");
-        }
-        else
-        {
-            $GLOBALS['TL_DCA']['tl_syncCto_clients_syncTo']['palettes']['default'] = str_replace(",lastSync", "", $GLOBALS['TL_DCA']['tl_syncCto_clients_syncTo']['palettes']['default']);
+            $this->addInfoMessage($strLastSync);
         }
     }
 
@@ -212,10 +232,18 @@ class tl_syncCto_clients_syncTo extends Backend
      */
     public function onsubmit_callback(DataContainer $dc)
     {
+        if(get_class($dc) != 'DC_General')
+		{
+			return;
+		}
+
         $strWidgetID     = $dc->getWidgetID();
         $arrSyncSettings = array();
 
-        // Synchronization type
+        // Automode off.
+        $arrSyncSettings["automode"] = false;
+
+        // Synchronization type.
         if (is_array($this->Input->post("sync_options_" . $strWidgetID)) && count($this->Input->post("sync_options_" . $strWidgetID)) != 0)
         {
             $arrSyncSettings["syncCto_Type"] = $this->Input->post('sync_options_' . $strWidgetID);
@@ -234,7 +262,7 @@ class tl_syncCto_clients_syncTo extends Backend
             $arrSyncSettings["syncCto_SyncDatabase"] = false;
         }
 
-        // Systemoperation execute
+        // Systemoperation execute.
         if ($this->Input->post("systemoperations_check_" . $strWidgetID) == 1)
         {
             if (is_array($this->Input->post("systemoperations_maintenance_" . $strWidgetID)) && count($this->Input->post("systemoperations_maintenance_" . $strWidgetID)) != 0)
@@ -251,7 +279,7 @@ class tl_syncCto_clients_syncTo extends Backend
             $arrSyncSettings["syncCto_Systemoperations_Maintenance"] = array();
         }
 
-        // Attention flag
+        // Attention flag.
         if ($this->Input->post("attentionFlag_" . $strWidgetID) == 1)
         {
             $arrSyncSettings["syncCto_AttentionFlag"] = true;
@@ -261,7 +289,7 @@ class tl_syncCto_clients_syncTo extends Backend
             $arrSyncSettings["syncCto_AttentionFlag"] = false;
         }
 
-        // Error msg
+        // Error msg.
         if ($this->Input->post("localconfig_error_" . $strWidgetID) == 1)
         {
             $arrSyncSettings["syncCto_ShowError"] = true;
@@ -270,6 +298,56 @@ class tl_syncCto_clients_syncTo extends Backend
         {
             $arrSyncSettings["syncCto_ShowError"] = false;
         }
+
+        // Write all data.
+        foreach ($_POST as $key => $value)
+        {
+            $strClearKey                                = str_replace("_" . $strWidgetID, "", $key);
+            $arrSyncSettings["post_data"][$strClearKey] = $this->Input->post($key);
+        }
+
+        // Save Session.
+        $this->Session->set("syncCto_SyncSettings_" . $dc->id, $arrSyncSettings);
+
+        $this->objSyncCtoHelper->checkSubmit(array(
+            'postUnset'   => array('start_sync'),
+            'error'       => array(
+                'key'     => 'syncCto_submit_false',
+                'message' => $GLOBALS['TL_LANG']['ERR']['missing_tables']
+            ),
+            'redirectUrl' => $this->Environment->base . "contao/main.php?do=synccto_clients&amp;table=tl_syncCto_clients_syncTo&amp;act=start&amp;step=0&amp;id=" . $this->Input->get("id")
+        ));
+    }
+    
+    /**
+     * Handle syncTo configurations.
+     * 
+     * @param DataContainer $dc
+     * @return array 
+     */
+    public function onsubmit_callback_all(DataContainer $dc)
+    {
+        if (get_class($dc) != 'DC_General')
+        {
+            return;
+        }
+
+        $strWidgetID     = $dc->getWidgetID();
+        $arrSyncSettings = array();
+
+        // Set array.
+        $arrSyncSettings["automode"]                             = true;
+        $arrSyncSettings["syncCto_Type"]                         = array(
+            'core_change',
+            'core_delete',
+            'user_change',
+            'user_delete',
+            'localconfig_update'
+        );
+        $arrSyncSettings["syncCto_SyncDatabase"]                 = true;
+        $arrSyncSettings["syncCto_Systemoperations_Maintenance"] = array();
+        $arrSyncSettings["syncCto_AttentionFlag"]                = false;
+        $arrSyncSettings["syncCto_ShowError"]                    = false;
 
         // Write all data
         foreach ($_POST as $key => $value)

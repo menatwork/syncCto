@@ -1857,7 +1857,7 @@ class SyncCtoModuleClient extends BackendModule
 
                         break;
                     }
-                    else if (key_exists("forward", $_POST) && count($this->arrListCompare) != 0)
+                    else if (($this->arrSyncSettings["automode"] || key_exists("forward", $_POST)) && count($this->arrListCompare) != 0)
                     {
                         $this->objData->setState(SyncCtoEnum::WORK_OK);
                         $this->objData->setDescription(vsprintf($GLOBALS['TL_LANG']['tl_syncCto_sync']["step_2"]['description_4'], array($intCountMissing, $intCountNeed, $intCountDelete, $intCountIgnored, $this->getReadableSize($intTotalSizeNew), $this->getReadableSize($intTotalSizeChange), $this->getReadableSize($intTotalSizeDel))));
@@ -2419,6 +2419,30 @@ class SyncCtoModuleClient extends BackendModule
 
                         $this->arrSyncSettings['syncCto_CompareTables'] = $arrCompareList;
 
+                        // If automode set all tabels as transferd.
+                        if ($this->arrSyncSettings['automode'])
+                        {
+                            $this->arrSyncSettings['syncCto_SyncDeleteTables'] = array();
+                            $this->arrSyncSettings['syncCto_SyncTables']       = array();
+
+                            foreach ($this->arrSyncSettings['syncCto_CompareTables'] as $arrType)
+                            {
+                                foreach ($arrType as $keyTable => $valueTable)
+                                {
+                                    if ($valueTable['del'] == true)
+                                    {
+                                        $this->arrSyncSettings['syncCto_SyncDeleteTables'][] = $keyTable;
+                                    }
+                                    else
+                                    {
+                                        $this->arrSyncSettings['syncCto_SyncTables'][] = $keyTable;
+                                    }
+                                }
+                            }
+
+                            unset($this->arrSyncSettings['syncCto_CompareTables']);
+                        }
+
                         $this->objStepPool->step++;
                     }
                     else
@@ -2432,7 +2456,7 @@ class SyncCtoModuleClient extends BackendModule
 
                 case 3:
                     // Unset some tables for pro feature
-                    if (key_exists("forward", $_POST) && $this->arrSyncSettings['post_data']['database_pages_check'] == true)
+                    if (($this->arrSyncSettings["automode"] && in_array('syncCtoPro', Config::getInstance()->getActiveModules())) || (key_exists("forward", $_POST) && $this->arrSyncSettings['post_data']['database_pages_check'] == true))
                     {
                         if (($mixKey = array_search('tl_page', $this->arrSyncSettings['syncCto_SyncTables'])) !== false)
                         {
@@ -2453,7 +2477,7 @@ class SyncCtoModuleClient extends BackendModule
                         }
                     }
 
-                    if (key_exists("forward", $_POST) && !(count($this->arrSyncSettings['syncCto_SyncTables']) == 0 && count($this->arrSyncSettings['syncCto_SyncDeleteTables']) == 0))
+                    if (($this->arrSyncSettings["automode"] || key_exists("forward", $_POST)) && !(count($this->arrSyncSettings['syncCto_SyncTables']) == 0 && count($this->arrSyncSettings['syncCto_SyncDeleteTables']) == 0))
                     {
                         // Go to next step
                         $this->objData->setState(SyncCtoEnum::WORK_WORK);
@@ -2463,7 +2487,7 @@ class SyncCtoModuleClient extends BackendModule
 
                         break;
                     }
-                    else if (key_exists("forward", $_POST) && count($this->arrSyncSettings['syncCto_SyncTables']) == 0 && count($this->arrSyncSettings['syncCto_SyncDeleteTables']) == 0)
+                    else if (($this->arrSyncSettings["automode"] || key_exists("forward", $_POST)) && count($this->arrSyncSettings['syncCto_SyncTables']) == 0 && count($this->arrSyncSettings['syncCto_SyncDeleteTables']) == 0)
                     {
                         // Skip if no tables are selected
                         $this->objData->setState(SyncCtoEnum::WORK_SKIPPED);
@@ -2799,7 +2823,7 @@ class SyncCtoModuleClient extends BackendModule
                  * Import Config
                  */
                 case 4:
-                    if (in_array("localconfig_update", $this->arrSyncSettings["syncCto_Type"]))
+                    if ($this->arrSyncSettings["syncCto_Type"] == 'all' || in_array("localconfig_update", $this->arrSyncSettings["syncCto_Type"]))
                     {
                         $this->objSyncCtoCommunicationClient->runLocalConfigImport();
                         $this->objStepPool->step++;
@@ -3496,7 +3520,7 @@ class SyncCtoModuleClient extends BackendModule
 
                         break;
                     }
-                    else if (key_exists("forward", $_POST) && count($this->arrListCompare) != 0)
+                    else if (($this->arrSyncSettings["automode"] ||key_exists("forward", $_POST)) && count($this->arrListCompare) != 0)
                     {
                         $this->objData->setState(SyncCtoEnum::WORK_OK);
                         $this->objData->setDescription(vsprintf($GLOBALS['TL_LANG']['tl_syncCto_sync']["step_2"]['description_4'], array($intCountMissing, $intCountNeed, $intCountDelete, $intCountIgnored, $this->getReadableSize($intTotalSizeNew), $this->getReadableSize($intTotalSizeChange), $this->getReadableSize($intTotalSizeDel))));
@@ -4085,6 +4109,30 @@ class SyncCtoModuleClient extends BackendModule
 
                         $this->arrSyncSettings['syncCto_CompareTables'] = $arrCompareList;
 
+                        // If automode set all tabels as transferd.
+                        if ($this->arrSyncSettings['automode'])
+                        {
+                            $this->arrSyncSettings['syncCto_SyncDeleteTables'] = array();
+                            $this->arrSyncSettings['syncCto_SyncTables']       = array();
+
+                            foreach ($this->arrSyncSettings['syncCto_CompareTables'] as $arrType)
+                            {
+                                foreach ($arrType as $keyTable => $valueTable)
+                                {
+                                    if ($valueTable['del'] == true)
+                                    {
+                                        $this->arrSyncSettings['syncCto_SyncDeleteTables'][] = $keyTable;
+                                    }
+                                    else
+                                    {
+                                        $this->arrSyncSettings['syncCto_SyncTables'][] = $keyTable;
+                                    }
+                                }
+                            }
+
+                            unset($this->arrSyncSettings['syncCto_CompareTables']);
+                        }
+
                         $this->objStepPool->step++;
                     }
                     else
@@ -4098,7 +4146,7 @@ class SyncCtoModuleClient extends BackendModule
 
                 case 3:
 
-                    if (key_exists("forward", $_POST) && !(count($this->arrSyncSettings['syncCto_SyncTables']) == 0 && count($this->arrSyncSettings['syncCto_SyncDeleteTables']) == 0))
+                    if (($this->arrSyncSettings['automode'] || key_exists("forward", $_POST)) && !(count($this->arrSyncSettings['syncCto_SyncTables']) == 0 && count($this->arrSyncSettings['syncCto_SyncDeleteTables']) == 0))
                     {
                         // Go to next step
                         $this->objData->setState(SyncCtoEnum::WORK_WORK);
@@ -4108,7 +4156,7 @@ class SyncCtoModuleClient extends BackendModule
 
                         break;
                     }
-                    else if (key_exists("forward", $_POST) && count($this->arrSyncSettings['syncCto_SyncTables']) == 0 && count($this->arrSyncSettings['syncCto_SyncDeleteTables']) == 0)
+                    else if (($this->arrSyncSettings['automode'] || key_exists("forward", $_POST)) && count($this->arrSyncSettings['syncCto_SyncTables']) == 0 && count($this->arrSyncSettings['syncCto_SyncDeleteTables']) == 0)
                     {
                         // Skip if no tables are selected
                         $this->objData->setState(SyncCtoEnum::WORK_SKIPPED);

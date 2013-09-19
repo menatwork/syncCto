@@ -33,6 +33,7 @@ $GLOBALS['TL_LANG']['MSC']['edit']                          = 'Edit';
 $GLOBALS['TL_LANG']['MSC']['copy']                          = 'Dublicate';
 $GLOBALS['TL_LANG']['MSC']['showExtern']                    = 'Client Systemcheck';
 $GLOBALS['TL_LANG']['MSC']['sync']                          = 'Synchronize';
+$GLOBALS['TL_LANG']['MSC']['syncAll']                       = 'C3 - Synchronize';
 $GLOBALS['TL_LANG']['MSC']['syncTo']                        = 'Synchronize client';
 $GLOBALS['TL_LANG']['MSC']['syncFrom']                      = 'Synchronize server';
 
@@ -115,3 +116,4 @@ $GLOBALS['TL_LANG']['ERR']['referer']                       = 'The clients refer
 $GLOBALS['TL_LANG']['ERR']['version']                       = 'Version conflict in %s. <br />Server: %s <br />Client: %s';
 $GLOBALS['TL_LANG']['ERR']['upload_ini']                    = 'No success with upload. Funktion is deactivated in the php.ini';
 $GLOBALS['TL_LANG']['ERR']['rebuild']                       = 'Error rebuilding the file(s). Path: %s';
+$GLOBALS['TL_LANG']['ERR']['contao3']                       = 'Contao 3 - FEHLER ! ! !';

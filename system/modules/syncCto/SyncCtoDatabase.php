@@ -30,6 +30,7 @@ class SyncCtoDatabase extends Backend
     protected $intMaxMemoryUsage;
     // Objects 
     protected $objSyncCtoHelper;
+    protected $Database;
 
     /**
      * @var XMLReader 
@@ -111,6 +112,7 @@ class SyncCtoDatabase extends Backend
 
         // Load Helper
         $this->objSyncCtoHelper = SyncCtoHelper::getInstance();
+        $this->Database         = Database::getInstance();       
     }
 
     /**

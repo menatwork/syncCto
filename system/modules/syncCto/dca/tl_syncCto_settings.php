@@ -144,7 +144,12 @@ $GLOBALS['TL_DCA']['tl_syncCto_settings'] = array(
             'label'     => &$GLOBALS['TL_LANG']['tl_syncCto_settings']['syncCto_auto_db_updater'],
             'inputType' => 'checkbox',
             'exclude'   => true,
-            'eval'      => array('tl_class' => 'clr', 'multiple' => true),
+            'eval'      => array
+            (                
+                'tl_class' => 'clr', 
+                'multiple' => true,
+                'disabled'  => SyncCtoHelper::isContao2() ? false : true,
+            ),
             'reference' => $GLOBALS['TL_LANG']['tl_syncCto_settings'],
             'options'   => array(
                 'CREATE',

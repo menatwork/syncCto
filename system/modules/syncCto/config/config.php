@@ -53,7 +53,10 @@ $GLOBALS['TL_HOOKS']['executePreActions'][]          = array('SyncCtoHelper', 'p
 $GLOBALS['TL_HOOKS']['parseBackendTemplate'][]       = array('SyncCtoHelper', 'checkExtensions');
 $GLOBALS['TL_HOOKS']['parseBackendTemplate'][]       = array('SyncCtoHelper', 'checkLockStatus');
 $GLOBALS['TL_HOOKS']['addCustomRegexp'][]            = array('SyncCtoHelper', 'customRegexp');
-$GLOBALS['TL_HOOKS']['syncExecuteFinalOperations'][] = array('SyncCtoDatabaseUpdater', 'runAutoUpdate');
+if(SyncCtoHelper::isContao2())
+    $GLOBALS['TL_HOOKS']['syncExecuteFinalOperations'][] = array('SyncCtoDatabaseUpdater', 'runAutoUpdate');    
+//else
+//    $GLOBALS['TL_HOOKS']['syncExecuteFinalOperations'][] = array('SyncCtoDatabaseUpdater3', 'runAutoUpdate');    
 
 /**
  * Permissions
@@ -121,6 +124,7 @@ $GLOBALS['SYC_CONFIG']['folder_blacklist'] = array_merge( (array) $GLOBALS['SYC_
 // Files only sync.
 $GLOBALS['SYC_CONFIG']['file_blacklist'] = array_merge( (array) $GLOBALS['SYC_CONFIG']['file_blacklist'], array(
     'TL_ROOT/.htaccess',
+    'TL_ROOT/.htpasswd',
     'localconfig.php',
     'pathconfig.php',
 ));
@@ -153,8 +157,10 @@ $GLOBALS['SYC_CONFIG']['local_blacklist'] = array_merge( (array) $GLOBALS['SYC_C
  * Whitelist
  */
 $GLOBALS['SYC_CONFIG']['folder_whitelist'] = array_merge( (array) $GLOBALS['SYC_CONFIG']['folder_whitelist'], array(
+    'assets',
     'contao',
     'plugins',
+    'share',
     'system',
     'templates',
     'typolight',
