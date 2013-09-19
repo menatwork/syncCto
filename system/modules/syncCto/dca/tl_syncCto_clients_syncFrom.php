@@ -8,6 +8,16 @@
  * @license    GNU/LGPL 
  * @filesource
  */
+
+if (SyncCtoHelper::isDcGeneralC3Version())
+{
+    $strDataProvider = 'GeneralDataSyncCto';
+}
+else
+{
+    $strDataProvider = 'GeneralDataSyncCtoC2';
+}
+
 $GLOBALS['TL_DCA']['tl_syncCto_clients_syncFrom'] = array(
     // Config
     'config' => array(
@@ -23,7 +33,7 @@ $GLOBALS['TL_DCA']['tl_syncCto_clients_syncFrom'] = array(
     'dca_config'  => array(
         'data_provider' => array(
             'default' => array(
-                'class'  => 'GeneralDataSyncCto',
+                'class'  => $strDataProvider,
                 'source' => 'tl_syncCto_clients_syncTo'
             ),
         ),
@@ -138,7 +148,8 @@ class tl_syncCto_clients_syncFrom extends Backend
 
         $dc->removeButton('save');
         $dc->removeButton('saveNclose');
-        
+       
+        // First check for Contao 3.1
         if (SyncCtoHelper::isContao31())
         {
             // Disable all fields for this version.
@@ -155,7 +166,7 @@ class tl_syncCto_clients_syncFrom extends Backend
 
             // If C3, use the syncAll settings.
             $arrData = array
-                (
+            (
                 'id'              => 'start_sync_all',
                 'formkey'         => 'start_sync_all',
                 'class'           => '',
@@ -165,11 +176,12 @@ class tl_syncCto_clients_syncFrom extends Backend
             );
 
             $dc->addButton('start_sync_all', $arrData);
-        }
+        }        
+        // Finaly run as normal mode for Contao < 3.0 or > 3.1 
         else
         {
             $arrData = array
-                (
+            (
                 'id'              => 'start_sync',
                 'formkey'         => 'start_sync',
                 'class'           => '',
