@@ -306,8 +306,6 @@ class SyncCtoModuleClient extends BackendModule
             $_SESSION["TL_ERROR"] = array($GLOBALS['TL_LANG']['ERR']['call_directly']);
             $this->redirect("contao/main.php?do=synccto_clients");
         }
-        
-        var_dump( $this->blnAllMode);
 
         // Set client for communication
         try

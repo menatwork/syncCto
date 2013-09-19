@@ -108,7 +108,6 @@ class CronFileBackups extends Backend
         catch (Exception $exc)
         {
             $this->log("Error by file backup with msg: " . $exc->getMessage(), __CLASS__ . " | " . __FUNCTION__, TL_CRON);
-            var_dump($exc);
         }
     }
 
