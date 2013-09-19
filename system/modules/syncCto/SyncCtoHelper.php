@@ -677,7 +677,7 @@ class SyncCtoHelper extends Backend
 
             foreach ($itPath as $itFolder)
             {
-                if (empty($itFolder) || $itFolder == "." || $itFolder == "..")
+                if ($itFolder === '' || $itFolder === null || $itFolder == "." || $itFolder == "..")
                 {
                     continue;
                 }
