@@ -662,30 +662,31 @@ class SyncCtoHelper extends Backend
     {
         $arrPath = func_get_args();
 
-        if (count($arrPath) == 0 || $arrPath == null || $arrPath == "")
+        if (empty($arrPath))
         {
             return "";
         }
 
-        $strVar = "";
+        $arrReturn = array();
 
         foreach ($arrPath as $itPath)
         {
-            $itPath = str_replace(array(TL_ROOT, "\\"), array("", "/"), $itPath);
-            $itPath = explode("/", $itPath);
+            $itPath = str_replace('\\', '/', $itPath);
+            $itPath = preg_replace('?^' . TL_ROOT . '?i', '', $itPath);
+            $itPath = explode('/', $itPath);
 
             foreach ($itPath as $itFolder)
             {
-                if ($itFolder == "" || $itFolder == "." || $itFolder == "..")
+                if (empty($itFolder) || $itFolder == "." || $itFolder == "..")
                 {
                     continue;
                 }
-
-                $strVar .= "/" . $itFolder;
+                
+                $arrReturn[] = $itFolder;
             }
         }
 
-        return preg_replace("/^\//i", "", $strVar);
+        return implode('/', $arrReturn);
     }
 
     /**
