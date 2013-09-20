@@ -38,12 +38,12 @@ $GLOBALS['TL_DCA']['tl_synccto_clients'] = array(
                 'class'      => 'header_edit_all',
                 'attributes' => 'onclick="Backend.getScrollOffset();"'
             ),
-            'syncToAll' => array(
-                'label' => &$GLOBALS['TL_LANG']['tl_syncCto_clients']['syncToAll'],
-                'href'  => '?do=synccto_clients&table=tl_syncCto_clients_syncTo&act=start&step=0&mode=all&init=1',
-                'class' => 'header_sync_all',                 
-                'icon'  => 'system/modules/syncCto/html/icons/nav/iconSyncTo.png',                
-            )
+//            'syncToAll' => array(
+//                'label' => &$GLOBALS['TL_LANG']['tl_syncCto_clients']['syncToAll'],
+//                'href'  => '?do=synccto_clients&table=tl_syncCto_clients_syncTo&act=start&step=0&mode=all&init=1',
+//                'class' => 'header_sync_all',                 
+//                'icon'  => 'system/modules/syncCto/html/icons/nav/iconSyncTo.png',                
+//            )
         ),
         'operations' => array(
             'edit' => array(
