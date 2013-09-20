@@ -94,9 +94,23 @@ class SyncCtoHelper extends Backend
      */
     static public function isDcGeneralC3Version()
     {
-        if (file_exists(TL_ROOT . '/system/modules/generalDriver/DcGeneral'))
+        if(version_compare(VERSION, '3.0', '>='))
         {
             return true;
+        }
+        // Check if we have a DC_General for Version c2 and c3.
+        else if (version_compare(VERSION, '3.0', '<') && file_exists(TL_ROOT . '/system/modules/generalDriver/DcGeneral'))
+        {
+            // Check if we have an autoloader in the config.
+            $objFile = new File('/system/modules/generalDriver/config/config.php');
+            $strContenr = $objFile->getContent();
+            $objFile->close();        
+            
+            // If true we have the right DC_General Version.
+            if(stripos('dcGeneral_autoload', $strContenr) !== false)
+            {
+                return true;
+            }
         }
 
         return false;

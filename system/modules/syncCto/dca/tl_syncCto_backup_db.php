@@ -9,6 +9,15 @@
  * @filesource
  */
 
+if (SyncCtoHelper::isDcGeneralC3Version())
+{
+    $strDataProvider = 'GeneralDataSyncCto';
+}
+else
+{
+    $strDataProvider = 'GeneralDataSyncCtoC2';
+}
+
 $GLOBALS['TL_DCA']['tl_syncCto_backup_db'] = array(
     // Config
     'config' => array(
@@ -24,7 +33,7 @@ $GLOBALS['TL_DCA']['tl_syncCto_backup_db'] = array(
     'dca_config'  => array(
         'data_provider' => array(
             'default' => array(
-                'class'  => 'GeneralDataSyncCto',
+                'class'  => $strDataProvider,
                 'source' => 'tl_syncCto_backup_db'
             ),
         ),
@@ -114,6 +123,11 @@ class tl_syncCto_backup_db extends Backend
      */
     public function onload_callback(DataContainer $dc)
     {
+        if (get_class($dc) != 'DC_General')
+        {
+            return;
+        }
+        
         $dc->removeButton('save');
         $dc->removeButton('saveNclose');
 

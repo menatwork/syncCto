@@ -9,6 +9,15 @@
  * @filesource
  */
 
+if (SyncCtoHelper::isDcGeneralC3Version())
+{
+    $strDataProvider = 'GeneralDataSyncCto';
+}
+else
+{
+    $strDataProvider = 'GeneralDataSyncCtoC2';
+}
+
 $GLOBALS['TL_DCA']['tl_syncCto_backup_file'] = array(
     // Config
     'config' => array(
@@ -26,7 +35,7 @@ $GLOBALS['TL_DCA']['tl_syncCto_backup_file'] = array(
     'dca_config'  => array(
         'data_provider' => array(
             'default' => array(
-                'class'  => 'GeneralDataSyncCto',
+                'class'  => $strDataProvider,
                 'source' => 'tl_syncCto_clients_syncTo'
             ),
         ),
@@ -101,6 +110,11 @@ class tl_syncCto_backup_file extends Backend
      */
     public function onload_callback(DataContainer $dc)
     {
+        if (get_class($dc) != 'DC_General')
+        {
+            return;
+        }
+        
         $dc->removeButton('save');
         $dc->removeButton('saveNclose');
 
@@ -150,6 +164,16 @@ class tl_syncCto_backup_file extends Backend
         $arrBackupSettings['user_filelist'] = $this->Input->post('filelist_' . $strWidgetID, true);
         $arrBackupSettings['backup_name']   = $this->Input->post('backup_name_' . $strWidgetID, true);
 
+        // If we have a Contao 3 version resolve id to path.
+        if (version_compare(VERSION, '3.0', '>='))
+        {
+            $arrBackupSettings['user_filelist'] = trimsplit(',', $arrBackupSettings['user_filelist']);            
+            foreach ((array) $arrBackupSettings['user_filelist'] as $key => $value)
+            {
+                $arrBackupSettings['user_filelist'][$key] = Contao\FilesModel::findByPk($value)->path;
+            }
+        }
+        
         $this->Session->set("syncCto_BackupSettings", $arrBackupSettings);
 
         $this->objSyncCtoHelper->checkSubmit(array(

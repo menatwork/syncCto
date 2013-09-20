@@ -30,6 +30,7 @@ ClassLoader::addClasses(array
 	'InterfaceSyncCtoStep'       => 'system/modules/syncCto/InterfaceSyncCtoStep.php',
 	'SyncCtoDatabaseUpdater3'    => 'system/modules/syncCto/SyncCtoDatabaseUpdater3.php',
 	'GeneralDataSyncCto'         => 'system/modules/syncCto/GeneralDataSyncCto.php',
+	'GeneralDataSyncCtoC2'       => 'system/modules/syncCto/GeneralDataSyncCtoC2.php',
 	'SyncCtoHelper'              => 'system/modules/syncCto/SyncCtoHelper.php',
 	'SyncCtoRPCFunctions'        => 'system/modules/syncCto/SyncCtoRPCFunctions.php',
 	'SyncCtoModuleBackup'        => 'system/modules/syncCto/SyncCtoModuleBackup.php',
