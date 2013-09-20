@@ -232,11 +232,6 @@ class tl_syncCto_clients_syncTo extends Backend
      */
     public function onsubmit_callback(DataContainer $dc)
     {
-        if(get_class($dc) != 'DC_General')
-		{
-			return;
-		}
-
         $strWidgetID     = $dc->getWidgetID();
         $arrSyncSettings = array();
 
@@ -327,11 +322,6 @@ class tl_syncCto_clients_syncTo extends Backend
      */
     public function onsubmit_callback_all(DataContainer $dc)
     {
-        if (get_class($dc) != 'DC_General')
-        {
-            return;
-        }
-
         $strWidgetID     = $dc->getWidgetID();
         $arrSyncSettings = array();
 
