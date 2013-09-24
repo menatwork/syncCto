@@ -1,16 +1,16 @@
 {
 	"name":"menatwork/synccto",
 	"description":"Synchronize multiple contao installations with each other",
-	"keywords":["backup", "synchronization", "management", "diff"],
-	"type": "contao-module",
-	"homepage": "http://www.men-at-work.de",
-	"license": "LGPL-3.0+",
-	"authors": [
+	"keywords":["backup","synchronization","management","diff"],
+	"type":"contao-module",
+	"homepage":"http://www.men-at-work.de",
+	"license":"LGPL-3.0+",
+	"authors":[
 		{
-			"name": "Andreas Isaak",
-			"email": "contao@men-at-work.de",
-			"homepage": "http://www.men-at-work.de",
-			"role":"Project leader"
+			"name":"Andreas Isaak",
+			"email":"contao@men-at-work.de",
+			"homepage":"http://www.men-at-work.de",
+			"role":"Projectleader"
 		},
 		{
 			"name":"Stefan Heimes",
@@ -19,42 +19,42 @@
 			"role":"Developer"
 		}
 	],
-	"support": {
-		"email": "info@men-at-work.de",
-		"issues": "https://github.com/menatwork/syncCto/issues",
-		"wiki": "https://github.com/menatwork/syncCto/wiki",
-		"irc": "irc://irc.freenode.org/contao.dev",
-		"source": "https://github.com/menatwork/syncCto"
+	"support":{
+		"email":"info@men-at-work.de",
+		"issues":"https://github.com/menatwork/syncCto/issues",
+		"wiki":"https://github.com/menatwork/syncCto/wiki",
+		"irc":"irc://irc.freenode.org/contao.dev",
+		"source":"https://github.com/menatwork/syncCto"
 	},
-	"require": {
-		"php": ">=5.3",
-		"contao/core": ">=2.11,<4",
-		"contao-community-alliance/composer-installer": "*",
-		"menatwork/contao-multicolumnwizard": "3.2.*",
-		"menatwork/ctocommunication":">=1.2",
-		"contao-legacy/dc_general": ">=1.0",
-		"menatwork/ziparchivecto":">=1.1"
+	"require":{
+		"php":">=5.3",
+		"contao/core":">=2.11,<4",
+		"contao-community-alliance/composer-installer":"*",
+		"menatwork/contao-multicolumnwizard":"3.2.*",
+		"menatwork/ctocommunication":"~1.2",
+		"contao-legacy/dc_general":"~1.0",
+		"menatwork/ziparchivecto":"~1.1"
 	},
 	"autoload":{
-		"classmap":["contao/", "system/"]
+		"classmap":["contao/","system/"]
 	},
-	"replace": {
-		"contao-legacy/synccto": "*"
+	"replace":{
+		"contao-legacy/synccto":"*"
 	},
-	"extra": {
-		"contao": {
-			"sources": {
-				"contao/popupSyncDB.php": "contao/popupSyncDB.php",
-				"contao/popupSyncFiles.php": "contao/popupSyncFiles.php",
-				"system/modules/syncCto": "system/modules/syncCto",
-				"system/modules/syncCtoUpdater": "system/modules/syncCtoUpdater"
+	"extra":{
+		"contao":{
+			"sources":{
+				"contao/popupSyncDB.php":"contao/popupSyncDB.php",
+				"contao/popupSyncFiles.php":"contao/popupSyncFiles.php",
+				"system/modules/syncCto":"system/modules/syncCto",
+				"system/modules/syncCtoUpdater":"system/modules/syncCtoUpdater"
 			},
-			"runonce": [
+			"runonce":[
 				"system/runonce.php"
 			]
 		},
-		"branch-alias": {
-			"dev-master": "2.4.x-dev"
+		"branch-alias":{
+			"dev-master":"2.4.x-dev"
 		}
 	}
 }
