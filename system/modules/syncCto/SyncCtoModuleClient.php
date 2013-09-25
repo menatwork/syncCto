@@ -322,9 +322,9 @@ class SyncCtoModuleClient extends BackendModule
 
         // Set template
         $this->Template->showControl    = true;
-        $this->Template->tryAgainLink   = $this->Environment->requestUri . ($this->blnAllMode) ? '&mode=all': '';
-        $this->Template->abortLink      = $this->Environment->requestUri . "&abort=true" . ($this->blnAllMode) ? '&mode=all': '';
-        $this->Template->nextClientLink = $this->Environment->requestUri . "&abort=true" . ($this->blnAllMode) ? '&mode=all&next=1': '';
+        $this->Template->tryAgainLink   = $this->Environment->requestUri . (($this->blnAllMode) ? '&mode=all': '');
+        $this->Template->abortLink      = $this->Environment->requestUri . "&abort=true" . (($this->blnAllMode) ? '&mode=all': '');
+        $this->Template->nextClientLink = $this->Environment->requestUri . "&abort=true" . (($this->blnAllMode) ? '&mode=all&next=1': '');
 
         // Load content from session
         if ($this->intStep != 0)
