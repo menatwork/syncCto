@@ -103,11 +103,11 @@ class SyncCtoHelper extends Backend
         {
             // Check if we have an autoloader in the config.
             $objFile = new File('/system/modules/generalDriver/config/config.php');
-            $strContenr = $objFile->getContent();
+            $strContent = $objFile->getContent();
             $objFile->close();        
             
             // If true we have the right DC_General Version.
-            if(stripos('dcGeneral_autoload', $strContenr) !== false)
+            if(stripos($strContent, 'dcGeneral_autoload') !== false)
             {
                 return true;
             }
