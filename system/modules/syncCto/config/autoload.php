@@ -35,6 +35,7 @@ ClassLoader::addClasses(array
 	'SyncCtoRPCFunctions'        => 'system/modules/syncCto/SyncCtoRPCFunctions.php',
 	'SyncCtoModuleBackup'        => 'system/modules/syncCto/SyncCtoModuleBackup.php',
 	'SyncCtoStats'               => 'system/modules/syncCto/SyncCtoStats.php',
+    'SyncCtoRunOnceEr'           => 'system/modules/syncCto/SyncCtoRunOnceEr.php',
 ));
 
 
