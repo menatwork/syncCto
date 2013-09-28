@@ -24,7 +24,7 @@ class SyncCtoRunOnce
         $arrActiveModules = Config::getInstance()->getActiveModules();
 
         // If not use the old way for the auto updater.
-        if (!in_array('!composer', $arrActiveModules) && !class_exists('Composer\Composer'))
+        if (!in_array('!composer', $arrActiveModules))
         {
             $objSyncCtoRunOnceEr = new SyncCtoRunOnceEr();
             $objSyncCtoRunOnceEr->run();
