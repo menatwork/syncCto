@@ -686,7 +686,7 @@ class SyncCtoHelper extends Backend
         foreach ($arrPath as $itPath)
         {
             $itPath = str_replace('\\', '/', $itPath);
-            $itPath = preg_replace('?^' . TL_ROOT . '?i', '', $itPath);
+            $itPath = preg_replace('?^' . str_replace('\\', '\\\\', TL_ROOT) . '?i', '', $itPath);
             $itPath = explode('/', $itPath);
 
             foreach ($itPath as $itFolder)
