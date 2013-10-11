@@ -20,8 +20,17 @@ class SyncCtoHelper extends Backend
 
     // instance
     protected static $instance = null;
+    
     // Objects   
     protected $objSyncCtoDatabase;
+    
+    // Cache
+    protected $arrPreparedBlacklistFolder = null;
+    protected $arrPreparedBlacklistFiles  = null;
+    
+    // Config
+    protected $arrSearch  = array("\\", ".", "^", "?", "*", "/");
+    protected $arrReplace = array("\\\\", "\\.", "\\^", ".?", ".*", "\\/");
 
     /* -------------------------------------------------------------------------
      * Core
@@ -41,6 +50,20 @@ class SyncCtoHelper extends Backend
 
         // Language
         $this->loadLanguageFile("default");
+                
+        // Instance a list for regex from the blacklist for folders.
+        $this->arrPreparedBlacklistFolder = array();
+        foreach ($this->getBlacklistFolder()as $key => $value)
+        {
+            $this->arrPreparedBlacklistFolder[$key] = str_replace($this->arrSearch, $this->arrReplace, $value);
+        }
+        
+        // Instance a list for regex from the blacklist for files.
+        $this->arrPreparedBlacklistFiles = array();
+        foreach ($this->getBlacklistFile()as $key => $value)
+        {
+            $this->arrPreparedBlacklistFiles[$key] = str_replace($this->arrSearch, $this->arrReplace, $value);
+        }
     }
 
     /**
@@ -51,7 +74,7 @@ class SyncCtoHelper extends Backend
     {
         if (self::$instance == null)
         {
-            self::$instance = new SyncCtoHelper();
+            self::$instance = new self();
         }
 
         return self::$instance;
@@ -285,18 +308,38 @@ class SyncCtoHelper extends Backend
         return $this->mergeConfigs($arrLocalconfig, $arrSyncCtoConfig);
     }
 
-    public function getWhitelistFolder()
+    /**
+     * Get a prepared list for regex.
+     * 
+     * @return array
+     */
+    public function getPreparedBlacklistFolder()
     {
-        $arrLocalconfig   = deserialize($GLOBALS['TL_CONFIG']['syncCto_folder_whitelist']);
-        $arrSyncCtoConfig = $GLOBALS['SYC_CONFIG']['folder_whitelist'];
-
-        return $this->mergeConfigs($arrLocalconfig, $arrSyncCtoConfig);
+        return $this->arrPreparedBlacklistFolder;
     }
 
     public function getBlacklistFile()
     {
         $arrLocalconfig   = deserialize($GLOBALS['TL_CONFIG']['syncCto_file_blacklist']);
         $arrSyncCtoConfig = $GLOBALS['SYC_CONFIG']['file_blacklist'];
+
+        return $this->mergeConfigs($arrLocalconfig, $arrSyncCtoConfig);
+    }
+
+    /**
+     * Get a prepared list for regex.
+     * 
+     * @return array
+     */
+    public function getPreparedBlacklistFiles()
+    {
+        return $this->arrPreparedBlacklistFiles;
+    }
+
+    public function getWhitelistFolder()
+    {
+        $arrLocalconfig   = deserialize($GLOBALS['TL_CONFIG']['syncCto_folder_whitelist']);
+        $arrSyncCtoConfig = $GLOBALS['SYC_CONFIG']['folder_whitelist'];
 
         return $this->mergeConfigs($arrLocalconfig, $arrSyncCtoConfig);
     }
