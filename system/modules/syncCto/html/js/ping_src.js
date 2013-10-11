@@ -65,7 +65,7 @@ function sendNextRequest(_strToken, _objElements, _intIndex)
 
 window.addEvent("domready", function() {
 
-    if (Contao.request_token)
+    if (typeof Contao !== 'undefined' && typeof Contao.request_token !== 'undefined')
     {
         REQUEST_TOKEN = Contao.request_token;
     }
