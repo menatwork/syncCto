@@ -27,8 +27,9 @@ class SyncCtoHelper extends Backend
     // Cache
     protected $arrPreparedBlacklistFolder = null;
     protected $arrPreparedBlacklistFiles  = null;
-    
-    // Config
+	protected $strPreparedTlRoot = '';
+
+	// Config
     protected $arrSearch  = array("\\", ".", "^", "?", "*", "/");
     protected $arrReplace = array("\\\\", "\\.", "\\^", ".?", ".*", "\\/");
 
@@ -64,6 +65,9 @@ class SyncCtoHelper extends Backend
         {
             $this->arrPreparedBlacklistFiles[$key] = str_replace($this->arrSearch, $this->arrReplace, $value);
         }
+		
+		// Replace some elements in TL_ROOT for regex.
+		$this->strPreparedTlRoot = str_replace('\\', '\\\\', TL_ROOT);
     }
 
     /**
@@ -300,7 +304,18 @@ class SyncCtoHelper extends Backend
      * Black and Whitelists
      */
 
-    public function getBlacklistFolder()
+	/**
+	 * Return the TL_ROOT prepared for regex.
+	 * 
+	 * @return string
+	 */
+	public function getPreparedTlRoot()
+	{
+		return $this->strPreparedTlRoot;
+	}
+
+
+	public function getBlacklistFolder()
     {
         $arrLocalconfig   = deserialize($GLOBALS['TL_CONFIG']['syncCto_folder_blacklist']);
         $arrSyncCtoConfig = $GLOBALS['SYC_CONFIG']['folder_blacklist'];
@@ -745,6 +760,8 @@ class SyncCtoHelper extends Backend
 
         return implode('/', $arrReturn);
     }
+	
+	
 
     /**
      * Returns a whole list of all tables in the database

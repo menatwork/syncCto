@@ -206,8 +206,14 @@ class SyncCtoFiles extends Backend
         // Check each file
         foreach ($this->getFileList($booCore, $booFiles) as $objFile)
         {
+            // Skipe if we have a dir.
+            if($objFile->isDir())
+            {
+                continue;
+            }
+
             // Get fileinformation.
-            $strRelativePath = preg_replace('?' . TL_ROOT . '/?', '', $objFile->getPathname(), 1);
+            $strRelativePath = preg_replace('?' . $this->objSyncCtoHelper->getPreparedTlRoot() . '/?', '', $objFile->getPathname(), 1);
             $strFullPath     = $objFile->getPathname();
             $intSize         = $objFile->getSize();
 
@@ -272,7 +278,7 @@ class SyncCtoFiles extends Backend
         // Check each file
         foreach ($this->getFolderList($booCore, $booFiles) as $objFolder)
         {
-            $strRelativePath = preg_replace('?' . TL_ROOT . '/?', '', $objFolder->getPathname(), 1);
+            $strRelativePath = preg_replace('?' . $this->objSyncCtoHelper->getPreparedTlRoot() . '/?', '', $objFolder->getPathname(), 1);
             
             $arrChecksum[md5($strRelativePath)] = array(
                 "path"         => $strRelativePath,
@@ -329,12 +335,12 @@ class SyncCtoFiles extends Backend
         $objXml->endElement(); // End metatags
 
         $objXml->startElement('files');
-        
+
         $i = 0;
         foreach ($objFileIterator as $objFile)
         {
             // Get fileinformation.
-            $strRelativePath = preg_replace('?' . TL_ROOT . '/?', '', $objFile->getPathname(), 1);
+            $strRelativePath = preg_replace('?' . $this->objSyncCtoHelper->getPreparedTlRoot() . '/?', '', $objFile->getPathname(), 1);
             $intSize         = $objFile->getSize();
 
             if ($intSize < 0 && $intSize != 0)
@@ -563,31 +569,72 @@ class SyncCtoFiles extends Backend
             throw new Exception($GLOBALS['TL_LANG']['MSC']['error'] . ": " . $objZipArchive->getErrorDescription($mixError));
         }
 
-        $arrFileList    = $this->getFileList($booCore, false);
-        $arrFileSkipped = array();
+	    $arrFileSkipped = array();
 
-        for ($index = 0; $index < count($arrFiles); $index++)
+        // Run backup for the core files.
+        if ($booCore)
         {
-            if (is_dir(TL_ROOT . "/" . $arrFiles[$index]))
+            foreach ($this->getFileList(true, false) as $objFile)
             {
-                $arrFiles = array_merge($arrFiles, $this->getFileListFromFolders(array($arrFiles[$index])));
-                continue;
-            }
-
-            if ($objZipArchive->addFile($arrFiles[$index], $arrFiles[$index]) == false)
-            {
-                $arrFileSkipped[] = $arrFiles[$index];
+                // Skipe all folders.
+                if($objFile->isDir())
+                {
+                    continue;
+                }
+                
+                // Build path witout tl_root.
+                $strFile = preg_replace('?' . $this->objSyncCtoHelper->getPreparedTlRoot() . '/?', '', $objFile->getPathname(), 1);
+                
+                // Add file to zip.
+                if ($objZipArchive->addFile($strFile, $strFile) == false)
+                {
+                    $arrFileSkipped[] = $strFile;
+                }
             }
         }
 
-        foreach ($arrFileList as $file)
+        // Run backup for tl_files/files
+        foreach ((array) $arrFiles as $file)
         {
-            if ($objZipArchive->addFile($file, $file) == false)
+            // Scann folders.
+            if (file_exists(TL_ROOT . '/' . $file) && is_dir(TL_ROOT . '/' . $file))
             {
-                $arrFileSkipped[] = $file;
+                // Scann.
+                $objDirectoryIt     = new RecursiveDirectoryIterator(TL_ROOT . '/' . $this->objSyncCtoHelper->standardizePath($file), $this->strRDIFlags);
+                $objFilterIt     = new SyncCtoFilterIteratorBase($objDirectoryIt);
+                $objRecursiverIt = new RecursiveIteratorIterator($objFilterIt, RecursiveIteratorIterator::SELF_FIRST);
+
+                $this->getFileListFromFolders();
+
+                foreach ($objRecursiverIt as $objFile)
+                {
+                    // Skipe all folders.
+                    if ($objFile->isDir())
+                    {
+                        continue;
+                    }
+
+                    // Build path witout tl_root.
+                    $strFile = preg_replace('?' . $this->objSyncCtoHelper->getPreparedTlRoot() . '/?', '', $objFile->getPathname(), 1);
+
+                    // Add file to zip.
+                    if ($objZipArchive->addFile($strFile, $strFile) == false)
+                    {
+                        $arrFileSkipped[] = $strFile;
+                    }
+                }
+            }
+            // Add files.
+            else if (file_exists(TL_ROOT . '/' . $file))
+            {
+                if ($objZipArchive->addFile($file, $file) == false)
+                {
+                    $arrFileSkipped[] = $file;
+                }
             }
         }
 
+        // Close zip, write data.
         $objZipArchive->close();
 
         return array("name"    => $strFilename, "skipped" => $arrFileSkipped);
