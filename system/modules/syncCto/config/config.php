@@ -159,6 +159,7 @@ $GLOBALS['SYC_CONFIG']['local_blacklist'] = array_merge( (array) $GLOBALS['SYC_C
  */
 $GLOBALS['SYC_CONFIG']['folder_whitelist'] = array_merge( (array) $GLOBALS['SYC_CONFIG']['folder_whitelist'], array(
     'assets',
+	'composer',
     'contao',
     'plugins',
     'share',
