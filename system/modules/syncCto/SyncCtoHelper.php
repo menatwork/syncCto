@@ -134,7 +134,7 @@ class SyncCtoHelper extends Backend
             $objFile->close();        
             
             // If true we have the right DC_General Version.
-            if(stripos($strContent, 'dcGeneral_autoload') !== false)
+            if(stripos($strContent, 'dcGeneral_autoload') !== false || stripos($strContent, 'ClassLoader') !== false)
             {
                 return true;
             }
