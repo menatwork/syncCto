@@ -29,7 +29,7 @@ $GLOBALS['TL_DCA']['tl_synccto_clients'] = array(
         ),
         'label'       => array(
             'fields' => array('title', 'id', 'address', 'path', 'id'),
-            'format'            => '<img class="ping" src="system/modules/syncCto/html/js/images/empty.png" alt="" /> %s <span style="color: #aaaaaa; padding-left: 3px;">(' . $GLOBALS['TL_LANG']['tl_syncCto_clients']['id'][0] . ': %s, ' . $GLOBALS['TL_LANG']['tl_syncCto_clients']['address'][0] . ': <span>%s%s</span><span class="client-id invisible">%s</span>)</span>',
+            'format'            => '<img class="ping" src="system/modules/syncCto/html/js/images/gray.png" alt="" /> %s <span style="color: #aaaaaa; padding-left: 3px;">(' . $GLOBALS['TL_LANG']['tl_syncCto_clients']['id'][0] . ': %s, ' . $GLOBALS['TL_LANG']['tl_syncCto_clients']['address'][0] . ': <span>%s%s</span><span class="client-id invisible">%s</span>)</span>',
         ),
         'global_operations' => array(
             'all' => array(

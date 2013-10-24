@@ -26,7 +26,7 @@ function sendNextRequest(_strToken, _objElements, _intIndex)
             "clientID"  : clientID
         }
     }
-    
+
     // Send new request for ping
     new Request.JSON({
         method:'post',
@@ -34,21 +34,30 @@ function sendNextRequest(_strToken, _objElements, _intIndex)
         data: data,
         evalScripts:false,
         evalResponse:false,
-        onSuccess:function(json){                    
-            // On this position we have a error or no response from client
-            if(json.error == true || json.value == 0)
+        onSuccess:function(json){ 
+            if(json.success == false)
             {
-                item.setProperty('src','system/modules/syncCto/html/js/images/offline.png');         
+                item.setProperty('src','system/modules/syncCto/html/js/images/gray.png');         
             }
-            // We have a response but no ctoCommunication.php found
-            else if(json.value == '1')
-            {   
-                item.setProperty('src','system/modules/syncCto/html/js/images/missing.png');   
+            else if(json.value == 0)
+            {
+                item.setProperty('src','system/modules/syncCto/html/js/images/gray.png');         
             }
-            // We have found ctoCommunication
-            else if(json.value == 2 || json.value == 3)
+            else if(json.value == 1)
             {   
-                item.setProperty('src','system/modules/syncCto/html/js/images/online.png');
+                item.setProperty('src','system/modules/syncCto/html/js/images/red.png');   
+            }
+            else if(json.value == 2)
+            {   
+                item.setProperty('src','system/modules/syncCto/html/js/images/blue.png');
+            }
+            else if(json.value == 3)
+            {   
+                item.setProperty('src','system/modules/syncCto/html/js/images/orange.png');
+            }
+            else if(json.value == 4)
+            {   
+                item.setProperty('src','system/modules/syncCto/html/js/images/green.png');
             }
             
             if((_objElements.length - 1 ) > _intIndex)
