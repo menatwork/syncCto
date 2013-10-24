@@ -258,10 +258,20 @@ class SyncCtoDatabase extends Backend
      * @param bool $booTempFolder Should the tmp folde used instead of backupfolder
      * @return void 
      */
-    public function runDump($mixTables, $booTempFolder, $booOnlyMachine = false)
+    public function runDump($mixTables, $booTempFolder, $booOnlyMachine = true)
     {
         // Set time limit to unlimited
         set_time_limit(0);
+
+        // Set limit for db query. Ticket #163
+        if ($GLOBALS['TL_CONFIG']['syncCto_custom_settings'] == true && intval($GLOBALS['TL_CONFIG']['syncCto_db_query_limt']) > 0)
+        {
+            $intElementsPerRequest = intval($GLOBALS['TL_CONFIG']['syncCto_db_query_limt']);
+        }
+        else
+        {
+            $intElementsPerRequest = 500;
+        }
 
         // Add to the backup array all tables
         if (is_array($mixTables))
@@ -414,8 +424,6 @@ class SyncCtoDatabase extends Backend
 
                 $arrFieldMeta[$value["name"]] = $value;
             }
-
-            $intElementsPerRequest = 500;
 
             $objXml->startElement('table');
             $objXml->writeAttribute('name', $TableName);
@@ -606,7 +614,6 @@ class SyncCtoDatabase extends Backend
                     $arrFieldMeta[$value["name"]] = $value;
                 }
 
-                $intElementsPerRequest = 500;
                 $booFirstEntry         = true;
 
                 for ($i = 0; true; $i++)
