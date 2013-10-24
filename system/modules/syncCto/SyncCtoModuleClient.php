@@ -1215,22 +1215,24 @@ class SyncCtoModuleClient extends BackendModule
                  */
                 case 3:
                     // Get infomations
-                    $arrConfigurations = $this->objSyncCtoCommunicationClient->getPhpConfigurations();
-                    $arrFunctions      = $this->objSyncCtoCommunicationClient->getPhpFunctions();
-                    $arrProFunctions   = $this->objSyncCtoCommunicationClient->getProFunctions();
-                    $strVersion        = $this->objSyncCtoCommunicationClient->getVersionSyncCto();
+                    $arrConfigurations      = $this->objSyncCtoCommunicationClient->getPhpConfigurations();
+                    $arrFunctions           = $this->objSyncCtoCommunicationClient->getPhpFunctions();
+                    $arrProFunctions        = $this->objSyncCtoCommunicationClient->getProFunctions();
+                    $arrExtendedInformation = $this->objSyncCtoCommunicationClient->getExtendedInformation();
+                    $strVersion             = $this->objSyncCtoCommunicationClient->getVersionSyncCto();
 
                     // Stop connection
                     $this->objSyncCtoCommunicationClient->stopConnection();
                     SyncCtoStats::getInstance()->addEndStat(time());
 
                     // Load module for html
-                    $objCheck                                = new SyncCtoModuleCheck();
-                    $objCheckTemplate                        = new BackendTemplate('be_syncCto_smallCheck');
-                    $objCheckTemplate->checkPhpConfiguration = $objCheck->checkPhpConfiguration($arrConfigurations);
-                    $objCheckTemplate->checkPhpFunctions     = $objCheck->checkPhpFunctions($arrFunctions);
-                    $objCheckTemplate->checkProFunctions     = $objCheck->checkProFunctions($arrProFunctions);
-                    $objCheckTemplate->syc_version           = $strVersion;
+                    $objCheck                                   = new SyncCtoModuleCheck();
+                    $objCheckTemplate                           = new BackendTemplate('be_syncCto_smallCheck');
+                    $objCheckTemplate->checkPhpConfiguration    = $objCheck->checkPhpConfiguration($arrConfigurations);
+                    $objCheckTemplate->checkPhpFunctions        = $objCheck->checkPhpFunctions($arrFunctions);
+                    $objCheckTemplate->checkProFunctions        = $objCheck->checkProFunctions($arrProFunctions);
+                    $objCheckTemplate->checkExtendedInformation = $objCheck->compareExtendedInformation($objCheck->getExtendedInformation(), $arrExtendedInformation);
+                    $objCheckTemplate->syc_version              = $strVersion;
 
                     // Show information
                     $this->objData->setState(SyncCtoEnum::WORK_OK);
@@ -1243,6 +1245,10 @@ class SyncCtoModuleClient extends BackendModule
                     $this->objStepPool->step++;
 
                 case 4:
+                    $this->objData->setState(SyncCtoEnum::WORK_OK);
+                    $this->booFinished           = true;
+                    $this->booRefresh            = false;
+                    $this->Template->showControl = false;
                     break;
             }
         }

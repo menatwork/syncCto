@@ -62,6 +62,7 @@ class SyncCtoModuleCheck extends BackendModule
         $this->Template->checkPhpConfiguration    = $this->checkPhpConfiguration($this->getPhpConfigurations());
         $this->Template->checkPhpFunctions        = $this->checkPhpFunctions($this->getPhpFunctions());
         $this->Template->checkProFunctions        = $this->checkProFunctions($this->getMySqlFunctions());
+        $this->Template->extendedInformation      = $this->checkExtendedInformation($this->getExtendedInformation());
         $this->Template->syc_version              = $GLOBALS['SYC_VERSION'];
     }
 
@@ -175,6 +176,46 @@ class SyncCtoModuleCheck extends BackendModule
             'error_create' => $strErrorCreate,
             'error_delete' => $strErrorDelete,
         );
+    }
+    
+    public function getExtendedInformation()
+    {
+        $arrReturn = array();
+
+        // date_default_timezone_get
+        if (date_default_timezone_get())
+        {
+            $arrReturn['date_default_timezone'] =  date_default_timezone_get();
+        }
+        else
+        {
+            $arrReturn['date_default_timezone'] = '';
+        }
+
+        // date.timezone
+        if (ini_get('date.timezone'))
+        {
+            $arrReturn['date_ini_timezone'] =  ini_get('date.timezone');
+        }
+        else
+        {
+            $arrReturn['date_ini_timezone'] = '';
+        }
+
+        // $_SERVER[$value]
+        $arrServerInfo = array(
+            'server_software' => 'SERVER_SOFTWARE',
+        );
+
+        foreach ($arrServerInfo as $strKey => $strValue)
+        {
+           $arrReturn[$strKey] = $_SERVER[$strValue];
+        }
+
+        // PHP
+        $arrReturn['php_version'] = phpversion();
+
+        return $arrReturn;
     }
 
     /**
@@ -472,6 +513,82 @@ class SyncCtoModuleCheck extends BackendModule
             
             $return .= '<tr class="' . ($ok ? 'ok' : 'warning') . '">';
             $return .= '<td colspan="4">' . $GLOBALS['TL_LANG']['tl_syncCto_check']['trigger_information'] . '</td>';           
+            $return .= '</tr>';
+        }
+
+        $return .= '</table>';
+
+        return $return;
+    }
+
+    public function checkExtendedInformation($arrExtendedFunctions)
+    {
+        $return .= '<table width="100%" cellspacing="0" cellpadding="0" class="extensions" summary="">';
+        $return .= '<colgroup>';
+        $return .= '<col width="50%" />';
+        $return .= '<col width="50%" />';
+        $return .= '</colgroup>';
+        $return .= '<tr>';
+        $return .= '<th>' . $GLOBALS['TL_LANG']['tl_syncCto_check']['parameter'] . '</th>';       
+        $return .= '<th>' . $GLOBALS['TL_LANG']['tl_syncCto_check']['value'] . '</th>';
+        $return .= '</tr>';
+        
+        foreach ($arrExtendedFunctions as $key => $value)
+        {
+            if(isset($GLOBALS['TL_LANG']['tl_syncCto_check']['extendedInformation_desc'][$key]))
+            {
+                $strTitle = $GLOBALS['TL_LANG']['tl_syncCto_check']['extendedInformation_desc'][$key];
+            }
+            else
+            {
+                $strTitle = $key;
+            }
+
+            $return .= '<tr class="ok">';
+            $return .= '<td>' . $strTitle . '</td>';
+            $return .= '<td>' . $value . '</td>';
+            $return .= '</tr>';
+        }
+
+        $return .= '</table>';
+        
+        return $return;
+    }
+    
+    public function compareExtendedInformation($arrServerExtendedFunctions, $arrClientExtendedFunctions)
+    {
+        $return .= '<table width="100%" cellspacing="0" cellpadding="0" class="extensions" summary="">';
+        $return .= '<colgroup>';
+        $return .= '<col width="25%" />';
+        $return .= '<col width="5%" />';
+        $return .= '<col width="35%" />';
+        $return .= '<col width="35%" />';
+        $return .= '</colgroup>';
+        $return .= '<tr>';
+        $return .= '<th>' . $GLOBALS['TL_LANG']['tl_syncCto_check']['parameter'] . '</th>';       
+        $return .= '<th class="dot" style="width:1%;">&#149;</th>';
+        $return .= '<th>' . $GLOBALS['TL_LANG']['tl_syncCto_check']['value_server'] . '</th>';
+        $return .= '<th>' . $GLOBALS['TL_LANG']['tl_syncCto_check']['value_client'] . '</th>';
+        $return .= '</tr>';
+        
+        foreach ($arrServerExtendedFunctions as $key => $value)
+        {
+            if (isset($GLOBALS['TL_LANG']['tl_syncCto_check']['extendedInformation_desc'][$key]))
+            {
+                $strTitle = $GLOBALS['TL_LANG']['tl_syncCto_check']['extendedInformation_desc'][$key];
+            }
+            else
+            {
+                $strTitle = $key;
+            }
+
+            $blnSame = ($value == $arrClientExtendedFunctions[$key]);
+
+            $return .= '<tr class="' . (($blnSame) ? 'ok' : 'warning') . '">';
+            $return .= '<td>' . $strTitle . '</td>';
+            $return .= '<td class="dot">' . ($blnSame ? '&nbsp;' : '&#149;') . '</td>';
+            $return .= '<td>' . $value . '</td>';
+            $return .= '<td>' . $arrClientExtendedFunctions[$key] . '</td>';
             $return .= '</tr>';
         }
 
