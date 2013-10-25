@@ -178,8 +178,14 @@ class SyncCtoModuleCheck extends BackendModule
         );
     }
     
-    public function getExtendedInformation()
+    public function getExtendedInformation($strTimeFormate = null)
     {
+        // Set the time formate.
+        if(empty($strTimeFormate))
+        {
+            $strTimeFormate = $GLOBALS['TL_CONFIG']['datimFormat'];
+        }
+
         $arrReturn = array();
 
         // date_default_timezone_get
@@ -209,8 +215,19 @@ class SyncCtoModuleCheck extends BackendModule
 
         foreach ($arrServerInfo as $strKey => $strValue)
         {
-           $arrReturn[$strKey] = $_SERVER[$strValue];
+            $arrReturn[$strKey] = $_SERVER[$strValue];
         }
+
+        // Time
+        $intCurrentTime                       = time();
+        $arrReturn['current_time']['time']    = $intCurrentTime;
+        $arrReturn['current_time']['formate'] = date($strTimeFormate, $intCurrentTime);
+        $arrReturn['current_time']['day']     = date('d', $intCurrentTime);
+        $arrReturn['current_time']['month']   = date('m', $intCurrentTime);
+        $arrReturn['current_time']['year']    = date('Y', $intCurrentTime);
+        $arrReturn['current_time']['houre']   = date('H', $intCurrentTime);
+        $arrReturn['current_time']['minute']  = date('i', $intCurrentTime);
+        $arrReturn['current_time']['second']  = date('s', $intCurrentTime);
 
         // PHP
         $arrReturn['php_version'] = phpversion();
@@ -544,10 +561,20 @@ class SyncCtoModuleCheck extends BackendModule
                 $strTitle = $key;
             }
 
-            $return .= '<tr class="ok">';
-            $return .= '<td>' . $strTitle . '</td>';
-            $return .= '<td>' . $value . '</td>';
-            $return .= '</tr>';
+            if ($key == 'current_time')
+            {
+                $return .= '<tr class="ok">';
+                $return .= '<td>' . $strTitle . '</td>';
+                $return .= '<td>' . $value['formate'] . '</td>';
+                $return .= '</tr>';
+            }
+            else
+            {
+                $return .= '<tr class="ok">';
+                $return .= '<td>' . $strTitle . '</td>';
+                $return .= '<td>' . $value . '</td>';
+                $return .= '</tr>';
+            }
         }
 
         $return .= '</table>';
@@ -582,14 +609,45 @@ class SyncCtoModuleCheck extends BackendModule
                 $strTitle = $key;
             }
 
-            $blnSame = ($value == $arrClientExtendedFunctions[$key]);
+            if ($key == 'current_time')
+            {
+                $blnSame = true;
 
-            $return .= '<tr class="' . (($blnSame) ? 'ok' : 'warning') . '">';
-            $return .= '<td>' . $strTitle . '</td>';
-            $return .= '<td class="dot">' . ($blnSame ? '&nbsp;' : '&#149;') . '</td>';
-            $return .= '<td>' . $value . '</td>';
-            $return .= '<td>' . $arrClientExtendedFunctions[$key] . '</td>';
-            $return .= '</tr>';
+                // Check if same.
+                foreach ($value as $strTimeKey => $mixTimeValue)
+                {
+                    if (in_array($strTimeKey, array('time', 'formate', 'second')))
+                    {
+                        continue;
+                    }
+
+                    if ($mixTimeValue != $arrClientExtendedFunctions[$key][$strTimeKey])
+                    {                        
+                        $blnSame = false;
+                    }
+                }
+                
+                // Build html.
+                $return .= '<tr class="' . (($blnSame) ? 'ok' : 'warning') . '">';
+                $return .= '<td>' . $strTitle . '</td>';
+                $return .= '<td class="dot">' . ($blnSame ? '&nbsp;' : '&#149;') . '</td>';
+                $return .= '<td>' . $value['formate'] . '</td>';
+                $return .= '<td>' . $arrClientExtendedFunctions[$key]['formate'] . '</td>';
+                $return .= '</tr>';
+            }
+            else
+            {
+                // Check if same.
+                $blnSame = ($value == $arrClientExtendedFunctions[$key]);
+
+                // Build html.
+                $return .= '<tr class="' . (($blnSame) ? 'ok' : 'warning') . '">';
+                $return .= '<td>' . $strTitle . '</td>';
+                $return .= '<td class="dot">' . ($blnSame ? '&nbsp;' : '&#149;') . '</td>';
+                $return .= '<td>' . $value . '</td>';
+                $return .= '<td>' . $arrClientExtendedFunctions[$key] . '</td>';
+                $return .= '</tr>';
+            }
         }
 
         $return .= '</table>';

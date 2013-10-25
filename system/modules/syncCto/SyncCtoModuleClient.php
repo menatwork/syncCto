@@ -1218,7 +1218,7 @@ class SyncCtoModuleClient extends BackendModule
                     $arrConfigurations      = $this->objSyncCtoCommunicationClient->getPhpConfigurations();
                     $arrFunctions           = $this->objSyncCtoCommunicationClient->getPhpFunctions();
                     $arrProFunctions        = $this->objSyncCtoCommunicationClient->getProFunctions();
-                    $arrExtendedInformation = $this->objSyncCtoCommunicationClient->getExtendedInformation();
+                    $arrExtendedInformation = $this->objSyncCtoCommunicationClient->getExtendedInformation($GLOBALS['TL_CONFIG']['datimFormat']);
                     $strVersion             = $this->objSyncCtoCommunicationClient->getVersionSyncCto();
 
                     // Stop connection

@@ -500,8 +500,8 @@ $GLOBALS["CTOCOM_FUNCTIONS"]["SYNCCTO_GET_PHP_FUNCTIONS"] = array(
 $GLOBALS["CTOCOM_FUNCTIONS"]["SYNCCTO_GET_EXTENDED_INFORMATIONS"] = array(
     "class" => "SyncCtoModuleCheck",
     "function" => "getExtendedInformation",
-    "typ" => "get",
-    "parameter" => null,
+    "typ" => "POST",
+    "parameter" => array("DateFormate"),
 );
 
 $GLOBALS["CTOCOM_FUNCTIONS"]["SYNCCTO_GET_PRO_FUNCTIONS"] = array(

@@ -64,3 +64,4 @@ $GLOBALS['TL_LANG']['tl_syncCto_check']['extendedInformation_desc']['date_defaul
 $GLOBALS['TL_LANG']['tl_syncCto_check']['extendedInformation_desc']['date_ini_timezone']     = 'Zeitzone (PHP.ini)';
 $GLOBALS['TL_LANG']['tl_syncCto_check']['extendedInformation_desc']['server_software']       = 'Serversoftware';
 $GLOBALS['TL_LANG']['tl_syncCto_check']['extendedInformation_desc']['php_version']           = 'PHP-Version';
+$GLOBALS['TL_LANG']['tl_syncCto_check']['extendedInformation_desc']['current_time']          = 'Serverzeit';

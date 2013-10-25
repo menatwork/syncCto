@@ -917,9 +917,16 @@ class SyncCtoCommunicationClient extends CtoCommunication
         return $this->runServer("SYNCCTO_GET_PHP_CONFIGURATION");
     }
 
-    public function getExtendedInformation()
+    public function getExtendedInformation($strDateFormate)
     {
-        return $this->runServer("SYNCCTO_GET_EXTENDED_INFORMATIONS");
+        $arrData = array(
+            array(
+                "name"  => "DateFormate",
+                "value" => $strDateFormate,
+            ),
+        );
+
+        return $this->runServer("SYNCCTO_GET_EXTENDED_INFORMATIONS", $arrData);
     }
 	
 	/**
