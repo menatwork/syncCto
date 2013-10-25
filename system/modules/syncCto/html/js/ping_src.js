@@ -3,11 +3,11 @@
 function sendNextRequest(_strToken, _objElements, _intIndex)
 {
     item = _objElements[_intIndex];
-    
+
     // Get client id
     var clientID = item.getSiblings('span').getChildren('span.client-id')[0].getProperty("text").toString();
     var data;
-    
+
     // Check if the request token is set
     if( typeof(REQUEST_TOKEN) !== 'undefined' )
     {
@@ -37,37 +37,43 @@ function sendNextRequest(_strToken, _objElements, _intIndex)
         onSuccess:function(json){ 
             if(json.success == false)
             {
-                item.setProperty('src','system/modules/syncCto/html/js/images/gray.png');         
+                item.setProperty('src','system/modules/syncCto/html/js/images/gray.png');
+                item.setProperty('title',json.msg);      
             }
             else if(json.value == 0)
             {
-                item.setProperty('src','system/modules/syncCto/html/js/images/gray.png');         
+                item.setProperty('src','system/modules/syncCto/html/js/images/gray.png');
+                item.setProperty('title',json.msg);    
             }
             else if(json.value == 1)
             {   
-                item.setProperty('src','system/modules/syncCto/html/js/images/red.png');   
+                item.setProperty('src','system/modules/syncCto/html/js/images/red.png'); 
+                item.setProperty('title',json.msg);    
             }
             else if(json.value == 2)
             {   
                 item.setProperty('src','system/modules/syncCto/html/js/images/blue.png');
+                item.setProperty('title',json.msg);    
             }
             else if(json.value == 3)
             {   
                 item.setProperty('src','system/modules/syncCto/html/js/images/orange.png');
+                item.setProperty('title',json.msg);    
             }
             else if(json.value == 4)
             {   
                 item.setProperty('src','system/modules/syncCto/html/js/images/green.png');
+                item.setProperty('title',json.msg);    
             }
             
             if((_objElements.length - 1 ) > _intIndex)
             {
-                sendNextRequest(json.token, _objElements, (_intIndex + 1));   
-            }            
+                sendNextRequest(json.token, _objElements, (_intIndex + 1));
+            }
         }.bind(_objElements).bind(_intIndex),
         onFailure:function(responseTree,responseElements,response,js){
             // On error show red point
-            item.setProperty('src','system/modules/syncCto/html/js/images/offline.png');            
+            item.setProperty('src','system/modules/syncCto/html/js/images/offline.png');
         }.bind(_objElements).bind(_intIndex)
     }).send();
 }

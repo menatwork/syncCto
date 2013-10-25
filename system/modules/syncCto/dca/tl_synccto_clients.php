@@ -229,11 +229,12 @@ class tl_synccto_clients extends Backend
     }
 
     /**
-     * Set the javascript file for client ping 
+     * Set the js and css files for client ping 
      */
     public function checkClientStatus()
     {
         $GLOBALS['TL_JAVASCRIPT'][] = 'system/modules/syncCto/html/js/ping.js';
+        $GLOBALS['TL_CSS'][]        = 'system/modules/syncCto/html/css/legend.css';
     }
 
     /**

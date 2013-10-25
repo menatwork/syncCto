@@ -51,6 +51,7 @@ class SyncCtoHelper extends Backend
 
         // Language
         $this->loadLanguageFile("default");
+        $this->loadLanguageFile('tl_synccto_clients');
                 
         // Instance a list for regex from the blacklist for folders.
         $this->arrPreparedBlacklistFolder = array();
@@ -380,6 +381,47 @@ class SyncCtoHelper extends Backend
      */
 
     /**
+     * Add the legend to the tmeplate.
+     * 
+     * @param string $strContent HTML Content.
+     * @param string $strTemplate Name of template.
+     * 
+     * @return string HTML content.
+     */
+    public function addLegend($strContent, $strTemplate)
+    {
+        // Check some vars if we have the overview.
+        $strDo  = Input::getInstance()->get('do');
+        $strTable  = Input::getInstance()->get('table');
+        $strAct = Input::getInstance()->get('act');
+
+        if ($strDo == 'synccto_clients' && empty($strAct) && empty($strTable) && $strTemplate == 'be_main')
+        {
+            // Split on the form | globale btn
+            $arrContent = split('<div id="tl_buttons">', $strContent, 2);
+
+            // Check if we have 2 elements.
+            if (count($arrContent) != 2)
+            {
+                return $strContent;
+            }
+
+            // Get legend template.
+            $objLegendTemplate = new BackendTemplate('be_syncCto_legend');
+
+            // Build new html and return.
+            $strReturn = $arrContent[0];
+            $strReturn .= $objLegendTemplate->parse();
+            $strReturn .= '<div id="tl_buttons">';
+            $strReturn .= $arrContent[1];
+            
+            return $strReturn;
+        }
+
+        return $strContent;
+    }
+
+    /**
      * Ping the current client status
      * 
      * @param string $strAction 
@@ -408,6 +450,7 @@ class SyncCtoHelper extends Backend
                         "success" => false,
                         "value"   => 0,
                         "error"   => "",
+                        "msg"     => $GLOBALS['TL_LANG']['tl_synccto_clients']['state']['gray'],
                         "token"   => REQUEST_TOKEN
                     );
 
@@ -456,6 +499,7 @@ class SyncCtoHelper extends Backend
                         $arrReturn["success"] = true;
                         $arrReturn["value"]   = 1;
                         $arrReturn["error"]   = 'Missing contao.';
+                        $arrReturn["msg"]     = $GLOBALS['TL_LANG']['tl_synccto_clients']['state']['red'];
                         echo json_encode($arrReturn);
                         exit();
                     }
@@ -469,6 +513,7 @@ class SyncCtoHelper extends Backend
                         $arrReturn["success"] = true;
                         $arrReturn["value"]   = 2;
                         $arrReturn["error"]   = 'Missing ctoCommunication.php';
+                        $arrReturn["msg"]     = $GLOBALS['TL_LANG']['tl_synccto_clients']['state']['blue'];
                         echo json_encode($arrReturn);
                         exit();
                     }
@@ -497,6 +542,7 @@ class SyncCtoHelper extends Backend
                             $arrReturn["success"] = true;
                             $arrReturn["value"]   = 2;
                             $arrReturn["error"]   = $exc->getMessage();
+                            $arrReturn["msg"]     = $GLOBALS['TL_LANG']['tl_synccto_clients']['state']['blue'];
                             echo json_encode($arrReturn);
                             exit();
                         }
@@ -509,6 +555,7 @@ class SyncCtoHelper extends Backend
                         $arrReturn["success"] = true;
                         $arrReturn["value"]   = 3;
                         $arrReturn["error"]   = $exc->getMessage();
+                        $arrReturn["msg"]     = $GLOBALS['TL_LANG']['tl_synccto_clients']['state']['orange'];
                         echo json_encode($arrReturn);
                         exit();
                     }
@@ -516,6 +563,7 @@ class SyncCtoHelper extends Backend
                     // State: Greeb => All systems ready.
                     $arrReturn["success"] = true;
                     $arrReturn["value"]   = 4;
+                    $arrReturn["msg"]     = $GLOBALS['TL_LANG']['tl_synccto_clients']['state']['green'];
                     echo json_encode($arrReturn);
                     exit();
                 }

@@ -22,6 +22,8 @@ $GLOBALS['TL_LANG']['tl_syncCto_check']['proFunctions']             = 'Pro funct
  */
 $GLOBALS['TL_LANG']['tl_syncCto_check']['parameter']                = 'Parameter';
 $GLOBALS['TL_LANG']['tl_syncCto_check']['value']                    = 'Value';
+$GLOBALS['TL_LANG']['tl_syncCto_check']['value_server']             = 'Value Server';
+$GLOBALS['TL_LANG']['tl_syncCto_check']['value_client']             = 'Value Client';
 $GLOBALS['TL_LANG']['tl_syncCto_check']['description']              = 'Description';
 $GLOBALS['TL_LANG']['tl_syncCto_check']['on']                       = 'On';
 $GLOBALS['TL_LANG']['tl_syncCto_check']['off']                      = 'Off';
@@ -52,3 +54,11 @@ $GLOBALS['TL_LANG']['tl_syncCto_check']['setting_on']               = 'Recommend
  * Text
  */
 $GLOBALS['TL_LANG']['tl_syncCto_check']['safemodehack']             = 'syncCto cannot be used because of missing write permissions.';
+
+/**
+ * Extended information
+ */
+$GLOBALS['TL_LANG']['tl_syncCto_check']['extendedInformation_desc']['date_default_timezone'] = 'Time zone (System)';
+$GLOBALS['TL_LANG']['tl_syncCto_check']['extendedInformation_desc']['date_ini_timezone']     = 'Time zine (PHP.ini)';
+$GLOBALS['TL_LANG']['tl_syncCto_check']['extendedInformation_desc']['server_software']       = 'Server software';
+$GLOBALS['TL_LANG']['tl_syncCto_check']['extendedInformation_desc']['php_version']           = 'PHP-Version';
