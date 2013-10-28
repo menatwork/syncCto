@@ -398,7 +398,7 @@ class SyncCtoHelper extends Backend
         if ($strDo == 'synccto_clients' && empty($strAct) && empty($strTable) && $strTemplate == 'be_main')
         {
             // Split on the form | globale btn
-            $arrContent = split('<div id="tl_buttons">', $strContent, 2);
+            $arrContent = explode('<div id="tl_buttons">', $strContent, 2);
 
             // Check if we have 2 elements.
             if (count($arrContent) != 2)
