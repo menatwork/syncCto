@@ -341,9 +341,6 @@ class SyncCtoDatabase extends Backend
                 continue;
             }
 
-            // Check if we have enough ram
-            $this->checkRAM($objXml, $objGzFile);
-
             // Get data
             $arrStructure = $this->getTableStructure($TableName);
 
@@ -389,6 +386,10 @@ class SyncCtoDatabase extends Backend
             $objXml->endElement(); // End table
         }
 
+        // Push structure into file.
+        $strXMLFlush = $objXml->flush(true);
+        gzputs($objGzFile, $strXMLFlush, strlen($strXMLFlush));
+
         $objXml->endElement(); // End structure
 
         $objXml->startElement('data');
@@ -400,9 +401,6 @@ class SyncCtoDatabase extends Backend
             {
                 continue;
             }
-
-            // Check if we have enough ram
-            $this->checkRAM($objXml, $objGzFile);
 
             // Check if table is in blacklist
             if (!in_array($TableName, $this->arrBackupTables))
@@ -430,8 +428,9 @@ class SyncCtoDatabase extends Backend
 
             for ($i = 0; true; $i++)
             {
-                // Check if we have enough ram
-                $this->checkRAM($objXml, $objGzFile);
+                // Push into file.
+                $strXMLFlush = $objXml->flush(true);
+                gzputs($objGzFile, $strXMLFlush, strlen($strXMLFlush));
 
                 $objData = $this->Database
                         ->prepare("SELECT * FROM $TableName")
@@ -445,9 +444,6 @@ class SyncCtoDatabase extends Backend
 
                 while ($row = $objData->fetchAssoc())
                 {
-                    // Check if we have enough ram
-                    $this->checkRAM($objXml, $objGzFile);
-
                     $objXml->startElement('row');
                     $objXml->writeAttribute("id", $row["id"]);
 
