@@ -44,14 +44,15 @@ ClassLoader::addClasses(array
  */
 TemplateLoader::addFiles(array
 (
-	'be_syncCto_smallCheck' => 'system/modules/syncCto/templates',
 	'be_syncCto_files'      => 'system/modules/syncCto/templates',
-	'be_syncCto_attention'  => 'system/modules/syncCto/templates',
-	'be_syncCto_database'   => 'system/modules/syncCto/templates',
-	'be_syncCto_backup'     => 'system/modules/syncCto/templates',
-	'be_syncCto_error'      => 'system/modules/syncCto/templates',
-	'be_syncCto_check'      => 'system/modules/syncCto/templates',
-	'be_syncCto_steps'      => 'system/modules/syncCto/templates',
 	'be_syncCto_popup'      => 'system/modules/syncCto/templates',
+	'be_syncCto_backup'     => 'system/modules/syncCto/templates',
+	'be_syncCto_attention'  => 'system/modules/syncCto/templates',
+	'be_syncCto_legend'     => 'system/modules/syncCto/templates',
+	'be_syncCto_smallCheck' => 'system/modules/syncCto/templates',
 	'be_syncCto_form'       => 'system/modules/syncCto/templates',
+	'be_syncCto_error'      => 'system/modules/syncCto/templates',
+	'be_syncCto_steps'      => 'system/modules/syncCto/templates',
+	'be_syncCto_check'      => 'system/modules/syncCto/templates',
+	'be_syncCto_database'   => 'system/modules/syncCto/templates',
 ));
