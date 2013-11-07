@@ -20,6 +20,9 @@ Systemzeit Server <> Client beim Systemcheck abgleichen (see #161).
 ### Feature
 Blacklist localconfig (see #132).
 
+### Defect
+Add the new php files to the autoload.php.
+
 
 Version 2.4.x
 -------------
