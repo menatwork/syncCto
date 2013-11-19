@@ -128,6 +128,7 @@ $GLOBALS['SYC_CONFIG']['file_blacklist'] = array_merge( (array) $GLOBALS['SYC_CO
     'TL_ROOT/.htpasswd',
     'localconfig.php',
     'pathconfig.php',
+    '.DS_Store',
     'composer/composer.json'
 ));
 
