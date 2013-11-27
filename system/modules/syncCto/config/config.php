@@ -14,7 +14,7 @@ $objInput = Input::getInstance();
 /**
  * Current syncCto version
  */
-$GLOBALS['SYC_VERSION'] = '2.4.6';
+$GLOBALS['SYC_VERSION'] = '2.5.0';
 
 /**
  * Back end modules
@@ -128,8 +128,7 @@ $GLOBALS['SYC_CONFIG']['file_blacklist'] = array_merge( (array) $GLOBALS['SYC_CO
     'TL_ROOT/.htpasswd',
     'localconfig.php',
     'pathconfig.php',
-    '.DS_Store',
-    'composer/composer.json'
+    '.DS_Store'
 ));
 
 // Local config
