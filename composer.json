@@ -48,10 +48,7 @@
 				"contao/popupSyncFiles.php":"contao/popupSyncFiles.php",
 				"system/modules/syncCto":"system/modules/syncCto",
 				"system/modules/syncCtoUpdater":"system/modules/syncCtoUpdater"
-			},
-			"runonce":[
-				"system/runonce.php"
-			]
+			}
 		},
 		"branch-alias":{
 			"dev-master":"2.4.x-dev"
