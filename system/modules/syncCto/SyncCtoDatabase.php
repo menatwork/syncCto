@@ -67,6 +67,20 @@ class SyncCtoDatabase extends Backend
     );
 
     /**
+     * A list with allowed keys for the field.
+     * 
+     * @var array 
+     */
+    protected $arrAllowedFieldKeys = array(
+        'name',
+        'type',
+        'attributes',
+        'null',
+        'extra',
+        'default'
+    );
+
+    /**
      * Search for special chars
      * 
      * @var array 
@@ -1514,6 +1528,12 @@ class SyncCtoDatabase extends Backend
             else
             {
                 $field['default'] = "default '" . $field['default'] . "'";
+            }
+
+            // Remove elements from the list, we did not want.
+            foreach (array_diff(array_keys($field), $this->arrAllowedFieldKeys) as $strKeyForUnset)
+            {
+                unset($field[$strKeyForUnset]);
             }
 
             $return['TABLE_FIELDS'][$name] = trim(implode(' ', $field));
