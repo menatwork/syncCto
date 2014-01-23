@@ -1211,9 +1211,25 @@ class SyncCtoModuleClient extends BackendModule
                     break;
 
                 /**
-                 * Get informations and close connection
+                 * Referer check deactivate
                  */
                 case 3:
+                    if (!$this->objSyncCtoCommunicationClient->referrerDisable())
+                    {
+                        $this->objData->setState(SyncCtoEnum::WORK_ERROR);
+                        $this->booError = true;
+                        $this->strError = $GLOBALS['TL_LANG']['ERR']['referer'];
+
+                        break;
+                    }
+
+                    $this->objStepPool->step++;
+                    break;
+
+                /**
+                 * Get informations and close connection
+                 */
+                case 4:
                     // Get infomations
                     $arrConfigurations      = $this->objSyncCtoCommunicationClient->getPhpConfigurations();
                     $arrFunctions           = $this->objSyncCtoCommunicationClient->getPhpFunctions();
@@ -1222,6 +1238,7 @@ class SyncCtoModuleClient extends BackendModule
                     $strVersion             = $this->objSyncCtoCommunicationClient->getVersionSyncCto();
 
                     // Stop connection
+                    $this->objSyncCtoCommunicationClient->referrerEnable();
                     $this->objSyncCtoCommunicationClient->stopConnection();
                     SyncCtoStats::getInstance()->addEndStat(time());
 
