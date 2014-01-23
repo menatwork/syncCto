@@ -397,6 +397,10 @@ class SyncCtoModuleBackup extends BackendModule
                     }
                     
                     $this->objStepPool->zipname = $this->objSyncCtoDatabase->runDump($this->arrBackupSettings['syncCto_BackupTables'], false, false);
+                    if(version_compare(VERSION, '3.0', '>='))
+                    {
+                        Dbafs::addResource(SyncCtoHelper::getInstance()->standardizePath($GLOBALS['SYC_PATH']['db'],$this->objStepPool->zipname));
+                    }
                     $this->intStep++;
                     break;
 
@@ -577,6 +581,11 @@ class SyncCtoModuleBackup extends BackendModule
                     $arrResult                       = $this->objSyncCtoFiles->runDump($this->arrBackupSettings['backup_name'], $this->arrBackupSettings['core_files'], $this->arrBackupSettings['user_filelist']);
                     $this->objStepPool->zipname      = $arrResult["name"];
                     $this->objStepPool->skippedfiles = $arrResult["skipped"];
+
+                    if(version_compare(VERSION, '3.0', '>='))
+                    {
+                        Dbafs::addResource(SyncCtoHelper::getInstance()->standardizePath($GLOBALS['SYC_PATH']['file'],$this->objStepPool->zipname));
+                    }
 
                     $this->intStep++;
                     break;
