@@ -115,11 +115,14 @@ $GLOBALS['SYC_CONFIG']['table_hidden'] = array_merge( (array) $GLOBALS['SYC_CONF
 
 // Folders
 $GLOBALS['SYC_CONFIG']['folder_blacklist'] = array_merge( (array) $GLOBALS['SYC_CONFIG']['folder_blacklist'], array(
+    'assets/css',
+    'assets/images',
+    'system/cache',
     'system/html',
     'system/logs',
     'system/scripts',
     'system/tmp',
-    '*/syncCto_backups',
+    '*/syncCto_backups'
 ));
 
 // Files only sync.
