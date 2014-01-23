@@ -408,9 +408,18 @@ class SyncCtoModuleBackup extends BackendModule
                     $this->objData->setStep(1);
                     $this->objData->setState(SyncCtoEnum::WORK_OK);
 
-                    $strHTML = "<p class='tl_help'><br />";
-                    $strHTML .= "<a" . ((version_compare(VERSION, '2.11', '==')) ? ' data-lightbox="600 300"' : ' rel="lightbox[600 300]"') . " href='contao/popup.php?src=" . base64_encode($GLOBALS['TL_CONFIG']['uploadPath'] . "/syncCto_backups/database/" . $this->objStepPool->zipname) . "'>" . $GLOBALS['TL_LANG']['MSC']['fileDownload'] . "</a>";
-                    $strHTML .= "</p>";
+                    if(version_compare(VERSION, '3.0', '>='))
+                    {
+                        $strHTML = "<p class='tl_help'><br />";
+                        $strHTML .= "<a onclick=\"Backend.openModalIframe({'width':600,'title':'" . $this->objStepPool->zipname . "','url':this.href,'height':216});return false\" href='contao/popup.php?src=" . base64_encode($GLOBALS['TL_CONFIG']['uploadPath'] . "/syncCto_backups/database/" . $this->objStepPool->zipname) . "'>" . $GLOBALS['TL_LANG']['MSC']['fileDownload'] . "</a>";
+                        $strHTML .= "</p>";
+                    }
+                    else
+                    {
+                        $strHTML = "<p class='tl_help'><br />";
+                        $strHTML .= "<a data-lightbox='600 300' href='contao/popup.php?src=" . base64_encode($GLOBALS['TL_CONFIG']['uploadPath'] . "/syncCto_backups/database/" . $this->objStepPool->zipname) . "'>" . $GLOBALS['TL_LANG']['MSC']['fileDownload'] . "</a>";
+                        $strHTML .= "</p>";
+                    }
 
                     $this->objData->setStep(2);
                     $this->objData->setTitle($GLOBALS['TL_LANG']['MSC']['complete']);
@@ -580,9 +589,18 @@ class SyncCtoModuleBackup extends BackendModule
                     $this->objData->setStep(1);
                     $this->objData->setState(SyncCtoEnum::WORK_OK);
 
-                    $strHTML = "<p class='tl_help'><br />";
-                    $strHTML .= "<a" . ((version_compare(VERSION, '2.11', '==')) ? ' data-lightbox="600 300"' : ' rel="lightbox[600 300]"') . " href='contao/popup.php?src=" . base64_encode($GLOBALS['TL_CONFIG']['uploadPath'] . "/syncCto_backups/files/" . $this->objStepPool->zipname) . "'>" . $GLOBALS['TL_LANG']['MSC']['fileDownload'] . "</a>";
-                    $strHTML .= "</p>";
+                    if(version_compare(VERSION, '3.0', '>='))
+                    {
+                        $strHTML = "<p class='tl_help'><br />";
+                        $strHTML .= "<a onclick=\"Backend.openModalIframe({'width':600,'title':'" . $this->objStepPool->zipname . "','url':this.href,'height':216});return false\" href='contao/popup.php?src=" . base64_encode($GLOBALS['TL_CONFIG']['uploadPath'] . "/syncCto_backups/files/" . $this->objStepPool->zipname) . "'>" . $GLOBALS['TL_LANG']['MSC']['fileDownload'] . "</a>";
+                        $strHTML .= "</p>";
+                    }
+                    else
+                    {
+                        $strHTML = "<p class='tl_help'><br />";
+                        $strHTML .= "<a data-lightbox='600 300' href='contao/popup.php?src=" . base64_encode($GLOBALS['TL_CONFIG']['uploadPath'] . "/syncCto_backups/files/" . $this->objStepPool->zipname) . "'>" . $GLOBALS['TL_LANG']['MSC']['fileDownload'] . "</a>";
+                        $strHTML .= "</p>";
+                    }
 
                     if (count($this->objStepPool->skippedfiles) != 0)
                     {
