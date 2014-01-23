@@ -60,7 +60,7 @@ class SyncCtoFiles extends Backend
         $this->intMaxExecutionTime = intval($this->intMaxExecutionTime / 100 * 25);
         
         // Flags for file scanning.
-        $this->strRDIFlags = RecursiveDirectoryIterator::FOLLOW_SYMLINKS | RecursiveDirectoryIterator::SKIP_DOTS;
+        $this->strRDIFlags = RecursiveDirectoryIterator::FOLLOW_SYMLINKS | RecursiveDirectoryIterator::SKIP_DOTS | RecursiveDirectoryIterator::UNIX_PATHS;
     }
 
     /**
