@@ -389,7 +389,14 @@ class SyncCtoFiles extends Backend
         $objFileXML->append($objXml->flush(true), "");
         $objFileXML->close();
 
-        return true;
+        if(file_exists(TL_ROOT . '/' . $strXMLFile))
+        {
+            return true;
+        }
+        else
+        {
+            return false;
+        }
     }
 
     ////////////////////////////////////////////////////////////////////////////
