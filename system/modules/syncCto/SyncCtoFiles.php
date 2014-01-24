@@ -368,7 +368,7 @@ class SyncCtoFiles extends Backend
                 }
             }
 
-            if ($this->intMaxMemoryUsage < memory_get_usage(true))
+            if (($i % 10) == 0)
             {
                 $objFileXML->append($objXml->flush(true), "");
                 $objFileXML->close();
