@@ -340,6 +340,12 @@ class SyncCtoFiles extends Backend
         $i = 0;
         foreach ($objFileIterator as $objFile)
         {
+            // Skipe if we have a dir.
+            if($objFile->isDir())
+            {
+                continue;
+            }
+            
             // Get fileinformation.
             $strRelativePath = preg_replace('?' . $this->objSyncCtoHelper->getPreparedTlRoot() . '/?', '', $objFile->getPathname(), 1);
             $intSize         = $objFile->getSize();
