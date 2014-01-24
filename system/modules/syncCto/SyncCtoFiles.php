@@ -301,7 +301,7 @@ class SyncCtoFiles extends Backend
      * @param boolean $booFiles Files scan
      * @return boolean 
      */
-    protected function generateChecksumFileAsXML($strXMLFile, $booCore = false, $booFiles = false, $intInformations = SyncCtoEnum::FILEINFORMATION_SMALL)
+    public function generateChecksumFileAsXML($strXMLFile, $booCore = false, $booFiles = false, $intInformations = SyncCtoEnum::FILEINFORMATION_SMALL)
     {
         $strXMLFile = $this->objSyncCtoHelper->standardizePath($strXMLFile);
 
