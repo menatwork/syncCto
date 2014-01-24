@@ -373,7 +373,7 @@ class SyncCtoFiles extends Backend
                 $objFileXML->append($objXml->flush(true), "");
                 $objFileXML->close();
             }
-            
+
             $i++;
         }
 
@@ -570,7 +570,7 @@ class SyncCtoFiles extends Backend
             throw new Exception($GLOBALS['TL_LANG']['MSC']['error'] . ": " . $objZipArchive->getErrorDescription($mixError));
         }
 
-	    $arrFileSkipped = array();
+        $arrFileSkipped = array();
 
         // Run backup for the core files.
         if ($booCore)
@@ -703,7 +703,7 @@ class SyncCtoFiles extends Backend
         $arrFinished  = array();
         $intRuns = 0;
 
-        // Run throug each
+        // Run through each
         foreach ($objFilesList as $file)
         {
             // Check if file exists
