@@ -114,6 +114,7 @@ class CronFileBackups extends Backend
             if ($arrResult["done"] == true)
             {
                 $objFile = new File($strXMLPath);
+                $objFile->blnSyncDb = false;
                 $objFile->delete();
                 $objFile->close();
             }
