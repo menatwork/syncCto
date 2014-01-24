@@ -305,9 +305,10 @@ class SyncCtoFiles extends Backend
     {
         $strXMLFile = $this->objSyncCtoHelper->standardizePath($strXMLFile);
 
-        $objFile = new File($strXMLFile);
-        $objFile->delete();
-        $objFile->close();
+        $objFileXML = new \File($strXMLFile, false);
+        $objFileXML->blnSyncDb = false;
+        $objFileXML->delete();
+        $objFileXML->close();
 
         $objFileIterator = $this->getFileList($booCore, $booFiles);
 
@@ -369,8 +370,8 @@ class SyncCtoFiles extends Backend
 
             if ($this->intMaxMemoryUsage < memory_get_usage(true))
             {
-                $objFile->append($objXml->flush(true), "");
-                $objFile->close();
+                $objFileXML->append($objXml->flush(true), "");
+                $objFileXML->close();
             }
             
             $i++;
@@ -379,8 +380,8 @@ class SyncCtoFiles extends Backend
         $objXml->endElement(); // End files
         $objXml->endElement(); // End fileslist
 
-        $objFile->append($objXml->flush(true), "");
-        $objFile->close();
+        $objFileXML->append($objXml->flush(true), "");
+        $objFileXML->close();
 
         return true;
     }
