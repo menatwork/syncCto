@@ -67,11 +67,10 @@ class CronFileBackups extends Backend
             $strXMLPath  = $this->objSyncCtoHelper->standardizePath($GLOBALS['SYC_PATH']['file'], "Auto-File-BackUp.xml");
             $booFirstRun = false;
 
-            // Check if we allready have a filelist
+            // Check if we already have a file list
             if (!file_exists(TL_ROOT . "/" . $strXMLPath))
             {
                 $booFirstRun = true;
-
                 if (!$this->objSyncCtoFile->generateChecksumFileAsXML($strXMLPath, true, true, SyncCtoEnum::FILEINFORMATION_SMALL))
                 {
                     $this->log("Error by creating filelist.", __CLASS__ . " | " . __FUNCTION__, TL_CRON);
