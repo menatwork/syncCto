@@ -604,7 +604,7 @@ class SyncCtoHelper extends Backend
             $arrRequiredExtensions = array(
                 'ctoCommunication'  => 'ctoCommunication',
                 'MultiColumnWizard' => 'multicolumnwizard',
-                'generalDriver'     => 'generalDriver',
+                'DC_General'        => 'generalDriver',
                 'ZipArchiveCto'     => 'ZipArchiveCto'
             );
 
