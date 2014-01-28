@@ -117,4 +117,4 @@ $GLOBALS['TL_LANG']['ERR']['referer']                       = 'Konnte die Refere
 $GLOBALS['TL_LANG']['ERR']['version']                       = 'Versionskonflikt in %s. <br />Server: %s <br />Client: %s';
 $GLOBALS['TL_LANG']['ERR']['upload_ini']                    = 'Upload nicht erfolgreich. Funktion ist in der php.ini deaktiviert.';
 $GLOBALS['TL_LANG']['ERR']['rebuild']                       = 'Fehler beim Zusammenbau der Datei(en). Pfad: %s';
-$GLOBALS['TL_LANG']['ERR']['contao3']                       = 'Aufgrund eines schwerwiegenden Fehlers in Contao 3 kann syncCto den Client nur komplett überschreiben. Um diesen Fehler zu beheben wurde das <a href="https://github.com/contao/core/issues/5757">Ticket #5757</a> eröffnet. Melde dich dort und sorge dafür das der Fehler schnell und ordentlich behoben wird.';
+$GLOBALS['TL_LANG']['ERR']['contao3']                       = 'Leider unterstützt syncCto noch nicht die Umstellung der Dateistrukturen auf Contao 3.2! An einer Unterstützung wird gearbeitet.';

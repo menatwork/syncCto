@@ -17,18 +17,11 @@ MultiColumnWizard
 * https://github.com/menatwork/MultiColumnWizard
 
 
-3CFramework
+DC_General
 -----------
-* http://contao.org/en/extension-list/view/3CFramework.html
-* https://github.com/menatwork/3CFramework
+* https://contao.org/en/extension-list/view/DC_General.html
+* https://github.com/MetaModels/DC_General
 
-
-DC_Memory
----------
-
-* http://contao.org/en/extension-list/view/DC_Memory.html
-* https://github.com/menatwork/3CFramework
-  
 
 ZipArchiveCto
 -------------

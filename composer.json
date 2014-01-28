@@ -8,19 +8,19 @@
 	"authors":[
 		{
 			"name":"Andreas Isaak",
-			"email":"contao@men-at-work.de",
+			"email":"isaak@men-at-work.de",
 			"homepage":"http://www.men-at-work.de",
 			"role":"Developer"
 		},
 		{
 			"name":"Stefan Heimes",
-			"email":"contao@men-at-work.de",
+			"email":"heimes@men-at-work.de",
 			"homepage":"http://www.men-at-work.de",
 			"role":"Developer"
 		}
 	],
 	"support":{
-		"email":"info@men-at-work.de",
+		"email":"contao@men-at-work.de",
 		"issues":"https://github.com/menatwork/syncCto/issues",
 		"wiki":"https://github.com/menatwork/syncCto/wiki",
 		"irc":"irc://irc.freenode.org/contao.dev",

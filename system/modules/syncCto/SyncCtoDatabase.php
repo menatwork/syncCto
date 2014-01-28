@@ -67,6 +67,20 @@ class SyncCtoDatabase extends Backend
     );
 
     /**
+     * A list with allowed keys for the field.
+     * 
+     * @var array 
+     */
+    protected $arrAllowedFieldKeys = array(
+        'name',
+        'type',
+        'attributes',
+        'null',
+        'extra',
+        'default'
+    );
+
+    /**
      * Search for special chars
      * 
      * @var array 
@@ -258,10 +272,20 @@ class SyncCtoDatabase extends Backend
      * @param bool $booTempFolder Should the tmp folde used instead of backupfolder
      * @return void 
      */
-    public function runDump($mixTables, $booTempFolder, $booOnlyMachine = false)
+    public function runDump($mixTables, $booTempFolder, $booOnlyMachine = true)
     {
         // Set time limit to unlimited
         set_time_limit(0);
+
+        // Set limit for db query. Ticket #163
+        if ($GLOBALS['TL_CONFIG']['syncCto_custom_settings'] == true && intval($GLOBALS['TL_CONFIG']['syncCto_db_query_limt']) > 0)
+        {
+            $intElementsPerRequest = intval($GLOBALS['TL_CONFIG']['syncCto_db_query_limt']);
+        }
+        else
+        {
+            $intElementsPerRequest = 500;
+        }
 
         // Add to the backup array all tables
         if (is_array($mixTables))
@@ -331,9 +355,6 @@ class SyncCtoDatabase extends Backend
                 continue;
             }
 
-            // Check if we have enough ram
-            $this->checkRAM($objXml, $objGzFile);
-
             // Get data
             $arrStructure = $this->getTableStructure($TableName);
 
@@ -379,6 +400,10 @@ class SyncCtoDatabase extends Backend
             $objXml->endElement(); // End table
         }
 
+        // Push structure into file.
+        $strXMLFlush = $objXml->flush(true);
+        gzputs($objGzFile, $strXMLFlush, strlen($strXMLFlush));
+
         $objXml->endElement(); // End structure
 
         $objXml->startElement('data');
@@ -390,9 +415,6 @@ class SyncCtoDatabase extends Backend
             {
                 continue;
             }
-
-            // Check if we have enough ram
-            $this->checkRAM($objXml, $objGzFile);
 
             // Check if table is in blacklist
             if (!in_array($TableName, $this->arrBackupTables))
@@ -415,15 +437,14 @@ class SyncCtoDatabase extends Backend
                 $arrFieldMeta[$value["name"]] = $value;
             }
 
-            $intElementsPerRequest = 500;
-
             $objXml->startElement('table');
             $objXml->writeAttribute('name', $TableName);
 
             for ($i = 0; true; $i++)
             {
-                // Check if we have enough ram
-                $this->checkRAM($objXml, $objGzFile);
+                // Push into file.
+                $strXMLFlush = $objXml->flush(true);
+                gzputs($objGzFile, $strXMLFlush, strlen($strXMLFlush));
 
                 $objData = $this->Database
                         ->prepare("SELECT * FROM $TableName")
@@ -437,9 +458,6 @@ class SyncCtoDatabase extends Backend
 
                 while ($row = $objData->fetchAssoc())
                 {
-                    // Check if we have enough ram
-                    $this->checkRAM($objXml, $objGzFile);
-
                     $objXml->startElement('row');
                     $objXml->writeAttribute("id", $row["id"]);
 
@@ -606,7 +624,6 @@ class SyncCtoDatabase extends Backend
                     $arrFieldMeta[$value["name"]] = $value;
                 }
 
-                $intElementsPerRequest = 500;
                 $booFirstEntry         = true;
 
                 for ($i = 0; true; $i++)
@@ -1511,6 +1528,12 @@ class SyncCtoDatabase extends Backend
             else
             {
                 $field['default'] = "default '" . $field['default'] . "'";
+            }
+
+            // Remove elements from the list, we did not want.
+            foreach (array_diff(array_keys($field), $this->arrAllowedFieldKeys) as $strKeyForUnset)
+            {
+                unset($field[$strKeyForUnset]);
             }
 
             $return['TABLE_FIELDS'][$name] = trim(implode(' ', $field));

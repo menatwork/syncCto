@@ -30,6 +30,16 @@ $GLOBALS['TL_LANG']['tl_synccto_clients']['title_legend']       = 'Client descri
 $GLOBALS['TL_LANG']['tl_synccto_clients']['connection_legend']  = 'Connection settings';
 $GLOBALS['TL_LANG']['tl_synccto_clients']['apikey_legend']      = 'Encryption';
 $GLOBALS['TL_LANG']['tl_synccto_clients']['expert_legend']      = 'Expert settings';
+$GLOBALS['TL_LANG']['tl_synccto_clients']['legend']             = 'Legend: ';
+
+/**
+ * Legend ping state
+ */
+$GLOBALS['TL_LANG']['tl_synccto_clients']['state']['gray']      = 'Host was not checked yet.';
+$GLOBALS['TL_LANG']['tl_synccto_clients']['state']['red']       = 'The host is offline or could not be found.';
+$GLOBALS['TL_LANG']['tl_synccto_clients']['state']['blue']      = 'The extensions ctoCommunication or syncCto is not installed.';
+$GLOBALS['TL_LANG']['tl_synccto_clients']['state']['orange']    = 'The ctoCommunication API key is incorrect.';
+$GLOBALS['TL_LANG']['tl_synccto_clients']['state']['green']     = 'The host is online and ctoCommunication and syncCto are working correct.';
 
 /**
  * Fields

@@ -14,7 +14,7 @@ $objInput = Input::getInstance();
 /**
  * Current syncCto version
  */
-$GLOBALS['SYC_VERSION'] = '2.4.6';
+$GLOBALS['SYC_VERSION'] = '2.5.0';
 
 /**
  * Back end modules
@@ -53,6 +53,7 @@ $GLOBALS['TL_HOOKS']['executePreActions'][]          = array('SyncCtoHelper', 'p
 $GLOBALS['TL_HOOKS']['parseBackendTemplate'][]       = array('SyncCtoHelper', 'checkExtensions');
 $GLOBALS['TL_HOOKS']['parseBackendTemplate'][]       = array('SyncCtoHelper', 'checkLockStatus');
 $GLOBALS['TL_HOOKS']['addCustomRegexp'][]            = array('SyncCtoHelper', 'customRegexp');
+$GLOBALS['TL_HOOKS']['parseBackendTemplate'][]       = array('SyncCtoHelper', 'addLegend');
 if(SyncCtoHelper::isContao2())
     $GLOBALS['TL_HOOKS']['syncExecuteFinalOperations'][] = array('SyncCtoDatabaseUpdater', 'runAutoUpdate');    
 //else
@@ -114,11 +115,14 @@ $GLOBALS['SYC_CONFIG']['table_hidden'] = array_merge( (array) $GLOBALS['SYC_CONF
 
 // Folders
 $GLOBALS['SYC_CONFIG']['folder_blacklist'] = array_merge( (array) $GLOBALS['SYC_CONFIG']['folder_blacklist'], array(
+    'assets/css',
+    'assets/images',
+    'system/cache',
     'system/html',
     'system/logs',
     'system/scripts',
     'system/tmp',
-    '*/syncCto_backups',
+    '*/syncCto_backups'
 ));
 
 // Files only sync.
@@ -127,7 +131,7 @@ $GLOBALS['SYC_CONFIG']['file_blacklist'] = array_merge( (array) $GLOBALS['SYC_CO
     'TL_ROOT/.htpasswd',
     'localconfig.php',
     'pathconfig.php',
-    'composer/composer.json'
+    '.DS_Store'
 ));
 
 // Local config
@@ -494,6 +498,13 @@ $GLOBALS["CTOCOM_FUNCTIONS"]["SYNCCTO_GET_PHP_FUNCTIONS"] = array(
     "function" => "getPhpFunctions",
     "typ" => "get",
     "parameter" => null,
+);
+
+$GLOBALS["CTOCOM_FUNCTIONS"]["SYNCCTO_GET_EXTENDED_INFORMATIONS"] = array(
+    "class" => "SyncCtoModuleCheck",
+    "function" => "getExtendedInformation",
+    "typ" => "POST",
+    "parameter" => array("DateFormate"),
 );
 
 $GLOBALS["CTOCOM_FUNCTIONS"]["SYNCCTO_GET_PRO_FUNCTIONS"] = array(

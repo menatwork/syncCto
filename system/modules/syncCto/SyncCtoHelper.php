@@ -20,8 +20,18 @@ class SyncCtoHelper extends Backend
 
     // instance
     protected static $instance = null;
+    
     // Objects   
     protected $objSyncCtoDatabase;
+    
+    // Cache
+    protected $arrPreparedBlacklistFolder = null;
+    protected $arrPreparedBlacklistFiles  = null;
+	protected $strPreparedTlRoot = '';
+
+	// Config
+    protected $arrSearch  = array("\\", ".", "^", "?", "*", "/");
+    protected $arrReplace = array("\\\\", "\\.", "\\^", ".?", ".*", "\\/");
 
     /* -------------------------------------------------------------------------
      * Core
@@ -41,6 +51,24 @@ class SyncCtoHelper extends Backend
 
         // Language
         $this->loadLanguageFile("default");
+        $this->loadLanguageFile('tl_synccto_clients');
+                
+        // Instance a list for regex from the blacklist for folders.
+        $this->arrPreparedBlacklistFolder = array();
+        foreach ($this->getBlacklistFolder()as $key => $value)
+        {
+            $this->arrPreparedBlacklistFolder[$key] = str_replace($this->arrSearch, $this->arrReplace, $value);
+        }
+        
+        // Instance a list for regex from the blacklist for files.
+        $this->arrPreparedBlacklistFiles = array();
+        foreach ($this->getBlacklistFile()as $key => $value)
+        {
+            $this->arrPreparedBlacklistFiles[$key] = str_replace($this->arrSearch, $this->arrReplace, $value);
+        }
+		
+		// Replace some elements in TL_ROOT for regex.
+		$this->strPreparedTlRoot = str_replace('\\', '\\\\', TL_ROOT);
     }
 
     /**
@@ -51,7 +79,7 @@ class SyncCtoHelper extends Backend
     {
         if (self::$instance == null)
         {
-            self::$instance = new SyncCtoHelper();
+            self::$instance = new self();
         }
 
         return self::$instance;
@@ -277,7 +305,18 @@ class SyncCtoHelper extends Backend
      * Black and Whitelists
      */
 
-    public function getBlacklistFolder()
+	/**
+	 * Return the TL_ROOT prepared for regex.
+	 * 
+	 * @return string
+	 */
+	public function getPreparedTlRoot()
+	{
+		return $this->strPreparedTlRoot;
+	}
+
+
+	public function getBlacklistFolder()
     {
         $arrLocalconfig   = deserialize($GLOBALS['TL_CONFIG']['syncCto_folder_blacklist']);
         $arrSyncCtoConfig = $GLOBALS['SYC_CONFIG']['folder_blacklist'];
@@ -285,18 +324,38 @@ class SyncCtoHelper extends Backend
         return $this->mergeConfigs($arrLocalconfig, $arrSyncCtoConfig);
     }
 
-    public function getWhitelistFolder()
+    /**
+     * Get a prepared list for regex.
+     * 
+     * @return array
+     */
+    public function getPreparedBlacklistFolder()
     {
-        $arrLocalconfig   = deserialize($GLOBALS['TL_CONFIG']['syncCto_folder_whitelist']);
-        $arrSyncCtoConfig = $GLOBALS['SYC_CONFIG']['folder_whitelist'];
-
-        return $this->mergeConfigs($arrLocalconfig, $arrSyncCtoConfig);
+        return $this->arrPreparedBlacklistFolder;
     }
 
     public function getBlacklistFile()
     {
         $arrLocalconfig   = deserialize($GLOBALS['TL_CONFIG']['syncCto_file_blacklist']);
         $arrSyncCtoConfig = $GLOBALS['SYC_CONFIG']['file_blacklist'];
+
+        return $this->mergeConfigs($arrLocalconfig, $arrSyncCtoConfig);
+    }
+
+    /**
+     * Get a prepared list for regex.
+     * 
+     * @return array
+     */
+    public function getPreparedBlacklistFiles()
+    {
+        return $this->arrPreparedBlacklistFiles;
+    }
+
+    public function getWhitelistFolder()
+    {
+        $arrLocalconfig   = deserialize($GLOBALS['TL_CONFIG']['syncCto_folder_whitelist']);
+        $arrSyncCtoConfig = $GLOBALS['SYC_CONFIG']['folder_whitelist'];
 
         return $this->mergeConfigs($arrLocalconfig, $arrSyncCtoConfig);
     }
@@ -322,6 +381,47 @@ class SyncCtoHelper extends Backend
      */
 
     /**
+     * Add the legend to the tmeplate.
+     * 
+     * @param string $strContent HTML Content.
+     * @param string $strTemplate Name of template.
+     * 
+     * @return string HTML content.
+     */
+    public function addLegend($strContent, $strTemplate)
+    {
+        // Check some vars if we have the overview.
+        $strDo  = Input::getInstance()->get('do');
+        $strTable  = Input::getInstance()->get('table');
+        $strAct = Input::getInstance()->get('act');
+
+        if ($strDo == 'synccto_clients' && empty($strAct) && empty($strTable) && $strTemplate == 'be_main')
+        {
+            // Split on the form | globale btn
+            $arrContent = explode('<div id="tl_buttons">', $strContent, 2);
+
+            // Check if we have 2 elements.
+            if (count($arrContent) != 2)
+            {
+                return $strContent;
+            }
+
+            // Get legend template.
+            $objLegendTemplate = new BackendTemplate('be_syncCto_legend');
+
+            // Build new html and return.
+            $strReturn = $arrContent[0];
+            $strReturn .= $objLegendTemplate->parse();
+            $strReturn .= '<div id="tl_buttons">';
+            $strReturn .= $arrContent[1];
+            
+            return $strReturn;
+        }
+
+        return $strContent;
+    }
+
+    /**
      * Ping the current client status
      * 
      * @param string $strAction 
@@ -330,19 +430,35 @@ class SyncCtoHelper extends Backend
     {
         if ($strAction == 'syncCtoPing')
         {
-            if (strlen($this->Input->post('clientID')) != 0 && is_numeric($this->Input->post('clientID')))
+            $intClientId = $this->Input->post('clientID');
+
+            if (!empty($intClientId) && is_numeric($intClientId))
             {
                 // Set time limit for this function
                 set_time_limit(10);
 
                 try
                 {
-                    $arrReturn = array("success" => false, "value"   => 0, "error"   => "", "token"   => REQUEST_TOKEN);
+                    // Flags fo the check.
+                    $blnFlagCheckContao  = false;
+                    $blnFlagCheckCtoCom  = false;
+                    $blnFlagCheckSyncCto = false;
+                    $blnFlagCheckCtoKey  = false;
+
+                    // Return array.
+                    $arrReturn          = array(
+                        "success" => false,
+                        "value"   => 0,
+                        "error"   => "",
+                        "msg"     => $GLOBALS['TL_LANG']['tl_synccto_clients']['state']['gray'],
+                        "token"   => REQUEST_TOKEN
+                    );
 
                     // Load Client from database
-                    $objClient = $this->Database->prepare("SELECT * FROM tl_synccto_clients WHERE id = %s")
+                    $objClient = Database::getInstance()
+                            ->prepare("SELECT * FROM tl_synccto_clients WHERE id = %s")
                             ->limit(1)
-                            ->execute((int) $this->Input->post('clientID'));
+                            ->execute($intClientId);
 
                     // Check if a client was loaded
                     if ($objClient->numRows == 0)
@@ -353,28 +469,9 @@ class SyncCtoHelper extends Backend
                         exit();
                     }
 
-                    // Clean link
-                    $objClient->path = preg_replace("/\/\z/i", "", $objClient->path);
-                    $objClient->path = preg_replace("/ctoCommunication.php\z/", "", $objClient->path);
+                    // Setup request class.
+                    $objRequest = new RequestExtendedCached();                   
 
-                    // Build link
-                    $strServer = $objClient->address . ":" . $objClient->port;
-
-                    if ($objClient->path == "")
-                    {
-
-                        $strUrl = $objClient->address . ":" . $objClient->port . "/ctoCommunication.php?act=ping";
-                    }
-                    else
-                    {
-                        $strUrl = $objClient->address . ":" . $objClient->port . "/" . $objClient->path . "/ctoCommunication.php?act=ping";
-                    }
-
-                    $intReturn = 0;
-
-                    $objRequest = new RequestExtendedCached();
-
-                    // Set http auth
                     if ($objClient->http_auth == true)
                     {
                         $this->import("Encryption");
@@ -383,27 +480,97 @@ class SyncCtoHelper extends Backend
                         $objRequest->password = $this->Encryption->decrypt($objClient->http_password);
                     }
 
-                    // Check Server
-                    $objRequest->send($strServer);
-                    if ($objRequest->code == '200')
+                    // Build base link.
+                    $objClient->path = preg_replace("/\/\z/i", "", $objClient->path);
+                    $objClient->path = preg_replace("/ctoCommunication.php\z/", "", $objClient->path);
+
+                    $strServerBaseUrl = $objClient->address . ":" . $objClient->port;
+                    if (strlen($objClient->path))
                     {
-                        $intReturn = $intReturn + 1;
+                        $strServerBaseUrl .= $objClient->path;
                     }
 
-                    // Check page
-                    $objRequest->send($strUrl);
-                    if ($objRequest->code == '200')
+                    // ---- First check for Contao ---- 
+
+                    $objRequest->send($strServerBaseUrl . '/contao/index.php');
+                    if ($objRequest->code != '200')
                     {
-                        $intReturn = $intReturn + 2;
+                        // State: Red => Offline.
+                        $arrReturn["success"] = true;
+                        $arrReturn["value"]   = 1;
+                        $arrReturn["error"]   = 'Missing contao.';
+                        $arrReturn["msg"]     = $GLOBALS['TL_LANG']['tl_synccto_clients']['state']['red'];
+                        echo json_encode($arrReturn);
+                        exit();
                     }
 
+                    // ---- Next CtoCom ---- 
+
+                    $objRequest->send($strServerBaseUrl . '/ctoCommunication.php?act=ping');
+                    if ($objRequest->code != '200')
+                    {
+                        // State: Blue => No CtoCom.
+                        $arrReturn["success"] = true;
+                        $arrReturn["value"]   = 2;
+                        $arrReturn["error"]   = 'Missing ctoCommunication.php';
+                        $arrReturn["msg"]     = $GLOBALS['TL_LANG']['tl_synccto_clients']['state']['blue'];
+                        echo json_encode($arrReturn);
+                        exit();
+                    }
+
+                    // ---- Next CtoCom Key + SyncCto ---- 
+
+                    $objSyncCtoClient = SyncCtoCommunicationClient::getInstance();
+                    $objSyncCtoClient->setClientBy($intClientId);
+
+                    try
+                    {
+                        $objSyncCtoClient->startConnection();
+
+                        // Check Version of syncCto.
+                        try
+                        {
+                            $mixVersion = $objSyncCtoClient->getVersionSyncCto();
+                            if(strlen($mixVersion) == 0)
+                            {
+                                throw new Exception('Missing syncCto Version.');
+                            }
+                        }
+                        catch (Exception $exc)
+                        {
+                            // State: Blue => SyncCto missing.
+                            $arrReturn["success"] = true;
+                            $arrReturn["value"]   = 2;
+                            $arrReturn["error"]   = $exc->getMessage();
+                            $arrReturn["msg"]     = $GLOBALS['TL_LANG']['tl_synccto_clients']['state']['blue'];
+                            echo json_encode($arrReturn);
+                            exit();
+                        }
+                        
+                        $objSyncCtoClient->stopConnection();
+                    }
+                    catch (Exception $exc)
+                    {
+                        // State: Orange => Key Error.
+                        $arrReturn["success"] = true;
+                        $arrReturn["value"]   = 3;
+                        $arrReturn["error"]   = $exc->getMessage();
+                        $arrReturn["msg"]     = $GLOBALS['TL_LANG']['tl_synccto_clients']['state']['orange'];
+                        echo json_encode($arrReturn);
+                        exit();
+                    }
+
+                    // State: Greeb => All systems ready.
                     $arrReturn["success"] = true;
-                    $arrReturn["value"]   = $intReturn;
+                    $arrReturn["value"]   = 4;
+                    $arrReturn["msg"]     = $GLOBALS['TL_LANG']['tl_synccto_clients']['state']['green'];
+                    echo json_encode($arrReturn);
+                    exit();
                 }
                 catch (Exception $exc)
                 {
                     $arrReturn["success"] = false;
-                    $arrReturn["error"]   = $exc->getMessage() . $exc->getFile() . " on " . $exc->getLine();
+                    $arrReturn["error"]   = $exc->getMessage() . " " . $exc->getFile() . " on " . $exc->getLine();
                 }
             }
             else
@@ -437,7 +604,7 @@ class SyncCtoHelper extends Backend
             $arrRequiredExtensions = array(
                 'ctoCommunication'  => 'ctoCommunication',
                 'MultiColumnWizard' => 'multicolumnwizard',
-                'generalDriver'     => 'generalDriver',
+                'DC_General'        => 'generalDriver',
                 'ZipArchiveCto'     => 'ZipArchiveCto'
             );
 
@@ -702,6 +869,8 @@ class SyncCtoHelper extends Backend
 
         return implode('/', $arrReturn);
     }
+	
+	
 
     /**
      * Returns a whole list of all tables in the database

@@ -916,6 +916,18 @@ class SyncCtoCommunicationClient extends CtoCommunication
     {
         return $this->runServer("SYNCCTO_GET_PHP_CONFIGURATION");
     }
+
+    public function getExtendedInformation($strDateFormate)
+    {
+        $arrData = array(
+            array(
+                "name"  => "DateFormate",
+                "value" => $strDateFormate,
+            ),
+        );
+
+        return $this->runServer("SYNCCTO_GET_EXTENDED_INFORMATIONS", $arrData);
+    }
 	
 	/**
 	 * Create a file which contains the relative path

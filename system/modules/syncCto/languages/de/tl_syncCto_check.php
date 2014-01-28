@@ -16,12 +16,16 @@ $GLOBALS['TL_LANG']['tl_syncCto_check']['check']                    = 'Systemche
 $GLOBALS['TL_LANG']['tl_syncCto_check']['configuration']            = 'PHP Konfigurationen';
 $GLOBALS['TL_LANG']['tl_syncCto_check']['functions']                = 'PHP Funktionen';
 $GLOBALS['TL_LANG']['tl_syncCto_check']['proFunctions']             = 'Pro Funktionen';
+$GLOBALS['TL_LANG']['tl_syncCto_check']['extendedInformation']      = 'Zusätzliche Informationen';
  
 /**
  * Table
  */
 $GLOBALS['TL_LANG']['tl_syncCto_check']['parameter']                = 'Parameter';
 $GLOBALS['TL_LANG']['tl_syncCto_check']['value']                    = 'Wert';
+$GLOBALS['TL_LANG']['tl_syncCto_check']['value_server']             = 'Werte Server';
+$GLOBALS['TL_LANG']['tl_syncCto_check']['value_client']             = 'Werte Client';
+$GLOBALS['TL_LANG']['tl_syncCto_check']['description']              = 'Beschreibung';
 $GLOBALS['TL_LANG']['tl_syncCto_check']['description']              = 'Beschreibung';
 $GLOBALS['TL_LANG']['tl_syncCto_check']['on']                       = 'An';
 $GLOBALS['TL_LANG']['tl_syncCto_check']['off']                      = 'Aus';
@@ -52,3 +56,12 @@ $GLOBALS['TL_LANG']['tl_syncCto_check']['setting_on']               = 'Die empfo
  * Text
  */
 $GLOBALS['TL_LANG']['tl_syncCto_check']['safemodehack']             = 'syncCto kann aufgrund fehlender Schreibrechte nicht ausgeführt werden.';
+
+/**
+ * Extended information
+ */
+$GLOBALS['TL_LANG']['tl_syncCto_check']['extendedInformation_desc']['date_default_timezone'] = 'Zeitzone (System)';
+$GLOBALS['TL_LANG']['tl_syncCto_check']['extendedInformation_desc']['date_ini_timezone']     = 'Zeitzone (PHP.ini)';
+$GLOBALS['TL_LANG']['tl_syncCto_check']['extendedInformation_desc']['server_software']       = 'Serversoftware';
+$GLOBALS['TL_LANG']['tl_syncCto_check']['extendedInformation_desc']['php_version']           = 'PHP-Version';
+$GLOBALS['TL_LANG']['tl_syncCto_check']['extendedInformation_desc']['current_time']          = 'Serverzeit';

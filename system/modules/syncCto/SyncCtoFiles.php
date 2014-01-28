@@ -14,9 +14,9 @@
  */
 class SyncCtoFiles extends Backend
 {
-    /* -------------------------------------------------------------------------
-     * Vars
-     */
+    ////////////////////////////////////////////////////////////////////////////
+    // Vars
+    ////////////////////////////////////////////////////////////////////////////
 
     // Singelten pattern
     protected static $instance         = null;
@@ -25,17 +25,16 @@ class SyncCtoFiles extends Backend
     protected $strTimestampFormat;
     protected $intMaxMemoryUsage;
     protected $intMaxExecutionTime;
+    protected $strRDIFlags;
     // Lists
-    protected $arrFolderBlacklist;
-    protected $arrFileBlacklist;
     protected $arrRootFolderList;
     // Objects 
     protected $objSyncCtoHelper;
     protected $objFiles;
-
-    /* -------------------------------------------------------------------------
-     * Core
-     */
+    
+    ////////////////////////////////////////////////////////////////////////////
+    // Core
+    ////////////////////////////////////////////////////////////////////////////
 
     /**
      * Constructor
@@ -50,22 +49,7 @@ class SyncCtoFiles extends Backend
         $this->strTimestampFormat = str_replace(array(':', ' '), array('', '_'), $GLOBALS['TL_CONFIG']['datimFormat']);
 
         // Load blacklists and whitelists
-        $this->arrFolderBlacklist = $this->objSyncCtoHelper->getBlacklistFolder();
-        $this->arrFileBlacklist   = $this->objSyncCtoHelper->getBlacklistFile();
         $this->arrRootFolderList  = $this->objSyncCtoHelper->getWhitelistFolder();
-
-        $arrSearch = array("\\", ".", "^", "?", "*", "/");
-        $arrReplace = array("\\\\", "\\.", "\\^", ".?", ".*", "\\/");
-
-        foreach ($this->arrFolderBlacklist as $key => $value)
-        {
-            $this->arrFolderBlacklist[$key] = str_replace($arrSearch, $arrReplace, $value);
-        }
-
-        foreach ($this->arrFileBlacklist as $key => $value)
-        {
-            $this->arrFileBlacklist[$key] = str_replace($arrSearch, $arrReplace, $value);
-        }
 
         // Get memory limit
         $this->intMaxMemoryUsage = intval(str_replace(array("m", "M", "k", "K"), array("000000", "000000", "000", "000"), ini_get('memory_limit')));
@@ -74,6 +58,9 @@ class SyncCtoFiles extends Backend
         // Get execution limit
         $this->intMaxExecutionTime = intval(ini_get('max_execution_time'));
         $this->intMaxExecutionTime = intval($this->intMaxExecutionTime / 100 * 25);
+        
+        // Flags for file scanning.
+        $this->strRDIFlags = RecursiveDirectoryIterator::FOLLOW_SYMLINKS | RecursiveDirectoryIterator::SKIP_DOTS | RecursiveDirectoryIterator::UNIX_PATHS;
     }
 
     /**
@@ -96,10 +83,10 @@ class SyncCtoFiles extends Backend
 
         return self::$instance;
     }
-
-    /* -------------------------------------------------------------------------
-     * Getter / Setter - Functions
-     */
+    
+    ////////////////////////////////////////////////////////////////////////////
+    // Getter / Setter - Functions
+    ////////////////////////////////////////////////////////////////////////////
 
     /**
      * Return zipname
@@ -141,26 +128,100 @@ class SyncCtoFiles extends Backend
         $this->strTimestampFormat = $strTimestampFormat;
     }
 
-    /* -------------------------------------------------------------------------
-     * Checksum Functions
+    /**
+     * Check if the given path is in blacklist of folders
+     * 
+     * @param string $strPath
+     * @return boolean 
      */
+    public function isInBlackFolder($strPath)
+    {
+        $strPath = $this->objSyncCtoHelper->standardizePath($strPath);
 
-    protected function getChecksumFiles($booCore = false, $booFiles = false)
+        foreach ($this->objSyncCtoHelper->getPreparedBlacklistFolder() as $value)
+        {
+            // Search with preg for values            
+            if (preg_match("/^" . $value . "/i", $strPath) != 0)
+            {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    /**
+     * Check if the given path is in blacklist of files
+     * 
+     * @param string $strPath
+     * @return boolean 
+     */
+    public function isInBlackFile($strPath)
+    {
+        $strPath = $this->objSyncCtoHelper->standardizePath($strPath);
+
+        foreach ($this->objSyncCtoHelper->getPreparedBlacklistFiles() as $value)
+        {
+            // Check if the preg starts with a TL_ROOT
+            if (preg_match("/^TL_ROOT/i", $value))
+            {
+                // Remove the TL_ROOT
+                $value = preg_replace("/TL_ROOT\\\\\//i", "", $value);
+
+                // Search with preg for values            
+                if (preg_match("/^" . $value . "$/i", $strPath) != 0)
+                {
+                    return true;
+                }
+            }
+            else
+            {
+                // Search with preg for values            
+                if (preg_match("/" . $value . "$/i", $strPath) != 0)
+                {
+                    return true;
+                }
+            }
+        }
+
+        return false;
+    }
+
+    ////////////////////////////////////////////////////////////////////////////
+    // Generate function
+    ////////////////////////////////////////////////////////////////////////////
+
+    /**
+     * Generate a array with files and some meta informations.
+     * 
+     * @param boolean $booCore Run for root folders/files
+     * @param boolean $booFiles Run for tl_files/files
+     * 
+     * @return array A array with meta informations.
+     */
+    protected function generateChecksumFiles($booCore = false, $booFiles = false)
     {
         $arrChecksum = array();
 
-        $arrFiles = $this->getFileList($booCore, $booFiles);
-
         // Check each file
-        foreach ($arrFiles as $value)
+        foreach ($this->getFileList($booCore, $booFiles) as $objFile)
         {
-            // Get filesize
-            $intSize = filesize(TL_ROOT . "/" . $value);
+            // Skipe if we have a dir.
+            if($objFile->isDir())
+            {
+                continue;
+            }
 
+            // Get fileinformation.
+            $strRelativePath = preg_replace('?' . $this->objSyncCtoHelper->getPreparedTlRoot() . '/?', '', $objFile->getPathname(), 1);
+            $strFullPath     = $objFile->getPathname();
+            $intSize         = $objFile->getSize();
+
+            // Get metadata.
             if ($intSize < 0 && $intSize != 0)
             {
-                $arrChecksum[md5($value)] = array(
-                    "path"         => $value,
+                $arrChecksum[md5($strRelativePath)] = array(
+                    "path"         => $strRelativePath,
                     "checksum"     => 0,
                     "size"         => -1,
                     "state"        => SyncCtoEnum::FILESTATE_BOMBASTIC_BIG,
@@ -169,8 +230,8 @@ class SyncCtoFiles extends Backend
             }
             else if ($intSize >= $GLOBALS['SYC_SIZE']['limit_ignore'])
             {
-                $arrChecksum[md5($value)] = array(
-                    "path"         => $value,
+                $arrChecksum[md5($strRelativePath)] = array(
+                    "path"         => $strRelativePath,
                     "checksum"     => 0,
                     "size"         => $intSize,
                     "state"        => SyncCtoEnum::FILESTATE_BOMBASTIC_BIG,
@@ -179,9 +240,9 @@ class SyncCtoFiles extends Backend
             }
             else if ($intSize >= $GLOBALS['SYC_SIZE']['limit'])
             {
-                $arrChecksum[md5($value)] = array(
-                    "path"         => $value,
-                    "checksum"     => md5_file(TL_ROOT . "/" . $value),
+                $arrChecksum[md5($strRelativePath)] = array(
+                    "path"         => $strRelativePath,
+                    "checksum"     => md5_file($strFullPath),
                     "size"         => $intSize,
                     "state"        => SyncCtoEnum::FILESTATE_TOO_BIG,
                     "transmission" => SyncCtoEnum::FILETRANS_WAITING,
@@ -189,14 +250,43 @@ class SyncCtoFiles extends Backend
             }
             else
             {
-                $arrChecksum[md5($value)] = array(
-                    "path"         => $value,
-                    "checksum"     => md5_file(TL_ROOT . "/" . $value),
+                $arrChecksum[md5($strRelativePath)] = array(
+                    "path"         => $strRelativePath,
+                    "checksum"     => md5_file($strFullPath),
                     "size"         => $intSize,
                     "state"        => SyncCtoEnum::FILESTATE_FILE,
                     "transmission" => SyncCtoEnum::FILETRANS_WAITING,
                 );
             }
+        }
+
+        return $arrChecksum;
+    }
+    
+    /**
+     * Generate a array with folders and some meta informations.
+     * 
+     * @param boolean $booCore Run for root folders/files
+     * @param boolean $booFiles Run for tl_files/files
+     * 
+     * @return array A array with meta informations.
+     */
+    protected function generateChecksumFolders($booCore = false, $booFiles = false)
+    {
+        $arrChecksum   = array();
+
+        // Check each file
+        foreach ($this->getFolderList($booCore, $booFiles) as $objFolder)
+        {
+            $strRelativePath = preg_replace('?' . $this->objSyncCtoHelper->getPreparedTlRoot() . '/?', '', $objFolder->getPathname(), 1);
+            
+            $arrChecksum[md5($strRelativePath)] = array(
+                "path"         => $strRelativePath,
+                "checksum"     => 0,
+                "size"         => 0,
+                "state"        => SyncCtoEnum::FILESTATE_FOLDER,
+                "transmission" => SyncCtoEnum::FILETRANS_WAITING,
+            );
         }
 
         return $arrChecksum;
@@ -211,17 +301,18 @@ class SyncCtoFiles extends Backend
      * @param boolean $booFiles Files scan
      * @return boolean 
      */
-    protected function getChecksumFileAsXML($strXMLFile, $booCore = false, $booFiles = false, $intInformations = SyncCtoEnum::FILEINFORMATION_SMALL)
+    public function generateChecksumFileAsXML($strXMLFile, $booCore = false, $booFiles = false, $intInformations = SyncCtoEnum::FILEINFORMATION_SMALL)
     {
         $strXMLFile = $this->objSyncCtoHelper->standardizePath($strXMLFile);
 
-        $objFile = new File($strXMLFile);
-        $objFile->delete();
-        $objFile->close();
+        $objFileXML = new \File($strXMLFile, false);
+        $objFileXML->blnSyncDb = false;
+        $objFileXML->delete();
+        $objFileXML->close();
 
-        $arrFiles = $this->getFileList($booCore, $booFiles);
+        $objFileIterator = $this->getFileList($booCore, $booFiles);
 
-        if (count($arrFiles) == 0)
+        if (!$objFileIterator->valid())
         {
             return false;
         }
@@ -246,10 +337,18 @@ class SyncCtoFiles extends Backend
 
         $objXml->startElement('files');
 
-        for ($i = 0; $i < count($arrFiles); $i++)
+        $i = 0;
+        foreach ($objFileIterator as $objFile)
         {
-            // Get filesize
-            $intSize = filesize(TL_ROOT . "/" . $arrFiles[$i]);
+            // Skipe if we have a dir.
+            if($objFile->isDir())
+            {
+                continue;
+            }
+            
+            // Get fileinformation.
+            $strRelativePath = preg_replace('?' . $this->objSyncCtoHelper->getPreparedTlRoot() . '/?', '', $objFile->getPathname(), 1);
+            $intSize         = $objFile->getSize();
 
             if ($intSize < 0 && $intSize != 0)
             {
@@ -260,62 +359,49 @@ class SyncCtoFiles extends Backend
                 if ($intInformations == SyncCtoEnum::FILEINFORMATION_SMALL)
                 {
                     $objXml->startElement('file');
-                    $objXml->writeAttribute("id", md5($arrFiles[$i]));
+                    $objXml->writeAttribute("id", md5($strRelativePath));
                     $objXml->writeAttribute("ai", $i);
-                    $objXml->text($arrFiles[$i]);
+                    $objXml->text($strRelativePath);
                     $objXml->endElement(); // End file
                 }
                 else if ($intInformations == SyncCtoEnum::FILEINFORMATION_BIG)
                 {
                     $objXml->startElement('file');
-                    $objXml->writeAttribute("id", md5($arrFiles[$i]));
+                    $objXml->writeAttribute("id", md5($strRelativePath));
                     $objXml->writeAttribute("ai", $i);
-                    $objXml->text($arrFiles[$i]);
+                    $objXml->text($strRelativePath);
                     $objXml->endElement(); // End file
                 }
             }
 
-            if ($this->intMaxMemoryUsage < memory_get_usage(true))
+            if (($i % 10) == 0)
             {
-                $objFile->append($objXml->flush(true), "");
-                $objFile->close();
+                $objFileXML->append($objXml->flush(true), "");
+                $objFileXML->close();
             }
+
+            $i++;
         }
 
         $objXml->endElement(); // End files
         $objXml->endElement(); // End fileslist
 
-        $objFile->append($objXml->flush(true), "");
-        $objFile->close();
+        $objFileXML->append($objXml->flush(true), "");
+        $objFileXML->close();
 
-        return true;
-    }
-
-    /**
-     * Create a checksum list from contao core folders
-     * 
-     * @CtoCommunication Enable
-     * @return array 
-     */
-    protected function getChecksumFolders($booCore = false, $booFiles = false)
-    {
-        $arrFolderList = $this->getFolderList($booCore, $booFiles);
-        $arrChecksum   = array();
-
-        // Check each file
-        foreach ($arrFolderList as $value)
+        if(file_exists(TL_ROOT . '/' . $strXMLFile))
         {
-            $arrChecksum[md5($value)] = array(
-                "path"         => $value,
-                "checksum"     => 0,
-                "size"         => 0,
-                "state"        => SyncCtoEnum::FILESTATE_FOLDER,
-                "transmission" => SyncCtoEnum::FILETRANS_WAITING,
-            );
+            return true;
         }
-
-        return $arrChecksum;
+        else
+        {
+            return false;
+        }
     }
+
+    ////////////////////////////////////////////////////////////////////////////
+    // Run functions
+    ////////////////////////////////////////////////////////////////////////////
     
     /**
      * Create a checksum list from contao core folders
@@ -325,7 +411,7 @@ class SyncCtoFiles extends Backend
      */
     public function runChecksumFolderCore()
     {
-        return $this->getChecksumFolders(true, false);
+        return $this->generateChecksumFolders(true, false);
     }
 
     /**
@@ -336,7 +422,7 @@ class SyncCtoFiles extends Backend
      */
     public function runChecksumFolderFiles()
     {
-        return $this->getChecksumFolders(false, true);
+        return $this->generateChecksumFolders(false, true);
     }
 
     /**
@@ -347,7 +433,7 @@ class SyncCtoFiles extends Backend
      */
     public function runChecksumCore()
     {
-        return $this->getChecksumFiles(true, false);
+        return $this->generateChecksumFiles(true, false);
     }
 
     /**
@@ -358,7 +444,7 @@ class SyncCtoFiles extends Backend
      */
     public function runChecksumFiles()
     {
-        return $this->getChecksumFiles(false, true);
+        return $this->generateChecksumFiles(false, true);
     }
 
     /**
@@ -416,6 +502,13 @@ class SyncCtoFiles extends Backend
         return $arrFileList;
     }
 
+    /**
+     * Search for deleteable folders.
+     * 
+     * @param array $arrChecksumList List with all folders.
+     * 
+     * @return string
+     */
     public function searchDeleteFolders($arrChecksumList)
     {
         $arrFolderList = array();
@@ -455,9 +548,9 @@ class SyncCtoFiles extends Backend
         return $arrReturn;
     }
 
-    /* -------------------------------------------------------------------------
-     * Dump Functions
-     */
+    ////////////////////////////////////////////////////////////////////////////
+    // Dump Functions
+    ////////////////////////////////////////////////////////////////////////////
 
     /**
      * Make a backup from a filelist
@@ -490,31 +583,72 @@ class SyncCtoFiles extends Backend
             throw new Exception($GLOBALS['TL_LANG']['MSC']['error'] . ": " . $objZipArchive->getErrorDescription($mixError));
         }
 
-        $arrFileList    = $this->getFileList($booCore, false);
         $arrFileSkipped = array();
 
-        for ($index = 0; $index < count($arrFiles); $index++)
+        // Run backup for the core files.
+        if ($booCore)
         {
-            if (is_dir(TL_ROOT . "/" . $arrFiles[$index]))
+            foreach ($this->getFileList(true, false) as $objFile)
             {
-                $arrFiles = array_merge($arrFiles, $this->getFileListFromFolders(array($arrFiles[$index])));
-                continue;
-            }
-
-            if ($objZipArchive->addFile($arrFiles[$index], $arrFiles[$index]) == false)
-            {
-                $arrFileSkipped[] = $arrFiles[$index];
+                // Skipe all folders.
+                if($objFile->isDir())
+                {
+                    continue;
+                }
+                
+                // Build path witout tl_root.
+                $strFile = preg_replace('?' . $this->objSyncCtoHelper->getPreparedTlRoot() . '/?', '', $objFile->getPathname(), 1);
+                
+                // Add file to zip.
+                if ($objZipArchive->addFile($strFile, $strFile) == false)
+                {
+                    $arrFileSkipped[] = $strFile;
+                }
             }
         }
 
-        foreach ($arrFileList as $file)
+        // Run backup for tl_files/files
+        foreach ((array) $arrFiles as $file)
         {
-            if ($objZipArchive->addFile($file, $file) == false)
+            // Scann folders.
+            if (file_exists(TL_ROOT . '/' . $file) && is_dir(TL_ROOT . '/' . $file))
             {
-                $arrFileSkipped[] = $file;
+                // Scann.
+                $objDirectoryIt     = new RecursiveDirectoryIterator(TL_ROOT . '/' . $this->objSyncCtoHelper->standardizePath($file), $this->strRDIFlags);
+                $objFilterIt     = new SyncCtoFilterIteratorBase($objDirectoryIt);
+                $objRecursiverIt = new RecursiveIteratorIterator($objFilterIt, RecursiveIteratorIterator::SELF_FIRST);
+
+                $this->getFileListFromFolders();
+
+                foreach ($objRecursiverIt as $objFile)
+                {
+                    // Skipe all folders.
+                    if ($objFile->isDir())
+                    {
+                        continue;
+                    }
+
+                    // Build path witout tl_root.
+                    $strFile = preg_replace('?' . $this->objSyncCtoHelper->getPreparedTlRoot() . '/?', '', $objFile->getPathname(), 1);
+
+                    // Add file to zip.
+                    if ($objZipArchive->addFile($strFile, $strFile) == false)
+                    {
+                        $arrFileSkipped[] = $strFile;
+                    }
+                }
+            }
+            // Add files.
+            else if (file_exists(TL_ROOT . '/' . $file))
+            {
+                if ($objZipArchive->addFile($file, $file) == false)
+                {
+                    $arrFileSkipped[] = $file;
+                }
             }
         }
 
+        // Close zip, write data.
         $objZipArchive->close();
 
         return array("name"    => $strFilename, "skipped" => $arrFileSkipped);
@@ -582,7 +716,7 @@ class SyncCtoFiles extends Backend
         $arrFinished  = array();
         $intRuns = 0;
 
-        // Run throug each
+        // Run through each
         foreach ($objFilesList as $file)
         {
             // Check if file exists
@@ -684,68 +818,9 @@ class SyncCtoFiles extends Backend
         }
     }
 
-    /* -------------------------------------------------------------------------
-     * Scan Functions
-     */
-
-    /**
-     * Check if the given path is in blacklist of folders
-     * 
-     * @param string $strPath
-     * @return boolean 
-     */
-    protected function isInBlackFolder($strPath)
-    {
-        $strPath = $this->objSyncCtoHelper->standardizePath($strPath);
-
-        foreach ($this->arrFolderBlacklist as $value)
-        {
-            // Search with preg for values            
-            if (preg_match("/^" . $value . "/i", $strPath) != 0)
-            {
-                return true;
-            }
-        }
-
-        return false;
-    }
-
-    /**
-     * Check if the given path is in blacklist of files
-     * 
-     * @param string $strPath
-     * @return boolean 
-     */
-    protected function isInBlackFile($strPath)
-    {
-        $strPath = $this->objSyncCtoHelper->standardizePath($strPath);
-
-        foreach ($this->arrFileBlacklist as $value)
-        {
-            // Check if the preg starts with a TL_ROOT
-            if (preg_match("/^TL_ROOT/i", $value))
-            {
-                // Remove the TL_ROOT
-                $value = preg_replace("/TL_ROOT\\\\\//i", "", $value);
-
-                // Search with preg for values            
-                if (preg_match("/^" . $value . "$/i", $strPath) != 0)
-                {
-                    return true;
-                }
-            }
-            else
-            {
-                // Search with preg for values            
-                if (preg_match("/" . $value . "$/i", $strPath) != 0)
-                {
-                    return true;
-                }
-            }
-        }
-
-        return false;
-    }
+    ////////////////////////////////////////////////////////////////////////////
+    // Scan Functions
+    ////////////////////////////////////////////////////////////////////////////   
 
     /**
      * Get all files from a list of folders
@@ -755,33 +830,19 @@ class SyncCtoFiles extends Backend
      */
     public function getFileListFromFolders($arrFolders = array())
     {
-        $arrAllFolders = array();
-        $arrFiles = array();
+        $objFilesIterator = new AppendIterator();
 
         foreach ($arrFolders as $strFolder)
         {
-            $arrAllFolders = array_merge($arrAllFolders, $this->recursiveFolderList($strFolder));
+            // Scann.
+            $objDirectoryIt  = new RecursiveDirectoryIterator(TL_ROOT . '/' . $this->objSyncCtoHelper->standardizePath($strFolder), $this->strRDIFlags);
+            $objFilterIt     = new SyncCtoFilterIteratorBase($objDirectoryIt);
+            $objRecursiverIt = new RecursiveIteratorIterator($objFilterIt, RecursiveIteratorIterator::SELF_FIRST);
+
+            $objFilesIterator->append($objRecursiverIt);
         }
 
-        foreach ($arrAllFolders as $strFolders)
-        {
-            $arrResult = scan(TL_ROOT . "/" . $strFolders, true);
-
-            foreach ($arrResult as $strFile)
-            {
-                if (is_file(TL_ROOT . "/" . $strFolders . "/" . $strFile))
-                {
-                    if ($this->isInBlackFile($strFolders . "/" . $strFile) == true)
-                    {
-                        continue;
-                    }
-
-                    $arrFiles[] = $strFolders . "/" . $strFile;
-                }
-            }
-        }
-
-        return $arrFiles;
+        return $objFilesIterator;
     }
 
     /**
@@ -792,50 +853,58 @@ class SyncCtoFiles extends Backend
      * @return array A list with all files 
      */
     public function getFileList($booRoot = false, $booFiles = false)
-    {
-        // Get a list with all folders
-        $arrFolder = $this->getFolderList($booRoot, $booFiles);
-        $arrFiles  = array();
+    {       
+        // Init appender.
+        $objAppendIt = new AppendIterator();
+        
+        // Return if no data are requested.
+        if ($booRoot == false && $booFiles == false)
+        {
+            return $objAppendIt;
+        }
 
-        // Search files in root folder
+        // Run Root
         if ($booRoot == true)
         {
-            $arrResult = scan(TL_ROOT, true);
+            // Scann root for files.
+            $objDirectoryIt  = new RecursiveDirectoryIterator(TL_ROOT);
+            $objFilterIt     = new SyncCtoFilterIteratorFiles($objDirectoryIt);
+            $objRecursiverIt = new RecursiveIteratorIterator($objFilterIt, RecursiveIteratorIterator::SELF_FIRST);
 
-            foreach ($arrResult as $strFile)
+            $objAppendIt->append($objRecursiverIt);
+
+            // Scann allowed root folders.
+            foreach ($this->arrRootFolderList as $value)
             {
-                if (is_file(TL_ROOT . "/" . $strFile))
-                {
-                    if ($this->isInBlackFile($strFile) == true)
-                    {
-                        continue;
-                    }
+                $strFullPath = TL_ROOT . '/' . $this->objSyncCtoHelper->standardizePath($value);
 
-                    $arrFiles[] = $strFile;
+                // Check if the folder exists.
+                if (!file_exists($strFullPath) || !is_dir($strFullPath))
+                {
+                    continue;
                 }
+
+                // Scann.
+                $objDirectoryIt  = new RecursiveDirectoryIterator($strFullPath, $this->strRDIFlags);
+                $objFilterIt     = new SyncCtoFilterIteratorBase($objDirectoryIt);
+                $objRecursiverIt = new RecursiveIteratorIterator($objFilterIt, RecursiveIteratorIterator::SELF_FIRST);
+
+                $objAppendIt->append($objRecursiverIt);
             }
         }
 
-        // Search in each folder
-        foreach ($arrFolder as $strFolders)
+        // Run tl_files/files.
+        if ($booFiles == true)
         {
-            $arrResult = scan(TL_ROOT . "/" . $strFolders, true);
+            // Scann.
+            $objDirectoryIt  = new RecursiveDirectoryIterator(TL_ROOT . '/' . $this->objSyncCtoHelper->standardizePath($GLOBALS['TL_CONFIG']['uploadPath']), $this->strRDIFlags);
+            $objFilterIt     = new SyncCtoFilterIteratorBase($objDirectoryIt);
+            $objRecursiverIt = new RecursiveIteratorIterator($objFilterIt, RecursiveIteratorIterator::SELF_FIRST);
 
-            foreach ($arrResult as $strFile)
-            {
-                if (is_file(TL_ROOT . "/" . $strFolders . "/" . $strFile))
-                {
-                    if ($this->isInBlackFile($strFolders . "/" . $strFile) == true)
-                    {
-                        continue;
-                    }
-
-                    $arrFiles[] = $strFolders . "/" . $strFile;
-                }
-            }
+            $objAppendIt->append($objRecursiverIt);
         }
 
-        return $arrFiles;
+        return $objAppendIt;
     }
 
     /**
@@ -843,71 +912,59 @@ class SyncCtoFiles extends Backend
      * 
      * @param boolean $booRoot Start search from root
      * @param boolean $booFiles Start search from files
-     * @return array A list with all folders
+     * 
+     * @return AppendIterator|Null A list with all folders or null when we have no data. 
      */
     public function getFolderList($booRoot = false, $booFiles = false)
     {
-        $arrFolders = array();
-
+        // Return if no data are requested.
         if ($booRoot == false && $booFiles == false)
         {
-            return $arrFolders;
+            return null;
         }
+        
+        // Init appender.
+        $objAppendIt = new AppendIterator();
 
+        // Run Root
         if ($booRoot == true)
         {
             foreach ($this->arrRootFolderList as $value)
             {
-                $arrFolders = array_merge($arrFolders, $this->recursiveFolderList($value));
-            }
-        }
-
-        if ($booFiles == true)
-        {
-            $arrFolders = array_merge($arrFolders, $this->recursiveFolderList($GLOBALS['TL_CONFIG']['uploadPath']));
-        }
-
-        return $arrFolders;
-    }
-
-    /**
-     * Scan path for all folders and subfolders
-     * 
-     * @param string $strPath start folder
-     * @return array A list with all folders 
-     */
-    public function recursiveFolderList($strPath)
-    {
-        $strPath = $this->objSyncCtoHelper->standardizePath($strPath);
-
-        if (!is_dir(TL_ROOT . "/" . $strPath) || $this->isInBlackFolder($strPath) == true)
-        {
-            return array();
-        }
-
-        $arrFolders = array($strPath);
-
-        $arrResult = scan(TL_ROOT . "/" . $strPath, true);
-
-        foreach ($arrResult as $value)
-        {
-            if (is_dir(TL_ROOT . "/" . $strPath . "/" . $value))
-            {
-                if ($this->isInBlackFolder($strPath . "/" . $value) == true)
+                $strFullPath = TL_ROOT . '/' . $this->objSyncCtoHelper->standardizePath($value);
+                
+                // Check if the folder exists.
+                if(!file_exists($strFullPath) || !is_dir($strFullPath))
                 {
                     continue;
                 }
+                
+                // Scann.
+                $objDirectoryIt  = new RecursiveDirectoryIterator($strFullPath, $this->strRDIFlags);
+                $objFilterIt     = new SyncCtoFilterIteratorFolder($objDirectoryIt);
+                $objRecursiverIt = new RecursiveIteratorIterator($objFilterIt, RecursiveIteratorIterator::SELF_FIRST);  
 
-                $arrFolders = array_merge($arrFolders, $this->recursiveFolderList($strPath . "/" . $value));
+                $objAppendIt->append($objRecursiverIt);
             }
         }
-
-        return $arrFolders;
+        
+        // Run tl_files/files.
+        if ($booFiles == true)
+        {
+            // Scann.
+            $objDirectoryIt  = new RecursiveDirectoryIterator(TL_ROOT . '/' . $this->objSyncCtoHelper->standardizePath($GLOBALS['TL_CONFIG']['uploadPath']), $this->strRDIFlags);
+            $objFilterIt     = new SyncCtoFilterIteratorFolder($objDirectoryIt);
+            $objRecursiverIt = new RecursiveIteratorIterator($objFilterIt, RecursiveIteratorIterator::SELF_FIRST);  
+            
+            $objAppendIt->append($objRecursiverIt);
+        }
+        
+        return $objAppendIt;
     }
 
-    /* -------------------------------------------------------------------------
-     * Folder Operations 
-     */
+    ////////////////////////////////////////////////////////////////////////////
+    // Folder Operations 
+    ////////////////////////////////////////////////////////////////////////////
 
     /**
      * Create syncCto folders if not exists
@@ -1079,9 +1136,9 @@ class SyncCtoFiles extends Backend
         }
     }
 
-    /* -------------------------------------------------------------------------
-     * File Operations 
-     */
+    ////////////////////////////////////////////////////////////////////////////
+    // File Operations 
+    ////////////////////////////////////////////////////////////////////////////
 
     /**
      * Split files function

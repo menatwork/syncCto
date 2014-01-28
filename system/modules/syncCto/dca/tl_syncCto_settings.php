@@ -25,7 +25,7 @@ $GLOBALS['TL_DCA']['tl_syncCto_settings'] = array(
     ),
     'subpalettes' => array
         (
-        'syncCto_custom_settings' => 'syncCto_wait_timeout,syncCto_interactive_timeout',
+        'syncCto_custom_settings' => 'syncCto_wait_timeout,syncCto_interactive_timeout,syncCto_db_query_limt',
     ),
     // Fields
     'fields' => array( 
@@ -125,30 +125,52 @@ $GLOBALS['TL_DCA']['tl_syncCto_settings'] = array(
             'exclude' => true,
             'eval' => array('submitOnChange' => true),
         ),
-        'syncCto_wait_timeout' => array
+        'syncCto_wait_timeout'        => array
+        (
+            'label'         => &$GLOBALS['TL_LANG']['tl_syncCto_settings']['wait_timeout'],
+            'inputType'     => 'text',
+            'exclude'       => true,
+            'load_callback' => array(array('tl_syncCto_settings', 'checkDefaulTimeoutValue')),
+            'eval'          => array
             (
-            'label' => &$GLOBALS['TL_LANG']['tl_syncCto_settings']['wait_timeout'],
-            'inputType' => 'text',
-            'exclude' => true,
-            'eval' => array('tl_class' => 'w50'),
+                'tl_class' => 'w50',
+                'rgxp'     => 'digit'
+            ),
         ),
         'syncCto_interactive_timeout' => array
+        (
+            'label'         => &$GLOBALS['TL_LANG']['tl_syncCto_settings']['interactive_timeout'],
+            'inputType'     => 'text',
+            'exclude'       => true,
+            'load_callback' => array(array('tl_syncCto_settings', 'checkDefaulTimeoutValue')),
+            'eval'          => array
             (
-            'label' => &$GLOBALS['TL_LANG']['tl_syncCto_settings']['interactive_timeout'],
-            'inputType' => 'text',
-            'exclude'   => true,
-            'eval'      => array('tl_class' => 'w50'),
+                'tl_class' => 'w50',
+                'rgxp'     => 'digit'
+            ),
+        ),
+        'syncCto_db_query_limt'       => array
+        (
+            'label'         => &$GLOBALS['TL_LANG']['tl_syncCto_settings']['db_query_limt'],
+            'inputType'     => 'text',
+            'exclude'       => true,
+            'load_callback' => array(array('tl_syncCto_settings', 'checkDefaulQueryValue')),
+            'eval'          => array
+            (
+                'tl_class' => 'w50',
+                'rgxp'     => 'digit'
+            ),
         ),
         'syncCto_auto_db_updater'     => array
-            (
-            'label'     => &$GLOBALS['TL_LANG']['tl_syncCto_settings']['syncCto_auto_db_updater'],
+        (
+            'label'     => &$GLOBALS['TL_LANG']['tl_syncCto_settings']['auto_db_updater'],
             'inputType' => 'checkbox',
             'exclude'   => true,
             'eval'      => array
-            (                
-                'tl_class' => 'clr', 
+            (
+                'tl_class' => 'clr',
                 'multiple' => true,
-                'disabled'  => SyncCtoHelper::isContao2() ? false : true,
+                'disabled' => SyncCtoHelper::isContao2() ? false : true,
             ),
             'reference' => $GLOBALS['TL_LANG']['tl_syncCto_settings'],
             'options'   => array(
@@ -301,6 +323,38 @@ class tl_syncCto_settings extends Backend
     public function loadTablesHidden($strValue)
     {
         return $this->objSyncCtoHelper->getTablesHidden();
+    }
+    
+    /**
+     * Check if we have a valid value for the timeout.
+     * 
+     * @param mixed $strValue Value from DC.
+     * @return int Default Value or the value from DC.
+     */
+    public function checkDefaulTimeoutValue($strValue)
+    {
+        if(empty($strValue) || $strValue < 1)
+        {
+            return 28000;
+        }
+        
+        return $strValue;
+    }
+    
+    /**
+     * Check if we have a valid value for the query limit.
+     * 
+     * @param mixed $strValue Value from DC.
+     * @return int Default Value or the value from DC.
+     */
+    public function checkDefaulQueryValue($strValue)
+    {        
+        if(empty($strValue) || $strValue < 1)
+        {
+            return 500;
+        }
+        
+        return $strValue;
     }
 
 }

@@ -34,7 +34,8 @@ $GLOBALS['TL_LANG']['tl_syncCto_settings']['debug_mode']                = array(
 $GLOBALS['TL_LANG']['tl_syncCto_settings']['custom_settings']           = array('Experten-Einstellungen aktivieren', 'Klicken Sie hier, wenn Sie wissen was Sie tun.');
 $GLOBALS['TL_LANG']['tl_syncCto_settings']['wait_timeout']              = array('"wait_timeout" konfigurieren', 'Mehr Informationen: http://goo.gl/rC5Y4');
 $GLOBALS['TL_LANG']['tl_syncCto_settings']['interactive_timeout']       = array('"interactive_timeout" konfigurieren', 'Mehr Informationen: http://goo.gl/VHxRK');
-$GLOBALS['TL_LANG']['tl_syncCto_settings']['syncCto_auto_db_updater']   = array('Automatische Aktualisierung der Datenbank', 'Hier können Sie auswählen, welche Aktion der DB Update nach einer Synchronisation ausführen soll.');
+$GLOBALS['TL_LANG']['tl_syncCto_settings']['db_query_limt']             = array('Datenbank Abfragelimit', 'Hier können Sie festlegen wieviele Datensätze auf einmal aus der DB geladen werden. Korrigieren Sie das Limit nach unten, wenn ein "500 Server Error" beim DB-Backup/Synchronisation entsteht.');
+$GLOBALS['TL_LANG']['tl_syncCto_settings']['auto_db_updater']           = array('Automatische Aktualisierung der Datenbank', 'Hier können Sie auswählen, welche Aktion der DB Update nach einer Synchronisation ausführen soll.');
 
 /**
  * Updater

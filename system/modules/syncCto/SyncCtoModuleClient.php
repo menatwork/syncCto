@@ -1211,26 +1211,45 @@ class SyncCtoModuleClient extends BackendModule
                     break;
 
                 /**
-                 * Get informations and close connection
+                 * Referer check deactivate
                  */
                 case 3:
+                    if (!$this->objSyncCtoCommunicationClient->referrerDisable())
+                    {
+                        $this->objData->setState(SyncCtoEnum::WORK_ERROR);
+                        $this->booError = true;
+                        $this->strError = $GLOBALS['TL_LANG']['ERR']['referer'];
+
+                        break;
+                    }
+
+                    $this->objStepPool->step++;
+                    break;
+
+                /**
+                 * Get informations and close connection
+                 */
+                case 4:
                     // Get infomations
-                    $arrConfigurations = $this->objSyncCtoCommunicationClient->getPhpConfigurations();
-                    $arrFunctions      = $this->objSyncCtoCommunicationClient->getPhpFunctions();
-                    $arrProFunctions   = $this->objSyncCtoCommunicationClient->getProFunctions();
-                    $strVersion        = $this->objSyncCtoCommunicationClient->getVersionSyncCto();
+                    $arrConfigurations      = $this->objSyncCtoCommunicationClient->getPhpConfigurations();
+                    $arrFunctions           = $this->objSyncCtoCommunicationClient->getPhpFunctions();
+                    $arrProFunctions        = $this->objSyncCtoCommunicationClient->getProFunctions();
+                    $arrExtendedInformation = $this->objSyncCtoCommunicationClient->getExtendedInformation($GLOBALS['TL_CONFIG']['datimFormat']);
+                    $strVersion             = $this->objSyncCtoCommunicationClient->getVersionSyncCto();
 
                     // Stop connection
+                    $this->objSyncCtoCommunicationClient->referrerEnable();
                     $this->objSyncCtoCommunicationClient->stopConnection();
                     SyncCtoStats::getInstance()->addEndStat(time());
 
                     // Load module for html
-                    $objCheck                                = new SyncCtoModuleCheck();
-                    $objCheckTemplate                        = new BackendTemplate('be_syncCto_smallCheck');
-                    $objCheckTemplate->checkPhpConfiguration = $objCheck->checkPhpConfiguration($arrConfigurations);
-                    $objCheckTemplate->checkPhpFunctions     = $objCheck->checkPhpFunctions($arrFunctions);
-                    $objCheckTemplate->checkProFunctions     = $objCheck->checkProFunctions($arrProFunctions);
-                    $objCheckTemplate->syc_version           = $strVersion;
+                    $objCheck                                   = new SyncCtoModuleCheck();
+                    $objCheckTemplate                           = new BackendTemplate('be_syncCto_smallCheck');
+                    $objCheckTemplate->checkPhpConfiguration    = $objCheck->checkPhpConfiguration($arrConfigurations);
+                    $objCheckTemplate->checkPhpFunctions        = $objCheck->checkPhpFunctions($arrFunctions);
+                    $objCheckTemplate->checkProFunctions        = $objCheck->checkProFunctions($arrProFunctions);
+                    $objCheckTemplate->checkExtendedInformation = $objCheck->compareExtendedInformation($objCheck->getExtendedInformation(), $arrExtendedInformation);
+                    $objCheckTemplate->syc_version              = $strVersion;
 
                     // Show information
                     $this->objData->setState(SyncCtoEnum::WORK_OK);
@@ -1243,6 +1262,10 @@ class SyncCtoModuleClient extends BackendModule
                     $this->objStepPool->step++;
 
                 case 4:
+                    $this->objData->setState(SyncCtoEnum::WORK_OK);
+                    $this->booFinished           = true;
+                    $this->booRefresh            = false;
+                    $this->Template->showControl = false;
                     break;
             }
         }

@@ -11,4 +11,9 @@
     <?php if ($this->safeModeHack): ?>
         <p class="warn"><?php echo $GLOBALS['TL_LANG']['tl_syncCto_check']['safemodehack']; ?></p>
     <?php endif; ?>
+
+    <?php if ($this->checkExtendedInformation): ?>
+        <h2><?php echo $GLOBALS['TL_LANG']['tl_syncCto_check']['extendedInformation']; ?></h2>
+        <?php echo $this->checkExtendedInformation; ?> 
+    <?php endif; ?>
 </div>

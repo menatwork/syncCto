@@ -1,8 +1,74 @@
 syncCto Changelog
 =================
 
-Version 2.3.x (2013-03-02)
---------------------------
+
+Version 2.5.x
+-------------
+
+### Feature
+Popups mit Symlinks betreiben (see #167).
+
+### Feature
+Erweiterung des Pings (see #166).
+
+### Feature
+Filesystem - SPL Support (see #162).
+
+### Feature
+Systemzeit Server <> Client beim Systemcheck abgleichen (see #161).
+
+### Feature
+Blacklist localconfig (see #132).
+
+### Defect
+Add the new php files to the autoload.php.
+
+
+Version 2.4.x
+-------------
+
+### Defect
+Fails with Windows paths (see #164).
+
+### Defect
+Änderung der Bezeichnung "Einstellungen" auf "Konfiguration" (see #159).
+
+### Feature
+More details for "we got warning on the client" (see #158).
+
+### Defect
+httprequestextended (see #157).
+
+### Defect
+We got a Warning on client site (see #155).
+
+### Defect
+Automatically change 'd/m/Y' date notation for 'd-m-Y' (see #154).
+
+### Defect
+Missing DB tables or fields (see #148).
+
+### Defect
+Keine feste Referenz mehr auf tl_files (see #147).
+
+### Defect
+Zu löschende Tabellen aus der Vergleichsliste entfernen (see #145).
+
+### Defect
+"Backup erfolgreich", obwohl eine Exception geworfen wurde (see #144).
+
+### Defect
+Backup erfolgreich, auch wenn Fehler passierten (see #143).
+
+### Feature
+Statistik führen (see #55).
+
+### Feature
+Backups automatisiert erstellen (see #45).
+
+
+Version 2.3.x
+-------------
 
 ### Defect
 Fehlende Version und Build Nummer (see #141).
@@ -50,8 +116,8 @@ Neuer Hook bevor die alten Tabellen gelöscht werden (see #117).
 Nur eine Synchronisation gleichzeitig pro Installation (see #52).
 
 
-Version 2.2.x (2012-08-17)
---------------------------
+Version 2.2.x
+-------------
 
 ### Defect
 Fehlerhafte Texte während der Synchronisation (see #115).
@@ -96,8 +162,8 @@ DB-Tabellen erst in den Steps auswählen (see #94).
 Auslagerung der Vergleichsliste in eine Lightbox (see #93).
 
 
-Version 2.1.x (2012-05-09)
---------------------------
+Version 2.1.x
+-------------
 
 ### Defect
 Anpassung der Rechte (see #92).
@@ -136,8 +202,8 @@ Zu große Datenbanken sprengen das Limit (see #3).
 Die Synchronisation des Clients wurde erfolgreich abgeschlossen (see #2).
 
 
-Version 2.0.0 (2012-02-01)
---------------------------
+Version 2.0.0
+-------------
 
 ### Feature
 Optimierung und Zusammenfassung der Backup-Templates (see #79).
@@ -260,8 +326,8 @@ DB-Tabellen werden nicht korrekt importiert (see #5).
 Umlaute der gelöschten Dateien (see #4).
 
 
-Version 1.1.5 (2012-01-01)
---------------------------
+Version 1.1.5
+-------------
 
 ### Fixed
 Doppelklick auf "Dateien transferieren" abfangen (see #82).
