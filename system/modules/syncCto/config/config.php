@@ -155,7 +155,8 @@ $GLOBALS['SYC_CONFIG']['local_blacklist'] = array_merge( (array) $GLOBALS['SYC_C
     'ctoCom_handshake',
     'syncCto_debug_mode',
     'syncCto_attentionFlag',
-    'syncCto_auto_db_updater'
+    'syncCto_auto_db_updater',
+    'liveUpdateId'
 ));
 
 /**
