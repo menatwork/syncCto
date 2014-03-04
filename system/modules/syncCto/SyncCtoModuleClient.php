@@ -627,7 +627,7 @@ class SyncCtoModuleClient extends BackendModule
         }
         else
         {
-            $this->arrListFile = deserialize($strContent);
+            $this->arrListFile = unserialize($strContent);
         }
         $objFileList->close();
 
@@ -639,7 +639,7 @@ class SyncCtoModuleClient extends BackendModule
         }
         else
         {
-            $this->arrListCompare = deserialize($strContent);
+            $this->arrListCompare = unserialize($strContent);
         }
         $objCompareList->close();
     }
@@ -2684,7 +2684,7 @@ class SyncCtoModuleClient extends BackendModule
 
                         if (strlen($mixLastTableTimestamp[0][$location . "_timestamp"]) != 0)
                         {
-                            $arrLastTableTimestamp = deserialize($mixLastTableTimestamp[0][$location . "_timestamp"]);
+                            $arrLastTableTimestamp = unserialize($mixLastTableTimestamp[0][$location . "_timestamp"]);
                         }
                         else
                         {
@@ -4299,7 +4299,7 @@ class SyncCtoModuleClient extends BackendModule
 
                         if (strlen($mixLastTableTimestamp[0][$location . "_timestamp"]) != 0)
                         {
-                            $arrLastTableTimestamp = deserialize($mixLastTableTimestamp[0][$location . "_timestamp"]);
+                            $arrLastTableTimestamp = unserialize($mixLastTableTimestamp[0][$location . "_timestamp"]);
                         }
                         else
                         {

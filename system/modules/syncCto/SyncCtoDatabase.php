@@ -1156,7 +1156,7 @@ class SyncCtoDatabase extends Backend
                     continue;
                 }
 
-                $value = deserialize($value);
+                $value = unserialize($value);
 
                 if (!is_array($value))
                 {
@@ -1417,7 +1417,7 @@ class SyncCtoDatabase extends Backend
 
             if (strlen($mixLastTableTimestamp[0][$location . "_timestamp"]) != 0)
             {
-                $arrLocationLastTableTimstamp[$location] = deserialize($mixLastTableTimestamp[0][$location . "_timestamp"]);
+                $arrLocationLastTableTimstamp[$location] = unserialize($mixLastTableTimestamp[0][$location . "_timestamp"]);
             }
             else
             {

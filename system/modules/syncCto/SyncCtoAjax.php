@@ -46,7 +46,7 @@ class SyncCtoAjax extends SyncCtoCommunicationClient
         }
         else
         {
-            $this->arrListCompare = deserialize($strContent);
+            $this->arrListCompare = unserialize($strContent);
         }
 
         $objCompareList->close();

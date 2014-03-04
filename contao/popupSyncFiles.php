@@ -292,7 +292,7 @@ class PopupSyncFiles extends Backend
         }
         else
         {
-            $this->arrListFile = deserialize($strContent);
+            $this->arrListFile = unserialize($strContent);
         }
         $objFileList->close();
 
@@ -304,7 +304,7 @@ class PopupSyncFiles extends Backend
         }
         else
         {
-            $this->arrListCompare = deserialize($strContent);
+            $this->arrListCompare = unserialize($strContent);
         }
 
         $objCompareList->close();
