@@ -314,7 +314,7 @@ class SyncCtoModuleBackup extends BackendModule
         }
         else
         {
-            $this->arrListFile = deserialize($strContent);
+            $this->arrListFile = unserialize($strContent);
         }
         $objFileList->close();
     }

@@ -202,7 +202,7 @@ class SyncCtoRPCFunctions extends Backend
         $objFiles->move_uploaded_file($_FILES[$strFilename]["tmp_name"], $this->objSyncCtoHelper->standardizePath($GLOBALS['SYC_PATH']['tmp'], "syncListInc.syncCto"));
 
         $objFile         = new File($this->objSyncCtoHelper->standardizePath($GLOBALS['SYC_PATH']['tmp'], "syncListInc.syncCto"));
-        $arrChecksumList = deserialize($objFile->getContent());
+        $arrChecksumList = unserialize($objFile->getContent());
         $objFile->close();
 
         if (!is_array($arrChecksumList))
@@ -236,7 +236,7 @@ class SyncCtoRPCFunctions extends Backend
         $objFiles->move_uploaded_file($_FILES[$strFilename]["tmp_name"], $this->objSyncCtoHelper->standardizePath($GLOBALS['SYC_PATH']['tmp'], "syncFolderListInc.syncCto"));
 
         $objFile         = new File($this->objSyncCtoHelper->standardizePath($GLOBALS['SYC_PATH']['tmp'], "syncFolderListInc.syncCto"));
-        $arrChecksumList = deserialize($objFile->getContent());
+        $arrChecksumList = unserialize($objFile->getContent());
         $objFile->close();
 
         if (!is_array($arrChecksumList))
@@ -270,7 +270,7 @@ class SyncCtoRPCFunctions extends Backend
         $objFiles->move_uploaded_file($_FILES[$strFilename]["tmp_name"], $this->objSyncCtoHelper->standardizePath($GLOBALS['SYC_PATH']['tmp'], "syncListInc.syncCto"));
 
         $objFile         = new File($this->objSyncCtoHelper->standardizePath($GLOBALS['SYC_PATH']['tmp'], "syncListInc.syncCto"));
-        $arrChecksumList = deserialize($objFile->getContent());
+        $arrChecksumList = unserialize($objFile->getContent());
         $objFile->close();
 
         if (!is_array($arrChecksumList))
