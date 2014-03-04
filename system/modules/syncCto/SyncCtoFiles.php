@@ -52,7 +52,7 @@ class SyncCtoFiles extends Backend
         $this->arrRootFolderList  = $this->objSyncCtoHelper->getWhitelistFolder();
 
         // Get memory limit
-        $this->intMaxMemoryUsage = intval(str_replace(array("m", "M", "k", "K"), array("000000", "000000", "000", "000"), ini_get('memory_limit')));
+        $this->intMaxMemoryUsage = SyncCtoModuleClient::parseSize(ini_get('memory_limit'));
         $this->intMaxMemoryUsage = $this->intMaxMemoryUsage / 100 * 30;
 
         // Get execution limit

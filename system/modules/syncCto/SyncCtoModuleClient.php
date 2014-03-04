@@ -1425,10 +1425,10 @@ class SyncCtoModuleClient extends BackendModule
                         break;
                     }
 
-                    $intClientUploadLimit = intval(str_replace("M", "000000", $arrClientParameter['upload_max_filesize']));
-                    $intClientMemoryLimit = intval(str_replace("M", "000000", $arrClientParameter['memory_limit']));
-                    $intClientPostLimit   = intval(str_replace("M", "000000", $arrClientParameter['post_max_size']));
-                    $intLocalMemoryLimit  = intval(str_replace("M", "000000", ini_get('memory_limit')));
+                    $intClientUploadLimit = static::parseSize($arrClientParameter['upload_max_filesize']);
+                    $intClientMemoryLimit = static::parseSize($arrClientParameter['memory_limit']);
+                    $intClientPostLimit   = static::parseSize($arrClientParameter['post_max_size']);
+                    $intLocalMemoryLimit  = static::parseSize(ini_get('memory_limit'));
 
                     // Check if memory limit on server and client is enough for upload  
                     $intLimit = min($intClientUploadLimit, $intClientMemoryLimit, $intClientPostLimit, $intLocalMemoryLimit);
@@ -4851,6 +4851,29 @@ class SyncCtoModuleClient extends BackendModule
         }
     }
 
+
+    /**
+     * Parse size
+     *
+     * @see http://us2.php.net/manual/en/function.ini-get.php#example-501
+     */
+    static public function parseSize($size)
+    {
+        $size = trim($size);
+        $last = strtolower($size[strlen($size)-1]);
+        switch($last) {
+            // The 'G' modifier is available since PHP 5.1.0
+            case 'g':
+                $size *= 1024;
+            case 'm':
+                $size *= 1024;
+            case 'k':
+                $size *= 1024;
+        }
+
+        return $size;
+    }
+    
     /*
      * End SyncCto Sync. From
      * -------------------------------------------------------------------------
@@ -5044,5 +5067,4 @@ class ContentData
     {
         throw new Exception("Unknown key for datacontent $name");
     }
-
 }

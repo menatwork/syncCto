@@ -243,7 +243,7 @@ class SyncCtoModuleCheck extends BackendModule
      */
     private function getSize($strValue)
     {
-        return intval($strValue) * str_replace(array('m', 'g'), array(pow(2, 20), pow(2, 30)), strtolower($strValue[strlen($strValue) - 1]));
+        return SyncCtoModuleClient::parseSize($strValue);
     }
 
     /**
