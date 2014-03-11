@@ -39,6 +39,7 @@ ClassLoader::addClasses(array
 	'SyncCtoRPCFunctions'         => 'system/modules/syncCto/SyncCtoRPCFunctions.php',
 	'SyncCtoStats'                => 'system/modules/syncCto/SyncCtoStats.php',
 	'SyncCtoRunOnceEr'            => 'system/modules/syncCto/SyncCtoRunOnceEr.php',
+	'SyncCtoTableSyncTo'          => 'system/modules/syncCto/SyncCtoTableSyncTo.php',
 ));
 
 
