@@ -2498,7 +2498,7 @@ class SyncCtoModuleClient extends BackendModule
                         }
                     }
 
-                    if (($this->arrSyncSettings["automode"] || key_exists("forward", $_POST)) && !(count($this->arrSyncSettings['syncCto_SyncTables']) == 0 && count($this->arrSyncSettings['syncCto_SyncDeleteTables']) == 0))
+                    if (($this->arrSyncSettings["automode"] || array_key_exists("forward", $_POST)) && !(count($this->arrSyncSettings['syncCto_SyncTables']) == 0 && count($this->arrSyncSettings['syncCto_SyncDeleteTables']) == 0))
                     {
                         // Go to next step
                         $this->objData->setState(SyncCtoEnum::WORK_WORK);
@@ -2508,7 +2508,7 @@ class SyncCtoModuleClient extends BackendModule
 
                         break;
                     }
-                    else if (($this->arrSyncSettings["automode"] || key_exists("forward", $_POST)) && count($this->arrSyncSettings['syncCto_SyncTables']) == 0 && count($this->arrSyncSettings['syncCto_SyncDeleteTables']) == 0)
+                    else if (($this->arrSyncSettings["automode"] || array_key_exists("forward", $_POST)) && count($this->arrSyncSettings['syncCto_SyncTables']) == 0 && count($this->arrSyncSettings['syncCto_SyncDeleteTables']) == 0)
                     {
                         // Skip if no tables are selected
                         $this->objData->setState(SyncCtoEnum::WORK_SKIPPED);
@@ -2518,7 +2518,7 @@ class SyncCtoModuleClient extends BackendModule
 
                         break;
                     }
-                    else if (key_exists("skip", $_POST))
+                    else if (array_key_exists("skip", $_POST))
                     {
                         $this->objData->setState(SyncCtoEnum::WORK_SKIPPED);
                         $this->objData->setHtml("");
@@ -4671,7 +4671,7 @@ class SyncCtoModuleClient extends BackendModule
                     // Check if there are some skipped files
                     if ($intSkippCount != 0)
                     {
-                        $compare .= '<br /><p class="tl_help">' . $intSkippCount . $GLOBALS['TL_LANG']['tl_syncCto_sync']["step_5"]['description_3'] . '</p>';
+                        $compare = '<br /><p class="tl_help">' . $intSkippCount . $GLOBALS['TL_LANG']['tl_syncCto_sync']["step_5"]['description_3'] . '</p>';
 
                         $arrSort = array();
 
