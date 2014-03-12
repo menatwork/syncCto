@@ -1,11 +1,19 @@
 <script>    
-    function openMediaBox()
+    function openSyncCtoPopUp()
     {
-        Mediabox.open('<?php echo $this->Environment->base; ?>contao/<?php echo $this->popupClassName; ?>?id=<?php echo $this->id; ?>&direction=<?php echo $this->direction; ?>&language=<?php echo BackendUser::getInstance()->language ?>', '', '850 80%');   
+        <?php
+            $strUrl = $this->Environment->base . 'contao/' .  $this->popupClassName . '?id=' . $this->id . '&direction=' . $this->direction . '&language=' . BackendUser::getInstance()->language;
+              if(SyncCtoHelper::isContao2()):
+        ?>
+        Mediabox.open('<?php echo $strUrl; ?>', '', '850 80%');
+        <?php else: ?>
+        var h = Math.max(document.documentElement.clientHeight, window.innerHeight || 0);
+        Backend.openModalIframe({'title':'<?php echo $GLOBALS['TL_LANG']['tl_syncCto_sync']['popup']; ?>','url':'<?php echo $strUrl; ?>','width':850, 'height':(h / 100 * 90)})
+        <?php endif; ?>
     }
     
     window.addEvent("domready",function(){
-        openMediaBox();
+        openSyncCtoPopUp();
     });
 </script>
 
@@ -17,7 +25,7 @@
         <div class="m12 submit_container">
             <input class="tl_submit invisible" name="forward" type="submit" value="<?php echo $this->forwardValue; ?>" />
             <input class="tl_submit" name="skip" type="submit" value="<?php echo $GLOBALS['TL_LANG']['MSC']['skip']; ?>" />
-            <input type="button" class="tl_submit" value="<?php echo $GLOBALS['TL_LANG']['MSC']['popup']; ?>" onClick="openMediaBox(); return false;"/>
+            <input type="button" class="tl_submit" value="<?php echo $GLOBALS['TL_LANG']['MSC']['popup']; ?>" onClick="openSyncCtoPopUp(); return false;"/>
         </div>
     </div>
 </form>
