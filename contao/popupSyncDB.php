@@ -9,6 +9,9 @@
  * @filesource
  */
 
+use MetaModels\Factory as MetaModelFactory;
+use MetaModels\Dca\MetaModelDcaBuilder as MetaModelDcaBuilder;
+
 /**
  * Initialize the system
  */
@@ -65,9 +68,9 @@ class popupSyncDB extends Backend
         $this->User->authenticate();
 
         // Set language from get or user
-        if ($this->Input->get('language') != '')
+        if (\Input::getInstance()->get('language') != '')
         {
-            $GLOBALS['TL_LANGUAGE'] = $this->Input->get('language');
+            $GLOBALS['TL_LANGUAGE'] = \Input::getInstance()->get('language');
         }
         else
         {
@@ -95,9 +98,7 @@ class popupSyncDB extends Backend
             try
             {
                 $this->loadSyncSettings();
-
                 $this->showNormalDatabase();
-
                 $this->saveSyncSettings();
 
                 unset($_POST);
@@ -129,19 +130,19 @@ class popupSyncDB extends Backend
     public function showNormalDatabase()
     {
         // Delete functinality
-        if (key_exists("delete", $_POST))
+        if (array_key_exists("delete", $_POST))
         {
             // Make a array from 'serverTables' and 'serverDeleteTables'
             $arrRemoveTables = array();
             
-            if (is_array($this->Input->post('serverTables')) && count($this->Input->post('serverTables')) != 0)
+            if (is_array(\Input::getInstance()->post('serverTables')) && count(\Input::getInstance()->post('serverTables')) != 0)
             {
-                $arrRemoveTables = $this->Input->post('serverTables');
+                $arrRemoveTables = \Input::getInstance()->post('serverTables');
             }
             
-            if (is_array($this->Input->post('serverDeleteTables')) && count($this->Input->post('serverDeleteTables')) != 0)
+            if (is_array(\Input::getInstance()->post('serverDeleteTables')) && count(\Input::getInstance()->post('serverDeleteTables')) != 0)
             {
-                $arrRemoveTables = array_merge($arrRemoveTables, $this->Input->post('serverDeleteTables'));
+                $arrRemoveTables = array_merge($arrRemoveTables, \Input::getInstance()->post('serverDeleteTables'));
             }
             
             // Remove tables from the list.
@@ -158,7 +159,7 @@ class popupSyncDB extends Backend
             }
         }
         // Close functinality
-        else if (key_exists("transfer", $_POST))
+        else if (array_key_exists("transfer", $_POST))
         {
             foreach ($this->arrSyncSettings['syncCto_CompareTables'] as $arrType)
             {
@@ -237,6 +238,7 @@ class popupSyncDB extends Backend
      * Last the mod language
      * 
      * @param string $strName Name of table
+     *
      * @return string
      */
     public function lookUpName($strName)
@@ -308,7 +310,7 @@ class popupSyncDB extends Backend
         }
 
         // Search in mod language array for a translation
-        if (key_exists($strBase, $GLOBALS['TL_LANG']['MOD']))
+        if (array_key_exists($strBase, $GLOBALS['TL_LANG']['MOD']))
         {            
             if (is_array($GLOBALS['TL_LANG']['MOD'][$strBase]))
             {
@@ -379,6 +381,9 @@ class popupSyncDB extends Backend
      */
     public function output()
     {
+        $GLOBALS['TL_CSS'] = array();
+        $GLOBALS['TL_JAVASCRIPT'] = array();
+
         // Set stylesheets
         $GLOBALS['TL_CSS'][] = TL_SCRIPT_URL . 'system/themes/' . $this->getTheme() . '/main.css';
         $GLOBALS['TL_CSS'][] = TL_SCRIPT_URL . 'system/themes/' . $this->getTheme() . '/basic.css';
@@ -386,8 +391,18 @@ class popupSyncDB extends Backend
         $GLOBALS['TL_CSS'][] = TL_SCRIPT_URL . 'system/modules/syncCto/html/css/compare.css';
 
         // Set javascript
-        $GLOBALS['TL_JAVASCRIPT'][] = TL_PLUGINS_URL . 'plugins/mootools/' . MOOTOOLS_CORE . '/mootools-core.js';
-        $GLOBALS['TL_JAVASCRIPT'][] = 'contao/contao.js';
+        if (version_compare(VERSION, '3.0', '<'))
+        {
+            $GLOBALS['TL_JAVASCRIPT'][] = TL_PLUGINS_URL . 'plugins/mootools/' . MOOTOOLS_CORE . '/mootools-core.js';
+            $GLOBALS['TL_JAVASCRIPT'][] = 'contao/contao.js';
+        }
+        else
+        {
+            $GLOBALS['TL_JAVASCRIPT'][] = 'assets/mootools/core/' . MOOTOOLS . '/mootools-core.js';
+            $GLOBALS['TL_JAVASCRIPT'][] = 'assets/mootools/core/' . MOOTOOLS . '/mootools-more.js';
+            $GLOBALS['TL_JAVASCRIPT'][] = 'assets/mootools/mootao/Mootao.js';
+            $GLOBALS['TL_JAVASCRIPT'][] = 'assets/contao/js/core.js';
+        }
 
         if (version_compare(VERSION, '2.11', '=='))
         {
@@ -424,9 +439,9 @@ class popupSyncDB extends Backend
     protected function initGetParams()
     {
         // Get Client id
-        if (strlen($this->Input->get('id')) != 0)
+        if (strlen(\Input::getInstance()->get('id')) != 0)
         {
-            $this->intClientID = intval($this->Input->get('id'));
+            $this->intClientID = intval(\Input::getInstance()->get('id'));
         }
         else
         {
@@ -435,9 +450,9 @@ class popupSyncDB extends Backend
         }
 
         // Get next step
-        if (strlen($this->Input->get('step')) != 0)
+        if (strlen(\Input::getInstance()->get('step')) != 0)
         {
-            $this->mixStep = $this->Input->get('step');
+            $this->mixStep = \Input::getInstance()->get('step');
         }
         else
         {
@@ -445,16 +460,16 @@ class popupSyncDB extends Backend
         }
         
         // Get direction
-        if (strlen($this->Input->get('direction')) != 0)
+        if (strlen(\Input::getInstance()->get('direction')) != 0)
         {
-           $this->strMode = $this->Input->get('direction');
+           $this->strMode = \Input::getInstance()->get('direction');
         }
         
     }
 
     protected function loadSyncSettings()
     {
-        $this->arrSyncSettings = $this->Session->get("syncCto_SyncSettings_" . $this->intClientID);
+        $this->arrSyncSettings = \Session::getInstance()->get("syncCto_SyncSettings_" . $this->intClientID);
 
         if (!is_array($this->arrSyncSettings))
         {
@@ -469,7 +484,7 @@ class popupSyncDB extends Backend
             $this->arrSyncSettings = array();
         }
 
-        $this->Session->set("syncCto_SyncSettings_" . $this->intClientID, $this->arrSyncSettings);
+        \Session::getInstance()->set("syncCto_SyncSettings_" . $this->intClientID, $this->arrSyncSettings);
     }
 
 }
@@ -479,4 +494,3 @@ class popupSyncDB extends Backend
  */
 $objPopup = new popupSyncDB();
 $objPopup->run();
-?>
