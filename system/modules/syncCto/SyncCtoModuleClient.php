@@ -3,9 +3,9 @@
 /**
  * Contao Open Source CMS
  *
- * @copyright  MEN AT WORK 2013 
+ * @copyright  MEN AT WORK 2013
  * @package    syncCto
- * @license    GNU/LGPL 
+ * @license    GNU/LGPL
  * @filesource
  */
 
@@ -50,7 +50,7 @@ class SyncCtoModuleClient extends BackendModule
     protected $arrModeAll;
 
     /**
-     * @var ContentData 
+     * @var ContentData
      */
     protected $objData;
 
@@ -105,7 +105,7 @@ class SyncCtoModuleClient extends BackendModule
 
     /**
      * Get the client informations
-     * 
+     *
      * @return array
      */
     public function getClientInformation()
@@ -238,8 +238,8 @@ class SyncCtoModuleClient extends BackendModule
 
     /**
      * Constructor
-     * 
-     * @param DataContainer $objDc 
+     *
+     * @param DataContainer $objDc
      */
     public function __construct(DataContainer $objDc = null)
     {
@@ -261,8 +261,8 @@ class SyncCtoModuleClient extends BackendModule
         // Import
         $this->import("Backenduser", "User");
     }
-    
-   
+
+
 
     /**
      * Generate page
@@ -299,7 +299,7 @@ class SyncCtoModuleClient extends BackendModule
         else if ($this->Input->get("mode") == 'all')
         {
             $this->blnAllMode = true;
-            $this->initModeAll();            
+            $this->initModeAll();
         }
         else
         {
@@ -388,11 +388,11 @@ class SyncCtoModuleClient extends BackendModule
         $this->saveContentData();
         $this->saveClientInformation();
         $this->saveSyncSettings();
-        
+
         // Save the informations for mode all.
         if ($this->Input->get("mode") == 'all')
         {
-            $this->saveStepPoolAll();  
+            $this->saveStepPoolAll();
         }
 
         // Set Vars for the template
@@ -401,7 +401,7 @@ class SyncCtoModuleClient extends BackendModule
 
     /**
      * Init the data array for syncAll or load it from session.
-     * 
+     *
      * @return void
      */
     protected function initModeAll()
@@ -411,7 +411,7 @@ class SyncCtoModuleClient extends BackendModule
             'index'     => -1,
             'count'     => 0,
         );
-        
+
         // Check if we have a init call.
         if ($this->Input->get('init') == 1)
         {
@@ -480,7 +480,7 @@ class SyncCtoModuleClient extends BackendModule
         $this->Template->information = $this->strInformation;
         $this->Template->finished    = $this->booFinished;
         $this->Template->allMode     = $this->blnAllMode;
-        
+
         if ($this->Input->get('table') == 'tl_syncCto_clients_syncTo')
         {
             $this->Template->direction = 'to';
@@ -496,7 +496,7 @@ class SyncCtoModuleClient extends BackendModule
     }
 
     /**
-     * Save the current state of the page/sychronization 
+     * Save the current state of the page/sychronization
      */
     protected function saveContentData()
     {
@@ -519,7 +519,7 @@ class SyncCtoModuleClient extends BackendModule
     }
 
     /**
-     * Load the current state of the page/synchronization 
+     * Load the current state of the page/synchronization
      */
     protected function loadContenData()
     {
@@ -740,7 +740,7 @@ class SyncCtoModuleClient extends BackendModule
      * Setup for page syncTo
      */
     private function pageSyncTo()
-    {        
+    {
         // Init | Set Step to 1
         if ($this->intStep == 0)
         {
@@ -757,13 +757,13 @@ class SyncCtoModuleClient extends BackendModule
             $this->intStep        = 1;
             $this->floStart       = microtime(true);
             $this->objData        = new ContentData(array(), $this->intStep);
-            
+
             // If mode all, add it to url.
             if($this->blnAllMode)
             {
                  $this->strUrl .= '&amp;mode=all';
             }
-            
+
             // Init tmep files
             $this->initTempLists();
 
@@ -771,7 +771,7 @@ class SyncCtoModuleClient extends BackendModule
             $this->Database->prepare("UPDATE `tl_synccto_clients` %s WHERE `tl_synccto_clients`.`id` = ?")
                     ->set(array("syncTo_user"   => $this->User->id, "syncTo_tstamp" => time()))
                     ->execute($this->intClientID);
-            
+
             // Add stats
             SyncCtoStats::getInstance()->addStartStat($this->User->id, $this->intClientID, time(), $this->arrSyncSettings, SyncCtoStats::SYNCDIRECTION_TO);
 
@@ -968,7 +968,7 @@ class SyncCtoModuleClient extends BackendModule
             $this->Database->prepare("UPDATE `tl_synccto_clients` %s WHERE `tl_synccto_clients`.`id` = ?")
                     ->set(array("syncFrom_user"   => $this->User->id, "syncFrom_tstamp" => time()))
                     ->execute($this->intClientID);
-            
+
             // Add stats
             SyncCtoStats::getInstance()->addStartStat($this->User->id, $this->intClientID, time(), $this->arrSyncSettings, SyncCtoStats::SYNCDIRECTION_FROM);
 
@@ -1159,7 +1159,7 @@ class SyncCtoModuleClient extends BackendModule
 
             // Init tmep files
             $this->initTempLists();
-            
+
             // Add stats
             SyncCtoStats::getInstance()->addStartStat($this->User->id, $this->intClientID, time(), array(), SyncCtoStats::SYNCDIRECTION_CHECK);
 
@@ -1389,7 +1389,7 @@ class SyncCtoModuleClient extends BackendModule
                     break;
 
                 /**
-                 * Clear client and server temp folder  
+                 * Clear client and server temp folder
                  */
                 case 5:
                     $this->objSyncCtoCommunicationClient->purgeTempFolder();
@@ -1537,7 +1537,7 @@ class SyncCtoModuleClient extends BackendModule
                     break;
 
                 // Check pathconfig for contao 2.11.10 =<
-                case 11:                    
+                case 11:
                     if(version_compare(VERSION . '.' . BUILD, '2.11.10', '>='))
                     {
                         $this->objSyncCtoCommunicationClient->createPathconfig();
@@ -1596,7 +1596,7 @@ class SyncCtoModuleClient extends BackendModule
             {
                 // Nothing to do 
             }
-            
+
             // Set stats
             SyncCtoStats::getInstance()->addAbortStat(time(), $this->intStep);
 
@@ -2131,7 +2131,7 @@ class SyncCtoModuleClient extends BackendModule
                     break;
 
                 /**
-                 * Send bigfiles 
+                 * Send bigfiles
                  */
                 case 4:
                     $intCountSplit = 0;
@@ -2476,8 +2476,13 @@ class SyncCtoModuleClient extends BackendModule
                     break;
 
                 case 3:
+                    var_dump($this->arrSyncSettings['syncCto_SyncTables']);
+                    var_dump($_POST);
+                    die();
+
+
                     // Unset some tables for pro feature
-                    if (($this->arrSyncSettings["automode"] && in_array('syncCtoPro', Config::getInstance()->getActiveModules())) || (key_exists("forward", $_POST) && $this->arrSyncSettings['post_data']['database_pages_check'] == true))
+                    if (($this->arrSyncSettings["automode"] && in_array('syncCtoPro', Config::getInstance()->getActiveModules())) || (array_key_exists("forward", $_POST) && $this->arrSyncSettings['post_data']['database_pages_check'] == true))
                     {
                         if (($mixKey = array_search('tl_page', $this->arrSyncSettings['syncCto_SyncTables'])) !== false)
                         {
@@ -2498,6 +2503,7 @@ class SyncCtoModuleClient extends BackendModule
                         }
                     }
 
+                    // Check the post vars.
                     if (($this->arrSyncSettings["automode"] || array_key_exists("forward", $_POST)) && !(count($this->arrSyncSettings['syncCto_SyncTables']) == 0 && count($this->arrSyncSettings['syncCto_SyncDeleteTables']) == 0))
                     {
                         // Go to next step
@@ -2607,7 +2613,7 @@ class SyncCtoModuleClient extends BackendModule
                     $this->objStepPool->step++;
 
                     break;
-               
+
                 /**
                  * Drop Tables
                  */
@@ -2638,7 +2644,7 @@ class SyncCtoModuleClient extends BackendModule
                  * Hook for custom sql code
                  */
                 case 8:
-                    
+
                     if (isset($GLOBALS['TL_HOOKS']['syncDBUpdate']) && is_array($GLOBALS['TL_HOOKS']['syncDBUpdate']))
                     {
                         $arrSQL = array();
@@ -2663,9 +2669,9 @@ class SyncCtoModuleClient extends BackendModule
                     $this->objStepPool->step++;
 
                     break;
-                    
+
                 /**
-                 * Set timestamps 
+                 * Set timestamps
                  */
                 case 9:
                     $arrTableTimestamp = array(
@@ -2710,7 +2716,7 @@ class SyncCtoModuleClient extends BackendModule
                                 ->prepare("UPDATE tl_synccto_clients SET " . $location . "_timestamp = ? WHERE id = ? ")
                                 ->execute(serialize($arrLastTableTimestamp), $this->intClientID);
                     }
-                    
+
                     // Show step information
                     $this->objData->setState(SyncCtoEnum::WORK_OK);
                     $this->objData->setDescription($GLOBALS['TL_LANG']['tl_syncCto_sync']['step_4']['description_4']);
@@ -2952,23 +2958,23 @@ class SyncCtoModuleClient extends BackendModule
                     $arrResponse = $this->objSyncCtoCommunicationClient->runFinalOperations();
                     $this->objStepPool->step++;
                     break;
-                
+
                 /**
                  * Call some functions on the server.
                  */
-                case 3:                      
+                case 3:
                     $mixCurrentAdditionalStep = $this->objStepPool->additionalStep;
-                                        
+
                     if(empty($mixCurrentAdditionalStep))
                     {
                         $mixCurrentAdditionalStep = 0;
                     }
-                    
+
                     // HOOK: do some last operations
                     if (isset($GLOBALS['TL_HOOKS']['syncAdditionalFunctions']) && is_array($GLOBALS['TL_HOOKS']['syncAdditionalFunctions']))
                     {
                         $arrKeys = array_keys($GLOBALS['TL_HOOKS']['syncAdditionalFunctions']);
-                                                
+
                         if(($mixCurrentAdditionalStep + 1) > count($arrKeys))
                         {
                             $this->objData->setDescription($GLOBALS['TL_LANG']['tl_syncCto_sync']['step_1']['description_2']);
@@ -2978,7 +2984,7 @@ class SyncCtoModuleClient extends BackendModule
 
                         $mixCurrentKey      = $arrKeys[$mixCurrentAdditionalStep];
                         $arrCurrentFunction = $GLOBALS['TL_HOOKS']['syncAdditionalFunctions'][$mixCurrentKey];
-                        
+
                         try
                         {
                             $this->import($arrCurrentFunction[0]);
@@ -2988,14 +2994,14 @@ class SyncCtoModuleClient extends BackendModule
                         {
                             $this->log("Error by: TL_HOOK $arrCurrentFunction[0] | $arrCurrentFunction[1] with Msg: " . $exc->getMessage(), __CLASS__ . "|" . __FUNCTION__, TL_ERROR);
                         }
-                        
+
                         $this->objStepPool->additionalStep = $mixCurrentAdditionalStep + 1;
                     }
                     else
                     {
                         $this->objStepPool->step++;
                     }
-                   
+
                     break;
 
                 case 4:
@@ -3021,7 +3027,7 @@ class SyncCtoModuleClient extends BackendModule
                         $intWaitCount  = 0;
                         $intDelCount   = 0;
                         $intSplitCount = 0;
-                
+
                         foreach ($this->arrListCompare as $value)
                         {
                             switch ($value["transmission"])
@@ -3802,7 +3808,7 @@ class SyncCtoModuleClient extends BackendModule
                     break;
 
                 /**
-                 * Get bigfiles 
+                 * Get bigfiles
                  */
                 case 4:
                     $intCountSplit = 0;
@@ -4270,8 +4276,8 @@ class SyncCtoModuleClient extends BackendModule
                             }
                         }
                     }
-                              
-                    $strSrc = $this->objSyncCtoHelper->standardizePath($GLOBALS['SYC_PATH']['tmp'], "sql", $this->objStepPool->zipname);                    
+
+                    $strSrc = $this->objSyncCtoHelper->standardizePath($GLOBALS['SYC_PATH']['tmp'], "sql", $this->objStepPool->zipname);
                     $this->objSyncCtoDatabase->runRestore($strSrc, $arrSQL);
 
                     $this->objStepPool->step++;
@@ -4279,7 +4285,7 @@ class SyncCtoModuleClient extends BackendModule
                     break;
 
                 /**
-                 * Set timestamps 
+                 * Set timestamps
                  */
                 case 7:
 
@@ -4873,7 +4879,7 @@ class SyncCtoModuleClient extends BackendModule
 
         return $size;
     }
-    
+
     /*
      * End SyncCto Sync. From
      * -------------------------------------------------------------------------
@@ -4884,7 +4890,7 @@ class SyncCtoModuleClient extends BackendModule
  * Sort function
  * @param type $a
  * @param type $b
- * @return type 
+ * @return type
  */
 function syncCtoModelClientCMP($a, $b)
 {
@@ -4908,7 +4914,7 @@ class StepPool
 
     /**
      *
-     * @param type $arrStepPool 
+     * @param type $arrStepPool
      */
     public function __construct($arrStepPool, $intStepID)
     {
@@ -4974,7 +4980,7 @@ class ContentData
     /**
      *
      * @param type $arrContentData
-     * @param type $intStep 
+     * @param type $intStep
      */
     public function __construct($arrContentData, $intStep)
     {
