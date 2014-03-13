@@ -1,15 +1,9 @@
 <script>    
     function openSyncCtoPopUp()
     {
-        <?php
-            $strUrl = $this->Environment->base . 'contao/' .  $this->popupClassName . '?id=' . $this->id . '&direction=' . $this->direction . '&language=' . BackendUser::getInstance()->language;
-              if(SyncCtoHelper::isContao2()):
-        ?>
-        Mediabox.open('<?php echo $strUrl; ?>', '', '850 80%');
-        <?php else: ?>
+        var url = '<?php echo $this->Environment->base . 'contao/' .  $this->popupClassName . '?id=' . $this->id . '&direction=' . $this->direction . '&language=' . BackendUser::getInstance()->language; ?>';
         var h = Math.max(document.documentElement.clientHeight, window.innerHeight || 0);
-        Backend.openModalIframe({'title':'<?php echo $GLOBALS['TL_LANG']['tl_syncCto_sync']['popup']; ?>','url':'<?php echo $strUrl; ?>','width':850, 'height':(h / 100 * 90)})
-        <?php endif; ?>
+        Backend.openModalIframe({'title':'<?php echo $GLOBALS['TL_LANG']['tl_syncCto_sync']['popup']; ?>','url':url,'width':850, 'height':(h / 100 * 90)})
     }
     
     window.addEvent("domready",function(){
