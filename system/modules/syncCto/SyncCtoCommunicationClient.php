@@ -580,16 +580,24 @@ class SyncCtoCommunicationClient extends CtoCommunication
     }
 
     /**
-     * Import files from tempfolder
-     * 
-     * @param array $arrFilelist
-     * @return array 
+     * Import files from temp folder to the target source. If we have tl_files the system
+     * tries to solve problems with the dbfas data from contao.
+     *
+     * @param array   $arrFilelist The list with all files.
+     *
+     * @param boolean $blnIsDbafs If true the system tries to run the support for the Contao dbafs.
+     *
+     * @return array Return a array with information from the client.
      */
-    public function runFileImport($arrFilelist)
+    public function runFileImport($arrFilelist, $blnIsDbafs)
     {
         $arrData = array(
             array(
-                "name" => "filelist",
+                "name"  => "filelist",
+                "value" => $arrFilelist,
+            ),
+            array(
+                "name"  => "dbafs",
                 "value" => $arrFilelist,
             ),
         );

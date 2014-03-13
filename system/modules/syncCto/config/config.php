@@ -353,7 +353,7 @@ $GLOBALS["CTOCOM_FUNCTIONS"]["SYNCCTO_IMPORT_FILE"] = array(
     "class" => "SyncCtoFiles",
     "function" => "moveTempFile",
     "typ" => "POST",
-    "parameter" => array("filelist"),
+    "parameter" => array("filelist", "dbafs"),
 );
 
 // Rebuild a split file
