@@ -100,6 +100,13 @@ $GLOBALS['SYC_SIZE']['limit_ignore'] = 838860800;
 /**
  * Blacklists
  */
+
+// Add some files to the blacklist for the DBAFS from contao.
+$arrFileSyncExclude = trimsplit(',', $GLOBALS['TL_CONFIG']['fileSyncExclude']);
+$arrFileSyncExclude[] = 'syncCto_backups/debug';
+$GLOBALS['TL_CONFIG']['fileSyncExclude'] = implode(',', $arrFileSyncExclude);
+
+
 // Tables
 $GLOBALS['SYC_CONFIG']['table_hidden'] = array_merge( (array) $GLOBALS['SYC_CONFIG']['table_hidden'], array(
     'tl_log',
