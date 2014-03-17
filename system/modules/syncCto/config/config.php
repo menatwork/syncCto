@@ -9,7 +9,7 @@
  * @filesource
  */
 
-$objInput = Input::getInstance();
+$objInput = \Input::getInstance();
 
 /**
  * Current syncCto version
@@ -352,7 +352,7 @@ $GLOBALS["CTOCOM_FUNCTIONS"]["SYNCCTO_DELETE_FILE"] = array(
     "class" => "SyncCtoFiles",
     "function" => "deleteFiles",
     "typ" => "POST",
-    "parameter" => array("filelist"),
+    "parameter" => array("filelist", "dbafs"),
 );
 
 // Import files into contao file system

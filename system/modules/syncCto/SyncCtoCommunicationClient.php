@@ -297,16 +297,19 @@ class SyncCtoCommunicationClient extends CtoCommunication
      */
 
     /**
-     * Compare a filelist with the filesystem
-     * 
+     * Compare a file list with the filesystem
+     *
      * @param array $arrChecksumList
-     * @return array 
+     *
+     * @throws Exception
+     *
+     * @return array
      */
     public function runCecksumCompare($arrChecksumList)
     {
         if (!is_array($arrChecksumList))
         {
-            throw new Exception("Filelist is not a array.");
+            throw new Exception("File list is not a array.");
         }
 
         $strPath = $this->objSyncCtoHelper->standardizePath($GLOBALS['SYC_PATH']['tmp'], "syncList.syncCto");
@@ -581,24 +584,24 @@ class SyncCtoCommunicationClient extends CtoCommunication
 
     /**
      * Import files from temp folder to the target source. If we have tl_files the system
-     * tries to solve problems with the dbfas data from contao.
+     * tries to solve problems with the dbafs data from contao.
      *
-     * @param array   $arrFilelist The list with all files.
+     * @param array   $arrFileList The list with all files.
      *
      * @param boolean $blnIsDbafs If true the system tries to run the support for the Contao dbafs.
      *
      * @return array Return a array with information from the client.
      */
-    public function runFileImport($arrFilelist, $blnIsDbafs)
+    public function runFileImport($arrFileList, $blnIsDbafs)
     {
         $arrData = array(
             array(
                 "name"  => "filelist",
-                "value" => $arrFilelist,
+                "value" => $arrFileList,
             ),
             array(
                 "name"  => "dbafs",
-                "value" => $arrFilelist,
+                "value" => $blnIsDbafs,
             ),
         );
 
@@ -607,17 +610,24 @@ class SyncCtoCommunicationClient extends CtoCommunication
 
     /**
      * Delete files
-     * 
-     * @param array $arrFilelist
-     * @return array 
+     *
+     * @param array   $arrFileList The list with all files.
+     *
+     * @param boolean $blnIsDbafs If true the system tries to run the support for the Contao dbafs.
+     *
+     * @return array Return a array with information from the client.
      */
-    public function deleteFiles($arrFilelist)
+    public function deleteFiles($arrFileList, $blnIsDbafs)
     {
         $arrData = array(
             array(
                 "name" => "filelist",
-                "value" => $arrFilelist,
-            )
+                "value" => $arrFileList,
+            ),
+            array(
+                "name"  => "dbafs",
+                "value" => $blnIsDbafs,
+            ),
         );
 
         return $this->runServer("SYNCCTO_DELETE_FILE", $arrData);
