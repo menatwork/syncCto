@@ -220,6 +220,7 @@ class SyncCtoFiles extends Backend
             $strRelativePath = preg_replace('?' . $this->objSyncCtoHelper->getPreparedTlRoot() . '/?', '', $objFile->getPathname(), 1);
             $strFullPath     = $objFile->getPathname();
             $intSize         = $objFile->getSize();
+            $intLasModified  = $objFile->getMTime();
 
             // Get metadata.
             if ($intSize < 0 && $intSize != 0)
@@ -230,6 +231,7 @@ class SyncCtoFiles extends Backend
                     "size"         => -1,
                     "state"        => SyncCtoEnum::FILESTATE_BOMBASTIC_BIG,
                     "transmission" => SyncCtoEnum::FILETRANS_WAITING,
+                    "lastModified" => $intLasModified
                 );
             }
             else if ($intSize >= $GLOBALS['SYC_SIZE']['limit_ignore'])
@@ -240,6 +242,7 @@ class SyncCtoFiles extends Backend
                     "size"         => $intSize,
                     "state"        => SyncCtoEnum::FILESTATE_BOMBASTIC_BIG,
                     "transmission" => SyncCtoEnum::FILETRANS_WAITING,
+                    "lastModified" => $intLasModified
                 );
             }
             else if ($intSize >= $GLOBALS['SYC_SIZE']['limit'])
@@ -250,6 +253,7 @@ class SyncCtoFiles extends Backend
                     "size"         => $intSize,
                     "state"        => SyncCtoEnum::FILESTATE_TOO_BIG,
                     "transmission" => SyncCtoEnum::FILETRANS_WAITING,
+                    "lastModified" => $intLasModified
                 );
             }
             else
@@ -260,6 +264,7 @@ class SyncCtoFiles extends Backend
                     "size"         => $intSize,
                     "state"        => SyncCtoEnum::FILESTATE_FILE,
                     "transmission" => SyncCtoEnum::FILETRANS_WAITING,
+                    "lastModified" => $intLasModified
                 );
             }
         }
