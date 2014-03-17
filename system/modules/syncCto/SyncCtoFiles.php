@@ -1282,13 +1282,13 @@ class SyncCtoFiles extends Backend
     }
 
     /**
-     * Move temp files
+     * Move temp files. If DBAFS support is enabled add entries to the dbafs.
      *
      * @CtoCommunication Enable
      *
-     * @param array   $arrFileList List with files for moving.
+     * @param  array   $arrFileList List with files for moving.
      *
-     * @param boolean $blnIsDbafs  Flag if we have to change the dbafs system.
+     * @param  boolean $blnIsDbafs  Flag if we have to change the dbafs system.
      *
      * @return array The list with some more information about the moving of the file.
      */
@@ -1296,163 +1296,151 @@ class SyncCtoFiles extends Backend
     {
         foreach ($arrFileList as $key => $value)
         {
-            $blnMovedFile = false;
-            $strTempFile  = $this->objSyncCtoHelper->standardizePath($GLOBALS['SYC_PATH']['tmp'], "sync", $value["path"]);
-
-            // Check if the tmp file exists.
-            if (!file_exists(TL_ROOT . "/" . $strTempFile))
+            try
             {
-                $arrFileList[$key]["saved"] = false;
-                $arrFileList[$key]["error"] = sprintf($GLOBALS['TL_LANG']['ERR']['unknown_file'], $strTempFile);
-                continue;
-            }
+                $blnMovedFile = false;
+                $strTempFile  = $this->objSyncCtoHelper->standardizePath($GLOBALS['SYC_PATH']['tmp'], "sync", $value["path"]);
 
-            // Generate the folder if not already there.
-            $strFolderPath = dirname($value["path"]);
-            if ($strFolderPath != ".")
-            {
-                $objFolder = new Folder($strFolderPath);
-                unset($objFolder);
-            }
-
-            // Build folders.
-            $strFileSource      = $this->objSyncCtoHelper->standardizePath($GLOBALS['SYC_PATH']['tmp'], "sync", $value["path"]);
-            $strFileDestination = $this->objSyncCtoHelper->standardizePath($value["path"]);
-
-            // DBAFS support.
-            if($blnIsDbafs)
-            {
-                // Missing state means "new" so we can simple add the files.
-                if($value['state'] == SyncCtoEnum::FILESTATE_MISSING || $value['state'] == SyncCtoEnum::FILESTATE_TOO_BIG_MISSING)
+                // Check if the tmp file exists.
+                if (!file_exists(TL_ROOT . "/" . $strTempFile))
                 {
-                    // Move file.
-                    $blnMovedFile = $this->objFiles->copy($strFileSource, $strFileDestination);
-
-                    // If success add file to the database.
-                    if($blnMovedFile)
-                    {
-                        $arrDataInsert = $value['tl_files'];
-                        unset($arrDataInsert['id']);
-                        unset($arrDataInsert['pid']); // ToDo: Resolve the folder parent problem.
-
-                        \Database::getInstance()->prepare('INSERT INTO tl_files %s')
-                            ->set($arrDataInsert)
-                            ->execute();
-
-                        // Add a status report for debugging and co.
-                        $arrFileList[$key]['tl_files_state'] = 'Add to database';
-                    }
+                    $arrFileList[$key]["saved"] = false;
+                    $arrFileList[$key]["error"] = sprintf($GLOBALS['TL_LANG']['ERR']['unknown_file'], $strTempFile);
+                    continue;
                 }
-                // If state is need, the file is already there but dif md5 hashes.
-                elseif($value['state'] == SyncCtoEnum::FILESTATE_NEED || $value['state'] == SyncCtoEnum::FILESTATE_NEED)
+
+                // Generate the folder if not already there.
+                $strFolderPath = dirname($value["path"]);
+                if ($strFolderPath != ".")
                 {
-                    // Get the information from the tl_files.
+                    $objFolder = new Folder($strFolderPath);
+                    unset($objFolder);
+                }
+
+                // Build folders.
+                $strFileSource      = $this->objSyncCtoHelper->standardizePath($GLOBALS['SYC_PATH']['tmp'], "sync", $value["path"]);
+                $strFileDestination = $this->objSyncCtoHelper->standardizePath($value["path"]);
+
+                // DBAFS support. Check if we have the file already in the locale dbafs system.
+                if ($blnIsDbafs)
+                {
+                    // Get the information from the dbafs.
+                    /**  @var \Model $objLocaleData */
                     $objLocaleData = \FilesModel::findByPath($strFileDestination);
 
-                    // Okay when null there is no entry in the tl_files just overwrite the locale and add it, so we
-                    // are the first one :).
-                    if($objLocaleData == null)
+                    // If we have no entry in the dbafs just overwrite the current file and add the entry to the dbafs.
+                    if ($objLocaleData == null)
                     {
                         // Move file.
                         $blnMovedFile = $this->objFiles->copy($strFileSource, $strFileDestination);
 
                         // If success add file to the database.
-                        if($blnMovedFile)
+                        if ($blnMovedFile)
                         {
-                            $arrDataInsert = $value['tl_files'];
-                            unset($arrDataInsert['id']);
-                            unset($arrDataInsert['pid']); // ToDo: Resolve the folder parent problem.
-
-                            \Database::getInstance()->prepare('INSERT INTO tl_files %s')
-                                ->set($arrDataInsert)
-                                ->execute();
+                            // First add it to the dbafs.
+                            $objLocaleData       = \Dbafs::addResource($strFileDestination);
+                            $objLocaleData->uuid = $value['tl_files']['uuid'];
+                            $objLocaleData->save();
 
                             // Add a status report for debugging and co.
-                            $arrFileList[$key]['tl_files_state'] = 'No locale entry found. Add to database';
+                            $arrFileList[$key]['dbafs']['msg']   = 'Moved file and add to database.';
+                            $arrFileList[$key]['dbafs']['state'] = SyncCtoEnum::DBAFS_CREATE;
                         }
                     }
-                    // If same we can just overwrite.
-                    elseif($objLocaleData->uuid == $value['tl_files']['uuid'])
+                    else
                     {
-                        // Move file.
-                        $blnMovedFile = $this->objFiles->copy($strFileSource, $strFileDestination);
+                        // Get the readable UUID for the work.
+                        $strLocaleUUID = \String::binToUuid($objLocaleData->uuid);
 
-                        // If success add file to the database.
-                        if($blnMovedFile)
+                        // Okay it seems we have already a file with this values.
+                        if ($strLocaleUUID == $value['tl_files']['uuid'])
                         {
-                            $arrDataInsert = $value['tl_files'];
-                            unset($arrDataInsert['id']);
-                            unset($arrDataInsert['pid']); // ToDo: Resolve the folder parent problem.
-                            unset($arrDataInsert['uuid']);
+                            // Move file.
+                            $blnMovedFile = $this->objFiles->copy($strFileSource, $strFileDestination);
 
-                            \Database::getInstance()->prepare('UPDATE tl_files %s WHERE id=?')
-                                ->set($arrDataInsert)
-                                ->execute($objLocaleData->id);
-
-                            // Add a status report for debugging and co.
-                            $arrFileList[$key]['tl_files_state'] = 'UUID same no problem found. Update database.';
-                        }
-                    }
-                    // Not same so we have to rearrange the files.
-                    elseif($objLocaleData->uuid != $value['tl_files']['uuid'])
-                    {
-                        // Get information about the current file information.
-                        $arrDestinationInformation = pathinfo($strFileDestination);
-
-                        $strNewDestinationName = null;
-                        $intFileNumber = 1;
-                        for($i = 1 ; $i < 100; $i++)
-                        {
-                            $strNewDestinationName = sprintf('%s/%s_%s.%s',
-                                $arrDestinationInformation['dirname'],
-                                $arrDestinationInformation['filename'],
-                                $i,
-                                $arrDestinationInformation['extension']
-                            );
-
-                            if(!file_exists(TL_ROOT . '/' . $strNewDestinationName ))
+                            // If success add file to the database.
+                            if ($blnMovedFile)
                             {
-                                $intFileNumber = $i;
-                                break;
+                                $objLocaleData->hash = $value['checksum'];
+                                $objLocaleData->save();
+
+                                // Add a status report for debugging and co.
+                                $arrFileList[$key]['dbafs']['msg']   = 'UUID same no problem found. Update database with new hash.';
+                                $arrFileList[$key]['dbafs']['state'] = SyncCtoEnum::DBAFS_SAME;
                             }
                         }
-
-                        // Move the current file to another name, that we have space for the new one.
-                        $objLocaleData = \Dbafs::moveResource($strFileDestination, $strNewDestinationName);
-
-                        // Move the tmp file.
-                        $blnMovedFile = $this->objFiles->copy($strFileSource, $strFileDestination);
-
-                        // If success add file to the database.
-                        if($blnMovedFile)
+                        // Not same so we have to rearrange the files.
+                        elseif ($strLocaleUUID != $value['tl_files']['uuid'])
                         {
-                            $arrDataInsert = $value['tl_files'];
-                            unset($arrDataInsert['id']);
-                            unset($arrDataInsert['pid']); // ToDo: Resolve the folder parent problem.
+                            // Get information about the current file information.
+                            $arrDestinationInformation = pathinfo($strFileDestination);
 
-                            \Database::getInstance()->prepare('INSERT INTO tl_files %s')
-                                ->set($arrDataInsert)
-                                ->execute();
+                            // Try to rename it to _1 or _2 and so on.
+                            $strNewDestinationName = null;
+                            $intFileNumber         = 1;
+                            for ($i = 1; $i < 100; $i++)
+                            {
+                                $strNewDestinationName = sprintf('%s/%s_%s.%s',
+                                    $arrDestinationInformation['dirname'],
+                                    $arrDestinationInformation['filename'],
+                                    $i,
+                                    $arrDestinationInformation['extension']
+                                );
 
-                            // Add a status report for debugging and co.
-                            $arrFileList[$key]['tl_files_state'] = 'UUID not same, move the locale file to _' . $intFileNumber . '. Add the new entry to the database.';
+                                if (!file_exists(TL_ROOT . '/' . $strNewDestinationName))
+                                {
+                                    $intFileNumber = $i;
+                                    break;
+                                }
+                            }
+
+                            // Move the current file to another name, that we have space for the new one.
+                            $this->objFiles->copy($strFileDestination, $strNewDestinationName);
+                            $objRenamedLocaleData = \Dbafs::moveResource($strFileDestination, $strNewDestinationName);
+
+                            // Move the tmp file.
+                            $blnMovedFile = $this->objFiles->copy($strFileSource, $strFileDestination);
+
+                            // If success add file to the database.
+                            if ($blnMovedFile)
+                            {
+                                // First add it to the dbafs.
+                                $objLocaleData       = \Dbafs::addResource($strFileDestination);
+                                $objLocaleData->uuid = $value['tl_files']['uuid'];
+                                $objLocaleData->save();
+
+                                // Add a status report for debugging and co.
+                                $arrFileList[$key]['dbafs']['msg']    = 'UUID not same, move the locale file to _' . $intFileNumber . '. Add the new entry to the database.';
+                                $arrFileList[$key]['dbafs']['rename'] = $strNewDestinationName;
+                                $arrFileList[$key]['dbafs']['state']  = SyncCtoEnum::DBAFS_CONFLICT;
+                            }
                         }
                     }
                 }
-            }
-            else
-            {
-               $blnMovedFile = $this->objFiles->copy($strFileSource, $strFileDestination);
-            }
+                else
+                {
+                    $blnMovedFile = $this->objFiles->copy($strFileSource, $strFileDestination);
+                }
 
-            if ($blnMovedFile)
-            {
-                $arrFileList[$key]["saved"] = true;
+                // Check the state at moving and add a msg to the return array.
+                if ($blnMovedFile)
+                {
+                    $arrFileList[$key]["saved"] = true;
+                }
+                else
+                {
+                    $arrFileList[$key]["saved"]        = false;
+                    $arrFileList[$key]["error"]        = sprintf($GLOBALS['TL_LANG']['ERR']['cant_move_file'], $strFileSource, $strFileDestination);
+                    $arrFileList[$key]["transmission"] = SyncCtoEnum::FILETRANS_SKIPPED;
+                    $arrFileList[$key]["skipreason"]   = $GLOBALS['TL_LANG']['ERR']['cant_move_file'];
+                }
             }
-            else
+            catch (Exception $e)
             {
-                $arrFileList[$key]["saved"] = false;
-                $arrFileList[$key]["error"] = vsprintf($GLOBALS['TL_LANG']['ERR']['cant_move_file'], array($strFileSource, $strFileDestination));
+                $arrFileList[$key]["saved"]        = false;
+                $arrFileList[$key]["error"]        = sprintf('Can not move file - %s. Exception message: %s', $strFileSource, $e->getMessage());
+                $arrFileList[$key]["transmission"] = SyncCtoEnum::FILETRANS_SKIPPED;
+                $arrFileList[$key]["skipreason"]   = $e->getMessage();
             }
         }
 
@@ -1460,51 +1448,74 @@ class SyncCtoFiles extends Backend
     }
 
     /**
-     * Delete files
-     * 
+     * Delete files based on a file list.
+     *
      * @CtoCommunication Enable
-     * @param type $arrFileList
-     * @return type 
+     *
+     * @param  array   $arrFileList List with files for deleting.
+     *
+     * @param  boolean $blnIsDbafs  Flag if we have to change the dbafs system.
+     *
+     * @return array The list with some more information about the deleted file.
      */
-    public function deleteFiles($arrFileList)
+    public function deleteFiles($arrFileList, $blnIsDbafs)
     {
         if (count($arrFileList) != 0)
         {
+            // Run each entry in the list..
             foreach ($arrFileList as $key => $value)
             {
-
-                if (is_file(TL_ROOT . "/" . $value['path']))
+                try
                 {
-                    try
+                    if (!file_exists(TL_ROOT . "/" . $value['path']))
                     {
+                        $arrFileList[$key]['transmission'] = SyncCtoEnum::FILETRANS_SEND;
+
+                        // Remove from dbafs.
+                        if ($blnIsDbafs)
+                        {
+                            \Dbafs::deleteResource($value['path']);
+                        }
+                    }
+                    // Check if we have a file.
+                    elseif (is_file(TL_ROOT . "/" . $value['path']))
+                    {
+                        // Delete the file.
                         if ($this->objFiles->delete($value['path']))
                         {
                             $arrFileList[$key]['transmission'] = SyncCtoEnum::FILETRANS_SEND;
+
+                            // Remove from dbafs.
+                            if ($blnIsDbafs)
+                            {
+                                \Dbafs::deleteResource($value['path']);
+                            }
                         }
+                        // If not possible add a msg.
                         else
                         {
                             $arrFileList[$key]['transmission'] = SyncCtoEnum::FILETRANS_SKIPPED;
                             $arrFileList[$key]["skipreason"]   = $GLOBALS['TL_LANG']['ERR']['cant_delete_file'];
                         }
+
                     }
-                    catch (Exception $exc)
-                    {
-                        $arrFileList[$key]['transmission'] = SyncCtoEnum::FILETRANS_SKIPPED;
-                        $arrFileList[$key]["skipreason"]   = $exc->getMessage();
-                    }
-                }
-                else
-                {
-                    try
+                    // .. else we have a folder and remove this with all files inside.
+                    elseif (is_dir(TL_ROOT . "/" . $value['path']))
                     {
                         $this->objFiles->rrdir($value['path']);
                         $arrFileList[$key]['transmission'] = SyncCtoEnum::FILETRANS_SEND;
+
+                        // Remove from dbafs.
+                        if ($blnIsDbafs)
+                        {
+                            \Dbafs::deleteResource($value['path']);
+                        }
                     }
-                    catch (Exception $exc)
-                    {
-                        $arrFileList[$key]['transmission'] = SyncCtoEnum::FILETRANS_SKIPPED;
-                        $arrFileList[$key]["skipreason"]   = $exc->getMessage();
-                    }
+                }
+                catch (Exception $exc)
+                {
+                    $arrFileList[$key]['transmission'] = SyncCtoEnum::FILETRANS_SKIPPED;
+                    $arrFileList[$key]["skipreason"]   = $exc->getMessage();
                 }
             }
         }

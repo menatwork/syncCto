@@ -262,7 +262,6 @@ class SyncCtoModuleClient extends BackendModule
         $this->import("Backenduser", "User");
     }
 
-
     /**
      * Generate page
      */
@@ -1548,7 +1547,7 @@ class SyncCtoModuleClient extends BackendModule
                         );
                     }
 
-                    $this->objSyncCtoCommunicationClient->runFileImport($arrImport);
+                    $this->objSyncCtoCommunicationClient->runFileImport($arrImport, false);
 
                     $this->objStepPool->step++;
 
@@ -1696,24 +1695,9 @@ class SyncCtoModuleClient extends BackendModule
                     break;
 
                 /**
-                 * Build checksum list for 'files'
-                 */
-                case 2:
-                    if (in_array("user_change", $this->arrSyncSettings["syncCto_Type"]))
-                    {
-                        $this->arrListFile['files'] = $this->objSyncCtoFiles->runChecksumFiles();
-                        $this->objStepPool->step++;
-                        break;
-                    }
-                    else
-                    {
-                        $this->arrListFile['files'] = array();
-                    }
-
-                /**
                  * Build checksum list for Conta core
                  */
-                case 3:
+                case 2:
                     if (in_array("core_change", $this->arrSyncSettings["syncCto_Type"]))
                     {
                         $this->arrListFile['core'] = $this->objSyncCtoFiles->runChecksumCore();
@@ -1726,24 +1710,47 @@ class SyncCtoModuleClient extends BackendModule
                     }
 
                 /**
+                 * Build checksum list for 'files'
+                 */
+                case 3:
+                    if (in_array("user_change", $this->arrSyncSettings["syncCto_Type"]))
+                    {
+                        $this->arrListFile['files'] = $this->objSyncCtoFiles->runChecksumFiles();
+                        $this->objStepPool->step++;
+                        break;
+                    }
+                    else
+                    {
+                        $this->arrListFile['files'] = array();
+                    }
+
+                /**
                  * Send it to the client
                  */
                 case 4:
                     if (in_array("core_change", $this->arrSyncSettings["syncCto_Type"]))
                     {
-                        $this->arrListCompare['files'] = $this->objSyncCtoCommunicationClient->runCecksumCompare($this->arrListFile['files']);
+                        $this->arrListCompare['core'] = $this->objSyncCtoCommunicationClient->runCecksumCompare($this->arrListFile['core']);
                         $this->objData->setDescription($GLOBALS['TL_LANG']['tl_syncCto_sync']["step_2"]['description_2']);
                         $this->objStepPool->step++;
                         break;
+                    }
+                    else
+                    {
+                        $this->arrListCompare['core'] = array();
                     }
 
                 case 5:
                     if (in_array("user_change", $this->arrSyncSettings["syncCto_Type"]))
                     {
-                        $this->arrListCompare['core'] = $this->objSyncCtoCommunicationClient->runCecksumCompare($this->arrListFile['core']);
+                        $this->arrListCompare['files'] = (array) $this->objSyncCtoCommunicationClient->runCecksumCompare($this->arrListFile['files']);
                         $this->objData->setDescription($GLOBALS['TL_LANG']['tl_syncCto_sync']["step_2"]['description_2']);
                         $this->objStepPool->step++;
                         break;
+                    }
+                    else
+                    {
+                        $this->arrListCompare['files'] = array();
                     }
 
                 /**
@@ -1753,7 +1760,7 @@ class SyncCtoModuleClient extends BackendModule
                     if (in_array("core_delete", $this->arrSyncSettings["syncCto_Type"]))
                     {
                         $arrChecksumClient            = $this->objSyncCtoCommunicationClient->getChecksumCore();
-                        $this->arrListCompare['core'] = array_merge($this->arrListCompare['core'], $this->objSyncCtoFiles->checkDeleteFiles($arrChecksumClient));
+                        $this->arrListCompare['core'] = array_merge((array) $this->arrListCompare['core'], $this->objSyncCtoFiles->checkDeleteFiles($arrChecksumClient));
                         $this->objStepPool->step++;
                         break;
                     }
@@ -1762,7 +1769,7 @@ class SyncCtoModuleClient extends BackendModule
                     if (in_array("user_delete", $this->arrSyncSettings["syncCto_Type"]))
                     {
                         $arrChecksumClient             = $this->objSyncCtoCommunicationClient->getChecksumFiles();
-                        $this->arrListCompare['files'] = array_merge($this->arrListCompare['files'], $this->objSyncCtoFiles->checkDeleteFiles($arrChecksumClient));
+                        $this->arrListCompare['files'] = array_merge((array) $this->arrListCompare['files'], $this->objSyncCtoFiles->checkDeleteFiles($arrChecksumClient));
 
                         $this->objStepPool->step++;
                         break;
@@ -1775,7 +1782,7 @@ class SyncCtoModuleClient extends BackendModule
                     if (in_array("core_delete", $this->arrSyncSettings["syncCto_Type"]))
                     {
                         $arrChecksumClient             = $this->objSyncCtoCommunicationClient->getChecksumFolderCore();
-                        $this->arrListComparee['core'] = array_merge($this->arrListCompare['core'], $this->objSyncCtoFiles->searchDeleteFolders($arrChecksumClient));
+                        $this->arrListComparee['core'] = array_merge((array) $this->arrListCompare['core'], $this->objSyncCtoFiles->searchDeleteFolders($arrChecksumClient));
 
                         $this->objStepPool->step++;
                         break;
@@ -1785,7 +1792,7 @@ class SyncCtoModuleClient extends BackendModule
                     if (in_array("user_delete", $this->arrSyncSettings["syncCto_Type"]))
                     {
                         $arrChecksumClient    = $this->objSyncCtoCommunicationClient->getChecksumFolderFiles();
-                        $this->arrListCompare['files'] = array_merge($this->arrListCompare['files'], $this->objSyncCtoFiles->searchDeleteFolders($arrChecksumClient));
+                        $this->arrListCompare['files'] = array_merge((array) $this->arrListCompare['files'], $this->objSyncCtoFiles->searchDeleteFolders($arrChecksumClient));
                     }
 
                     $this->objData->setDescription($GLOBALS['TL_LANG']['tl_syncCto_sync']["step_2"]['description_3']);
@@ -2865,73 +2872,15 @@ class SyncCtoModuleClient extends BackendModule
                  */
                 case 1:
                     $this->objData->setState(SyncCtoEnum::WORK_WORK);
-                    $this->objData->setDescription($GLOBALS['TL_LANG']['tl_syncCto_sync']["step_5"]['description_1']);
+                    $this->objData->setDescription($GLOBALS['TL_LANG']['tl_syncCto_sync']["step_5"]['description_2']);
                     $this->objData->setTitle($GLOBALS['TL_LANG']['MSC']['step'] . " %s");
                     $this->objStepPool->step++;
                     break;
 
                 /**
-                 * Import Files
-                 */
-                case 2:
-                    if (is_array($this->arrListCompare) && (count($this->arrListCompare['core']) != 0 || count($this->arrListCompare['files']) != 0))
-                    {
-                        $arrImport = array();
-
-                        // For core file do it like all the time SIMPEL ....
-                        foreach ($this->arrListCompare['core'] as $key => $value)
-                        {
-                            if ($value["transmission"] == SyncCtoEnum::FILETRANS_SEND)
-                            {
-                                $arrImport['core'][$key] = $value;
-                            }
-                        }
-                        // ...and now the support for the uuid und dbafs system
-                        foreach ($this->arrListCompare['files'] as $key => $value)
-                        {
-                            if ($value["transmission"] == SyncCtoEnum::FILETRANS_SEND)
-                            {
-                                // Get the information from the tl_files.
-                                $objModel = \FilesModel::findByPath($value['path']);
-
-                                // Add all to the list.
-                                $arrImport['files'][$key] = $value;
-                                $arrImport['files'][$key]['tl_files'] = $objModel->row();
-                            }
-                        }
-
-                        // Import all files/core data and write the data back in the compare list.
-                        if (is_array($arrImport['core']) && count($arrImport['core']) > 0)
-                        {
-                            $arrTransmission = $this->objSyncCtoCommunicationClient->runFileImport($arrImport['core'], false);
-                            foreach ($arrTransmission as $key => $value)
-                            {
-                                $this->arrListCompare['core'][$key] = $value;
-                            }
-                        }
-                        // Import all files/core data and write the data back in the compare list.
-                        if (is_array($arrImport['files']) && count($arrImport['files']) > 0)
-                        {
-                            $arrTransmission = $this->objSyncCtoCommunicationClient->runFileImport($arrImport['files'], true);
-                            foreach ($arrTransmission as $key => $value)
-                            {
-                                $this->arrListCompare['files'][$key] = $value;
-                            }
-                        }
-
-                        var_dump($this->arrListCompare);
-                        die();
-
-                        $this->objStepPool->step++;
-                        break;
-                    }
-
-                    $this->objStepPool->step++;
-
-                /**
                  * Delete files
                  */
-                case 3:
+                case 2:
                     if (is_array($this->arrListCompare) && (count($this->arrListCompare['core']) != 0 || count($this->arrListCompare['files']) != 0))
                     {
                         $arrDelete = array();
@@ -2948,24 +2897,119 @@ class SyncCtoModuleClient extends BackendModule
                             }
                         }
 
-                        // Delete all files/core data and write the data back in the compare list.
-                        foreach ($arrDelete as $strType => $arrList)
+                        // Send the list for deleting the core files.
+                        if (is_array($arrDelete['core']) && count($arrDelete['core']) > 0)
                         {
-                            if (is_array($arrList) && count($arrList) > 0)
+                            $arrTransmission = $this->objSyncCtoCommunicationClient->deleteFiles($arrDelete['core'], false);
+                            foreach ($arrTransmission as $key => $value)
                             {
-                                $arrTransmission = $this->objSyncCtoCommunicationClient->deleteFiles($arrList);
+                                $this->arrListCompare['core'][$key] = $value;
+                            }
+                        }
 
-                                foreach ($arrTransmission as $key => $value)
-                                {
-                                    $this->arrListCompare[$strType][$key] = $value;
-                                }
+                        // Send the list for deleting the core files.
+                        if (is_array($arrDelete['files']) && count($arrDelete['files']) > 0)
+                        {
+                            $arrTransmission = $this->objSyncCtoCommunicationClient->deleteFiles($arrDelete['files'], true);
+                            foreach ($arrTransmission as $key => $value)
+                            {
+                                $this->arrListCompare['files'][$key] = $value;
                             }
                         }
                     }
 
-                    $this->objData->setDescription($GLOBALS['TL_LANG']['tl_syncCto_sync']["step_5"]['description_2']);
+                    $this->objData->setDescription($GLOBALS['TL_LANG']['tl_syncCto_sync']["step_5"]['description_1']);
                     $this->objStepPool->step++;
                     break;
+
+                /**
+                 * Import Files
+                 */
+                case 3:
+
+
+
+                    if (is_array($this->arrListCompare) && (count($this->arrListCompare['core']) != 0 || count($this->arrListCompare['files']) != 0))
+                    {
+                        $arrImport = array();
+
+                        // For core file do it like all the time SIMPEL ....
+                        foreach ($this->arrListCompare['core'] as $key => $value)
+                        {
+                            // Skip some values.
+                            if(in_array($value["state"], array( SyncCtoEnum::FILESTATE_DELETE, SyncCtoEnum::FILESTATE_FOLDER_DELETE, SyncCtoEnum::FILESTATE_TOO_BIG_DELETE)))
+                            {
+                                continue;
+                            }
+
+                            // Only add valid ones.
+                            if ($value["transmission"] == SyncCtoEnum::FILETRANS_SEND)
+                            {
+                                $arrImport['core'][$key] = $value;
+                            }
+                        }
+
+                        // ...and now the support for the uuid und dbafs system
+                        foreach ($this->arrListCompare['files'] as $key => $value)
+                        {
+                            // Skip some values.
+                            if(in_array($value["state"], array( SyncCtoEnum::FILESTATE_DELETE, SyncCtoEnum::FILESTATE_FOLDER_DELETE, SyncCtoEnum::FILESTATE_TOO_BIG_DELETE)))
+                            {
+                                continue;
+                            }
+
+                            // Only add valid ones.
+                            if ($value["transmission"] == SyncCtoEnum::FILETRANS_SEND)
+                            {
+                                // Add the file to the import array.
+                                $arrImport['files'][$key] = $value;
+
+                                // Get the information from the tl_files.
+                                $objModel = \FilesModel::findByPath($value['path']);
+
+                                // Okay we have the file ...
+                                if($objModel != null)
+                                {
+                                    $arrModelData = $objModel->row();
+                                    $arrModelData['uuid'] = \String::binToUuid($arrModelData['uuid']);
+                                    $arrImport['files'][$key]['tl_files'] = $arrModelData;
+                                }
+                                // if not add it to the current DBAFS.
+                                else
+                                {
+                                    $objModel = \Dbafs::addResource($value['path']);
+                                    $arrModelData = $objModel->row();
+                                    $arrModelData['uuid'] = \String::binToUuid($arrModelData['uuid']);
+                                    $arrImport['files'][$key]['tl_files'] = $arrModelData;
+                                }
+                            }
+                        }
+
+                        // Import all /core data and write the data back in the compare list.
+                        if (is_array($arrImport['core']) && count($arrImport['core']) > 0)
+                        {
+                            $arrTransmission = $this->objSyncCtoCommunicationClient->runFileImport($arrImport['core'], false);
+                            foreach ($arrTransmission as $key => $value)
+                            {
+                                $this->arrListCompare['core'][$key] = $value;
+                            }
+                        }
+
+                        // Import all files data and write the data back in the compare list.
+                        if (is_array($arrImport['files']) && count($arrImport['files']) > 0)
+                        {
+                            $arrTransmission = $this->objSyncCtoCommunicationClient->runFileImport($arrImport['files'], true);
+                            foreach ($arrTransmission as $key => $value)
+                            {
+                                $this->arrListCompare['files'][$key] = $value;
+                            }
+                        }
+
+                        $this->objStepPool->step++;
+                        break;
+                    }
+
+                    $this->objStepPool->step++;
 
                 /**
                  * Import Config
@@ -3186,7 +3230,7 @@ class SyncCtoModuleClient extends BackendModule
                     $this->Template->showNextControl = true;
 
                     // If no files are send show success msg
-                    if (!is_array($this->arrListCompare) || count($this->arrListCompare['core']) == 0 || count($this->arrListCompare['files']) == 0)
+                    if (!is_array($this->arrListCompare) || (count($this->arrListCompare['core']) == 0 && count($this->arrListCompare['files']) == 0))
                     {
                         $this->objData->setHtml("");
                         $this->objData->setState(SyncCtoEnum::WORK_OK);
@@ -3210,22 +3254,21 @@ class SyncCtoModuleClient extends BackendModule
 
                         break;
                     }
-                    // If files was send, show more informations
-                    else
+                    // If files was send, show more information.
+                    elseif (is_array($this->arrListCompare) && (count($this->arrListCompare['core']) != 0 || count($this->arrListCompare['files']) != 0))
                     {
-                        if (is_array($this->arrListCompare) && (count($this->arrListCompare['core']) != 0 || count($this->arrListCompare['files']) != 0))
-                        {
-                            $this->objData->setHtml("");
-                            $this->objData->setState(SyncCtoEnum::WORK_OK);
-                            $this->objData->setDescription(vsprintf($GLOBALS['TL_LANG']['tl_syncCto_sync']["step_3"]['description_2'], array($intSendCount, (count($this->arrListCompare['core']) + count($this->arrListCompare['files'])))));
-                            $this->booFinished = true;
-                        }
+                        $this->objData->setHtml("");
+                        $this->objData->setState(SyncCtoEnum::WORK_OK);
+                        $this->objData->setDescription(vsprintf($GLOBALS['TL_LANG']['tl_syncCto_sync']["step_3"]['description_2'], array($intSendCount, (count($this->arrListCompare['core']) + count($this->arrListCompare['files'])))));
+                        $this->booFinished = true;
                     }
+
+                    $compare = '';
 
                     // Check if there are some skipped files
                     if ($intSkippCount != 0)
                     {
-                        $compare = '<br /><p class="tl_help">' . $intSkippCount . $GLOBALS['TL_LANG']['tl_syncCto_sync']["step_5"]['description_3'] . '</p>';
+                        $compare .= '<br /><p class="tl_help">' . $intSkippCount . $GLOBALS['TL_LANG']['tl_syncCto_sync']["step_5"]['description_3'] . '</p>';
 
                         $arrSort = array();
 
@@ -3257,6 +3300,54 @@ class SyncCtoModuleClient extends BackendModule
                             $compare .= "</ul>";
                             $compare .= "</li>";
                         }
+                        $compare .= "</ul>";
+                    }
+
+                    // Write some information about the dbafs.
+                    if(is_array($this->arrListCompare) && count($this->arrListCompare['files']) != 0)
+                    {
+                        $arrDbafsFiles = array();
+                        $arrDbafsMsg = array();
+                        foreach ($this->arrListCompare['files'] as $key => $value)
+                        {
+                            if (!isset($value['dbafs']))
+                            {
+                                continue;
+                            }
+
+                            // Add entries to the list.
+                            $arrDbafsFiles[$value['dbafs']['state']][] = $value["path"];
+                            $arrDbafsMsg[$value['dbafs']['state']] = $value['dbafs']['msg'];
+                        }
+
+                        $compare .= '<ul class="dbafsinfo">';
+                        $compare .= "<li>";
+
+                        if(count($arrDbafsFiles) == 0)
+                        {
+                            $compare .= sprintf('%s', 'DBAFS import seems to have no problems.');
+                        }
+                        else
+                        {
+                            $compare .= sprintf('%s', 'There where some problems in the DBAFS see list for more:');
+                            foreach($arrDbafsMsg as $mixKey => $strMsg)
+                            {
+                                $compare .= '<ul>';
+                                $compare .= '<li>';
+                                $compare .= sprintf('<p>%s</p>', $strMsg);
+                                $compare .= '<ul>';
+                                $compare .= '<li>';
+                                $compare .= implode('</li><li>', $arrDbafsFiles[$mixKey]);
+                                $compare .= '</li>';
+                                $compare .= '</ul>';
+                                $compare .= '</li>';
+                                $compare .= '</ul>';
+                            }
+                            $compare .= '</li>';
+                            $compare .= '</ul>';
+                        }
+
+                        $compare .= "</li>";
                         $compare .= "</ul>";
                     }
 
@@ -5061,193 +5152,3 @@ class SyncCtoModuleClient extends BackendModule
      */
 }
 
-/**
- * Sort function
- *
- * @param type $a
- * @param type $b
- *
- * @return type
- */
-function syncCtoModelClientCMP($a, $b)
-{
-    if ($a["state"] == $b["state"])
-    {
-        return 0;
-    }
-
-    return ($a["state"] < $b["state"]) ? -1 : 1;
-}
-
-/* -----------------------------------------------------------------------------
- * Container Classes
- */
-
-class StepPool
-{
-
-    protected $arrValues;
-    protected $intStepID;
-
-    /**
-     *
-     * @param type $arrStepPool
-     */
-    public function __construct($arrStepPool, $intStepID)
-    {
-        $this->arrValues = $arrStepPool;
-        $this->intStepID = $intStepID;
-    }
-
-    public function getArrValues()
-    {
-        return $this->arrValues;
-    }
-
-    public function setArrValues($arrValues)
-    {
-        $this->arrValues = $arrValues;
-    }
-
-    public function getIntStepID()
-    {
-        return $this->intStepID;
-    }
-
-    public function setIntStepID($intStepID)
-    {
-        $this->intStepID = $intStepID;
-    }
-
-    public function __get($name)
-    {
-        if ($this->arrValues == false || !is_array($this->arrValues))
-        {
-            return null;
-        }
-
-        if (key_exists($name, $this->arrValues))
-        {
-            return $this->arrValues[$name];
-        }
-        else
-        {
-            return null;
-        }
-    }
-
-    public function __set($name, $value)
-    {
-        if ($this->arrValues == false || !is_array($this->arrValues))
-        {
-            $this->arrValues = array();
-        }
-
-        return $this->arrValues[$name] = $value;
-    }
-
-}
-
-class ContentData
-{
-
-    protected $arrValues;
-    protected $intStep;
-
-    /**
-     *
-     * @param type $arrContentData
-     * @param type $intStep
-     */
-    public function __construct($arrContentData, $intStep)
-    {
-        $this->arrValues = $arrContentData;
-
-        if (!is_array($this->arrValues))
-        {
-            $this->arrValues = array();
-        }
-
-        $this->intStep = $intStep;
-    }
-
-    public function getArrValues()
-    {
-        return $this->arrValues;
-    }
-
-    public function setArrValues($arrValues)
-    {
-        $this->arrValues = $arrValues;
-    }
-
-    public function nextStep()
-    {
-        $this->intStep++;
-    }
-
-    public function getTitle()
-    {
-        return $this->arrValues[$this->intStep]["title"];
-    }
-
-    public function setTitle($title)
-    {
-        $this->arrValues[$this->intStep]["title"] = $title;
-    }
-
-    public function getState()
-    {
-        return $this->arrValues[$this->intStep]["state"];
-    }
-
-    public function setState($state)
-    {
-        $this->arrValues[$this->intStep]["state"] = $state;
-    }
-
-    public function getDescription()
-    {
-        return $this->arrValues[$this->intStep]["description"];
-    }
-
-    public function setDescription($description)
-    {
-        $this->arrValues[$this->intStep]["description"] = $description;
-    }
-
-    public function getMsg()
-    {
-        return $this->arrValues[$this->intStep]["msg"];
-    }
-
-    public function setMsg($msg)
-    {
-        $this->arrValues[$this->intStep]["msg"] = $msg;
-    }
-
-    public function getHtml()
-    {
-        return $this->arrValues[$this->intStep]["html"];
-    }
-
-    public function setHtml($html)
-    {
-        $this->arrValues[$this->intStep]["html"] = $html;
-    }
-
-    public function setStep($intStep)
-    {
-        $this->intStep = $intStep;
-    }
-
-    public function __get($name)
-    {
-        throw new Exception("Unknown key for datacontent $name");
-    }
-
-    public function __set($name, $value)
-    {
-        throw new Exception("Unknown key for datacontent $name");
-    }
-}
