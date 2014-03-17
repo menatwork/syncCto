@@ -3,8 +3,8 @@
 window.addEvent("domready",function(){
     
     $$('input[name=delete]').set('disabled', true);
-        
-    $each($$('.checkbox input[type=checkbox]'), function(item){
+
+	$$('.checkbox input[type=checkbox]').each(function(item){
         item.addEvents({
             click: function(){
                 var blnFound = ($$('.checkbox input[type=checkbox]:checked').length != 0) ? true : false;
