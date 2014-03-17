@@ -5,7 +5,7 @@
 <div id="tl_listing" class="tl_listing_container">
 <?php if($this->close || $this->error): ?>
     <?php if($this->close): ?>
-    <img src="<?php echo $this->Environment->base; ?>system/modules/syncCto/html/icons/steps/iconWork.gif" alt="" />
+    <img src="<?php echo $this->Environment->base; ?>system/modules/syncCto/assets/icons/steps/iconWork.gif" alt="" />
     <script>
         window.addEvent("domready",function(){
             window.parent.document.getElement('input[name=forward]').click();
@@ -56,7 +56,7 @@
             <tr class="head">
                 <th class="checkbox"><input class="tl_checkbox" onclick="Backend.toggleCheckboxGroup(this, '<?php echo ($strState == 'recommended') ? 'recommended' : 'nonrecommended'; ?>')" type="checkbox" /></th>
                 <th class="server" title="<?php echo $this->serverPath; ?>"><?php echo $GLOBALS['TL_LANG']['MSC']['server']; ?></th>
-                <th class="direction"><img src="<?php echo $this->Environment->base; ?>system/modules/syncCto/html/icons/steps/iconSync<?php echo $this->direction; ?>.png" alt="" /></th>
+                <th class="direction"><img src="<?php echo $this->Environment->base; ?>system/modules/syncCto/assets/icons/steps/iconSync<?php echo $this->direction; ?>.png" alt="" /></th>
                 <th class="client" title="<?php echo $this->clientPath; ?>"><?php echo $GLOBALS['TL_LANG']['MSC']['client']; ?></th>
                 <th class="diff"><?php echo $GLOBALS['TL_LANG']['MSC']['difference']; ?></th>
             </tr>

@@ -25,23 +25,23 @@ array_insert($GLOBALS['BE_MOD'], $i + 1, array
     'syncCto' => array(
         'syncCto_settings' => array(
             'tables' => array('tl_syncCto_settings'),
-            'icon' => 'system/modules/syncCto/html/icons/nav/iconSettings.png'
+            'icon' => 'system/modules/syncCto/assets/icons/nav/iconSettings.png'
         ),
         'synccto_clients' => array(
             'tables' => array('tl_synccto_clients', 'tl_syncCto_clients_syncTo', 'tl_syncCto_clients_syncFrom', 'tl_syncCto_clients_showExtern' ),
-            'icon' => 'system/modules/syncCto/html/icons/nav/iconClients.png',
+            'icon' => 'system/modules/syncCto/assets/icons/nav/iconClients.png',
             'callback' => 'SyncCtoModuleClient',
-            'stylesheet' => 'system/modules/syncCto/html/css/systemcheck.css',
+            'stylesheet' => 'system/modules/syncCto/assets/css/systemcheck.css',
         ),
         'syncCto_backups' => array(
             'tables' => array('tl_syncCto_backup_file', 'tl_syncCto_backup_db', 'tl_syncCto_restore_file', 'tl_syncCto_restore_db'),
-            'icon' => 'system/modules/syncCto/html/icons/nav/iconBackups.png',
+            'icon' => 'system/modules/syncCto/assets/icons/nav/iconBackups.png',
             'callback' => 'SyncCtoModuleBackup',
         ),
         'syncCto_check' => array(
-            'icon' => 'system/modules/syncCto/html/icons/nav/iconCheck.png',
+            'icon' => 'system/modules/syncCto/assets/icons/nav/iconCheck.png',
             'callback' => 'SyncCtoModuleCheck',
-            'stylesheet' => 'system/modules/syncCto/html/css/systemcheck.css',
+            'stylesheet' => 'system/modules/syncCto/assets/css/systemcheck.css',
         )
     )
 ));
@@ -89,7 +89,7 @@ if ($strDo == 'synccto_clients' && $strAct != 'start' && in_array($strTable, arr
  */
 if($GLOBALS['TL_CONFIG']['syncCto_attentionFlag'] == true)
 {
-    $GLOBALS['TL_CSS'][] = 'system/modules/syncCto/html/css/attention.css';
+    $GLOBALS['TL_CSS'][] = 'system/modules/syncCto/assets/css/attention.css';
 }
 
 // Size limit for files in bytes, will be checked
