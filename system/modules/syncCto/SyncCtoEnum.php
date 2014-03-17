@@ -42,6 +42,14 @@ class SyncCtoEnum
     const FILETRANS_WAITING = 3;
 
     /**
+     * DBAFS state
+     */
+
+    const DBAFS_CREATE   = 'create';
+    const DBAFS_SAME     = 'same';
+    const DBAFS_CONFLICT = 'conflict';
+
+    /**
      * Upload Folder
      */
     
