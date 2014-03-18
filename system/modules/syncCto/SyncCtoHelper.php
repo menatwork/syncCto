@@ -10,7 +10,7 @@
  */
 
 /**
- * Helper class for syncCto. Callbackfunction, small global helper function.
+ * Helper class for syncCto. Callback functions, small global helper functions.
  */
 class SyncCtoHelper extends Backend
 {
@@ -154,6 +154,7 @@ class SyncCtoHelper extends Backend
         if(version_compare(VERSION, '3.0', '>='))
         {
             return true;
+
         }
         // Check if we have a DC_General for Version c2 and c3.
         else if (version_compare(VERSION, '3.0', '<') && file_exists(TL_ROOT . '/system/modules/generalDriver/DcGeneral'))
@@ -1332,5 +1333,3 @@ class SyncCtoHelper extends Backend
     }
 
 }
-
-?>
