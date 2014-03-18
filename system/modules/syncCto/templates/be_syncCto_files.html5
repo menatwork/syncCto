@@ -1,5 +1,3 @@
-<h1 class="file"><strong><?php echo $this->headline; ?></strong></h1>
-
 <div id="tl_listing" class="tl_listing_container">
 <?php if($this->close || $this->error): ?>
     <?php if($this->close): ?>
@@ -26,8 +24,6 @@
         <div class="submit_container">         
             <input class="tl_submit" name="delete" type="submit" value="<?php echo $GLOBALS['TL_LANG']['MSC']['updateRemove']; ?>" />
         </div>
-        
-        <h3><?php echo $GLOBALS['TL_LANG']['MSC']['totalSize']; ?></h3>
 
         <ul class="file">
         <li><?php echo $GLOBALS['TL_LANG']['MSC']['create']; ?>: ~ <?php echo $this->getReadableSize($this->totalsizeNew); ?></li>
@@ -48,12 +44,13 @@
             }        
         ?>
         
-        <?php if(count($arrFileList) != 0): ?>        
+        <?php if(count($arrFileList) != 0): ?>
         <h3><?php echo $GLOBALS['TL_LANG']['MSC'][(($i == 1)? 'normal' : 'big') . '_files']; ?></h3>
         <table class="comparelist" id="<?php echo ($i == 1)? 'normal' : 'big'; ?>filelist">
             <colgroup>
                 <col width="15%" />
-                <col width="15%" />
+                <col width="120" />
+                <col width="120" />
                 <col width="35" />
                 <col width="*" />
             </colgroup>
@@ -61,6 +58,7 @@
                 <tr class="head">
                     <th class="state"><?php echo $GLOBALS['TL_LANG']['MSC']['state']; ?></th>
                     <th class="filesize"><?php echo $GLOBALS['TL_LANG']['MSC']['fileSize']; ?></th>
+                    <th class="filetime"><?php echo $GLOBALS['TL_LANG']['MSC']['fileTime']; ?></th>
                     <th class="checkbox table-th-nosort"><input class="tl_checkbox" onclick="Backend.toggleCheckboxGroup(this, '<?php echo ($i == 1)? 'normal' : 'big'; ?>filelist')" type="checkbox" /></th>
                     <th class="last"><?php echo $GLOBALS['TL_LANG']['MSC']['file']; ?></th>
                 </tr>
@@ -70,15 +68,16 @@
                 <tr>                    
                     <td class="state <?php echo $file["css"]; ?>"><?php echo $this->arrLangStates[$file["state"]]; ?></td>
                     <td class="filesize"><?php echo ($file["size"] == -1) ? "N.A." : $this->getReadableSize($file["size"]); ?></td>
+                    <td class="filetime"><?php echo \Date::parse($GLOBALS['TL_CONFIG']['datimFormat'], $file["lastModified"]); ?></td>
                     <?php if($this->compare_complex == false): ?>
-                        <td class="checkbox"><input class="tl_checkbox" type="checkbox" name="del-file-<?php echo $key; ?>" value="<?php echo $key; ?>" /></td>                   
+                    <td class="checkbox"><input class="tl_checkbox" type="checkbox" name="del-file-<?php echo $key; ?>" value="<?php echo $key; ?>" /></td>
                     <?php else: ?>
-                        <td class="checkbox"><?php if (empty($file["css_big"])): ?><input class="tl_checkbox" type="checkbox" name="del-file-<?php echo $key; ?>" value="<?php echo $key; ?>" /><?php else: ?> X <?php endif; ?></td>  
+                    <td class="checkbox"><?php if (empty($file["css_big"])): ?><input class="tl_checkbox" type="checkbox" name="del-file-<?php echo $key; ?>" value="<?php echo $key; ?>" /><?php else: ?> X <?php endif; ?></td>
                     <?php endif; ?>
-                        <td class="last" title="<?php echo $file["path"]; ?>">
-                            <?php echo ($file['state'] > 99)? $this->generateImage('folderC.gif') : $this->generateImage('iconPLAIN.gif'); ?>
-                            <?php echo SyncCtoHelper::getInstance()->substrCenter($file["path"], $this->maxLength); ?>
-                        </td>
+                    <td class="last" title="<?php echo $file["path"]; ?>">
+                        <?php echo ($file['state'] > 99)? $this->generateImage('folderC.gif') : $this->generateImage('iconPLAIN.gif'); ?>
+                        <?php echo SyncCtoHelper::getInstance()->substrCenter($file["path"], $this->maxLength); ?>
+                    </td>
                </tr>
             <?php endforeach; ?>
             </tbody>

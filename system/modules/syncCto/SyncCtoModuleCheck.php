@@ -265,9 +265,9 @@ class SyncCtoModuleCheck extends BackendModule
     {
         $return = '<table width="100%" cellspacing="0" cellpadding="0" class="extensions" summary="">';
         $return .= '<colgroup>';
-        $return .= '<col width="25%" />';
-        $return .= '<col width="5%" />';
-        $return .= '<col width="15%" />';
+        $return .= '<col width="215" />';
+        $return .= '<col width="35" />';
+        $return .= '<col width="90" />';
         $return .= '<col width="*" />';
         $return .= '</colgroup>';
         $return .= '<tr>';
@@ -396,9 +396,9 @@ class SyncCtoModuleCheck extends BackendModule
     {
         $return = '<table width="100%" cellspacing="0" cellpadding="0" class="extensions" summary="">';
         $return .= '<colgroup>';
-        $return .= '<col width="25%" />';
-        $return .= '<col width="5%" />';
-        $return .= '<col width="15%" />';
+        $return .= '<col width="215" />';
+        $return .= '<col width="35" />';
+        $return .= '<col width="90" />';
         $return .= '<col width="*" />';
         $return .= '</colgroup>';
         $return .= '<tr>';
@@ -496,9 +496,9 @@ class SyncCtoModuleCheck extends BackendModule
 
         $return .= '<table width="100%" cellspacing="0" cellpadding="0" class="extensions" summary="">';
         $return .= '<colgroup>';
-        $return .= '<col width="25%" />';
-        $return .= '<col width="5%" />';
-        $return .= '<col width="15%" />';
+        $return .= '<col width="215" />';
+        $return .= '<col width="35" />';
+        $return .= '<col width="90" />';
         $return .= '<col width="*" />';
         $return .= '</colgroup>';
         $return .= '<tr>';
@@ -529,7 +529,7 @@ class SyncCtoModuleCheck extends BackendModule
             }
             
             $return .= '<tr class="' . ($ok ? 'ok' : 'warning') . '">';
-            $return .= '<td colspan="4">' . $GLOBALS['TL_LANG']['tl_syncCto_check']['trigger_information'] . '</td>';           
+            $return .= '<td colspan="4">' . $GLOBALS['TL_LANG']['tl_syncCto_check']['trigger_information'] . '</td>';
             $return .= '</tr>';
         }
 
@@ -542,11 +542,11 @@ class SyncCtoModuleCheck extends BackendModule
     {
         $return .= '<table width="100%" cellspacing="0" cellpadding="0" class="extensions" summary="">';
         $return .= '<colgroup>';
-        $return .= '<col width="50%" />';
-        $return .= '<col width="50%" />';
+        $return .= '<col width="331" />';
+        $return .= '<col width="*" />';
         $return .= '</colgroup>';
         $return .= '<tr>';
-        $return .= '<th>' . $GLOBALS['TL_LANG']['tl_syncCto_check']['parameter'] . '</th>';       
+        $return .= '<th>' . $GLOBALS['TL_LANG']['tl_syncCto_check']['parameter'] . '</th>';
         $return .= '<th>' . $GLOBALS['TL_LANG']['tl_syncCto_check']['value'] . '</th>';
         $return .= '</tr>';
         
@@ -586,13 +586,13 @@ class SyncCtoModuleCheck extends BackendModule
     {
         $return .= '<table width="100%" cellspacing="0" cellpadding="0" class="extensions" summary="">';
         $return .= '<colgroup>';
-        $return .= '<col width="25%" />';
-        $return .= '<col width="5%" />';
-        $return .= '<col width="35%" />';
-        $return .= '<col width="35%" />';
+        $return .= '<col width="215" />';
+        $return .= '<col width="35" />';
+        $return .= '<col width="*" />';
+        $return .= '<col width="*" />';
         $return .= '</colgroup>';
         $return .= '<tr>';
-        $return .= '<th>' . $GLOBALS['TL_LANG']['tl_syncCto_check']['parameter'] . '</th>';       
+        $return .= '<th>' . $GLOBALS['TL_LANG']['tl_syncCto_check']['parameter'] . '</th>';
         $return .= '<th class="dot" style="width:1%;">&#149;</th>';
         $return .= '<th>' . $GLOBALS['TL_LANG']['tl_syncCto_check']['value_server'] . '</th>';
         $return .= '<th>' . $GLOBALS['TL_LANG']['tl_syncCto_check']['value_client'] . '</th>';
