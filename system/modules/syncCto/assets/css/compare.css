@@ -1,18 +1,8 @@
 /* Copyright (c) MEN AT WORK 2013 :: LGPL license */
 
-  body {
-    overflow-y:scroll;
-  }
-
   #container {
-    padding:12px 18px;
+    padding:18px 18px 28px;
   }
-  
-  #main {
-
-  }
-  
- /*------------------------------------------------------------------------*/
 
   .comparelist, h3, 
   form, .formbody {
@@ -193,11 +183,16 @@
   .bottom .tl_submit {
     margin-bottom:0;
   }
+
+  .tl_checkbox {
+    margin-right:0;
+  }
   
   ul.file { 
     padding-left:0;
     list-style:none;
     margin-bottom:20px;
+    clear:both;
   }
   
   ul.file li { 
