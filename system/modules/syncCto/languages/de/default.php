@@ -15,7 +15,7 @@
 $GLOBALS['TL_LANG']['SYC']['core']                          = 'Contao-Installation';
 $GLOBALS['TL_LANG']['SYC']['core_change']                   = 'Veränderte Daten';
 $GLOBALS['TL_LANG']['SYC']['core_delete']                   = 'Gelöschte Daten';
-$GLOBALS['TL_LANG']['SYC']['user']                          = 'Persönliche Daten (tl_files)';
+$GLOBALS['TL_LANG']['SYC']['user']                          = 'Dateiverwaltung (files)';
 $GLOBALS['TL_LANG']['SYC']['user_change']                   = 'Veränderte Daten';
 $GLOBALS['TL_LANG']['SYC']['user_delete']                   = 'Gelöschte Daten';
 $GLOBALS['TL_LANG']['SYC']['configfiles']                   = 'Konfigurationsdateien';
@@ -33,7 +33,7 @@ $GLOBALS['TL_LANG']['MSC']['edit']                          = 'Bearbeiten';
 $GLOBALS['TL_LANG']['MSC']['copy']                          = 'Duplizieren';
 $GLOBALS['TL_LANG']['MSC']['showExtern']                    = 'Client Systemcheck';
 $GLOBALS['TL_LANG']['MSC']['sync']                          = 'Synchronisieren';
-$GLOBALS['TL_LANG']['MSC']['syncAll']                       = 'System komplett überschreiben';
+$GLOBALS['TL_LANG']['MSC']['syncAll']                       = 'System überschreiben';
 $GLOBALS['TL_LANG']['MSC']['syncTo']                        = 'Client synchronisieren';
 $GLOBALS['TL_LANG']['MSC']['syncFrom']                      = 'Server synchronisieren';
 
@@ -53,14 +53,14 @@ $GLOBALS['TL_LANG']['MSC']['step']                          = 'Schritt';
 $GLOBALS['TL_LANG']['MSC']['substep']                       = 'Zwischenschritt';
 $GLOBALS['TL_LANG']['MSC']['abort']                         = 'Abbruch!';
 $GLOBALS['TL_LANG']['MSC']['complete']                      = 'Fertig!';
-$GLOBALS['TL_LANG']['MSC']['comparelist']                   = 'Vergleichsliste';
 $GLOBALS['TL_LANG']['MSC']['debug_mode']                    = 'Debugausgaben';
 
 /**
  * Compare list
  */
 $GLOBALS['TL_LANG']['MSC']['state']                         = 'Status';
-$GLOBALS['TL_LANG']['MSC']['file']                          = 'Datei';               
+$GLOBALS['TL_LANG']['MSC']['fileTime']                      = 'Zeitstempel';
+$GLOBALS['TL_LANG']['MSC']['file']                          = 'Datei';
 $GLOBALS['TL_LANG']['MSC']['totalsize']                     = 'Größe aller Dateien:';
 $GLOBALS['TL_LANG']['MSC']['skipped']                       = 'Übersprungen';
 $GLOBALS['TL_LANG']['MSC']['ignored']                       = 'Ignoriert';
@@ -117,4 +117,3 @@ $GLOBALS['TL_LANG']['ERR']['referer']                       = 'Konnte die Refere
 $GLOBALS['TL_LANG']['ERR']['version']                       = 'Versionskonflikt in %s. <br />Server: %s <br />Client: %s';
 $GLOBALS['TL_LANG']['ERR']['upload_ini']                    = 'Upload nicht erfolgreich. Funktion ist in der php.ini deaktiviert.';
 $GLOBALS['TL_LANG']['ERR']['rebuild']                       = 'Fehler beim Zusammenbau der Datei(en). Pfad: %s';
-$GLOBALS['TL_LANG']['ERR']['contao3']                       = 'Leider unterstützt syncCto noch nicht die Umstellung der Dateistrukturen auf Contao 3.2! An einer Unterstützung wird gearbeitet.';

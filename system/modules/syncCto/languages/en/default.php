@@ -15,25 +15,25 @@
 $GLOBALS['TL_LANG']['SYC']['core']                          = 'Contao Installation';
 $GLOBALS['TL_LANG']['SYC']['core_change']                   = 'Modified data';
 $GLOBALS['TL_LANG']['SYC']['core_delete']                   = 'Deleted data';
-$GLOBALS['TL_LANG']['SYC']['user']                          = 'Personal data (tl_files)';
+$GLOBALS['TL_LANG']['SYC']['user']                          = 'File manager (files)';
 $GLOBALS['TL_LANG']['SYC']['user_change']                   = 'Modified data';
 $GLOBALS['TL_LANG']['SYC']['user_delete']                   = 'Deleted data';
 $GLOBALS['TL_LANG']['SYC']['configfiles']                   = 'Configuration files';
 $GLOBALS['TL_LANG']['SYC']['localconfig_update']            = 'Update all entries';
-$GLOBALS['TL_LANG']['SYC']['localconfig_errors']            = 'Display errors';  
-$GLOBALS['TL_LANG']['SYC']['temp_tables']                   = 'Database tables';    
-$GLOBALS['TL_LANG']['SYC']['temp_folders']                  = 'Temp files';    
-$GLOBALS['TL_LANG']['SYC']['css_create']                    = 'CSS files';    
-$GLOBALS['TL_LANG']['SYC']['xml_create']                    = 'XML files';   
+$GLOBALS['TL_LANG']['SYC']['localconfig_errors']            = 'Display errors';
+$GLOBALS['TL_LANG']['SYC']['temp_tables']                   = 'Database tables';
+$GLOBALS['TL_LANG']['SYC']['temp_folders']                  = 'Temp files';
+$GLOBALS['TL_LANG']['SYC']['css_create']                    = 'CSS files';
+$GLOBALS['TL_LANG']['SYC']['xml_create']                    = 'XML files';
 
 /**
  * Back end modules
  */
 $GLOBALS['TL_LANG']['MSC']['edit']                          = 'Edit';
-$GLOBALS['TL_LANG']['MSC']['copy']                          = 'Dublicate';
-$GLOBALS['TL_LANG']['MSC']['showExtern']                    = 'Client Systemcheck';
+$GLOBALS['TL_LANG']['MSC']['copy']                          = 'Duplicate';
+$GLOBALS['TL_LANG']['MSC']['showExtern']                    = 'Client System check';
 $GLOBALS['TL_LANG']['MSC']['sync']                          = 'Synchronize';
-$GLOBALS['TL_LANG']['MSC']['syncAll']                       = 'C3 - Synchronize';
+$GLOBALS['TL_LANG']['MSC']['syncAll']                       = 'Overwrite system';
 $GLOBALS['TL_LANG']['MSC']['syncTo']                        = 'Synchronize client';
 $GLOBALS['TL_LANG']['MSC']['syncFrom']                      = 'Synchronize server';
 
@@ -44,7 +44,7 @@ $GLOBALS['TL_LANG']['MSC']['skip']                          = 'Skip';
 $GLOBALS['TL_LANG']['MSC']['popup']                         = 'Open compare list';
 $GLOBALS['TL_LANG']['MSC']['unknown_step']                  = 'Unknown step';
 $GLOBALS['TL_LANG']['MSC']['last_sync']                     = 'Last synchronisation was made at %s on %s from %s (%s).';
-$GLOBALS['TL_LANG']['MSC']['disabled_cache']                = 'Current entries in the "initconfig.php" disrupt a successful synchronization.';
+$GLOBALS['TL_LANG']['MSC']['disabled_cache']                = 'Current entries in the "initconfig.php" disrupt a successfully synchronization.';
 
 /**
  * Headline
@@ -53,14 +53,14 @@ $GLOBALS['TL_LANG']['MSC']['step']                          = 'Step';
 $GLOBALS['TL_LANG']['MSC']['substep']                       = 'Substep';
 $GLOBALS['TL_LANG']['MSC']['abort']                         = "Abort!";
 $GLOBALS['TL_LANG']['MSC']['complete']                      = 'Completed!';
-$GLOBALS['TL_LANG']['MSC']['comparelist']                   = 'Compare list';
 $GLOBALS['TL_LANG']['MSC']['debug_mode']                    = 'Debug mode';
 
 /**
  * Filelist
  */
 $GLOBALS['TL_LANG']['MSC']['state']                         = 'State';
-$GLOBALS['TL_LANG']['MSC']['file']                          = 'File';               
+$GLOBALS['TL_LANG']['MSC']['fileTime']                      = 'Timestamp';
+$GLOBALS['TL_LANG']['MSC']['file']                          = 'File';
 $GLOBALS['TL_LANG']['MSC']['totalsize']                     = 'Total size of files:';
 $GLOBALS['TL_LANG']['MSC']['skipped']                       = 'Skipped';
 $GLOBALS['TL_LANG']['MSC']['ignored']                       = 'Ignored';
@@ -116,4 +116,3 @@ $GLOBALS['TL_LANG']['ERR']['referer']                       = 'The clients refer
 $GLOBALS['TL_LANG']['ERR']['version']                       = 'Version conflict in %s. <br />Server: %s <br />Client: %s';
 $GLOBALS['TL_LANG']['ERR']['upload_ini']                    = 'No success with upload. Funktion is deactivated in the php.ini';
 $GLOBALS['TL_LANG']['ERR']['rebuild']                       = 'Error rebuilding the file(s). Path: %s';
-$GLOBALS['TL_LANG']['ERR']['contao3']                       = 'Unfortunately syncCto does not support the new file structure of Contao 3.2! We are working on it.';
