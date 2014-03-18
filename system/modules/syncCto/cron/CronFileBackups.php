@@ -30,7 +30,7 @@ define('TL_MODE', 'BACKUP');
 require($dir . '/system/initialize.php');
 
 /**
- * Class PurgeLog
+ * Class CronFileBackups
  */
 class CronFileBackups extends Backend
 {
