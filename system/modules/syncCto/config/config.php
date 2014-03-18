@@ -14,7 +14,7 @@ $objInput = \Input::getInstance();
 /**
  * Current syncCto version
  */
-$GLOBALS['SYC_VERSION'] = '2.5.0';
+$GLOBALS['SYC_VERSION'] = '2.6.0';
 
 /**
  * Back end modules
