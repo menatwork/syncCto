@@ -27,11 +27,11 @@
     <div id="tl_moverview">
         <h2><?php echo $GLOBALS['TL_LANG']['tl_syncCto_backup']['title_backup']; ?></h2>
         <div class="tl_module_desc">
-            <h3><a style="background-image:url(system/modules/syncCto/assets/icons/nav/iconBackupDB.png);" href="<?php echo $this->Environment->base; ?>contao/main.php?do=syncCto_backups&amp;table=tl_syncCto_backup_db&amp;act=create" class="navigation"><?php echo $GLOBALS['TL_LANG']['tl_syncCto_backup']['db_backup'][0]; ?></a></h3>
+            <h3><a style="background-image:url(system/modules/syncCto/assets/images/nav/iconBackupDB.png);" href="<?php echo $this->Environment->base; ?>contao/main.php?do=syncCto_backups&amp;table=tl_syncCto_backup_db&amp;act=create" class="navigation"><?php echo $GLOBALS['TL_LANG']['tl_syncCto_backup']['db_backup'][0]; ?></a></h3>
             <?php echo $GLOBALS['TL_LANG']['tl_syncCto_backup']['db_backup'][1]; ?>
         </div>
         <div class="tl_module_desc">
-            <h3><a style="background-image:url(system/modules/syncCto/assets/icons/nav/iconBackupFile.png);" href="<?php echo $this->Environment->base; ?>contao/main.php?do=syncCto_backups&amp;table=tl_syncCto_backup_file&amp;act=create" class="navigation"><?php echo $GLOBALS['TL_LANG']['tl_syncCto_backup']['file_backup'][0]; ?></a></h3>
+            <h3><a style="background-image:url(system/modules/syncCto/assets/images/nav/iconBackupFile.png);" href="<?php echo $this->Environment->base; ?>contao/main.php?do=syncCto_backups&amp;table=tl_syncCto_backup_file&amp;act=create" class="navigation"><?php echo $GLOBALS['TL_LANG']['tl_syncCto_backup']['file_backup'][0]; ?></a></h3>
             <?php echo $GLOBALS['TL_LANG']['tl_syncCto_backup']['file_backup'][1]; ?>
         </div>
     </div>
@@ -39,11 +39,11 @@
     <div id="tl_moverview">
         <h2><?php echo $GLOBALS['TL_LANG']['tl_syncCto_backup']['title_restore']; ?></h2>
         <div class="tl_module_desc">
-            <h3><a style="background-image:url(system/modules/syncCto/assets/icons/nav/iconRestoreDB.png);" href="<?php echo $this->Environment->base; ?>contao/main.php?do=syncCto_backups&amp;table=tl_syncCto_restore_db&amp;act=create" class="navigation"><?php echo $GLOBALS['TL_LANG']['tl_syncCto_backup']['db_restore'][0]; ?></a></h3>
+            <h3><a style="background-image:url(system/modules/syncCto/assets/images/nav/iconRestoreDB.png);" href="<?php echo $this->Environment->base; ?>contao/main.php?do=syncCto_backups&amp;table=tl_syncCto_restore_db&amp;act=create" class="navigation"><?php echo $GLOBALS['TL_LANG']['tl_syncCto_backup']['db_restore'][0]; ?></a></h3>
             <?php echo $GLOBALS['TL_LANG']['tl_syncCto_backup']['db_restore'][1]; ?>
         </div>
         <div class="tl_module_desc">
-            <h3><a style="background-image:url(system/modules/syncCto/assets/icons/nav/iconRestoreFile.png);" href="<?php echo $this->Environment->base; ?>contao/main.php?do=syncCto_backups&amp;table=tl_syncCto_restore_file&amp;act=create" class="navigation"><?php echo $GLOBALS['TL_LANG']['tl_syncCto_backup']['file_restore'][0]; ?></a></h3>
+            <h3><a style="background-image:url(system/modules/syncCto/assets/images/nav/iconRestoreFile.png);" href="<?php echo $this->Environment->base; ?>contao/main.php?do=syncCto_backups&amp;table=tl_syncCto_restore_file&amp;act=create" class="navigation"><?php echo $GLOBALS['TL_LANG']['tl_syncCto_backup']['file_restore'][0]; ?></a></h3>
             <?php echo $GLOBALS['TL_LANG']['tl_syncCto_backup']['file_restore'][1]; ?>
         </div>
     </div>

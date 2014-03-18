@@ -35,7 +35,7 @@ $GLOBALS['TL_DCA']['tl_synccto_clients'] = array
         'label' => array
         (
             'fields'              => array('title', 'id', 'address', 'path', 'id'),
-            'format'              => '<img class="ping" src="system/modules/syncCto/assets/js/images/gray.png" alt="" /> %s <span style="color: #aaaaaa; padding-left: 3px;">(' . $GLOBALS['TL_LANG']['tl_syncCto_clients']['id'][0] . ': %s, ' . $GLOBALS['TL_LANG']['tl_syncCto_clients']['address'][0] . ': <span>%s%s</span><span class="client-id invisible">%s</span>)</span>',
+            'format'              => '<img class="ping" src="system/modules/syncCto/assets/images/js/gray.png" alt="" /> %s <span style="color: #aaaaaa; padding-left: 3px;">(' . $GLOBALS['TL_LANG']['tl_syncCto_clients']['id'][0] . ': %s, ' . $GLOBALS['TL_LANG']['tl_syncCto_clients']['address'][0] . ': <span>%s%s</span><span class="client-id invisible">%s</span>)</span>',
         ),
         'global_operations' => array
         (
@@ -51,7 +51,7 @@ $GLOBALS['TL_DCA']['tl_synccto_clients'] = array
                 'label'           => &$GLOBALS['TL_LANG']['tl_syncCto_clients']['syncToAll'],
                 'href'            => '?do=synccto_clients&table=tl_syncCto_clients_syncTo&act=start&step=0&mode=all&init=1',
                 'class'           => 'header_sync_all',
-                'icon'            => 'system/modules/syncCto/assets/icons/nav/iconSyncTo.png',
+                'icon'            => 'system/modules/syncCto/assets/images/nav/iconSyncTo.png',
             ) */
         ),
         'operations' => array
@@ -82,14 +82,14 @@ $GLOBALS['TL_DCA']['tl_synccto_clients'] = array
             (
                 'label'           => &$GLOBALS['TL_LANG']['tl_syncCto_clients']['showExtern'],
                 'href'            => '&table=tl_syncCto_clients_showExtern&act=start',
-                'icon'            => 'system/modules/syncCto/assets/icons/nav/iconCheck.png',
+                'icon'            => 'system/modules/syncCto/assets/images/nav/iconCheck.png',
                 'button_callback' => array('tl_synccto_clients', 'checkPermission_client_showExtern'),
             ),
             'syncFrom' => array
             (
                 'label'           => &$GLOBALS['TL_LANG']['tl_syncCto_clients']['syncFrom'],
                 'href'            => '&table=tl_syncCto_clients_syncFrom&act=create',
-                'icon'            => 'system/modules/syncCto/assets/icons/nav/iconSyncFrom.png',
+                'icon'            => 'system/modules/syncCto/assets/images/nav/iconSyncFrom.png',
                 'attributes'      => 'onclick="if (!confirm(\'' . $GLOBALS['TL_LANG']['tl_syncCto_clients']['syncFromConfirm'] . '\')) return false; Backend.getScrollOffset();"',
                 'button_callback' => array('tl_synccto_clients', 'checkPermission_client_syncFrom'),
             ),
@@ -97,7 +97,7 @@ $GLOBALS['TL_DCA']['tl_synccto_clients'] = array
             (
                 'label'           => &$GLOBALS['TL_LANG']['tl_syncCto_clients']['syncTo'],
                 'href'            => '&table=tl_syncCto_clients_syncTo&act=create',
-                'icon'            => 'system/modules/syncCto/assets/icons/nav/iconSyncTo.png',
+                'icon'            => 'system/modules/syncCto/assets/images/nav/iconSyncTo.png',
                 'button_callback' => array('tl_synccto_clients', 'checkPermission_client_syncTo'),
             ),
         )
@@ -330,17 +330,17 @@ class tl_synccto_clients extends Backend
             {
                 switch ($icon)
                 {
-                    case 'system/modules/syncCto/assets/icons/nav/iconCheck.png':
-                        $icon = 'system/modules/syncCto/assets/icons/nav/iconCheckDisabled.png';
+                    case 'system/modules/syncCto/assets/images/nav/iconCheck.png':
+                        $icon = 'system/modules/syncCto/assets/images/nav/iconCheckDisabled.png';
                         break;
 
-                    case 'system/modules/syncCto/assets/icons/nav/iconSyncFrom.png':
-                    case 'system/modules/syncCto/assets/icons/nav/iconSyncTo.png':
-                        $icon = 'system/modules/syncCto/assets/icons/nav/iconSyncDisabled.png';
+                    case 'system/modules/syncCto/assets/images/nav/iconSyncFrom.png':
+                    case 'system/modules/syncCto/assets/images/nav/iconSyncTo.png':
+                        $icon = 'system/modules/syncCto/assets/images/nav/iconSyncDisabled.png';
                         break;
 
                     case 'edit.gif':
-                        $icon = 'system/modules/syncCto/assets/icons/nav/iconEditDisabled.gif';
+                        $icon = 'system/modules/syncCto/assets/images/nav/iconEditDisabled.gif';
                         break;
                 }
 

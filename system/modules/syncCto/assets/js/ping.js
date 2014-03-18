@@ -37,32 +37,32 @@ function sendNextRequest(_strToken, _objElements, _intIndex)
         onSuccess:function(json){ 
             if(json.success == false)
             {
-                item.setProperty('src','system/modules/syncCto/assets/js/images/gray.png');
+                item.setProperty('src','system/modules/syncCto/assets/images/js/gray.png');
                 item.setProperty('title',json.msg);
             }
             else if(json.value == 0)
             {
-                item.setProperty('src','system/modules/syncCto/assets/js/images/gray.png');
+                item.setProperty('src','system/modules/syncCto/assets/images/js/gray.png');
                 item.setProperty('title',json.msg);
             }
             else if(json.value == 1)
             {
-                item.setProperty('src','system/modules/syncCto/assets/js/images/red.png');
+                item.setProperty('src','system/modules/syncCto/assets/images/js/red.png');
                 item.setProperty('title',json.msg);
             }
             else if(json.value == 2)
             {
-                item.setProperty('src','system/modules/syncCto/assets/js/images/blue.png');
+                item.setProperty('src','system/modules/syncCto/assets/images/js/blue.png');
                 item.setProperty('title',json.msg);
             }
             else if(json.value == 3)
             {
-                item.setProperty('src','system/modules/syncCto/assets/js/images/orange.png');
+                item.setProperty('src','system/modules/syncCto/assets/images/js/orange.png');
                 item.setProperty('title',json.msg);
             }
             else if(json.value == 4)
             {
-                item.setProperty('src','system/modules/syncCto/assets/js/images/green.png');
+                item.setProperty('src','system/modules/syncCto/assets/images/js/green.png');
                 item.setProperty('title',json.msg);
             }
             
@@ -73,7 +73,7 @@ function sendNextRequest(_strToken, _objElements, _intIndex)
         }.bind(_objElements).bind(_intIndex),
         onFailure:function(responseTree,responseElements,response,js){
             // On error show red point
-            item.setProperty('src','system/modules/syncCto/assets/js/images/offline.png');
+            item.setProperty('src','system/modules/syncCto/assets/images/js/offline.png');
         }.bind(_objElements).bind(_intIndex)
     }).send();
 }

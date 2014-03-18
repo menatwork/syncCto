@@ -4,7 +4,7 @@
         <?php foreach (array('gray','red','blue','orange','green') as $strValue): ?>
         <li>
             <span>
-                <img title="<?php echo $GLOBALS['TL_LANG']['tl_synccto_clients']['state'][$strValue]; ?>" src="system/modules/syncCto/assets/js/images/<?php echo $strValue; ?>.png" alt="" />
+                <img title="<?php echo $GLOBALS['TL_LANG']['tl_synccto_clients']['state'][$strValue]; ?>" src="system/modules/syncCto/assets/images/js/<?php echo $strValue; ?>.png" alt="" />
             </span>
         </li>
         <?php endforeach; ?>
