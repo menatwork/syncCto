@@ -33,7 +33,7 @@ define('TL_MODE', 'BE');
 require($dir . '/system/initialize.php');
 
 /**
- * Class SyncCtoPopup
+ * Class popupSyncDB
  */
 class popupSyncDB extends Backend
 {
