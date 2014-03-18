@@ -7,7 +7,7 @@
 <?php echo $this->stylesheets; ?>
 <?php echo $this->javascripts; ?>
 </head>
-<body class="__ua__">
+<body class="<?php echo $this->ua; ?>">
 
 <div id="container">
     <div id="main"> 
