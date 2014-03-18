@@ -1,5 +1,5 @@
 <div class="logo-synccto">
-    <a target="_blank" href="http://www.contao-synccto.com/"><img width="227" height="156" alt="" src="system/modules/syncCto/assets/logo.png"></a>
+    <a target="_blank" href="http://www.contao-synccto.com/"><img width="195" height="142" alt="" src="system/modules/syncCto/assets/logo.png"></a>
 </div>
 
 <h1 id="tl_welcome"><?php echo $GLOBALS['TL_LANG']['tl_syncCto_backup']['welcome']; ?></h1>
