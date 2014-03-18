@@ -12,8 +12,9 @@
 /**
  * List operation
  */
-$GLOBALS['TL_LANG']['tl_synccto_clients']['new']                = array('Neuer Client', 'Neuer Client');
-$GLOBALS['TL_LANG']['tl_syncCto_clients']['all']                = array('Mehrere bearbeiten');
+$GLOBALS['TL_LANG']['tl_synccto_clients']['new']                = array('Neuer Client', 'Einen neuen Client anlegen');
+$GLOBALS['TL_LANG']['tl_syncCto_clients']['syncToAll']          = array('Alle synchronisieren', 'Alle Clients auf einmal synchronisieren');
+$GLOBALS['TL_LANG']['tl_syncCto_clients']['all']                = array('Mehrere bearbeiten', 'Mehrere Datensätze auf einmal bearbeiten');
 $GLOBALS['TL_LANG']['tl_syncCto_clients']['edit']               = array('Client bearbeiten', 'Client ID %s bearbeiten');
 $GLOBALS['TL_LANG']['tl_syncCto_clients']['copy']               = array('Client duplizieren', 'Client ID %s duplizieren');
 $GLOBALS['TL_LANG']['tl_syncCto_clients']['delete']             = array('Client löschen', 'Client ID %s löschen');
@@ -21,7 +22,7 @@ $GLOBALS['TL_LANG']['tl_syncCto_clients']['show']               = array('Clientd
 $GLOBALS['TL_LANG']['tl_syncCto_clients']['showExtern']         = array('Systemcheck', 'Systemcheck des Clients ID %s anzeigen');
 $GLOBALS['TL_LANG']['tl_syncCto_clients']['syncTo']             = array('Client synchronisieren', 'Client ID %s synchronisieren');
 $GLOBALS['TL_LANG']['tl_syncCto_clients']['syncFrom']           = array('Server synchronisieren', 'Server synchronisieren');
-$GLOBALS['TL_LANG']['tl_syncCto_clients']['syncFromConfirm']    = 'Soll der Server wirklich synchronisiert werden? Es werden hierbei Daten geändert, die Sie zurzeit verwenden.';
+$GLOBALS['TL_LANG']['tl_syncCto_clients']['syncFromConfirm']    = 'Soll der Server wirklich synchronisiert werden? Es können dabei Dateien überschrieben werden, die sich derzeit in der Bearbeitung befinden.';
 
 /**
  * Legends
@@ -38,7 +39,7 @@ $GLOBALS['TL_LANG']['tl_synccto_clients']['legend']             = 'Legende: ';
 $GLOBALS['TL_LANG']['tl_synccto_clients']['state']['gray']      = 'Das System konnte noch nicht geprüft werden.';
 $GLOBALS['TL_LANG']['tl_synccto_clients']['state']['red']       = 'Das System ist offline oder konnte nicht gefunden werden.';
 $GLOBALS['TL_LANG']['tl_synccto_clients']['state']['blue']      = 'Die Extensions ctoCommunication/syncCto sind nicht installiert.';
-$GLOBALS['TL_LANG']['tl_synccto_clients']['state']['orange']    = 'Der ctoCommunication API Key ist nicht korrekt.';
+$GLOBALS['TL_LANG']['tl_synccto_clients']['state']['orange']    = 'Der ctoCommunication API-Key ist nicht korrekt.';
 $GLOBALS['TL_LANG']['tl_synccto_clients']['state']['green']     = 'Alle Systeme sind online.';
 
 /**

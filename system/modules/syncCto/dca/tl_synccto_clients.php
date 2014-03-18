@@ -46,12 +46,13 @@ $GLOBALS['TL_DCA']['tl_synccto_clients'] = array
                 'class'           => 'header_edit_all',
                 'attributes'      => 'onclick="Backend.getScrollOffset();"'
             ),
-//            'syncToAll' => array(
-//                'label' => &$GLOBALS['TL_LANG']['tl_syncCto_clients']['syncToAll'],
-//                'href'  => '?do=synccto_clients&table=tl_syncCto_clients_syncTo&act=start&step=0&mode=all&init=1',
-//                'class' => 'header_sync_all',                 
-//                'icon'  => 'system/modules/syncCto/assets/icons/nav/iconSyncTo.png',
-//            )
+            /* 'syncToAll' => array
+            (
+                'label'           => &$GLOBALS['TL_LANG']['tl_syncCto_clients']['syncToAll'],
+                'href'            => '?do=synccto_clients&table=tl_syncCto_clients_syncTo&act=start&step=0&mode=all&init=1',
+                'class'           => 'header_sync_all',
+                'icon'            => 'system/modules/syncCto/assets/icons/nav/iconSyncTo.png',
+            ) */
         ),
         'operations' => array
         (
@@ -76,13 +77,6 @@ $GLOBALS['TL_DCA']['tl_synccto_clients'] = array
                 'icon'            => 'delete.gif',
                 'attributes'      => 'onclick="if (!confirm(\'' . $GLOBALS['TL_LANG']['MSC']['deleteConfirm'] . '\')) return false; Backend.getScrollOffset();"',
                 'button_callback' => array('tl_synccto_clients', 'checkPermission_client_delete'),
-            ),
-            'show' => array
-            (
-                'label'           => &$GLOBALS['TL_LANG']['tl_syncCto_clients']['show'],
-                'href'            => 'act=show',
-                'icon'            => 'show.gif',
-                'button_callback' => array('tl_synccto_clients', 'checkPermission_client_show'),
             ),
             'showExtern' => array
             (
@@ -119,7 +113,7 @@ $GLOBALS['TL_DCA']['tl_synccto_clients'] = array
         'http_auth'               => 'http_username,http_password',
     ),
     // Fields
-    'fields'    => array
+    'fields' => array
     (
         'apikey' => array
         (
