@@ -17,3 +17,30 @@
   h1.headline span {
     float:left;
   }
+
+  #tl_moverview + #tl_moverview {
+    margin-top: 24px;
+  }
+
+  #tl_moverview h2 {
+    background: none repeat scroll 0 0 #F6F6F6;
+    border-top: 1px solid #E9E9E9;
+    margin: 18px 0 0;
+    padding: 2px 6px 3px;
+  }
+
+  #tl_moverview .tl_module_desc {
+    background: none repeat scroll 0 0 #FFFFFF;
+    border-top: 1px solid #E9E9E9;
+    padding: 8px 6px;
+  }
+
+  #tl_moverview h3 {
+    margin:0 0 4px;
+  }
+
+  .logo-synccto {
+    background-color:#7ACAC1;
+    padding:18px;
+    margin-top:1px;
+  }
