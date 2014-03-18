@@ -1,7 +1,7 @@
 <div id="tl_listing" class="tl_listing_container">
 <?php if($this->close || $this->error): ?>
     <?php if($this->close): ?>
-    <img src="system/modules/syncCto/assets/icons/steps/iconWork.gif" alt="" />
+    <img src="<?php echo $this->Environment->base; ?>system/modules/syncCto/assets/icons/steps/iconWork.gif" alt="" />
     <script>
         window.addEvent("domready",function(){
             window.parent.document.getElement('input[name=forward]').click();
@@ -15,13 +15,13 @@
 
 <form id="filelist_form" action="<?php echo $this->Environment->base; ?>contao/popupSyncFiles.php?id=<?php echo $this->id; ?>&amp;step=<?php echo $this->step; ?>" method="post">
     <div class="formbody">
-        <input type="hidden" name="FORM_SUBMIT" value="<?php echo $this->formId; ?>" />        
+        <input type="hidden" name="FORM_SUBMIT" value="<?php echo $this->formId; ?>" />
         <input type="hidden" name="REQUEST_TOKEN" value="<?php echo REQUEST_TOKEN; ?>">
         
         <div class="submit_container">
             <input class="tl_submit" name="transfer" type="submit" value="<?php echo $GLOBALS['TL_LANG']['MSC']['apply']; ?>" />
         </div>
-        <div class="submit_container">         
+        <div class="submit_container">
             <input class="tl_submit" name="delete" type="submit" value="<?php echo $GLOBALS['TL_LANG']['MSC']['updateRemove']; ?>" />
         </div>
 
@@ -41,12 +41,12 @@
                 case 2:
                     $arrFileList = $this->bigFilelist;
                     break;
-            }        
+            }
         ?>
         
         <?php if(count($arrFileList) != 0): ?>
-        <h3><?php echo $GLOBALS['TL_LANG']['MSC'][(($i == 1)? 'normal' : 'big') . '_files']; ?></h3>
-        <table class="comparelist" id="<?php echo ($i == 1)? 'normal' : 'big'; ?>filelist">
+        <h3><?php echo $GLOBALS['TL_LANG']['MSC'][(($i == 1) ? 'normal' : 'big') . '_files']; ?></h3>
+        <table class="comparelist" id="<?php echo ($i == 1) ? 'normal' : 'big'; ?>filelist">
             <colgroup>
                 <col width="15%" />
                 <col width="120" />
@@ -59,13 +59,13 @@
                     <th class="state"><?php echo $GLOBALS['TL_LANG']['MSC']['state']; ?></th>
                     <th class="filesize"><?php echo $GLOBALS['TL_LANG']['MSC']['fileSize']; ?></th>
                     <th class="filetime"><?php echo $GLOBALS['TL_LANG']['MSC']['fileTime']; ?></th>
-                    <th class="checkbox table-th-nosort"><input class="tl_checkbox" onclick="Backend.toggleCheckboxGroup(this, '<?php echo ($i == 1)? 'normal' : 'big'; ?>filelist')" type="checkbox" /></th>
+                    <th class="checkbox table-th-nosort"><input class="tl_checkbox" onclick="Backend.toggleCheckboxGroup(this, '<?php echo ($i == 1) ? 'normal' : 'big'; ?>filelist')" type="checkbox" /></th>
                     <th class="last"><?php echo $GLOBALS['TL_LANG']['MSC']['file']; ?></th>
                 </tr>
             </thead>
-            <tbody>            
+            <tbody>
             <?php foreach ($arrFileList as $key => $file): ?>
-                <tr>                    
+                <tr>
                     <td class="state <?php echo $file["css"]; ?>"><?php echo $this->arrLangStates[$file["state"]]; ?></td>
                     <td class="filesize"><?php echo ($file["size"] == -1) ? "N.A." : $this->getReadableSize($file["size"]); ?></td>
                     <td class="filetime"><?php echo \Date::parse($GLOBALS['TL_CONFIG']['datimFormat'], $file["lastModified"]); ?></td>
@@ -87,7 +87,7 @@
         <div class="bottom submit_container">
             <input class="tl_submit" name="transfer" type="submit" value="<?php echo $GLOBALS['TL_LANG']['MSC']['apply']; ?>" />
         </div>
-        <div class="bottom submit_container">         
+        <div class="bottom submit_container">
             <input class="tl_submit" name="delete" type="submit" value="<?php echo $GLOBALS['TL_LANG']['MSC']['updateRemove']; ?>" />
         </div>
     </div>
