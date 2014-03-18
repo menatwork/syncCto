@@ -12,11 +12,10 @@
 /**
  * RPC  
  */
-$GLOBALS["CTOCOM_FUNCTIONS"]["SYNCCTO_AUTO_UPDATE"] = array(
-    "class" => "SyncCtoAutoUpdater",
-    "function" => "update",
-    "typ" => "POST",
-    "parameter" => array("zipfile"),
+$GLOBALS["CTOCOM_FUNCTIONS"]["SYNCCTO_AUTO_UPDATE"] = array
+(
+    "class"             => "SyncCtoAutoUpdater",
+    "function"          => "update",
+    "typ"               => "POST",
+    "parameter"         => array("zipfile"),
 );
-
-?>
