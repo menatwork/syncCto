@@ -18,45 +18,56 @@ else
     $strDataProvider = 'GeneralDataSyncCtoC2';
 }
 
-$GLOBALS['TL_DCA']['tl_syncCto_backup_db'] = array(
+$GLOBALS['TL_DCA']['tl_syncCto_backup_db'] = array
+(
     // Config
-    'config' => array(
-        'dataContainer' => 'General',
-        'disableSubmit' => false,
-        'onload_callback' => array(
+    'config' => array
+    (
+        'dataContainer'           => 'General',
+        'disableSubmit'           => false,
+        'onload_callback' => array
+        (
             array('tl_syncCto_backup_db', 'onload_callback'),
         ),
-        'onsubmit_callback' => array(
+        'onsubmit_callback' => array
+        (
             array('tl_syncCto_backup_db', 'onsubmit_callback'),
         )
     ),
-    'dca_config'  => array(
-        'data_provider' => array(
-            'default' => array(
-                'class'  => $strDataProvider,
-                'source' => 'tl_syncCto_backup_db'
+    'dca_config' => array
+    (
+        'data_provider' => array
+        (
+            'default' => array
+            (
+                'class'           => $strDataProvider,
+                'source'          => 'tl_syncCto_backup_db'
             ),
         ),
     ),
     // Palettes
-    'palettes' => array(
-        'default' => '{table_recommend_legend},database_tables_recommended;{table_none_recommend_legend:hide},database_tables_none_recommended;'
+    'palettes' => array
+    (
+        'default'                 => '{table_recommend_legend},database_tables_recommended;{table_none_recommend_legend:hide},database_tables_none_recommended;'
     ),
     // Fields
-    'fields' => array(
-        'database_tables_recommended' => array(
-            'label' => &$GLOBALS['TL_LANG']['tl_syncCto_backup_db']['database_tables_recommended'],
-            'inputType' => 'checkbox',
-            'exclude' => true,
-            'eval' => array('multiple' => true),
-            'options_callback' => array('tl_syncCto_backup_db', 'databaseTablesRecommended'),
+    'fields' => array
+    (
+        'database_tables_recommended' => array
+        (
+            'label'               => &$GLOBALS['TL_LANG']['tl_syncCto_backup_db']['database_tables_recommended'],
+            'inputType'           => 'checkbox',
+            'exclude'             => true,
+            'eval'                => array('multiple' => true),
+            'options_callback'    => array('tl_syncCto_backup_db', 'databaseTablesRecommended'),
         ),
-        'database_tables_none_recommended' => array(
-            'label' => &$GLOBALS['TL_LANG']['tl_syncCto_backup_db']['database_tables_none_recommended'],
-            'inputType' => 'checkbox',
-            'exclude' => true,
-            'eval' => array('multiple' => true),
-            'options_callback' => array('tl_syncCto_backup_db', 'databaseTablesNoneRecommendedWithHidden'),
+        'database_tables_none_recommended' => array
+        (
+            'label'               => &$GLOBALS['TL_LANG']['tl_syncCto_backup_db']['database_tables_none_recommended'],
+            'inputType'           => 'checkbox',
+            'exclude'             => true,
+            'eval'                => array('multiple' => true),
+            'options_callback'    => array('tl_syncCto_backup_db', 'databaseTablesNoneRecommendedWithHidden'),
         )
     )
 );

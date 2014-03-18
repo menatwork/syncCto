@@ -9,11 +9,13 @@
  * @filesource
  */
 
-$GLOBALS['TL_DCA']['tl_syncCto_clients_showExtern'] = array(
+$GLOBALS['TL_DCA']['tl_syncCto_clients_showExtern'] = array
+(
     // Config
-    'config' => array(
-        'dataContainer' => 'General',
-        'closed' => true,
-        'disableSubmit' => false
+    'config' => array
+    (
+        'dataContainer'           => 'General',
+        'closed'                  => true,
+        'disableSubmit'           => false
     )
 );

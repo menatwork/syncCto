@@ -18,41 +18,52 @@ else
     $strDataProvider = 'GeneralDataSyncCtoC2';
 }
 
-$GLOBALS['TL_DCA']['tl_syncCto_restore_file'] = array(
+$GLOBALS['TL_DCA']['tl_syncCto_restore_file'] = array
+(
     // Config
-    'config' => array(
-        'dataContainer' => 'General',
-        'disableSubmit' => false,
-        'onload_callback' => array(
+    'config' => array
+    (
+        'dataContainer'           => 'General',
+        'disableSubmit'           => false,
+        'onload_callback' => array
+        (
             array('tl_syncCto_restore_file', 'onload_callback'),
         ),
-        'onsubmit_callback' => array(
+        'onsubmit_callback' => array
+        (
             array('tl_syncCto_restore_file', 'onsubmit_callback'),
         ),
     ),
-    'dca_config'  => array(
-        'data_provider' => array(
-            'default' => array(
-                'class'  => $strDataProvider,
-                'source' => 'tl_syncCto_restore_file'
+    'dca_config'  => array
+    (
+        'data_provider' => array
+        (
+            'default' => array
+            (
+                'class'           => $strDataProvider,
+                'source'          => 'tl_syncCto_restore_file'
             ),
         ),
     ),
     // Palettes
-    'palettes' => array(
-        'default' => '{filelist_legend},filelist;',
+    'palettes' => array
+    (
+        'default'                 => '{filelist_legend},filelist;',
     ),
     // Fields
-    'fields' => array(
-        'filelist' => array(
-            'label' => &$GLOBALS['TL_LANG']['tl_syncCto_restore_file']['filelist'],
-            'inputType' => 'fileTree',
-            'eval' => array(
-                'files' => true,
-                'filesOnly' => true,
-                'fieldType' => 'radio',
-                'path' => $GLOBALS['TL_CONFIG']['uploadPath'] . '/syncCto_backups/files', 
-                'extensions' => 'rar,zip'
+    'fields' => array
+    (
+        'filelist' => array
+        (
+            'label'               => &$GLOBALS['TL_LANG']['tl_syncCto_restore_file']['filelist'],
+            'inputType'           => 'fileTree',
+            'eval' => array
+            (
+                'files'           => true,
+                'filesOnly'       => true,
+                'fieldType'       => 'radio',
+                'path'            => $GLOBALS['TL_CONFIG']['uploadPath'] . '/syncCto_backups/files', 
+                'extensions'      => 'rar,zip'
             ),
         ),
     )
