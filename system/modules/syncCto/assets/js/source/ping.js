@@ -1,4 +1,4 @@
-/* Copyright (c) MEN AT WORK 2012 :: LGPL license */
+/* Copyright (c) MEN AT WORK 2014 :: LGPL license */
 
 function sendNextRequest(_strToken, _objElements, _intIndex)
 {
@@ -38,32 +38,32 @@ function sendNextRequest(_strToken, _objElements, _intIndex)
             if(json.success == false)
             {
                 item.setProperty('src','system/modules/syncCto/assets/js/images/gray.png');
-                item.setProperty('title',json.msg);      
+                item.setProperty('title',json.msg);
             }
             else if(json.value == 0)
             {
                 item.setProperty('src','system/modules/syncCto/assets/js/images/gray.png');
-                item.setProperty('title',json.msg);    
+                item.setProperty('title',json.msg);
             }
             else if(json.value == 1)
-            {   
+            {
                 item.setProperty('src','system/modules/syncCto/assets/js/images/red.png');
-                item.setProperty('title',json.msg);    
+                item.setProperty('title',json.msg);
             }
             else if(json.value == 2)
-            {   
+            {
                 item.setProperty('src','system/modules/syncCto/assets/js/images/blue.png');
-                item.setProperty('title',json.msg);    
+                item.setProperty('title',json.msg);
             }
             else if(json.value == 3)
-            {   
+            {
                 item.setProperty('src','system/modules/syncCto/assets/js/images/orange.png');
-                item.setProperty('title',json.msg);    
+                item.setProperty('title',json.msg);
             }
             else if(json.value == 4)
-            {   
+            {
                 item.setProperty('src','system/modules/syncCto/assets/js/images/green.png');
-                item.setProperty('title',json.msg);    
+                item.setProperty('title',json.msg);
             }
             
             if((_objElements.length - 1 ) > _intIndex)
@@ -94,4 +94,5 @@ window.addEvent("domready", function() {
     {
         sendNextRequest(REQUEST_TOKEN, $$('img.ping'), 0);
     }
+
 });
