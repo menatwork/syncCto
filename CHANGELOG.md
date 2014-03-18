@@ -6,6 +6,45 @@ Version 2.5.x
 -------------
 
 ### Feature
+Änderung des Datums von 2013 zu 2014 in allen Dateien
+
+### Defect
+Änderung der Contao 3 spezifischen Blacklisteinträge
+
+### Defect
+Änderung der deserialize Aufrufe in unserialize (see #188)
+
+### Defect
+Unterstützung der Maßeinheit Gigabyte in Vergleichslisten (see #187)
+
+### Feature
+Backupordner des LiveUpdates zur Blacklist hinzugefügt
+
+### Feature
+LiveUpdateId zur localconfig.php Blacklist hinzugefügt
+
+### Defect
+Behebung eines Rechtschreibfehlers (see #183)
+
+### Defect
+Optimierung des Systemchecks
+
+### Feature
+Unterstützung des Contao 3 Filesystems für Backups
+
+### Defect
+Verbesserung der Windows Unterstützung (see #175)
+
+### Feature
+Contao 3 spezifische Ordner in der Blacklist aufgenommen (see #180)
+
+### Feature
+.DS_Store als Standard in die Blacklist aufgenommen (see #177)
+
+### Defect
+Fehlerhafter Aufruf in der CronFileBackups.php (see #172)
+
+### Feature
 Popups mit Symlinks betreiben (see #167).
 
 ### Feature
@@ -18,10 +57,10 @@ Filesystem - SPL Support (see #162).
 Systemzeit Server <> Client beim Systemcheck abgleichen (see #161).
 
 ### Feature
-Blacklist localconfig (see #132).
+Unbekannte Konfigurationseinträge für die Blackliste auflisten (see #132).
 
 ### Defect
-Add the new php files to the autoload.php.
+autoload.php um weitere Klassen erweitert
 
 
 Version 2.4.x
