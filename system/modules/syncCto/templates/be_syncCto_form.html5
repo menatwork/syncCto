@@ -3,7 +3,7 @@
     {
         var url = '<?php echo $this->Environment->base . 'contao/' .  $this->popupClassName . '?id=' . $this->id . '&direction=' . $this->direction . '&language=' . BackendUser::getInstance()->language; ?>';
         var h = Math.max(document.documentElement.clientHeight, window.innerHeight || 0);
-        Backend.openModalIframe({'title':'<?php echo $GLOBALS['TL_LANG']['tl_syncCto_sync']['popup']; ?>','url':url,'width':955, 'height':(h / 100 * 90)})
+        Backend.openModalIframe({'title':'<?php echo $GLOBALS['TL_LANG']['tl_syncCto_sync']['popup']; ?>','url':url,'width':935, 'height':(h / 100 * 90)})
     }
     
     window.addEvent("domready",function(){
