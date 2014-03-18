@@ -12,7 +12,7 @@
 /**
  * Reference
  */
-$GLOBALS['TL_LANG']['SYC']['core']                          = 'Contao Installation';
+$GLOBALS['TL_LANG']['SYC']['core']                          = 'Contao installation';
 $GLOBALS['TL_LANG']['SYC']['core_change']                   = 'Modified data';
 $GLOBALS['TL_LANG']['SYC']['core_delete']                   = 'Deleted data';
 $GLOBALS['TL_LANG']['SYC']['user']                          = 'File manager (files)';

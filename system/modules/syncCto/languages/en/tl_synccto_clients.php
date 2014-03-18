@@ -12,8 +12,8 @@
 /**
  * List operation
  */
-$GLOBALS['TL_LANG']['tl_synccto_clients']['new']                = array('New client', 'New client');
-$GLOBALS['TL_LANG']['tl_syncCto_clients']['all']                = array('Edit multiple');
+$GLOBALS['TL_LANG']['tl_synccto_clients']['new']                = array('New client', 'Create a new client');
+$GLOBALS['TL_LANG']['tl_syncCto_clients']['all']                = array('Edit multiple', 'Edit multiple records at once');
 $GLOBALS['TL_LANG']['tl_syncCto_clients']['edit']               = array('Edit client', 'Edit client ID %s');
 $GLOBALS['TL_LANG']['tl_syncCto_clients']['copy']               = array('Duplicate client', 'Duplicate client ID %s');
 $GLOBALS['TL_LANG']['tl_syncCto_clients']['delete']             = array('Delete client', 'Delete client ID %s');
