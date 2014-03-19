@@ -218,7 +218,6 @@ $GLOBALS['SYC_CONFIG']['maintance_options'] = array_merge( (array) $GLOBALS['SYC
 (
     'temp_tables',
     'temp_folders',
-    'css_create',
     'xml_create',
 ));
 

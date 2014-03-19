@@ -1011,104 +1011,64 @@ class SyncCtoFiles extends Backend
     }
 
     /**
-     * Use the contao maintance
-     * 
+     * Use the contao maintenance
+     *
      * @CtoCommunication Enable
+     *
+     * @param $arrSettings
+     *
      * @return array
      */
-    public function runMaintenance($arrSetings)
+    public function runMaintenance($arrSettings)
     {
         $arrReturn = array(
             "success"  => false,
             "info_msg" => array()
         );
 
-        $this->import('Automator');
-        $this->import('StyleSheets');
-        $this->import("Database");
-
-        foreach ($arrSetings as $value)
+        foreach ($arrSettings as $value)
         {
             try
             {
                 switch ($value)
                 {
-                    // Database table
-                    // Get all cachable tables from TL_CACHE
+                    // Tables
                     case "temp_tables":
-                        foreach ($GLOBALS['TL_CACHE'] as $k => $v)
+                        foreach ($GLOBALS['TL_PURGE']['tables'] as $key => $config)
                         {
-                            if (in_array($v, array("tl_ctocom_cache", "tl_requestcache ")))
+                            $arrCallback = $config['callback'];
+                            if(is_array($arrCallback) && count($arrCallback) == 2)
                             {
-                                continue;
+                                $this->import($arrCallback[0]);
+                                $this->$arrCallback[0]->$arrCallback[1]();
                             }
-
-                            $this->Database->execute("TRUNCATE TABLE " . $v);
                         }
                         break;
 
+                    // Folders
                     case "temp_folders":
-                        // Html folder
-                        $this->Automator->purgeHtmlFolder();
-                        // Scripts folder
-                        $this->Automator->purgeScriptsFolder();
-                        // Temporary folder
-                        $this->Automator->purgeTempFolder();
+                        foreach ($GLOBALS['TL_PURGE']['folders'] as $key => $config)
+                        {
+                            $arrCallback = $config['callback'];
+                            if(is_array($arrCallback) && count($arrCallback) == 2)
+                            {
+                                $this->import($arrCallback[0]);
+                                $this->$arrCallback[0]->$arrCallback[1]();
+                            }
+                        }
                         break;
 
-                    // CSS files
-                    case "css_create":
-                        $this->StyleSheets->updateStyleSheets();
-                        break;
-
+                    // Custom
                     case "xml_create":
-                        try
+                        foreach ($GLOBALS['TL_PURGE']['custom'] as $key => $config)
                         {
-                            // XML files
-                            // HOOK: use the googlesitemap module
-                            if (in_array('googlesitemap', $this->Config->getActiveModules()))
+                            $arrCallback = $config['callback'];
+                            if(is_array($arrCallback) && count($arrCallback) == 2)
                             {
-                                $this->import('GoogleSitemap');
-                                $this->GoogleSitemap->generateSitemap();
-                            }
-                            else
-                            {
-                                $this->Automator->generateSitemap();
+                                $this->import($arrCallback[0]);
+                                $this->$arrCallback[0]->$arrCallback[1]();
                             }
                         }
-                        catch (Exception $exc)
-                        {
-                            $arrReturn["info_msg"][] = "Error by: $value with Msg: " . $exc->getMessage();
-                        }
-
-                        try
-                        {
-                            // HOOK: recreate news feeds
-                            if (in_array('news', $this->Config->getActiveModules()))
-                            {
-                                $this->import('News');
-                                $this->News->generateFeeds();
-                            }
-                        }
-                        catch (Exception $exc)
-                        {
-                            $arrReturn["info_msg"][] = "Error by: $value with Msg: " . $exc->getMessage();
-                        }
-
-                        try
-                        {
-                            // HOOK: recreate calendar feeds
-                            if (in_array('calendar', $this->Config->getActiveModules()))
-                            {
-                                $this->import('Calendar');
-                                $this->Calendar->generateFeeds();
-                            }
-                        }
-                        catch (Exception $exc)
-                        {
-                            $arrReturn["info_msg"][] = "Error by: $value with Msg: " . $exc->getMessage();
-                        }
-                    default:
                         break;
                 }
             }
@@ -1126,7 +1086,7 @@ class SyncCtoFiles extends Backend
                 try
                 {
                     $this->import($callback[0]);
-                    $this->$callback[0]->$callback[1]($arrSetings);
+                    $this->$callback[0]->$callback[1]($arrSettings);
                 }
                 catch (Exception $exc)
                 {
