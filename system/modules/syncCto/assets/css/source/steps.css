@@ -39,8 +39,10 @@
     margin:0 0 4px;
   }
 
+  #tl_moverview a.navigation {
+    padding-left:23px;
+  }
+
   .logo-synccto {
-    background-color:#7ACAC1;
-    padding:18px;
     margin-top:1px;
   }

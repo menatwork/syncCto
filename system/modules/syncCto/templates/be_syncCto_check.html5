@@ -1,5 +1,5 @@
 <div class="logo-synccto">
-    <a target="_blank" href="http://www.contao-synccto.com/"><img width="195" height="142" alt="" src="system/modules/syncCto/assets/logo.png"></a>
+    <a target="_blank" href="http://www.contao-synccto.com/"><img alt="" src="system/modules/syncCto/assets/logo.png"></a>
 </div>
 
 <h1 id="tl_welcome">syncCto <?php echo $this->syc_version; ?> <?php echo $GLOBALS['TL_LANG']['tl_syncCto_check']['check']; ?></h1>
