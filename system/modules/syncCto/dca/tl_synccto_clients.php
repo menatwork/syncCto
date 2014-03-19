@@ -36,6 +36,7 @@ $GLOBALS['TL_DCA']['tl_synccto_clients'] = array
         (
             'fields'              => array('title', 'id', 'address', 'path', 'id'),
             'format'              => '<img class="ping" src="system/modules/syncCto/assets/images/js/gray.png" alt="" /> %s <span style="color: #aaaaaa; padding-left: 3px;">(' . $GLOBALS['TL_LANG']['tl_syncCto_clients']['id'][0] . ': %s, ' . $GLOBALS['TL_LANG']['tl_syncCto_clients']['address'][0] . ': <span>%s%s</span><span class="client-id invisible">%s</span>)</span>',
+            'label_callback'      => array('tl_synccto_clients', 'setLabel')
         ),
         'global_operations' => array
         (
@@ -106,7 +107,7 @@ $GLOBALS['TL_DCA']['tl_synccto_clients'] = array
     'palettes' => array
     (
         '__selector__'            => array('http_auth'),
-        'default'                 => '{apikey_legend},apikey;{title_legend},title,description;{connection_legend},address,path,port,codifyengine;{expert_legend:hide},http_auth',
+        'default'                 => '{client_legend},apikey,title;{connection_legend},address,path,port,codifyengine;{expert_legend:hide},http_auth',
     ),
     'subpalettes' => array
     (
@@ -121,7 +122,7 @@ $GLOBALS['TL_DCA']['tl_synccto_clients'] = array
             'explanation'         => 'apiKey',
             'inputType'           => 'text',
             'exclude'             => true,
-            'eval'                => array('helpwizard' => true, 'mandatory' => true, 'maxlength' => '64', 'tl_class' => 'long')
+            'eval'                => array('helpwizard' => true, 'mandatory' => true, 'maxlength' => '64', 'tl_class' => 'w50')
         ),
         'title' => array
         (
@@ -129,14 +130,7 @@ $GLOBALS['TL_DCA']['tl_synccto_clients'] = array
             'inputType'           => 'text',
             'search'              => true,
             'exclude'             => true,
-            'eval'                => array('mandatory' => true, 'maxlength' => '64', 'tl_class' => 'long')
-        ),
-        'description' => array
-        (
-            'label'               => &$GLOBALS['TL_LANG']['tl_syncCto_clients']['description'],
-            'exclude'             => true,
-            'inputType'           => 'textarea',
-            'eval'                => array('style' => 'height:80px')
+            'eval'                => array('mandatory' => true, 'maxlength' => '64', 'tl_class' => 'w50')
         ),
         'address' => array
         (
@@ -459,4 +453,23 @@ class tl_synccto_clients extends Backend
         }
     }
 
+    /**
+     * Add the address to the label.
+     *
+     * @param $row
+     *
+     * @param $label
+     *
+     * @return mixed
+     */
+    public function setLabel($row, $label)
+    {
+        $intMaxChars = 65;
+        $intMinChars = 30;
+        $intLeft     = $intMaxChars - (strlen($row['title']) + strlen($row['id']));
+        $intLeft     = max($intLeft , $intMinChars);
+
+        $strAddress  = SyncCtoHelper::getInstance()->substrCenter($row['address'] . $row['path'], $intLeft, ' [...] ');
+        return str_replace('[URL]', $strAddress, $label);
+    }
 }
