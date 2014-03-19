@@ -5,7 +5,7 @@
  *
  * @copyright  MEN AT WORK 2014
  * @package    syncCto
- * @license    GNU/LGPL 
+ * @license    GNU/LGPL
  * @filesource
  */
 
@@ -20,17 +20,17 @@ class SyncCtoHelper extends Backend
 
     // instance
     protected static $instance = null;
-    
+
     // Objects   
     protected $objSyncCtoDatabase;
-    
+
     // Cache
     protected $arrPreparedBlacklistFolder = null;
-    protected $arrPreparedBlacklistFiles  = null;
-	protected $strPreparedTlRoot = '';
+    protected $arrPreparedBlacklistFiles = null;
+    protected $strPreparedTlRoot = '';
 
-	// Config
-    protected $arrSearch  = array("\\", ".", "^", "?", "*", "/");
+    // Config
+    protected $arrSearch = array("\\", ".", "^", "?", "*", "/");
     protected $arrReplace = array("\\\\", "\\.", "\\^", ".?", ".*", "\\/");
 
     /* -------------------------------------------------------------------------
@@ -52,23 +52,23 @@ class SyncCtoHelper extends Backend
         // Language
         $this->loadLanguageFile("default");
         $this->loadLanguageFile('tl_synccto_clients');
-                
+
         // Instance a list for regex from the blacklist for folders.
         $this->arrPreparedBlacklistFolder = array();
-        foreach ($this->getBlacklistFolder()as $key => $value)
+        foreach ($this->getBlacklistFolder() as $key => $value)
         {
             $this->arrPreparedBlacklistFolder[$key] = str_replace($this->arrSearch, $this->arrReplace, $value);
         }
-        
+
         // Instance a list for regex from the blacklist for files.
         $this->arrPreparedBlacklistFiles = array();
-        foreach ($this->getBlacklistFile()as $key => $value)
+        foreach ($this->getBlacklistFile() as $key => $value)
         {
             $this->arrPreparedBlacklistFiles[$key] = str_replace($this->arrSearch, $this->arrReplace, $value);
         }
-		
-		// Replace some elements in TL_ROOT for regex.
-		$this->strPreparedTlRoot = str_replace('\\', '\\\\', TL_ROOT);
+
+        // Replace some elements in TL_ROOT for regex.
+        $this->strPreparedTlRoot = str_replace('\\', '\\\\', TL_ROOT);
     }
 
     /**
@@ -100,8 +100,9 @@ class SyncCtoHelper extends Backend
     static public function parseSize($size)
     {
         $size = trim($size);
-        $last = strtolower($size[strlen($size)-1]);
-        switch($last) {
+        $last = strtolower($size[strlen($size) - 1]);
+        switch ($last)
+        {
             // The 'G' modifier is available since PHP 5.1.0
             case 'g':
                 $size *= 1024;
@@ -113,16 +114,17 @@ class SyncCtoHelper extends Backend
 
         return $size;
     }
-    
+
     /* -------------------------------------------------------------------------
      * Config
      */
 
     /**
      * Configuration merge functions
-     * 
+     *
      * @param array $arrLocalconfig
      * @param array $arrSyncCtoConfig
+     *
      * @return array
      */
     private function mergeConfigs($arrLocalconfig, $arrSyncCtoConfig)
@@ -134,27 +136,33 @@ class SyncCtoHelper extends Backend
 
             return array_keys(array_flip(array_merge($arrLocalconfig, $arrSyncCtoConfig)));
         }
-        else if (!is_array($arrLocalconfig) && is_array($arrSyncCtoConfig))
-        {
-            return $arrSyncCtoConfig;
-        }
         else
         {
-            return array();
+            if (!is_array($arrLocalconfig) && is_array($arrSyncCtoConfig))
+            {
+                return $arrSyncCtoConfig;
+            }
+            else
+            {
+                return array();
+            }
         }
     }
 
     /**
      * Get localconfig entries
-     * 
+     *
      * @param int $intTyp
+     *
+     * @throws Exception
+     *
      * @return string
      */
     public function loadConfigs($intTyp = 1)
     {
         if ($intTyp != SyncCtoEnum::LOADCONFIG_KEYS_ONLY && $intTyp != SyncCtoEnum::LOADCONFIG_KEY_VALUE)
         {
-            throw new Exception("Unknow typ for " . __CLASS__ . " in function " . __FUNCTION__);
+            throw new Exception("Unknown type for " . __CLASS__ . " in function " . __FUNCTION__);
         }
 
         // Read the local configuration file
@@ -201,10 +209,13 @@ class SyncCtoHelper extends Backend
                 {
                     $arrData[] = str_replace(array("$", "GLOBALS['TL_CONFIG']['", "']"), array("", "", ""), $arrChunks[0]);
                 }
-                else if ($intTyp == SyncCtoEnum::LOADCONFIG_KEY_VALUE)
+                else
                 {
-                    $key = str_replace(array("$", "GLOBALS['TL_CONFIG']['", "']"), array("", "", ""), $arrChunks[0]);
-                    $arrData[$key] = $GLOBALS['TL_CONFIG'][$key];
+                    if ($intTyp == SyncCtoEnum::LOADCONFIG_KEY_VALUE)
+                    {
+                        $key           = str_replace(array("$", "GLOBALS['TL_CONFIG']['", "']"), array("", "", ""), $arrChunks[0]);
+                        $arrData[$key] = $GLOBALS['TL_CONFIG'][$key];
+                    }
                 }
             }
         }
@@ -213,90 +224,90 @@ class SyncCtoHelper extends Backend
 
         return $arrData;
     }
-	
-	/**
-	 * Store the relative path
-	 *
-	 * Only store this value if the temp directory is writable and the local
-	 * configuration file exists, otherwise it will initialize a Files object and
-	 * prevent the install tool from loading the Safe Mode Hack (see #3215).
-	 * 
-	 * @throws Exception
-	 * @return boolean 
-	 */
-	public function createPathconfig()
-	{
-		// Check if we have the file
-		if (file_exists(TL_ROOT . '/system/config/pathconfig.php'))
-		{
-			return true;
-		}
-		
-		// Check localconfig
-		if(!file_exists(TL_ROOT . '/system/config/localconfig.php'))
-		{
-			throw new Exception('Missing localconfig.php');
-		}
-		
-		// Check tmp
-		if(!is_writable(TL_ROOT . '/system/tmp'))
-		{
-			throw new Exception('"/system/tmp" is not writable.');
-		}
 
-		// Write file
-		try
-		{
-			$objFile = new File('system/config/pathconfig.php');
-			
-			// Check if we have the path
-			if(TL_PATH === null || TL_PATH == "")
-			{	
-				$objFile->write("<?php\n\n// Relative path to the installation\nreturn '" . preg_replace('/\/ctoCommunication.php\?.*$/i', '', Environment::getInstance()->requestUri) . "';\n");				
-			}
-			else
-			{
-				$objFile->write("<?php\n\n// Relative path to the installation\nreturn '" . TL_PATH . "';\n");
-			}
-			
-			$objFile->close();
-		}
-		catch (Exception $e)
-		{
-			log_message($e->getMessage());
-			throw $e;
-		}
-		
-		// All done
-		return true;
-	}
+    /**
+     * Store the relative path
+     *
+     * Only store this value if the temp directory is writable and the local
+     * configuration file exists, otherwise it will initialize a Files object and
+     * prevent the install tool from loading the Safe Mode Hack (see #3215).
+     *
+     * @throws Exception
+     * @return boolean
+     */
+    public function createPathconfig()
+    {
+        // Check if we have the file
+        if (file_exists(TL_ROOT . '/system/config/pathconfig.php'))
+        {
+            return true;
+        }
+
+        // Check localconfig
+        if (!file_exists(TL_ROOT . '/system/config/localconfig.php'))
+        {
+            throw new Exception('Missing localconfig.php');
+        }
+
+        // Check tmp
+        if (!is_writable(TL_ROOT . '/system/tmp'))
+        {
+            throw new Exception('"/system/tmp" is not writable.');
+        }
+
+        // Write file
+        try
+        {
+            $objFile = new File('system/config/pathconfig.php');
+
+            // Check if we have the path
+            if (TL_PATH === null || TL_PATH == "")
+            {
+                $objFile->write("<?php\n\n// Relative path to the installation\nreturn '" . preg_replace('/\/ctoCommunication.php\?.*$/i', '', Environment::getInstance()->requestUri) . "';\n");
+            }
+            else
+            {
+                $objFile->write("<?php\n\n// Relative path to the installation\nreturn '" . TL_PATH . "';\n");
+            }
+
+            $objFile->close();
+        }
+        catch (Exception $e)
+        {
+            log_message($e->getMessage());
+            throw $e;
+        }
+
+        // All done
+        return true;
+    }
 
     /* -------------------------------------------------------------------------
      * Black and Whitelists
      */
 
-	/**
-	 * Return the TL_ROOT prepared for regex.
-	 * 
-	 * @return string
-	 */
-	public function getPreparedTlRoot()
-	{
-		return $this->strPreparedTlRoot;
-	}
+    /**
+     * Return the TL_ROOT prepared for regex.
+     *
+     * @return string
+     */
+    public function getPreparedTlRoot()
+    {
+        return $this->strPreparedTlRoot;
+    }
 
 
-	public function getBlacklistFolder()
+    public function getBlacklistFolder()
     {
         $arrLocalconfig   = deserialize($GLOBALS['TL_CONFIG']['syncCto_folder_blacklist']);
         $arrSyncCtoConfig = $GLOBALS['SYC_CONFIG']['folder_blacklist'];
 
-        return $this->mergeConfigs($arrLocalconfig, $arrSyncCtoConfig);
+        return $this->mergeConfigs($arrSyncCtoConfig, $arrLocalconfig);
     }
 
     /**
      * Get a prepared list for regex.
-     * 
+     *
      * @return array
      */
     public function getPreparedBlacklistFolder()
@@ -309,12 +320,12 @@ class SyncCtoHelper extends Backend
         $arrLocalconfig   = deserialize($GLOBALS['TL_CONFIG']['syncCto_file_blacklist']);
         $arrSyncCtoConfig = $GLOBALS['SYC_CONFIG']['file_blacklist'];
 
-        return $this->mergeConfigs($arrLocalconfig, $arrSyncCtoConfig);
+        return $this->mergeConfigs($arrSyncCtoConfig, $arrLocalconfig);
     }
 
     /**
      * Get a prepared list for regex.
-     * 
+     *
      * @return array
      */
     public function getPreparedBlacklistFiles()
@@ -327,7 +338,7 @@ class SyncCtoHelper extends Backend
         $arrLocalconfig   = deserialize($GLOBALS['TL_CONFIG']['syncCto_folder_whitelist']);
         $arrSyncCtoConfig = $GLOBALS['SYC_CONFIG']['folder_whitelist'];
 
-        return $this->mergeConfigs($arrLocalconfig, $arrSyncCtoConfig);
+        return $this->mergeConfigs($arrSyncCtoConfig, $arrLocalconfig);
     }
 
     public function getBlacklistLocalconfig()
@@ -335,7 +346,7 @@ class SyncCtoHelper extends Backend
         $arrLocalconfig   = deserialize($GLOBALS['TL_CONFIG']['syncCto_local_blacklist']);
         $arrSyncCtoConfig = $GLOBALS['SYC_CONFIG']['local_blacklist'];
 
-        return $this->mergeConfigs($arrLocalconfig, $arrSyncCtoConfig);
+        return $this->mergeConfigs($arrSyncCtoConfig, $arrLocalconfig);
     }
 
     public function getTablesHidden()
@@ -343,7 +354,7 @@ class SyncCtoHelper extends Backend
         $arrLocalconfig   = deserialize($GLOBALS['TL_CONFIG']['syncCto_hidden_tables']);
         $arrSyncCtoConfig = $GLOBALS['SYC_CONFIG']['table_hidden'];
 
-        return $this->mergeConfigs($arrLocalconfig, $arrSyncCtoConfig);
+        return $this->mergeConfigs($arrSyncCtoConfig, $arrLocalconfig);
     }
 
     /* -------------------------------------------------------------------------
@@ -352,18 +363,18 @@ class SyncCtoHelper extends Backend
 
     /**
      * Add the legend to the tmeplate.
-     * 
-     * @param string $strContent HTML Content.
+     *
+     * @param string $strContent  HTML Content.
      * @param string $strTemplate Name of template.
-     * 
+     *
      * @return string HTML content.
      */
     public function addLegend($strContent, $strTemplate)
     {
         // Check some vars if we have the overview.
-        $strDo  = Input::getInstance()->get('do');
-        $strTable  = Input::getInstance()->get('table');
-        $strAct = Input::getInstance()->get('act');
+        $strDo    = Input::getInstance()->get('do');
+        $strTable = Input::getInstance()->get('table');
+        $strAct   = Input::getInstance()->get('act');
 
         if ($strDo == 'synccto_clients' && empty($strAct) && empty($strTable) && $strTemplate == 'be_main')
         {
@@ -384,7 +395,7 @@ class SyncCtoHelper extends Backend
             $strReturn .= $objLegendTemplate->parse();
             $strReturn .= '<div id="tl_buttons">';
             $strReturn .= $arrContent[1];
-            
+
             return $strReturn;
         }
 
@@ -393,8 +404,8 @@ class SyncCtoHelper extends Backend
 
     /**
      * Ping the current client status
-     * 
-     * @param string $strAction 
+     *
+     * @param string $strAction
      */
     public function pingClientStatus($strAction)
     {
@@ -416,7 +427,7 @@ class SyncCtoHelper extends Backend
                     $blnFlagCheckCtoKey  = false;
 
                     // Return array.
-                    $arrReturn          = array(
+                    $arrReturn = array(
                         "success" => false,
                         "value"   => 0,
                         "error"   => "",
@@ -426,9 +437,9 @@ class SyncCtoHelper extends Backend
 
                     // Load Client from database
                     $objClient = Database::getInstance()
-                            ->prepare("SELECT * FROM tl_synccto_clients WHERE id = %s")
-                            ->limit(1)
-                            ->execute($intClientId);
+                        ->prepare("SELECT * FROM tl_synccto_clients WHERE id = %s")
+                        ->limit(1)
+                        ->execute($intClientId);
 
                     // Check if a client was loaded
                     if ($objClient->numRows == 0)
@@ -440,7 +451,7 @@ class SyncCtoHelper extends Backend
                     }
 
                     // Setup request class.
-                    $objRequest = new RequestExtendedCached();                   
+                    $objRequest = new RequestExtendedCached();
 
                     if ($objClient->http_auth == true)
                     {
@@ -501,7 +512,7 @@ class SyncCtoHelper extends Backend
                         try
                         {
                             $mixVersion = $objSyncCtoClient->getVersionSyncCto();
-                            if(strlen($mixVersion) == 0)
+                            if (strlen($mixVersion) == 0)
                             {
                                 throw new Exception('Missing syncCto Version.');
                             }
@@ -516,7 +527,7 @@ class SyncCtoHelper extends Backend
                             echo json_encode($arrReturn);
                             exit();
                         }
-                        
+
                         $objSyncCtoClient->stopConnection();
                     }
                     catch (Exception $exc)
@@ -556,9 +567,10 @@ class SyncCtoHelper extends Backend
 
     /**
      * Check the required extensions and files for syncCto
-     * 
+     *
      * @param string $strContent
      * @param string $strTemplate
+     *
      * @return string
      */
     public function checkExtensions($strContent, $strTemplate)
@@ -593,11 +605,12 @@ class SyncCtoHelper extends Backend
                     }
                 }
             }
-            
+
             // Check syncCtoPro, if not set remove triggers.
-            if(!in_array('syncCtoPro', $this->Config->getActiveModules()) 
-                    && ($this->hasTrigger('tl_page') || $this->hasTrigger('tl_article') || $this->hasTrigger('tl_content')))
-            {                
+            if (!in_array('syncCtoPro', $this->Config->getActiveModules())
+                && ($this->hasTrigger('tl_page') || $this->hasTrigger('tl_article') || $this->hasTrigger('tl_content'))
+            )
+            {
                 $this->dropTrigger('tl_page');
                 $this->dropTrigger('tl_article');
                 $this->dropTrigger('tl_content');
@@ -609,10 +622,11 @@ class SyncCtoHelper extends Backend
 
     /**
      * Insert a warning msg if the attention flag is active
-     * 
+     *
      * @param string $strContent
      * @param string $strTemplate
-     * @return stinrg 
+     *
+     * @return stinrg
      */
     public function checkLockStatus($strContent, $strTemplate)
     {
@@ -639,7 +653,7 @@ class SyncCtoHelper extends Backend
 
     /**
      * Get a list with all file synchronization options
-     * @return array 
+     * @return array
      */
     public function getFileSyncOptions()
     {
@@ -673,7 +687,7 @@ class SyncCtoHelper extends Backend
 
     /**
      * Get a list with all maintance options
-     * @return array 
+     * @return array
      */
     public function getMaintanceOptions()
     {
@@ -703,7 +717,7 @@ class SyncCtoHelper extends Backend
                         'callback' => implode("|", $callback),
                         'info_msg' => "Error by: TL_HOOK $callback[0] | $callback[1] with Msg: " . $exc->getMessage()
                     );
-                    
+
                     $this->log("Error by: TL_HOOK $callback[0] | $callback[1] with Msg: " . $exc->getMessage(), __CLASS__ . "|" . __FUNCTION__, TL_ERROR);
                 }
             }
@@ -722,9 +736,11 @@ class SyncCtoHelper extends Backend
      * Shortens a string to a given number of characters preserving words
      * (therefore it might be a bit shorter or longer than the number of
      * characters specified). Stips all tags.
+     *
      * @param string
      * @param integer
      * @param string
+     *
      * @return string
      */
     public function substrCenter($strString, $intNumberOfChars, $strEllipsis = ' […] ')
@@ -737,8 +753,8 @@ class SyncCtoHelper extends Backend
             return $strString;
         }
 
-        $intCharCount = 0;
-        $arrWords     = array();
+        $intCharCount   = 0;
+        $arrWords       = array();
         $arrChunks      = preg_split('/\s+/', $strString);
         $blnAddEllipsis = false;
 
@@ -776,9 +792,9 @@ class SyncCtoHelper extends Backend
         {
             $strEllipsis = ' […] ';
         }
-        
+
         $intCharCount = 0;
-        $arrWordsPt2 = array();
+        $arrWordsPt2  = array();
 
         // Second path
         foreach (array_reverse($arrChunks) as $strChunk)
@@ -806,7 +822,7 @@ class SyncCtoHelper extends Backend
     /**
      * Standardize path for folder
      * No TL_ROOT, No starting /
-     * 
+     *
      * @return string the normalized path
      */
     public function standardizePath()
@@ -832,20 +848,19 @@ class SyncCtoHelper extends Backend
                 {
                     continue;
                 }
-                
+
                 $arrReturn[] = $itFolder;
             }
         }
 
         return implode('/', $arrReturn);
     }
-	
-	
+
 
     /**
      * Returns a whole list of all tables in the database
-     * 
-     * @return array 
+     *
+     * @return array
      */
     public function hiddenTables()
     {
@@ -861,12 +876,12 @@ class SyncCtoHelper extends Backend
 
     /**
      * Returns a list without the hidden tables
-     * 
-     * @return array 
+     *
+     * @return array
      */
     public function databaseTables()
     {
-        $arrTables = array();
+        $arrTables       = array();
         $arrTablesHidden = $this->getTablesHidden();
 
         foreach ($this->Database->listTables() as $key => $value)
@@ -999,10 +1014,11 @@ class SyncCtoHelper extends Backend
 
     /**
      * Get Table Meta
-     * 
-     * @param string $strTableName
+     *
+     * @param string  $strTableName
      * @param boolean $booHashSame
-     * @return string 
+     *
+     * @return string
      */
     private function getTableMeta($strTableName)
     {
@@ -1019,9 +1035,10 @@ class SyncCtoHelper extends Backend
 
     /**
      * Set styles for the given array recommended table data and return it as string
-     * 
+     *
      * @param array $arrTableMeta
-     * @return string 
+     *
+     * @return string
      */
     public function getStyledTableMeta($arrTableMeta)
     {
@@ -1042,8 +1059,8 @@ class SyncCtoHelper extends Backend
 
     /**
      * Return a list with all timestamps form tables
-     * 
-     * @param string/array $mixTableNames 
+     *
+     * @param string /array $mixTableNames
      */
     public function getDatabaseTablesTimestamp($mixTableNames = array())
     {
@@ -1093,7 +1110,7 @@ class SyncCtoHelper extends Backend
             }
 
             // Load all fields
-            $arrFields = array();
+            $arrFields   = array();
             $arrDBFields = $this->Database->listFields($strTable);
 
             foreach ($arrDBFields as $arrField)
@@ -1124,7 +1141,8 @@ class SyncCtoHelper extends Backend
      * Import configuration entries
      *
      * @param array $arrConfig
-     * @return array 
+     *
+     * @return array
      */
     public function importConfig($arrConfig)
     {
@@ -1152,11 +1170,12 @@ class SyncCtoHelper extends Backend
 
     /**
      * Check for customer regular expression
-     * 
-     * @param type $strRegexp
-     * @param type $varValue
+     *
+     * @param type   $strRegexp
+     * @param type   $varValue
      * @param Widget $objWidget
-     * @return boolean 
+     *
+     * @return boolean
      */
     public function customRegexp($strRegexp, $varValue, Widget $objWidget)
     {
@@ -1175,9 +1194,9 @@ class SyncCtoHelper extends Backend
     }
 
     /**
-     * Check if the post of the submited form is empty and set error or unset error 
-     * 
-     * @param array $arrCheckSubmit 
+     * Check if the post of the submited form is empty and set error or unset error
+     *
+     * @param array $arrCheckSubmit
      */
     public function checkSubmit($arrCheckSubmit)
     {
@@ -1230,14 +1249,14 @@ class SyncCtoHelper extends Backend
             }
         }
     }
-    
+
     /* -------------------------------------------------------------------------
      * Trigger functions
      */
-    
+
     /**
      * Drop triggers for table XXX.
-     * 
+     *
      * @param string $strTable
      */
     public function dropTrigger($strTable)
@@ -1254,27 +1273,27 @@ class SyncCtoHelper extends Backend
         $strQuery = "DROP TRIGGER IF EXISTS `" . $strTable . "_AfterDeleteHashRefresh`";
         $this->Database->query($strQuery);
     }
-    
+
     /**
      * Check if a trigger is set on one of the tables.
-     * 
+     *
      * @return boolean True = we have some triggers | False = no trigger are set.
      */
     public function hasTrigger($strTable)
     {
         $arrTriggers = $this->Database->query('SHOW TRIGGERS')->fetchEach('Trigger');
-        
-        if(in_array($strTable . "_AfterUpdateHashRefresh", $arrTriggers))
+
+        if (in_array($strTable . "_AfterUpdateHashRefresh", $arrTriggers))
         {
             return true;
         }
-        
-        if(in_array($strTable . "_AfterInsertHashRefresh", $arrTriggers))
+
+        if (in_array($strTable . "_AfterInsertHashRefresh", $arrTriggers))
         {
             return true;
         }
-        
-        if(in_array($strTable . "_AfterDeleteHashRefresh", $arrTriggers))
+
+        if (in_array($strTable . "_AfterDeleteHashRefresh", $arrTriggers))
         {
             return true;
         }

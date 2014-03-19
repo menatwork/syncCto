@@ -5,7 +5,7 @@
  *
  * @copyright  MEN AT WORK 2014
  * @package    syncCto
- * @license    GNU/LGPL 
+ * @license    GNU/LGPL
  * @filesource
  */
 $GLOBALS['TL_DCA']['tl_synccto_clients'] = array
@@ -35,7 +35,7 @@ $GLOBALS['TL_DCA']['tl_synccto_clients'] = array
         'label' => array
         (
             'fields'              => array('title', 'id', 'address', 'path', 'id'),
-            'format'              => '<img class="ping" src="system/modules/syncCto/assets/images/js/gray.png" alt="" /> %s <span style="color: #aaaaaa; padding-left: 3px;">(' . $GLOBALS['TL_LANG']['tl_syncCto_clients']['id'][0] . ': %s, ' . $GLOBALS['TL_LANG']['tl_syncCto_clients']['address'][0] . ': <span>%s%s</span><span class="client-id invisible">%s</span>)</span>',
+            'format'              => '<img class="ping" src="system/modules/syncCto/assets/images/js/gray.png" alt="" /> %s <span style="color: #aaaaaa; padding-left: 3px;">(' . $GLOBALS['TL_LANG']['tl_syncCto_clients']['id'][0] . ': %s, ' . $GLOBALS['TL_LANG']['tl_syncCto_clients']['address'][0] . ': <span title="%s%s">[URL]</span><span class="client-id invisible">%s</span>)</span>',
             'label_callback'      => array('tl_synccto_clients', 'setLabel')
         ),
         'global_operations' => array
@@ -225,10 +225,10 @@ class tl_synccto_clients extends Backend
 
     /**
      * User for permission check from operation callbacks
-     * 
+     *
      * @param string $name Name of function
      * @param array $arguments Arguments
-     * @return mixed 
+     * @return mixed
      */
     public function __call($name, $arguments)
     {
@@ -247,7 +247,7 @@ class tl_synccto_clients extends Backend
     }
 
     /**
-     * Set the js and css files for client ping 
+     * Set the js and css files for client ping
      */
     public function checkClientStatus()
     {
@@ -257,7 +257,7 @@ class tl_synccto_clients extends Backend
 
     /**
      * Permission check for the client overview page
-     * 
+     *
      * @param type $row
      * @param type $href
      * @param type $label
@@ -265,7 +265,7 @@ class tl_synccto_clients extends Backend
      * @param type $icon
      * @param type $attributes
      * @param type $operations
-     * @return type 
+     * @return type
      */
     public function checkPermissionClientButton($row, $href, $label, $title, $icon, $attributes, $operations)
     {
@@ -307,7 +307,7 @@ class tl_synccto_clients extends Backend
                         {
                             $blnFoundOne = true;
                         }
-                        
+
                         if($blnFoundOne == true)
                         {
                             $blnUserIsWorking = true;
@@ -317,7 +317,7 @@ class tl_synccto_clients extends Backend
                 }
             }
         }
-        
+
         if ($this->objBackendUser->hasAccess($operations, 'syncCto_clients_p') == true)
         {
             if ($blnUserIsWorking)
@@ -429,10 +429,10 @@ class tl_synccto_clients extends Backend
 
     /**
      * Check and delete the first slash
-     * 
+     *
      * @param string $strValue
      * @param DataContainer $dc
-     * @return string 
+     * @return string
      */
     public function checkFirstSlash($strValue, DataContainer $dc)
     {
