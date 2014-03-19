@@ -34,7 +34,6 @@ ClassLoader::addClasses(array
 	'SyncCtoModuleClient'         => 'system/modules/syncCto/SyncCtoModuleClient.php',
 	'InterfaceSyncCtoStep'        => 'system/modules/syncCto/InterfaceSyncCtoStep.php',
 	'GeneralDataSyncCto'          => 'system/modules/syncCto/GeneralDataSyncCto.php',
-	'GeneralDataSyncCtoC2'        => 'system/modules/syncCto/GeneralDataSyncCtoC2.php',
 	'SyncCtoHelper'               => 'system/modules/syncCto/SyncCtoHelper.php',
 	'SyncCtoRPCFunctions'         => 'system/modules/syncCto/SyncCtoRPCFunctions.php',
 	'SyncCtoStats'                => 'system/modules/syncCto/SyncCtoStats.php',
