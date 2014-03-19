@@ -71,39 +71,39 @@ $GLOBALS['TL_DCA']['tl_syncCto_clients_syncTo'] = array
         ),
         'systemoperations_check' => array
         (
-            'label'              => &$GLOBALS['TL_LANG']['tl_syncCto_clients_syncTo']['systemoperations_check'],
-            'inputType'          => 'checkbox',
-            'exclude'            => true,
+            'label'               => &$GLOBALS['TL_LANG']['tl_syncCto_clients_syncTo']['systemoperations_check'],
+            'inputType'           => 'checkbox',
+            'exclude'             => true,
             'eval' => array
             (
-                'submitOnChange' => true,
-                'tl_class'       => 'clr'
+                'submitOnChange'  => true,
+                'tl_class'        => 'clr'
             ),
         ),
         'systemoperations_maintenance' => array
         (
-            'label'              => &$GLOBALS['TL_LANG']['tl_syncCto_clients_syncTo']['systemoperations_maintenance'],
-            'inputType'          => 'checkbox',
-            'exclude'            => true,
-            'reference'          => &$GLOBALS['TL_LANG']['SYC'],
+            'label'               => &$GLOBALS['TL_LANG']['tl_syncCto_clients_syncTo']['systemoperations_maintenance'],
+            'inputType'           => 'checkbox',
+            'exclude'             => true,
+            'reference'           => &$GLOBALS['TL_LANG']['SYC'],
             'eval' => array
             (
-                'multiple'       => true,
-                'checkAll'       => true
+                'multiple'        => true,
+                'checkAll'        => true
             ),
-            'options_callback'   => array('SyncCtoHelper', 'getMaintanceOptions'),
+            'options_callback'    => array('SyncCtoHelper', 'getMaintanceOptions'),
         ),
         'attentionFlag' => array
         (
-            'label'              => &$GLOBALS['TL_LANG']['tl_syncCto_clients_syncTo']['attention_flag'],
-            'inputType'          => 'checkbox',
-            'exclude'            => true
+            'label'               => &$GLOBALS['TL_LANG']['tl_syncCto_clients_syncTo']['attention_flag'],
+            'inputType'           => 'checkbox',
+            'exclude'             => true
         ),
         'localconfig_error' => array
         (
-            'label'              => &$GLOBALS['TL_LANG']['tl_syncCto_clients_syncTo']['localconfig_error'],
-            'inputType'          => 'checkbox',
-            'exclude'            => true
+            'label'               => &$GLOBALS['TL_LANG']['tl_syncCto_clients_syncTo']['localconfig_error'],
+            'inputType'           => 'checkbox',
+            'exclude'             => true
         )
     )
 );
