@@ -21,9 +21,8 @@ $GLOBALS['TL_LANG']['SYC']['user_delete']                   = 'Deleted data';
 $GLOBALS['TL_LANG']['SYC']['configfiles']                   = 'Configuration files';
 $GLOBALS['TL_LANG']['SYC']['localconfig_update']            = 'Update all entries';
 $GLOBALS['TL_LANG']['SYC']['localconfig_errors']            = 'Display errors';
-$GLOBALS['TL_LANG']['SYC']['temp_tables']                   = 'Database tables';
-$GLOBALS['TL_LANG']['SYC']['temp_folders']                  = 'Temp files';
-$GLOBALS['TL_LANG']['SYC']['css_create']                    = 'CSS files';
+$GLOBALS['TL_LANG']['SYC']['temp_tables']                   = 'Database cache';
+$GLOBALS['TL_LANG']['SYC']['temp_folders']                  = 'File cache';
 $GLOBALS['TL_LANG']['SYC']['xml_create']                    = 'XML files';
 
 /**
@@ -116,3 +115,4 @@ $GLOBALS['TL_LANG']['ERR']['referer']                       = 'The clients refer
 $GLOBALS['TL_LANG']['ERR']['version']                       = 'Version conflict in %s. <br />Server: %s <br />Client: %s';
 $GLOBALS['TL_LANG']['ERR']['upload_ini']                    = 'No success with upload. Funktion is deactivated in the php.ini';
 $GLOBALS['TL_LANG']['ERR']['rebuild']                       = 'Error rebuilding the file(s). Path: %s';
+$GLOBALS['TL_LANG']['ERR']['no_functions']                  = 'There are no options for the synchronization.';

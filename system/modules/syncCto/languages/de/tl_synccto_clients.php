@@ -27,9 +27,8 @@ $GLOBALS['TL_LANG']['tl_syncCto_clients']['syncFromConfirm']    = 'Soll der Serv
 /**
  * Legends
  */
-$GLOBALS['TL_LANG']['tl_synccto_clients']['title_legend']       = 'Client-Beschreibung';
+$GLOBALS['TL_LANG']['tl_synccto_clients']['client_legend']      = 'Client-Einstellungen';
 $GLOBALS['TL_LANG']['tl_synccto_clients']['connection_legend']  = 'Verbindungs-Einstellungen';
-$GLOBALS['TL_LANG']['tl_synccto_clients']['apikey_legend']      = 'Verschlüsselung';
 $GLOBALS['TL_LANG']['tl_synccto_clients']['expert_legend']      = 'Experten-Einstellungen';
 $GLOBALS['TL_LANG']['tl_synccto_clients']['legend']             = 'Legende: ';
 
@@ -47,7 +46,6 @@ $GLOBALS['TL_LANG']['tl_synccto_clients']['state']['green']     = 'Alle Systeme 
  */
 $GLOBALS['TL_LANG']['tl_syncCto_clients']['title']              = array('Titel', 'Hier können Sie den Titel des Clients eingeben.');
 $GLOBALS['TL_LANG']['tl_syncCto_clients']['id']                 = array('ID', 'ID des Clients.');
-$GLOBALS['TL_LANG']['tl_syncCto_clients']['description']        = array('Beschreibung', 'Hier können Sie eine Kurzbeschreibung des Clients eingeben.');
 $GLOBALS['TL_LANG']['tl_syncCto_clients']['address']            = array('Domain', 'Bitte geben Sie die Domain ein.');
 $GLOBALS['TL_LANG']['tl_syncCto_clients']['path']               = array('Serverpfad', 'Bitte geben Sie den Pfad zur Installation ein, falls sich diese in einem Unterordner befindet.');
 $GLOBALS['TL_LANG']['tl_syncCto_clients']['port']               = array('Portnummer', 'Bitte geben Sie die Nummer des HTTP-Ports ein. Standard ist 80.');

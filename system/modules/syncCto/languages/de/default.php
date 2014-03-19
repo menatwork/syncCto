@@ -21,9 +21,8 @@ $GLOBALS['TL_LANG']['SYC']['user_delete']                   = 'Gelöschte Daten'
 $GLOBALS['TL_LANG']['SYC']['configfiles']                   = 'Konfigurationsdateien';
 $GLOBALS['TL_LANG']['SYC']['localconfig_update']            = 'Alle Einträge aktualisieren';
 $GLOBALS['TL_LANG']['SYC']['localconfig_errors']            = 'Fehlermeldungen anzeigen';
-$GLOBALS['TL_LANG']['SYC']['temp_tables']                   = 'Temporäre DB-Tabellen';
-$GLOBALS['TL_LANG']['SYC']['temp_folders']                  = 'Temporäre Ordner';
-$GLOBALS['TL_LANG']['SYC']['css_create']                    = 'CSS-Dateien';
+$GLOBALS['TL_LANG']['SYC']['temp_tables']                   = 'Datenbank-Cache';
+$GLOBALS['TL_LANG']['SYC']['temp_folders']                  = 'Datei-Cache';
 $GLOBALS['TL_LANG']['SYC']['xml_create']                    = 'XML-Dateien';
   
 /**
@@ -117,3 +116,4 @@ $GLOBALS['TL_LANG']['ERR']['referer']                       = 'Konnte die Refere
 $GLOBALS['TL_LANG']['ERR']['version']                       = 'Versionskonflikt in %s. <br />Server: %s <br />Client: %s';
 $GLOBALS['TL_LANG']['ERR']['upload_ini']                    = 'Upload nicht erfolgreich. Funktion ist in der php.ini deaktiviert.';
 $GLOBALS['TL_LANG']['ERR']['rebuild']                       = 'Fehler beim Zusammenbau der Datei(en). Pfad: %s';
+$GLOBALS['TL_LANG']['ERR']['no_functions']                  = 'Es wurden keine Optionen für die Synchronisation ausgewählt.';

@@ -26,9 +26,8 @@ $GLOBALS['TL_LANG']['tl_syncCto_clients']['syncFromConfirm']    = 'Do you really
 /**
  * Legends
  */
-$GLOBALS['TL_LANG']['tl_synccto_clients']['title_legend']       = 'Client description';
+$GLOBALS['TL_LANG']['tl_synccto_clients']['client_legend']      = 'Client settings';
 $GLOBALS['TL_LANG']['tl_synccto_clients']['connection_legend']  = 'Connection settings';
-$GLOBALS['TL_LANG']['tl_synccto_clients']['apikey_legend']      = 'Encryption';
 $GLOBALS['TL_LANG']['tl_synccto_clients']['expert_legend']      = 'Expert settings';
 $GLOBALS['TL_LANG']['tl_synccto_clients']['legend']             = 'Legend: ';
 
@@ -46,7 +45,6 @@ $GLOBALS['TL_LANG']['tl_synccto_clients']['state']['green']     = 'The host is o
  */
 $GLOBALS['TL_LANG']['tl_syncCto_clients']['title']              = array('Title', 'Please enter the title of the client.');
 $GLOBALS['TL_LANG']['tl_syncCto_clients']['id']                 = array('ID', 'Client ID.');
-$GLOBALS['TL_LANG']['tl_syncCto_clients']['description']        = array('Description', 'Here you can enter a short description of the client.');
 $GLOBALS['TL_LANG']['tl_syncCto_clients']['address']            = array('Domain', 'Please enter the complete address to the contao installation.');
 $GLOBALS['TL_LANG']['tl_syncCto_clients']['path']               = array('Server path', 'Please enter the path to the installation, if it is located in a subfolder.');
 $GLOBALS['TL_LANG']['tl_syncCto_clients']['port']               = array('Port number', 'Please enter the number of the HTTP port. Default is 80.');
