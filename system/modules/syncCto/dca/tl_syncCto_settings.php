@@ -57,7 +57,7 @@ $GLOBALS['TL_DCA']['tl_syncCto_settings'] = array
             ),
             'save_callback' => array
             (
-                array('tl_syncCto_settings', 'saveMcwEntries')
+                array('tl_syncCto_settings', 'saveBlacklistFolder')
             )
         ),
         'syncCto_file_blacklist' => array
@@ -91,7 +91,7 @@ $GLOBALS['TL_DCA']['tl_syncCto_settings'] = array
             ),
             'save_callback' => array
             (
-                array('tl_syncCto_settings', 'saveMcwEntries')
+                array('tl_syncCto_settings', 'saveBlacklistFile')
             )
         ),
         'syncCto_folder_whitelist' => array
@@ -125,7 +125,7 @@ $GLOBALS['TL_DCA']['tl_syncCto_settings'] = array
             ),
             'save_callback' => array
             (
-                array('tl_syncCto_settings', 'saveMcwEntries')
+                array('tl_syncCto_settings', 'saveWhitelistFolder')
             )
         ),
         'syncCto_local_blacklist' => array
@@ -138,6 +138,10 @@ $GLOBALS['TL_DCA']['tl_syncCto_settings'] = array
             'load_callback'       => array
             (
                 array('tl_syncCto_settings', 'loadBlacklistLocalconfig')
+            ),
+            'save_callback' => array
+            (
+                array('tl_syncCto_settings', 'saveBlacklistLocalconfig')
             )
         ),
         'syncCto_hidden_tables' => array
@@ -150,6 +154,10 @@ $GLOBALS['TL_DCA']['tl_syncCto_settings'] = array
             'load_callback'       => array
             (
                 array('tl_syncCto_settings', 'loadTablesHidden')
+            ),
+            'save_callback' => array
+            (
+                array('tl_syncCto_settings', 'saveTablesHidden')
             )
         ),
         'syncCto_database_tables' => array
@@ -259,12 +267,73 @@ class tl_syncCto_settings extends Backend
         parent::__construct();
 
         $this->objSyncCtoHelper = SyncCtoHelper::getInstance();
-    }  
-    
+    }
+
+    /**
+     * @param string $strValue     Values.
+     *
+     * @param string $strConfigKey Name of the config key.
+     *
+     * @return string Return the cleaned array.
+     */
+    protected function saveMcwEntries($strValue, $strConfigKey)
+    {
+        $arrConfigEntries = $GLOBALS['SYC_CONFIG'][$strConfigKey];
+        $arrList          = deserialize($strValue);
+        $arrSaveList      = array();
+
+        if (is_array($arrSaveList) && count($arrList) > 0)
+        {
+            foreach ($arrList AS $key => $arrValue)
+            {
+                foreach ($arrValue AS $value)
+                {
+                    if(!in_array($value, $arrConfigEntries))
+                    {
+                        $arrSaveList[$key] = $value;
+                    }
+                }
+            }
+
+            return serialize($arrSaveList);
+        }
+
+        return serialize(array());
+    }
+
+    /**
+     * @param string $strValue     Values.
+     *
+     * @param string $strConfigKey Name of the config key.
+     *
+     * @return string Return the cleaned array.
+     */
+    protected function saveEntries($strValue, $strConfigKey)
+    {
+        $arrConfigEntries = $GLOBALS['SYC_CONFIG'][$strConfigKey];
+        $arrList          = deserialize($strValue);
+        $arrSaveList      = array();
+
+        if (is_array($arrSaveList) && count($arrList) > 0)
+        {
+            foreach ($arrList AS $key => $strValue)
+            {
+                if(!in_array($strValue, $arrConfigEntries))
+                {
+                    $arrSaveList[$key] = $strValue;
+                }
+            }
+
+            return serialize($arrSaveList);
+        }
+
+        return serialize(array());
+    }
+
     /**
      * Load localconfig entries
-     * 
-     * @return array 
+     *
+     * @return array
      */
     public function localconfigEntries()
     {
@@ -299,6 +368,18 @@ class tl_syncCto_settings extends Backend
     }
 
     /**
+     * Load blacklist localconfig entries
+     *
+     * @param string $strValue
+     *
+     * @return array
+     */
+    public function saveBlacklistLocalconfig($strValue)
+    {
+        return $this->saveEntries($strValue, 'local_blacklist');
+    }
+
+    /**
      * Load blacklist folder
      * 
      * @param string $strValue
@@ -320,23 +401,9 @@ class tl_syncCto_settings extends Backend
      * @param string $strValue
      * @return string
      */
-    public function saveMcwEntries($strValue)
+    public function saveBlacklistFolder($strValue)
     {
-        $arrList = deserialize($strValue); 
-        $arrSaveList = array();
-        
-        if(is_array($arrSaveList) && count($arrList) > 0)
-        {        
-            foreach($arrList AS $key => $arrValue)
-            {
-                foreach($arrValue AS $value)
-                {
-                    $arrSaveList[$key] = $value;
-                }
-            }
-            return serialize($arrSaveList);
-        }
-        return serialize(array());
+        return $this->saveMcwEntries($strValue, 'folder_blacklist');
     }
 
     /**
@@ -353,6 +420,18 @@ class tl_syncCto_settings extends Backend
             $arrList[$key] = array('entries' => $value);
         }
         return $arrList;
+    }
+
+    /**
+     * Save blacklist entries
+     *
+     * @param string $strValue
+     *
+     * @return string
+     */
+    public function saveBlacklistFile($strValue)
+    {
+        return $this->saveMcwEntries($strValue, 'file_blacklist');
     }
 
     /**
@@ -373,6 +452,18 @@ class tl_syncCto_settings extends Backend
     }
 
     /**
+     * Save blacklist entries
+     *
+     * @param string $strValue
+     *
+     * @return string
+     */
+    public function saveWhitelistFolder($strValue)
+    {
+        return $this->saveMcwEntries($strValue, 'folder_whitelist');
+    }
+
+    /**
      * Load hidden tables
      * 
      * @param string $strValue
@@ -383,6 +474,18 @@ class tl_syncCto_settings extends Backend
         return $this->objSyncCtoHelper->getTablesHidden();
     }
     
+    /**
+     * Load blacklist localconfig entries
+     *
+     * @param string $strValue
+     *
+     * @return array
+     */
+    public function saveTablesHidden($strValue)
+    {
+        return $this->saveEntries($strValue, 'table_hidden');
+    }
+
     /**
      * Check if we have a valid value for the timeout.
      * 
