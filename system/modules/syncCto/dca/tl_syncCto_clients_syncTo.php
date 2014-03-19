@@ -9,15 +9,6 @@
  * @filesource
  */
 
-if (SyncCtoHelper::isDcGeneralC3Version())
-{
-    $strDataProvider = 'GeneralDataSyncCto';
-}
-else
-{
-    $strDataProvider = 'GeneralDataSyncCtoC2';
-}
-
 $GLOBALS['TL_DCA']['tl_syncCto_clients_syncTo'] = array
 (
     // Config
@@ -41,7 +32,7 @@ $GLOBALS['TL_DCA']['tl_syncCto_clients_syncTo'] = array
         (
             'default' => array
             (
-                'class'           => $strDataProvider,
+                'class'           => 'GeneralDataSyncCto',
                 'source'          => 'tl_syncCto_clients_syncTo'
             ),
         ),

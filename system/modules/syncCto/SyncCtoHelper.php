@@ -115,66 +115,6 @@ class SyncCtoHelper extends Backend
     }
     
     /* -------------------------------------------------------------------------
-     * Contao 2.xx and 3.xx helper
-     */
-    
-    /**
-     * Check if we have a version from contao 3 or higher.
-     * @return boolean
-     */
-    static public function isContao3()
-    {
-        return version_compare(VERSION, '3.0', '>=');
-    }
-    
-    /**
-     * Check if we have a version from contao 3 or higher.
-     * @return boolean
-     */
-    static public function isContao31()
-    {
-        return version_compare(VERSION, '3.1', '>=');
-    }
-
-    /**
-     * Check if we have a version from contao 2 or lower.
-     * @return boolean
-     */
-    static public function isContao2()
-    {
-        return version_compare(VERSION, '3', '<');
-    }
-
-    /**
-     * Check which DC General version is installed.
-     * @return boolean
-     */
-    static public function isDcGeneralC3Version()
-    {
-        if(version_compare(VERSION, '3.0', '>='))
-        {
-            return true;
-
-        }
-        // Check if we have a DC_General for Version c2 and c3.
-        else if (version_compare(VERSION, '3.0', '<') && file_exists(TL_ROOT . '/system/modules/generalDriver/DcGeneral'))
-        {
-            // Check if we have an autoloader in the config.
-            $objFile = new File('/system/modules/generalDriver/config/config.php');
-            $strContent = $objFile->getContent();
-            $objFile->close();        
-            
-            // If true we have the right DC_General Version.
-            if(stripos($strContent, 'dcGeneral_autoload') !== false || stripos($strContent, 'ClassLoader') !== false)
-            {
-                return true;
-            }
-        }
-
-        return false;
-    }
-
-    /* -------------------------------------------------------------------------
      * Config
      */
 
