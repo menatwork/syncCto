@@ -1181,7 +1181,7 @@ class SyncCtoHelper extends Backend
      */
     public function checkSubmit($arrCheckSubmit)
     {
-        $arrPostUnset = array('FORM_SUBMIT', 'FORM_FIELDS', 'REQUEST_TOKEN');
+        $arrPostUnset = array('FORM_SUBMIT', 'FORM_FIELDS', 'REQUEST_TOKEN', 'FORM_INPUTS', 'postUnset', 'error', 'redirectUrl');
 
         if (is_array($arrCheckSubmit['postUnset']))
         {
@@ -1195,6 +1195,14 @@ class SyncCtoHelper extends Backend
             if (array_key_exists($value, $arrPost))
             {
                 unset($arrPost[$value]);
+            }
+        }
+
+        foreach ($arrPost AS $strKey => $value)
+        {
+            if (empty($value))
+            {
+                unset($arrPost[$strKey]);
             }
         }
 
