@@ -282,7 +282,7 @@ class SyncCtoModuleBackup extends BackendModule
             $arrStepPool = array();
         }
 
-        $this->objStepPool = new StepPool($arrStepPool);
+        $this->objStepPool = new StepPool($arrStepPool,  $this->intStep);
     }
 
     protected function saveStepPool()
@@ -590,7 +590,7 @@ class SyncCtoModuleBackup extends BackendModule
 
                     if (count($this->objStepPool->skippedfiles) != 0)
                     {
-                        $strHTML = '<br /><p class="tl_help">' . count($arrStepPool["skippedfiles"]) . $GLOBALS['TL_LANG']['MSC']['skipped_files'] . '</p>';
+                        $strHTML = '<br /><p class="tl_help">' . count($this->objStepPool->skippedfiles) . $GLOBALS['TL_LANG']['MSC']['skipped_files'] . '</p>';
 
                         $strHTML .= '<ul class="fileinfo">';
                         foreach ($this->objStepPool->skippedfiles as $value)
@@ -725,168 +725,6 @@ class SyncCtoModuleBackup extends BackendModule
             $this->objData->setState(SyncCtoEnum::WORK_ERROR);
             $this->objData->setHtml($objErrTemplate->parse());
         }
-    }
-
-}
-
-/* -----------------------------------------------------------------------------
- * Container Classes
- */
-
-class StepPool
-{
-
-    protected $arrValues;
-
-    /**
-     *
-     * @param type $arrStepPool 
-     */
-    public function __construct($arrStepPool)
-    {
-        $this->arrValues = $arrStepPool;
-    }
-
-    public function getArrValues()
-    {
-        return $this->arrValues;
-    }
-
-    public function setArrValues($arrValues)
-    {
-        $this->arrValues = $arrValues;
-    }
-
-    public function __get($name)
-    {
-        if ($this->arrValues == FALSE || !is_array($this->arrValues))
-        {
-            return null;
-        }
-
-        if (key_exists($name, $this->arrValues))
-        {
-            return $this->arrValues[$name];
-        }
-        else
-        {
-            throw new Exception("Unknown key in step pool.");
-        }
-    }
-
-    public function __set($name, $value)
-    {
-        if ($this->arrValues == FALSE || !is_array($this->arrValues))
-        {
-            $this->arrValues = array();
-        }
-
-        return $this->arrValues[$name] = $value;
-    }
-
-}
-
-class ContentData
-{
-
-    protected $arrValues;
-    protected $intStep;
-
-    /**
-     *
-     * @param type $arrContentData
-     * @param type $intStep 
-     */
-    public function __construct($arrContentData, $intStep)
-    {
-        $this->arrValues = $arrContentData;
-
-        if (!is_array($this->arrValues))
-        {
-            $this->arrValues = array();
-        }
-
-        $this->intStep = $intStep;
-    }
-
-    public function getArrValues()
-    {
-        return $this->arrValues;
-    }
-
-    public function setArrValues($arrValues)
-    {
-        $this->arrValues = $arrValues;
-    }
-
-    public function nextStep()
-    {
-        $this->intStep++;
-    }
-
-    public function getTitle()
-    {
-        return $this->arrValues[$this->intStep]["title"];
-    }
-
-    public function setTitle($title)
-    {
-        $this->arrValues[$this->intStep]["title"] = $title;
-    }
-
-    public function getState()
-    {
-        return $this->arrValues[$this->intStep]["state"];
-    }
-
-    public function setState($state)
-    {
-        $this->arrValues[$this->intStep]["state"] = $state;
-    }
-
-    public function getDescription()
-    {
-        return $this->arrValues[$this->intStep]["description"];
-    }
-
-    public function setDescription($description)
-    {
-        $this->arrValues[$this->intStep]["description"] = $description;
-    }
-
-    public function getMsg()
-    {
-        return $this->arrValues[$this->intStep]["msg"];
-    }
-
-    public function setMsg($msg)
-    {
-        $this->arrValues[$this->intStep]["msg"] = $msg;
-    }
-
-    public function getHtml()
-    {
-        return $this->arrValues[$this->intStep]["html"];
-    }
-
-    public function setHtml($html)
-    {
-        $this->arrValues[$this->intStep]["html"] = $html;
-    }
-
-    public function setStep($intStep)
-    {
-        $this->intStep = $intStep;
-    }
-
-    public function __get($name)
-    {
-        throw new Exception("Unknown key for datacontent $name");
-    }
-    
-    public function __set($name, $value)
-    {
-        throw new Exception("Unknown key for datacontent $name");
     }
 
 }
