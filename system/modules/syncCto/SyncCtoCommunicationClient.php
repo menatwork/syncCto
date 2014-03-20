@@ -748,6 +748,26 @@ class SyncCtoCommunicationClient extends CtoCommunication
         return $this->runServer("SYNCCTO_GET_PATHLIST", $arrData);
     }
 
+    /**
+     * Get for a list of files the DBAFS information. If the file in not in the DBAFS
+     * add it to the DBAFS and than get the information.
+     *
+     * @param array $arrFiles List of files
+     *
+     * @return array Return the file list with the information from the dbafs.
+     */
+    public function getDbafsInformationFor($arrFiles)
+    {
+        $arrData = array(
+            array(
+                "name" => "files",
+                "value" => $arrFiles,
+            )
+        );
+
+        return $this->runServer("SYNCCTO_DBAFS_INFORMATION", $arrData);
+    }
+
     /* -------------------------------------------------------------------------
      * Database Operations
      */

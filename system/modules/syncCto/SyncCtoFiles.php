@@ -191,6 +191,63 @@ class SyncCtoFiles extends Backend
     // DBAFS - Support for contao 3 and the tl_files
     ////////////////////////////////////////////////////////////////////////////
 
+    /**
+     * Get the file information from a file and add these to the file array.
+     *
+     * @param array $arrFileList A list with file information.
+     *
+     * @param bool  $blnAutoAdd  Flag if the system should add unknown files to the DBAFS.
+     *
+     * @return array Return the file list with dbafs information.
+     */
+    public function getDbafsInformationFor($arrFileList, $blnAutoAdd = true)
+    {
+        // Check if we have array.
+        if (!is_array($arrFileList) || count($arrFileList) == 0)
+        {
+            return $arrFileList;
+        }
+
+        // ...and now the support for the uuid und dbafs system
+        foreach ($arrFileList as $key => $value)
+        {
+            // Check if we have this file in the filesystem.
+            if(!file_exists(TL_ROOT . PATH_SEPARATOR . $value['path']))
+            {
+                $arrFileList[$key]['tl_files'] = null;
+            }
+
+            // Add the file to the import array.
+            $arrImport['files'][$key] = $value;
+
+            // Get the information from the tl_files.
+            $objModel = \FilesModel::findByPath($value['path']);
+
+            // If the file is not in the dbafs and
+            if ($objModel == null && $blnAutoAdd)
+            {
+                $objModel                      = \Dbafs::addResource($value['path']);
+                $arrModelData                  = $objModel->row();
+                $arrModelData['uuid']          = \String::binToUuid($arrModelData['uuid']);
+                $arrFileList[$key]['tl_files'] = $arrModelData;
+            }
+            // If empty and auto add disable retrun null for this file.
+            elseif ($objModel == null && !$blnAutoAdd)
+            {
+                $arrFileList[$key]['tl_files'] = null;
+            }
+            // If we have data add it to the file
+            else
+            {
+                $arrModelData                  = $objModel->row();
+                $arrModelData['uuid']          = \String::binToUuid($arrModelData['uuid']);
+                $arrFileList[$key]['tl_files'] = $arrModelData;
+            }
+        }
+
+        return $arrFileList;
+    }
+
     ////////////////////////////////////////////////////////////////////////////
     // Generate function
     ////////////////////////////////////////////////////////////////////////////
