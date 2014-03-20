@@ -123,6 +123,7 @@ $GLOBALS['TL_CONFIG']['fileSyncExclude'] = implode(',', $arrFileSyncExclude);
 // Tables
 $GLOBALS['SYC_CONFIG']['table_hidden'] = array_merge( (array) $GLOBALS['SYC_CONFIG']['table_hidden'], array
 (
+    'tl_files',
     'tl_log',
     'tl_lock',
     'tl_session',
@@ -131,7 +132,7 @@ $GLOBALS['SYC_CONFIG']['table_hidden'] = array_merge( (array) $GLOBALS['SYC_CONF
     'tl_undo',
     'tl_version',
     'tl_synccto_clients',
-    'tl_synccto_stats',
+    'tl_synccto_stats'
 ));
 
 // Folders
@@ -496,6 +497,15 @@ $GLOBALS["CTOCOM_FUNCTIONS"]["SYNCCTO_FILEBACKUP"] = array
     "function"           => "runDump",
     "typ"                => "GET",
     "parameter"          => FALSE,
+);
+
+// Get information from the DBAFS for some files.
+$GLOBALS["CTOCOM_FUNCTIONS"]["SYNCCTO_DBAFS_INFORMATION"] = array
+(
+    "class"              => "SyncCtoFiles",
+    "function"           => "getDbafsInformationFor",
+    "typ"                => "POST",
+    "parameter"          => array("files"),
 );
 
 // - Miscellaneous -------------------------------------------------------------
