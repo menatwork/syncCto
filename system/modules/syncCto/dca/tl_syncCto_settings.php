@@ -52,11 +52,11 @@ $GLOBALS['TL_DCA']['tl_syncCto_settings'] = array
             ),
             'load_callback' => array
             (
-                array('tl_syncCto_settings', 'loadBlacklistFolder')
+                array('SyncCtoTableSettings', 'loadBlacklistFolder')
             ),
             'save_callback' => array
             (
-                array('tl_syncCto_settings', 'saveBlacklistFolder')
+                array('SyncCtoTableSettings', 'saveBlacklistFolder')
             )
         ),
         'syncCto_file_blacklist' => array
@@ -85,11 +85,11 @@ $GLOBALS['TL_DCA']['tl_syncCto_settings'] = array
             ),
             'load_callback' => array
             (
-                array('tl_syncCto_settings', 'loadBlacklistFile')
+                array('SyncCtoTableSettings', 'loadBlacklistFile')
             ),
             'save_callback' => array
             (
-                array('tl_syncCto_settings', 'saveBlacklistFile')
+                array('SyncCtoTableSettings', 'saveBlacklistFile')
             )
         ),
         'syncCto_folder_whitelist' => array
@@ -119,11 +119,11 @@ $GLOBALS['TL_DCA']['tl_syncCto_settings'] = array
             ),
             'load_callback' => array
             (
-                array('tl_syncCto_settings', 'loadWhitelistFolder')
+                array('SyncCtoTableSettings', 'loadWhitelistFolder')
             ),
             'save_callback' => array
             (
-                array('tl_syncCto_settings', 'saveWhitelistFolder')
+                array('SyncCtoTableSettings', 'saveWhitelistFolder')
             )
         ),
         'syncCto_local_blacklist' => array
@@ -132,14 +132,14 @@ $GLOBALS['TL_DCA']['tl_syncCto_settings'] = array
             'inputType'           => 'checkboxWizard',
             'exclude'             => true,
             'eval'                => array('multiple' => true),
-            'options_callback'    => array('tl_syncCto_settings', 'localconfigEntries'),
+            'options_callback'    => array('SyncCtoTableSettings', 'localconfigEntries'),
             'load_callback'       => array
             (
-                array('tl_syncCto_settings', 'loadBlacklistLocalconfig')
+                array('SyncCtoTableSettings', 'loadBlacklistLocalconfig')
             ),
             'save_callback' => array
             (
-                array('tl_syncCto_settings', 'saveBlacklistLocalconfig')
+                array('SyncCtoTableSettings', 'saveBlacklistLocalconfig')
             )
         ),
         'syncCto_hidden_tables' => array
@@ -151,11 +151,11 @@ $GLOBALS['TL_DCA']['tl_syncCto_settings'] = array
             'options_callback'    => array('SyncCtoHelper', 'hiddenTables'),
             'load_callback'       => array
             (
-                array('tl_syncCto_settings', 'loadTablesHidden')
+                array('SyncCtoTableSettings', 'loadTablesHidden')
             ),
             'save_callback' => array
             (
-                array('tl_syncCto_settings', 'saveTablesHidden')
+                array('SyncCtoTableSettings', 'saveTablesHidden')
             )
         ),
         'syncCto_database_tables' => array
@@ -186,7 +186,7 @@ $GLOBALS['TL_DCA']['tl_syncCto_settings'] = array
             'exclude'             => true,
             'load_callback'       => array
             (
-                array('tl_syncCto_settings', 'checkDefaulTimeoutValue')
+                array('SyncCtoTableSettings', 'checkDefaulTimeoutValue')
             ),
             'eval' => array
             (
@@ -201,7 +201,7 @@ $GLOBALS['TL_DCA']['tl_syncCto_settings'] = array
             'exclude'             => true,
             'load_callback'       => array
             (
-                array('tl_syncCto_settings', 'checkDefaulTimeoutValue')
+                array('SyncCtoTableSettings', 'checkDefaulTimeoutValue')
             ),
             'eval' => array
             (
@@ -216,7 +216,7 @@ $GLOBALS['TL_DCA']['tl_syncCto_settings'] = array
             'exclude'             => true,
             'load_callback'       => array
             (
-                array('tl_syncCto_settings', 'checkDefaulQueryValue')
+                array('SyncCtoTableSettings', 'checkDefaulQueryValue')
             ),
             'eval' => array
             (
@@ -246,279 +246,3 @@ $GLOBALS['TL_DCA']['tl_syncCto_settings'] = array
         )
     )
 );
-
-/**
- * Class for syncCto settings
- */
-class tl_syncCto_settings extends Backend
-{
-
-    protected $objSyncCtoHelper;
-    protected static $instance = null;
-
-    /**
-     * Constructor
-     */
-    public function __construct()
-    {
-        parent::__construct();
-
-        $this->objSyncCtoHelper = SyncCtoHelper::getInstance();
-    }
-
-    /**
-     * @param string $strValue     Values.
-     *
-     * @param string $strConfigKey Name of the config key.
-     *
-     * @return string Return the cleaned array.
-     */
-    protected function saveMcwEntries($strValue, $strConfigKey)
-    {
-        $arrConfigEntries = $GLOBALS['SYC_CONFIG'][$strConfigKey];
-        $arrList          = deserialize($strValue);
-        $arrSaveList      = array();
-
-        if (is_array($arrSaveList) && count($arrList) > 0)
-        {
-            foreach ($arrList AS $key => $arrValue)
-            {
-                foreach ($arrValue AS $value)
-                {
-                    if(!in_array($value, $arrConfigEntries))
-                    {
-                        $arrSaveList[$key] = $value;
-                    }
-                }
-            }
-
-            return serialize($arrSaveList);
-        }
-
-        return serialize(array());
-    }
-
-    /**
-     * @param string $strValue     Values.
-     *
-     * @param string $strConfigKey Name of the config key.
-     *
-     * @return string Return the cleaned array.
-     */
-    protected function saveEntries($strValue, $strConfigKey)
-    {
-        $arrConfigEntries = $GLOBALS['SYC_CONFIG'][$strConfigKey];
-        $arrList          = deserialize($strValue);
-        $arrSaveList      = array();
-
-        if (is_array($arrSaveList) && count($arrList) > 0)
-        {
-            foreach ($arrList AS $key => $strValue)
-            {
-                if(!in_array($strValue, $arrConfigEntries))
-                {
-                    $arrSaveList[$key] = $strValue;
-                }
-            }
-
-            return serialize($arrSaveList);
-        }
-
-        return serialize(array());
-    }
-
-    /**
-     * Load localconfig entries
-     *
-     * @return array
-     */
-    public function localconfigEntries()
-    {
-        // Get entries from localconfig.
-        $arrLocalconfig = $this->objSyncCtoHelper->loadConfigs(SyncCtoEnum::LOADCONFIG_KEYS_ONLY);
-
-        // Load all fields for tl_settings.
-        if (empty($GLOBALS['TL_DCA']['tl_settings']))
-        {
-            $this->loadDataContainer('tl_settings');
-        }
-        $arrDcaFields = array_keys($GLOBALS['TL_DCA']['tl_settings']['fields']);
-
-        // Merge all.
-        $arrReturn = array_keys(array_flip(array_merge($arrLocalconfig, $arrDcaFields)));
-
-        // Sort.
-        natcasesort($arrReturn);
-
-        return array_values($arrReturn);
-    }
-
-    /**
-     * Load blacklist localconfig entries
-     *
-     * @param string $strValue
-     *
-     * @return array
-     */
-    public function loadBlacklistLocalconfig($strValue)
-    {
-        return $this->objSyncCtoHelper->getBlacklistLocalconfig();
-    }
-
-    /**
-     * Load blacklist localconfig entries
-     *
-     * @param string $strValue
-     *
-     * @return array
-     */
-    public function saveBlacklistLocalconfig($strValue)
-    {
-        return $this->saveEntries($strValue, 'local_blacklist');
-    }
-
-    /**
-     * Load blacklist folder
-     *
-     * @param string $strValue
-     *
-     * @return array
-     */
-    public function loadBlacklistFolder($strValue)
-    {
-        $arrList = array();
-        foreach ($this->objSyncCtoHelper->getBlacklistFolder() AS $key => $value)
-        {
-            $arrList[$key] = array('entries' => $value);
-        }
-        return $arrList;
-    }
-
-    /**
-     * Save blacklist entries
-     *
-     * @param string $strValue
-     *
-     * @return string
-     */
-    public function saveBlacklistFolder($strValue)
-    {
-        return $this->saveMcwEntries($strValue, 'folder_blacklist');
-    }
-
-    /**
-     * Load blacklist entries
-     *
-     * @param string $strValue
-     *
-     * @return array
-     */
-    public function loadBlacklistFile($strValue)
-    {
-        $arrList = array();
-        foreach ($this->objSyncCtoHelper->getBlacklistFile() AS $key => $value)
-        {
-            $arrList[$key] = array('entries' => $value);
-        }
-        return $arrList;
-    }
-
-    /**
-     * Save blacklist entries
-     *
-     * @param string $strValue
-     *
-     * @return string
-     */
-    public function saveBlacklistFile($strValue)
-    {
-        return $this->saveMcwEntries($strValue, 'file_blacklist');
-    }
-
-    /**
-     * Load whitelist folder
-     *
-     * @param string $strValue
-     *
-     * @return array
-     */
-    public function loadWhitelistFolder($strValue)
-    {
-        $arrList = array();
-        foreach ($this->objSyncCtoHelper->getWhitelistFolder() AS $key => $value)
-        {
-            $arrList[$key] = array('entries' => $value);
-        }
-        return $arrList;
-    }
-
-    /**
-     * Save blacklist entries
-     *
-     * @param string $strValue
-     *
-     * @return string
-     */
-    public function saveWhitelistFolder($strValue)
-    {
-        return $this->saveMcwEntries($strValue, 'folder_whitelist');
-    }
-
-    /**
-     * Load hidden tables
-     *
-     * @param string $strValue
-     *
-     * @return array
-     */
-    public function loadTablesHidden($strValue)
-    {
-        return $this->objSyncCtoHelper->getTablesHidden();
-    }
-
-    /**
-     * Load blacklist localconfig entries
-     *
-     * @param string $strValue
-     *
-     * @return array
-     */
-    public function saveTablesHidden($strValue)
-    {
-        return $this->saveEntries($strValue, 'table_hidden');
-    }
-
-    /**
-     * Check if we have a valid value for the timeout.
-     *
-     * @param mixed $strValue Value from DC.
-     *
-     * @return int Default Value or the value from DC.
-     */
-    public function checkDefaulTimeoutValue($strValue)
-    {
-        if (empty($strValue) || $strValue < 1)
-        {
-            return 28000;
-        }
-
-        return $strValue;
-    }
-
-    /**
-     * Check if we have a valid value for the query limit.
-     *
-     * @param mixed $strValue Value from DC.
-     *
-     * @return int Default Value or the value from DC.
-     */
-    public function checkDefaulQueryValue($strValue)
-    {
-        if (empty($strValue) || $strValue < 1)
-        {
-            return 500;
-        }
-
-        return $strValue;
-    }
-}
