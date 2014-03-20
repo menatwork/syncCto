@@ -1692,7 +1692,7 @@ class SyncCtoModuleClient extends BackendModule
                     break;
 
                 /**
-                 * Build checksum list for Conta core
+                 * Build checksum list for Contao core
                  */
                 case 2:
                     if (in_array("core_change", $this->arrSyncSettings["syncCto_Type"]))
@@ -2923,9 +2923,6 @@ class SyncCtoModuleClient extends BackendModule
                  * Import Files
                  */
                 case 3:
-
-
-
                     if (is_array($this->arrListCompare) && (count($this->arrListCompare['core']) != 0 || count($this->arrListCompare['files']) != 0))
                     {
                         $arrImport = array();
@@ -3564,69 +3561,75 @@ class SyncCtoModuleClient extends BackendModule
                     break;
 
                 /**
-                 * Build checksum list for 'files'
+                 * Build checksum list for Conta core
                  */
                 case 2:
-                    if (in_array("user_change", $this->arrSyncSettings["syncCto_Type"]))
+                    if (in_array("core_change", $this->arrSyncSettings["syncCto_Type"]))
                     {
-                        $this->arrListFile = $this->objSyncCtoCommunicationClient->getChecksumFiles(array());
+                        $this->arrListFile['core'] = array_merge($this->arrListFile, $this->objSyncCtoCommunicationClient->getChecksumCore());
                         $this->objStepPool->step++;
                         break;
                     }
                     else
                     {
-                        $this->arrListFile = array();
+                        $this->arrListFile['core'] = array();
                     }
 
                 /**
-                 * Build checksum list for Conta core
+                 * Build checksum list for 'files'
                  */
                 case 3:
-                    if (in_array("core_change", $this->arrSyncSettings["syncCto_Type"]))
+                    if (in_array("user_change", $this->arrSyncSettings["syncCto_Type"]))
                     {
-                        $this->arrListFile = array_merge($this->arrListFile, $this->objSyncCtoCommunicationClient->getChecksumCore());
+                        $this->arrListFile['files'] = $this->objSyncCtoCommunicationClient->getChecksumFiles(array());
                         $this->objStepPool->step++;
                         break;
+                    }
+                    else
+                    {
+                        $this->arrListFile['files'] = array();
                     }
 
                 /**
                  * Check List
                  */
                 case 4:
-                    if (in_array("core_change", $this->arrSyncSettings["syncCto_Type"]) || in_array("user_change", $this->arrSyncSettings["syncCto_Type"]))
+                    if (in_array("core_change", $this->arrSyncSettings["syncCto_Type"]))
                     {
-                        $this->arrListCompare = $this->objSyncCtoFiles->runCecksumCompare($this->arrListFile);
+                        $this->arrListCompare['core'] = $this->objSyncCtoFiles->runCecksumCompare($this->arrListFile['core']);
                         $this->objData->setDescription($GLOBALS['TL_LANG']['tl_syncCto_sync']["step_2"]['description_2']);
                         $this->objStepPool->step++;
                         break;
+                    }
+                    else
+                    {
+                        $this->arrListCompare['core'] = array();
+                    }
+
+                case 5:
+                    if (in_array("user_change", $this->arrSyncSettings["syncCto_Type"]))
+                    {
+                        $this->arrListCompare['files'] = $this->objSyncCtoFiles->runCecksumCompare($this->arrListFile['files']);
+                        $this->objData->setDescription($GLOBALS['TL_LANG']['tl_syncCto_sync']["step_2"]['description_2']);
+                        $this->objStepPool->step++;
+                        break;
+                    }
+                    else
+                    {
+                        $this->arrListCompare['files'] = array();
                     }
 
                 /**
                  * Check for deleted files
                  */
-                case 5:
+                case 6:
                     if (in_array("core_delete", $this->arrSyncSettings["syncCto_Type"]))
                     {
                         $arrChecksumClient = $this->objSyncCtoFiles->runChecksumCore();
                         $arrChecksumClient = $this->objSyncCtoCommunicationClient->checkDeleteFiles($arrChecksumClient);
                         if (count($arrChecksumClient) != 0)
                         {
-                            $this->arrListCompare = array_merge($this->arrListCompare, $arrChecksumClient);
-                        }
-
-                        $this->objStepPool->step++;
-                        break;
-                    }
-
-                case 6:
-                    if (in_array("user_delete", $this->arrSyncSettings["syncCto_Type"]))
-                    {
-                        $arrChecksumClient = $this->objSyncCtoFiles->runChecksumFiles();
-                        $arrChecksumClient = $this->objSyncCtoCommunicationClient->checkDeleteFiles($arrChecksumClient);
-
-                        if (count($arrChecksumClient) != 0)
-                        {
-                            $this->arrListCompare = array_merge($this->arrListCompare, $arrChecksumClient);
+                            $this->arrListCompare['core'] = array_merge((array) $this->arrListCompare['core'], $arrChecksumClient);
                         }
 
                         $this->objStepPool->step++;
@@ -3634,6 +3637,24 @@ class SyncCtoModuleClient extends BackendModule
                     }
 
                 case 7:
+                    if (in_array("user_delete", $this->arrSyncSettings["syncCto_Type"]))
+                    {
+                        $arrChecksumClient = $this->objSyncCtoFiles->runChecksumFiles();
+                        $arrChecksumClient = $this->objSyncCtoCommunicationClient->checkDeleteFiles($arrChecksumClient);
+
+                        if (count($arrChecksumClient) != 0)
+                        {
+                            $this->arrListCompare['files'] = array_merge((array) $this->arrListCompare['files'], $arrChecksumClient);
+                        }
+
+                        $this->objStepPool->step++;
+                        break;
+                    }
+
+                /**
+                 * Check folders
+                 */
+                case 8:
                     if (in_array("core_delete", $this->arrSyncSettings["syncCto_Type"]))
                     {
                         $arrChecksumClienta = $this->objSyncCtoFiles->runChecksumFolderCore();
@@ -3641,14 +3662,14 @@ class SyncCtoModuleClient extends BackendModule
 
                         if (count($arrChecksumClientb) != 0)
                         {
-                            $this->arrListCompare = array_merge($this->arrListCompare, $arrChecksumClientb);
+                            $this->arrListCompare['core'] = array_merge((array) $this->arrListCompare['core'], $arrChecksumClientb);
                         }
 
                         $this->objStepPool->step++;
                         break;
                     }
 
-                case 8:
+                case 9:
                     if (in_array("user_delete", $this->arrSyncSettings["syncCto_Type"]))
                     {
                         $arrChecksumClient = $this->objSyncCtoFiles->runChecksumFolderFiles();
@@ -3656,7 +3677,7 @@ class SyncCtoModuleClient extends BackendModule
 
                         if (count($arrChecksumClient) != 0)
                         {
-                            $this->arrListCompare = array_merge($this->arrListCompare, $arrChecksumClient);
+                            $this->arrListCompare['files'] = array_merge((array) $this->arrListCompare['files'], $arrChecksumClient);
                         }
                     }
 
@@ -3667,55 +3688,58 @@ class SyncCtoModuleClient extends BackendModule
                 /**
                  * Set CSS and search for bigfiles
                  */
-                case 9:
-                    foreach ($this->arrListCompare as $key => $value)
+                case 10:
+                    foreach($this->arrListCompare as $strType => $arrLists)
                     {
-                        switch ($value["state"])
+                        foreach ($arrLists as $key => $value)
                         {
-                            case SyncCtoEnum::FILESTATE_BOMBASTIC_BIG:
-                                $this->arrListCompare[$key]["css"]     = "unknown";
-                                $this->arrListCompare[$key]["css_big"] = "ignored";
-                                break;
-
-                            case SyncCtoEnum::FILESTATE_TOO_BIG_NEED:
-                                $this->arrListCompare[$key]["css_big"] = "ignored";
-                            case SyncCtoEnum::FILESTATE_NEED:
-                                $this->arrListCompare[$key]["css"] = "modified";
-                                break;
-
-                            case SyncCtoEnum::FILESTATE_TOO_BIG_MISSING:
-                                $this->arrListCompare[$key]["css_big"] = "ignored";
-                            case SyncCtoEnum::FILESTATE_MISSING:
-                                $this->arrListCompare[$key]["css"] = "new";
-                                break;
-
-                            case SyncCtoEnum::FILESTATE_DELETE:
-                            case SyncCtoEnum::FILESTATE_FOLDER_DELETE:
-                                $this->arrListCompare[$key]["css"] = "deleted";
-                                break;
-
-                            default:
-                                $this->arrListCompare[$key]["css"] = "unknown";
-                                break;
-                        }
-
-                        if ($value["state"] == SyncCtoEnum::FILESTATE_TOO_BIG_DELETE
-                            || $value["state"] == SyncCtoEnum::FILESTATE_TOO_BIG_MISSING
-                            || $value["state"] == SyncCtoEnum::FILESTATE_TOO_BIG_NEED
-                            || $value["state"] == SyncCtoEnum::FILESTATE_TOO_BIG_SAME
-                            || $value["state"] == SyncCtoEnum::FILESTATE_BOMBASTIC_BIG
-                            || $value["state"] == SyncCtoEnum::FILESTATE_DELETE
-                            || $value["state"] == SyncCtoEnum::FILESTATE_FOLDER_DELETE
-                            || $value["state"] == SyncCtoEnum::FILESTATE_FOLDER
-                        )
-                        {
-                            continue;
-                        }
-                        else
-                        {
-                            if ($value["size"] > $this->arrClientInformation["upload_sizeLimit"])
+                            switch ($value["state"])
                             {
-                                $this->arrListCompare[$key]["split"] = true;
+                                case SyncCtoEnum::FILESTATE_BOMBASTIC_BIG:
+                                    $this->arrListCompare[$strType][$key]["css"]     = "unknown";
+                                    $this->arrListCompare[$strType][$key]["css_big"] = "ignored";
+                                    break;
+
+                                case SyncCtoEnum::FILESTATE_TOO_BIG_NEED:
+                                    $this->arrListCompare[$strType][$key]["css_big"] = "ignored";
+                                case SyncCtoEnum::FILESTATE_NEED:
+                                    $this->arrListCompare[$strType][$key]["css"] = "modified";
+                                    break;
+
+                                case SyncCtoEnum::FILESTATE_TOO_BIG_MISSING:
+                                    $this->arrListCompare[$strType][$key]["css_big"] = "ignored";
+                                case SyncCtoEnum::FILESTATE_MISSING:
+                                    $this->arrListCompare[$strType][$key]["css"] = "new";
+                                    break;
+
+                                case SyncCtoEnum::FILESTATE_DELETE:
+                                case SyncCtoEnum::FILESTATE_FOLDER_DELETE:
+                                    $this->arrListCompare[$strType][$key]["css"] = "deleted";
+                                    break;
+
+                                default:
+                                    $this->arrListCompare[$strType][$key]["css"] = "unknown";
+                                    break;
+                            }
+
+                            if ($value["state"] == SyncCtoEnum::FILESTATE_TOO_BIG_DELETE
+                                || $value["state"] == SyncCtoEnum::FILESTATE_TOO_BIG_MISSING
+                                || $value["state"] == SyncCtoEnum::FILESTATE_TOO_BIG_NEED
+                                || $value["state"] == SyncCtoEnum::FILESTATE_TOO_BIG_SAME
+                                || $value["state"] == SyncCtoEnum::FILESTATE_BOMBASTIC_BIG
+                                || $value["state"] == SyncCtoEnum::FILESTATE_DELETE
+                                || $value["state"] == SyncCtoEnum::FILESTATE_FOLDER_DELETE
+                                || $value["state"] == SyncCtoEnum::FILESTATE_FOLDER
+                            )
+                            {
+                                continue;
+                            }
+                            else
+                            {
+                                if ($value["size"] > $this->arrClientInformation["upload_sizeLimit"])
+                                {
+                                    $this->arrListCompare[$strType][$key]["split"] = true;
+                                }
                             }
                         }
                     }
@@ -3726,7 +3750,7 @@ class SyncCtoModuleClient extends BackendModule
                 /**
                  * Show files form
                  */
-                case 10:
+                case 11:
                     // Counter
                     $intCountMissing = 0;
                     $intCountNeed    = 0;
@@ -3738,32 +3762,35 @@ class SyncCtoModuleClient extends BackendModule
                     $intTotalSizeChange = 0;
 
                     // Count files
-                    foreach ($this->arrListCompare as $key => $value)
+                    foreach($this->arrListCompare as $strType => $arrLists)
                     {
-                        switch ($value['state'])
+                        foreach ($arrLists as $key => $value)
                         {
-                            case SyncCtoEnum::FILESTATE_MISSING:
-                                $intCountMissing++;
-                                $intTotalSizeNew += $value["size"];
-                                break;
+                            switch ($value['state'])
+                            {
+                                case SyncCtoEnum::FILESTATE_MISSING:
+                                    $intCountMissing++;
+                                    $intTotalSizeNew += $value["size"];
+                                    break;
 
-                            case SyncCtoEnum::FILESTATE_NEED:
-                                $intCountNeed++;
-                                $intTotalSizeChange += $value["size"];
-                                break;
+                                case SyncCtoEnum::FILESTATE_NEED:
+                                    $intCountNeed++;
+                                    $intTotalSizeChange += $value["size"];
+                                    break;
 
-                            case SyncCtoEnum::FILESTATE_DELETE:
-                            case SyncCtoEnum::FILESTATE_FOLDER_DELETE:
-                                $intCountDelete++;
-                                $intTotalSizeDel += $value["size"];
-                                break;
+                                case SyncCtoEnum::FILESTATE_DELETE:
+                                case SyncCtoEnum::FILESTATE_FOLDER_DELETE:
+                                    $intCountDelete++;
+                                    $intTotalSizeDel += $value["size"];
+                                    break;
 
-                            case SyncCtoEnum::FILESTATE_BOMBASTIC_BIG:
-                            case SyncCtoEnum::FILESTATE_TOO_BIG_NEED:
-                            case SyncCtoEnum::FILESTATE_TOO_BIG_MISSING:
-                            case SyncCtoEnum::FILESTATE_TOO_BIG_DELETE :
-                                $intCountIgnored++;
-                                break;
+                                case SyncCtoEnum::FILESTATE_BOMBASTIC_BIG:
+                                case SyncCtoEnum::FILESTATE_TOO_BIG_NEED:
+                                case SyncCtoEnum::FILESTATE_TOO_BIG_MISSING:
+                                case SyncCtoEnum::FILESTATE_TOO_BIG_DELETE :
+                                    $intCountIgnored++;
+                                    break;
+                            }
                         }
                     }
 
@@ -3784,7 +3811,7 @@ class SyncCtoModuleClient extends BackendModule
 
                         break;
                     }
-                    else if (count($this->arrListCompare) == 0 || key_exists("skip", $_POST))
+                    else if (count($this->arrListCompare) == 0 || array_key_exists("skip", $_POST))
                     {
                         $this->objData->setState(SyncCtoEnum::WORK_SKIPPED);
                         $this->objData->setDescription($GLOBALS['TL_LANG']['tl_syncCto_sync']["step_2"]['description_1']);
@@ -3796,7 +3823,7 @@ class SyncCtoModuleClient extends BackendModule
 
                         break;
                     }
-                    else if (($this->arrSyncSettings["automode"] ||key_exists("forward", $_POST)) && count($this->arrListCompare) != 0)
+                    else if (($this->arrSyncSettings["automode"] ||array_key_exists("forward", $_POST)) && count($this->arrListCompare) != 0)
                     {
                         $this->objData->setState(SyncCtoEnum::WORK_OK);
                         $this->objData->setDescription(vsprintf($GLOBALS['TL_LANG']['tl_syncCto_sync']["step_2"]['description_4'], array($intCountMissing, $intCountNeed, $intCountDelete, $intCountIgnored, $this->getReadableSize($intTotalSizeNew), $this->getReadableSize($intTotalSizeChange), $this->getReadableSize($intTotalSizeDel))));
@@ -3867,31 +3894,34 @@ class SyncCtoModuleClient extends BackendModule
             $intDelCount   = 0;
             $intSplitCount = 0;
 
-            foreach ($this->arrListCompare as $value)
+            foreach($this->arrListCompare as $strType => $arrLists)
             {
-                switch ($value["transmission"])
+                foreach ($arrLists as $key => $value)
                 {
-                    case SyncCtoEnum::FILETRANS_SEND:
-                        $intSendCount++;
-                        break;
+                    switch ($value["transmission"])
+                    {
+                        case SyncCtoEnum::FILETRANS_SEND:
+                            $intSendCount++;
+                            break;
 
-                    case SyncCtoEnum::FILETRANS_SKIPPED:
-                        $intSkippCount++;
-                        break;
+                        case SyncCtoEnum::FILETRANS_SKIPPED:
+                            $intSkippCount++;
+                            break;
 
-                    case SyncCtoEnum::FILETRANS_WAITING:
-                        $intWaitCount++;
-                        break;
-                }
+                        case SyncCtoEnum::FILETRANS_WAITING:
+                            $intWaitCount++;
+                            break;
+                    }
 
-                if ($value["state"] == SyncCtoEnum::FILESTATE_DELETE || $value["state"] == SyncCtoEnum::FILESTATE_FOLDER_DELETE)
-                {
-                    $intDelCount++;
-                }
+                    if ($value["state"] == SyncCtoEnum::FILESTATE_DELETE || $value["state"] == SyncCtoEnum::FILESTATE_FOLDER_DELETE)
+                    {
+                        $intDelCount++;
+                    }
 
-                if ($value["split"] == true)
-                {
-                    $intSplitCount++;
+                    if ($value["split"] == true)
+                    {
+                        $intSplitCount++;
+                    }
                 }
             }
         }
@@ -3921,65 +3951,68 @@ class SyncCtoModuleClient extends BackendModule
                     // Send allfiles exclude the big thing ones
                     $intCountTransfer = 1;
 
-                    foreach ($this->arrListCompare as $key => $value)
+                    foreach ($this->arrListCompare as $strType => $arrLists)
                     {
-                        if ($value["transmission"] == SyncCtoEnum::FILETRANS_SEND || $value["transmission"] == SyncCtoEnum::FILETRANS_SKIPPED)
+                        foreach ($arrLists as $key => $value)
                         {
-                            continue;
-                        }
-
-                        if (in_array($value["state"], array(SyncCtoEnum::FILESTATE_DELETE, SyncCtoEnum::FILESTATE_FOLDER_DELETE)))
-                        {
-                            continue;
-                        }
-
-                        if ($value["skipped"] == true)
-                        {
-                            continue;
-                        }
-
-                        if ($value["split"] == true)
-                        {
-                            continue;
-                        }
-
-                        if ($value["state"] == SyncCtoEnum::FILESTATE_TOO_BIG
-                            || $value["state"] == SyncCtoEnum::FILESTATE_TOO_BIG_DELETE
-                            || $value["state"] == SyncCtoEnum::FILESTATE_TOO_BIG_NEED
-                            || $value["state"] == SyncCtoEnum::FILESTATE_TOO_BIG_MISSING
-                            || $value["state"] == SyncCtoEnum::FILESTATE_BOMBASTIC_BIG
-                        )
-                        {
-                            $this->arrListCompare[$key]["skipreason"]   = $GLOBALS['TL_LANG']['ERR']['maximum_filesize'];
-                            $this->arrListCompare[$key]["transmission"] = SyncCtoEnum::FILETRANS_SKIPPED;
-
-                            continue;
-                        }
-
-                        try
-                        {
-                            // Get files
-                            $booResponse = $this->objSyncCtoCommunicationClient->getFile($value["path"], $this->objSyncCtoHelper->standardizePath($GLOBALS['SYC_PATH']['tmp'], "sync", $value["path"]));
-
-                            // Check if the file was send and saved.
-                            if ($booResponse != true)
+                            if ($value["transmission"] == SyncCtoEnum::FILETRANS_SEND || $value["transmission"] == SyncCtoEnum::FILETRANS_SKIPPED)
                             {
-                                throw new Exception(vsprintf($GLOBALS['TL_LANG']['ERR']['unknown_file'], $value["path"]));
+                                continue;
                             }
 
-                            $this->arrListCompare[$key]["transmission"] = SyncCtoEnum::FILETRANS_SEND;
-                        }
-                        catch (Exception $exc)
-                        {
-                            $this->arrListCompare[$key]["transmission"] = SyncCtoEnum::FILETRANS_SKIPPED;
-                            $this->arrListCompare[$key]["skipreason"]   = $exc->getMessage();
-                        }
+                            if (in_array($value["state"], array(SyncCtoEnum::FILESTATE_DELETE, SyncCtoEnum::FILESTATE_FOLDER_DELETE)))
+                            {
+                                continue;
+                            }
 
-                        $intCountTransfer++;
+                            if ($value["skipped"] == true)
+                            {
+                                continue;
+                            }
 
-                        if ($intCountTransfer == 201 || $intStart < (time() - 30))
-                        {
-                            break;
+                            if ($value["split"] == true)
+                            {
+                                continue;
+                            }
+
+                            if ($value["state"] == SyncCtoEnum::FILESTATE_TOO_BIG
+                                || $value["state"] == SyncCtoEnum::FILESTATE_TOO_BIG_DELETE
+                                || $value["state"] == SyncCtoEnum::FILESTATE_TOO_BIG_NEED
+                                || $value["state"] == SyncCtoEnum::FILESTATE_TOO_BIG_MISSING
+                                || $value["state"] == SyncCtoEnum::FILESTATE_BOMBASTIC_BIG
+                            )
+                            {
+                                $this->arrListCompare[$strType][$key]["skipreason"]   = $GLOBALS['TL_LANG']['ERR']['maximum_filesize'];
+                                $this->arrListCompare[$strType][$key]["transmission"] = SyncCtoEnum::FILETRANS_SKIPPED;
+
+                                continue;
+                            }
+
+                            try
+                            {
+                                // Get files
+                                $booResponse = $this->objSyncCtoCommunicationClient->getFile($value["path"], $this->objSyncCtoHelper->standardizePath($GLOBALS['SYC_PATH']['tmp'], "sync", $value["path"]));
+
+                                // Check if the file was send and saved.
+                                if ($booResponse != true)
+                                {
+                                    throw new Exception(vsprintf($GLOBALS['TL_LANG']['ERR']['unknown_file'], $value["path"]));
+                                }
+
+                                $this->arrListCompare[$strType][$key]["transmission"] = SyncCtoEnum::FILETRANS_SEND;
+                            }
+                            catch (Exception $exc)
+                            {
+                                $this->arrListCompare[$strType][$key]["transmission"] = SyncCtoEnum::FILETRANS_SKIPPED;
+                                $this->arrListCompare[$strType][$key]["skipreason"]   = $exc->getMessage();
+                            }
+
+                            $intCountTransfer++;
+
+                            if ($intCountTransfer == 201 || $intStart < (time() - 30))
+                            {
+                                break;
+                            }
                         }
                     }
 
@@ -3989,13 +4022,16 @@ class SyncCtoModuleClient extends BackendModule
                     }
                     else
                     {
-                        foreach ($this->arrListCompare as $key => $value)
+                        foreach ($this->arrListCompare as $strType => $arrLists)
                         {
-                            if ($value["split"] == true)
+                            foreach ($arrLists as $key => $value)
                             {
-                                $this->objStepPool->step++;
-                                $this->objData->setDescription($GLOBALS['TL_LANG']['tl_syncCto_sync']["step_3"]['description_3']);
-                                return;
+                                if ($value["split"] == true)
+                                {
+                                    $this->objStepPool->step++;
+                                    $this->objData->setDescription($GLOBALS['TL_LANG']['tl_syncCto_sync']["step_3"]['description_3']);
+                                    return;
+                                }
                             }
                         }
 
@@ -4013,36 +4049,42 @@ class SyncCtoModuleClient extends BackendModule
                     $intCountSplit = 0;
                     $intCount      = 0;
 
-                    foreach ($this->arrListCompare as $key => $value)
+                    foreach ($this->arrListCompare as $strType => $arrLists)
                     {
-                        if ($value["split"] == true)
+                        foreach ($arrLists as $key => $value)
                         {
-                            $intCountSplit++;
+                            if ($value["split"] == true)
+                            {
+                                $intCountSplit++;
+                            }
                         }
                     }
 
-                    foreach ($this->arrListCompare as $key => $value)
+                    foreach ($this->arrListCompare as $strType => $arrLists)
                     {
-                        if ($value["split"] != true)
+                        foreach ($arrLists as $key => $value)
                         {
-                            continue;
+                            if ($value["split"] != true)
+                            {
+                                continue;
+                            }
+
+                            if ($value["split"] != 0 && $value["splitname"] != "")
+                            {
+                                $intCount++;
+                                continue;
+                            }
+
+                            $strSavePath = $this->objSyncCtoHelper->standardizePath($this->arrClientInformation["folders"]['tmp'], $key);
+
+                            // Splitt file
+                            $intSplits = $this->objSyncCtoCommunicationClient->runSplitFiles($value["path"], $strSavePath, $key, ($this->arrClientInformation["upload_sizeLimit"] / 100 * $this->arrClientInformation["upload_sizePercent"]));
+
+                            $this->arrListCompare[$strType][$key]["splitcount"] = $intSplits;
+                            $this->arrListCompare[$strType][$key]["splitname"]  = $key;
+
+                            break;
                         }
-
-                        if ($value["split"] != 0 && $value["splitname"] != "")
-                        {
-                            $intCount++;
-                            continue;
-                        }
-
-                        $strSavePath = $this->objSyncCtoHelper->standardizePath($this->arrClientInformation["folders"]['tmp'], $key);
-
-                        // Splitt file
-                        $intSplits = $this->objSyncCtoCommunicationClient->runSplitFiles($value["path"], $strSavePath, $key, ($this->arrClientInformation["upload_sizeLimit"] / 100 * $this->arrClientInformation["upload_sizePercent"]));
-
-                        $this->arrListCompare[$key]["splitcount"] = $intSplits;
-                        $this->arrListCompare[$key]["splitname"]  = $key;
-
-                        break;
                     }
 
                     if ($intCount != $intCountSplit)
@@ -4064,70 +4106,76 @@ class SyncCtoModuleClient extends BackendModule
                     $intCountSplit = 0;
                     $intCount      = 0;
 
-                    foreach ($this->arrListCompare as $key => $value)
+                    foreach ($this->arrListCompare as $strType => $arrLists)
                     {
-                        if ($value["split"] == true)
+                        foreach ($arrLists as $key => $value)
                         {
-                            $intCountSplit++;
+                            if ($value["split"] == true)
+                            {
+                                $intCountSplit++;
+                            }
                         }
                     }
 
-                    foreach ($this->arrListCompare as $key => $value)
+                    foreach ($this->arrListCompare as $strType => $arrLists)
                     {
-                        if ($value["split"] != true)
+                        foreach ($arrLists as $key => $value)
                         {
-                            continue;
-                        }
-
-                        if (in_array($value["state"], array(
-                            SyncCtoEnum::FILESTATE_TOO_BIG_DELETE,
-                            SyncCtoEnum::FILESTATE_TOO_BIG_MISSING,
-                            SyncCtoEnum::FILESTATE_TOO_BIG_NEED,
-                            SyncCtoEnum::FILESTATE_TOO_BIG_SAME,
-                            SyncCtoEnum::FILESTATE_BOMBASTIC_BIG,
-                            SyncCtoEnum::FILESTATE_DELETE,
-                            SyncCtoEnum::FILESTATE_FOLDER_DELETE
-                        ))
-                        )
-                        {
-                            continue;
-                        }
-
-                        if (!empty($value["split_transfer"]) && $value["splitcount"] == $value["split_transfer"])
-                        {
-                            $intCount++;
-                            continue;
-                        }
-
-                        if (empty($value["split_transfer"]))
-                        {
-                            $value["split_transfer"] = 0;
-                        }
-
-                        for ($ii = $value["split_transfer"]; $ii < $value["splitcount"]; $ii++)
-                        {
-                            // Max limit for file send, 10 minutes
-                            set_time_limit(7200);
-
-                            // Send file to client
-                            $booResponse = $this->objSyncCtoCommunicationClient->getFile($this->objSyncCtoHelper->standardizePath($this->arrClientInformation["folders"]['tmp'], $key, $value["splitname"] . ".sync$ii"), $this->objSyncCtoHelper->standardizePath($GLOBALS['SYC_PATH']['tmp'], $key, $value["splitname"] . ".sync$ii"));
-
-                            // Check if the file was send and saved.
-                            if ($booResponse != true)
+                            if ($value["split"] != true)
                             {
-                                throw new Exception(vsprintf($GLOBALS['TL_LANG']['ERR']['unknown_file'], $strFrom));
+                                continue;
                             }
 
-                            $this->arrListCompare[$key]["split_transfer"] = $ii + 1;
-
-                            // check time limit 30 secs
-                            if ($intStart + 30 < time())
+                            if (in_array($value["state"], array(
+                                SyncCtoEnum::FILESTATE_TOO_BIG_DELETE,
+                                SyncCtoEnum::FILESTATE_TOO_BIG_MISSING,
+                                SyncCtoEnum::FILESTATE_TOO_BIG_NEED,
+                                SyncCtoEnum::FILESTATE_TOO_BIG_SAME,
+                                SyncCtoEnum::FILESTATE_BOMBASTIC_BIG,
+                                SyncCtoEnum::FILESTATE_DELETE,
+                                SyncCtoEnum::FILESTATE_FOLDER_DELETE
+                            ))
+                            )
                             {
-                                break;
+                                continue;
                             }
-                        }
 
-                        break;
+                            if (!empty($value["split_transfer"]) && $value["splitcount"] == $value["split_transfer"])
+                            {
+                                $intCount++;
+                                continue;
+                            }
+
+                            if (empty($value["split_transfer"]))
+                            {
+                                $value["split_transfer"] = 0;
+                            }
+
+                            for ($ii = $value["split_transfer"]; $ii < $value["splitcount"]; $ii++)
+                            {
+                                // Max limit for file send, 10 minutes
+                                set_time_limit(7200);
+
+                                // Send file to client
+                                $booResponse = $this->objSyncCtoCommunicationClient->getFile($this->objSyncCtoHelper->standardizePath($this->arrClientInformation["folders"]['tmp'], $key, $value["splitname"] . ".sync$ii"), $this->objSyncCtoHelper->standardizePath($GLOBALS['SYC_PATH']['tmp'], $key, $value["splitname"] . ".sync$ii"));
+
+                                // Check if the file was send and saved.
+                                if ($booResponse != true)
+                                {
+                                    throw new Exception(vsprintf($GLOBALS['TL_LANG']['ERR']['unknown_file'], $value["path"]));
+                                }
+
+                                $this->arrListCompare[$strType][$key]["split_transfer"] = $ii + 1;
+
+                                // check time limit 30 secs
+                                if ($intStart + 30 < time())
+                                {
+                                    break;
+                                }
+                            }
+
+                            break;
+                        }
                     }
 
                     if ($intCount != $intCountSplit)
@@ -4150,51 +4198,57 @@ class SyncCtoModuleClient extends BackendModule
                     $intCountSplit = 0;
                     $intCount      = 0;
 
-                    foreach ($this->arrListCompare as $key => $value)
+                    foreach ($this->arrListCompare as $strType => $arrLists)
                     {
-                        if ($value["split"] == true)
+                        foreach ($arrLists as $key => $value)
                         {
-                            $intCountSplit++;
+                            if ($value["split"] == true)
+                            {
+                                $intCountSplit++;
+                            }
                         }
                     }
 
-                    foreach ($this->arrListCompare as $key => $value)
+                    foreach ($this->arrListCompare as $strType => $arrLists)
                     {
-                        if ($value["split"] != true)
+                        foreach ($arrLists as $key => $value)
                         {
-                            continue;
-                        }
+                            if ($value["split"] != true)
+                            {
+                                continue;
+                            }
 
-                        if (in_array($value["state"], array(
-                            SyncCtoEnum::FILESTATE_TOO_BIG_DELETE,
-                            SyncCtoEnum::FILESTATE_TOO_BIG_MISSING,
-                            SyncCtoEnum::FILESTATE_TOO_BIG_NEED,
-                            SyncCtoEnum::FILESTATE_TOO_BIG_SAME,
-                            SyncCtoEnum::FILESTATE_BOMBASTIC_BIG,
-                            SyncCtoEnum::FILESTATE_DELETE,
-                            SyncCtoEnum::FILESTATE_FOLDER_DELETE
-                        ))
-                        )
-                        {
-                            continue;
-                        }
+                            if (in_array($value["state"], array(
+                                SyncCtoEnum::FILESTATE_TOO_BIG_DELETE,
+                                SyncCtoEnum::FILESTATE_TOO_BIG_MISSING,
+                                SyncCtoEnum::FILESTATE_TOO_BIG_NEED,
+                                SyncCtoEnum::FILESTATE_TOO_BIG_SAME,
+                                SyncCtoEnum::FILESTATE_BOMBASTIC_BIG,
+                                SyncCtoEnum::FILESTATE_DELETE,
+                                SyncCtoEnum::FILESTATE_FOLDER_DELETE
+                            ))
+                            )
+                            {
+                                continue;
+                            }
 
-                        if ($value["transmission"] == SyncCtoEnum::FILETRANS_SEND)
-                        {
-                            $intCount++;
-                            continue;
-                        }
+                            if ($value["transmission"] == SyncCtoEnum::FILETRANS_SEND)
+                            {
+                                $intCount++;
+                                continue;
+                            }
 
-                        if (!$this->objSyncCtoFiles->rebuildSplitFiles($value["splitname"], $value["splitcount"], $value["path"], $value["checksum"]))
-                        {
-                            throw new Exception(vsprintf($GLOBALS['TL_LANG']['ERR']['rebuild'], array($value["path"])));
-                        }
+                            if (!$this->objSyncCtoFiles->rebuildSplitFiles($value["splitname"], $value["splitcount"], $value["path"], $value["checksum"]))
+                            {
+                                throw new Exception(vsprintf($GLOBALS['TL_LANG']['ERR']['rebuild'], array($value["path"])));
+                            }
 
-                        $this->arrListCompare[$key]["transmission"] = SyncCtoEnum::FILETRANS_SEND;
+                            $this->arrListCompare[$strType][$key]["transmission"] = SyncCtoEnum::FILETRANS_SEND;
 
-                        if ($intStart < time() - 30)
-                        {
-                            break;
+                            if ($intStart < time() - 30)
+                            {
+                                break;
+                            }
                         }
                     }
 
@@ -4663,28 +4717,110 @@ class SyncCtoModuleClient extends BackendModule
                     break;
 
                 /**
-                 * Import Files
+                 * Delete files
                  */
                 case 2:
-                    if (is_array($this->arrListCompare) && count($this->arrListCompare) != 0)
+                    if (is_array($this->arrListCompare) && (count($this->arrListCompare['core']) != 0 || count($this->arrListCompare['files']) != 0))
                     {
-                        $arrImport = array();
+                        $arrDelete = array();
 
-                        foreach ($this->arrListCompare as $key => $value)
+                        foreach($this->arrListCompare as $strType => $arrLists)
                         {
-                            if ($value["transmission"] == SyncCtoEnum::FILETRANS_SEND)
+                            foreach ($arrLists as $key => $value)
                             {
-                                $arrImport[$key] = $this->arrListCompare[$key];
+                                if (in_array($value["state"], array(SyncCtoEnum::FILESTATE_DELETE, SyncCtoEnum::FILESTATE_FOLDER_DELETE)))
+                                {
+                                    $arrDelete[$strType][$key] = $this->arrListCompare[$key];
+                                }
                             }
                         }
 
-                        if (count($arrImport) > 0)
+                        // Execute the list with deleted files.
+                        if (is_array($arrDelete['core']) && count($arrDelete['core']) > 0)
                         {
-                            $arrTransmission = $this->objSyncCtoFiles->moveTempFile($arrImport);
-
-                            foreach ($arrTransmission as $key => $value)
+                            $arrResponseDelete = $this->objSyncCtoFiles->deleteFiles($arrDelete['core'], false);
+                            foreach ($arrResponseDelete as $key => $value)
                             {
-                                $this->arrListCompare[$key] = $arrTransmission[$key];
+                                $this->arrListCompare['core'][$key] = $value;
+                            }
+                        }
+
+                        // Execute the list with deleted files.
+                        if (is_array($arrDelete['files']) && count($arrDelete['files']) > 0)
+                        {
+                            $arrResponseDelete = $this->objSyncCtoFiles->deleteFiles($arrDelete['files'], true);
+                            foreach ($arrResponseDelete as $key => $value)
+                            {
+                                $this->arrListCompare['files'][$key] = $value;
+                            }
+                        }
+                    }
+
+                    $this->objData->setDescription($GLOBALS['TL_LANG']['tl_syncCto_sync']["step_5"]['description_2']);
+                    $this->objStepPool->step++;
+                    break;
+
+                /**
+                 * Import Files
+                 */
+                case 3:
+                    if (is_array($this->arrListCompare) && (count($this->arrListCompare['core']) != 0 || count($this->arrListCompare['files']) != 0))
+                    {
+                        $arrImport = array();
+
+                        // For core file do it like all the time SIMPEL ....
+                        foreach ($this->arrListCompare['core'] as $key => $value)
+                        {
+                            // Skip some values.
+                            if(in_array($value["state"], array( SyncCtoEnum::FILESTATE_DELETE, SyncCtoEnum::FILESTATE_FOLDER_DELETE, SyncCtoEnum::FILESTATE_TOO_BIG_DELETE)))
+                            {
+                                continue;
+                            }
+
+                            if ($value["transmission"] == SyncCtoEnum::FILETRANS_SEND)
+                            {
+                                $arrImport['core'][$key] = $value;
+                            }
+                        }
+
+                        // ...and now the support for the uuid und dbafs system
+                        foreach ($this->arrListCompare['files'] as $key => $value)
+                        {
+                            // Skip some values.
+                            if(in_array($value["state"], array( SyncCtoEnum::FILESTATE_DELETE, SyncCtoEnum::FILESTATE_FOLDER_DELETE, SyncCtoEnum::FILESTATE_TOO_BIG_DELETE)))
+                            {
+                                continue;
+                            }
+
+                            // Only add valid ones.
+                            if ($value["transmission"] == SyncCtoEnum::FILETRANS_SEND)
+                            {
+                                // Add the file to the import array.
+                                $arrImport['files'][$key] = $value;
+                            }
+                        }
+
+                        // Import all core data and write the data back in the compare list.
+                        if (is_array($arrImport['core']) && count($arrImport['core']) > 0)
+                        {
+                            $arrResultFiles = $this->objSyncCtoFiles->moveTempFile($arrImport['core'], false);
+                            foreach ($arrResultFiles as $key => $value)
+                            {
+                                $this->arrListCompare['core'][$key] = $value;
+                            }
+                        }
+
+                        // Import all files data and write the data back in the compare list.
+                        if (is_array($arrImport['files']) && count($arrImport['files']) > 0)
+                        {
+                            // Get the DBAFS information from the client for the locale import.
+                            $arrImport['files'] = $this->objSyncCtoCommunicationClient->getDbafsInformationFor($arrImport['files']);
+
+                            // Move the files with DBAFS support.
+                            $arrResultFiles = $this->objSyncCtoFiles->moveTempFile($arrImport['files'], true);
+                            foreach ($arrResultFiles as $key => $value)
+                            {
+                                $this->arrListCompare['files'][$key] = $value;
                             }
                         }
 
@@ -4694,36 +4830,6 @@ class SyncCtoModuleClient extends BackendModule
 
                     $this->objStepPool->step++;
 
-                /**
-                 * Delete files
-                 */
-                case 3:
-                    if (count($this->arrListCompare) != 0 && is_array($this->arrListCompare))
-                    {
-                        $arrDelete = array();
-
-                        foreach ($this->arrListCompare as $key => $value)
-                        {
-                            if (in_array($value["state"], array(SyncCtoEnum::FILESTATE_DELETE, SyncCtoEnum::FILESTATE_FOLDER_DELETE)))
-                            {
-                                $arrDelete[$key] = $this->arrListCompare[$key];
-                            }
-                        }
-
-                        if (count($arrDelete) > 0)
-                        {
-                            $arrDelete = $this->objSyncCtoFiles->deleteFiles($arrDelete);
-
-                            foreach ($arrDelete as $key => $value)
-                            {
-                                $this->arrListCompare[$key] = $value;
-                            }
-                        }
-                    }
-
-                    $this->objData->setDescription($GLOBALS['TL_LANG']['tl_syncCto_sync']["step_5"]['description_2']);
-                    $this->objStepPool->step++;
-                    break;
 
                 /**
                  * Import Config
@@ -4852,7 +4958,7 @@ class SyncCtoModuleClient extends BackendModule
                  */
                 case 6:
                     // Count files
-                    if (is_array($this->arrListCompare) && count($this->arrListCompare) != 0 && $this->arrListCompare != false)
+                    if (is_array($this->arrListCompare) && (count($this->arrListCompare['core']) != 0 || count($this->arrListCompare['files']) != 0))
                     {
                         $intSkippCount = 0;
                         $intSendCount  = 0;
@@ -4860,40 +4966,44 @@ class SyncCtoModuleClient extends BackendModule
                         $intDelCount   = 0;
                         $intSplitCount = 0;
 
-                        foreach ($this->arrListCompare as $value)
+                        foreach($this->arrListCompare as $strType => $arrLists)
                         {
-                            switch ($value["transmission"])
+                            foreach ($arrLists as $key => $value)
                             {
-                                case SyncCtoEnum::FILETRANS_SEND:
-                                    $intSendCount++;
-                                    break;
+                                switch ($value["transmission"])
+                                {
+                                    case SyncCtoEnum::FILETRANS_SEND:
+                                        $intSendCount++;
+                                        break;
 
-                                case SyncCtoEnum::FILETRANS_SKIPPED:
-                                    $intSkippCount++;
-                                    break;
+                                    case SyncCtoEnum::FILETRANS_SKIPPED:
+                                        $intSkippCount++;
+                                        break;
 
-                                case SyncCtoEnum::FILETRANS_WAITING:
-                                    $intWaitCount++;
-                                    break;
-                            }
+                                    case SyncCtoEnum::FILETRANS_WAITING:
+                                        $intWaitCount++;
+                                        break;
+                                }
 
-                            if (in_array($value["state"], array(SyncCtoEnum::FILESTATE_DELETE, SyncCtoEnum::FILESTATE_FOLDER_DELETE)))
-                            {
-                                $intDelCount++;
-                            }
+                                if ($value["state"] == SyncCtoEnum::FILESTATE_DELETE || $value["state"] == SyncCtoEnum::FILESTATE_FOLDER_DELETE)
+                                {
+                                    $intDelCount++;
+                                }
 
-                            if ($value["split"] == true)
-                            {
-                                $intSplitCount++;
+                                if ($value["split"] == true)
+                                {
+                                    $intSplitCount++;
+                                }
                             }
                         }
                     }
 
                     // Hide control div
-                    $this->Template->showControl = false;
+                    $this->Template->showControl     = false;
+                    $this->Template->showNextControl = true;
 
                     // If no files are send show success msg
-                    if (!is_array($this->arrListCompare) || count($this->arrListCompare) == 0)
+                    if (!is_array($this->arrListCompare) || (count($this->arrListCompare['core']) == 0 && count($this->arrListCompare['files']) == 0))
                     {
                         $this->objData->setHtml("");
                         $this->objData->setState(SyncCtoEnum::WORK_OK);
@@ -4901,46 +5011,53 @@ class SyncCtoModuleClient extends BackendModule
                         $this->booFinished = true;
 
                         // Set finished msg
-                        // Set success information 
+                        // Set success information
                         $arrClientLink = $this->Database
                             ->prepare("SELECT * FROM tl_synccto_clients WHERE id=?")
                             ->limit(1)
                             ->execute($this->intClientID)
                             ->fetchAllAssoc();
 
-                        $strLink = vsprintf('<a href="%s" target="_blank" style="text-decoration:underline;">', array($this->Environment->base));
+                        $strLink = vsprintf('<a href="%s:%s%s" target="_blank" style="text-decoration:underline;">', array($arrClientLink[0]['address'], $arrClientLink[0]['port'], $arrClientLink[0]['path']));
 
                         $this->objData->nextStep();
                         $this->objData->setTitle($GLOBALS['TL_LANG']['MSC']['complete']);
-                        $this->objData->setDescription(vsprintf($GLOBALS['TL_LANG']['tl_syncCto_sync']['complete_server'], array($strLink, "</a>")));
+                        $this->objData->setDescription(vsprintf($GLOBALS['TL_LANG']['tl_syncCto_sync']['complete_client'], array($strLink, "</a>")));
                         $this->objData->setState(SyncCtoEnum::WORK_OK);
 
                         break;
                     }
-                    // If files was send, show more informations
-                    else if (is_array($this->arrListCompare) && count($this->arrListCompare) != 0)
+                    // If files was send, show more information.
+                    elseif (is_array($this->arrListCompare) && (count($this->arrListCompare['core']) != 0 || count($this->arrListCompare['files']) != 0))
                     {
                         $this->objData->setHtml("");
                         $this->objData->setState(SyncCtoEnum::WORK_OK);
-                        $this->objData->setDescription(vsprintf($GLOBALS['TL_LANG']['tl_syncCto_sync']["step_3"]['description_2'], array($intSendCount, count($this->arrListCompare))));
+                        $this->objData->setDescription(vsprintf($GLOBALS['TL_LANG']['tl_syncCto_sync']["step_3"]['description_2'], array($intSendCount, (count($this->arrListCompare['core']) + count($this->arrListCompare['files'])))));
                         $this->booFinished = true;
                     }
+
+                    $compare = '';
 
                     // Check if there are some skipped files
                     if ($intSkippCount != 0)
                     {
-                        $compare = '<br /><p class="tl_help">' . $intSkippCount . $GLOBALS['TL_LANG']['tl_syncCto_sync']["step_5"]['description_3'] . '</p>';
+                        $compare .= '<br /><p class="tl_help">' . $intSkippCount . $GLOBALS['TL_LANG']['tl_syncCto_sync']["step_5"]['description_3'] . '</p>';
 
                         $arrSort = array();
 
-                        foreach ($this->arrListCompare as $key => $value)
+                        foreach($this->arrListCompare as $strType => $arrLists)
                         {
-                            if ($value["transmission"] != SyncCtoEnum::FILETRANS_SKIPPED)
+                            foreach ($arrLists as $key => $value)
                             {
-                                continue;
-                            }
+                                if ($value["transmission"] != SyncCtoEnum::FILETRANS_SKIPPED)
+                                {
+                                    continue;
+                                }
 
-                            $arrSort[$value["skipreason"]][] = $value["path"];
+                                $skipreason = preg_replace("/(RPC Call:.*|\<br\>|\<br\/\>)/i", " ", $value["skipreason"]);
+
+                                $arrSort[$skipreason][] = $value["path"];
+                            }
                         }
 
                         $compare .= '<ul class="fileinfo">';
@@ -4959,10 +5076,58 @@ class SyncCtoModuleClient extends BackendModule
                         $compare .= "</ul>";
                     }
 
+                    // Write some information about the dbafs.
+                    if(is_array($this->arrListCompare) && count($this->arrListCompare['files']) != 0)
+                    {
+                        $arrDbafsFiles = array();
+                        $arrDbafsMsg = array();
+                        foreach ($this->arrListCompare['files'] as $key => $value)
+                        {
+                            if (!isset($value['dbafs']))
+                            {
+                                continue;
+                            }
+
+                            // Add entries to the list.
+                            $arrDbafsFiles[$value['dbafs']['state']][] = $value["path"];
+                            $arrDbafsMsg[$value['dbafs']['state']] = $value['dbafs']['msg'];
+                        }
+
+                        $compare .= '<ul class="dbafsinfo">';
+                        $compare .= "<li>";
+
+                        if(count($arrDbafsFiles) == 0)
+                        {
+                            $compare .= sprintf('%s', 'DBAFS import seems to have no problems.');
+                        }
+                        else
+                        {
+                            $compare .= sprintf('%s', 'There where some problems in the DBAFS see list for more:');
+                            foreach($arrDbafsMsg as $mixKey => $strMsg)
+                            {
+                                $compare .= '<ul>';
+                                $compare .= '<li>';
+                                $compare .= sprintf('<p>%s</p>', $strMsg);
+                                $compare .= '<ul>';
+                                $compare .= '<li>';
+                                $compare .= implode('</li><li>', $arrDbafsFiles[$mixKey]);
+                                $compare .= '</li>';
+                                $compare .= '</ul>';
+                                $compare .= '</li>';
+                                $compare .= '</ul>';
+                            }
+                            $compare .= '</li>';
+                            $compare .= '</ul>';
+                        }
+
+                        $compare .= "</li>";
+                        $compare .= "</ul>";
+                    }
+
                     // Show filelist only in debug mode
                     if ($GLOBALS['TL_CONFIG']['syncCto_debug_mode'] == true)
                     {
-                        if (count($this->arrListCompare) != 0 && is_array($this->arrListCompare))
+                        if (is_array($this->arrListCompare) && (count($this->arrListCompare['core']) != 0 || count($this->arrListCompare['files']) != 0))
                         {
                             $compare .= '<br /><p class="tl_help">' . $intSendCount . $GLOBALS['TL_LANG']['tl_syncCto_sync']["step_5"]['description_4'] . '</p>';
 
@@ -4976,21 +5141,24 @@ class SyncCtoModuleClient extends BackendModule
                                 $compare .= '<strong>' . $GLOBALS['TL_LANG']['tl_syncCto_sync']["step_5"]['description_6'] . '</strong>';
                                 $compare .= "<ul>";
 
-                                foreach ($this->arrListCompare as $key => $value)
+                                foreach($this->arrListCompare as $strType => $arrLists)
                                 {
-                                    if ($value["transmission"] != SyncCtoEnum::FILETRANS_SEND)
+                                    foreach ($arrLists as $key => $value)
                                     {
-                                        continue;
-                                    }
+                                        if ($value["transmission"] != SyncCtoEnum::FILETRANS_SEND)
+                                        {
+                                            continue;
+                                        }
 
-                                    if (in_array($value["state"], array(SyncCtoEnum::FILESTATE_DELETE, SyncCtoEnum::FILESTATE_FOLDER_DELETE)))
-                                    {
-                                        continue;
-                                    }
+                                        if ($value["state"] == SyncCtoEnum::FILESTATE_DELETE)
+                                        {
+                                            continue;
+                                        }
 
-                                    $compare .= "<li>";
-                                    $compare .= (mb_check_encoding($value["path"], 'UTF-8')) ? $value["path"] : utf8_encode($value["path"]);
-                                    $compare .= "</li>";
+                                        $compare .= "<li>";
+                                        $compare .= (mb_check_encoding($value["path"], 'UTF-8')) ? $value["path"] : utf8_encode($value["path"]);
+                                        $compare .= "</li>";
+                                    }
                                 }
                                 $compare .= "</ul>";
                                 $compare .= "</li>";
@@ -5011,21 +5179,24 @@ class SyncCtoModuleClient extends BackendModule
                                 $compare .= '<strong>' . $GLOBALS['TL_LANG']['tl_syncCto_sync']["step_5"]['description_7'] . '</strong>';
                                 $compare .= "<ul>";
 
-                                foreach ($this->arrListCompare as $key => $value)
+                                foreach($this->arrListCompare as $strType => $arrLists)
                                 {
-                                    if ($value["transmission"] != SyncCtoEnum::FILETRANS_SEND)
+                                    foreach ($arrLists as $key => $value)
                                     {
-                                        continue;
-                                    }
+                                        if ($value["transmission"] != SyncCtoEnum::FILETRANS_SEND)
+                                        {
+                                            continue;
+                                        }
 
-                                    if ($value["state"] != SyncCtoEnum::FILESTATE_DELETE)
-                                    {
-                                        continue;
-                                    }
+                                        if ($value["state"] != SyncCtoEnum::FILESTATE_DELETE)
+                                        {
+                                            continue;
+                                        }
 
-                                    $compare .= "<li>";
-                                    $compare .= (mb_check_encoding($value["path"], 'UTF-8')) ? $value["path"] : utf8_encode($value["path"]);
-                                    $compare .= "</li>";
+                                        $compare .= "<li>";
+                                        $compare .= (mb_check_encoding($value["path"], 'UTF-8')) ? $value["path"] : utf8_encode($value["path"]);
+                                        $compare .= "</li>";
+                                    }
                                 }
 
                                 $compare .= "</ul>";
@@ -5035,21 +5206,24 @@ class SyncCtoModuleClient extends BackendModule
                                 $compare .= '<strong>' . $GLOBALS['TL_LANG']['tl_syncCto_sync']["step_5"]['description_9'] . '</strong>';
                                 $compare .= "<ul>";
 
-                                foreach ($this->arrListCompare as $key => $value)
+                                foreach($this->arrListCompare as $strType => $arrLists)
                                 {
-                                    if ($value["transmission"] != SyncCtoEnum::FILETRANS_SEND)
+                                    foreach ($arrLists as $key => $value)
                                     {
-                                        continue;
-                                    }
+                                        if ($value["transmission"] != SyncCtoEnum::FILETRANS_SEND)
+                                        {
+                                            continue;
+                                        }
 
-                                    if ($value["state"] != SyncCtoEnum::FILESTATE_FOLDER_DELETE)
-                                    {
-                                        continue;
-                                    }
+                                        if ($value["state"] != SyncCtoEnum::FILESTATE_FOLDER_DELETE)
+                                        {
+                                            continue;
+                                        }
 
-                                    $compare .= "<li>";
-                                    $compare .= (mb_check_encoding($value["path"], 'UTF-8')) ? $value["path"] : utf8_encode($value["path"]);
-                                    $compare .= "</li>";
+                                        $compare .= "<li>";
+                                        $compare .= (mb_check_encoding($value["path"], 'UTF-8')) ? $value["path"] : utf8_encode($value["path"]);
+                                        $compare .= "</li>";
+                                    }
                                 }
 
                                 $compare .= "</ul>";
@@ -5071,20 +5245,24 @@ class SyncCtoModuleClient extends BackendModule
                                 $compare .= '<ul class="fileinfo">';
 
                                 $compare .= "<li>";
-                                $compare .= '<strong>' . $GLOBALS['TL_LANG']['tl_syncCto_sync']["step_5"]['description_9'] . '</strong>';
+                                $compare .= '<strong>' . $GLOBALS['TL_LANG']['tl_syncCto_sync']["step_5"]['description_8'] . '</strong>';
                                 $compare .= "<ul>";
 
-                                foreach ($this->arrListCompare as $key => $value)
+                                foreach($this->arrListCompare as $strType => $arrLists)
                                 {
-                                    if ($value["transmission"] != SyncCtoEnum::FILETRANS_WAITING)
+                                    foreach ($arrLists as $key => $value)
                                     {
-                                        continue;
-                                    }
+                                        if ($value["transmission"] != SyncCtoEnum::FILETRANS_WAITING)
+                                        {
+                                            continue;
+                                        }
 
-                                    $compare .= "<li>";
-                                    $compare .= (mb_check_encoding($value["path"], 'UTF-8')) ? $value["path"] : utf8_encode($value["path"]);
-                                    $compare .= "</li>";
+                                        $compare .= "<li>";
+                                        $compare .= (mb_check_encoding($value["path"], 'UTF-8')) ? $value["path"] : utf8_encode($value["path"]);
+                                        $compare .= "</li>";
+                                    }
                                 }
+
                                 $compare .= "</ul>";
                                 $compare .= "</li>";
                                 $compare .= "</ul>";
@@ -5101,11 +5279,11 @@ class SyncCtoModuleClient extends BackendModule
                         ->execute($this->intClientID)
                         ->fetchAllAssoc();
 
-                    $strLink = vsprintf('<a href="%s" target="_blank" style="text-decoration:underline;">', array($this->Environment->base));
+                    $strLink = vsprintf('<a href="%s:%s%s" target="_blank" style="text-decoration:underline;">', array($arrClientLink[0]['address'], $arrClientLink[0]['port'], $arrClientLink[0]['path']));
 
                     $this->objData->nextStep();
                     $this->objData->setTitle($GLOBALS['TL_LANG']['MSC']['complete']);
-                    $this->objData->setDescription(vsprintf($GLOBALS['TL_LANG']['tl_syncCto_sync']['complete_server'], array($strLink, "</a>")));
+                    $this->objData->setDescription(vsprintf($GLOBALS['TL_LANG']['tl_syncCto_sync']['complete_client'], array($strLink, "</a>")));
                     $this->objData->setState(SyncCtoEnum::WORK_OK);
 
                     break;
