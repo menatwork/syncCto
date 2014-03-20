@@ -686,10 +686,10 @@ class SyncCtoHelper extends Backend
     }
 
     /**
-     * Get a list with all maintance options
+     * Get a list with all maintenance options
      * @return array
      */
-    public function getMaintanceOptions()
+    public function getMaintenanceOptions()
     {
         return $GLOBALS['SYC_CONFIG']['maintance_options'];
     }

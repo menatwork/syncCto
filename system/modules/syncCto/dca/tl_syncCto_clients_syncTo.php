@@ -91,7 +91,7 @@ $GLOBALS['TL_DCA']['tl_syncCto_clients_syncTo'] = array
                 'multiple'        => true,
                 'checkAll'        => true
             ),
-            'options_callback'    => array('SyncCtoHelper', 'getMaintanceOptions'),
+            'options_callback'    => array('SyncCtoHelper', 'getMaintenanceOptions'),
         ),
         'attentionFlag' => array
         (
