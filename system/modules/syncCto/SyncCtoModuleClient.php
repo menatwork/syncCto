@@ -1955,7 +1955,7 @@ class SyncCtoModuleClient extends BackendModule
                     $objTemp->headline       = $GLOBALS['TL_LANG']['MSC']['totalsize'];
                     $objTemp->cssId          = 'syncCto_filelist_form';
                     $objTemp->forwardValue   = $GLOBALS['TL_LANG']['MSC']['apply'];
-                    $objTemp->popupClassName = 'popupSyncFiles.php';
+                    $objTemp->popupClassName = 'SyncCtoPopupFiles.php';
 
                     // Build content 
                     $this->objData->setDescription(vsprintf($GLOBALS['TL_LANG']['tl_syncCto_sync']["step_2"]['description_4'], array($intCountMissing, $intCountNeed, $intCountDelete, $intCountIgnored, $this->getReadableSize($intTotalSizeNew), $this->getReadableSize($intTotalSizeChange), $this->getReadableSize($intTotalSizeDel))));
@@ -2632,7 +2632,7 @@ class SyncCtoModuleClient extends BackendModule
                     $objTemp->headline       = $GLOBALS['TL_LANG']['MSC']['totalsize'];
                     $objTemp->cssId          = 'syncCto_database_form';
                     $objTemp->forwardValue   = $GLOBALS['TL_LANG']['MSC']['apply'];
-                    $objTemp->popupClassName = 'popupSyncDB.php';
+                    $objTemp->popupClassName = 'SyncCtoPopupDB.php';
 
                     // Build content 
                     $this->objData->setDescription($GLOBALS['TL_LANG']['tl_syncCto_sync']['step_4']['description_1']);
@@ -3841,7 +3841,7 @@ class SyncCtoModuleClient extends BackendModule
                     $objTemp->headline       = $GLOBALS['TL_LANG']['MSC']['totalsize'];
                     $objTemp->cssId          = 'syncCto_filelist_form';
                     $objTemp->forwardValue   = $GLOBALS['TL_LANG']['MSC']['apply'];
-                    $objTemp->popupClassName = 'popupSyncFiles.php';
+                    $objTemp->popupClassName = 'SyncCtoPopupFiles.php';
 
                     // Build content 
                     $this->objData->setDescription(vsprintf($GLOBALS['TL_LANG']['tl_syncCto_sync']["step_2"]['description_4'], array($intCountMissing, $intCountNeed, $intCountDelete, $intCountIgnored, $this->getReadableSize($intTotalSizeNew), $this->getReadableSize($intTotalSizeChange), $this->getReadableSize($intTotalSizeDel))));
@@ -4516,7 +4516,7 @@ class SyncCtoModuleClient extends BackendModule
                     $objTemp->headline       = $GLOBALS['TL_LANG']['MSC']['totalsize'];
                     $objTemp->cssId          = 'syncCto_database_form';
                     $objTemp->forwardValue   = $GLOBALS['TL_LANG']['MSC']['apply'];
-                    $objTemp->popupClassName = 'popupSyncDB.php';
+                    $objTemp->popupClassName = 'SyncCtoPopupDB.php';
 
                     // Build content 
                     $this->objData->setDescription($GLOBALS['TL_LANG']['tl_syncCto_sync']['step_4']['description_1']);

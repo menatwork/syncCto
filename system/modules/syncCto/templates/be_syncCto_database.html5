@@ -22,7 +22,7 @@
 
 <?php else: ?>
 
-<form id="db_form" action="<?php echo $this->Environment->base; ?>contao/popupSyncDB.php?id=<?php echo $this->id; ?>&amp;step=<?php echo $this->step; ?>&amp;direction=<?php echo $this->direction ?>" method="post">
+<form id="db_form" action="<?php echo $this->Environment->base; ?>system/modules/syncCto/SyncCtoPopupDB.php?id=<?php echo $this->id; ?>&amp;step=<?php echo $this->step; ?>&amp;direction=<?php echo $this->direction ?>" method="post">
     
     <div class="formbody">
         <input type="hidden" name="FORM_SUBMIT" value="<?php echo $this->formId; ?>" />
