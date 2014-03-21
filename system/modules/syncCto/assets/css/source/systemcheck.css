@@ -75,3 +75,7 @@
   .logo-synccto {
     margin-top:1px;
   }
+
+  #start_sync_all {
+    float:right;
+  }
