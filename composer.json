@@ -36,7 +36,7 @@
 		"menatwork/ziparchivecto":"~1.1"
 	},
 	"autoload":{
-		"classmap":["contao/","system/"]
+		"classmap":["system/"]
 	},
 	"replace":{
 		"contao-legacy/synccto":"*"
@@ -44,8 +44,6 @@
 	"extra":{
 		"contao":{
 			"sources":{
-				"contao/popupSyncDB.php":"contao/popupSyncDB.php",
-				"contao/popupSyncFiles.php":"contao/popupSyncFiles.php",
 				"system/modules/syncCto":"system/modules/syncCto",
 				"system/modules/syncCtoUpdater":"system/modules/syncCtoUpdater"
 			}
