@@ -140,6 +140,8 @@ $GLOBALS['SYC_CONFIG']['folder_blacklist'] = array_merge( (array) $GLOBALS['SYC_
 (
     'assets/css/',
     'assets/images/',
+    'assets/js/',
+    'composer/cache/',
     'system/cache/',
     'system/backup/',
     'system/html/',
