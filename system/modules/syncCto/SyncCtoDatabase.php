@@ -1041,7 +1041,7 @@ class SyncCtoDatabase extends Backend
             {
                 foreach ($arrSuffixSQL as $key => $value)
                 {
-                    $arrSuffixSQL[$key]['response'] = $this->Database->query($value['query']);
+                    $this->Database->query($value['query']);
                 }
             }
 
