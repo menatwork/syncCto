@@ -273,6 +273,7 @@ class SyncCtoPopupFiles extends Backend
         $GLOBALS['TL_JAVASCRIPT'][] = 'assets/mootools/mootao/Mootao.js';
         $GLOBALS['TL_JAVASCRIPT'][] = 'assets/contao/js/core.js';
         $GLOBALS['TL_JAVASCRIPT'][] = 'system/modules/syncCto/assets/js/compare.js';
+        $GLOBALS['TL_JAVASCRIPT'][] = 'system/modules/syncCto/assets/js/htmltable.js';
 
         // Set wrapper template information
         $this->popupTemplate           = new BackendTemplate("be_syncCto_popup");
