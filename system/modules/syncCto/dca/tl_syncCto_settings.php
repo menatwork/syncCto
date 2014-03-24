@@ -36,8 +36,10 @@ $GLOBALS['TL_DCA']['tl_syncCto_settings'] = array
             'label'               => &$GLOBALS['TL_LANG']['tl_syncCto_settings']['folder_blacklist'],
             'exclude'             => true,
             'inputType'           => 'multiColumnWizard',
+            'explanation'         => 'folder_blacklist',
             'eval' => array
             (
+                'helpwizard'      => true,
                 'tl_class'        => 'clr',
                 'columnFields' => array
                 (
