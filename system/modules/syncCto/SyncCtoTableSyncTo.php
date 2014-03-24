@@ -53,7 +53,7 @@ class SyncCtoTableSyncTo extends Backend
                     if (preg_match("/system\/tmp/", $strContent))
                     {
                         // Set data.
-                        $this->addInfoMessage($GLOBALS['TL_LANG']['MSC']['disabled_cache']);
+                        \Message::addInfo($GLOBALS['TL_LANG']['MSC']['disabled_cache']);
                     }
                 }
             }
@@ -107,7 +107,7 @@ class SyncCtoTableSyncTo extends Backend
             );
 
             // Set data
-            $this->addInfoMessage($strLastSync);
+            \Message::addInfo($strLastSync);
         }
     }
 

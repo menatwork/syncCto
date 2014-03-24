@@ -47,7 +47,6 @@ class SyncCtoTableSyncFrom extends Backend
         {
             $strFile        = new File($strInitFilePath);
             $arrFileContent = $strFile->getContentAsArray();
-            $booLocated     = false;
             foreach ($arrFileContent AS $strContent)
             {
                 if (!preg_match("/(\/\*|\*|\*\/|\/\/)/", $strContent))
@@ -56,8 +55,7 @@ class SyncCtoTableSyncFrom extends Backend
                     if (preg_match("/system\/tmp/", $strContent))
                     {
                         // Set data.
-                        $this->addInfoMessage($GLOBALS['TL_LANG']['MSC']['disabled_cache']);
-                        $booLocated = true;
+                        \Message::addInfo($GLOBALS['TL_LANG']['MSC']['disabled_cache']);
                     }
                 }
             }
@@ -112,7 +110,7 @@ class SyncCtoTableSyncFrom extends Backend
             );
 
             // Set data
-            $this->addInfoMessage($strLastSync);
+            \Message::addInfo($strLastSync);
         }
     }
 
