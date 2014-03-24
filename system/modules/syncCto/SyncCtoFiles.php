@@ -140,8 +140,8 @@ class SyncCtoFiles extends Backend
 
         foreach ($this->objSyncCtoHelper->getPreparedBlacklistFolder() as $value)
         {
-            // Search with preg for values            
-            if (preg_match("/^" . $value . "/i", $strPath) != 0)
+            // Search with preg for values
+            if (preg_match("/^" . $value . "/i", $strPath . '/') != 0)
             {
                 return true;
             }
@@ -159,6 +159,7 @@ class SyncCtoFiles extends Backend
     public function isInBlackFile($strPath)
     {
         $strPath = $this->objSyncCtoHelper->standardizePath($strPath);
+
 
         foreach ($this->objSyncCtoHelper->getPreparedBlacklistFiles() as $value)
         {
