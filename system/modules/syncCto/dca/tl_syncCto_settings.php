@@ -48,7 +48,7 @@ $GLOBALS['TL_DCA']['tl_syncCto_settings'] = array
                         'label'           => &$GLOBALS['TL_LANG']['tl_syncCto_settings']['folder_blacklist'],
                         'exclude'         => true,
                         'inputType'       => 'text',
-                        'eval'            => array('trailingSlash' => false, 'style' => 'width:595px', 'allowHtml' => false)
+                        'eval'            => array('style' => 'width:595px', 'allowHtml' => false)
                     )
                 )
             ),
