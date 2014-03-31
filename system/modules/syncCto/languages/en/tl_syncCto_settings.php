@@ -30,6 +30,7 @@ $GLOBALS['TL_LANG']['tl_syncCto_settings']['folder_whitelist']          = array(
 $GLOBALS['TL_LANG']['tl_syncCto_settings']['local_blacklist']           = array('localconfig.php', 'Here you can define which localconfig.php entries should not be synchronized.');
 $GLOBALS['TL_LANG']['tl_syncCto_settings']['database_tables']           = array('Not recommended tables', 'Here you can define which database tables you do not recommend for the synchronization.');
 $GLOBALS['TL_LANG']['tl_syncCto_settings']['hidden_tables']             = array('Hidden tables', 'Here you can grant access to one or more database tables for the synchronization.');
+$GLOBALS['TL_LANG']['tl_syncCto_settings']['hidden_tables_placeholder'] = array('Hidden tables - Placeholder', 'Here you can grant access to temporary database tables, that are periodical created and deleted (eg Tabimporter).');
 $GLOBALS['TL_LANG']['tl_syncCto_settings']['debug_mode']                = array('Activate debug mode', 'Print information like runtime or synchronized during the synchronization');
 $GLOBALS['TL_LANG']['tl_syncCto_settings']['custom_settings']           = array('Activate expert settings', 'Click here if you know what you are doing.');
 $GLOBALS['TL_LANG']['tl_syncCto_settings']['wait_timeout']              = array('Configure "wait_timeout"', 'More informationen: http://goo.gl/rC5Y4');
@@ -45,3 +46,8 @@ $GLOBALS['TL_LANG']['tl_syncCto_settings']['ALTER_ADD']                 = 'Add n
 $GLOBALS['TL_LANG']['tl_syncCto_settings']['ALTER_CHANGE']              = 'Change existing columns';
 $GLOBALS['TL_LANG']['tl_syncCto_settings']['ALTER_DROP']                = 'Drop existing columns';
 $GLOBALS['TL_LANG']['tl_syncCto_settings']['DROP']                      = 'Drop existing tables';
+
+/**
+ * Miscellaneous
+ */
+$GLOBALS['TL_LANG']['tl_syncCto_settings']['hide_by_regex']             = "%s <span style='color: #999; display:inline;'>(Temporary database tables)</span>";

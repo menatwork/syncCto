@@ -2432,11 +2432,13 @@ class SyncCtoModuleClient extends BackendModule
                         $arrClientTableR    = $this->objSyncCtoCommunicationClient->getRecommendedTables();
                         $arrClientTableNR   = $this->objSyncCtoCommunicationClient->getNoneRecommendedTables();
                         $arrClientTableH    = $this->objSyncCtoCommunicationClient->getHiddenTables();
+                        $arrClientTableHP   = $this->objSyncCtoCommunicationClient->getPreparedHiddenTablesPlaceholder();
                         $arrClientTimestamp = $this->objSyncCtoCommunicationClient->getClientTimestamp(array());
 
                         $arrServerTableR    = $this->objSyncCtoHelper->databaseTablesRecommended();
                         $arrServerTableNR   = $this->objSyncCtoHelper->databaseTablesNoneRecommended();
                         $arrServerTableH    = $this->objSyncCtoHelper->getTablesHidden();
+                        $arrServerTableHP   = $this->objSyncCtoHelper->getPreparedHiddenTablesPlaceholder();
                         $arrServerTimestamp = $this->objSyncCtoHelper->getDatabaseTablesTimestamp();
 
                         // clean up tables. Use user rights.
@@ -2512,12 +2514,14 @@ class SyncCtoModuleClient extends BackendModule
                             $arrClientTableNR[$key]['type'] = 'nonRecommended';
                         }
 
-                        $arrServerTables  = array_merge($arrServerTableR, $arrServerTableNR);
-                        $arrClientTables  = array_merge($arrClientTableR, $arrClientTableNR);
-                        $arrHiddenTables  = array_keys(array_flip(array_merge($arrServerTableH, $arrClientTableH)));
-                        $arrAllTimeStamps = $this->objSyncCtoDatabase->getAllTimeStamps($arrServerTimestamp, $arrClientTimestamp, $this->intClientID);
+                        $arrServerTables            = array_merge($arrServerTableR, $arrServerTableNR);
+                        $arrClientTables            = array_merge($arrClientTableR, $arrClientTableNR);
+                        $arrHiddenTables            = array_keys(array_flip(array_merge($arrServerTableH, $arrClientTableH)));
+                        $arrHiddenTablesPlaceholder = array_keys(array_flip(array_merge($arrClientTableHP, $arrServerTableHP)));
+                        $arrAllTimeStamps           = $this->objSyncCtoDatabase->getAllTimeStamps($arrServerTimestamp, $arrClientTimestamp, $this->intClientID);
 
-                        $arrCompareList = $this->objSyncCtoDatabase->getFormatedCompareList($arrServerTables, $arrClientTables, $arrHiddenTables, $arrAllTimeStamps['server'], $arrAllTimeStamps['client'], $arrAllowedTables, 'server', 'client');
+
+                        $arrCompareList = $this->objSyncCtoDatabase->getFormatedCompareList($arrServerTables, $arrClientTables, $arrHiddenTables, $arrHiddenTablesPlaceholder, $arrAllTimeStamps['server'], $arrAllTimeStamps['client'], $arrAllowedTables, 'server', 'client');
 
                         if (count($arrCompareList['recommended']) == 0 && count($arrCompareList['none_recommended']) == 0)
                         {
@@ -4344,11 +4348,13 @@ class SyncCtoModuleClient extends BackendModule
                         $arrClientTableR    = $this->objSyncCtoCommunicationClient->getRecommendedTables();
                         $arrClientTableNR   = $this->objSyncCtoCommunicationClient->getNoneRecommendedTables();
                         $arrClientTableH    = $this->objSyncCtoCommunicationClient->getHiddenTables();
+                        $arrClientTableHP   = $this->objSyncCtoCommunicationClient->getPreparedHiddenTablesPlaceholder();
                         $arrClientTimestamp = $this->objSyncCtoCommunicationClient->getClientTimestamp(array());
 
                         $arrServerTableR    = $this->objSyncCtoHelper->databaseTablesRecommended();
                         $arrServerTableNR   = $this->objSyncCtoHelper->databaseTablesNoneRecommended();
                         $arrServerTableH    = $this->objSyncCtoHelper->getTablesHidden();
+                        $arrServerTableHP   = $this->objSyncCtoHelper->getPreparedHiddenTablesPlaceholder();
                         $arrServerTimestamp = $this->objSyncCtoHelper->getDatabaseTablesTimestamp();
 
                         // clean up tables. Use user rights.
@@ -4424,12 +4430,13 @@ class SyncCtoModuleClient extends BackendModule
                             $arrClientTableNR[$key]['type'] = 'nonRecommended';
                         }
 
-                        $arrServerTables  = array_merge($arrServerTableR, $arrServerTableNR);
-                        $arrClientTables  = array_merge($arrClientTableR, $arrClientTableNR);
-                        $arrHiddenTables  = array_keys(array_flip(array_merge($arrServerTableH, $arrClientTableH)));
-                        $arrAllTimeStamps = $this->objSyncCtoDatabase->getAllTimeStamps($arrServerTimestamp, $arrClientTimestamp, $this->intClientID);
+                        $arrServerTables            = array_merge($arrServerTableR, $arrServerTableNR);
+                        $arrClientTables            = array_merge($arrClientTableR, $arrClientTableNR);
+                        $arrHiddenTables            = array_keys(array_flip(array_merge($arrServerTableH, $arrClientTableH)));
+                        $arrHiddenTablesPlaceholder = array_keys(array_flip(array_merge($arrClientTableHP, $arrServerTableHP)));
+                        $arrAllTimeStamps           = $this->objSyncCtoDatabase->getAllTimeStamps($arrServerTimestamp, $arrClientTimestamp, $this->intClientID);
 
-                        $arrCompareList = $this->objSyncCtoDatabase->getFormatedCompareList($arrClientTables, $arrServerTables, $arrHiddenTables, $arrAllTimeStamps['client'], $arrAllTimeStamps['server'], $arrAllowedTables, 'client', 'server');
+                        $arrCompareList = $this->objSyncCtoDatabase->getFormatedCompareList($arrClientTables, $arrServerTables, $arrHiddenTables, $arrHiddenTablesPlaceholder, $arrAllTimeStamps['client'], $arrAllTimeStamps['server'], $arrAllowedTables, 'client', 'server');
 
                         if (count($arrCompareList['recommended']) == 0 && count($arrCompareList['none_recommended']) == 0)
                         {

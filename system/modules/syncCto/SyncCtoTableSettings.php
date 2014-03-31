@@ -28,6 +28,29 @@ class SyncCtoTableSettings extends Backend
         $this->objSyncCtoHelper = SyncCtoHelper::getInstance();
     }
 
+    public function getHiddenTables()
+    {
+        // Get the data from the helper.
+        $arrTables = SyncCtoHelper::getInstance()->hiddenTables();
+        $arrReturn = array();
+
+        // Check if a regex remove this entry from the list.
+        foreach($arrTables as $strTable)
+        {
+            if(SyncCtoHelper::getInstance()->isTableHiddenByPlaceholder($strTable))
+            {
+                $arrReturn[$strTable] = sprintf($GLOBALS['TL_LANG']['tl_syncCto_settings']['hide_by_regex'], $strTable);
+            }
+            else
+            {
+                $arrReturn[$strTable] = $strTable;
+            }
+        }
+
+        // Return the values.
+        return $arrReturn;
+    }
+
     /**
      * @param string $strValue     Values.
      *

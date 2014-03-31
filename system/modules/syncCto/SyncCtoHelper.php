@@ -25,8 +25,9 @@ class SyncCtoHelper extends Backend
     protected $objSyncCtoDatabase;
 
     // Cache
-    protected $arrPreparedBlacklistFolder = null;
-    protected $arrPreparedBlacklistFiles = null;
+    protected $arrPreparedBlacklistFolder;
+    protected $arrPreparedBlacklistFiles;
+    protected $arrPreparedHiddenTablePlaceholder;
     protected $strPreparedTlRoot = '';
 
     // Config
@@ -65,6 +66,13 @@ class SyncCtoHelper extends Backend
         foreach ($this->getBlacklistFile() as $key => $value)
         {
             $this->arrPreparedBlacklistFiles[$key] = str_replace($this->arrSearch, $this->arrReplace, $value);
+        }
+
+        // Instance a list for regex from the hidden table list.
+        $this->arrPreparedHiddenTablePlaceholder = array();
+        foreach ($this->getHiddenTablePlaceholder() as $key => $value)
+        {
+            $this->arrPreparedHiddenTablePlaceholder[$key] = str_replace($this->arrSearch, $this->arrReplace, $value);
         }
 
         // Replace some elements in TL_ROOT for regex.
@@ -355,6 +363,66 @@ class SyncCtoHelper extends Backend
         $arrSyncCtoConfig = $GLOBALS['SYC_CONFIG']['table_hidden'];
 
         return $this->mergeConfigs($arrSyncCtoConfig, $arrLocalconfig);
+    }
+
+    /**
+     * Return a list with the regex list of the hidden table.
+     *
+     * @return array A list with the entries from the localconfig.
+     */
+    public function getHiddenTablePlaceholder()
+    {
+        $arrReturn = array();
+
+        // Get the entries from the loclconfig and add them to the list.
+        $arrHiddenTableConfig = deserialize($GLOBALS['TL_CONFIG']['syncCto_hidden_tables_placeholder']);
+        if(is_array($arrHiddenTableConfig) && count($arrHiddenTableConfig) != 0)
+        {
+            foreach ($arrHiddenTableConfig as$value)
+            {
+                $arrReturn[] =  $value['entries'];
+            }
+        }
+
+        return $arrReturn;
+    }
+
+    /**
+     * Return a list with the regex list of the hidden table.
+     *
+     * @return array A list with the entries from the localconfig.
+     */
+    public function getPreparedHiddenTablesPlaceholder()
+    {
+        return $this->arrPreparedHiddenTablePlaceholder;
+    }
+
+    /**
+     * Check if the table is in the placeholder list.
+     *
+     * @param string $strTable The table name to check
+     *
+     * @return bool True => Hit in the Placeholder | False => No hit.
+     */
+    public function isTableHiddenByPlaceholder($strTable)
+    {
+        // Check if we have entries.
+        if (count($this->arrPreparedHiddenTablePlaceholder) == 0)
+        {
+            return false;
+        }
+
+        // Run each and check it with the given name.
+        foreach ($this->arrPreparedHiddenTablePlaceholder as $arrEntry)
+        {
+            if (preg_match('/^' . $arrEntry . '$/', $strTable))
+            {
+                return true;
+            }
+        }
+
+        // No result.
+        return false;
     }
 
     /* -------------------------------------------------------------------------
@@ -875,7 +943,7 @@ class SyncCtoHelper extends Backend
     }
 
     /**
-     * Returns a list without the hidden tables
+     * Returns a list without the hidden tables and the placeholder.
      *
      * @return array
      */
@@ -888,6 +956,12 @@ class SyncCtoHelper extends Backend
         {
             // Check if table is a hidden one.
             if (in_array($value, $arrTablesHidden) || preg_match("/synccto_temp_.*/", $value))
+            {
+                continue;
+            }
+
+            // Check if is a hidden one by the placeholder.
+            if($this->isTableHiddenByPlaceholder($value))
             {
                 continue;
             }
@@ -1013,21 +1087,71 @@ class SyncCtoHelper extends Backend
     }
 
     /**
-     * Get Table Meta
+     * Get Table meta
      *
-     * @param string  $strTableName
-     * @param boolean $booHashSame
+     * @param string $strTableName Name of table.
+     *
+     * @internal param bool $booHashSame
      *
      * @return string
      */
     private function getTableMeta($strTableName)
     {
-        $objCount = $this->Database->prepare("SELECT COUNT(*) as Count FROM $strTableName")->executeUncached();
+        // Count the entries.
+        $intCount = $this->Database
+            ->prepare("SELECT COUNT(*) as Count FROM $strTableName")
+            ->executeUncached()
+            ->Count;
+
+        // Try to build the id list.
+        $arrIdParts = array();
+        if (\Database::getInstance()->fieldExists('id', $strTableName))
+        {
+            $objIds = \Database::getInstance()
+                ->prepare('SELECT id FROM ' . $strTableName, ' ORDER BY id ASC')
+                ->execute();
+
+            $intStart   = null;
+            $intLast    = null;
+
+            while ($objIds->next())
+            {
+                // Init first num.
+                if ($intStart == null)
+                {
+                    $intStart = $objIds->id;
+                    $intLast  = $objIds->id;
+                    continue;
+                }
+
+                // Check if the next number is in line.
+                if (($intLast + 1) == $objIds->id)
+                {
+                    $intLast++;
+                }
+                else
+                {
+                    $arrIdParts[] = array(
+                        'start' => intval($intStart),
+                        'end'   => intval($intLast),
+                    );
+
+                    $intStart = $objIds->id;
+                    $intLast  = $objIds->id;
+                }
+            }
+
+            $arrIdParts[] = array(
+                'start' => intval($intStart),
+                'end'   => intval($intLast),
+            );
+        }
 
         $arrTableMeta = array(
             'name'  => $strTableName,
-            'count' => $objCount->Count,
-            'size'  => $this->Database->getSizeOf($strTableName)
+            'count' => $intCount,
+            'ids'   => $arrIdParts,
+            'size'  => \Database::getInstance()->getSizeOf($strTableName)
         );
 
         return $arrTableMeta;
@@ -1074,10 +1198,10 @@ class SyncCtoHelper extends Backend
             $arrTableNames = $mixTableNames;
         }
 
-        // Return array
+        // Return array.
         $arrTimestamp = array();
 
-        // Load all Tables
+        // Load all Tables.
         $arrTables = $this->Database->listTables();
 
         $objDBSchema = $this->Database->prepare("SELECT TABLE_NAME, UPDATE_TIME FROM information_schema.TABLES WHERE TABLE_SCHEMA = ?")->executeUncached($GLOBALS['TL_CONFIG']['dbDatabase']);

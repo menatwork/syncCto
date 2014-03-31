@@ -894,6 +894,16 @@ class SyncCtoCommunicationClient extends CtoCommunication
         return $this->runServer("SYNCCTO_HIDDEN_TABLES");
     }
 
+    /**
+     * Returns a list without the hidden tables
+     *
+     * @return array
+     */
+    public function getPreparedHiddenTablesPlaceholder()
+    {
+        return $this->runServer("SYNCCTO_HIDDEN_TABLES_PLACEHOLDER");
+    }
+
     /* -------------------------------------------------------------------------
      * Config Operations
      */

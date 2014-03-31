@@ -22,7 +22,7 @@ $GLOBALS['TL_DCA']['tl_syncCto_settings'] = array
     'palettes' => array
     (
         '__selector__'            => array('syncCto_custom_settings'),
-        'default'                 => '{blacklist_legend},syncCto_folder_blacklist,syncCto_file_blacklist;{whitelist_legend},syncCto_folder_whitelist;{local_blacklist_legend},syncCto_local_blacklist;{tables_legend},syncCto_database_tables;{hidden_tables_legend:hide},syncCto_hidden_tables;{custom_legend:hide},syncCto_debug_mode,syncCto_custom_settings,syncCto_auto_db_updater;'
+        'default'                 => '{blacklist_legend},syncCto_folder_blacklist,syncCto_file_blacklist;{whitelist_legend},syncCto_folder_whitelist;{local_blacklist_legend},syncCto_local_blacklist;{tables_legend},syncCto_database_tables;{hidden_tables_legend:hide},syncCto_hidden_tables,syncCto_hidden_tables_placeholder;{custom_legend:hide},syncCto_debug_mode,syncCto_custom_settings,syncCto_auto_db_updater;'
     ),
     'subpalettes' => array
     (
@@ -129,7 +129,7 @@ $GLOBALS['TL_DCA']['tl_syncCto_settings'] = array
             )
         ),
         'syncCto_local_blacklist' => array
-            (
+        (
             'label'               => &$GLOBALS['TL_LANG']['tl_syncCto_settings']['local_blacklist'],
             'inputType'           => 'checkboxWizard',
             'exclude'             => true,
@@ -145,12 +145,12 @@ $GLOBALS['TL_DCA']['tl_syncCto_settings'] = array
             )
         ),
         'syncCto_hidden_tables' => array
-            (
+        (
             'label'               => &$GLOBALS['TL_LANG']['tl_syncCto_settings']['hidden_tables'],
             'inputType'           => 'checkboxWizard',
             'exclude'             => true,
             'eval'                => array('multiple' => true),
-            'options_callback'    => array('SyncCtoHelper', 'hiddenTables'),
+            'options_callback'    => array('SyncCtoTableSettings', 'getHiddenTables'),
             'load_callback'       => array
             (
                 array('SyncCtoTableSettings', 'loadTablesHidden')
@@ -160,8 +160,28 @@ $GLOBALS['TL_DCA']['tl_syncCto_settings'] = array
                 array('SyncCtoTableSettings', 'saveTablesHidden')
             )
         ),
-        'syncCto_database_tables' => array
+        'syncCto_hidden_tables_placeholder' => array
+        (
+            'label'               => &$GLOBALS['TL_LANG']['tl_syncCto_settings']['hidden_tables_placeholder'],
+            'exclude'             => true,
+            'inputType'           => 'multiColumnWizard',
+            'explanation'         => 'folder_blacklist',
+            'eval' => array
             (
+                'columnFields' => array
+                (
+                    'entries' => array
+                    (
+                        'label'           => &$GLOBALS['TL_LANG']['tl_syncCto_settings']['hidden_tables_placeholder'],
+                        'exclude'         => true,
+                        'inputType'       => 'text',
+                        'eval'            => array('trailingSlash' => false, 'style' => 'width:595px', 'allowHtml' => false)
+                    )
+                )
+            )
+        ),
+        'syncCto_database_tables' => array
+        (
             'label'               => &$GLOBALS['TL_LANG']['tl_syncCto_settings']['database_tables'],
             'inputType'           => 'checkboxWizard',
             'exclude'             => true,
@@ -169,13 +189,13 @@ $GLOBALS['TL_DCA']['tl_syncCto_settings'] = array
             'options_callback'    => array('SyncCtoHelper', 'databaseTables')
         ),
         'syncCto_debug_mode' => array
-            (
+        (
             'label'               => &$GLOBALS['TL_LANG']['tl_syncCto_settings']['debug_mode'],
             'inputType'           => 'checkbox',
             'exclude'             => true
         ),
         'syncCto_custom_settings' => array
-            (
+        (
             'label'               => &$GLOBALS['TL_LANG']['tl_syncCto_settings']['custom_settings'],
             'inputType'           => 'checkbox',
             'exclude'             => true,

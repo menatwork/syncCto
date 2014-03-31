@@ -46,9 +46,10 @@
         <table class="comparelist" id="<?php echo ($strState == 'recommended') ? 'recommended' : 'nonrecommended'; ?>">
         <colgroup>
             <col width="20px" />
-            <col width="40%" />
+            <col width="30%" />
             <col width="30px" />
-            <col width="40%" />
+            <col width="30%" />
+            <col width="20%" />
             <col width="*" />
         </colgroup>
         <thead>
@@ -57,6 +58,7 @@
                 <th class="server" title="<?php echo $this->serverPath; ?>"><?php echo $GLOBALS['TL_LANG']['MSC']['server']; ?></th>
                 <th class="direction"><img src="<?php echo $this->Environment->base; ?>system/modules/syncCto/assets/images/steps/iconSync<?php echo $this->direction; ?>.png" alt="" /></th>
                 <th class="client" title="<?php echo $this->clientPath; ?>"><?php echo $GLOBALS['TL_LANG']['MSC']['client']; ?></th>
+                <th class="diff"><?php echo $GLOBALS['TL_LANG']['MSC']['difference_id']; ?></th>
                 <th class="diff"><?php echo $GLOBALS['TL_LANG']['MSC']['difference']; ?></th>
             </tr>
         </thead>
@@ -71,6 +73,7 @@
                     <td class="col_3 <?php echo $arrCompareTable['client']['class']; ?>" title="<?php echo $arrCompareTable['client']['iname']; ?> (<?php echo $arrCompareTable['client']['tooltip']; ?>)">
                         <?php echo $arrCompareTable['client']['tname']; ?>
                     </td>
+                    <td class="col_4 diff"><?php echo $GLOBALS['TL_LANG']['MSC']['difference_new']; ?> <?php echo count($arrCompareTable['diffNewId']); ?> / <?php echo $GLOBALS['TL_LANG']['MSC']['difference_deleted']; ?> <?php echo count($arrCompareTable['diffDeletedId']); ?></td>
                     <td class="col_4 diff"><?php echo $arrCompareTable['diff']; ?></td>
                 </tr>
             <?php endforeach; ?>

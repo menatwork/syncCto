@@ -273,13 +273,14 @@ class SyncCtoPopupDB extends Backend
         {
             try
             {
-                if (!is_null(MetaModelFactory::byTableName($strName)))
+                if (!is_null(\MetaModels\Factory::byTableName($strName)))
                 {
-                    $objDCABuilder     = MetaModelDcaBuilder::getInstance();
-                    $arrDCA            = $objDCABuilder->getDca(MetaModelFactory::byTableName($strName)->get('id'));
+                    $objDCABuilder     = \MetaModels\Dca\MetaModelDcaBuilder::getInstance();
+                    $objMetaModels     = \MetaModels\Factory::byTableName($strName);
+                    $arrDCA            = $objDCABuilder->getDca($objMetaModels->get('id'));
                     $arrBackendcaption = deserialize($arrDCA['backendcaption']);
 
-                    $strReturn = MetaModelFactory::byTableName($strName)->getName();
+                    $strReturn = $objMetaModels->getName();
 
                     foreach ((array)$arrBackendcaption as $value)
                     {

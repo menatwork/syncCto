@@ -342,7 +342,16 @@ $GLOBALS["CTOCOM_FUNCTIONS"]["SYNCCTO_HIDDEN_TABLES"] = array
 (
     "class"              => "SyncCtoHelper",
     "function"           => "getTablesHidden",
-    "typ"                => "POST",
+    "typ"                => "GET",
+    "parameter"          => false,
+);
+
+// Load recommended tables from client
+$GLOBALS["CTOCOM_FUNCTIONS"]["SYNCCTO_HIDDEN_TABLES_PLACEHOLDER"] = array
+(
+    "class"              => "SyncCtoHelper",
+    "function"           => "getPreparedHiddenTablesPlaceholder",
+    "typ"                => "GET",
     "parameter"          => false,
 );
 

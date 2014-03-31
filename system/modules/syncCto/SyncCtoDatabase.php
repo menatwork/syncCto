@@ -1236,17 +1236,31 @@ class SyncCtoDatabase extends Backend
      */
 
     /**
-     * 
-     * @param type $arrSourceTables
-     * @param type $arrDesTables
-     * @param type $arrHiddenTables
-     * @param type $arrSourceTS
-     * @param type $arrDesTS
-     * @return string
+     * Build the compare list for the database.
+     *
+     * @param array  $arrSourceTables           A list with all tables from the source.
+     *
+     * @param array  $arrDesTables              A list with all tables from the destination.
+     *
+     * @param array  $arrHiddenTables           A list with hidden tables. Merged from source and destination.
+     *
+     * @param array  $arrHiddenTablePlaceholder A list with regex expressions for the filter. The same like the $arrHiddenTables.
+     *
+     * @param array  $arrSourceTS               List with timestamps from the source.
+     *
+     * @param array  $arrDesTS                  List with timestamps from the destination.
+     *
+     * @param array  $arrAllowedTables          List with allowed tables. For example based on the user settings/rights.
+     *
+     * @param string $strSrcName                Name of the source e.g. client or server.
+     *
+     * @param string $strDesName                Name of the destination e.g. client or server.
+     *
+     * @return array
      */
-    public function getFormatedCompareList($arrSourceTables, $arrDesTables, $arrHiddenTables, $arrSourceTS, $arrDesTS, $arrAllowedTables, $strSrcName, $strDesName)
+    public function getFormatedCompareList($arrSourceTables, $arrDesTables, $arrHiddenTables, $arrHiddenTablePlaceholder, $arrSourceTS, $arrDesTS, $arrAllowedTables, $strSrcName, $strDesName)
     {
-        // Remove hidden tables or tables without premission
+        // Remove hidden tables or tables without permission.
         if (is_array($arrHiddenTables) && count($arrHiddenTables) != 0)
         {
             foreach ($arrSourceTables as $key => $value)
@@ -1265,7 +1279,32 @@ class SyncCtoDatabase extends Backend
                 }
             }
         }
-        
+
+        // Remove hidden tables based on the regex.
+        if (is_array($arrHiddenTablePlaceholder) && count($arrHiddenTablePlaceholder) != 0)
+        {
+            foreach ($arrHiddenTablePlaceholder as $strRegex)
+            {
+                // Run each and check it with the given name.
+                foreach ($arrSourceTables as $key => $value)
+                {
+                    if (preg_match('/^' . $strRegex . '$/', $key))
+                    {
+                        unset($arrSourceTables[$key]);
+                    }
+                }
+
+                // Run each and check it with the given name.
+                foreach ($arrDesTables as $key => $value)
+                {
+                    if (preg_match('/^' . $strRegex . '$/', $key))
+                    {
+                        unset($arrDesTables[$key]);
+                    }
+                }
+            }
+        }
+
         $arrCompareList = array();
 
         // Make a diff
@@ -1309,7 +1348,7 @@ class SyncCtoDatabase extends Backend
             unset($arrDesTables[$keyDesTables]);
         }
 
-        // Tables which exsist on both systems
+        // Tables which exist on both systems
         foreach ($arrSourceTables as $keySrcTable => $valueSrcTable)
         {
             $strType = $valueSrcTable['type'];
@@ -1326,14 +1365,21 @@ class SyncCtoDatabase extends Backend
                     . ', '
                     . vsprintf(($valueClientTable['count'] == 1) ? $GLOBALS['TL_LANG']['MSC']['entry'] : $GLOBALS['TL_LANG']['MSC']['entries'], array($valueClientTable['count']));
 
-            $intDiff = $this->getDiff($valueSrcTable, $valueClientTable);
+            // Get some diff information
+            $arrNewId     = $this->getDiffId($valueClientTable, $valueSrcTable);
+            $arrDeletedId = $this->getDiffId($valueSrcTable, $valueClientTable);
+            $intDiffId    = count($arrNewId) + count($arrDeletedId);
+            $intDiff      = $this->getDiff($valueSrcTable, $valueClientTable);
 
             // Add 'entry' or 'entries' to diff
-            $arrCompareList[$strType][$keySrcTable]['diffCount'] = $intDiff;
-            $arrCompareList[$strType][$keySrcTable]['diff']      = vsprintf(($intDiff == 1) ? $GLOBALS['TL_LANG']['MSC']['entry'] : $GLOBALS['TL_LANG']['MSC']['entries'], array($intDiff));
+            $arrCompareList[$strType][$keySrcTable]['diffCount']     = $intDiff;
+            $arrCompareList[$strType][$keySrcTable]['diffCountId']   = $intDiffId;
+            $arrCompareList[$strType][$keySrcTable]['diff']          = vsprintf(($intDiff == 1) ? $GLOBALS['TL_LANG']['MSC']['entry'] : $GLOBALS['TL_LANG']['MSC']['entries'], array($intDiff));
+            $arrCompareList[$strType][$keySrcTable]['diffNewId']     = $arrNewId;
+            $arrCompareList[$strType][$keySrcTable]['diffDeletedId'] = $arrDeletedId;
 
             // Check timestamps
-            if (key_exists($keySrcTable, $arrSourceTS['current']) && key_exists($keySrcTable, $arrSourceTS['lastSync']))
+            if (array_key_exists($keySrcTable, $arrSourceTS['current']) && array_key_exists($keySrcTable, $arrSourceTS['lastSync']))
             {
                 if ($arrSourceTS['current'][$keySrcTable] == $arrSourceTS['lastSync'][$keySrcTable])
                 {
@@ -1349,7 +1395,7 @@ class SyncCtoDatabase extends Backend
                 $arrCompareList[$strType][$keySrcTable][$strSrcName]['class'] = 'no-sync';
             }
 
-            if (key_exists($keySrcTable, $arrDesTS['current']) && key_exists($keySrcTable, $arrDesTS['lastSync']))
+            if (array_key_exists($keySrcTable, $arrDesTS['current']) && array_key_exists($keySrcTable, $arrDesTS['lastSync']))
             {
                 if ($arrDesTS['current'][$keySrcTable] == $arrDesTS['lastSync'][$keySrcTable])
                 {
@@ -1388,14 +1434,66 @@ class SyncCtoDatabase extends Backend
 
     /**
      * Get the calculated difference between the two given arrays
-     * 
-     * @param array $arrServerTables
-     * @param array $arrClientTables
-     * @return string 
+     *
+     * @param array $arrSrcTables
+     *
+     * @param array $arrDesTables
+     *
+     * @return int
      */
     public function getDiff($arrSrcTables, $arrDesTables)
     {
         return abs(intval($arrSrcTables['count']) - intval($arrDesTables['count']));        
+    }
+
+    /**
+     * Check the id list from both sides and check with arrays are missing.
+     *
+     * @param array $arrSrcTables
+     *
+     * @param array $arrDesTables
+     *
+     * @return array
+     */
+    public function getDiffId($arrSrcTables, $arrDesTables)
+    {
+        $arrSrcId = array();
+        $arrDesId = array();
+
+        // Rebuild the id list.
+        foreach($arrSrcTables['ids'] as $arrIdRange)
+        {
+            if($arrIdRange['start'] == $arrIdRange['end'])
+            {
+                $arrSrcId[] = intval($arrIdRange['start']);
+            }
+            else
+            {
+                for($i = $arrIdRange['start'] ; $i < ($arrIdRange['end'] + 1) ; $i++)
+                {
+                    $arrSrcId[] = intval($i);
+                }
+            }
+        }
+
+        // Rebuild the id list.
+        foreach($arrDesTables['ids'] as $arrIdRange)
+        {
+            if($arrIdRange['start'] == $arrIdRange['end'])
+            {
+                $arrDesId[] = intval($arrIdRange['start']);
+            }
+            else
+            {
+                for($i = $arrIdRange['start'] ; $i < ($arrIdRange['end'] + 1) ; $i++)
+                {
+                    $arrDesId[] = intval($i);
+                }
+            }
+        }
+
+        // Make a diff from both id arrays.
+        return array_diff($arrDesId, $arrSrcId);
     }
 
     /**
