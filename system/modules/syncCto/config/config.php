@@ -148,7 +148,8 @@ $GLOBALS['SYC_CONFIG']['folder_blacklist'] = array_merge( (array) $GLOBALS['SYC_
     'system/logs/',
     'system/scripts/',
     'system/tmp/',
-    '*/syncCto_backups/'
+    '*/syncCto_backups/',
+    '*/.git'
 ));
 
 // Files only sync.
