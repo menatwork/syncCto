@@ -165,6 +165,7 @@ $GLOBALS['SYC_CONFIG']['file_blacklist'] = array_merge( (array) $GLOBALS['SYC_CO
 $GLOBALS['SYC_CONFIG']['local_blacklist'] = array_merge( (array) $GLOBALS['SYC_CONFIG']['local_blacklist'], array
 (
     'websitePath',
+    'websiteTitle',
     'installPassword',
     'disableRefererCheck',
     'encryptionKey',
@@ -176,7 +177,10 @@ $GLOBALS['SYC_CONFIG']['local_blacklist'] = array_merge( (array) $GLOBALS['SYC_C
     'dbPconnect',
     'dbCharset',
     'dbPort',
+    'dbSocket',
     'displayErrors',
+    'debugMode',
+    'maintenanceMode',
     'ctoCom_APIKey',
     'ctoCom_disableRefererCheck',
     'ctoCom_responseLength',
@@ -184,7 +188,9 @@ $GLOBALS['SYC_CONFIG']['local_blacklist'] = array_merge( (array) $GLOBALS['SYC_C
     'syncCto_debug_mode',
     'syncCto_attentionFlag',
     'syncCto_auto_db_updater',
-    'liveUpdateId'
+    'liveUpdateId',
+    'disableCron',
+    'enableSearch'
 ));
 
 /**
