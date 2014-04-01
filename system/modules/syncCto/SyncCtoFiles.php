@@ -1631,4 +1631,53 @@ class SyncCtoFiles extends Backend
         return array("md5"     => md5_file(TL_ROOT . "/" . $strPath), "content" => $strContent);
     }
 
+    /**
+     * Return the mime type and icon of the file based on its extension
+     *
+     * @param string  $strExtension        Name of extension.
+     *
+     * @param boolean $blnResolveExtension If true the system trys to resolve the extension name by himself.
+     *
+     * @param boolean $blnOnlyPictureName  If true return only the picture name.
+     *
+     * @return array An array with mime type and icon name
+     */
+    public static function getMimeInfo($strExtension, $blnResolveExtension, $blnOnlyPictureName)
+    {
+        if ($blnResolveExtension)
+        {
+            $arrFileInfo  = pathinfo($strExtension);
+            $strExtension = $arrFileInfo['extension'];
+        }
+
+        // Get the basic mime types.
+        $arrMimeTypes = $GLOBALS['SYC_CONFIG']['mime_types'];
+
+        // Extend the default lookup array.
+        if (!empty($GLOBALS['TL_MIME']) && is_array($GLOBALS['TL_MIME']))
+        {
+            $arrMimeTypes = array_merge($GLOBALS['SYC_CONFIG']['mime_types'], $GLOBALS['TL_MIME']);
+        }
+
+        // Fallback to application/octet-stream.
+        if (!isset($arrMimeTypes[$strExtension]))
+        {
+            $arrReturn = array('application/octet-stream', 'iconPLAIN.gif');
+        }
+        else
+        {
+            $arrReturn = $arrMimeTypes[$strExtension];
+        }
+
+        // If only picture name true return.
+        if($blnOnlyPictureName)
+        {
+            return $arrReturn[1];
+        }
+        else
+        {
+            return $arrReturn;
+        }
+    }
+
 }
