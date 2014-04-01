@@ -256,6 +256,8 @@ $GLOBALS['SYC_CONFIG']['table_hidden'] = array_merge( (array) $GLOBALS['SYC_CONF
     'tl_search_index',
     'tl_undo',
     'tl_version',
+    'tl_comments',
+    'tl_comments_notify',
     'tl_synccto_clients',
     'tl_synccto_stats'
 ));
