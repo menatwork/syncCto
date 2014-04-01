@@ -45,12 +45,10 @@
         <h3><?php echo ($strState == 'recommended') ? $GLOBALS['TL_LANG']['MSC']['recom_tables'] : $GLOBALS['TL_LANG']['MSC']['nonrecom_tables']; ?></h3>
         <table class="comparelist" id="<?php echo ($strState == 'recommended') ? 'recommended' : 'nonrecommended'; ?>">
         <colgroup>
-            <col width="20px" />
-            <col width="30%" />
-            <col width="30px" />
-            <col width="30%" />
-            <col width="20%" />
+            <col width="25px" />
+            <col width="44%" />
             <col width="*" />
+            <col width="44%" />
         </colgroup>
         <thead>
             <tr class="head">
@@ -58,23 +56,15 @@
                 <th class="server" title="<?php echo $this->serverPath; ?>"><?php echo $GLOBALS['TL_LANG']['MSC']['server']; ?></th>
                 <th class="direction"><img src="<?php echo $this->Environment->base; ?>system/modules/syncCto/assets/images/steps/iconSync<?php echo $this->direction; ?>.png" alt="" /></th>
                 <th class="client" title="<?php echo $this->clientPath; ?>"><?php echo $GLOBALS['TL_LANG']['MSC']['client']; ?></th>
-                <th class="diff"><?php echo $GLOBALS['TL_LANG']['MSC']['difference_id']; ?></th>
-                <th class="diff"><?php echo $GLOBALS['TL_LANG']['MSC']['difference']; ?></th>
             </tr>
         </thead>
         <tbody>
             <?php foreach($arrCompareList AS $strTableName => $arrCompareTable): ?>
                 <tr>
                     <td class="col_0 checkbox"><?php if($arrCompareTable['server'] != '-'): ?><input type="checkbox" class="tl_checkbox" name="<?php echo ($arrCompareTable['del'] == true) ? 'serverDeleteTables[]' : 'serverTables[]';?>" value="<?php echo $strTableName; ?>" /><?php endif; ?></td>
-                    <td class="col_1 <?php echo $arrCompareTable['server']['class']; ?>" title="<?php echo $arrCompareTable['server']['iname']; ?> (<?php echo $arrCompareTable['server']['tooltip']; ?>)">
-                        <?php echo $arrCompareTable['server']['tname']; ?>
-                    </td>
-                    <td class="col_2"></td>
-                    <td class="col_3 <?php echo $arrCompareTable['client']['class']; ?>" title="<?php echo $arrCompareTable['client']['iname']; ?> (<?php echo $arrCompareTable['client']['tooltip']; ?>)">
-                        <?php echo $arrCompareTable['client']['tname']; ?>
-                    </td>
-                    <td class="col_4 diff"><?php echo $GLOBALS['TL_LANG']['MSC']['difference_new']; ?> <?php echo count($arrCompareTable['diffNewId']); ?> / <?php echo $GLOBALS['TL_LANG']['MSC']['difference_deleted']; ?> <?php echo count($arrCompareTable['diffDeletedId']); ?></td>
-                    <td class="col_4 diff"><?php echo $arrCompareTable['diff']; ?></td>
+                    <td class="col_1 <?php echo $arrCompareTable['server']['class']; ?>" title="<?php echo $arrCompareTable['server']['iname']; ?> (<?php echo $arrCompareTable['server']['tooltip']; ?>)"><?php echo $arrCompareTable['server']['tname']; ?></td>
+                    <td class="col_2 diff"><abbr title="<?php echo $GLOBALS['TL_LANG']['MSC']['difference_new']; ?>"><?php echo count($arrCompareTable['diffNewId']); ?></abbr> / <abbr title="<?php echo $GLOBALS['TL_LANG']['MSC']['difference_deleted']; ?>"><?php echo count($arrCompareTable['diffDeletedId']); ?></abbr></td>
+                    <td class="col_3 <?php echo $arrCompareTable['client']['class']; ?>" title="<?php echo $arrCompareTable['client']['iname']; ?> (<?php echo $arrCompareTable['client']['tooltip']; ?>)"><?php echo $arrCompareTable['client']['tname']; ?></td>
                 </tr>
             <?php endforeach; ?>
         </tbody>

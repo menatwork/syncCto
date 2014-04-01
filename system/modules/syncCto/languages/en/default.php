@@ -75,12 +75,15 @@ $GLOBALS['TL_LANG']['MSC']['big_files']                     = 'Big files';
 $GLOBALS['TL_LANG']['MSC']['changed']                       = 'Changed';
 $GLOBALS['TL_LANG']['MSC']['unchanged']                     = 'Unchanged';
 $GLOBALS['TL_LANG']['MSC']['both_changed']                  = 'Both changed';
+$GLOBALS['TL_LANG']['MSC']['difference_new']                = 'New';
+$GLOBALS['TL_LANG']['MSC']['difference_deleted']            = 'Deleted';
 
 /**
  * Buttons
  */
-$GLOBALS['TL_LANG']['MSC']['abort_sync']                    = array("Abort", 'In progress');
-$GLOBALS['TL_LANG']['MSC']['repeat_sync']                   = array("Repeat", 'In progress');
+$GLOBALS['TL_LANG']['MSC']['abort_sync']                    = array('Abort', 'In progress');
+$GLOBALS['TL_LANG']['MSC']['repeat_sync']                   = array('Repeat', 'In progress');
+$GLOBALS['TL_LANG']['MSC']['next_sync']                     = array('Next client', 'In progress');
 
 /**
  * Debug mode

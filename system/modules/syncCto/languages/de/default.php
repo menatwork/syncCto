@@ -75,7 +75,6 @@ $GLOBALS['TL_LANG']['MSC']['big_files']                     = 'Große Dateien';
 $GLOBALS['TL_LANG']['MSC']['changed']                       = 'Geändert';
 $GLOBALS['TL_LANG']['MSC']['unchanged']                     = 'Nicht geändert';
 $GLOBALS['TL_LANG']['MSC']['both_changed']                  = 'Beide geändert';
-$GLOBALS['TL_LANG']['MSC']['difference_id']                 = 'Daten differenz';
 $GLOBALS['TL_LANG']['MSC']['difference_new']                = 'Neu';
 $GLOBALS['TL_LANG']['MSC']['difference_deleted']            = 'Gelöscht';
 

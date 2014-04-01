@@ -51,13 +51,7 @@
   
   #db_form th {
     background-image:none;
-    padding-left:9px;
     cursor:default;
-  }
-
-  #db_form th.checkbox,
-  #db_form td.checkbox {
-    padding-left:4px;
   }
   
   .table-sort .comparelist th.table-th-sort {
