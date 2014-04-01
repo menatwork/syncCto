@@ -1357,7 +1357,7 @@ class SyncCtoFiles extends Backend
                         {
                             // First add it to the dbafs.
                             $objLocaleData       = \Dbafs::addResource($strFileDestination);
-                            $objLocaleData->uuid = $value['tl_files']['uuid'];
+                            $objLocaleData->uuid = \String::uuidToBin($value['tl_files']['uuid']);
                             $objLocaleData->save();
 
                             // Add a status report for debugging and co.
@@ -1424,7 +1424,7 @@ class SyncCtoFiles extends Backend
                             {
                                 // First add it to the dbafs.
                                 $objLocaleData       = \Dbafs::addResource($strFileDestination);
-                                $objLocaleData->uuid = $value['tl_files']['uuid'];
+                                $objLocaleData->uuid = \String::uuidToBin($value['tl_files']['uuid']);
                                 $objLocaleData->save();
 
                                 // Add a status report for debugging and co.
