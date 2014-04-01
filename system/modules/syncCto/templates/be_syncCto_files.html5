@@ -1,7 +1,7 @@
 <div id="tl_listing" class="tl_listing_container">
 <?php if($this->close || $this->error): ?>
     <?php if($this->close): ?>
-    <img src="<?php echo $this->Environment->base; ?>system/modules/syncCto/assets/images/steps/iconWork.gif" alt="" />
+    <img class="loader" src="<?php echo $this->Environment->base; ?>system/modules/syncCto/assets/images/steps/iconWork.gif" alt="" />
     <script>
         window.addEvent("domready",function(){
             window.parent.document.getElement('input[name=forward]').click();
