@@ -28,7 +28,7 @@
 	},
 	"require":{
 		"php":">=5.3",
-		"contao/core":">=2.11,<4",
+		"contao/core":">=3.2,<4",
 		"contao-community-alliance/composer-installer":"*",
 		"menatwork/contao-multicolumnwizard":"3.2.*",
 		"menatwork/ctocommunication":"~1.2",
@@ -49,7 +49,6 @@
 			}
 		},
 		"branch-alias":{
-			"dev-master":"2.5.x-dev",
 			"dev-contao3": "2.6.x-dev"
 		}
 	}
