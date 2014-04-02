@@ -26,7 +26,7 @@ window.addEvent("domready",function(){
         
         HtmlTable.defineParsers({
             dimension: {
-                match: '.*(Bytes|kB|mB|gB)',
+                match: '.*(Bytes|KiB|MiB|GiB)',
                 convert: function(){
                     var strDimension = this.get('text').replace(/.*(\d|,| )/, '').toString().toLowerCase();
                     var floatVal = this.get('text').replace(',', '.').toFloat();
@@ -52,7 +52,7 @@ window.addEvent("domready",function(){
 
         var myHtmlTableNormal = new HtmlTable($('normalfilelist'), {
             sortIndex: 3,
-            parsers: ['string', 'dimension', 'string'],
+            parsers: ['string', 'dimension', 'number', 'string', 'string'],
             sortable: true
         }).enableSort({
             sortable: true, 
@@ -61,7 +61,7 @@ window.addEvent("domready",function(){
         
         var myHtmlTableBig = new HtmlTable($('bigfilelist'), {
             sortIndex: 3,
-            parsers: ['string', 'dimension', 'string'],
+            parsers: ['string', 'dimension', 'number', 'string', 'string'],
             sortable: true
         }).enableSort({
             sortable: true, 
