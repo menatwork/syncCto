@@ -36,7 +36,7 @@ $GLOBALS['TL_LANG']['tl_synccto_clients']['legend']             = 'Legende: ';
  * Legend ping state
  */
 $GLOBALS['TL_LANG']['tl_synccto_clients']['state']['gray']      = 'Das System konnte noch nicht geprüft werden.';
-$GLOBALS['TL_LANG']['tl_synccto_clients']['state']['red']       = 'Das System ist offline oder konnte nicht gefunden werden.';
+$GLOBALS['TL_LANG']['tl_synccto_clients']['state']['red']       = 'Das System ist nicht erreichbar.';
 $GLOBALS['TL_LANG']['tl_synccto_clients']['state']['blue']      = 'Die Extensions ctoCommunication/syncCto sind nicht installiert.';
 $GLOBALS['TL_LANG']['tl_synccto_clients']['state']['orange']    = 'Der ctoCommunication API-Key ist nicht korrekt.';
 $GLOBALS['TL_LANG']['tl_synccto_clients']['state']['green']     = 'Alle Systeme sind online.';

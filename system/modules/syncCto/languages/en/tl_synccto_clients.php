@@ -13,6 +13,7 @@
  * List operation
  */
 $GLOBALS['TL_LANG']['tl_synccto_clients']['new']                = array('New client', 'Create a new client');
+$GLOBALS['TL_LANG']['tl_syncCto_clients']['syncToAll']          = array('Alle synchronisieren', 'Alle Clients auf einmal synchronisieren');
 $GLOBALS['TL_LANG']['tl_syncCto_clients']['all']                = array('Edit multiple', 'Edit multiple records at once');
 $GLOBALS['TL_LANG']['tl_syncCto_clients']['edit']               = array('Edit client', 'Edit client ID %s');
 $GLOBALS['TL_LANG']['tl_syncCto_clients']['copy']               = array('Duplicate client', 'Duplicate client ID %s');
@@ -35,7 +36,7 @@ $GLOBALS['TL_LANG']['tl_synccto_clients']['legend']             = 'Legend: ';
  * Legend ping state
  */
 $GLOBALS['TL_LANG']['tl_synccto_clients']['state']['gray']      = 'Host was not checked yet.';
-$GLOBALS['TL_LANG']['tl_synccto_clients']['state']['red']       = 'The host is offline or could not be found.';
+$GLOBALS['TL_LANG']['tl_synccto_clients']['state']['red']       = 'The host is unreachable.';
 $GLOBALS['TL_LANG']['tl_synccto_clients']['state']['blue']      = 'The extensions ctoCommunication or syncCto is not installed.';
 $GLOBALS['TL_LANG']['tl_synccto_clients']['state']['orange']    = 'The ctoCommunication API key is incorrect.';
 $GLOBALS['TL_LANG']['tl_synccto_clients']['state']['green']     = 'The host is online and ctoCommunication and syncCto are working correct.';
