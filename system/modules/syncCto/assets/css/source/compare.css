@@ -1,11 +1,28 @@
 /* Copyright (c) MEN AT WORK 2014:: LGPL license */
 
-  #container {
-    padding:18px 18px 28px;
+  html, 
+  body, 
+  #container, 
+  #main, 
+  #tl_listing {
+    height:100%;
   }
 
-  .comparelist, h3, 
-  form, .formbody {
+  #container {
+    padding:18px 18px 28px;
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    box-sizing: border-box;
+  }
+
+  #tl_listing {
+    position:relative;
+  }
+
+  .comparelist, 
+  h3, 
+  form, 
+  .formbody {
     clear:both;
     width:100%;
     overflow:hidden;
@@ -13,10 +30,6 @@
   
   table.comparelist {
     margin-bottom:10px;
-  }
-  
-  #legend + h3 {
-    padding-top:10px;
   }
 
   #recommended + h3 {
@@ -42,7 +55,7 @@
   }
   
   .table-sort .comparelist th {
-    background-image:url(../../images/js/sorting.png);
+    background-image:url(../images/js/sorting.png);
     background-repeat:no-repeat;
     background-position:6px 10px;
     padding-left:19px;
@@ -51,15 +64,9 @@
   
   #db_form th {
     background-image:none;
-    padding-left:9px;
     cursor:default;
   }
 
-  #db_form th.checkbox,
-  #db_form td.checkbox {
-    padding-left:4px;
-  }
-  
   .table-sort .comparelist th.table-th-sort {
     background-position:6px center;
   }
@@ -72,10 +79,11 @@
     background-image:none;
     padding-left:0;
   }
-  
-  td img {
-    float:left;
-    margin-right:5px;
+
+  td.icon img, 
+  td.icon span {
+    display:inline-block;
+    vertical-align:middle;
   }
   
   td {
@@ -91,38 +99,61 @@
   #filelist .tl_checkbox {
     margin:0;
   }
+
+  #legend {
+    position:absolute;
+    top:5px;
+    right:0;
+  }
+
+  #legend p {
+    float:left;
+    margin-left:10px;
+    margin-bottom:0;
+    padding:3px 8px;
+    -webkit-border-radius:3px;
+    border-radius:3px;
+  }
   
   td.state {
     background-color:#F0F0F0;
   }
-  
-  td.changed, p.changed {
+
+  td.unchanged,
+  p.unchanged,
+  p.legend {
+    background-color:#F9F9F9;
+  }
+
+  td.changed,
+  p.changed {
     background-color:#D8F9D8;
   }
   
-  td.changed-both, p.changed-both {
+  td.changed-both,
+  p.changed-both {
     background-color:#F8F4A0;
   }
 
-  td.unchanged, p.unchanged {
-    background-color:#F9F9F9;
-  }
-  
-  p.changed, p.changed-both, p.unchanged {
+  p.changed,
+  p.changed-both,
+  p.unchanged,
+  p.legend {
     border-width:1px;
     border-style:solid;
   }
-  
+
+  p.unchanged,
+  p.legend {
+    border-color:#DDD;
+  }
+
   p.changed {
-    border-color:#D8F9D8;
+    border-color:#a0dca0;
   }
   
   p.changed-both {
-    border-color:#F8F4A0;
-  }
-
-  p.unchanged {
-    border-color:#DDD;
+    border-color:#d7d26e;
   }
   
   td.diff, 
@@ -153,48 +184,26 @@
     padding-left:0;
   }
   
-  #legend {
-    float:right;
-    margin-top:6px;
-  }
-  
-  #legend p {
-    float:left;
-    margin-left:10px;
-    margin-bottom:0;
-    padding:3px 8px;
-    -webkit-border-radius:3px;
-    border-radius:3px; 
-  }
-  
-  .submit_container {
-    float:left;
-  }
-  
   .bottom.submit_container {
-    margin-top:10px;
+    margin-top:20px;
+    margin-bottom:10px;
   }
   
   .tl_submit {
     cursor:pointer;
-    margin:5px 15px 15px 0;
-  }
-  
-  .bottom .tl_submit {
-    margin-bottom:0;
+    margin:5px 10px 15px 0;
+    display:inline-block;
   }
 
   .tl_checkbox {
     margin-right:0;
   }
   
-  ul.file { 
-    padding-left:0;
-    list-style:none;
-    margin-bottom:20px;
-    clear:both;
-  }
-  
-  ul.file li { 
-    padding:2px 0;
+  img.loader {
+    display:block;
+    position:absolute;
+    top:50%;
+    margin-top:-16px;
+    left:50%;
+    margin-left:-16px;
   }
