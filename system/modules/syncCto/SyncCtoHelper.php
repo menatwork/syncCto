@@ -440,9 +440,9 @@ class SyncCtoHelper extends Backend
     public function addLegend($strContent, $strTemplate)
     {
         // Check some vars if we have the overview.
-        $strDo    = Input::getInstance()->get('do');
-        $strTable = Input::getInstance()->get('table');
-        $strAct   = Input::getInstance()->get('act');
+        $strDo    = \Input::getInstance()->get('do');
+        $strTable = \Input::getInstance()->get('table');
+        $strAct   = \Input::getInstance()->get('act');
 
         if ($strDo == 'synccto_clients' && empty($strAct) && empty($strTable) && $strTemplate == 'be_main')
         {
@@ -479,7 +479,7 @@ class SyncCtoHelper extends Backend
     {
         if ($strAction == 'syncCtoPing')
         {
-            $intClientId = $this->Input->post('clientID');
+            $intClientId = \Input::getInstance()->post('clientID');
 
             if (!empty($intClientId) && is_numeric($intClientId))
             {
