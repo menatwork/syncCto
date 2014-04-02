@@ -46,6 +46,12 @@
 			"sources":{
 				"system/modules/syncCto":"system/modules/syncCto",
 				"system/modules/syncCtoUpdater":"system/modules/syncCtoUpdater"
+			},
+			"transifex": {
+				"project": "synccto",
+				"prefix": "",
+				"languages_cto": "system/modules/syncCto/languages",
+				"languages_tx": ".tx"
 			}
 		},
 		"branch-alias":{
