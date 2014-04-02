@@ -681,7 +681,7 @@ class SyncCtoFiles extends Backend
             if (file_exists(TL_ROOT . '/' . $file) && is_dir(TL_ROOT . '/' . $file))
             {
                 // Scann.
-                $objDirectoryIt     = new RecursiveDirectoryIterator(TL_ROOT . '/' . $this->objSyncCtoHelper->standardizePath($file), $this->strRDIFlags);
+                $objDirectoryIt  = new RecursiveDirectoryIterator(TL_ROOT . '/' . $this->objSyncCtoHelper->standardizePath($file), $this->strRDIFlags);
                 $objFilterIt     = new SyncCtoFilterIteratorBase($objDirectoryIt);
                 $objRecursiverIt = new RecursiveIteratorIterator($objFilterIt, RecursiveIteratorIterator::SELF_FIRST);
 
@@ -934,7 +934,7 @@ class SyncCtoFiles extends Backend
         if ($booRoot == true)
         {
             // Scann root for files.
-            $objDirectoryIt  = new RecursiveDirectoryIterator(TL_ROOT);
+            $objDirectoryIt  = new RecursiveDirectoryIterator(TL_ROOT, $this->strRDIFlags);
             $objFilterIt     = new SyncCtoFilterIteratorFiles($objDirectoryIt);
             $objRecursiverIt = new RecursiveIteratorIterator($objFilterIt, RecursiveIteratorIterator::SELF_FIRST);
 
