@@ -1,14 +1,19 @@
 <div id="tl_listing" class="tl_listing_container">
 <?php if($this->close || $this->error): ?>
+
     <?php if($this->close): ?>
-    <img class="loader" src="<?php echo $this->Environment->base; ?>system/modules/syncCto/assets/images/steps/iconWork.gif" alt="" />
+
+    <img class="loader" src="<?php echo $this->Environment->base; ?>system/modules/syncCto/assets/images/steps/loader.gif" alt="" />
     <script>
-        window.addEvent("domready",function(){
-            window.parent.document.getElement('input[name=forward]').click();
-        });
+    window.addEvent("domready",function(){
+        window.parent.document.getElement('input[name=forward]').click();
+    });
     </script>
+
     <?php else: ?>
+
     <p class="tl_error"><?php echo $this->text; ?></p>
+
     <?php endif; ?>
 
 <?php else: ?>
@@ -20,19 +25,16 @@
         
         <div class="submit_container">
             <input class="tl_submit" name="transfer" type="submit" value="<?php echo $GLOBALS['TL_LANG']['MSC']['apply']; ?>" />
-        </div>
-        <div class="submit_container">
             <input class="tl_submit" name="delete" type="submit" value="<?php echo $GLOBALS['TL_LANG']['MSC']['updateRemove']; ?>" />
         </div>
 
-        <ul class="file">
-        <li><?php echo $GLOBALS['TL_LANG']['MSC']['create']; ?>: ~ <?php echo $this->getReadableSize($this->totalsizeNew); ?></li>
-        <li><?php echo $GLOBALS['TL_LANG']['MSC']['overrideSelected'] ; ?>: ~ <?php echo $this->getReadableSize($this->totalsizeChange); ?></li>
-        <li><?php echo $GLOBALS['TL_LANG']['MSC']['delete']; ?>: ~ <?php echo $this->getReadableSize($this->totalsizeDel); ?></li>
-        </ul>
+        <div id="legend">
+            <?php if ($this->totalsizeNew): ?><p class="legend"><?php echo $GLOBALS['TL_LANG']['MSC']['create']; ?>: <?php echo $this->getReadableSize($this->totalsizeNew); ?></p><?php endif; ?>
+            <?php if ($this->totalsizeChange): ?><p class="legend"><?php echo $GLOBALS['TL_LANG']['MSC']['overrideSelected'] ; ?>: <?php echo $this->getReadableSize($this->totalsizeChange); ?></p><?php endif; ?>
+            <?php if ($this->totalsizeDel): ?><p class="legend"><?php echo $GLOBALS['TL_LANG']['MSC']['delete']; ?>: <?php echo $this->getReadableSize($this->totalsizeDel); ?></p><?php endif; ?>
+        </div>
 
-        <?php 
-            for($i = 1 ; $i <= 2 ; $i++):
+        <?php for($i = 1 ; $i <= 2 ; $i++):
             switch ($i)
             {
                 case 1:
@@ -41,16 +43,15 @@
                 case 2:
                     $arrFileList = $this->bigFilelist;
                     break;
-            }
-        ?>
-        
+            } ?>
+
         <?php if(count($arrFileList) != 0): ?>
         <h3><?php echo $GLOBALS['TL_LANG']['MSC'][(($i == 1) ? 'normal' : 'big') . '_files']; ?></h3>
         <table class="comparelist" id="<?php echo ($i == 1) ? 'normal' : 'big'; ?>filelist">
             <colgroup>
                 <col width="15%" />
                 <col width="120" />
-                <col width="120" />
+                <col width="130" />
                 <col width="35" />
                 <col width="*" />
             </colgroup>
@@ -74,9 +75,9 @@
                     <?php else: ?>
                     <td class="checkbox"><?php if (empty($file["css_big"])): ?><input class="tl_checkbox" type="checkbox" name="del-file-<?php echo $key; ?>" value="<?php echo $key; ?>" /><?php else: ?> X <?php endif; ?></td>
                     <?php endif; ?>
-                    <td class="last" title="<?php echo $file["path"]; ?>">
+                    <td class="last icon" title="<?php echo $file["path"]; ?>">
                         <?php echo ($file['state'] > 99)? $this->generateImage('folderC.gif') : $this->generateImage(SyncCtoFiles::getMimeInfo($file['path'], true, true)); ?>
-                        <?php echo SyncCtoHelper::getInstance()->substrCenter($file["path"], $this->maxLength); ?>
+                        <span><?php echo SyncCtoHelper::getInstance()->substrCenter($file["path"], $this->maxLength); ?></span>
                     </td>
                </tr>
             <?php endforeach; ?>
@@ -86,8 +87,6 @@
  
         <div class="bottom submit_container">
             <input class="tl_submit" name="transfer" type="submit" value="<?php echo $GLOBALS['TL_LANG']['MSC']['apply']; ?>" />
-        </div>
-        <div class="bottom submit_container">
             <input class="tl_submit" name="delete" type="submit" value="<?php echo $GLOBALS['TL_LANG']['MSC']['updateRemove']; ?>" />
         </div>
     </div>
