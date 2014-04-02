@@ -196,6 +196,7 @@ $GLOBALS['TL_HOOKS']['parseBackendTemplate'][]       = array('SyncCtoHelper', 'c
 $GLOBALS['TL_HOOKS']['parseBackendTemplate'][]       = array('SyncCtoHelper', 'checkLockStatus');
 $GLOBALS['TL_HOOKS']['addCustomRegexp'][]            = array('SyncCtoHelper', 'customRegexp');
 $GLOBALS['TL_HOOKS']['parseBackendTemplate'][]       = array('SyncCtoHelper', 'addLegend');
+$GLOBALS['TL_HOOKS']['syncExecuteFinalOperations'][] = array('SyncCtoDatabaseUpdater3', 'runAutoUpdate');
 
 /**
  * Permissions
