@@ -11,7 +11,7 @@
 
 $GLOBALS['TL_LANG']['XPL']['apiKey']['0']['0']           = 'ctoCommunication API-Key';
 $GLOBALS['TL_LANG']['XPL']['apiKey']['0']['1']           = 'Der API-Key ist für die Verschlüsselung bei der Synchronisation von zwei Contao-Installationen zuständig.<br /><br />Der Schlüssel wird immer in den allgemeinen Einstellungen des Clients generiert und muss von dort kopiert und in das dafür bereitgestellte Feld auf dem Server eingefügt werden.';
-$GLOBALS['TL_LANG']['XPL']['folder_blacklist']['0']['0'] = 'Allgemein - Pfad Anfang';
+$GLOBALS['TL_LANG']['XPL']['folder_blacklist']['0']['0'] = 'Platzhalter am Anfang eines Pfades';
 $GLOBALS['TL_LANG']['XPL']['folder_blacklist']['0']['1'] = 'Jeder Eintrag geht vom TL_ROOT aus. Wenn Sie zum Beispiel "assets/css" angeben, wird nur der Ordner "TL_ROOT/assests/css/" ignoriert aber nicht die Ordner die zum Beipsiel unter "system/modules/my_extension/assets/css/" liegen.';
 $GLOBALS['TL_LANG']['XPL']['folder_blacklist']['1']['0'] = 'Allgemein - Pfad Ende';
 $GLOBALS['TL_LANG']['XPL']['folder_blacklist']['1']['1'] = 'Jeder Eintrag wird automatisch am ende mit einem * versehen. Wenn Sie also zum Beispiel "assets/css" eintrage, würder das System neben dem "assets/css" auch den "assets/css3pie" ignorieren. Daher sollten Sie nach jedem Ordner einen "/" angeben.';
