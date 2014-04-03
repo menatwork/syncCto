@@ -1368,17 +1368,25 @@ class SyncCtoModuleClient extends BackendModule
                  * Check version
                  */
                 case 4:
-                    // Check syncCto
-                    $strVersion                                    = $this->objSyncCtoCommunicationClient->getVersionSyncCto();
-                    $this->arrClientInformation["version_SyncCto"] = $strVersion;
-
-                    if (version_compare($strVersion, $GLOBALS['SYC_VERSION'], "="))
+                    // Check if the composer is enabled if enabled skip the auto update.
+                    if(!in_array('!composer', \Config::getInstance()->getActiveModules()))
                     {
-                        $this->objStepPool->autoUpdate = false;
+                        // Check syncCto
+                        $strVersion                                    = $this->objSyncCtoCommunicationClient->getVersionSyncCto();
+                        $this->arrClientInformation["version_SyncCto"] = $strVersion;
+
+                        if (version_compare($strVersion, $GLOBALS['SYC_VERSION'], "="))
+                        {
+                            $this->objStepPool->autoUpdate = false;
+                        }
+                        else
+                        {
+                            $this->objStepPool->autoUpdate = true;
+                        }
                     }
                     else
                     {
-                        $this->objStepPool->autoUpdate = true;
+                        $this->objStepPool->autoUpdate = false;
                     }
 
                     // Check Contao
