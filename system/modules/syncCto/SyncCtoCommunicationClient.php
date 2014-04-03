@@ -285,7 +285,7 @@ class SyncCtoCommunicationClient extends CtoCommunication
     /**
      * Call the last operations on client side.
      * 
-     * @return array with informations. 
+     * @return array with information.
      */
     public function runFinalOperations()
     {
