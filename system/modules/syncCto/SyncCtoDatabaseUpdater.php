@@ -5,63 +5,43 @@
  *
  * @copyright  MEN AT WORK 2014
  * @package    syncCto
- * @license    GNU/LGPL 
+ * @license    GNU/LGPL
  * @filesource
  */
- 
-class SyncCtoDatabaseUpdater extends DbInstaller
+
+class SyncCtoDatabaseUpdater extends \Database\Installer
 {
 
     /**
      * List with allowed update actions.
-     * 
-     * @var array 
+     *
+     * @var array
      */
     protected $arrAllowedAction;
 
     /**
      * List with errors
-     * 
-     * @var array 
+     *
+     * @var array
      */
     protected $arrError = array();
-    
-    /**
-     * Instance
-     * 
-     * @var SyncCtoDatabaseUpdater 
-     */
-    protected static $objInstance = null;
 
     /**
      * __construct
      */
-    protected function __construct()
+    public function __construct()
     {
         parent::__construct();
-        
+
         // Load allowed actions from config file.
         $this->arrAllowedAction = deserialize($GLOBALS['TL_CONFIG']['syncCto_auto_db_updater'], true);
-    }
-    
-    /**
-     * Get current instance.
-     * 
-     * @return SyncCtoDatabaseUpdater
-     */
-    public static function getInstance()
-    {
-        if(self::$objInstance == null)
-        {
-            self::$objInstance = new self();
-        }
-        
-        return self::$objInstance;
     }
 
     /**
      * Run auto update
-     * 
+     *
+     * @throws Exception
+     *
      * @return boolean Return true on success or when there are no data.
      */
     public function runAutoUpdate()
@@ -90,11 +70,16 @@ class SyncCtoDatabaseUpdater extends DbInstaller
         // Execute all
         foreach ($this->arrAllowedAction as $strAction)
         {
+            if(!isset($sql_command[$strAction]))
+            {
+                continue;
+            }
+
             foreach ($sql_command[$strAction] as $strOperation)
             {
                 try
                 {
-                    Database::getInstance()->query($strOperation);
+                    \Database::getInstance()->query($strOperation);
                 }
                 catch (Exception $exc)
                 {

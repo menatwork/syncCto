@@ -28,7 +28,6 @@ ClassLoader::addClasses(array
 	'SyncCtoEnum'                 => 'system/modules/syncCto/SyncCtoEnum.php',
 	'SyncCtoUpdater'              => 'system/modules/syncCto/SyncCtoUpdater.php',
 	'SyncCtoDatabaseUpdater'      => 'system/modules/syncCto/SyncCtoDatabaseUpdater.php',
-	'SyncCtoDatabaseUpdater3'     => 'system/modules/syncCto/SyncCtoDatabaseUpdater3.php',
 	'SyncCtoModuleBackup'         => 'system/modules/syncCto/SyncCtoModuleBackup.php',
 	'SyncCtoModuleCheck'          => 'system/modules/syncCto/SyncCtoModuleCheck.php',
 	'SyncCtoModuleClient'         => 'system/modules/syncCto/SyncCtoModuleClient.php',
