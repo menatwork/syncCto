@@ -92,6 +92,14 @@ $GLOBALS['TL_LANG']['MSC']['run_time']                      = 'Running time: %s 
 $GLOBALS['TL_LANG']['MSC']['memory_limit']                  = 'Memory limit: %s';
 
 /**
+ * DBFAS
+ */
+$GLOBALS['TL_LANG']['MSC']['dbafs_all_green']               = 'The DBAFS import seems to have no problems.';
+$GLOBALS['TL_LANG']['ERR']['dbafs_error']                   = 'There are some problems in the DBAFS:';
+$GLOBALS['TL_LANG']['ERR']['dbafs_uuid_conflict']           = 'Conflict in the DBFAS from Contao. Renamed the original file.';
+$GLOBALS['TL_LANG']['ERR']['dbafs_uuid_conflict_rename']    = 'Conflict in the DBFAS from Contao. Renamed the original file to _%s.';
+
+/**
  * Errors
  */
 $GLOBALS['TL_LANG']['ERR']['missing_file_folder']           = 'Missing file/folder "%s".';
@@ -102,6 +110,7 @@ $GLOBALS['TL_LANG']['ERR']['unknown_path']                  = 'Unknown path.';
 $GLOBALS['TL_LANG']['ERR']['cant_open']                     = 'Can\'t open file %s.';
 $GLOBALS['TL_LANG']['ERR']['checksum_error']                = 'Checksum error.';
 $GLOBALS['TL_LANG']['ERR']['cant_move_file']                = 'Can\'t move the file from %s to %s.';
+$GLOBALS['TL_LANG']['ERR']['cant_move_files']               = 'Can\'t move the files.';
 $GLOBALS['TL_LANG']['ERR']['cant_delete_file']              = 'Error deleting file.';
 $GLOBALS['TL_LANG']['ERR']['attention_headline']            = 'Beware of changes to the system';
 $GLOBALS['TL_LANG']['ERR']['attention_text']                = 'The contao installation is currently in <strong>maintenance mode of syncCto</strong>. Any changes made in this installation may be overwritten by the master installation. This message can only be removed by synchronization by the master installation.';

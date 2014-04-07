@@ -1322,8 +1322,10 @@ class SyncCtoFiles extends Backend
                 // Check if the tmp file exists.
                 if (!file_exists(TL_ROOT . "/" . $strTempFile))
                 {
-                    $arrFileList[$key]["saved"] = false;
-                    $arrFileList[$key]["error"] = sprintf($GLOBALS['TL_LANG']['ERR']['unknown_file'], $strTempFile);
+                    $arrFileList[$key]['saved']       = false;
+                    $arrFileList[$key]['error']       = sprintf($GLOBALS['TL_LANG']['ERR']['unknown_file'], $strTempFile);
+                    $arrFileList[$key]['skipreasons'] = $GLOBALS['TL_LANG']['ERR']['missing_file_information'];
+
                     continue;
                 }
 
@@ -1428,7 +1430,8 @@ class SyncCtoFiles extends Backend
                                 $objLocaleData->save();
 
                                 // Add a status report for debugging and co.
-                                $arrFileList[$key]['dbafs']['msg']    = 'UUID not same, move the locale file to _' . $intFileNumber . '. Add the new entry to the database.';
+                                $arrFileList[$key]['dbafs']['msg']    = $GLOBALS['TL_LANG']['ERR']['dbafs_uuid_conflict'];
+                                $arrFileList[$key]['dbafs']['error']  = sprintf($GLOBALS['TL_LANG']['ERR']['dbafs_uuid_conflict_rename'], $intFileNumber);
                                 $arrFileList[$key]['dbafs']['rename'] = $strNewDestinationName;
                                 $arrFileList[$key]['dbafs']['state']  = SyncCtoEnum::DBAFS_CONFLICT;
                             }
@@ -1443,22 +1446,22 @@ class SyncCtoFiles extends Backend
                 // Check the state at moving and add a msg to the return array.
                 if ($blnMovedFile)
                 {
-                    $arrFileList[$key]["saved"] = true;
+                    $arrFileList[$key]['saved'] = true;
                 }
                 else
                 {
-                    $arrFileList[$key]["saved"]        = false;
-                    $arrFileList[$key]["error"]        = sprintf($GLOBALS['TL_LANG']['ERR']['cant_move_file'], $strFileSource, $strFileDestination);
-                    $arrFileList[$key]["transmission"] = SyncCtoEnum::FILETRANS_SKIPPED;
-                    $arrFileList[$key]["skipreason"]   = $GLOBALS['TL_LANG']['ERR']['cant_move_file'];
+                    $arrFileList[$key]['saved']        = false;
+                    $arrFileList[$key]['error']        = sprintf($GLOBALS['TL_LANG']['ERR']['cant_move_file'], $strFileSource, $strFileDestination);
+                    $arrFileList[$key]['transmission'] = SyncCtoEnum::FILETRANS_SKIPPED;
+                    $arrFileList[$key]['skipreason']   = $GLOBALS['TL_LANG']['ERR']['cant_move_files'];
                 }
             }
             catch (Exception $e)
             {
-                $arrFileList[$key]["saved"]        = false;
-                $arrFileList[$key]["error"]        = sprintf('Can not move file - %s. Exception message: %s', $strFileSource, $e->getMessage());
-                $arrFileList[$key]["transmission"] = SyncCtoEnum::FILETRANS_SKIPPED;
-                $arrFileList[$key]["skipreason"]   = $e->getMessage();
+                $arrFileList[$key]['saved']        = false;
+                $arrFileList[$key]['error']        = sprintf('Can not move file - %s. Exception message: %s', $value["path"], $e->getMessage());
+                $arrFileList[$key]['transmission'] = SyncCtoEnum::FILETRANS_SKIPPED;
+                $arrFileList[$key]['skipreason']   = $GLOBALS['TL_LANG']['ERR']['cant_move_files'];
             }
         }
 
@@ -1513,7 +1516,8 @@ class SyncCtoFiles extends Backend
                         else
                         {
                             $arrFileList[$key]['transmission'] = SyncCtoEnum::FILETRANS_SKIPPED;
-                            $arrFileList[$key]["skipreason"]   = $GLOBALS['TL_LANG']['ERR']['cant_delete_file'];
+                            $arrFileList[$key]['error']        = $GLOBALS['TL_LANG']['ERR']['cant_delete_file'];
+                            $arrFileList[$key]['skipreason']   = $GLOBALS['TL_LANG']['ERR']['cant_delete_file'];
                         }
 
                     }
@@ -1533,7 +1537,8 @@ class SyncCtoFiles extends Backend
                 catch (Exception $exc)
                 {
                     $arrFileList[$key]['transmission'] = SyncCtoEnum::FILETRANS_SKIPPED;
-                    $arrFileList[$key]["skipreason"]   = $exc->getMessage();
+                    $arrFileList[$key]['error']        = sprintf('Can not delete file - %s. Exception message: %s', $value["path"], $exc->getMessage());
+                    $arrFileList[$key]['skipreason']   = $GLOBALS['TL_LANG']['ERR']['cant_delete_file'];
                 }
             }
         }
