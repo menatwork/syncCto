@@ -17,7 +17,7 @@ By using syncCto editors can work quickly and easily in a preview system, and th
 Screenshot
 -----------
 
-![Synchronization steps](http://img6.imagebanana.com/img/q7dh208y/steps.jpg)
+![File overview](http://menatwork.github.io/sync-doku/screenshots/file-overview.png)
 
 
 System requirements
