@@ -15,13 +15,6 @@
 class SyncCtoRunOnce
 {
     /**
-     * The SyncCto Helper.
-     *
-     * @var SyncCtoHelper
-     */
-    protected $objSyncCtoHelper;
-
-    /**
      * Old settings to be replaced with the new ones.
      *
      * @var array
@@ -46,13 +39,16 @@ class SyncCtoRunOnce
     /**
      * Init
      */
-    public function __construct()
-    {
-        $this->objSyncCtoHelper = SyncCtoHelper::getInstance();
-    }
+    public function __construct(){}
 
     public function run()
     {
+        // Include the syncCto config file if we are in core mode only.
+        if($GLOBALS['TL_CONFIG']['coreOnlyMode'])
+        {
+            include_once(TL_ROOT . '/system/modules/syncCto/config/config.php');
+        }
+
         // Check config
         $this->updateConfig();
 
@@ -60,10 +56,10 @@ class SyncCtoRunOnce
         $this->checkFolders();
 
         // Check if we have a composer installation.
-        $arrActiveModules = Config::getInstance()->getActiveModules();
+        $arrActiveModules = \Config::getInstance()->getActiveModules();
 
         // If not use the old way for the auto updater.
-        if (!in_array('!composer', $arrActiveModules))
+        if (!in_array('!composer', $arrActiveModules) && !$GLOBALS['TL_CONFIG']['coreOnlyMode'])
         {
             $objSyncCtoRunOnceEr = new SyncCtoRunOnceEr();
             $objSyncCtoRunOnceEr->run();
@@ -105,7 +101,7 @@ class SyncCtoRunOnce
         $arrClearConfig['syncCto_hidden_tables'] = $strLocalconfig;
 
         // Save back to the localconfig.
-        $this->objSyncCtoHelper->importConfig($arrClearConfig);
+        $this->importConfig($arrClearConfig);
     }
 
     /**
@@ -213,6 +209,29 @@ class SyncCtoRunOnce
         }
 
         return serialize(array());
+    }
+
+    /**
+     * Import configuration entries
+     *
+     * @param array $arrConfig
+     *
+     * @return array
+     */
+    protected function importConfig($arrConfig)
+    {
+        foreach ($arrConfig as $key => $value)
+        {
+            if ($key == "disableRefererCheck" && $value == true)
+            {
+                \Config::getInstance()->add("\$GLOBALS['TL_CONFIG']['ctoCom_disableRefererCheck']", true);
+                continue;
+            }
+
+            \Config::getInstance()->add("\$GLOBALS['TL_CONFIG']['" . $key . "']", $value);
+        }
+
+        return true;
     }
 
 }
