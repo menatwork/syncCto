@@ -20,9 +20,11 @@ class StepPool
 
     /**
      *
-     * @param type $arrStepPool
+     * @param array $arrStepPool List with all data.
+     *
+     * @param int  $intStepID The current step.
      */
-    public function __construct($arrStepPool, $intStepID)
+    public function __construct($arrStepPool, $intStepID = 0)
     {
         $this->arrValues = $arrStepPool;
         $this->intStepID = $intStepID;
