@@ -613,7 +613,7 @@ class SyncCtoModuleBackup extends BackendModule
 
                     if (count($this->objStepPool->skippedfiles) != 0)
                     {
-                        $strHTML = '<br /><p class="tl_help">' . count($arrStepPool["skippedfiles"]) . $GLOBALS['TL_LANG']['MSC']['skipped_files'] . '</p>';
+                        $strHTML = '<br /><p class="tl_help">' . count($this->objStepPool->skippedfiles) . $GLOBALS['TL_LANG']['MSC']['skipped_files'] . '</p>';
 
                         $strHTML .= '<ul class="fileinfo">';
                         foreach ($this->objStepPool->skippedfiles as $value)
