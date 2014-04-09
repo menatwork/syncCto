@@ -546,6 +546,15 @@ $GLOBALS["CTOCOM_FUNCTIONS"]["SYNCCTO_IMPORT_FILE"] = array
     "parameter"          => array("filelist", "dbafs"),
 );
 
+// Import files into contao file system
+$GLOBALS["CTOCOM_FUNCTIONS"]["SYNCCTO_UPDATE_DBAFS"] = array
+(
+    "class"              => "SyncCtoFiles",
+    "function"           => "updateDbafs",
+    "typ"                => "POST",
+    "parameter"          => array("filelist"),
+);
+
 // Rebuild a split file
 $GLOBALS["CTOCOM_FUNCTIONS"]["SYNCCTO_REBUILD_SPLITFILE"] = array
 (

@@ -1835,9 +1835,18 @@ class SyncCtoModuleClient extends BackendModule
                                     $this->arrListCompare[$strType][$key]["css"] = "deleted";
                                     break;
 
+                                case SyncCtoEnum::FILESTATE_DBAFS_CONFLICT:
+                                    $this->arrListCompare[$strType][$key]["css"] = "conflict";
+                                    break;
+
                                 default:
                                     $this->arrListCompare[$strType][$key]["css"] = "unknown";
                                     break;
+                            }
+
+                            if($value["state"] != SyncCtoEnum::FILESTATE_DBAFS_CONFLICT && (isset($value["dbafs_state"]) || isset($value["dbafs_tail_state"])))
+                            {
+                                $this->arrListCompare[$strType][$key]["css"] .= " conflict";
                             }
 
                             if ($value["state"] == SyncCtoEnum::FILESTATE_TOO_BIG_DELETE
@@ -1868,10 +1877,11 @@ class SyncCtoModuleClient extends BackendModule
                  */
                 case 11:
                     // Counter
-                    $intCountMissing = 0;
-                    $intCountNeed    = 0;
-                    $intCountIgnored = 0;
-                    $intCountDelete  = 0;
+                    $intCountMissing       = 0;
+                    $intCountNeed          = 0;
+                    $intCountIgnored       = 0;
+                    $intCountDelete        = 0;
+                    $intCountDbafsConflict = 0;
 
                     $intTotalSizeNew    = 0;
                     $intTotalSizeDel    = 0;
@@ -1907,16 +1917,25 @@ class SyncCtoModuleClient extends BackendModule
                                     $intCountIgnored++;
                                     break;
                             }
+
+                            if($value["state"] == SyncCtoEnum::FILESTATE_DBAFS_CONFLICT
+                                || isset($value["dbafs_state"])
+                                || isset($value["dbafs_tail_state"])
+                            )
+                            {
+                                $intCountDbafsConflict++;
+                            }
                         }
                     }
 
-                    $this->objStepPool->missing = $intCountMissing;
-                    $this->objStepPool->need    = $intCountNeed;
-                    $this->objStepPool->ignored = $intCountIgnored;
-                    $this->objStepPool->delete  = $intCountDelete;
+                    $this->objStepPool->missing   = $intCountMissing;
+                    $this->objStepPool->need      = $intCountNeed;
+                    $this->objStepPool->ignored   = $intCountIgnored;
+                    $this->objStepPool->delete    = $intCountDelete;
+                    $this->objStepPool->conflict  = $intCountDbafsConflict;
 
                     // Save files and go on or skip here
-                    if ($intCountMissing == 0 && $intCountNeed == 0 && $intCountIgnored == 0 && $intCountDelete == 0)
+                    if ($intCountMissing == 0 && $intCountNeed == 0 && $intCountIgnored == 0 && $intCountDelete == 0 && $intCountDbafsConflict == 0)
                     {
                         // Set current step informations
                         $this->objData->setState(SyncCtoEnum::WORK_SKIPPED);
@@ -2020,6 +2039,11 @@ class SyncCtoModuleClient extends BackendModule
             {
                 foreach ($arrLists as $key => $value)
                 {
+                    if($value['state'] == SyncCtoEnum::FILESTATE_DBAFS_CONFLICT)
+                    {
+                        continue;
+                    }
+
                     switch ($value["transmission"])
                     {
                         case SyncCtoEnum::FILETRANS_SEND:
@@ -2082,7 +2106,7 @@ class SyncCtoModuleClient extends BackendModule
                                 continue;
                             }
 
-                            if (in_array($value["state"], array(SyncCtoEnum::FILESTATE_DELETE, SyncCtoEnum::FILESTATE_FOLDER_DELETE)))
+                            if (in_array($value["state"], array(SyncCtoEnum::FILESTATE_DELETE, SyncCtoEnum::FILESTATE_FOLDER_DELETE, SyncCtoEnum::FILESTATE_DBAFS_CONFLICT)))
                             {
                                 continue;
                             }
@@ -2168,6 +2192,11 @@ class SyncCtoModuleClient extends BackendModule
                     {
                         foreach ($arrLists as $key => $value)
                         {
+                            if($value['state'] == SyncCtoEnum::FILESTATE_DBAFS_CONFLICT)
+                            {
+                                continue;
+                            }
+
                             if ($value["split"] == true)
                             {
                                 $intCountSplit++;
@@ -2180,6 +2209,11 @@ class SyncCtoModuleClient extends BackendModule
                         foreach ($arrLists as $key => $value)
                         {
                             if ($value["split"] != true)
+                            {
+                                continue;
+                            }
+
+                            if($value['state'] == SyncCtoEnum::FILESTATE_DBAFS_CONFLICT)
                             {
                                 continue;
                             }
@@ -2224,6 +2258,11 @@ class SyncCtoModuleClient extends BackendModule
                     {
                         foreach ($arrLists as $key => $value)
                         {
+                            if($value['state'] == SyncCtoEnum::FILESTATE_DBAFS_CONFLICT)
+                            {
+                                continue;
+                            }
+
                             if ($value["split"] == true)
                             {
                                 $intCountSplit++;
@@ -2248,7 +2287,8 @@ class SyncCtoModuleClient extends BackendModule
                                     SyncCtoEnum::FILESTATE_TOO_BIG_SAME,
                                     SyncCtoEnum::FILESTATE_BOMBASTIC_BIG,
                                     SyncCtoEnum::FILESTATE_DELETE,
-                                    SyncCtoEnum::FILESTATE_FOLDER_DELETE
+                                    SyncCtoEnum::FILESTATE_FOLDER_DELETE,
+                                    SyncCtoEnum::FILESTATE_DBAFS_CONFLICT
                                 ))
                             )
                             {
@@ -2311,6 +2351,11 @@ class SyncCtoModuleClient extends BackendModule
                     {
                         foreach ($arrLists as $key => $value)
                         {
+                            if($value['state'] == SyncCtoEnum::FILESTATE_DBAFS_CONFLICT)
+                            {
+                                continue;
+                            }
+
                             if ($value["split"] == true)
                             {
                                 $intCountSplit++;
@@ -2334,7 +2379,8 @@ class SyncCtoModuleClient extends BackendModule
                                 SyncCtoEnum::FILESTATE_TOO_BIG_SAME,
                                 SyncCtoEnum::FILESTATE_BOMBASTIC_BIG,
                                 SyncCtoEnum::FILESTATE_DELETE,
-                                SyncCtoEnum::FILESTATE_FOLDER_DELETE
+                                SyncCtoEnum::FILESTATE_FOLDER_DELETE,
+                                SyncCtoEnum::FILESTATE_DBAFS_CONFLICT
                             ))
                             )
                             {
@@ -2959,7 +3005,7 @@ class SyncCtoModuleClient extends BackendModule
                         foreach ($this->arrListCompare['files'] as $key => $value)
                         {
                             // Skip some values.
-                            if(in_array($value["state"], array( SyncCtoEnum::FILESTATE_DELETE, SyncCtoEnum::FILESTATE_FOLDER_DELETE, SyncCtoEnum::FILESTATE_TOO_BIG_DELETE)))
+                            if(in_array($value["state"], array(SyncCtoEnum::FILESTATE_DELETE, SyncCtoEnum::FILESTATE_FOLDER_DELETE, SyncCtoEnum::FILESTATE_TOO_BIG_DELETE, SyncCtoEnum::FILESTATE_DBAFS_CONFLICT)))
                             {
                                 continue;
                             }
@@ -2977,6 +3023,7 @@ class SyncCtoModuleClient extends BackendModule
                                 if($objModel != null)
                                 {
                                     $arrModelData = $objModel->row();
+                                    $arrModelData['pid'] = (strlen($arrModelData['pid'])) ? \String::binToUuid($arrModelData['pid']) : $arrModelData['pid'];
                                     $arrModelData['uuid'] = \String::binToUuid($arrModelData['uuid']);
                                     $arrImport['files'][$key]['tl_files'] = $arrModelData;
                                 }
@@ -2985,10 +3032,24 @@ class SyncCtoModuleClient extends BackendModule
                                 {
                                     $objModel = \Dbafs::addResource($value['path']);
                                     $arrModelData = $objModel->row();
+                                    $arrModelData['pid'] = (strlen($arrModelData['pid'])) ? \String::binToUuid($arrModelData['pid']) : $arrModelData['pid'];
                                     $arrModelData['uuid'] = \String::binToUuid($arrModelData['uuid']);
                                     $arrImport['files'][$key]['tl_files'] = $arrModelData;
                                 }
                             }
+                        }
+
+                        // and at least, only update the dbafs for some files because this .... just hate me.
+                        foreach ($this->arrListCompare['files'] as $key => $value)
+                        {
+                            // Skip some values.
+                            if($value["state"] != SyncCtoEnum::FILESTATE_DBAFS_CONFLICT)
+                            {
+                                continue;
+                            }
+
+                            // Add the file to the import array.
+                            $arrImport['dbafs'][$key] = $value;
                         }
 
                         // Import all /core data and write the data back in the compare list.
@@ -3011,11 +3072,29 @@ class SyncCtoModuleClient extends BackendModule
                             }
                         }
 
+                        // Update the dbafs system.
+                        if (is_array($arrImport['dbafs']) && count($arrImport['dbafs']) > 0)
+                        {
+                            $arrTransmission = $this->objSyncCtoCommunicationClient->updateDbafs($arrImport['dbafs']);
+                            foreach ($arrTransmission as $key => $value)
+                            {
+                                // Set the state.
+                                if($value['saved'])
+                                {
+                                    $value["transmission"] = SyncCtoEnum::FILETRANS_SEND;
+                                }
+                                else
+                                {
+                                    $value["transmission"] = SyncCtoEnum::FILETRANS_SKIPPED;
+                                }
+
+                                $this->arrListCompare['files'][$key] = $value;
+                            }
+                        }
+
                         $this->objStepPool->step++;
                         break;
                     }
-
-                    $this->objStepPool->step++;
 
                 /**
                  * Import Config

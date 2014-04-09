@@ -34,7 +34,7 @@ require($dir . '/system/initialize.php');
 /**
  * Class SyncCtoPopupFiles
  */
-class SyncCtoPopupFiles extends Backend
+class SyncCtoPopupFiles extends \Backend
 {
 
     // Vars
@@ -57,9 +57,10 @@ class SyncCtoPopupFiles extends Backend
      */
     public function __construct()
     {
+        \BackendUser::getInstance()->authenticate();
+
         parent::__construct();
 
-        \BackendUser::getInstance()->authenticate();
         $this->loadLanguageFile('default');
 
         $this->objSyncCtoHelper = SyncCtoHelper::getInstance();
@@ -129,10 +130,11 @@ class SyncCtoPopupFiles extends Backend
         }
 
         // Counter
-        $intCountMissing = 0;
-        $intCountNeed    = 0;
-        $intCountIgnored = 0;
-        $intCountDelete  = 0;
+        $intCountMissing       = 0;
+        $intCountNeed          = 0;
+        $intCountIgnored       = 0;
+        $intCountDelete        = 0;
+        $intCountDbafsConflict = 0;
 
         $intTotalSizeNew    = 0;
         $intTotalSizeDel    = 0;
@@ -171,6 +173,13 @@ class SyncCtoPopupFiles extends Backend
                     case SyncCtoEnum::FILESTATE_BOMBASTIC_BIG:
                         $intCountIgnored++;
                         break;
+                }
+
+                // Check for dbafs conflict.
+                if($value["state"] == SyncCtoEnum::FILESTATE_DBAFS_CONFLICT || isset($value["dbafs_state"]) || isset($value["dbafs_tail_state"]))
+                {
+                    $intCountDbafsConflict++;
+                    $value['dbafs_conflict'] = true;
                 }
 
                 if (in_array($value["state"],
@@ -216,6 +225,7 @@ class SyncCtoPopupFiles extends Backend
         $arrLanguageTags[SyncCtoEnum::FILESTATE_TOO_BIG_NEED]    = $GLOBALS['TL_LANG']['MSC']['skipped'];
         $arrLanguageTags[SyncCtoEnum::FILESTATE_TOO_BIG_DELETE]  = $GLOBALS['TL_LANG']['MSC']['skipped'];
         $arrLanguageTags[SyncCtoEnum::FILESTATE_BOMBASTIC_BIG]   = $GLOBALS['TL_LANG']['MSC']['ignored'];
+        $arrLanguageTags[SyncCtoEnum::FILESTATE_DBAFS_CONFLICT]  = $GLOBALS['TL_LANG']['MSC']['dbafs_conflict'];
 
         // Set template
         $this->Template                  = new BackendTemplate('be_syncCto_files');

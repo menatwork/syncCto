@@ -609,6 +609,25 @@ class SyncCtoCommunicationClient extends CtoCommunication
     }
 
     /**
+     * Update the DBAFS
+     *
+     * @param array $arrFileList The list with all files.
+     *
+     * @return mixed
+     */
+    public function updateDbafs($arrFileList)
+    {
+        $arrData = array(
+            array(
+                "name"  => "filelist",
+                "value" => $arrFileList,
+            )
+        );
+
+        return $this->runServer("SYNCCTO_UPDATE_DBAFS", $arrData);
+    }
+
+    /**
      * Delete files
      *
      * @param array   $arrFileList The list with all files.

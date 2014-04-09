@@ -45,7 +45,7 @@ class SyncCtoFiles extends Backend
 
         // Init
         $this->objSyncCtoHelper   = SyncCtoHelper::getInstance();
-        $this->objFiles           = Files::getInstance();
+        $this->objFiles           = \Files::getInstance();
         $this->strTimestampFormat = str_replace(array(':', ' '), array('', '_'), $GLOBALS['TL_CONFIG']['datimFormat']);
 
         // Load blacklists and whitelists
@@ -212,37 +212,259 @@ class SyncCtoFiles extends Backend
         // ...and now the support for the uuid und dbafs system
         foreach ($arrFileList as $key => $value)
         {
+            // If we have a file in files get the dbafs data.
+            if(!preg_match('/^files\//i',  $value['path']))
+            {
+                continue;
+            }
+
             // Check if we have this file in the filesystem.
-            if(!file_exists(TL_ROOT . PATH_SEPARATOR . $value['path']))
+            if(!file_exists(TL_ROOT . DIRECTORY_SEPARATOR . $value['path']))
             {
-                $arrFileList[$key]['tl_files'] = null;
+                continue;
             }
 
-            // Add the file to the import array.
-            $arrImport['files'][$key] = $value;
+            // Get the information from the dbafs.
+            $arrFileList[$key]['tl_files'] = $this->getDbafsInformation($value['path'], $blnAutoAdd);
+        }
 
+        return $arrFileList;
+    }
+
+    /**
+     * Get the file information from a file and add these to the file array.
+     *
+     * @param string $strFilePath        The name of the path.
+     *
+     * @param bool   $blnAutoAdd         Flag if the system should add unknown files to the DBAFS.
+     *
+     * @param bool   $blnSkipExistsCheck If true the system will not check if the file exists.
+     *
+     * @return array Return the file list with dbafs information.
+     */
+    public function getDbafsInformation($strFilePath, $blnAutoAdd = false, $blnSkipExistsCheck = false)
+    {
+        // If we have a file in files get the dbafs data.
+        if(!preg_match('/^files\//i',  $strFilePath))
+        {
+            return null;
+        }
+
+        // Check if we have this file in the filesystem.
+        if(!$blnSkipExistsCheck && !file_exists(TL_ROOT . DIRECTORY_SEPARATOR . $strFilePath))
+        {
+            return null;
+        }
+
+        // Get the information from the tl_files.
+        $objModel = \FilesModel::findByPath($strFilePath);
+
+        // If the file is not in the dbafs and
+        if ($objModel == null && $blnAutoAdd)
+        {
+            $objModel                      = \Dbafs::addResource($strFilePath);
+            $arrModelData                  = $objModel->row();
+            $arrModelData['uuid']          = \String::binToUuid($arrModelData['uuid']);
+            $arrModelData['pid']           = (strlen($arrModelData['pid'])) ? \String::binToUuid($arrModelData['pid']) : $arrModelData['pid'];
+            $arrModelData['tail']          = $this->getDbafsTailFor($arrModelData['pid']);
+
+            return $arrModelData;
+        }
+        // If empty and auto add disable retrun null for this file.
+        elseif ($objModel == null && !$blnAutoAdd)
+        {
+            return null;
+        }
+        // If we have data add it to the file
+        else
+        {
+            $arrModelData                  = $objModel->row();
+            $arrModelData['uuid']          = \String::binToUuid($arrModelData['uuid']);
+            $arrModelData['pid']           = (strlen($arrModelData['pid'])) ? \String::binToUuid($arrModelData['pid']) : $arrModelData['pid'];
+            $arrModelData['tail']          = $this->getDbafsTailFor($arrModelData['pid']);
+
+            return $arrModelData;
+        }
+    }
+
+    /**
+     * Get the tail for one file. This means all parent folders. This function
+     * has a limit for the depth. Max 100 rounds are allowed.
+     *
+     * @param string $mixPID The human readable UUID from the parent.
+     *
+     * @return array A list with all parent folders. First one is the first parent.
+     */
+    public function getDbafsTailFor($mixPID)
+    {
+        $arrTail = array();
+
+        // Check if we have a value.
+        if(empty($mixPID))
+        {
+            return $arrTail;
+        }
+
+        // Max depth is 100.
+        for ($i = 0; $i < 100; $i++)
+        {
             // Get the information from the tl_files.
-            $objModel = \FilesModel::findByPath($value['path']);
+            $objModel = \FilesModel::findByUuid($mixPID);
 
-            // If the file is not in the dbafs and
-            if ($objModel == null && $blnAutoAdd)
+            // Check if we have a information.
+            if ($objModel == null)
             {
-                $objModel                      = \Dbafs::addResource($value['path']);
-                $arrModelData                  = $objModel->row();
-                $arrModelData['uuid']          = \String::binToUuid($arrModelData['uuid']);
-                $arrFileList[$key]['tl_files'] = $arrModelData;
+                return $arrTail;
             }
-            // If empty and auto add disable retrun null for this file.
-            elseif ($objModel == null && !$blnAutoAdd)
+
+            // Bin to string cast.
+            $arrModelData         = $objModel->row();
+            $arrModelData['uuid'] = \String::binToUuid($arrModelData['uuid']);
+            $arrModelData['pid']  = (strlen($arrModelData['pid'])) ? \String::binToUuid($arrModelData['pid']) : $arrModelData['pid'];
+
+            // Save to the array.
+            $arrTail[$mixPID] = $arrModelData;
+
+            // Id we have no pid return.
+            if(strlen($arrModelData['pid']) == 0)
             {
-                $arrFileList[$key]['tl_files'] = null;
+                return $arrTail;
             }
-            // If we have data add it to the file
+
+            // Else set the new pid and run again.
+            $mixPID = $arrModelData['pid'];
+        }
+    }
+
+    /**
+     * Compare the tails list from the dbafs array.
+     *
+     * @param array $arrLeft
+     *
+     * @param array $arrRight
+     *
+     * @return array|bool List with diff or true if same.
+     */
+    public function compareDbafsTails($arrLeft, $arrRight)
+    {
+        $arrFoldersLeft  = array();
+        $arrFoldersRight = array();
+        $arrDiff         = array();
+
+        // Replace the uuid with the path.
+        foreach ($arrLeft as $arrEntry)
+        {
+            $arrFoldersLeft[$arrEntry['path']] = $arrEntry;
+        }
+
+        foreach ($arrRight as $arrEntry)
+        {
+            $arrFoldersRight[$arrEntry['path']] = $arrEntry;
+        }
+
+        // Get the same keys.
+        $arrSameFolders = array_intersect(array_keys($arrFoldersLeft), array_keys($arrFoldersRight));
+
+        // Run each and found out if the uuid is same.
+        foreach ($arrSameFolders as $strKey)
+        {
+            if ($arrFoldersLeft[$strKey]['uuid'] != $arrFoldersRight[$strKey]['uuid'])
+            {
+                $arrDiff[] = array(
+                    'left'  => $arrFoldersLeft[$strKey],
+                    'right' => $arrFoldersRight[$strKey],
+                );
+            }
+        }
+
+        // Check the missing
+        $arrMissingRight = array_diff(array_keys($arrFoldersLeft), array_keys($arrFoldersRight));
+        foreach ($arrMissingRight as $strKey)
+        {
+            if ($arrFoldersLeft[$strKey]['uuid'] != $arrFoldersRight[$strKey]['uuid'])
+            {
+                $arrDiff[] = array(
+                    'left'  => $arrFoldersLeft[$strKey],
+                    'right' => null,
+                );
+            }
+        }
+
+        // Check the missing
+        $arrMissingLeft = array_diff(array_keys($arrFoldersRight), array_keys($arrFoldersLeft));
+        foreach ($arrMissingLeft as $strKey)
+        {
+            if ($arrFoldersLeft[$strKey]['uuid'] != $arrFoldersRight[$strKey]['uuid'])
+            {
+                $arrDiff[] = array(
+                    'left'  => null,
+                    'right' => $arrFoldersRight[$strKey],
+                );
+            }
+        }
+
+        // If empty return true for all same.
+        if(empty($arrDiff))
+        {
+            return true;
+        }
+
+        // Else return the diff array with all information.
+        return $arrDiff;
+    }
+
+    public function updateDbafs($arrFileList)
+    {
+        foreach($arrFileList as $key => $arrFile)
+        {
+            // Get information about the current file information.
+            $arrDestinationInformation = pathinfo($arrFile['path']);
+
+            // Try to rename it to _1 or _2 and so on.
+            $strNewDestinationName = null;
+            $intFileNumber         = 1;
+            for ($i = 1; $i < 100; $i++)
+            {
+                $strNewDestinationName = sprintf('%s/%s_%s.%s',
+                    $arrDestinationInformation['dirname'],
+                    $arrDestinationInformation['filename'],
+                    $i,
+                    $arrDestinationInformation['extension']
+                );
+
+                if (!file_exists(TL_ROOT . '/' . $strNewDestinationName))
+                {
+                    $intFileNumber = $i;
+                    break;
+                }
+            }
+
+            // Move the current file to another name, that we have space for the new one.
+            $blnCopyFile = $this->objFiles->copy($arrFile['path'], $strNewDestinationName);
+
+            // If success add file to the database.
+            if ($blnCopyFile)
+            {
+                $objRenamedLocaleData = \Dbafs::moveResource($arrFile['path'], $strNewDestinationName);
+
+                // First add it to the dbafs.
+                $objLocaleData       = \Dbafs::addResource($arrFile['path']);
+                $objLocaleData->uuid = \String::uuidToBin($arrFile['tl_files']['uuid']);
+                $objLocaleData->save();
+
+                // Add a status report for debugging and co.
+                $arrFileList[$key]['saved']           = true;
+                $arrFileList[$key]['dbafs']['msg']    = $GLOBALS['TL_LANG']['ERR']['dbafs_uuid_conflict'];
+                $arrFileList[$key]['dbafs']['error']  = sprintf($GLOBALS['TL_LANG']['ERR']['dbafs_uuid_conflict_rename'], $intFileNumber);
+                $arrFileList[$key]['dbafs']['rename'] = $strNewDestinationName;
+                $arrFileList[$key]['dbafs']['state']  = SyncCtoEnum::DBAFS_CONFLICT;
+            }
             else
             {
-                $arrModelData                  = $objModel->row();
-                $arrModelData['uuid']          = \String::binToUuid($arrModelData['uuid']);
-                $arrFileList[$key]['tl_files'] = $arrModelData;
+                $arrFileList[$key]['saved']        = false;
+                $arrFileList[$key]['error']        = sprintf('Can not move file - %s. Exception message: %s', $arrFile["path"], 'Unable to move.');
+                $arrFileList[$key]['transmission'] = SyncCtoEnum::FILETRANS_SKIPPED;
+                $arrFileList[$key]['skipreason']   = $GLOBALS['TL_LANG']['ERR']['cant_move_files'];
             }
         }
 
@@ -274,7 +496,7 @@ class SyncCtoFiles extends Backend
                 continue;
             }
 
-            // Get fileinformation.
+            // Get file information.
             $strRelativePath = preg_replace('?' . $this->objSyncCtoHelper->getPreparedTlRoot() . '/?', '', $objFile->getPathname(), 1);
             $strFullPath     = $objFile->getPathname();
             $intSize         = $objFile->getSize();
@@ -325,6 +547,12 @@ class SyncCtoFiles extends Backend
                     "lastModified" => $intLasModified
                 );
             }
+        }
+
+        // If we have the files folder add the dbafs information.
+        if($booFiles)
+        {
+            $arrChecksum = $this->getDbafsInformationFor($arrChecksum);
         }
 
         return $arrChecksum;
@@ -526,10 +754,11 @@ class SyncCtoFiles extends Backend
 
         foreach ($arrChecksumList as $key => $value)
         {
+            // Check the files old school, md5 hash and co.
             if ($value['state'] == SyncCtoEnum::FILESTATE_BOMBASTIC_BIG)
             {
                 $arrFileList[$key]        = $arrChecksumList[$key];
-                $arrFileList[$key]["raw"] = "file bombastic";
+                $arrFileList[$key]['raw'] = 'file bombastic';
             }
             else if (file_exists(TL_ROOT . "/" . $value['path']))
             {
@@ -542,12 +771,12 @@ class SyncCtoFiles extends Backend
                     if ($value['state'] == SyncCtoEnum::FILESTATE_TOO_BIG)
                     {
                         $arrFileList[$key]          = $arrChecksumList[$key];
-                        $arrFileList[$key]["state"] = SyncCtoEnum::FILESTATE_TOO_BIG_NEED;
+                        $arrFileList[$key]['state'] = SyncCtoEnum::FILESTATE_TOO_BIG_NEED;
                     }
                     else
                     {
                         $arrFileList[$key]          = $arrChecksumList[$key];
-                        $arrFileList[$key]["state"] = SyncCtoEnum::FILESTATE_NEED;
+                        $arrFileList[$key]['state'] = SyncCtoEnum::FILESTATE_NEED;
                     }
                 }
             }
@@ -556,12 +785,48 @@ class SyncCtoFiles extends Backend
                 if ($value['state'] == SyncCtoEnum::FILESTATE_TOO_BIG)
                 {
                     $arrFileList[$key]          = $arrChecksumList[$key];
-                    $arrFileList[$key]["state"] = SyncCtoEnum::FILESTATE_TOO_BIG_MISSING;
+                    $arrFileList[$key]['state'] = SyncCtoEnum::FILESTATE_TOO_BIG_MISSING;
                 }
                 else
                 {
                     $arrFileList[$key]          = $arrChecksumList[$key];
-                    $arrFileList[$key]["state"] = SyncCtoEnum::FILESTATE_MISSING;
+                    $arrFileList[$key]['state'] = SyncCtoEnum::FILESTATE_MISSING;
+                }
+            }
+
+            // Next check dbafs changes.
+            if (preg_match('/^files\//i', $value['path']))
+            {
+                // Get the dbafs data and compare them..
+                $arrLocaleDBAFSInformation = $this->getDbafsInformation($value['path']);
+
+                // If we have the data run the compare.
+                if($arrLocaleDBAFSInformation != null)
+                {
+                    // First compare the uuid
+                    if ($arrLocaleDBAFSInformation['uuid'] != $value['tl_files']['uuid'])
+                    {
+                        if (!isset($arrFileList[$key]))
+                        {
+                            $arrFileList[$key]          = $arrChecksumList[$key];
+                            $arrFileList[$key]['state'] = SyncCtoEnum::FILESTATE_DBAFS_CONFLICT;
+                        }
+
+                        $arrFileList[$key]['dbafs_state'] = SyncCtoEnum::DBAFS_CONFLICT;
+                    }
+
+                    // And than the tails.
+                    if (($arrDiff = $this->compareDbafsTails($value['tl_files'], $arrLocaleDBAFSInformation)) != true)
+                    {
+                        if (!isset($arrFileList[$key]))
+                        {
+                            $arrFileList[$key]          = $arrChecksumList[$key];
+                            $arrFileList[$key]['state'] = SyncCtoEnum::FILESTATE_DBAFS_CONFLICT;
+                        }
+
+                        $arrFileList[$key]['dbafs_tail_state'] = SyncCtoEnum::DBAFS_CONFLICT;
+                        $arrFileList[$key]['dbafs_tail_data']  = $arrDiff;
+                    }
                 }
             }
         }

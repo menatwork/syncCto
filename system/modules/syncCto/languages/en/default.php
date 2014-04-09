@@ -63,6 +63,7 @@ $GLOBALS['TL_LANG']['MSC']['file']                          = 'File';
 $GLOBALS['TL_LANG']['MSC']['totalsize']                     = 'Total size of files:';
 $GLOBALS['TL_LANG']['MSC']['skipped']                       = 'Skipped';
 $GLOBALS['TL_LANG']['MSC']['ignored']                       = 'Ignored';
+$GLOBALS['TL_LANG']['MSC']['dbafs_conflict']                = 'Conflict';
 $GLOBALS['TL_LANG']['MSC']['client']                        = 'Client';
 $GLOBALS['TL_LANG']['MSC']['server']                        = 'Server';
 $GLOBALS['TL_LANG']['MSC']['sync_target']                   = 'Target';

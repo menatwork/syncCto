@@ -67,7 +67,7 @@
             <tbody>
             <?php foreach ($arrFileList as $key => $file): ?>
                 <tr>
-                    <td class="state <?php echo $file["css"]; ?>"><?php echo $this->arrLangStates[$file["state"]]; ?></td>
+                    <td class="state <?php echo $file["css"]; ?>"><?php echo $this->arrLangStates[$file["state"]]; ?><?php if($file["state"] != 200 && $file['dbafs_conflict']): ?> / <?php echo $GLOBALS['TL_LANG']['MSC']['dbafs_conflict']; endif; ?></td>
                     <td class="filesize"><?php echo ($file["size"] == -1) ? "N.A." : $this->getReadableSize($file["size"]); ?></td>
                     <td class="filetime"><?php echo \Date::parse($GLOBALS['TL_CONFIG']['datimFormat'], $file["lastModified"]); ?></td>
                     <?php if($this->compare_complex == false): ?>
@@ -76,7 +76,7 @@
                     <td class="checkbox"><?php if (empty($file["css_big"])): ?><input class="tl_checkbox" type="checkbox" name="del-file-<?php echo $key; ?>" value="<?php echo $key; ?>" /><?php else: ?> X <?php endif; ?></td>
                     <?php endif; ?>
                     <td class="last icon" title="<?php echo $file["path"]; ?>">
-                        <?php echo ($file['state'] > 99)? $this->generateImage('folderC.gif') : $this->generateImage(SyncCtoFiles::getMimeInfo($file['path'], true, true)); ?>
+                        <?php echo ($file['state'] > 99 && $file['state'] < 200)? $this->generateImage('folderC.gif') : $this->generateImage(SyncCtoFiles::getMimeInfo($file['path'], true, true)); ?>
                         <span><?php echo SyncCtoHelper::getInstance()->substrCenter($file["path"], $this->maxLength); ?></span>
                     </td>
                </tr>

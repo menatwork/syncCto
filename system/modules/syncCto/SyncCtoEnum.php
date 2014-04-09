@@ -33,6 +33,8 @@ class SyncCtoEnum
     const FILESTATE_FOLDER          = 100;
     const FILESTATE_FOLDER_DELETE   = 104;
 
+    const FILESTATE_DBAFS_CONFLICT  = 200;
+
     /**
      * File Transmission
      */
@@ -45,9 +47,10 @@ class SyncCtoEnum
      * DBAFS state
      */
 
-    const DBAFS_CREATE   = 'create';
-    const DBAFS_SAME     = 'same';
-    const DBAFS_CONFLICT = 'conflict';
+    const DBAFS_CREATE        = 'create';
+    const DBAFS_SAME          = 'same';
+    const DBAFS_CONFLICT      = 'conflict';
+    const DBAFS_TAIL_CONFLICT = 'tail_conflict';
 
     /**
      * Upload Folder
