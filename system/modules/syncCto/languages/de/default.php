@@ -48,6 +48,7 @@ $GLOBALS['TL_LANG']['MSC']['client']                     = 'Client';
 $GLOBALS['TL_LANG']['MSC']['complete']                   = 'Fertig!';
 $GLOBALS['TL_LANG']['MSC']['copy']                       = 'Duplizieren';
 $GLOBALS['TL_LANG']['MSC']['dbafs_all_green']            = 'Der Import ins DBAFS konnte ohne Probleme durchgeführt werden.';
+$GLOBALS['TL_LANG']['MSC']['dbafs_conflict']             = 'Konflikt';
 $GLOBALS['TL_LANG']['MSC']['debug_mode']                 = 'Debugausgaben';
 $GLOBALS['TL_LANG']['MSC']['difference']                 = 'Differenz';
 $GLOBALS['TL_LANG']['MSC']['difference_deleted']         = 'Gelöscht';
