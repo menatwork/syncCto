@@ -3404,8 +3404,8 @@ class SyncCtoModuleClient extends BackendModule
                             $arrDbafsFiles[$value['dbafs']['msg']][] = $value;
                         }
 
-                        $compare .= '<ul class="dbafsinfo">';
-                        $compare .= "<li>";
+                        $compare .= '<ul class="dbafs_info">';
+                        $compare .= '<li class="tl_help">';
 
                         if (count($arrDbafsFiles) == 0)
                         {
@@ -3419,8 +3419,8 @@ class SyncCtoModuleClient extends BackendModule
 
                             foreach($arrDbafsFiles as $strMsg => $arrFiles)
                             {
-                                $compare .= '<li>';
-                                $compare .= sprintf('<p>%s</p>', $strMsg);
+                                $compare .= '<li class="tl_help">';
+                                $compare .= sprintf('<p class="tl_help">%s</p>', $strMsg);
                                 $compare .= '<ul>';
 
                                 foreach($arrFiles as $arrFile)
