@@ -56,10 +56,11 @@ class SyncCtoPopupDB extends Backend
      */
     public function __construct()
     {
-        parent::__construct();
-
         // Check user auth
         \BackendUser::getInstance()->authenticate();
+
+        // Call the parent.
+        parent::__construct();
 
         // Set language from get or user
         if (\Input::getInstance()->get('language') != '')
