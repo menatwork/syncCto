@@ -47,6 +47,9 @@
 				"system/modules/syncCto":"system/modules/syncCto",
 				"system/modules/syncCtoUpdater":"system/modules/syncCtoUpdater"
 			},
+			"runonce":[
+				"system/modules/syncCto/runonce/runonce.php"
+			],
 			"transifex": {
 				"project": "synccto",
 				"prefix": "",
