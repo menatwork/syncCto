@@ -2610,6 +2610,9 @@ class SyncCtoModuleClient extends BackendModule
                             }
 
                             unset($this->arrSyncSettings['syncCto_CompareTables']);
+
+                            // Set the tl_files if we have the automode.
+                            $this->arrSyncSettings['syncCto_SyncTables'][] = 'tl_files';
                         }
 
                         $this->objStepPool->step++;
@@ -4553,6 +4556,9 @@ class SyncCtoModuleClient extends BackendModule
                             }
 
                             unset($this->arrSyncSettings['syncCto_CompareTables']);
+
+                            // Set the tl_files if we have the automode.
+                            $this->arrSyncSettings['syncCto_SyncTables'][] = 'tl_files';
                         }
 
                         $this->objStepPool->step++;
