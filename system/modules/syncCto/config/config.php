@@ -252,6 +252,7 @@ $GLOBALS['SYC_CONFIG']['table_hidden'] = array_merge( (array) $GLOBALS['SYC_CONF
     'tl_files',
     'tl_log',
     'tl_lock',
+    'tl_cron',
     'tl_session',
     'tl_search',
     'tl_search_index',
@@ -287,6 +288,7 @@ $GLOBALS['SYC_CONFIG']['file_blacklist'] = array_merge( (array) $GLOBALS['SYC_CO
     'TL_ROOT/.htpasswd',
     'localconfig.php',
     'pathconfig.php',
+    'system/cron/cron.txt'
     '.DS_Store'
 ));
 
