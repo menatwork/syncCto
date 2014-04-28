@@ -95,7 +95,7 @@ $GLOBALS['TL_DCA']['tl_synccto_clients'] = array(
     // Palettes
     'palettes' => array(
         '__selector__' => array('http_auth'),
-        'default'     => '{apikey_legend},apikey;{title_legend},title,description;{connection_legend},address,path,port,codifyengine;{expert_legend:hide},http_auth',
+        'default'     => '{title_legend},title,description;{apikey_legend},apikey;{connection_legend},address,path,port,codifyengine;{expert_legend:hide},http_auth',
     ),
     'subpalettes' => array(
         'http_auth' => 'http_username,http_password',
