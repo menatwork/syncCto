@@ -406,7 +406,7 @@ class SyncCtoFiles extends Backend
         // If empty return true for all same.
         if(empty($arrDiff))
         {
-            return true;
+            return false;
         }
 
         // Else return the diff array with all information.
@@ -816,17 +816,18 @@ class SyncCtoFiles extends Backend
                     }
 
                     // And than the tails.
-                    if (($arrDiff = $this->compareDbafsTails($value['tl_files'], $arrLocaleDBAFSInformation)) != true)
-                    {
-                        if (!isset($arrFileList[$key]))
-                        {
-                            $arrFileList[$key]          = $arrChecksumList[$key];
-                            $arrFileList[$key]['state'] = SyncCtoEnum::FILESTATE_DBAFS_CONFLICT;
-                        }
-
-                        $arrFileList[$key]['dbafs_tail_state'] = SyncCtoEnum::DBAFS_CONFLICT;
-                        $arrFileList[$key]['dbafs_tail_data']  = $arrDiff;
-                    }
+					// ToDo: This is for a later feature.
+//                    if (($arrDiff = $this->compareDbafsTails($value['tl_files']['tail'], $arrLocaleDBAFSInformation['tail'])) !== false)
+//                    {
+//                        if (!isset($arrFileList[$key]))
+//                        {
+//                            $arrFileList[$key]          = $arrChecksumList[$key];
+//                            $arrFileList[$key]['state'] = SyncCtoEnum::FILESTATE_DBAFS_CONFLICT;
+//                        }
+//
+//                        $arrFileList[$key]['dbafs_tail_state'] = SyncCtoEnum::DBAFS_CONFLICT;
+//                        $arrFileList[$key]['dbafs_tail_data']  = $arrDiff;
+//                    }
                 }
             }
         }
