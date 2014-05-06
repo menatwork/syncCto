@@ -318,6 +318,15 @@ class tl_synccto_clients extends Backend
             }
         }
 
+        if(in_array($operations, array('syncTo', 'syncFrom', 'showExtern')))
+        {
+            $strIdName = 'cid';
+        }
+        else
+        {
+            $strIdName = 'id';
+        }
+
         if ($this->objBackendUser->hasAccess($operations, 'syncCto_clients_p') == true)
         {
             if ($blnUserIsWorking)
@@ -339,11 +348,11 @@ class tl_synccto_clients extends Backend
                 }
 
                 $title = implode("<br/>", $arrNotices);
-                return '<a class="user-history" href="' . $this->addToUrl($href . '&amp;id=' . $row['id']) . '" title="' . specialchars($title) . '"' . $attributes . '>' . $this->generateImage($icon, $label) . '</a> ';
+                return '<a class="user-history" href="' . $this->addToUrl($href . '&amp;' . $strIdName . '=' . $row['id']) . '" title="' . specialchars($title) . '"' . $attributes . '>' . $this->generateImage($icon, $label) . '</a> ';
             }
             else
             {
-                return '<a href="' . $this->addToUrl($href . '&amp;id=' . $row['id']) . '" title="' . specialchars($title) . '"' . $attributes . '>' . $this->generateImage($icon, $label) . '</a> ';
+                return '<a href="' . $this->addToUrl($href . '&amp;' . $strIdName . '=' . $row['id']) . '" title="' . specialchars($title) . '"' . $attributes . '>' . $this->generateImage($icon, $label) . '</a> ';
             }
         }
         else if (preg_match("/\.png/i", $icon))

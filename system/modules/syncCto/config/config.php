@@ -64,6 +64,12 @@ array_insert($GLOBALS['BE_MOD'], $i + 1, array
 ));
 
 /**
+ * DcGeneral event callbacks
+ */
+
+$GLOBALS['TL_EVENTS'][\ContaoCommunityAlliance\Contao\EventDispatcher\Event\CreateEventDispatcherEvent::NAME][] = 'SyncCtoSubscriber::registerEvents';
+
+/**
  * Mime types
  */
 $GLOBALS['SYC_CONFIG']['mime_types'] = array_merge((array) $GLOBALS['SYC_CONFIG']['mime_types'],

@@ -42,6 +42,7 @@ ClassLoader::addClasses(array
 	'SyncCtoTableSettings'        => 'system/modules/syncCto/SyncCtoTableSettings.php',
 	'StepPool'                    => 'system/modules/syncCto/StepPool.php',
 	'ContentData'                 => 'system/modules/syncCto/ContentData.php',
+	'SyncCtoSubscriber'           => 'system/modules/syncCto/SyncCtoSubscriber.php',
 ));
 
 
