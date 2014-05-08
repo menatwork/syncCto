@@ -229,7 +229,7 @@ class SyncCtoPopupFiles extends \Backend
 
         // Set template
         $this->Template                  = new BackendTemplate('be_syncCto_files');
-        $this->Template->maxLength       = 60;
+        $this->Template->maxLength       = 55;
         $this->Template->arrLangStates   = $arrLanguageTags;
         $this->Template->normalFilelist  = $arrNormalFiles;
         $this->Template->bigFilelist     = $arrBigFiles;
