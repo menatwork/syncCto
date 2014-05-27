@@ -305,7 +305,7 @@ class SyncCtoCommunicationClient extends CtoCommunication
      *
      * @return array
      */
-    public function runCecksumCompare($arrChecksumList)
+    public function runCecksumCompare($arrChecksumList, $blnDisableDbafsConflicts = false)
     {
         if (!is_array($arrChecksumList))
         {
@@ -327,6 +327,10 @@ class SyncCtoCommunicationClient extends CtoCommunication
             array(
                 "name" => "file",
                 "value" => md5($strPath),
+            ),
+            array(
+                "name" => "disable_dbafs_conflicts",
+                "value" => $blnDisableDbafsConflicts
             ),
             array(
                 "name" => md5($strPath),

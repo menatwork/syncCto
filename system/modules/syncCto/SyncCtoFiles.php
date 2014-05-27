@@ -748,7 +748,7 @@ class SyncCtoFiles extends Backend
      * @param array $arrChecksumList
      * @return array 
      */
-    public function runCecksumCompare($arrChecksumList)
+    public function runCecksumCompare($arrChecksumList, $blnDisableDbafsConflicts = false)
     {
         $arrFileList = array();
 
@@ -795,7 +795,7 @@ class SyncCtoFiles extends Backend
             }
 
             // Next check dbafs changes.
-            if (preg_match('/^files\//i', $value['path']))
+            if ($blnDisableDbafsConflicts != true && preg_match('/^files\//i', $value['path']))
             {
                 // Get the dbafs data and compare them..
                 $arrLocaleDBAFSInformation = $this->getDbafsInformation($value['path']);
@@ -816,7 +816,7 @@ class SyncCtoFiles extends Backend
                     }
 
                     // And than the tails.
-					// ToDo: This is for a later feature.
+                    // ToDo: This is for a later feature.
 //                    if (($arrDiff = $this->compareDbafsTails($value['tl_files']['tail'], $arrLocaleDBAFSInformation['tail'])) !== false)
 //                    {
 //                        if (!isset($arrFileList[$key]))

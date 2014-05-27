@@ -599,7 +599,7 @@ $GLOBALS["CTOCOM_FUNCTIONS"]["SYNCCTO_CHECKSUM_COMPARE"] = array
     "class"              => "SyncCtoRPCFunctions",
     "function"           => "runCecksumCompare",
     "typ"                => "POST",
-    "parameter"          => array("md5", "file"),
+    "parameter"          => array("md5", "file", "disable_dbafs_conflicts"),
 );
 
 // Get filelist of contao core

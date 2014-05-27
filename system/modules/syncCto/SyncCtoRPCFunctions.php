@@ -254,7 +254,7 @@ class SyncCtoRPCFunctions extends Backend
      * @param string $strFilename
      * @return mixed 
      */
-    public function runCecksumCompare($strMD5, $strFilename)
+    public function runCecksumCompare($strMD5, $strFilename, $blnDisableDbafsConflicts)
     {
         if (!key_exists($strFilename, $_FILES))
         {
@@ -278,7 +278,7 @@ class SyncCtoRPCFunctions extends Backend
             throw new Exception("Could not rebuild array.");
         }
 
-        return $this->objSyncCtoFiles->runCecksumCompare($arrChecksumList);
+        return $this->objSyncCtoFiles->runCecksumCompare($arrChecksumList, $blnDisableDbafsConflicts);
     }
 
     /**
