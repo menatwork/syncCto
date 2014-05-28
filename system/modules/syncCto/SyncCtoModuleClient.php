@@ -1748,7 +1748,7 @@ class SyncCtoModuleClient extends \BackendModule
                 case 5:
                     if (in_array("user_change", $this->arrSyncSettings["syncCto_Type"]))
                     {
-                        $this->arrListCompare['files'] = (array) $this->objSyncCtoCommunicationClient->runCecksumCompare($this->arrListFile['files']);
+                        $this->arrListCompare['files'] = (array) $this->objSyncCtoCommunicationClient->runCecksumCompare($this->arrListFile['files'], !!$this->arrSyncSettings['automode']);
                         $this->objData->setDescription($GLOBALS['TL_LANG']['tl_syncCto_sync']["step_2"]['description_2']);
                         $this->objStepPool->step++;
                         break;
@@ -2466,7 +2466,6 @@ class SyncCtoModuleClient extends \BackendModule
                     $this->objData->setTitle($GLOBALS['TL_LANG']['MSC']['step'] . " %s");
                     $this->objData->setDescription($GLOBALS['TL_LANG']['tl_syncCto_sync']['step_4']['description_1']);
                     $this->objStepPool->step++;
-
                     break;
 
                 case 2:
@@ -3698,7 +3697,7 @@ class SyncCtoModuleClient extends \BackendModule
                 case 5:
                     if (in_array("user_change", $this->arrSyncSettings["syncCto_Type"]))
                     {
-                        $this->arrListCompare['files'] = $this->objSyncCtoFiles->runCecksumCompare($this->arrListFile['files']);
+                        $this->arrListCompare['files'] = $this->objSyncCtoFiles->runCecksumCompare($this->arrListFile['files'], !!$this->arrSyncSettings['automode']);
                         $this->objData->setDescription($GLOBALS['TL_LANG']['tl_syncCto_sync']["step_2"]['description_2']);
                         $this->objStepPool->step++;
                         break;
