@@ -1445,6 +1445,9 @@ class SyncCtoFiles extends Backend
      */
     public function splitFiles($strSrcFile, $strDesFolder, $strDesFile, $intSizeLimit)
     {
+        // Cast to int, we only accept int here.
+        $intSizeLimit = intval($intSizeLimit);
+
         @set_time_limit(3600);
 
         if ($intSizeLimit < 500 * 1024)
