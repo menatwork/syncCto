@@ -12,7 +12,7 @@
 /**
  * Class for backup functions
  */
-class SyncCtoModuleBackup extends BackendModule
+class SyncCtoModuleBackup extends \BackendModule
 {
     /* -------------------------------------------------------------------------
      * Variablen
@@ -79,11 +79,11 @@ class SyncCtoModuleBackup extends BackendModule
         $this->import('BackendUser', 'User');
 
         // Choose template
-        if ($this->Input->get("table") == "" && $this->Input->get("act") == "")
+        if (\Input::getInstance()->get("table") == "" && \Input::getInstance()->get("act") == "")
         {
             $this->strTemplate = "be_syncCto_backup";
         }
-        else if ($this->Input->get("table") != "" && $this->Input->get("act") != "")
+        else if (\Input::getInstance()->get("table") != "" && \Input::getInstance()->get("act") != "")
         {
             $this->strTemplate = "be_syncCto_steps";
         }
@@ -99,11 +99,11 @@ class SyncCtoModuleBackup extends BackendModule
     protected function compile()
     {
         // Choose template
-        if ($this->Input->get("table") == "" && $this->Input->get("act") == "")
+        if (\Input::getInstance()->get("table") == "" && \Input::getInstance()->get("act") == "")
         {
             $this->compileStart();
         }
-        else if ($this->Input->get("table") != "" && $this->Input->get("act") != "")
+        else if (\Input::getInstance()->get("table") != "" && \Input::getInstance()->get("act") != "")
         {
             $this->compileBackup();
         }
@@ -127,20 +127,20 @@ class SyncCtoModuleBackup extends BackendModule
     protected function compileBackup()
     {
         // Check if start is set
-        if ($this->Input->get("act") != "start" || $this->Input->get("do") != "syncCto_backups")
+        if (\Input::getInstance()->get("act") != "start" || \Input::getInstance()->get("do") != "syncCto_backups")
         {
             $_SESSION["TL_ERROR"] = array($GLOBALS['TL_LANG']['ERR']['call_directly']);
             $this->redirect("contao/main.php?do=syncCto_backups");
         }
 
         // Get step
-        if ($this->Input->get("step") == "" || $this->Input->get("step") == null)
+        if (\Input::getInstance()->get("step") == "" || \Input::getInstance()->get("step") == null)
         {
             $this->intStep = 0;
         }
         else
         {
-            $this->intStep = intval($this->Input->get("step"));
+            $this->intStep = intval(\Input::getInstance()->get("step"));
         }
 
         // Set template
@@ -156,7 +156,7 @@ class SyncCtoModuleBackup extends BackendModule
         $this->loadBackupSettings();
 
         // Which table is in use
-        switch ($this->Input->get("table"))
+        switch (\Input::getInstance()->get("table"))
         {
             case 'tl_syncCto_backup_db':
                 $this->pageDbBackup();
@@ -231,7 +231,7 @@ class SyncCtoModuleBackup extends BackendModule
             "abort" => $this->booAbort,
         );
 
-        $this->Session->set("syncCto_Backup_Content", $arrContenData);
+         \Session::getInstance()->set("syncCto_Backup_Content", $arrContenData);
     }
 
     /**
@@ -239,7 +239,7 @@ class SyncCtoModuleBackup extends BackendModule
      */
     protected function loadContenData()
     {
-        $arrContenData = $this->Session->get("syncCto_Backup_Content");
+        $arrContenData =  \Session::getInstance()->get("syncCto_Backup_Content");
 
         if (is_array($arrContenData) && count($arrContenData) != 0)
         {
@@ -275,7 +275,7 @@ class SyncCtoModuleBackup extends BackendModule
 
     protected function loadStepPool()
     {
-        $arrStepPool = $this->Session->get("syncCto_Backup_StepPool");
+        $arrStepPool =  \Session::getInstance()->get("syncCto_Backup_StepPool");
 
         if ($arrStepPool == false || !is_array($arrStepPool))
         {
@@ -287,18 +287,18 @@ class SyncCtoModuleBackup extends BackendModule
 
     protected function saveStepPool()
     {
-        $this->Session->set("syncCto_Backup_StepPool", $this->objStepPool->getArrValues());
+         \Session::getInstance()->set("syncCto_Backup_StepPool", $this->objStepPool->getArrValues());
     }
 
     protected function resetStepPool()
     {
-        $this->Session->set("syncCto_Backup_StepPool", FALSE);
+         \Session::getInstance()->set("syncCto_Backup_StepPool", FALSE);
     }
 
     protected function initTempLists()
     {
         // Load Files
-        $objFileList = new File($this->objSyncCtoHelper->standardizePath($GLOBALS['SYC_PATH']['tmp'], "syncfilelist-Backup.txt"));
+        $objFileList = new \File($this->objSyncCtoHelper->standardizePath($GLOBALS['SYC_PATH']['tmp'], "syncfilelist-Backup.txt"));
         $objFileList->delete();
         $objFileList->close();
     }
@@ -306,7 +306,7 @@ class SyncCtoModuleBackup extends BackendModule
     protected function loadTempLists()
     {
         // Load Files
-        $objFileList = new File($this->objSyncCtoHelper->standardizePath($GLOBALS['SYC_PATH']['tmp'], "syncfilelist-Backup.txt"));
+        $objFileList = new \File($this->objSyncCtoHelper->standardizePath($GLOBALS['SYC_PATH']['tmp'], "syncfilelist-Backup.txt"));
         $strContent  = $objFileList->getContent();
         if (strlen($strContent) == 0)
         {
@@ -321,14 +321,14 @@ class SyncCtoModuleBackup extends BackendModule
 
     protected function saveTempLists()
     {
-        $objFileList = new File($this->objSyncCtoHelper->standardizePath($GLOBALS['SYC_PATH']['tmp'], "syncfilelist-Backup.txt"));
+        $objFileList = new \File($this->objSyncCtoHelper->standardizePath($GLOBALS['SYC_PATH']['tmp'], "syncfilelist-Backup.txt"));
         $objFileList->write(serialize($this->arrListFile));
         $objFileList->close();
     }
 
     protected function loadBackupSettings()
     {
-        $this->arrBackupSettings = $this->Session->get("syncCto_BackupSettings");
+        $this->arrBackupSettings =  \Session::getInstance()->get("syncCto_BackupSettings");
 
         if (!is_array($this->arrBackupSettings))
         {
