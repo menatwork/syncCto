@@ -1,0 +1,328 @@
+<?php
+
+/**
+ * Contao Open Source CMS
+ *
+ * @copyright  MEN AT WORK 2014
+ * @package    syncCto
+ * @license    GNU/LGPL
+ * @filesource
+ */
+
+use ContaoCommunityAlliance\DcGeneral\Contao\View\Contao2BackendView\Event\GetEditModeButtonsEvent;
+use ContaoCommunityAlliance\DcGeneral\Event\PrePersistModelEvent;
+
+/**
+ * Class for syncFrom configurations
+ */
+class SyncCtoTableBackupFile
+{
+
+    // Vars
+    protected $objSyncCtoHelper;
+
+    /**
+     * Priority for the event.
+     */
+    const PRIORITY = 200;
+
+    /**
+     * Constructor
+     */
+    public function __construct()
+    {
+        $this->BackendUser      = BackendUser::getInstance();
+        $this->objSyncCtoHelper = SyncCtoHelper::getInstance();
+    }
+
+    /**
+     * @param GetEditModeButtonsEvent $objEvent
+     */
+    public static function addButton(GetEditModeButtonsEvent $objEvent)
+    {
+        // Check the file cache.
+        $strInitFilePath = '/system/config/initconfig.php';
+        if (file_exists(TL_ROOT . $strInitFilePath))
+        {
+            $strFile        = new File($strInitFilePath);
+            $arrFileContent = $strFile->getContentAsArray();
+            foreach ($arrFileContent AS $strContent)
+            {
+                if (!preg_match("/(\/\*|\*|\*\/|\/\/)/", $strContent))
+                {
+                    //system/tmp.
+                    if (preg_match("/system\/tmp/", $strContent))
+                    {
+                        // Set data.
+                        \Message::addInfo($GLOBALS['TL_LANG']['MSC']['disabled_cache']);
+                    }
+                }
+            }
+        }
+
+        // Update a field with last sync information
+        $objSyncTime = \Database::getInstance()
+            ->prepare("SELECT cl.syncFrom_tstamp as syncFrom_tstamp, user.name as syncFrom_user, user.username as syncFrom_alias
+                         FROM tl_synccto_clients as cl
+                         INNER JOIN tl_user as user
+                         ON cl.syncTo_user = user.id
+                         WHERE cl.id = ?")
+            ->limit(1)
+            ->execute(\Input::get("id"));
+
+        if ($objSyncTime->syncFrom_tstamp != 0 && strlen($objSyncTime->syncFrom_user) != 0 && strlen($objSyncTime->syncFrom_alias) != 0)
+        {
+            $strLastSync = vsprintf($GLOBALS['TL_LANG']['MSC']['last_sync'], array(
+                    date($GLOBALS['TL_CONFIG']['timeFormat'], $objSyncTime->syncFrom_tstamp),
+                    date($GLOBALS['TL_CONFIG']['dateFormat'], $objSyncTime->syncFrom_tstamp),
+                    $objSyncTime->syncFrom_user,
+                    $objSyncTime->syncFrom_alias)
+            );
+
+            // Set data
+            \Message::addInfo($strLastSync);
+        }
+
+        // Set buttons.
+        $objEvent->setButtons(array
+            (
+                'start_sync'     => '<input type="submit" name="start_sync" id="start_sync" class="tl_submit" accesskey="s" value="' . specialchars($GLOBALS['TL_LANG']['MSC']['sync']) . '" />',
+                'start_sync_all' => '<input type="submit" name="start_sync_all" id="start_sync_all" class="tl_submit" accesskey="o" value="' . specialchars($GLOBALS['TL_LANG']['MSC']['syncAll']) . '" />'
+            )
+        );
+    }
+
+    /**
+     * Function for exporting languages
+     *
+     * @param PrePersistModelEvent $objEvent
+     *
+     * @throws RuntimeException If the submit type is unknown.
+     */
+    public function submit(PrePersistModelEvent $objEvent)
+    {
+        // Get the data from the DC.
+        $arrData = $objEvent->getModel()->getPropertiesAsArray();
+        foreach($arrData as $strKey => $mixData)
+        {
+            if(empty($mixData))
+            {
+                unset($arrData[$strKey]);
+            }
+        }
+
+        if (isset($_POST['start_sync']))
+        {
+            $this->runSync($arrData);
+        }
+        elseif (isset($_POST['start_sync_all']))
+        {
+            $this->runSyncAll($arrData);
+        }
+        else
+        {
+            throw new \RuntimeException('Unknown submit.');
+        }
+    }
+
+    /**
+     * Handle syncTo configurations
+     *
+     * @param array $arrData
+     *
+     * @return array
+     */
+    protected function runSync($arrData)
+    {
+        $arrSyncSettings = array();
+
+        // Automode off.
+        $arrSyncSettings["automode"] = false;
+
+        // Synchronization type.
+        if (isset($arrData['sync_options']))
+        {
+            $arrSyncSettings["syncCto_Type"] = $arrData['sync_options'];
+        }
+        else
+        {
+            $arrSyncSettings["syncCto_Type"] = array();
+        }
+
+        // Database.
+        if (isset($arrData['database_check']))
+        {
+            $arrSyncSettings["syncCto_SyncDatabase"] = true;
+        }
+        else
+        {
+            $arrSyncSettings["syncCto_SyncDatabase"] = false;
+        }
+
+        // Systemoperation execute.
+        if (isset($arrData['systemoperations_check']) && isset($arrData['systemoperations_maintenance']))
+        {
+            $arrSyncSettings["syncCto_Systemoperations_Maintenance"] = $arrData['systemoperations_maintenance'];
+        }
+        else
+        {
+            $arrSyncSettings["syncCto_Systemoperations_Maintenance"] = array();
+        }
+
+        // Attention flag.
+        if (isset($arrData['attentionFlag']))
+        {
+            $arrSyncSettings["syncCto_AttentionFlag"] = true;
+        }
+        else
+        {
+            $arrSyncSettings["syncCto_AttentionFlag"] = false;
+        }
+
+        // Error msg.
+        if (isset($arrData['localconfig_error']))
+        {
+            $arrSyncSettings["syncCto_ShowError"] = true;
+        }
+        else
+        {
+            $arrSyncSettings["syncCto_ShowError"] = false;
+        }
+
+        // Save Session.
+        \Session::getInstance()->set("syncCto_SyncSettings_" . \Input::get('cid'), $arrSyncSettings);
+
+        // Check the vars.
+        $this->objSyncCtoHelper->checkSubmit(array(
+                'postUnset'   => array('start_sync'),
+                'error'       => array(
+                    'key'     => 'syncCto_submit_false',
+                    'message' => $GLOBALS['TL_LANG']['ERR']['no_functions']
+                ),
+                'redirectUrl' => \Environment::get('base') . "contao/main.php?do=synccto_clients&amp;table=tl_syncCto_clients_syncFrom&amp;act=start&amp;step=0&amp;id=" . \Input::get("cid")
+            ),
+            $arrSyncSettings
+        );
+    }
+
+    /**
+     * Handle syncTo configurations.
+     *
+     * @param array $arrData
+     *
+     * @return array
+     */
+    protected function runSyncAll($arrData)
+    {
+        $arrSyncSettings = array();
+
+        // Set array.
+        $arrSyncSettings["automode"]                             = true;
+        $arrSyncSettings["syncCto_Type"]                         = array(
+            'core_change',
+            'core_delete',
+            'user_change',
+            'user_delete',
+            'localconfig_update'
+        );
+        $arrSyncSettings["syncCto_SyncDatabase"]                 = true;
+        $arrSyncSettings["syncCto_Systemoperations_Maintenance"] = array();
+        $arrSyncSettings["syncCto_AttentionFlag"]                = false;
+        $arrSyncSettings["syncCto_ShowError"]                    = false;
+
+        // Save Session
+        \Session::getInstance()->set("syncCto_SyncSettings_" . \Input::get('cid'), $arrSyncSettings);
+
+        $this->objSyncCtoHelper->checkSubmit(array(
+                'postUnset'   => array('start_sync'),
+                'error'       => array(
+                    'key'     => 'syncCto_submit_false',
+                    'message' => $GLOBALS['TL_LANG']['ERR']['missing_tables']
+                ),
+                'redirectUrl' => \Environment::get('base') . "contao/main.php?do=synccto_clients&amp;table=tl_syncCto_clients_syncFrom&amp;act=start&amp;step=0&amp;id=" . \Input::get("cid")
+            ),
+            $arrSyncSettings
+        );
+
+
+        /**
+         * Set new and remove old buttons
+         *
+         * @param DataContainer $dc
+         */
+        public function onload_callback(DataContainer $dc)
+    {
+        if (get_class($dc) != 'DC_General')
+        {
+            return;
+        }
+
+        $dc->removeButton('save');
+        $dc->removeButton('saveNclose');
+
+        $arrData = array(
+            'id'              => 'start_backup',
+            'formkey'         => 'start_backup',
+            'class'           => '',
+            'accesskey'       => 'g',
+            'value'           => specialchars($GLOBALS['TL_LANG']['MSC']['apply']),
+            'button_callback' => array('tl_syncCto_backup_file', 'onsubmit_callback')
+        );
+
+        $dc->addButton('start_backup', $arrData);
+    }
+
+        /**
+         * Handle backup files configurations
+         *
+         * @param DataContainer $dc
+         * @return array
+         */
+        public function onsubmit_callback(DataContainer $dc)
+    {
+        $strWidgetID     = $dc->getWidgetID();
+
+        // Check if core or user backup is selected
+        if ($this->Input->post('core_files_' . $strWidgetID) != 1 && $this->Input->post('user_files_' . $strWidgetID) != 1)
+        {
+            $_SESSION["TL_ERROR"][] = $GLOBALS['TL_LANG']['ERR']['missing_file_selection'];
+            $this->redirect($this->Environment->base . "contao/main.php?do=syncCto_backups&table=tl_syncCto_backup_file");
+        }
+
+        // Check if we have a filelist for user files
+        if ($this->Input->post('core_files_' . $strWidgetID) != 1
+            && $this->Input->post('user_files_' . $strWidgetID) == 1
+            && is_array($this->Input->post('filelist_' . $strWidgetID, true)) != true
+            && count($this->Input->post('filelist_' . $strWidgetID, true)) == 0)
+        {
+            $_SESSION["TL_ERROR"][] = $GLOBALS['TL_LANG']['ERR']['missing_file_selection'];
+            $this->redirect($this->Environment->base . "contao/main.php?do=syncCto_backups&table=tl_syncCto_backup_file");
+        }
+
+        $arrBackupSettings = array();
+
+        $arrBackupSettings['core_files']    = $this->Input->post('core_files_' . $strWidgetID);
+        $arrBackupSettings['user_files']    = $this->Input->post('user_files_' . $strWidgetID);
+        $arrBackupSettings['user_filelist'] = $this->Input->post('filelist_' . $strWidgetID, true);
+        $arrBackupSettings['backup_name']   = $this->Input->post('backup_name_' . $strWidgetID, true);
+
+        // If we have a Contao 3 version resolve id to path.
+        $arrBackupSettings['user_filelist'] = trimsplit(',', $arrBackupSettings['user_filelist']);
+        foreach ((array) $arrBackupSettings['user_filelist'] as $key => $value)
+        {
+            $arrBackupSettings['user_filelist'][$key] = Contao\FilesModel::findByPk($value)->path;
+        }
+
+        $this->Session->set("syncCto_BackupSettings", $arrBackupSettings);
+
+        $this->objSyncCtoHelper->checkSubmit(array(
+            'postUnset' => array('start_backup'),
+            'error' => array(
+                'key'         => 'syncCto_submit_false',
+                'message'     => $GLOBALS['TL_LANG']['ERR']['missing_tables']
+            ),
+            'redirectUrl' => $this->Environment->base . "contao/main.php?do=syncCto_backups&table=tl_syncCto_backup_file&act=start"
+        ));
+    }
+
+}
