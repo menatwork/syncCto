@@ -8,13 +8,14 @@
  * @license    GNU/LGPL
  * @filesource
  */
+
 use ContaoCommunityAlliance\DcGeneral\Contao\View\Contao2BackendView\Event\GetEditModeButtonsEvent;
 use ContaoCommunityAlliance\DcGeneral\Event\PrePersistModelEvent;
 
 /**
  * Class for syncTo configurations
  */
-class SyncCtoTableSyncTo extends Backend
+class SyncCtoTableSyncTo
 {
     // Vars
     protected $objSyncCtoHelper;
@@ -30,8 +31,6 @@ class SyncCtoTableSyncTo extends Backend
     public function __construct()
     {
         $this->objSyncCtoHelper = SyncCtoHelper::getInstance();
-
-        parent::__construct();
     }
 
     /**
@@ -85,8 +84,8 @@ class SyncCtoTableSyncTo extends Backend
         // Set buttons.
         $objEvent->setButtons(array
             (
-                'start_sync'     => '<input type="submit" name="start_sync" id="start_sync" class="tl_submit" accesskey="g" value="' . specialchars($GLOBALS['TL_LANG']['MSC']['sync']) . '" />',
-                'start_sync_all' => '<input type="submit" name="start_sync_all" id="start_sync_all" class="tl_submit" accesskey="g" value="' . specialchars($GLOBALS['TL_LANG']['MSC']['syncAll']) . '" />'
+                'start_sync'     => '<input type="submit" name="start_sync" id="start_sync" class="tl_submit" accesskey="s" value="' . specialchars($GLOBALS['TL_LANG']['MSC']['sync']) . '" />',
+                'start_sync_all' => '<input type="submit" name="start_sync_all" id="start_sync_all" class="tl_submit" accesskey="o" value="' . specialchars($GLOBALS['TL_LANG']['MSC']['syncAll']) . '" />'
             )
         );
     }
@@ -102,6 +101,13 @@ class SyncCtoTableSyncTo extends Backend
     {
         // Get the data from the DC.
         $arrData = $objEvent->getModel()->getPropertiesAsArray();
+        foreach($arrData as $strKey => $mixData)
+        {
+            if(empty($mixData))
+            {
+                unset($arrData[$strKey]);
+            }
+        }
 
         if(isset($_POST['start_sync']))
         {

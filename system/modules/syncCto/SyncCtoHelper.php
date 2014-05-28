@@ -12,7 +12,7 @@
 /**
  * Helper class for syncCto. Callback functions, small global helper functions.
  */
-class SyncCtoHelper extends Backend
+class SyncCtoHelper extends \Backend
 {
     /* -------------------------------------------------------------------------
      * Vars

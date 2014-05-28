@@ -15,15 +15,7 @@ $GLOBALS['TL_DCA']['tl_syncCto_clients_syncFrom'] = array
     'config' => array
     (
         'dataContainer'           => 'General',
-        'disableSubmit'           => false,
-        'onload_callback' => array
-        (
-            array('SyncCtoTableSyncFrom', 'onload_callback')
-        ),
-        'onsubmit_callback' => array
-        (
-            array('SyncCtoTableSyncFrom', 'onsubmit_callback'),
-        )
+        'disableSubmit'           => false
     ),
     'dca_config'  => array
     (
@@ -31,7 +23,7 @@ $GLOBALS['TL_DCA']['tl_syncCto_clients_syncFrom'] = array
         (
             'default' => array
             (
-                'class'           => 'GeneralDataSyncCto',
+                'class'           => 'ContaoCommunityAlliance\DcGeneral\Data\NoOpDataProvider',
                 'source'          => 'tl_syncCto_clients_syncTo'
             ),
         ),

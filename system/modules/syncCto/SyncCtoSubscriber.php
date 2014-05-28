@@ -40,13 +40,26 @@ class SyncCtoSubscriber
         self::registerListeners(
             array(
                 \ContaoCommunityAlliance\DcGeneral\Contao\View\Contao2BackendView\Event\GetEditModeButtonsEvent::NAME
-                => array(new SyncCtoTableSyncTo(),'addButton'),
+                => array(new SyncCtoTableSyncTo(), 'addButton'),
                 \ContaoCommunityAlliance\DcGeneral\Event\PrePersistModelEvent::NAME
                 => array(new SyncCtoTableSyncTo(), 'submit')
             ),
             $dispatcher,
             array('tl_syncCto_clients_syncTo'),
             SyncCtoTableSyncTo::PRIORITY
+        );
+
+        // Save and load callbacks.
+        self::registerListeners(
+            array(
+                \ContaoCommunityAlliance\DcGeneral\Contao\View\Contao2BackendView\Event\GetEditModeButtonsEvent::NAME
+                => array(new SyncCtoTableSyncFrom(), 'addButton'),
+                \ContaoCommunityAlliance\DcGeneral\Event\PrePersistModelEvent::NAME
+                => array(new SyncCtoTableSyncFrom(), 'submit')
+            ),
+            $dispatcher,
+            array('tl_syncCto_clients_syncFrom'),
+            SyncCtoTableSyncFrom::PRIORITY
         );
     }
 
