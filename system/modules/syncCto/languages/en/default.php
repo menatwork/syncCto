@@ -99,6 +99,7 @@ $GLOBALS['TL_LANG']['MSC']['dbafs_all_green']               = 'The DBAFS import 
 $GLOBALS['TL_LANG']['ERR']['dbafs_error']                   = 'There are some problems in the DBAFS:';
 $GLOBALS['TL_LANG']['ERR']['dbafs_uuid_conflict']           = 'Conflict in the DBFAS from Contao. Renamed the original file.';
 $GLOBALS['TL_LANG']['ERR']['dbafs_uuid_conflict_rename']    = 'Conflict in the DBFAS from Contao. Renamed the original file to _%s.';
+$GLOBALS['TL_LANG']['ERR']['dbafs_diff_data']               = 'The source and destination files have different metadata.';
 
 /**
  * Errors

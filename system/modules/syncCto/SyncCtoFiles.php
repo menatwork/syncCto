@@ -417,55 +417,81 @@ class SyncCtoFiles extends Backend
     {
         foreach($arrFileList as $key => $arrFile)
         {
-            // Get information about the current file information.
-            $arrDestinationInformation = pathinfo($arrFile['path']);
-
-            // Try to rename it to _1 or _2 and so on.
-            $strNewDestinationName = null;
-            $intFileNumber         = 1;
-            for ($i = 1; $i < 100; $i++)
+            if($arrFile['dbafs_state'] == SyncCtoEnum::DBAFS_DATA_CONFLICT)
             {
-                $strNewDestinationName = sprintf('%s/%s_%s.%s',
-                    $arrDestinationInformation['dirname'],
-                    $arrDestinationInformation['filename'],
-                    $i,
-                    $arrDestinationInformation['extension']
-                );
+                // Get the information from the tl_files.
+                $objModel       = \FilesModel::findByPath($arrFile['path']);
 
-                if (!file_exists(TL_ROOT . '/' . $strNewDestinationName))
+                // If we have no data for this, skip it.
+                if($objModel == null)
                 {
-                    $intFileNumber = $i;
-                    break;
+                    $arrFileList[$key]['saved']        = false;
+                    $arrFileList[$key]['error']        = sprintf('Can not find the model for ' . $arrFile['path']);
+                    $arrFileList[$key]['transmission'] = SyncCtoEnum::FILETRANS_SKIPPED;
+                    $arrFileList[$key]['skipreason']   = sprintf($GLOBALS['TL_LANG']['ERR']['unknown_file'], $arrFile['path']);
+                    continue;
                 }
-            }
 
-            // Move the current file to another name, that we have space for the new one.
-            $blnCopyFile = $this->objFiles->copy($arrFile['path'], $strNewDestinationName);
-
-            // If success add file to the database.
-            if ($blnCopyFile)
-            {
-                $objRenamedLocaleData = \Dbafs::moveResource($arrFile['path'], $strNewDestinationName);
-
-                // First add it to the dbafs.
-                $objLocaleData       = \Dbafs::addResource($arrFile['path']);
-                $objLocaleData->uuid = \String::uuidToBin($arrFile['tl_files']['uuid']);
-                $objLocaleData->meta = $arrFile['tl_files']['meta'];
-                $objLocaleData->save();
+                $objModel->meta = $arrFile['tl_files']['meta'];
+                $objModel->save();
 
                 // Add a status report for debugging and co.
                 $arrFileList[$key]['saved']           = true;
-                $arrFileList[$key]['dbafs']['msg']    = $GLOBALS['TL_LANG']['ERR']['dbafs_uuid_conflict'];
-                $arrFileList[$key]['dbafs']['error']  = sprintf($GLOBALS['TL_LANG']['ERR']['dbafs_uuid_conflict_rename'], $intFileNumber);
-                $arrFileList[$key]['dbafs']['rename'] = $strNewDestinationName;
-                $arrFileList[$key]['dbafs']['state']  = SyncCtoEnum::DBAFS_CONFLICT;
+                $arrFileList[$key]['dbafs']['msg']    = $GLOBALS['TL_LANG']['ERR']['dbafs_diff_data'];
+                $arrFileList[$key]['dbafs']['state']  = SyncCtoEnum::DBAFS_DATA_CONFLICT;
             }
             else
             {
-                $arrFileList[$key]['saved']        = false;
-                $arrFileList[$key]['error']        = sprintf('Can not move file - %s. Exception message: %s', $arrFile["path"], 'Unable to move.');
-                $arrFileList[$key]['transmission'] = SyncCtoEnum::FILETRANS_SKIPPED;
-                $arrFileList[$key]['skipreason']   = $GLOBALS['TL_LANG']['ERR']['cant_move_files'];
+                // Get information about the current file information.
+                $arrDestinationInformation = pathinfo($arrFile['path']);
+
+                // Try to rename it to _1 or _2 and so on.
+                $strNewDestinationName = null;
+                $intFileNumber         = 1;
+                for ($i = 1; $i < 100; $i++)
+                {
+                    $strNewDestinationName = sprintf('%s/%s_%s.%s',
+                        $arrDestinationInformation['dirname'],
+                        $arrDestinationInformation['filename'],
+                        $i,
+                        $arrDestinationInformation['extension']
+                    );
+
+                    if (!file_exists(TL_ROOT . '/' . $strNewDestinationName))
+                    {
+                        $intFileNumber = $i;
+                        break;
+                    }
+                }
+
+                // Move the current file to another name, that we have space for the new one.
+                $blnCopyFile = $this->objFiles->copy($arrFile['path'], $strNewDestinationName);
+
+                // If success add file to the database.
+                if ($blnCopyFile)
+                {
+                    $objRenamedLocaleData = \Dbafs::moveResource($arrFile['path'], $strNewDestinationName);
+
+                    // First add it to the dbafs.
+                    $objLocaleData       = \Dbafs::addResource($arrFile['path']);
+                    $objLocaleData->uuid = \String::uuidToBin($arrFile['tl_files']['uuid']);
+                    $objLocaleData->meta = $arrFile['tl_files']['meta'];
+                    $objLocaleData->save();
+
+                    // Add a status report for debugging and co.
+                    $arrFileList[$key]['saved']           = true;
+                    $arrFileList[$key]['dbafs']['msg']    = $GLOBALS['TL_LANG']['ERR']['dbafs_uuid_conflict'];
+                    $arrFileList[$key]['dbafs']['error']  = sprintf($GLOBALS['TL_LANG']['ERR']['dbafs_uuid_conflict_rename'], $intFileNumber);
+                    $arrFileList[$key]['dbafs']['rename'] = $strNewDestinationName;
+                    $arrFileList[$key]['dbafs']['state']  = SyncCtoEnum::DBAFS_CONFLICT;
+                }
+                else
+                {
+                    $arrFileList[$key]['saved']        = false;
+                    $arrFileList[$key]['error']        = sprintf('Can not move file - %s. Exception message: %s', $arrFile["path"], 'Unable to move.');
+                    $arrFileList[$key]['transmission'] = SyncCtoEnum::FILETRANS_SKIPPED;
+                    $arrFileList[$key]['skipreason']   = $GLOBALS['TL_LANG']['ERR']['cant_move_files'];
+                }
             }
         }
 
@@ -814,6 +840,13 @@ class SyncCtoFiles extends Backend
                         }
 
                         $arrFileList[$key]['dbafs_state'] = SyncCtoEnum::DBAFS_CONFLICT;
+                    }
+                    // Second check the meta
+                    elseif ($arrLocaleDBAFSInformation['meta'] != $value['tl_files']['meta'])
+                    {
+                        $arrFileList[$key]          = $arrChecksumList[$key];
+                        $arrFileList[$key]['state']       = SyncCtoEnum::FILESTATE_DBAFS_CONFLICT;
+                        $arrFileList[$key]['dbafs_state'] = SyncCtoEnum::DBAFS_DATA_CONFLICT;
                     }
 
                     // And than the tails.
