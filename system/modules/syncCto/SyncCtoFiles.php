@@ -450,6 +450,7 @@ class SyncCtoFiles extends Backend
                 // First add it to the dbafs.
                 $objLocaleData       = \Dbafs::addResource($arrFile['path']);
                 $objLocaleData->uuid = \String::uuidToBin($arrFile['tl_files']['uuid']);
+                $objLocaleData->meta = $arrFile['tl_files']['meta'];
                 $objLocaleData->save();
 
                 // Add a status report for debugging and co.
@@ -1629,6 +1630,7 @@ class SyncCtoFiles extends Backend
                             // First add it to the dbafs.
                             $objLocaleData       = \Dbafs::addResource($strFileDestination);
                             $objLocaleData->uuid = \String::uuidToBin($value['tl_files']['uuid']);
+                            $objLocaleData->meta = $value['tl_files']['meta'];
                             $objLocaleData->save();
 
                             // Add a status report for debugging and co.
@@ -1651,6 +1653,7 @@ class SyncCtoFiles extends Backend
                             if ($blnMovedFile)
                             {
                                 $objLocaleData->hash = $value['checksum'];
+                                $objLocaleData->meta = $value['tl_files']['meta'];
                                 $objLocaleData->save();
 
                                 // Add a status report for debugging and co.
@@ -1696,6 +1699,7 @@ class SyncCtoFiles extends Backend
                                 // First add it to the dbafs.
                                 $objLocaleData       = \Dbafs::addResource($strFileDestination);
                                 $objLocaleData->uuid = \String::uuidToBin($value['tl_files']['uuid']);
+                                $objLocaleData->meta = $value['tl_files']['meta'];
                                 $objLocaleData->save();
 
                                 // Add a status report for debugging and co.
