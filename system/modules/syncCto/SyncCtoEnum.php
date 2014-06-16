@@ -51,6 +51,7 @@ class SyncCtoEnum
     const DBAFS_SAME          = 'same';
     const DBAFS_CONFLICT      = 'conflict';
     const DBAFS_TAIL_CONFLICT = 'tail_conflict';
+    const DBAFS_DATA_CONFLICT = 'data_conflict';
 
     /**
      * Upload Folder
