@@ -41,7 +41,7 @@ class SyncCtoHelper extends \Backend
     /**
      * Constructor
      */
-    protected function __construct()
+    public function __construct()
     {
         // Import
         $this->import("BackendUser");

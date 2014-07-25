@@ -12,7 +12,7 @@
 /**
  * Class for file operations
  */
-class SyncCtoFiles extends Backend
+class SyncCtoFiles extends \Backend
 {
     ////////////////////////////////////////////////////////////////////////////
     // Vars
@@ -39,7 +39,7 @@ class SyncCtoFiles extends Backend
     /**
      * Constructor
      */
-    protected function __construct()
+    public function __construct()
     {
         parent::__construct();
 
