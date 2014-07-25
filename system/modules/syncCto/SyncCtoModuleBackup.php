@@ -668,7 +668,7 @@ class SyncCtoModuleBackup extends \BackendModule
                 case 2:
                     try
                     {
-                        $mixResponse = $this->objSyncCtoFiles->runRestore($this->arrBackupSettings['backup_file']);
+                        $mixResponse = $this->objSyncCtoFiles->runRestore($this->arrBackupSettings['syncCto_restoreFile']);
 
                         if ($mixResponse !== true)
                         {
