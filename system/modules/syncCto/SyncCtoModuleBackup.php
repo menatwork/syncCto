@@ -355,7 +355,7 @@ class SyncCtoModuleBackup extends \BackendModule
             $this->strError = "";
             $this->booRefresh = true;
             $this->strUrl = "contao/main.php?do=syncCto_backups&amp;table=tl_syncCto_backup_db&amp;act=start";
-            $this->strGoBack = $this->Environment->base . "contao/main.php?do=syncCto_backups&table=tl_syncCto_backup_db";
+            $this->strGoBack = \Environment::get('base') . "contao/main.php?do=syncCto_backups&table=tl_syncCto_backup_db";
             $this->strHeadline = $GLOBALS['TL_LANG']['tl_syncCto_backup_db']['edit'];
             $this->strInformation = "";
             $this->intStep = 1;
@@ -448,7 +448,7 @@ class SyncCtoModuleBackup extends \BackendModule
             $this->strError = "";
             $this->booRefresh = true;
             $this->strUrl = "contao/main.php?do=syncCto_backups&amp;table=tl_syncCto_restore_db&amp;act=start";
-            $this->strGoBack = $this->Environment->base . "contao/main.php?do=syncCto_backups&table=tl_syncCto_restore_db";
+            $this->strGoBack =  \Environment::get('base') . "contao/main.php?do=syncCto_backups&table=tl_syncCto_restore_db";
             $this->strHeadline = $GLOBALS['TL_LANG']['tl_syncCto_restore_db']['edit'];
             $this->strInformation = "";
             $this->intStep = 1;
@@ -525,7 +525,7 @@ class SyncCtoModuleBackup extends \BackendModule
             $this->strError = "";
             $this->booRefresh = true;
             $this->strUrl = "contao/main.php?do=syncCto_backups&amp;table=tl_syncCto_backup_file&amp;act=start";
-            $this->strGoBack = $this->Environment->base . "contao/main.php?do=syncCto_backups&table=tl_syncCto_backup_file";
+            $this->strGoBack =  \Environment::get('base') . "contao/main.php?do=syncCto_backups&table=tl_syncCto_backup_file";
             $this->strHeadline = $GLOBALS['TL_LANG']['tl_syncCto_backup_file']['edit'];
             $this->strInformation = "";
             $this->intStep = 1;
@@ -567,15 +567,14 @@ class SyncCtoModuleBackup extends \BackendModule
                         throw new Exception(sprintf($GLOBALS['TL_LANG']['ERR']['missing_file_folder'] , SyncCtoHelper::getInstance()->standardizePath($GLOBALS['SYC_PATH']['file'])));
                     }
                     
-                    $arrResult                       = $this->objSyncCtoFiles->runDump($this->arrBackupSettings['backup_name'], $this->arrBackupSettings['core_files'], $this->arrBackupSettings['user_filelist']);
+                    $arrResult                       = $this->objSyncCtoFiles->runDump($this->arrBackupSettings['backup_name'], $this->arrBackupSettings['core_files'], $this->arrBackupSettings['filelist']);
                     $this->objStepPool->zipname      = $arrResult["name"];
                     $this->objStepPool->skippedfiles = $arrResult["skipped"];
 
-                    Dbafs::addResource(SyncCtoHelper::getInstance()->standardizePath($GLOBALS['SYC_PATH']['file'],$this->objStepPool->zipname));
+                    \Dbafs::addResource(SyncCtoHelper::getInstance()->standardizePath($GLOBALS['SYC_PATH']['file'],$this->objStepPool->zipname));
 
                     $this->intStep++;
                     break;
-
 
                 case 3:
                     $this->booFinished = true;
@@ -633,7 +632,7 @@ class SyncCtoModuleBackup extends \BackendModule
             $this->strError = "";
             $this->booRefresh = true;
             $this->strUrl = "contao/main.php?do=syncCto_backups&amp;table=tl_syncCto_restore_file&amp;act=start";
-            $this->strGoBack = $this->Environment->base . "contao/main.php?do=syncCto_backups&table=tl_syncCto_restore_file";
+            $this->strGoBack =  \Environment::get('base') . "contao/main.php?do=syncCto_backups&table=tl_syncCto_restore_file";
             $this->strHeadline = $GLOBALS['TL_LANG']['tl_syncCto_restore_file']['edit'];
             $this->strInformation = "";
             $this->intStep = 1;
@@ -647,7 +646,7 @@ class SyncCtoModuleBackup extends \BackendModule
         // Load step pool
         $this->loadStepPool();
 
-		// Set content back to normale mode
+        // Set content back to normale mode
         $this->booRefresh = true;
 
         $this->objData->setStep(1);
