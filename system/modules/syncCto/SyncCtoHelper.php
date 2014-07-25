@@ -661,7 +661,7 @@ class SyncCtoHelper extends Backend
             // check for required extensions
             foreach ($arrRequiredExtensions as $key => $val)
             {
-                if (!in_array($val, $this->Config->getActiveModules()))
+                if (!in_array($val, \Config::getInstance()->getActiveModules()))
                 {
                     $_SESSION["TL_INFO"] = array_merge($_SESSION["TL_INFO"], array($val => 'Please install the required extension <strong>' . $key . '</strong>'));
                 }
@@ -675,7 +675,7 @@ class SyncCtoHelper extends Backend
             }
 
             // Check syncCtoPro, if not set remove triggers.
-            if (!in_array('syncCtoPro', $this->Config->getActiveModules())
+            if (!in_array('syncCtoPro', \Config::getInstance()->getActiveModules())
                 && ($this->hasTrigger('tl_page') || $this->hasTrigger('tl_article') || $this->hasTrigger('tl_content'))
             )
             {
@@ -694,7 +694,7 @@ class SyncCtoHelper extends Backend
      * @param string $strContent
      * @param string $strTemplate
      *
-     * @return stinrg
+     * @return string
      */
     public function checkLockStatus($strContent, $strTemplate)
     {
