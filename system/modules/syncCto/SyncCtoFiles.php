@@ -921,11 +921,22 @@ class SyncCtoFiles extends Backend
 
     /**
      * Make a backup from a filelist
-     * 
+     *
      * @CtoCommunication Enable
+     *
      * @param string $strZip
-     * @param array $arrFileList
-     * @return string Filename 
+     *
+     * @param bool   $booCore
+     *
+     * @param array  $arrFiles
+     *
+     * @throws RuntimeException
+     *
+     * @throws Exception
+     *
+     * @internal         param array $arrFileList
+     *
+     * @return string Filename
      */
     public function runDump($strZip = "", $booCore = false, $arrFiles = array())
     {
@@ -937,17 +948,16 @@ class SyncCtoFiles extends Backend
         {
             $strFilename = standardize(str_replace(array(" "), array("_"), preg_replace("/\.zip\z/i", "", $strZip))) . ".zip";
         }
-        
+
         // Replace special chars from the filename..
         $strFilename = str_replace(array_keys($GLOBALS['SYC_CONFIG']['folder_file_replacement']), array_values($GLOBALS['SYC_CONFIG']['folder_file_replacement']), $strFilename);
-        
+
         $strPath = $this->objSyncCtoHelper->standardizePath($GLOBALS['SYC_PATH']['file'], $strFilename);
 
         $objZipArchive = new ZipArchiveCto();
-
         if (($mixError = $objZipArchive->open($strPath, ZipArchiveCto::CREATE)) !== true)
         {
-            throw new Exception($GLOBALS['TL_LANG']['MSC']['error'] . ": " . $objZipArchive->getErrorDescription($mixError));
+            throw new \RuntimeException($GLOBALS['TL_LANG']['MSC']['error'] . ": " . $objZipArchive->getErrorDescription($mixError));
         }
 
         $arrFileSkipped = array();
@@ -955,17 +965,25 @@ class SyncCtoFiles extends Backend
         // Run backup for the core files.
         if ($booCore)
         {
+            /** @var \SplFileInfo $objFile */
             foreach ($this->getFileList(true, false) as $objFile)
             {
-                // Skipe all folders.
-                if($objFile->isDir())
+                // Skip all folders.
+                if ($objFile->isDir())
                 {
                     continue;
                 }
-                
-                // Build path witout tl_root.
+
+                // Build path without tl_root.
                 $strFile = preg_replace('?' . $this->objSyncCtoHelper->getPreparedTlRoot() . '/?', '', $objFile->getPathname(), 1);
-                
+
+                // Skip all symlinked files.
+                if ($objFile->isLink())
+                {
+                    $arrFileSkipped[] = $strFile;
+                    continue;
+                }
+
                 // Add file to zip.
                 if ($objZipArchive->addFile($strFile, $strFile) == false)
                 {
@@ -975,9 +993,9 @@ class SyncCtoFiles extends Backend
         }
 
         // Run backup for tl_files/files
-        foreach ((array) $arrFiles as $file)
+        foreach ((array)$arrFiles as $file)
         {
-            // Scann folders.
+            // Scan folders.
             if (file_exists(TL_ROOT . '/' . $file) && is_dir(TL_ROOT . '/' . $file))
             {
                 // Scann.
@@ -989,13 +1007,13 @@ class SyncCtoFiles extends Backend
 
                 foreach ($objRecursiverIt as $objFile)
                 {
-                    // Skipe all folders.
+                    // Skip all folders.
                     if ($objFile->isDir())
                     {
                         continue;
                     }
 
-                    // Build path witout tl_root.
+                    // Build path without tl_root.
                     $strFile = preg_replace('?' . $this->objSyncCtoHelper->getPreparedTlRoot() . '/?', '', $objFile->getPathname(), 1);
 
                     // Add file to zip.
@@ -1018,7 +1036,21 @@ class SyncCtoFiles extends Backend
         // Close zip, write data.
         $objZipArchive->close();
 
-        return array("name"    => $strFilename, "skipped" => $arrFileSkipped);
+        if ($objZipArchive->status != $objZipArchive::ER_OK || $objZipArchive->statusSys != $objZipArchive::ER_OK)
+        {
+            $strError = sprintf(
+                "Error during zip creation with message \"%s\"  || Status (%s): %s || System (%s): %s ",
+                $objZipArchive->getStatusString(),
+                $objZipArchive->status,
+                $objZipArchive->getErrorDescription($objZipArchive->status),
+                $objZipArchive->statusSys,
+                $objZipArchive->getErrorDescription($objZipArchive->statusSys)
+            );
+
+            throw new \RuntimeException($strError);
+        }
+
+        return array("name" => $strFilename, "skipped" => $arrFileSkipped);
     }
 
     /**
@@ -1153,7 +1185,17 @@ class SyncCtoFiles extends Backend
 
         if (($mixError = $objZipArchive->open($strRestoreFile)) !== true)
         {
-            throw new Exception($GLOBALS['TL_LANG']['MSC']['error'] . ": " . $objZipArchive->getErrorDescription($mixError));
+            $strError = sprintf(
+                "%s %s || Status (%s): %s || System (%s): %s  ",
+                $GLOBALS['TL_LANG']['ERR']['cant_extract_file'],
+                $objZipArchive->getErrorDescription($mixError),
+                $objZipArchive->status,
+                $objZipArchive->getErrorDescription($objZipArchive->status),
+                $objZipArchive->statusSys,
+                $objZipArchive->getErrorDescription($objZipArchive->statusSys)
+            );
+
+            throw new \RuntimeException($strError);
         }
 
         if ($objZipArchive->numFiles == 0)
@@ -1217,7 +1259,8 @@ class SyncCtoFiles extends Backend
      * 
      * @param boolean $booRoot Start search from root
      * @param boolean $booFiles Start search from files
-     * @return array A list with all files 
+     *
+     * @return AppendIterator A list with all files
      */
     public function getFileList($booRoot = false, $booFiles = false)
     {       
