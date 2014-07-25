@@ -15,6 +15,7 @@
  */
 
 use ContaoCommunityAlliance\Contao\EventDispatcher\Event\CreateEventDispatcherEvent;
+use ContaoCommunityAlliance\DcGeneral\Contao\View\Contao2BackendView\Event\GetPropertyOptionsEvent;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 
@@ -36,7 +37,10 @@ class SyncCtoSubscriber
     {
         $dispatcher = $event->getEventDispatcher();
 
-        // Save and load callbacks.
+        /*
+         * Save and load callbacks.
+         */
+
         self::registerListeners(
             array(
                 \ContaoCommunityAlliance\DcGeneral\Contao\View\Contao2BackendView\Event\GetEditModeButtonsEvent::NAME
@@ -49,7 +53,6 @@ class SyncCtoSubscriber
             SyncCtoTableSyncTo::PRIORITY
         );
 
-        // Save and load callbacks.
         self::registerListeners(
             array(
                 \ContaoCommunityAlliance\DcGeneral\Contao\View\Contao2BackendView\Event\GetEditModeButtonsEvent::NAME
@@ -60,6 +63,74 @@ class SyncCtoSubscriber
             $dispatcher,
             array('tl_syncCto_clients_syncFrom'),
             SyncCtoTableSyncFrom::PRIORITY
+        );
+
+        self::registerListeners(
+            array(
+                \ContaoCommunityAlliance\DcGeneral\Contao\View\Contao2BackendView\Event\GetEditModeButtonsEvent::NAME
+                => array(new SyncCtoTableBackupDatabase(), 'addButtonBackup'),
+                \ContaoCommunityAlliance\DcGeneral\Event\PrePersistModelEvent::NAME
+                => array(new SyncCtoTableBackupDatabase(), 'submitBackup')
+            ),
+            $dispatcher,
+            array('tl_syncCto_backup_db'),
+            SyncCtoTableBackupDatabase::PRIORITY
+        );
+
+        self::registerListeners(
+            array(
+                \ContaoCommunityAlliance\DcGeneral\Contao\View\Contao2BackendView\Event\GetEditModeButtonsEvent::NAME
+                => array(new SyncCtoTableBackupDatabase(), 'addButtonRestore'),
+                \ContaoCommunityAlliance\DcGeneral\Event\PrePersistModelEvent::NAME
+                => array(new SyncCtoTableBackupDatabase(), 'submitRestore')
+            ),
+            $dispatcher,
+            array('tl_syncCto_restore_db'),
+            SyncCtoTableBackupDatabase::PRIORITY
+        );
+
+        self::registerListeners(
+            array(
+                \ContaoCommunityAlliance\DcGeneral\Contao\View\Contao2BackendView\Event\GetEditModeButtonsEvent::NAME
+                => array(new SyncCtoTableBackupFile(), 'addButtonBackup'),
+                \ContaoCommunityAlliance\DcGeneral\Event\PrePersistModelEvent::NAME
+                => array(new SyncCtoTableBackupFile(), 'submitBackup')
+            ),
+            $dispatcher,
+            array('tl_syncCto_backup_file'),
+            SyncCtoTableBackupDatabase::PRIORITY
+        );
+
+        self::registerListeners(
+            array(
+                \ContaoCommunityAlliance\DcGeneral\Contao\View\Contao2BackendView\Event\GetEditModeButtonsEvent::NAME
+                => array(new SyncCtoTableBackupFile(), 'addButtonRestore'),
+                \ContaoCommunityAlliance\DcGeneral\Event\PrePersistModelEvent::NAME
+                => array(new SyncCtoTableBackupFile(), 'submitRestore')
+            ),
+            $dispatcher,
+            array('tl_syncCto_restore_file'),
+            SyncCtoTableBackupDatabase::PRIORITY
+        );
+
+        /*
+         * Data callback for widgets.
+         */
+
+        self::registerListeners(
+            array(
+                GetPropertyOptionsEvent::NAME => array(new SyncCtoTableBackupDatabase(), 'databaseTablesRecommended')
+            ),
+            $dispatcher,
+            array('tl_syncCto_backup_db', 'database_tables_recommended')
+        );
+
+        self::registerListeners(
+            array(
+                GetPropertyOptionsEvent::NAME => array(new SyncCtoTableBackupDatabase(), 'databaseTablesNoneRecommendedWithHidden')
+            ),
+            $dispatcher,
+            array('tl_syncCto_backup_db', 'database_tables_none_recommended')
         );
     }
 

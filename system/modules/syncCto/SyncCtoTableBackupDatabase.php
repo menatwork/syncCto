@@ -10,12 +10,13 @@
  */
 
 use ContaoCommunityAlliance\DcGeneral\Contao\View\Contao2BackendView\Event\GetEditModeButtonsEvent;
+use ContaoCommunityAlliance\DcGeneral\Contao\View\Contao2BackendView\Event\GetPropertyOptionsEvent;
 use ContaoCommunityAlliance\DcGeneral\Event\PrePersistModelEvent;
 
 /**
  * Class for syncFrom configurations
  */
-class SyncCtoTableBackupFile
+class SyncCtoTableBackupDatabase extends SyncCtoTableBase
 {
 
     // Vars
@@ -78,34 +79,27 @@ class SyncCtoTableBackupFile
             }
         }
 
-        // Check if core or user backup is selected
-        if (!isset($arrData['core_files']) && !isset($arrData['user_files']))
+        // Merge recommend and none recommend post arrays
+        $arrBackupSettings['syncCto_BackupTables'] = array();
+        if (isset($arrData['database_tables_recommended']))
         {
-            \Message::addError($GLOBALS['TL_LANG']['ERR']['missing_file_selection']);
-            \Controller::redirect(\Environment::get('base') . "contao/main.php?do=syncCto_backups&table=tl_syncCto_backup_file");
+            $arrBackupSettings['syncCto_BackupTables'] = $arrData['database_tables_recommended'];
+        }
+        if (isset($arrData['database_tables_none_recommended_']))
+        {
+            $arrBackupSettings['syncCto_BackupTables'] = array_merge($arrBackupSettings['syncCto_BackupTables'], $arrData['database_tables_none_recommended_']);
         }
 
-        if (isset($arrData['user_files']) && is_array($arrData['filelist']) && count($arrData['filelist']) == 0)
-        {
-            \Message::addError($GLOBALS['TL_LANG']['ERR']['missing_file_selection']);
-            \Controller::redirect(\Environment::get('base') . "contao/main.php?do=syncCto_backups&table=tl_syncCto_backup_file");
-        }
-
-        foreach ((array)$arrData['filelist'] as $key => $value)
-        {
-            $arrData['filelist'][$key] = Contao\FilesModel::findByPk($value)->path;
-        }
-
-        \Session::getInstance()->set("syncCto_BackupSettings", $arrData);
+        \Session::getInstance()->set('syncCto_BackupSettings', $arrBackupSettings);
 
         // Check the vars.
         $this->objSyncCtoHelper->checkSubmit(array(
                 'postUnset'   => array('start_backup'),
                 'error'       => array(
                     'key'     => 'syncCto_submit_false',
-                    'message' => $GLOBALS['TL_LANG']['ERR']['missing_tables']
+                    'message' => $GLOBALS['TL_LANG']['ERR']['no_functions']
                 ),
-                'redirectUrl' => \Environment::get('base') . "contao/main.php?do=syncCto_backups&table=tl_syncCto_backup_file&act=start"
+                'redirectUrl' => \Environment::get('base') . "contao/main.php?do=syncCto_backups&table=tl_syncCto_backup_db&act=start"
             ),
             $arrData
         );
@@ -158,7 +152,46 @@ class SyncCtoTableBackupFile
         \Session::getInstance()->set("syncCto_BackupSettings", $arrBackupSettings);
 
         // Redirect to the restore page.
-        \Controller::redirect(\Environment::get('base') . "contao/main.php?do=syncCto_backups&amp;table=tl_syncCto_restore_file&amp;act=start");
+        \Controller::redirect(\Environment::get('base') . "contao/main.php?do=syncCto_backups&table=tl_syncCto_restore_db&act=start");
     }
 
+    /**
+     * Get database tables recommended array
+     *
+     * @param ContaoCommunityAlliance\DcGeneral\Contao\View\Contao2BackendView\Event\GetPropertyOptionsEvent $event
+     *
+     * @return array
+     */
+    public function databaseTablesRecommended(GetPropertyOptionsEvent $event)
+    {
+        $arrTableRecommended = $this->objSyncCtoHelper->databaseTablesRecommended();
+
+        $arrStyledTableRecommended = array();
+        foreach ($arrTableRecommended AS $strTableName => $arrTable)
+        {
+            $arrStyledTableRecommended[$strTableName] = $this->objSyncCtoHelper->getStyledTableMeta($arrTable);
+        }
+
+        $event->setOptions($arrStyledTableRecommended);
+    }
+
+    /**
+     * Get database tables none recommended with hidden array
+     *
+     * @param ContaoCommunityAlliance\DcGeneral\Contao\View\Contao2BackendView\Event\GetPropertyOptionsEvent $event
+     *
+     * @return array
+     */
+    public function databaseTablesNoneRecommendedWithHidden(GetPropertyOptionsEvent $event)
+    {
+        $arrTableRecommended = $this->objSyncCtoHelper->databaseTablesNoneRecommendedWithHidden();
+
+        $arrStyledTableRecommended = array();
+        foreach ($arrTableRecommended AS $strTableName => $arrTable)
+        {
+            $arrStyledTableRecommended[$strTableName] = $this->objSyncCtoHelper->getStyledTableMeta($arrTable);
+        }
+
+        $event->setOptions($arrStyledTableRecommended);
+    }
 }
