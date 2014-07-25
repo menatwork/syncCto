@@ -318,7 +318,7 @@ class tl_synccto_clients extends Backend
             }
         }
 
-        if(in_array($operations, array('syncTo', 'syncFrom', 'showExtern')))
+        if(in_array($operations, array('syncTo', 'syncFrom')))
         {
             $strIdName = 'cid';
         }
