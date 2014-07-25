@@ -18,14 +18,14 @@ $GLOBALS['TL_DCA']['tl_syncCto_backup_file'] = array
         'disableSubmit'           => false,
         'enableVersioning'        => false
     ),
-    'dca_config'  => array
+    'dca_config' => array
     (
         'data_provider' => array
         (
             'default' => array
             (
-                'class'           => 'ContaoCommunityAlliance\DcGeneral\Data\NoOpDataProvider',
-                'source'          => 'tl_syncCto_clients_syncTo'
+                'class'  => 'ContaoCommunityAlliance\DcGeneral\Data\NoOpDataProvider',
+                'source' => 'tl_syncCto_backup_file'
             ),
         ),
     ),
@@ -66,7 +66,8 @@ $GLOBALS['TL_DCA']['tl_syncCto_backup_file'] = array
                 'fieldType'       => 'checkbox',
                 'files'           => true,
                 'filesOnly'       => false,
-                'tl_class'        => 'clr'
+                'tl_class'        => 'clr',
+                'multiple'        => true
             ),
         ),
         'backup_name' => array
