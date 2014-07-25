@@ -9,7 +9,7 @@
  * @filesource
  */
 
-class SyncCtoStats extends Backend
+class SyncCtoStats extends \Backend
 {
     /*
      * Constants
@@ -55,7 +55,7 @@ class SyncCtoStats extends Backend
     /**
      * Construct
      */
-    protected function __construct()
+    public function __construct()
     {
         parent::__construct();
 
