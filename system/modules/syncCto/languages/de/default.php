@@ -97,4 +97,8 @@ $GLOBALS['TL_LANG']['SYC']['user']                       = 'Dateiverwaltung (fil
 $GLOBALS['TL_LANG']['SYC']['user_change']                = 'Veränderte Daten';
 $GLOBALS['TL_LANG']['SYC']['user_delete']                = 'Gelöschte Daten';
 $GLOBALS['TL_LANG']['SYC']['xml_create']                 = 'XML-Dateien';
+$GLOBALS['TL_LANG']['MSC']['pattern']                    = 'Pattern (Regex)';
+$GLOBALS['TL_LANG']['MSC']['select']                     = 'Auswählen';
+$GLOBALS['TL_LANG']['MSC']['unselect']                   = 'Abwählen';
+$GLOBALS['TL_LANG']['MSC']['toggle']                     = 'Auswahl umkehren';
 

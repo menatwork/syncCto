@@ -78,6 +78,11 @@ $GLOBALS['TL_LANG']['MSC']['unchanged']                     = 'Unchanged';
 $GLOBALS['TL_LANG']['MSC']['both_changed']                  = 'Both changed';
 $GLOBALS['TL_LANG']['MSC']['difference_new']                = 'New';
 $GLOBALS['TL_LANG']['MSC']['difference_deleted']            = 'Deleted';
+$GLOBALS['TL_LANG']['MSC']['pattern']                       = 'Pattern (Regex)';
+$GLOBALS['TL_LANG']['MSC']['select']                        = 'Select';
+$GLOBALS['TL_LANG']['MSC']['unselect']                      = 'Unselect';
+$GLOBALS['TL_LANG']['MSC']['toggle']                        = 'Toggle selection';
+
 
 /**
  * Buttons
