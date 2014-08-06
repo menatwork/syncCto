@@ -30,6 +30,7 @@ $GLOBALS['TL_LANG']['ERR']['missing_file_information']   = 'Es fehlt entweder ei
 $GLOBALS['TL_LANG']['ERR']['missing_file_selection']     = 'Es wurde(n) keine Datei(en) ausgewählt.';
 $GLOBALS['TL_LANG']['ERR']['missing_tables']             = 'Es wurde(n) keine Tabell(en) gefunden.';
 $GLOBALS['TL_LANG']['ERR']['no_functions']               = 'Es wurden keine Optionen für die Synchronisation ausgewählt.';
+$GLOBALS['TL_LANG']['ERR']['pattern']                    = 'Ungültiger Ausdruck.';
 $GLOBALS['TL_LANG']['ERR']['rebuild']                    = 'Fehler beim Zusammenbau der Datei(en). Pfad: %s';
 $GLOBALS['TL_LANG']['ERR']['referer']                    = 'Konnte die Referer-Überprüfung des Clients nicht deaktivieren.';
 $GLOBALS['TL_LANG']['ERR']['unknown_client']             = 'Unbekannter Client.';
@@ -97,4 +98,8 @@ $GLOBALS['TL_LANG']['SYC']['user']                       = 'Dateiverwaltung (fil
 $GLOBALS['TL_LANG']['SYC']['user_change']                = 'Veränderte Daten';
 $GLOBALS['TL_LANG']['SYC']['user_delete']                = 'Gelöschte Daten';
 $GLOBALS['TL_LANG']['SYC']['xml_create']                 = 'XML-Dateien';
+$GLOBALS['TL_LANG']['MSC']['pattern']                    = 'Pattern (Regex)';
+$GLOBALS['TL_LANG']['MSC']['select']                     = 'Auswählen';
+$GLOBALS['TL_LANG']['MSC']['unselect']                   = 'Abwählen';
+$GLOBALS['TL_LANG']['MSC']['toggle']                     = 'Auswahl umkehren';
 

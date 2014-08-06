@@ -79,6 +79,10 @@ $GLOBALS['TL_LANG']['MSC']['both_changed']                  = 'Both changed';
 $GLOBALS['TL_LANG']['MSC']['difference_new']                = 'New';
 $GLOBALS['TL_LANG']['MSC']['difference_deleted']            = 'Deleted';
 $GLOBALS['TL_LANG']['MSC']['skipped_files']                 = ' skipped files.';
+$GLOBALS['TL_LANG']['MSC']['pattern']                       = 'Pattern (Regex)';
+$GLOBALS['TL_LANG']['MSC']['select']                        = 'Select';
+$GLOBALS['TL_LANG']['MSC']['unselect']                      = 'Unselect';
+$GLOBALS['TL_LANG']['MSC']['toggle']                        = 'Toggle selection';
 
 /**
  * Buttons
@@ -131,3 +135,5 @@ $GLOBALS['TL_LANG']['ERR']['version']                       = 'Version conflict 
 $GLOBALS['TL_LANG']['ERR']['upload_ini']                    = 'No success with upload. Funktion is deactivated in the php.ini';
 $GLOBALS['TL_LANG']['ERR']['rebuild']                       = 'Error rebuilding the file(s). Path: %s';
 $GLOBALS['TL_LANG']['ERR']['no_functions']                  = 'There are no options for the synchronization.';
+$GLOBALS['TL_LANG']['ERR']['pattern']                       = 'Invalid pattern (regular expression?).';
+
