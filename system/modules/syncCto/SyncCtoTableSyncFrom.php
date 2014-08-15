@@ -135,6 +135,7 @@ class SyncCtoTableSyncFrom
     protected function runSync($arrData)
     {
         $arrSyncSettings = array();
+		$arrSyncSettings["post_data"] = $arrData;
 
         // Automode off.
         $arrSyncSettings["automode"] = false;
