@@ -1787,7 +1787,7 @@ class SyncCtoModuleClient extends \BackendModule
                     if (in_array("core_delete", $this->arrSyncSettings["syncCto_Type"]))
                     {
                         $arrChecksumClient             = $this->objSyncCtoCommunicationClient->getChecksumFolderCore();
-                        $this->arrListComparee['core'] = array_merge((array) $this->arrListCompare['core'], $this->objSyncCtoFiles->searchDeleteFolders($arrChecksumClient));
+                        $this->arrListCompare['core'] = array_merge((array) $this->arrListCompare['core'], $this->objSyncCtoFiles->searchDeleteFolders($arrChecksumClient));
 
                         $this->objStepPool->step++;
                         break;
@@ -1937,7 +1937,7 @@ class SyncCtoModuleClient extends \BackendModule
                     // Save files and go on or skip here
                     if ($intCountMissing == 0 && $intCountNeed == 0 && $intCountIgnored == 0 && $intCountDelete == 0 && $intCountDbafsConflict == 0)
                     {
-                        // Set current step informations
+                        // Set current step information
                         $this->objData->setState(SyncCtoEnum::WORK_SKIPPED);
                         $this->objData->setDescription($GLOBALS['TL_LANG']['tl_syncCto_sync']["step_2"]['description_1']);
                         $this->objData->setHtml("");
@@ -2748,8 +2748,21 @@ class SyncCtoModuleClient extends \BackendModule
                     {
                         foreach ($GLOBALS['TL_HOOKS']['syncDBUpdateBeforeDrop'] as $callback)
                         {
-                            $this->import($callback[0]);
-                            $mixReturn = $this->$callback[0]->$callback[1]($this->intClientID, $this->arrSyncSettings['syncCto_SyncTables'], $arrSQL);
+                            if(!class_exists($callback[0]))
+                            {
+                                continue;
+                            }
+
+                            if(method_exists($callback[0], 'getInstance'))
+                            {
+                                $objCallbackClass = $callback[0]::getInstance();
+                            }
+                            else
+                            {
+                                $objCallbackClass = new $callback[0]();
+                            }
+
+                            $mixReturn = $objCallbackClass->$callback[1]($this->intClientID, $this->arrSyncSettings['syncCto_SyncTables'], $arrSQL);
 
                             if (!empty($mixReturn) && is_array($mixReturn))
                             {
