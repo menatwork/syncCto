@@ -1787,7 +1787,7 @@ class SyncCtoModuleClient extends BackendModule
                     if (in_array("core_delete", $this->arrSyncSettings["syncCto_Type"]))
                     {
                         $arrChecksumClient             = $this->objSyncCtoCommunicationClient->getChecksumFolderCore();
-                        $this->arrListComparee['core'] = array_merge((array) $this->arrListCompare['core'], $this->objSyncCtoFiles->searchDeleteFolders($arrChecksumClient));
+                        $this->arrListCompare['core'] = array_merge((array) $this->arrListCompare['core'], $this->objSyncCtoFiles->searchDeleteFolders($arrChecksumClient));
 
                         $this->objStepPool->step++;
                         break;
