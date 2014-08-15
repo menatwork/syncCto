@@ -274,26 +274,26 @@ class SyncCtoPopupDB extends Backend
         {
             try
             {
-                if (!is_null(\MetaModels\Factory::byTableName($strName)))
-                {
-                    $objDCABuilder     = \MetaModels\Dca\MetaModelDcaBuilder::getInstance();
-                    $objMetaModels     = \MetaModels\Factory::byTableName($strName);
-                    $arrDCA            = $objDCABuilder->getDca($objMetaModels->get('id'));
-                    $arrBackendcaption = deserialize($arrDCA['backendcaption']);
-
-                    $strReturn = $objMetaModels->getName();
-
-                    foreach ((array)$arrBackendcaption as $value)
-                    {
-                        if ($value['langcode'] == \BackendUser::getInstance()->language)
-                        {
-                            $strReturn = $value['label'];
-                            break;
-                        }
-                    }
-
-                    return $this->formateLookUpName($strName, $strReturn);
-                }
+//                if (!is_null(\MetaModels\Factory::byTableName($strName)))
+//                {
+//                    $objDCABuilder     = \MetaModels\Dca\MetaModelDcaBuilder::getInstance();
+//                    $objMetaModels     = \MetaModels\Factory::byTableName($strName);
+//                    $arrDCA            = $objDCABuilder->getDca($objMetaModels->get('id'));
+//                    $arrBackendcaption = deserialize($arrDCA['backendcaption']);
+//
+//                    $strReturn = $objMetaModels->getName();
+//
+//                    foreach ((array)$arrBackendcaption as $value)
+//                    {
+//                        if ($value['langcode'] == \BackendUser::getInstance()->language)
+//                        {
+//                            $strReturn = $value['label'];
+//                            break;
+//                        }
+//                    }
+//
+//                    return $this->formateLookUpName($strName, $strReturn);
+//                }
             }
             catch (Exception $exc)
             {
