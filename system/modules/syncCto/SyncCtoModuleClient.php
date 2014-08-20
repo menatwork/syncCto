@@ -29,6 +29,7 @@ class SyncCtoModuleClient extends \BackendModule
     protected $objSyncCtoFiles;
     protected $objSyncCtoHelper;
     protected $objSyncCtoMeasurement;
+    protected $User = null;
     // Content data
     protected $booError;
     protected $booAbort;
@@ -258,8 +259,8 @@ class SyncCtoModuleClient extends \BackendModule
         // Load CSS
         $GLOBALS['TL_CSS'][] = 'system/modules/syncCto/assets/css/steps.css';
 
-        // Import
-        $this->import("Backenduser", "User");
+        // Init classes.
+        $this->User = \BackendUser::getInstance();
     }
 
     /**
@@ -2815,8 +2816,21 @@ class SyncCtoModuleClient extends \BackendModule
 
                         foreach ($GLOBALS['TL_HOOKS']['syncDBUpdate'] as $callback)
                         {
-                            $this->import($callback[0]);
-                            $mixReturn = $this->$callback[0]->$callback[1]($this->intClientID, $arrSQL);
+                            if(!class_exists($callback[0]))
+                            {
+                                continue;
+                            }
+
+                            if(method_exists($callback[0], 'getInstance'))
+                            {
+                                $objCallbackClass = $callback[0]::getInstance();
+                            }
+                            else
+                            {
+                                $objCallbackClass = new $callback[0]();
+                            }
+
+                            $mixReturn = $objCallbackClass->$callback[1]($this->intClientID, $arrSQL);
 
                             if (!empty($mixReturn) && is_array($mixReturn))
                             {
@@ -3169,6 +3183,13 @@ class SyncCtoModuleClient extends \BackendModule
                     $this->intStep++;
 
                     break;
+
+                default:
+                    $this->objData->setState(SyncCtoEnum::WORK_OK);
+                    $this->objData->setHtml("");
+                    $this->booRefresh = true;
+                    $this->intStep++;
+                    break;
             }
         }
         catch (Exception $exc)
@@ -3252,8 +3273,16 @@ class SyncCtoModuleClient extends \BackendModule
 
                         try
                         {
-                            $this->import($arrCurrentFunction[0]);
-                            $this->$arrCurrentFunction[0]->$arrCurrentFunction[1]($this, $this->intClientID);
+                            if(method_exists($arrCurrentFunction[0], 'getInstance'))
+                            {
+                                $objCallbackClass = $arrCurrentFunction[0]::getInstance();
+                            }
+                            else
+                            {
+                                $objCallbackClass = new $arrCurrentFunction[0]();
+                            }
+
+                            $objCallbackClass->$arrCurrentFunction[1]($this, $this->intClientID);
                         }
                         catch (Exception $exc)
                         {
@@ -4680,8 +4709,21 @@ class SyncCtoModuleClient extends \BackendModule
                     {
                         foreach ($GLOBALS['TL_HOOKS']['syncDBUpdateBeforeDrop'] as $callback)
                         {
-                            $this->import($callback[0]);
-                            $mixReturn = $this->$callback[0]->$callback[1]($this->intClientID, $this->arrSyncSettings['syncCto_SyncTables'], $arrSQL);
+                            if(!class_exists($callback[0]))
+                            {
+                                continue;
+                            }
+
+                            if(method_exists($callback[0], 'getInstance'))
+                            {
+                                $objCallbackClass = $callback[0]::getInstance();
+                            }
+                            else
+                            {
+                                $objCallbackClass = new $callback[0]();
+                            }
+
+                            $mixReturn = $objCallbackClass->$callback[1]($this->intClientID, $this->arrSyncSettings['syncCto_SyncTables'], $arrSQL);
 
                             if (!empty($mixReturn) && is_array($mixReturn))
                             {
