@@ -46,6 +46,7 @@ ClassLoader::addClasses(array
 	'SyncCtoDatabaseUpdater'      => 'system/modules/syncCto/SyncCtoDatabaseUpdater.php',
 	'SyncCtoTableSyncTo'          => 'system/modules/syncCto/SyncCtoTableSyncTo.php',
 	'ContentData'                 => 'system/modules/syncCto/ContentData.php',
+    'SyncCtoContaoAutomator'      => 'system/modules/syncCto/SyncCtoContaoAutomator.php'
 ));
 
 

@@ -2961,10 +2961,15 @@ class SyncCtoModuleClient extends \BackendModule
                     $this->objStepPool->step++;
                     break;
 
+                case 2:
+                    $this->objSyncCtoCommunicationClient->purgeCache();
+                    $this->objStepPool->step++;
+                    break;
+
                 /**
                  * Delete files
                  */
-                case 2:
+                case 3:
                     if (is_array($this->arrListCompare) && (count($this->arrListCompare['core']) != 0 || count($this->arrListCompare['files']) != 0))
                     {
                         $arrDelete = array();
@@ -3009,7 +3014,7 @@ class SyncCtoModuleClient extends \BackendModule
                 /**
                  * Import Files
                  */
-                case 3:
+                case 4:
                     if (is_array($this->arrListCompare) && (count($this->arrListCompare['core']) != 0 || count($this->arrListCompare['files']) != 0))
                     {
                         $arrImport = array();
@@ -3125,10 +3130,15 @@ class SyncCtoModuleClient extends \BackendModule
                         break;
                     }
 
+                case 5:
+                    $this->objSyncCtoCommunicationClient->createCache();
+                    $this->objStepPool->step++;
+                    break;
+
                 /**
                  * Import Config
                  */
-                case 4:
+                case 6:
                     if ($this->arrSyncSettings["syncCto_Type"] == 'all' || in_array("localconfig_update", $this->arrSyncSettings["syncCto_Type"]))
                     {
                         $this->objSyncCtoCommunicationClient->runLocalConfigImport();
@@ -3141,7 +3151,7 @@ class SyncCtoModuleClient extends \BackendModule
                 /**
                  * Import Config / Set show error
                  */
-                case 5:
+                case 7:
                     $this->objSyncCtoCommunicationClient->setDisplayErrors($this->arrSyncSettings["syncCto_ShowError"]);
                     $this->objStepPool->step++;
                     break;
@@ -3149,7 +3159,7 @@ class SyncCtoModuleClient extends \BackendModule
                 /**
                  * Import Config / Set referrer check
                  */
-                case 6:
+                case 8:
                     if (is_array($this->arrSyncSettings["syncCto_Systemoperations_Maintenance"]) && count($this->arrSyncSettings["syncCto_Systemoperations_Maintenance"]) != 0)
                     {
                         $this->objSyncCtoCommunicationClient->runMaintenance($this->arrSyncSettings["syncCto_Systemoperations_Maintenance"]);
@@ -3158,7 +3168,7 @@ class SyncCtoModuleClient extends \BackendModule
                     $this->objStepPool->step++;
                     break;
 
-                case 7:
+                case 9:
                     if ($this->arrSyncSettings["syncCto_AttentionFlag"] == true)
                     {
                         $this->objSyncCtoCommunicationClient->setAttentionFlag(false);
@@ -3169,7 +3179,7 @@ class SyncCtoModuleClient extends \BackendModule
                 /**
                  * Cleanup
                  */
-                case 8:
+                case 10:
                     if (in_array("temp_folders", $this->arrSyncSettings["syncCto_Systemoperations_Maintenance"]))
                     {
                         $this->objSyncCtoCommunicationClient->purgeTempFolder();

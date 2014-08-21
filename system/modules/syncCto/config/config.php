@@ -700,6 +700,24 @@ $GLOBALS["CTOCOM_FUNCTIONS"]["SYNCCTO_PURGETEMP"] = array
     "parameter"          => FALSE,
 );
 
+// Contao Cache.
+$GLOBALS["CTOCOM_FUNCTIONS"]["SYNCCTO_PURGE_CACHE"] = array
+(
+    "class"              => "SyncCtoContaoAutomator",
+    "function"           => "purgeInternalCache",
+    "typ"                => "GET",
+    "parameter"          => FALSE,
+);
+
+// Contao Cache.
+$GLOBALS["CTOCOM_FUNCTIONS"]["SYNCCTO_CREATE_CACHE"] = array
+(
+    "class"              => "SyncCtoContaoAutomator",
+    "function"           => "createInternalCache",
+    "typ"                => "GET",
+    "parameter"          => FALSE,
+);
+
 // Run maintenance
 $GLOBALS["CTOCOM_FUNCTIONS"]["SYNCCTO_MAINTENANCE"] = array
 (
