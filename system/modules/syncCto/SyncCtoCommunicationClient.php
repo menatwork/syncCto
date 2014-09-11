@@ -5,13 +5,13 @@
  *
  * @copyright  MEN AT WORK 2014
  * @package    syncCto
- * @license    GNU/LGPL 
+ * @license    GNU/LGPL
  * @filesource
  */
 
 /**
  * Communication Class
- * 
+ *
  * Extends CtoCommunication witch special RPC-Requests
  */
 class SyncCtoCommunicationClient extends CtoCommunication
@@ -40,14 +40,14 @@ class SyncCtoCommunicationClient extends CtoCommunication
         parent::__construct();
 
         // Objects
-        $this->objSyncCtoFiles = SyncCtoFiles::getInstance();
+        $this->objSyncCtoFiles  = SyncCtoFiles::getInstance();
         $this->objSyncCtoHelper = SyncCtoHelper::getInstance();
     }
 
     /**
      * Singelton Pattern
-     * 
-     * @return SyncCtoCommunicationClient 
+     *
+     * @return SyncCtoCommunicationClient
      */
     public static function getInstance()
     {
@@ -61,16 +61,17 @@ class SyncCtoCommunicationClient extends CtoCommunication
 
     /**
      * Set client by id
-     * 
-     * @param int $id 
+     *
+     * @param int $id
+     *
      * @throws Exception
      */
     public function setClientBy($id)
     {
         // Load Client from database
         $objClient = $this->Database->prepare("SELECT * FROM tl_synccto_clients WHERE id = %s")
-                ->limit(1)
-                ->execute((int) $id);
+            ->limit(1)
+            ->execute((int)$id);
 
         // Check if a client was loaded
         if ($objClient->numRows == 0)
@@ -122,10 +123,10 @@ class SyncCtoCommunicationClient extends CtoCommunication
 
         return $this->arrClientData;
     }
-    
+
     /**
      * Return a list with basic client informations
-     * 
+     *
      * @return array {title, address, path, port}
      */
     public function getClientData()
@@ -133,15 +134,15 @@ class SyncCtoCommunicationClient extends CtoCommunication
         return $this->arrClientData;
     }
 
-    
+
     /* -------------------------------------------------------------------------
      * Security Function
      */
 
     /**
      * Disable the referrer check on the client
-     * 
-     * @return boolean 
+     *
+     * @return boolean
      */
     public function referrerDisable()
     {
@@ -150,8 +151,8 @@ class SyncCtoCommunicationClient extends CtoCommunication
 
     /**
      * Enable the referrer check on the client
-     * 
-     * @return boolean 
+     *
+     * @return boolean
      */
     public function referrerEnable()
     {
@@ -204,8 +205,8 @@ class SyncCtoCommunicationClient extends CtoCommunication
 
     /**
      * Get informations for purgedata
-     * 
-     * @return array 
+     *
+     * @return array
      */
     public function getPurgData()
     {
@@ -214,14 +215,14 @@ class SyncCtoCommunicationClient extends CtoCommunication
 
     /**
      * Set the attention flag from client
-     * 
-     * @param boolean $booState 
+     *
+     * @param boolean $booState
      */
     public function setAttentionFlag($booState)
     {
         $arrData = array(
             array(
-                "name" => "state",
+                "name"  => "state",
                 "value" => $booState,
             ),
         );
@@ -231,14 +232,14 @@ class SyncCtoCommunicationClient extends CtoCommunication
 
     /**
      * Set the reffere flag from client
-     * 
-     * @param boolean $booState 
+     *
+     * @param boolean $booState
      */
     public function setDisplayErrors($booState)
     {
         $arrData = array(
             array(
-                "name" => "state",
+                "name"  => "state",
                 "value" => $booState,
             ),
         );
@@ -252,39 +253,59 @@ class SyncCtoCommunicationClient extends CtoCommunication
 
     /**
      * Clear tempfolder
-     * 
-     * @return type 
+     *
+     * @return type
      */
     public function purgeTempFolder()
     {
         return $this->runServer("SYNCCTO_PURGETEMP");
     }
-    
+
     public function purgeTempTables()
     {
         return $this->runServer("SYNCCTO_PURGETEMP_TABLES");
     }
 
     /**
+     * Clean the cache.
+     *
+     * @return mixed
+     */
+    public function purgeCache()
+    {
+        return $this->runServer("SYNCCTO_PURGE_CACHE");
+    }
+
+    /**
+     * Rebuild the cache.
+     *
+     * @return mixed
+     */
+    public function createCache()
+    {
+        return $this->runServer("SYNCCTO_CREATE_CACHE");
+    }
+
+    /**
      * Use the contao function for maintance
-     * 
-     * @return boolean 
+     *
+     * @return boolean
      */
     public function runMaintenance($arrSettings)
     {
         $arrData = array(
             array(
-                "name" => "options",
+                "name"  => "options",
                 "value" => $arrSettings,
             )
         );
 
         return $this->runServer("SYNCCTO_MAINTENANCE", $arrData);
     }
-    
+
     /**
      * Call the last operations on client side.
-     * 
+     *
      * @return array with information.
      */
     public function runFinalOperations()
@@ -321,22 +342,22 @@ class SyncCtoCommunicationClient extends CtoCommunication
 
         $arrData = array(
             array(
-                "name" => "md5",
+                "name"  => "md5",
                 "value" => md5_file(TL_ROOT . "/" . $strPath),
             ),
             array(
-                "name" => "file",
+                "name"  => "file",
                 "value" => md5($strPath),
             ),
             array(
-                "name" => "disable_dbafs_conflicts",
+                "name"  => "disable_dbafs_conflicts",
                 "value" => $blnDisableDbafsConflicts
             ),
             array(
-                "name" => md5($strPath),
+                "name"     => md5($strPath),
                 "filename" => "syncList.syncCto",
                 "filepath" => TL_ROOT . "/" . $this->objSyncCtoHelper->standardizePath($GLOBALS['SYC_PATH']['tmp'], "syncList.syncCto"),
-                "mime" => $strMime,
+                "mime"     => $strMime,
             )
         );
 
@@ -345,15 +366,16 @@ class SyncCtoCommunicationClient extends CtoCommunication
 
     /**
      * Get a list with fileinformations from files
-     * 
+     *
      * @param a $fileList
-     * @return type 
+     *
+     * @return type
      */
-    public function getChecksumFiles($arrFileList = NULL)
+    public function getChecksumFiles($arrFileList = null)
     {
         $arrData = array(
             array(
-                "name" => "fileList",
+                "name"  => "fileList",
                 "value" => $arrFileList,
             ),
         );
@@ -366,8 +388,8 @@ class SyncCtoCommunicationClient extends CtoCommunication
 
     /**
      * Get a list with files from contao core
-     * 
-     * @return type 
+     *
+     * @return type
      */
     public function getChecksumCore()
     {
@@ -379,18 +401,18 @@ class SyncCtoCommunicationClient extends CtoCommunication
 
     /**
      * Get a list with folder from contao core
-     * 
-     * @return type 
+     *
+     * @return type
      */
     public function getChecksumFolderCore()
     {
         return $this->runServer("SYNCCTO_CHECKSUM_FOLDERS_CORE");
     }
-    
+
     /**
      * Get a list with folder from contao core
-     * 
-     * @return type 
+     *
+     * @return type
      */
     public function getChecksumFolderFiles()
     {
@@ -399,9 +421,10 @@ class SyncCtoCommunicationClient extends CtoCommunication
 
     /**
      * Check for deleted files
-     * 
+     *
      * @param array $arrFilelist
-     * @return array 
+     *
+     * @return array
      */
     public function checkDeleteFiles($arrChecksumList)
     {
@@ -419,29 +442,30 @@ class SyncCtoCommunicationClient extends CtoCommunication
 
         $arrData = array(
             array(
-                "name" => "md5",
+                "name"  => "md5",
                 "value" => md5_file(TL_ROOT . "/" . $strPath),
             ),
             array(
-                "name" => "file",
+                "name"  => "file",
                 "value" => md5($strPath),
             ),
             array(
-                "name" => md5($strPath),
+                "name"     => md5($strPath),
                 "filename" => "syncList.syncCto",
                 "filepath" => TL_ROOT . "/" . $strPath,
-                "mime" => $strMime,
+                "mime"     => $strMime,
             )
         );
 
         return $this->runServer("SYNCCTO_CHECK_DELETE_FILE", $arrData);
     }
-    
+
     /**
      * Check for deleted files
-     * 
+     *
      * @param array $arrFilelist
-     * @return array 
+     *
+     * @return array
      */
     public function searchDeleteFolders($arrChecksumList)
     {
@@ -481,6 +505,7 @@ class SyncCtoCommunicationClient extends CtoCommunication
      * Send a file to the client
      *
      * @param string $strFile File + path. Start from TL_ROOT.
+     *
      * @return bool [true|false]
      */
     public function sendFile($strFolder, $strFile, $strMD5 = "", $intTyp = 1, $strSplitname = "")
@@ -509,20 +534,20 @@ class SyncCtoCommunicationClient extends CtoCommunication
         // Build array with informations
         $arrData = array(
             array(
-                "name" => $strMD5,
+                "name"     => $strMD5,
                 "filename" => $strFile,
                 "filepath" => TL_ROOT . "/" . $strFilePath,
-                "mime" => $strMime,
+                "mime"     => $strMime,
             ),
             array(
-                "name" => "metafiles",
+                "name"  => "metafiles",
                 "value" => array(
                     $strMD5 => array(
-                        "folder" => $strFolder,
-                        "file" => $strFile,
-                        "MD5" => $strMD5,
+                        "folder"    => $strFolder,
+                        "file"      => $strFile,
+                        "MD5"       => $strMD5,
                         "splitname" => $strSplitname,
-                        "typ" => $intTyp
+                        "typ"       => $intTyp
                     )
                 )
             ),
@@ -530,11 +555,12 @@ class SyncCtoCommunicationClient extends CtoCommunication
 
         return $this->runServer("SYNCCTO_SEND_FILE", $arrData);
     }
-    
+
     /**
      * Send a file to the client
      *
      * @param string $strFile File + path. Start from TL_ROOT.
+     *
      * @return bool [true|false]
      */
     public function sendFileNewDestination($strSource, $strDestination, $strMD5 = "", $intTyp = 1, $strSplitname = "")
@@ -543,7 +569,7 @@ class SyncCtoCommunicationClient extends CtoCommunication
         @set_time_limit(3600);
 
         //Build path
-        $strSource = $this->objSyncCtoHelper->standardizePath($strSource);
+        $strSource      = $this->objSyncCtoHelper->standardizePath($strSource);
         $strDestination = $this->objSyncCtoHelper->standardizePath($strDestination);
 
         // Check file exsist
@@ -564,20 +590,20 @@ class SyncCtoCommunicationClient extends CtoCommunication
         // Build array with informations
         $arrData = array(
             array(
-                "name" => $strMD5,
+                "name"     => $strMD5,
                 "filename" => basename($strSource),
                 "filepath" => TL_ROOT . "/" . $strSource,
-                "mime" => $strMime,
+                "mime"     => $strMime,
             ),
             array(
-                "name" => "metafiles",
+                "name"  => "metafiles",
                 "value" => array(
                     $strMD5 => array(
-                        "folder" => dirname($strDestination),
-                        "file" => basename($strDestination),
-                        "MD5" => $strMD5,
+                        "folder"    => dirname($strDestination),
+                        "file"      => basename($strDestination),
+                        "MD5"       => $strMD5,
                         "splitname" => $strSplitname,
-                        "typ" => $intTyp
+                        "typ"       => $intTyp
                     )
                 )
             ),
@@ -592,7 +618,7 @@ class SyncCtoCommunicationClient extends CtoCommunication
      *
      * @param array   $arrFileList The list with all files.
      *
-     * @param boolean $blnIsDbafs If true the system tries to run the support for the Contao dbafs.
+     * @param boolean $blnIsDbafs  If true the system tries to run the support for the Contao dbafs.
      *
      * @return array Return a array with information from the client.
      */
@@ -636,7 +662,7 @@ class SyncCtoCommunicationClient extends CtoCommunication
      *
      * @param array   $arrFileList The list with all files.
      *
-     * @param boolean $blnIsDbafs If true the system tries to run the support for the Contao dbafs.
+     * @param boolean $blnIsDbafs  If true the system tries to run the support for the Contao dbafs.
      *
      * @return array Return a array with information from the client.
      */
@@ -644,7 +670,7 @@ class SyncCtoCommunicationClient extends CtoCommunication
     {
         $arrData = array(
             array(
-                "name" => "filelist",
+                "name"  => "filelist",
                 "value" => $arrFileList,
             ),
             array(
@@ -658,30 +684,31 @@ class SyncCtoCommunicationClient extends CtoCommunication
 
     /**
      * Build splitfiles back to one big file
-     * 
+     *
      * @param type $strSplitname
      * @param type $intSplitcount
      * @param type $strMovepath
      * @param type $strMD5
-     * @return type 
+     *
+     * @return type
      */
     public function buildSingleFile($strSplitname, $intSplitcount, $strMovepath, $strMD5)
     {
         $arrData = array(
             array(
-                "name" => "splitname",
+                "name"  => "splitname",
                 "value" => $strSplitname,
             ),
             array(
-                "name" => "splitcount",
+                "name"  => "splitcount",
                 "value" => $intSplitcount,
             ),
             array(
-                "name" => "movepath",
+                "name"  => "movepath",
                 "value" => $strMovepath,
             ),
             array(
-                "name" => "md5",
+                "name"  => "md5",
                 "value" => $strMD5,
             ),
         );
@@ -691,30 +718,31 @@ class SyncCtoCommunicationClient extends CtoCommunication
 
     /**
      * Build splitfiles back to one big file
-     * 
+     *
      * @param type $strSplitname
      * @param type $intSplitcount
      * @param type $strMovepath
      * @param type $strMD5
-     * @return type 
+     *
+     * @return type
      */
     public function runSplitFiles($strSrcFile, $strDesFolder, $strDesFile, $intSizeLimit)
     {
         $arrData = array(
             array(
-                "name" => "splitname",
+                "name"  => "splitname",
                 "value" => $strSrcFile,
             ),
             array(
-                "name" => "destfolder",
+                "name"  => "destfolder",
                 "value" => $strDesFolder,
             ),
             array(
-                "name" => "destfile",
+                "name"  => "destfile",
                 "value" => $strDesFile,
             ),
             array(
-                "name" => "limit",
+                "name"  => "limit",
                 "value" => $intSizeLimit,
             ),
         );
@@ -724,16 +752,17 @@ class SyncCtoCommunicationClient extends CtoCommunication
 
     /**
      * Get a file
-     * 
-     * @param type $strPath
+     *
+     * @param type   $strPath
      * @param string $strSavePath
-     * @return boolean 
+     *
+     * @return boolean
      */
     public function getFile($strPath, $strSavePath)
     {
         $arrData = array(
             array(
-                "name" => "path",
+                "name"  => "path",
                 "value" => $strPath,
             ),
         );
@@ -753,17 +782,18 @@ class SyncCtoCommunicationClient extends CtoCommunication
     }
 
     /**
-     * Get a list or a string with path information from 
+     * Get a list or a string with path information from
      * syncCto.
-     * 
+     *
      * @param string $strName
-     * @return mixed 
+     *
+     * @return mixed
      */
     public function getPathList($strName = null)
     {
         $arrData = array(
             array(
-                "name" => "name",
+                "name"  => "name",
                 "value" => $strName,
             )
         );
@@ -783,7 +813,7 @@ class SyncCtoCommunicationClient extends CtoCommunication
     {
         $arrData = array(
             array(
-                "name" => "files",
+                "name"  => "files",
                 "value" => $arrFiles,
             )
         );
@@ -797,19 +827,20 @@ class SyncCtoCommunicationClient extends CtoCommunication
 
     /**
      * Import a SQL zip
-     * 
+     *
      * @param type $filename
-     * @return type 
+     *
+     * @return type
      */
     public function runSQLImport($filename, $additionalSQL)
     {
         $arrData = array(
             array(
-                "name" => "filepath",
+                "name"  => "filepath",
                 "value" => $filename,
             ),
             array(
-                "name" => "additionalSQL",
+                "name"  => "additionalSQL",
                 "value" => $additionalSQL,
             ),
         );
@@ -821,34 +852,35 @@ class SyncCtoCommunicationClient extends CtoCommunication
     {
         $arrData = array(
             array(
-                "name" => "tables",
+                "name"  => "tables",
                 "value" => $arrTables,
             ),
             array(
-                "name" => "tempfolder",
+                "name"  => "tempfolder",
                 "value" => $booTempFolder,
             ),
         );
 
         return $this->runServer("SYNCCTO_RUN_DUMP", $arrData);
     }
-    
+
     /**
      * Drop tables on client site
-     * 
-     * @param array $arrTables
+     *
+     * @param array   $arrTables
      * @param boolean $blnBackup
+     *
      * @return void
      */
     public function dropTable($arrTables, $blnBackup)
     {
         $arrData = array(
             array(
-                "name" => "tablelist",
+                "name"  => "tablelist",
                 "value" => $arrTables,
             ),
             array(
-                "name" => "backup",
+                "name"  => "backup",
                 "value" => $blnBackup,
             ),
         );
@@ -858,15 +890,16 @@ class SyncCtoCommunicationClient extends CtoCommunication
 
     /**
      * Exceute SQL commands on client side
-     * 
+     *
      * @param array $arrSQL array([ID] => <br/>array("prepare" => [String(SQL)], "execute" => array([mix]) ) <br/>)
+     *
      * @return array array([ID] => response)
      */
     public function executeSQL($arrSQL)
     {
         $arrData = array(
             array(
-                "name" => "sql",
+                "name"  => "sql",
                 "value" => $arrSQL,
             )
         );
@@ -878,18 +911,18 @@ class SyncCtoCommunicationClient extends CtoCommunication
     {
         $arrData = array(
             array(
-                "name" => "TableList",
+                "name"  => "TableList",
                 "value" => $arrTableList,
             ),
         );
 
         return $this->runServer("SYNCCTO_TIMESTAMP", $arrData);
-    }    
-    
+    }
+
     /**
      * Returns a list without the hidden tables
-     * 
-     * @return array 
+     *
+     * @return array
      */
     public function getRecommendedTables()
     {
@@ -898,19 +931,19 @@ class SyncCtoCommunicationClient extends CtoCommunication
 
     /**
      * Returns a list without the hidden tables
-     * 
-     * @return array 
+     *
+     * @return array
      */
     public function getNoneRecommendedTables()
     {
         return $this->runServer("SYNCCTO_NONERECOMMENDED_TABLES");
     }
-    
-    
+
+
     /**
      * Returns a list without the hidden tables
-     * 
-     * @return array 
+     *
+     * @return array
      */
     public function getHiddenTables()
     {
@@ -933,8 +966,8 @@ class SyncCtoCommunicationClient extends CtoCommunication
 
     /**
      * Import localconfig
-     * 
-     * @return type 
+     *
+     * @return type
      */
     public function runLocalConfigImport()
     {
@@ -947,12 +980,14 @@ class SyncCtoCommunicationClient extends CtoCommunication
         foreach ($arrConfig as $key => $value)
         {
             if (in_array($key, $arrConfigBlacklist))
+            {
                 unset($arrConfig[$key]);
+            }
         }
 
         $arrData = array(
             array(
-                "name" => "configlist",
+                "name"  => "configlist",
                 "value" => $arrConfig,
             ),
         );
@@ -964,7 +999,7 @@ class SyncCtoCommunicationClient extends CtoCommunication
     {
         $arrData = array(
             array(
-                "name" => "ConfigBlacklist",
+                "name"  => "ConfigBlacklist",
                 "value" => $this->objSyncCtoHelper->getBlacklistLocalconfig(),
             ),
         );
@@ -977,7 +1012,7 @@ class SyncCtoCommunicationClient extends CtoCommunication
     {
         return $this->runServer("SYNCCTO_GET_PHP_FUNCTIONS");
     }
-    
+
     public function getProFunctions()
     {
         return $this->runServer("SYNCCTO_GET_PRO_FUNCTIONS");
@@ -999,17 +1034,17 @@ class SyncCtoCommunicationClient extends CtoCommunication
 
         return $this->runServer("SYNCCTO_GET_EXTENDED_INFORMATIONS", $arrData);
     }
-	
-	/**
-	 * Create a file which contains the relative path
-	 * 
-	 * @throws Exception
-	 * @return boolean 
-	 */
-	public function createPathconfig()
-	{
-		return $this->runServer("SYNCCTO_CREATE_PATHCONFIG");
-	}
+
+    /**
+     * Create a file which contains the relative path
+     *
+     * @throws Exception
+     * @return boolean
+     */
+    public function createPathconfig()
+    {
+        return $this->runServer("SYNCCTO_CREATE_PATHCONFIG");
+    }
 
     /* -------------------------------------------------------------------------
      * Auto Updater
@@ -1025,7 +1060,7 @@ class SyncCtoCommunicationClient extends CtoCommunication
         );
 
         return $this->runServer("SYNCCTO_AUTO_UPDATE", $arrData);
-    }   
+    }
 
 }
 
