@@ -24,7 +24,7 @@ $GLOBALS['TL_DCA']['tl_syncCto_clients_syncFrom'] = array
             'default' => array
             (
                 'class'           => 'ContaoCommunityAlliance\DcGeneral\Data\NoOpDataProvider',
-                'source'          => 'tl_syncCto_clients_syncTo'
+                'source'          => 'tl_syncCto_clients_syncFrom'
             ),
         ),
     ),
