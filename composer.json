@@ -32,7 +32,7 @@
 		"contao-community-alliance/composer-installer":"*",
 		"menatwork/contao-multicolumnwizard":"3.2.*",
 		"menatwork/ctocommunication":"~1.2",
-		"contao-legacy/dc_general":"~1.0",
+		"metamodels/dc_general": "1.0.*@dev",
 		"menatwork/ziparchivecto":"~1.1"
 	},
 	"autoload":{
