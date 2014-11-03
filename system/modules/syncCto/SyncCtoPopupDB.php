@@ -143,13 +143,13 @@ class SyncCtoPopupDB extends Backend
             // Remove tables from the list.
             foreach ($arrRemoveTables as $value)
             {
-                if (isset($this->arrSyncSettings['syncCto_CompareTables']['recommended']) && key_exists($value, $this->arrSyncSettings['syncCto_CompareTables']['recommended']))
+                if (isset($this->arrSyncSettings['syncCto_CompareTables']['recommended']) && array_key_exists($value, $this->arrSyncSettings['syncCto_CompareTables']['recommended']))
                 {
                     unset($this->arrSyncSettings['syncCto_CompareTables']['recommended'][$value]);
                 }
                 else
                 {
-                    if (isset($this->arrSyncSettings['syncCto_CompareTables']['nonRecommended']) && key_exists($value, $this->arrSyncSettings['syncCto_CompareTables']['nonRecommended']))
+                    if (isset($this->arrSyncSettings['syncCto_CompareTables']['nonRecommended']) && array_key_exists($value, $this->arrSyncSettings['syncCto_CompareTables']['nonRecommended']))
                     {
                         unset($this->arrSyncSettings['syncCto_CompareTables']['nonRecommended'][$value]);
                     }
@@ -257,7 +257,7 @@ class SyncCtoPopupDB extends Backend
         }
 
         // Make a lookup in synccto language files
-        if (is_array($GLOBALS['TL_LANG']['tl_syncCto_database']) && key_exists($strName, $GLOBALS['TL_LANG']['tl_syncCto_database']))
+        if (is_array($GLOBALS['TL_LANG']['tl_syncCto_database']) && array_key_exists($strName, $GLOBALS['TL_LANG']['tl_syncCto_database']))
         {
             if (is_array($GLOBALS['TL_LANG']['tl_syncCto_database'][$strName]))
             {
@@ -302,7 +302,7 @@ class SyncCtoPopupDB extends Backend
         }
 
         // Little mapping for names        
-        if (is_array($GLOBALS['SYC_CONFIG']['database_mapping']) && key_exists($strName, $GLOBALS['SYC_CONFIG']['database_mapping']))
+        if (is_array($GLOBALS['SYC_CONFIG']['database_mapping']) && array_key_exists($strName, $GLOBALS['SYC_CONFIG']['database_mapping']))
         {
             $strRealSystemName = $GLOBALS['SYC_CONFIG']['database_mapping'][$strName];
 
