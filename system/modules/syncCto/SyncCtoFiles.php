@@ -868,7 +868,7 @@ class SyncCtoFiles extends Backend
         if ($booRoot == true)
         {
             // Scann root for files.
-            $objDirectoryIt  = new RecursiveDirectoryIterator(TL_ROOT);
+            $objDirectoryIt  = new RecursiveDirectoryIterator(TL_ROOT, $this->strRDIFlags);
             $objFilterIt     = new SyncCtoFilterIteratorFiles($objDirectoryIt);
             $objRecursiverIt = new RecursiveIteratorIterator($objFilterIt, RecursiveIteratorIterator::SELF_FIRST);
 
