@@ -30,7 +30,7 @@
 		"php":">=5.3",
 		"contao/core":">=3.2,<3.4",
 		"contao-community-alliance/composer-installer":"*",
-		"menatwork/contao-multicolumnwizard":"3.2.*",
+		"menatwork/contao-multicolumnwizard":"~3.2",
 		"menatwork/ctocommunication":"~1.2",
 		"metamodels/dc_general": "1.0.*@dev",
 		"menatwork/ziparchivecto":"~1.1"
