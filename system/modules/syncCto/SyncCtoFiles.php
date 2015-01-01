@@ -1457,6 +1457,11 @@ class SyncCtoFiles extends \Backend
                                 $this->$arrCallback[0]->$arrCallback[1]();
                             }
                         }
+
+                        // Rebuild the cache.
+                        $objAutomator = new SyncCtoContaoAutomator();
+                        $objAutomator->generateInternalCache();
+
                         break;
 
                     // Custom
