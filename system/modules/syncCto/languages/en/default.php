@@ -78,6 +78,7 @@ $GLOBALS['TL_LANG']['MSC']['unchanged']                     = 'Unchanged';
 $GLOBALS['TL_LANG']['MSC']['both_changed']                  = 'Both changed';
 $GLOBALS['TL_LANG']['MSC']['difference_new']                = 'New';
 $GLOBALS['TL_LANG']['MSC']['difference_deleted']            = 'Deleted';
+$GLOBALS['TL_LANG']['MSC']['skipped_files']                 = ' skipped files.';
 
 /**
  * Buttons
