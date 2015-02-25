@@ -5403,6 +5403,11 @@ class SyncCtoModuleClient extends BackendModule
      */
     static public function parseSize($size)
     {
+        if ($size == -1)
+        {
+            return PHP_INT_MAX;
+        }
+
         $size = trim($size);
         $last = strtolower($size[strlen($size) - 1]);
         switch ($last)
