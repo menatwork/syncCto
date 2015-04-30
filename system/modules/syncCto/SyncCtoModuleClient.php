@@ -2627,7 +2627,7 @@ class SyncCtoModuleClient extends BackendModule
 
                 case 3:
                     // Unset some tables for pro feature
-                    if (($this->arrSyncSettings["automode"] && in_array('syncCtoPro', Config::getInstance()->getActiveModules())) || (array_key_exists("forward", $_POST) && $this->arrSyncSettings['post_data']['database_pages_check'] == true))
+                    if (!$this->arrSyncSettings["automode"] && in_array('syncCtoPro', Config::getInstance()->getActiveModules()) && array_key_exists('forward', $_POST) && $this->arrSyncSettings['post_data']['database_pages_check'] == true)
                     {
                         if (($mixKey = array_search('tl_page', $this->arrSyncSettings['syncCto_SyncTables'])) !== false)
                         {
@@ -4583,7 +4583,7 @@ class SyncCtoModuleClient extends BackendModule
 
                 case 3:
 
-                    if (($this->arrSyncSettings['automode'] || key_exists("forward", $_POST)) && !(count($this->arrSyncSettings['syncCto_SyncTables']) == 0 && count($this->arrSyncSettings['syncCto_SyncDeleteTables']) == 0))
+                    if (($this->arrSyncSettings['automode'] || array_key_exists("forward", $_POST)) && !(count($this->arrSyncSettings['syncCto_SyncTables']) == 0 && count($this->arrSyncSettings['syncCto_SyncDeleteTables']) == 0))
                     {
                         // Go to next step
                         $this->objData->setState(SyncCtoEnum::WORK_WORK);
@@ -4593,7 +4593,7 @@ class SyncCtoModuleClient extends BackendModule
 
                         break;
                     }
-                    else if (($this->arrSyncSettings['automode'] || key_exists("forward", $_POST)) && count($this->arrSyncSettings['syncCto_SyncTables']) == 0 && count($this->arrSyncSettings['syncCto_SyncDeleteTables']) == 0)
+                    else if (($this->arrSyncSettings['automode'] || array_key_exists("forward", $_POST)) && count($this->arrSyncSettings['syncCto_SyncTables']) == 0 && count($this->arrSyncSettings['syncCto_SyncDeleteTables']) == 0)
                     {
                         // Skip if no tables are selected
                         $this->objData->setState(SyncCtoEnum::WORK_SKIPPED);
@@ -5403,6 +5403,11 @@ class SyncCtoModuleClient extends BackendModule
      */
     static public function parseSize($size)
     {
+        if ($size == -1)
+        {
+            return PHP_INT_MAX;
+        }
+
         $size = trim($size);
         $last = strtolower($size[strlen($size) - 1]);
         switch ($last)
