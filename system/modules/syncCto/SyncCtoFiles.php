@@ -160,7 +160,6 @@ class SyncCtoFiles extends Backend
     {
         $strPath = $this->objSyncCtoHelper->standardizePath($strPath);
 
-
         foreach ($this->objSyncCtoHelper->getPreparedBlacklistFiles() as $value)
         {
             // Check if the preg starts with a TL_ROOT
@@ -210,22 +209,25 @@ class SyncCtoFiles extends Backend
         }
 
         // ...and now the support for the uuid und dbafs system
-        foreach ($arrFileList as $key => $value)
+        foreach ( $arrFileList as $key => $value )
         {
+            $strPath     = $this->objSyncCtoHelper->standardizePath($value['path']);
+            $strFullPath = $this->objSyncCtoHelper->getFullPath($strPath);
+
             // If we have a file in files get the dbafs data.
-            if(!preg_match('/^files\//i',  $value['path']))
+            if ( !$this->objSyncCtoHelper->isPartOfFiles($strPath) )
             {
                 continue;
             }
 
             // Check if we have this file in the filesystem.
-            if(!file_exists(TL_ROOT . DIRECTORY_SEPARATOR . $value['path']))
+            if ( !file_exists($strFullPath) )
             {
                 continue;
             }
 
             // Get the information from the dbafs.
-            $arrFileList[$key]['tl_files'] = $this->getDbafsInformation($value['path'], $blnAutoAdd);
+            $arrFileList[$key]['tl_files'] = $this->getDbafsInformation($strPath, $blnAutoAdd);
         }
 
         return $arrFileList;
@@ -244,25 +246,28 @@ class SyncCtoFiles extends Backend
      */
     public function getDbafsInformation($strFilePath, $blnAutoAdd = false, $blnSkipExistsCheck = false)
     {
+        $strFilePath     = $this->objSyncCtoHelper->standardizePath($strFilePath);
+        $strFullFilePath = $this->objSyncCtoHelper->getFullPath($strFilePath);
+
         // If we have a file in files get the dbafs data.
-        if(!preg_match('/^files\//i',  $strFilePath))
+        if(!$this->objSyncCtoHelper->isPartOfFiles($strFilePath))
         {
             return null;
         }
 
         // Check if we have this file in the filesystem.
-        if(!$blnSkipExistsCheck && !file_exists(TL_ROOT . DIRECTORY_SEPARATOR . $strFilePath))
+        if(!$blnSkipExistsCheck && !file_exists($strFullFilePath))
         {
             return null;
         }
 
         // Get the information from the tl_files.
-        $objModel = \FilesModel::findByPath($strFilePath);
+        $objModel = \FilesModel::findByPath(str_replace('\\\\', '/', $strFilePath));
 
         // If the file is not in the dbafs and
         if ($objModel == null && $blnAutoAdd)
         {
-            $objModel                      = \Dbafs::addResource($strFilePath);
+            $objModel                      = \Dbafs::addResource(str_replace('\\\\', '/', $strFilePath));
             $arrModelData                  = $objModel->row();
             $arrModelData['uuid']          = \String::binToUuid($arrModelData['uuid']);
             $arrModelData['pid']           = (strlen($arrModelData['pid'])) ? \String::binToUuid($arrModelData['pid']) : $arrModelData['pid'];
@@ -354,11 +359,13 @@ class SyncCtoFiles extends Backend
         // Replace the uuid with the path.
         foreach ($arrLeft as $arrEntry)
         {
+            $arrEntry['path'] = $this->objSyncCtoHelper->standardizePath($arrEntry['path']);
             $arrFoldersLeft[$arrEntry['path']] = $arrEntry;
         }
 
         foreach ($arrRight as $arrEntry)
         {
+            $arrEntry['path'] = $this->objSyncCtoHelper->standardizePath($arrEntry['path']);
             $arrFoldersRight[$arrEntry['path']] = $arrEntry;
         }
 
@@ -417,10 +424,12 @@ class SyncCtoFiles extends Backend
     {
         foreach($arrFileList as $key => $arrFile)
         {
+            $arrFile['path'] = $this->objSyncCtoHelper->standardizePath($arrFile['path']);
+
             if($arrFile['dbafs_state'] == SyncCtoEnum::DBAFS_DATA_CONFLICT)
             {
                 // Get the information from the tl_files.
-                $objModel       = \FilesModel::findByPath($arrFile['path']);
+                $objModel       = \FilesModel::findByPath(str_replace('\\\\', '/', $arrFile['path']));
 
                 // If we have no data for this, skip it.
                 if($objModel == null)
@@ -450,14 +459,14 @@ class SyncCtoFiles extends Backend
                 $intFileNumber         = 1;
                 for ($i = 1; $i < 100; $i++)
                 {
-                    $strNewDestinationName = sprintf('%s/%s_%s.%s',
+                    $strNewDestinationName = sprintf('%s' . DIRECTORY_SEPARATOR . '%s_%s.%s',
                         $arrDestinationInformation['dirname'],
                         $arrDestinationInformation['filename'],
                         $i,
                         $arrDestinationInformation['extension']
                     );
 
-                    if (!file_exists(TL_ROOT . '/' . $strNewDestinationName))
+                    if (!file_exists(TL_ROOT . DIRECTORY_SEPARATOR . $strNewDestinationName))
                     {
                         $intFileNumber = $i;
                         break;
@@ -711,7 +720,7 @@ class SyncCtoFiles extends Backend
         $objFileXML->append($objXml->flush(true), "");
         $objFileXML->close();
 
-        if(file_exists(TL_ROOT . '/' . $strXMLFile))
+        if(file_exists(TL_ROOT . DIRECTORY_SEPARATOR . $strXMLFile))
         {
             return true;
         }
@@ -781,15 +790,17 @@ class SyncCtoFiles extends Backend
 
         foreach ($arrChecksumList as $key => $value)
         {
+            $value['path'] = $this->objSyncCtoHelper->standardizePath($value['path']);
+
             // Check the files old school, md5 hash and co.
             if ($value['state'] == SyncCtoEnum::FILESTATE_BOMBASTIC_BIG)
             {
                 $arrFileList[$key]        = $arrChecksumList[$key];
                 $arrFileList[$key]['raw'] = 'file bombastic';
             }
-            else if (file_exists(TL_ROOT . "/" . $value['path']))
+            else if (file_exists($this->objSyncCtoHelper->getFullPath($value['path'])))
             {
-                if (md5_file(TL_ROOT . "/" . $value['path']) == $value['checksum'])
+                if (md5_file($this->objSyncCtoHelper->getFullPath($value['path'])) == $value['checksum'])
                 {
                     // Do nothing
                 }
@@ -822,7 +833,7 @@ class SyncCtoFiles extends Backend
             }
 
             // Next check dbafs changes.
-            if ($blnDisableDbafsConflicts != true && preg_match('/^files\//i', $value['path']))
+            if ($blnDisableDbafsConflicts != true && $this->objSyncCtoHelper->isPartOfFiles($value['path']))
             {
                 // Get the dbafs data and compare them..
                 $arrLocaleDBAFSInformation = $this->getDbafsInformation($value['path']);
@@ -882,7 +893,9 @@ class SyncCtoFiles extends Backend
 
         foreach ($arrChecksumList as $keyItem => $valueItem)
         {
-            if (!file_exists(TL_ROOT . "/" . $valueItem["path"]))
+            $valueItem["path"] = $this->objSyncCtoHelper->standardizePath($valueItem["path"]);
+
+            if (!file_exists($this->objSyncCtoHelper->getFullPath($valueItem["path"])))
             {
                 $arrFolderList[$keyItem]          = $valueItem;
                 $arrFolderList[$keyItem]["state"] = SyncCtoEnum::FILESTATE_FOLDER_DELETE;
@@ -904,7 +917,9 @@ class SyncCtoFiles extends Backend
 
         foreach ($arrFilelist as $keyItem => $valueItem)
         {
-            if (!file_exists(TL_ROOT . "/" . $valueItem["path"]))
+            $valueItem["path"] = $this->objSyncCtoHelper->standardizePath($valueItem["path"]);
+
+            if (!file_exists($this->objSyncCtoHelper->getFullPath($valueItem["path"])))
             {
                 $arrReturn[$keyItem]          = $valueItem;
                 $arrReturn[$keyItem]["state"] = SyncCtoEnum::FILESTATE_DELETE;
@@ -995,11 +1010,14 @@ class SyncCtoFiles extends Backend
         // Run backup for tl_files/files
         foreach ((array)$arrFiles as $file)
         {
+            $file = $this->objSyncCtoHelper->standardizePath($file);
+            $strFullFilePath = $this->objSyncCtoHelper->getFullPath($file);
+
             // Scan folders.
-            if (file_exists(TL_ROOT . '/' . $file) && is_dir(TL_ROOT . '/' . $file))
+            if (file_exists($strFullFilePath) && is_dir($strFullFilePath))
             {
                 // Scann.
-                $objDirectoryIt  = new RecursiveDirectoryIterator(TL_ROOT . '/' . $this->objSyncCtoHelper->standardizePath($file), $this->strRDIFlags);
+                $objDirectoryIt  = new RecursiveDirectoryIterator($strFullFilePath, $this->strRDIFlags);
                 $objFilterIt     = new SyncCtoFilterIteratorBase($objDirectoryIt);
                 $objRecursiverIt = new RecursiveIteratorIterator($objFilterIt, RecursiveIteratorIterator::SELF_FIRST);
 
@@ -1024,7 +1042,7 @@ class SyncCtoFiles extends Backend
                 }
             }
             // Add files.
-            else if (file_exists(TL_ROOT . '/' . $file))
+            else if (file_exists($strFullFilePath))
             {
                 if ($objZipArchive->addFile($file, $file) == false)
                 {
@@ -1067,7 +1085,7 @@ class SyncCtoFiles extends Backend
         $floatTimeStart = microtime(true);
 
         // Check if filelist exists
-        if (!file_exists(TL_ROOT . "/" . $srtXMLFilelist))
+        if (!file_exists(TL_ROOT . DIRECTORY_SEPARATOR . $srtXMLFilelist))
         {
             throw new Exception("File not found: " + $srtXMLFilelist);
         }
@@ -1088,7 +1106,7 @@ class SyncCtoFiles extends Backend
 
         // Open XML Reader
         $objXml = new DOMDocument("1.0", "UTF-8");
-        $objXml->load(TL_ROOT . "/" . $srtXMLFilelist);
+        $objXml->load(TL_ROOT . DIRECTORY_SEPARATOR . $srtXMLFilelist);
 
         // Check if we have some files
         if ($objXml->getElementsByTagName("file")->length == 0)
@@ -1119,7 +1137,7 @@ class SyncCtoFiles extends Backend
         foreach ($objFilesList as $file)
         {
             // Check if file exists
-            if (file_exists(TL_ROOT . "/" . $file->nodeValue))
+            if (file_exists(TL_ROOT . DIRECTORY_SEPARATOR . $file->nodeValue))
             {
                 $objZipArchive->addFile($file->nodeValue, $file->nodeValue);
             }
@@ -1150,7 +1168,7 @@ class SyncCtoFiles extends Backend
         }
 
         // Close XML and zip
-        $objXml->save(TL_ROOT . "/" . $srtXMLFilelist);
+        $objXml->save(TL_ROOT . DIRECTORY_SEPARATOR . $srtXMLFilelist);
         $objZipArchive->close();
 
         if ($objXml->getElementsByTagName("file")->length == 0)
@@ -1244,7 +1262,7 @@ class SyncCtoFiles extends Backend
         foreach ($arrFolders as $strFolder)
         {
             // Scann.
-            $objDirectoryIt  = new RecursiveDirectoryIterator(TL_ROOT . '/' . $this->objSyncCtoHelper->standardizePath($strFolder), $this->strRDIFlags);
+            $objDirectoryIt  = new RecursiveDirectoryIterator(TL_ROOT . DIRECTORY_SEPARATOR . $this->objSyncCtoHelper->standardizePath($strFolder), $this->strRDIFlags);
             $objFilterIt     = new SyncCtoFilterIteratorBase($objDirectoryIt);
             $objRecursiverIt = new RecursiveIteratorIterator($objFilterIt, RecursiveIteratorIterator::SELF_FIRST);
 
@@ -1286,7 +1304,7 @@ class SyncCtoFiles extends Backend
             // Scann allowed root folders.
             foreach ($this->arrRootFolderList as $value)
             {
-                $strFullPath = TL_ROOT . '/' . $this->objSyncCtoHelper->standardizePath($value);
+                $strFullPath = TL_ROOT . DIRECTORY_SEPARATOR . $this->objSyncCtoHelper->standardizePath($value);
 
                 // Check if the folder exists.
                 if (!file_exists($strFullPath) || !is_dir($strFullPath))
@@ -1307,7 +1325,7 @@ class SyncCtoFiles extends Backend
         if ($booFiles == true)
         {
             // Scann.
-            $objDirectoryIt  = new RecursiveDirectoryIterator(TL_ROOT . '/' . $this->objSyncCtoHelper->standardizePath($GLOBALS['TL_CONFIG']['uploadPath']), $this->strRDIFlags);
+            $objDirectoryIt  = new RecursiveDirectoryIterator(TL_ROOT . DIRECTORY_SEPARATOR . $this->objSyncCtoHelper->standardizePath($GLOBALS['TL_CONFIG']['uploadPath']), $this->strRDIFlags);
             $objFilterIt     = new SyncCtoFilterIteratorBase($objDirectoryIt);
             $objRecursiverIt = new RecursiveIteratorIterator($objFilterIt, RecursiveIteratorIterator::SELF_FIRST);
 
@@ -1341,7 +1359,7 @@ class SyncCtoFiles extends Backend
         {
             foreach ($this->arrRootFolderList as $value)
             {
-                $strFullPath = TL_ROOT . '/' . $this->objSyncCtoHelper->standardizePath($value);
+                $strFullPath = TL_ROOT . DIRECTORY_SEPARATOR . $this->objSyncCtoHelper->standardizePath($value);
                 
                 // Check if the folder exists.
                 if(!file_exists($strFullPath) || !is_dir($strFullPath))
@@ -1362,7 +1380,7 @@ class SyncCtoFiles extends Backend
         if ($booFiles == true)
         {
             // Scann.
-            $objDirectoryIt  = new RecursiveDirectoryIterator(TL_ROOT . '/' . $this->objSyncCtoHelper->standardizePath($GLOBALS['TL_CONFIG']['uploadPath']), $this->strRDIFlags);
+            $objDirectoryIt  = new RecursiveDirectoryIterator(TL_ROOT . DIRECTORY_SEPARATOR . $this->objSyncCtoHelper->standardizePath($GLOBALS['TL_CONFIG']['uploadPath']), $this->strRDIFlags);
             $objFilterIt     = new SyncCtoFilterIteratorFolder($objDirectoryIt);
             $objRecursiverIt = new RecursiveIteratorIterator($objFilterIt, RecursiveIteratorIterator::SELF_FIRST);  
             
@@ -1532,7 +1550,7 @@ class SyncCtoFiles extends Backend
             throw new Exception(vsprintf($GLOBALS['TL_LANG']['ERR']['min_size_limit'], array("500KiB")));
         }
 
-        if (!file_exists(TL_ROOT . "/" . $strSrcFile))
+        if (!file_exists(TL_ROOT . DIRECTORY_SEPARATOR . $strSrcFile))
         {
             throw new Exception(vsprintf($GLOBALS['TL_LANG']['ERR']['unknown_file'], array($strSrcFile)));
         }
@@ -1549,7 +1567,7 @@ class SyncCtoFiles extends Backend
         $i      = 0;
         for ($i; $booRun; $i++)
         {
-            $fp = fopen(TL_ROOT . "/" . $strSrcFile, "rb");
+            $fp = fopen(TL_ROOT . DIRECTORY_SEPARATOR . $strSrcFile, "rb");
 
             if ($fp === FALSE)
             {
@@ -1612,14 +1630,14 @@ class SyncCtoFiles extends Backend
             $strReadFile = $this->objSyncCtoHelper->standardizePath($GLOBALS['SYC_PATH']['tmp'], $strSplitname, $strSplitname . ".sync" . $i);
 
             // Check if file exists
-            if (!file_exists(TL_ROOT . "/" . $strReadFile))
+            if (!file_exists(TL_ROOT . DIRECTORY_SEPARATOR . $strReadFile))
             {
                 throw new Exception(vsprintf($GLOBALS['TL_LANG']['ERR']['unknown_file'], array($strSplitname . ".sync" . $i)));
             }
 
             // Create new file objects
             $objFilePart  = new File($strReadFile);
-            $hanFileWhole = fopen(TL_ROOT . "/" . $strSavePath, "a+");
+            $hanFileWhole = fopen(TL_ROOT . DIRECTORY_SEPARATOR . $strSavePath, "a+");
 
             // Write part file to main file
             fwrite($hanFileWhole, $objFilePart->getContent());
@@ -1637,7 +1655,7 @@ class SyncCtoFiles extends Backend
         }
 
         // Check MD5 Checksum
-        if (md5_file(TL_ROOT . "/" . $strSavePath) != $strMD5)
+        if (md5_file(TL_ROOT . DIRECTORY_SEPARATOR . $strSavePath) != $strMD5)
         {
             throw new Exception($GLOBALS['TL_LANG']['ERR']['checksum_error']);
         }
@@ -1666,7 +1684,7 @@ class SyncCtoFiles extends Backend
                 $strTempFile  = $this->objSyncCtoHelper->standardizePath($GLOBALS['SYC_PATH']['tmp'], "sync", $value["path"]);
 
                 // Check if the tmp file exists.
-                if (!file_exists(TL_ROOT . "/" . $strTempFile))
+                if (!file_exists(TL_ROOT . DIRECTORY_SEPARATOR . $strTempFile))
                 {
                     $arrFileList[$key]['saved']       = false;
                     $arrFileList[$key]['error']       = sprintf($GLOBALS['TL_LANG']['ERR']['unknown_file'], $strTempFile);
@@ -1748,14 +1766,14 @@ class SyncCtoFiles extends Backend
                             $intFileNumber         = 1;
                             for ($i = 1; $i < 100; $i++)
                             {
-                                $strNewDestinationName = sprintf('%s/%s_%s.%s',
+                                $strNewDestinationName = sprintf('%s' . DIRECTORY_SEPARATOR . '%s_%s.%s',
                                     $arrDestinationInformation['dirname'],
                                     $arrDestinationInformation['filename'],
                                     $i,
                                     $arrDestinationInformation['extension']
                                 );
 
-                                if (!file_exists(TL_ROOT . '/' . $strNewDestinationName))
+                                if (!file_exists(TL_ROOT . DIRECTORY_SEPARATOR . $strNewDestinationName))
                                 {
                                     $intFileNumber = $i;
                                     break;
@@ -1835,30 +1853,34 @@ class SyncCtoFiles extends Backend
             // Run each entry in the list..
             foreach ($arrFileList as $key => $value)
             {
+                // Clean up the path.
+                $strPath = $this->objSyncCtoHelper->standardizePath($value['path']);
+                $strFullPath = $this->objSyncCtoHelper->getFullPath($strPath);
+
                 try
                 {
-                    if (!file_exists(TL_ROOT . "/" . $value['path']))
+                    if (!file_exists($strFullPath))
                     {
                         $arrFileList[$key]['transmission'] = SyncCtoEnum::FILETRANS_SEND;
 
                         // Remove from dbafs.
                         if ($blnIsDbafs)
                         {
-                            \Dbafs::deleteResource($value['path']);
+                            \Dbafs::deleteResource($strPath);
                         }
                     }
                     // Check if we have a file.
-                    elseif (is_file(TL_ROOT . "/" . $value['path']))
+                    elseif (is_file($strFullPath))
                     {
                         // Delete the file.
-                        if ($this->objFiles->delete($value['path']))
+                        if ($this->objFiles->delete($strPath))
                         {
                             $arrFileList[$key]['transmission'] = SyncCtoEnum::FILETRANS_SEND;
 
                             // Remove from dbafs.
                             if ($blnIsDbafs)
                             {
-                                \Dbafs::deleteResource($value['path']);
+                                \Dbafs::deleteResource($strPath);
                             }
                         }
                         // If not possible add a msg.
@@ -1871,22 +1893,22 @@ class SyncCtoFiles extends Backend
 
                     }
                     // .. else we have a folder and remove this with all files inside.
-                    elseif (is_dir(TL_ROOT . "/" . $value['path']))
+                    elseif (is_dir($strFullPath))
                     {
-                        $this->objFiles->rrdir($value['path']);
+                        $this->objFiles->rrdir($strPath);
                         $arrFileList[$key]['transmission'] = SyncCtoEnum::FILETRANS_SEND;
 
                         // Remove from dbafs.
                         if ($blnIsDbafs)
                         {
-                            \Dbafs::deleteResource($value['path']);
+                            \Dbafs::deleteResource($strPath);
                         }
                     }
                 }
                 catch (Exception $exc)
                 {
                     $arrFileList[$key]['transmission'] = SyncCtoEnum::FILETRANS_SKIPPED;
-                    $arrFileList[$key]['error']        = sprintf('Can not delete file - %s. Exception message: %s', $value["path"], $exc->getMessage());
+                    $arrFileList[$key]['error']        = sprintf('Can not delete file - %s. Exception message: %s', $strPath, $exc->getMessage());
                     $arrFileList[$key]['skipreason']   = $GLOBALS['TL_LANG']['ERR']['cant_delete_file'];
                 }
             }
@@ -1913,7 +1935,7 @@ class SyncCtoFiles extends Backend
 
         foreach ($_FILES as $key => $value)
         {
-            if (!key_exists($key, $arrMetafiles))
+            if (!array_key_exists($key, $arrMetafiles))
             {
                 throw new Exception($GLOBALS['TL_LANG']['ERR']['missing_file_information']);
             }
@@ -1951,7 +1973,7 @@ class SyncCtoFiles extends Backend
             {
                 throw new Exception(vsprintf($GLOBALS['TL_LANG']['ERR']['cant_move_file'], array($value["tmp_name"], $strSaveFile)));
             }
-            else if ($key != md5_file(TL_ROOT . "/" . $strSaveFile))
+            else if ($key != md5_file(TL_ROOT . DIRECTORY_SEPARATOR . $strSaveFile))
             {
                 throw new Exception($GLOBALS['TL_LANG']['ERR']['checksum_error']);
             }
@@ -1973,7 +1995,10 @@ class SyncCtoFiles extends Backend
      */
     public function getFile($strPath)
     {
-        if (!file_exists(TL_ROOT . "/" . $strPath))
+        $strPath = $this->objSyncCtoHelper->standardizePath($strPath);
+        $strFullPath = $this->objSyncCtoHelper->getFullPath($strPath);
+
+        if (!file_exists($strFullPath))
         {
             throw new Exception(vsprintf($GLOBALS['TL_LANG']['ERR']['unknown_file'], array($strPath)));
         }
@@ -1982,7 +2007,7 @@ class SyncCtoFiles extends Backend
         $strContent = base64_encode($objFile->getContent());
         $objFile->close();
 
-        return array("md5"     => md5_file(TL_ROOT . "/" . $strPath), "content" => $strContent);
+        return array("md5"     => md5_file($strFullPath), "content" => $strContent);
     }
 
     /**

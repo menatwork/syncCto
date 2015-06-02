@@ -910,12 +910,17 @@ class SyncCtoHelper extends Backend
 
         foreach ($arrPath as $itPath)
         {
+            // Make all directory separator to one type.
             $itPath = str_replace('\\', '/', $itPath);
+            // Replace some chars.
             $itPath = preg_replace('?^' . str_replace('\\', '\\\\', TL_ROOT) . '?i', '', $itPath);
+            // Explode all elements.
             $itPath = explode('/', $itPath);
 
+            // Run each part and check some none valid elements.
             foreach ($itPath as $itFolder)
             {
+                // Remove all elements we don't want.
                 if ($itFolder === '' || $itFolder === null || $itFolder == "." || $itFolder == "..")
                 {
                     continue;
@@ -925,7 +930,57 @@ class SyncCtoHelper extends Backend
             }
         }
 
-        return implode('/', $arrReturn);
+        // Build the new path. Use the system directory separator.
+        return implode(DIRECTORY_SEPARATOR, $arrReturn);
+    }
+
+    /**
+     * Add the TL_Root and check if we need a / at the beginning.
+     *
+     * @param string $strPath The path.
+     *
+     * @return string The full path.
+     */
+    public function getFullPath($strPath)
+    {
+        if ( empty($strPath) )
+        {
+            return "";
+        }
+
+        // Check if we have a separator at the start.
+        if ( stripos($strPath, DIRECTORY_SEPARATOR) === 0 )
+        {
+            return TL_ROOT . $strPath;
+        }
+        else
+        {
+            return TL_ROOT . DIRECTORY_SEPARATOR . $strPath;
+        }
+    }
+
+    /**
+     * Check if the path is part of the files.
+     *
+     * @param string $strPath The path to check.
+     *
+     * @return boolean
+     */
+    public function isPartOfFiles($strPath)
+    {
+        // Clean up the path.
+        $strPath       = $this->standardizePath($strPath);
+        $strUploadPath = $this->standardizePath($GLOBALS['TL_CONFIG']['uploadPath']);
+
+        // Check the separator.
+        if ( DIRECTORY_SEPARATOR == '/' )
+        {
+            return preg_match('/' . $strUploadPath . '\//i', $strPath);
+        }
+        else
+        {
+            return preg_match('/' . $strUploadPath . '\\\\/i', $strPath);
+        }
     }
 
 
