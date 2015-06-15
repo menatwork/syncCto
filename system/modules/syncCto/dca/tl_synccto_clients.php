@@ -89,7 +89,7 @@ $GLOBALS['TL_DCA']['tl_synccto_clients'] = array
             'syncFrom' => array
             (
                 'label'           => &$GLOBALS['TL_LANG']['tl_syncCto_clients']['syncFrom'],
-                'href'            => '&table=tl_syncCto_clients_syncFrom&act=create',
+                'href'            => '&table=tl_syncCto_clients_syncFrom&act=edit',
                 'icon'            => 'system/modules/syncCto/assets/images/nav/iconSyncFrom.png',
                 'attributes'      => 'onclick="if (!confirm(\'' . $GLOBALS['TL_LANG']['tl_syncCto_clients']['syncFromConfirm'] . '\')) return false; Backend.getScrollOffset();"',
                 'button_callback' => array('tl_synccto_clients', 'checkPermission_client_syncFrom'),
@@ -97,7 +97,7 @@ $GLOBALS['TL_DCA']['tl_synccto_clients'] = array
             'syncTo' => array
             (
                 'label'           => &$GLOBALS['TL_LANG']['tl_syncCto_clients']['syncTo'],
-                'href'            => '&table=tl_syncCto_clients_syncTo&act=create',
+                'href'            => '&table=tl_syncCto_clients_syncTo&act=edit',
                 'icon'            => 'system/modules/syncCto/assets/images/nav/iconSyncTo.png',
                 'button_callback' => array('tl_synccto_clients', 'checkPermission_client_syncTo'),
             ),
@@ -318,6 +318,15 @@ class tl_synccto_clients extends Backend
             }
         }
 
+        if(in_array($operations, array('syncTo', 'syncFrom')))
+        {
+            $strIdName = 'cid';
+        }
+        else
+        {
+            $strIdName = 'id';
+        }
+
         if ($this->objBackendUser->hasAccess($operations, 'syncCto_clients_p') == true)
         {
             if ($blnUserIsWorking)
@@ -339,11 +348,11 @@ class tl_synccto_clients extends Backend
                 }
 
                 $title = implode("<br/>", $arrNotices);
-                return '<a class="user-history" href="' . $this->addToUrl($href . '&amp;id=' . $row['id']) . '" title="' . specialchars($title) . '"' . $attributes . '>' . $this->generateImage($icon, $label) . '</a> ';
+                return '<a class="user-history" href="' . $this->addToUrl($href . '&amp;' . $strIdName . '=' . $row['id']) . '" title="' . specialchars($title) . '"' . $attributes . '>' . $this->generateImage($icon, $label) . '</a> ';
             }
             else
             {
-                return '<a href="' . $this->addToUrl($href . '&amp;id=' . $row['id']) . '" title="' . specialchars($title) . '"' . $attributes . '>' . $this->generateImage($icon, $label) . '</a> ';
+                return '<a href="' . $this->addToUrl($href . '&amp;' . $strIdName . '=' . $row['id']) . '" title="' . specialchars($title) . '"' . $attributes . '>' . $this->generateImage($icon, $label) . '</a> ';
             }
         }
         else if (preg_match("/\.png/i", $icon))

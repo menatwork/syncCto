@@ -12,7 +12,7 @@
 /**
  * Class for client interaction
  */
-class SyncCtoModuleClient extends BackendModule
+class SyncCtoModuleClient extends \BackendModule
 {
     /* -------------------------------------------------------------------------
      * Variablen
@@ -29,6 +29,7 @@ class SyncCtoModuleClient extends BackendModule
     protected $objSyncCtoFiles;
     protected $objSyncCtoHelper;
     protected $objSyncCtoMeasurement;
+    protected $User = null;
     // Content data
     protected $booError;
     protected $booAbort;
@@ -258,8 +259,8 @@ class SyncCtoModuleClient extends BackendModule
         // Load CSS
         $GLOBALS['TL_CSS'][] = 'system/modules/syncCto/assets/css/steps.css';
 
-        // Import
-        $this->import("Backenduser", "User");
+        // Init classes.
+        $this->User = \BackendUser::getInstance();
     }
 
     /**
@@ -268,37 +269,37 @@ class SyncCtoModuleClient extends BackendModule
     protected function compile()
     {
         // Check if start is set
-        if ($this->Input->get("act") != "start" && $this->Input->get('table') != 'tl_syncCto_clients_showExtern')
+        if (\Input::get("act") != "start" && \Input::get('table') != 'tl_syncCto_clients_showExtern')
         {
             $_SESSION["TL_ERROR"] = array($GLOBALS['TL_LANG']['ERR']['call_directly']);
             $this->redirect("contao/main.php?do=synccto_clients");
         }
 
         // Get step
-        if ($this->Input->get("step") == "" || $this->Input->get("step") == null)
+        if (\Input::get("step") == "" || \Input::get("step") == null)
         {
             $this->intStep = 0;
         }
         else
         {
-            $this->intStep = intval($this->Input->get("step"));
+            $this->intStep = intval(\Input::get("step"));
         }
 
         // Get Client id or check if we in allmode
-        if (strlen($this->Input->get("id")) != 0 && $this->Input->get("mode") != 'all')
+        if (strlen(\Input::get("id")) != 0 && \Input::get("mode") != 'all')
         {
-            $this->intClientID = intval($this->Input->get("id"));
+            $this->intClientID = intval(\Input::get("id"));
         }
         else
         {
-            if (strlen($this->Input->get("id")) != 0 && $this->Input->get("mode") == 'all' && $this->Input->get("next") != '1')
+            if (strlen(\Input::get("id")) != 0 && \Input::get("mode") == 'all' && \Input::get("next") != '1')
             {
                 $this->blnAllMode  = true;
-                $this->intClientID = intval($this->Input->get("id"));
+                $this->intClientID = intval(\Input::get("id"));
             }
             else
             {
-                if ($this->Input->get("mode") == 'all')
+                if (\Input::get("mode") == 'all')
                 {
                     $this->blnAllMode = true;
                     $this->initModeAll();
@@ -326,9 +327,9 @@ class SyncCtoModuleClient extends BackendModule
 
         // Set template
         $this->Template->showControl    = true;
-        $this->Template->tryAgainLink   = $this->Environment->requestUri . (($this->blnAllMode) ? '&mode=all' : '');
-        $this->Template->abortLink      = $this->Environment->requestUri . "&abort=true" . (($this->blnAllMode) ? '&mode=all' : '');
-        $this->Template->nextClientLink = $this->Environment->requestUri . "&abort=true" . (($this->blnAllMode) ? '&mode=all&next=1' : '');
+        $this->Template->tryAgainLink   = \Environment::get('requestUri') . (($this->blnAllMode) ? '&mode=all' : '');
+        $this->Template->abortLink      = \Environment::get('requestUri') . "&abort=true" . (($this->blnAllMode) ? '&mode=all' : '');
+        $this->Template->nextClientLink = \Environment::get('requestUri') . "&abort=true" . (($this->blnAllMode) ? '&mode=all&next=1' : '');
 
         // Load content from session
         if ($this->intStep != 0)
@@ -346,14 +347,14 @@ class SyncCtoModuleClient extends BackendModule
             && intval($GLOBALS['TL_CONFIG']['syncCto_interactive_timeout']) > 0
         )
         {
-            $this->Database->query('SET SESSION wait_timeout = GREATEST(' . intval($GLOBALS['TL_CONFIG']['syncCto_wait_timeout']) . ', @@wait_timeout), SESSION interactive_timeout = GREATEST(' . intval($GLOBALS['TL_CONFIG']['syncCto_interactive_timeout']) . ', @@wait_timeout);');
+            \Database::getInstance()->query('SET SESSION wait_timeout = GREATEST(' . intval($GLOBALS['TL_CONFIG']['syncCto_wait_timeout']) . ', @@wait_timeout), SESSION interactive_timeout = GREATEST(' . intval($GLOBALS['TL_CONFIG']['syncCto_interactive_timeout']) . ', @@wait_timeout);');
         }
         else
         {
-            $this->Database->query('SET SESSION wait_timeout = GREATEST(28000, @@wait_timeout), SESSION interactive_timeout = GREATEST(28000, @@wait_timeout);');
+            \Database::getInstance()->query('SET SESSION wait_timeout = GREATEST(28000, @@wait_timeout), SESSION interactive_timeout = GREATEST(28000, @@wait_timeout);');
         }
 
-        if ($this->Input->get("abort") == "true")
+        if (\Input::get("abort") == "true")
         {
             // Load content from session
             $this->loadContenData();
@@ -369,7 +370,7 @@ class SyncCtoModuleClient extends BackendModule
         }
 
         // Which table is in use
-        switch ($this->Input->get("table"))
+        switch (\Input::get("table"))
         {
             case "tl_syncCto_clients_syncTo":
                 $this->pageSyncTo();
@@ -395,7 +396,7 @@ class SyncCtoModuleClient extends BackendModule
         $this->saveSyncSettings();
 
         // Save the informations for mode all.
-        if ($this->Input->get("mode") == 'all')
+        if (\Input::get("mode") == 'all')
         {
             $this->saveStepPoolAll();
         }
@@ -418,10 +419,10 @@ class SyncCtoModuleClient extends BackendModule
         );
 
         // Check if we have a init call.
-        if ($this->Input->get('init') == 1)
+        if (\Input::get('init') == 1)
         {
             // Get a list with all client.
-            $objClients = $this->Database->query('SELECT id FROM tl_synccto_clients');
+            $objClients = \Database::getInstance()->query('SELECT id FROM tl_synccto_clients');
 
             // ToDo: Add a check for premissions.
 
@@ -448,7 +449,7 @@ class SyncCtoModuleClient extends BackendModule
         // Set client id.
         else
         {
-            if ($this->Input->get('next') == 1)
+            if (\Input::get('next') == 1)
             {
                 // Increase everything.
                 $this->arrModeAll['index']++;
@@ -489,13 +490,13 @@ class SyncCtoModuleClient extends BackendModule
         $this->Template->finished    = $this->booFinished;
         $this->Template->allMode     = $this->blnAllMode;
 
-        if ($this->Input->get('table') == 'tl_syncCto_clients_syncTo')
+        if (\Input::get('table') == 'tl_syncCto_clients_syncTo')
         {
             $this->Template->direction = 'to';
         }
         else
         {
-            if ($this->Input->get('table') == 'tl_syncCto_clients_syncFrom')
+            if (\Input::get('table') == 'tl_syncCto_clients_syncFrom')
             {
                 $this->Template->direction = 'from';
             }
@@ -526,7 +527,7 @@ class SyncCtoModuleClient extends BackendModule
             "abort"       => $this->booAbort,
         );
 
-        $this->Session->set("syncCto_Content", $arrContenData);
+        \Session::getInstance()->set("syncCto_Content", $arrContenData);
     }
 
     /**
@@ -534,7 +535,7 @@ class SyncCtoModuleClient extends BackendModule
      */
     protected function loadContenData()
     {
-        $arrContenData = $this->Session->get("syncCto_Content");
+        $arrContenData = \Session::getInstance()->get("syncCto_Content");
 
         if (is_array($arrContenData) && count($arrContenData) != 0)
         {
@@ -570,7 +571,7 @@ class SyncCtoModuleClient extends BackendModule
 
     protected function loadStepPool()
     {
-        $arrStepPool = $this->Session->get("syncCto_" . $this->intClientID . "_StepPool" . $this->intStep);
+        $arrStepPool = \Session::getInstance()->get("syncCto_" . $this->intClientID . "_StepPool" . $this->intStep);
 
         if ($arrStepPool == false || !is_array($arrStepPool))
         {
@@ -582,30 +583,30 @@ class SyncCtoModuleClient extends BackendModule
 
     protected function saveStepPool()
     {
-        $this->Session->set("syncCto_" . $this->intClientID . "_StepPool" . $this->objStepPool->getIntStepID(), $this->objStepPool->getArrValues());
+        \Session::getInstance()->set("syncCto_" . $this->intClientID . "_StepPool" . $this->objStepPool->getIntStepID(), $this->objStepPool->getArrValues());
     }
 
     protected function resetStepPool()
     {
-        $this->Session->set("syncCto_" . $this->intClientID . "_StepPool" . $this->objStepPool->getIntStepID(), false);
+        \Session::getInstance()->set("syncCto_" . $this->intClientID . "_StepPool" . $this->objStepPool->getIntStepID(), false);
     }
 
     protected function resetStepPoolByID($arrID)
     {
         foreach ($arrID as $value)
         {
-            $this->Session->set("syncCto_" . $this->intClientID . "_StepPool" . $value, false);
+            \Session::getInstance()->set("syncCto_" . $this->intClientID . "_StepPool" . $value, false);
         }
     }
 
     protected function saveStepPoolAll()
     {
-        $this->Session->set("syncCto_All_StepPool", $this->arrModeAll);
+        \Session::getInstance()->set("syncCto_All_StepPool", $this->arrModeAll);
     }
 
     protected function loadStepPoolAll()
     {
-        $arrStepPool = $this->Session->get("syncCto_All_StepPool");
+        $arrStepPool = \Session::getInstance()->get("syncCto_All_StepPool");
 
         if ($arrStepPool == false || !is_array($arrStepPool))
         {
@@ -668,7 +669,7 @@ class SyncCtoModuleClient extends BackendModule
 
     protected function loadSyncSettings()
     {
-        $this->arrSyncSettings = $this->Session->get("syncCto_SyncSettings_" . $this->intClientID);
+        $this->arrSyncSettings = \Session::getInstance()->get("syncCto_SyncSettings_" . $this->intClientID);
 
         if (!is_array($this->arrSyncSettings))
         {
@@ -683,12 +684,12 @@ class SyncCtoModuleClient extends BackendModule
             $this->arrSyncSettings = array();
         }
 
-        $this->Session->set("syncCto_SyncSettings_" . $this->intClientID, $this->arrSyncSettings);
+        \Session::getInstance()->set("syncCto_SyncSettings_" . $this->intClientID, $this->arrSyncSettings);
     }
 
     protected function loadClientInformation()
     {
-        $this->arrClientInformation = $this->Session->get("syncCto_ClientInformation_" . $this->intClientID);
+        $this->arrClientInformation = \Session::getInstance()->get("syncCto_ClientInformation_" . $this->intClientID);
 
         if (!is_array($this->arrClientInformation))
         {
@@ -698,12 +699,12 @@ class SyncCtoModuleClient extends BackendModule
 
     protected function saveClientInformation()
     {
-        $this->Session->set("syncCto_ClientInformation_" . $this->intClientID, $this->arrClientInformation);
+        \Session::getInstance()->set("syncCto_ClientInformation_" . $this->intClientID, $this->arrClientInformation);
     }
 
     protected function resetClientInformation()
     {
-        $this->Session->set("syncCto_ClientInformation_" . $this->intClientID, false);
+        \Session::getInstance()->set("syncCto_ClientInformation_" . $this->intClientID, false);
     }
 
     /* -------------------------------------------------------------------------
@@ -762,7 +763,7 @@ class SyncCtoModuleClient extends BackendModule
             $this->strError       = "";
             $this->booRefresh     = true;
             $this->strUrl         = "contao/main.php?do=synccto_clients&amp;table=tl_syncCto_clients_syncTo&amp;act=start&amp;id=" . $this->intClientID;
-            $this->strGoBack      = $this->Environment->base . "contao/main.php?do=synccto_clients";
+            $this->strGoBack      = \Environment::get('base') . "contao/main.php?do=synccto_clients";
             $this->strHeadline    = $GLOBALS['TL_LANG']['tl_syncCto_sync']['edit'];
             $this->strInformation = "";
             $this->intStep        = 1;
@@ -779,21 +780,21 @@ class SyncCtoModuleClient extends BackendModule
             $this->initTempLists();
 
             // Update last sync
-            $this->Database->prepare("UPDATE `tl_synccto_clients` %s WHERE `tl_synccto_clients`.`id` = ?")
-                ->set(array("syncTo_user" => $this->User->id, "syncTo_tstamp" => time()))
+            \Database::getInstance()->prepare("UPDATE `tl_synccto_clients` %s WHERE `tl_synccto_clients`.`id` = ?")
+                ->set(array("syncTo_user" => \BackendUser::getInstance()->id, "syncTo_tstamp" => time()))
                 ->execute($this->intClientID);
 
             // Add stats
-            SyncCtoStats::getInstance()->addStartStat($this->User->id, $this->intClientID, time(), $this->arrSyncSettings, SyncCtoStats::SYNCDIRECTION_TO);
+            SyncCtoStats::getInstance()->addStartStat(\BackendUser::getInstance()->id, $this->intClientID, time(), $this->arrSyncSettings, SyncCtoStats::SYNCDIRECTION_TO);
 
             // Write log
-            $this->log(vsprintf("Start synchronization client ID %s.", array($this->Input->get("id"))), __CLASS__ . " " . __FUNCTION__, "INFO");
+            $this->log(vsprintf("Start synchronization client ID %s.", array(\Input::get("id"))), __CLASS__ . " " . __FUNCTION__, "INFO");
 
             // Reset some Sessions
             $this->resetStepPoolByID(array(1, 2, 3, 4, 5, 6, 7));
             $this->resetClientInformation();
 
-            $this->Session->set("SyncCto_FileLock_ID" . $this->intClientID, array("lock" => false));
+            \Session::getInstance()->set("SyncCto_FileLock_ID" . $this->intClientID, array("lock" => false));
         }
 
         // Check if we have to do the current step
@@ -968,7 +969,7 @@ class SyncCtoModuleClient extends BackendModule
             $this->strError       = "";
             $this->booRefresh     = true;
             $this->strUrl         = "contao/main.php?do=synccto_clients&amp;table=tl_syncCto_clients_syncFrom&amp;act=start&amp;id=" . $this->intClientID;
-            $this->strGoBack      = $this->Environment->base . "contao/main.php?do=synccto_clients";
+            $this->strGoBack      = \Environment::get('base') . "contao/main.php?do=synccto_clients";
             $this->strHeadline    = $GLOBALS['TL_LANG']['tl_syncCto_sync']['edit'];
             $this->strInformation = "";
             $this->intStep        = 1;
@@ -979,21 +980,21 @@ class SyncCtoModuleClient extends BackendModule
             $this->initTempLists();
 
             // Update last sync
-            $this->Database->prepare("UPDATE `tl_synccto_clients` %s WHERE `tl_synccto_clients`.`id` = ?")
-                ->set(array("syncFrom_user" => $this->User->id, "syncFrom_tstamp" => time()))
+            \Database::getInstance()->prepare("UPDATE `tl_synccto_clients` %s WHERE `tl_synccto_clients`.`id` = ?")
+                ->set(array("syncFrom_user" => \BackendUser::getInstance()->id, "syncFrom_tstamp" => time()))
                 ->execute($this->intClientID);
 
             // Add stats
-            SyncCtoStats::getInstance()->addStartStat($this->User->id, $this->intClientID, time(), $this->arrSyncSettings, SyncCtoStats::SYNCDIRECTION_FROM);
+            SyncCtoStats::getInstance()->addStartStat(\BackendUser::getInstance()->id, $this->intClientID, time(), $this->arrSyncSettings, SyncCtoStats::SYNCDIRECTION_FROM);
 
             // Write log
-            $this->log(vsprintf("Start synchronization server with client ID %s.", array($this->Input->get("id"))), __CLASS__ . " " . __FUNCTION__, "INFO");
+            $this->log(vsprintf("Start synchronization server with client ID %s.", array(\Input::get("id"))), __CLASS__ . " " . __FUNCTION__, "INFO");
 
             // Reset some Sessions
             $this->resetStepPoolByID(array(1, 2, 3, 4, 5, 6, 7));
             $this->resetClientInformation();
 
-            $this->Session->set("SyncCto_FileLock_ID" . $this->intClientID, array("lock" => false));
+            \Session::getInstance()->set("SyncCto_FileLock_ID" . $this->intClientID, array("lock" => false));
         }
 
         // Check if we have to do the current step
@@ -1167,7 +1168,7 @@ class SyncCtoModuleClient extends BackendModule
             $this->strError       = "";
             $this->booRefresh     = true;
             $this->strUrl         = "contao/main.php?do=synccto_clients&amp;table=tl_syncCto_clients_showExtern&amp;act=start&amp;id=" . $this->intClientID;
-            $this->strGoBack      = $this->Environment->base . "contao/main.php?do=synccto_clients";
+            $this->strGoBack      = \Environment::get('base') . "contao/main.php?do=synccto_clients";
             $this->strHeadline    = $GLOBALS['TL_LANG']['tl_syncCto_check']['check'];
             $this->strInformation = "";
             $this->intStep        = 1;
@@ -1178,7 +1179,7 @@ class SyncCtoModuleClient extends BackendModule
             $this->initTempLists();
 
             // Add stats
-            SyncCtoStats::getInstance()->addStartStat($this->User->id, $this->intClientID, time(), array(), SyncCtoStats::SYNCDIRECTION_CHECK);
+            SyncCtoStats::getInstance()->addStartStat(\BackendUser::getInstance()->id, $this->intClientID, time(), array(), SyncCtoStats::SYNCDIRECTION_CHECK);
 
             // Reset some Sessions
             $this->resetStepPoolByID(array(1, 2, 3, 4, 5, 6, 7));
@@ -1288,7 +1289,7 @@ class SyncCtoModuleClient extends BackendModule
         }
         catch (Exception $exc)
         {
-            $this->log(vsprintf("Error on synchronization client ID %s", array($this->Input->get("id"))), __CLASS__ . " " . __FUNCTION__, "ERROR");
+            $this->log(vsprintf("Error on synchronization client ID %s", array(\Input::get("id"))), __CLASS__ . " " . __FUNCTION__, "ERROR");
 
             $this->booError = true;
             $this->strError = $exc->getMessage();
@@ -1400,7 +1401,7 @@ class SyncCtoModuleClient extends BackendModule
 
                     if ($strVersion != $strCurrentVersion)
                     {
-                        $this->log(vsprintf("Not the same version from contao on synchronization client ID %s. Serverversion: %s. Clientversion: %s", array($this->Input->get("id"), $GLOBALS['SYC_VERSION'], $strVersion)), __CLASS__ . " " . __FUNCTION__, "GENERAL");
+                        $this->log(vsprintf("Not the same version from contao on synchronization client ID %s. Serverversion: %s. Clientversion: %s", array(\Input::get("id"), $GLOBALS['SYC_VERSION'], $strVersion)), __CLASS__ . " " . __FUNCTION__, "GENERAL");
 
                         $this->objData->setState(SyncCtoEnum::WORK_ERROR);
                         $this->booError = true;
@@ -1582,7 +1583,7 @@ class SyncCtoModuleClient extends BackendModule
         }
         catch (Exception $exc)
         {
-            $this->log(vsprintf("Error on synchronization client ID %s with msg: %s", array($this->Input->get("id"), $exc->getMessage())), __CLASS__ . " " . __FUNCTION__, "ERROR");
+            $this->log(vsprintf("Error on synchronization client ID %s with msg: %s", array(\Input::get("id"), $exc->getMessage())), __CLASS__ . " " . __FUNCTION__, "ERROR");
 
             $this->booError = true;
             $this->strError = $exc->getMessage();
@@ -1937,7 +1938,7 @@ class SyncCtoModuleClient extends BackendModule
                     // Save files and go on or skip here
                     if ($intCountMissing == 0 && $intCountNeed == 0 && $intCountIgnored == 0 && $intCountDelete == 0 && $intCountDbafsConflict == 0)
                     {
-                        // Set current step informations
+                        // Set current step information
                         $this->objData->setState(SyncCtoEnum::WORK_SKIPPED);
                         $this->objData->setDescription($GLOBALS['TL_LANG']['tl_syncCto_sync']["step_2"]['description_1']);
                         $this->objData->setHtml("");
@@ -2006,7 +2007,7 @@ class SyncCtoModuleClient extends BackendModule
             $this->booRefresh = true;
             $this->intStep++;
 
-            $this->log(vsprintf("Error on synchronization client ID %s with msg: %s", array($this->Input->get("id"), $exc->getMessage())), __CLASS__ . " " . __FUNCTION__, "ERROR");
+            $this->log(vsprintf("Error on synchronization client ID %s with msg: %s", array(\Input::get("id"), $exc->getMessage())), __CLASS__ . " " . __FUNCTION__, "ERROR");
         }
     }
 
@@ -2431,7 +2432,7 @@ class SyncCtoModuleClient extends BackendModule
             $this->booRefresh = true;
             $this->intStep++;
 
-            $this->log(vsprintf("Error on synchronization client ID %s with msg: %s", array($this->Input->get("id"), $exc->getMessage())), __CLASS__ . " " . __FUNCTION__, "ERROR");
+            $this->log(vsprintf("Error on synchronization client ID %s with msg: %s", array(\Input::get("id"), $exc->getMessage())), __CLASS__ . " " . __FUNCTION__, "ERROR");
         }
     }
 
@@ -2470,16 +2471,16 @@ class SyncCtoModuleClient extends BackendModule
 
                 case 2:
                     // Check user
-                    if ($this->User->isAdmin || $this->User->syncCto_tables != null)
+                    if (\BackendUser::getInstance()->isAdmin || \BackendUser::getInstance()->syncCto_tables != null)
                     {
                         // Load allowed tables for this user
-                        if ($this->User->isAdmin)
+                        if (\BackendUser::getInstance()->isAdmin)
                         {
                             $arrAllowedTables = true;
                         }
                         else
                         {
-                            $arrAllowedTables = $this->User->syncCto_tables;
+                            $arrAllowedTables = \BackendUser::getInstance()->syncCto_tables;
                         }
 
                         $arrClientTableR    = $this->objSyncCtoCommunicationClient->getRecommendedTables();
@@ -2748,8 +2749,21 @@ class SyncCtoModuleClient extends BackendModule
                     {
                         foreach ($GLOBALS['TL_HOOKS']['syncDBUpdateBeforeDrop'] as $callback)
                         {
-                            $this->import($callback[0]);
-                            $mixReturn = $this->$callback[0]->$callback[1]($this->intClientID, $this->arrSyncSettings['syncCto_SyncTables'], $arrSQL);
+                            if(!class_exists($callback[0]))
+                            {
+                                continue;
+                            }
+
+                            if(method_exists($callback[0], 'getInstance'))
+                            {
+                                $objCallbackClass = $callback[0]::getInstance();
+                            }
+                            else
+                            {
+                                $objCallbackClass = new $callback[0]();
+                            }
+
+                            $mixReturn = $objCallbackClass->$callback[1]($this->intClientID, $this->arrSyncSettings['syncCto_SyncTables'], $arrSQL);
 
                             if (!empty($mixReturn) && is_array($mixReturn))
                             {
@@ -2772,7 +2786,7 @@ class SyncCtoModuleClient extends BackendModule
 
                     if (count($this->arrSyncSettings['syncCto_SyncDeleteTables']) != 0)
                     {
-                        $arrKnownTables = $this->Database->listTables();
+                        $arrKnownTables = \Database::getInstance()->listTables();
 
                         foreach ($this->arrSyncSettings['syncCto_SyncDeleteTables'] as $key => $value)
                         {
@@ -2802,8 +2816,21 @@ class SyncCtoModuleClient extends BackendModule
 
                         foreach ($GLOBALS['TL_HOOKS']['syncDBUpdate'] as $callback)
                         {
-                            $this->import($callback[0]);
-                            $mixReturn = $this->$callback[0]->$callback[1]($this->intClientID, $arrSQL);
+                            if(!class_exists($callback[0]))
+                            {
+                                continue;
+                            }
+
+                            if(method_exists($callback[0], 'getInstance'))
+                            {
+                                $objCallbackClass = $callback[0]::getInstance();
+                            }
+                            else
+                            {
+                                $objCallbackClass = new $callback[0]();
+                            }
+
+                            $mixReturn = $objCallbackClass->$callback[1]($this->intClientID, $arrSQL);
 
                             if (!empty($mixReturn) && is_array($mixReturn))
                             {
@@ -2833,7 +2860,7 @@ class SyncCtoModuleClient extends BackendModule
                     foreach ($arrTableTimestamp AS $location => $arrTimeStamps)
                     {
                         // Update timestamp
-                        $mixLastTableTimestamp = $this->Database
+                        $mixLastTableTimestamp = \Database::getInstance()
                             ->prepare("SELECT " . $location . "_timestamp FROM tl_synccto_clients WHERE id=?")
                             ->limit(1)
                             ->execute($this->intClientID)
@@ -2854,7 +2881,7 @@ class SyncCtoModuleClient extends BackendModule
                         }
 
                         // Search for old entries
-                        $arrTables = $this->Database->listTables();
+                        $arrTables = \Database::getInstance()->listTables();
                         foreach ($arrLastTableTimestamp as $key => $value)
                         {
                             if (!in_array($key, $arrTables))
@@ -2863,7 +2890,7 @@ class SyncCtoModuleClient extends BackendModule
                             }
                         }
 
-                        $this->Database
+                        \Database::getInstance()
                             ->prepare("UPDATE tl_synccto_clients SET " . $location . "_timestamp = ? WHERE id = ? ")
                             ->execute(serialize($arrLastTableTimestamp), $this->intClientID);
                     }
@@ -2893,7 +2920,7 @@ class SyncCtoModuleClient extends BackendModule
             $this->booRefresh = true;
             $this->intStep++;
 
-            $this->log(vsprintf("Error on synchronization client ID %s with msg: %s", array($this->Input->get("id"), $exc->getMessage())), __CLASS__ . " " . __FUNCTION__, "ERROR");
+            $this->log(vsprintf("Error on synchronization client ID %s with msg: %s", array(\Input::get("id"), $exc->getMessage())), __CLASS__ . " " . __FUNCTION__, "ERROR");
         }
     }
 
@@ -3147,7 +3174,7 @@ class SyncCtoModuleClient extends BackendModule
                         $this->objSyncCtoCommunicationClient->setAttentionFlag(false);
                     }
 
-                    $this->log(vsprintf("Successfully finishing of synchronization client ID %s.", array($this->Input->get("id"))), __CLASS__ . " " . __FUNCTION__, "INFO");
+                    $this->log(vsprintf("Successfully finishing of synchronization client ID %s.", array(\Input::get("id"))), __CLASS__ . " " . __FUNCTION__, "INFO");
 
                 /**
                  * Cleanup
@@ -3166,13 +3193,20 @@ class SyncCtoModuleClient extends BackendModule
                     $this->intStep++;
 
                     break;
+
+                default:
+                    $this->objData->setState(SyncCtoEnum::WORK_OK);
+                    $this->objData->setHtml("");
+                    $this->booRefresh = true;
+                    $this->intStep++;
+                    break;
             }
         }
         catch (Exception $exc)
         {
             $this->objStepPool->step++;
 
-            $this->log(vsprintf("Error on synchronization client ID %s with msg: %s", array($this->Input->get("id"), $exc->getMessage())), __CLASS__ . " " . __FUNCTION__, "ERROR");
+            $this->log(vsprintf("Error on synchronization client ID %s with msg: %s", array(\Input::get("id"), $exc->getMessage())), __CLASS__ . " " . __FUNCTION__, "ERROR");
         }
     }
 
@@ -3249,8 +3283,16 @@ class SyncCtoModuleClient extends BackendModule
 
                         try
                         {
-                            $this->import($arrCurrentFunction[0]);
-                            $this->$arrCurrentFunction[0]->$arrCurrentFunction[1]($this, $this->intClientID);
+                            if(method_exists($arrCurrentFunction[0], 'getInstance'))
+                            {
+                                $objCallbackClass = $arrCurrentFunction[0]::getInstance();
+                            }
+                            else
+                            {
+                                $objCallbackClass = new $arrCurrentFunction[0]();
+                            }
+
+                            $objCallbackClass->$arrCurrentFunction[1]($this, $this->intClientID);
                         }
                         catch (Exception $exc)
                         {
@@ -3336,7 +3378,7 @@ class SyncCtoModuleClient extends BackendModule
 
                         // Set finished msg
                         // Set success information 
-                        $arrClientLink = $this->Database
+                        $arrClientLink = \Database::getInstance()
                             ->prepare("SELECT * FROM tl_synccto_clients WHERE id=?")
                             ->limit(1)
                             ->execute($this->intClientID)
@@ -3592,7 +3634,7 @@ class SyncCtoModuleClient extends BackendModule
                     $this->objData->setHtml($compare);
 
                     // Set finished msg
-                    $arrClientLink = $this->Database
+                    $arrClientLink = \Database::getInstance()
                         ->prepare("SELECT * FROM tl_synccto_clients WHERE id=?")
                         ->limit(1)
                         ->execute($this->intClientID)
@@ -3612,7 +3654,7 @@ class SyncCtoModuleClient extends BackendModule
         {
             $this->objStepPool->step++;
 
-            $this->log(vsprintf("Error on synchronization client ID %s with msg: %s", array($this->Input->get("id"), $exc->getMessage())), __CLASS__ . " " . __FUNCTION__, "ERROR");
+            $this->log(vsprintf("Error on synchronization client ID %s with msg: %s", array(\Input::get("id"), $exc->getMessage())), __CLASS__ . " " . __FUNCTION__, "ERROR");
         }
     }
 
@@ -3963,7 +4005,7 @@ class SyncCtoModuleClient extends BackendModule
             $this->booRefresh = true;
             $this->intStep++;
 
-            $this->log(vsprintf("Error on synchronization client ID %s with msg: %s", array($this->Input->get("id"), $exc->getMessage())), __CLASS__ . " " . __FUNCTION__, "ERROR");
+            $this->log(vsprintf("Error on synchronization client ID %s with msg: %s", array(\Input::get("id"), $exc->getMessage())), __CLASS__ . " " . __FUNCTION__, "ERROR");
         }
     }
 
@@ -4378,7 +4420,7 @@ class SyncCtoModuleClient extends BackendModule
             $this->booRefresh = true;
             $this->intStep++;
 
-            $this->log(vsprintf("Error on synchronization client ID %s with msg: %s", array($this->Input->get("id"), $exc->getMessage())), __CLASS__ . " " . __FUNCTION__, "ERROR");
+            $this->log(vsprintf("Error on synchronization client ID %s with msg: %s", array(\Input::get("id"), $exc->getMessage())), __CLASS__ . " " . __FUNCTION__, "ERROR");
         }
     }
 
@@ -4427,16 +4469,16 @@ class SyncCtoModuleClient extends BackendModule
 
                 case 2:
                     // Check user
-                    if ($this->User->isAdmin || $this->User->syncCto_tables != null)
+                    if (\BackendUser::getInstance()->isAdmin || \BackendUser::getInstance()->syncCto_tables != null)
                     {
                         // Load allowed tables for this user
-                        if ($this->User->isAdmin)
+                        if (\BackendUser::getInstance()->isAdmin)
                         {
                             $arrAllowedTables = true;
                         }
                         else
                         {
-                            $arrAllowedTables = $this->User->syncCto_tables;
+                            $arrAllowedTables = \BackendUser::getInstance()->syncCto_tables;
                         }
 
                         $arrClientTableR    = $this->objSyncCtoCommunicationClient->getRecommendedTables();
@@ -4677,8 +4719,21 @@ class SyncCtoModuleClient extends BackendModule
                     {
                         foreach ($GLOBALS['TL_HOOKS']['syncDBUpdateBeforeDrop'] as $callback)
                         {
-                            $this->import($callback[0]);
-                            $mixReturn = $this->$callback[0]->$callback[1]($this->intClientID, $this->arrSyncSettings['syncCto_SyncTables'], $arrSQL);
+                            if(!class_exists($callback[0]))
+                            {
+                                continue;
+                            }
+
+                            if(method_exists($callback[0], 'getInstance'))
+                            {
+                                $objCallbackClass = $callback[0]::getInstance();
+                            }
+                            else
+                            {
+                                $objCallbackClass = new $callback[0]();
+                            }
+
+                            $mixReturn = $objCallbackClass->$callback[1]($this->intClientID, $this->arrSyncSettings['syncCto_SyncTables'], $arrSQL);
 
                             if (!empty($mixReturn) && is_array($mixReturn))
                             {
@@ -4707,7 +4762,7 @@ class SyncCtoModuleClient extends BackendModule
                     foreach ($arrTableTimestamp AS $location => $arrTimeStamps)
                     {
                         // Update Timestamp
-                        $mixLastTableTimestamp = $this->Database
+                        $mixLastTableTimestamp = \Database::getInstance()
                             ->prepare("SELECT " . $location . "_timestamp FROM tl_synccto_clients WHERE id=?")
                             ->limit(1)
                             ->executeUncached($this->intClientID)
@@ -4728,7 +4783,7 @@ class SyncCtoModuleClient extends BackendModule
                         }
 
                         // Search for old entries
-                        $arrTables = $this->Database->listTables();
+                        $arrTables = \Database::getInstance()->listTables();
                         foreach ($arrLastTableTimestamp as $key => $value)
                         {
                             if (!in_array($key, $arrTables))
@@ -4737,7 +4792,7 @@ class SyncCtoModuleClient extends BackendModule
                             }
                         }
 
-                        $this->Database
+                        \Database::getInstance()
                             ->prepare("UPDATE tl_synccto_clients SET " . $location . "_timestamp = ? WHERE id = ? ")
                             ->execute(serialize($arrLastTableTimestamp), $this->intClientID);
                     }
@@ -4779,7 +4834,7 @@ class SyncCtoModuleClient extends BackendModule
             $this->booRefresh = true;
             $this->intStep++;
 
-            $this->log(vsprintf("Error on synchronization client ID %s with msg: %s", array($this->Input->get("id"), $exc->getMessage())), __CLASS__ . " " . __FUNCTION__, "ERROR");
+            $this->log(vsprintf("Error on synchronization client ID %s with msg: %s", array(\Input::get("id"), $exc->getMessage())), __CLASS__ . " " . __FUNCTION__, "ERROR");
         }
     }
 
@@ -4975,7 +5030,7 @@ class SyncCtoModuleClient extends BackendModule
                         $this->objSyncCtoCommunicationClient->setAttentionFlag(false);
                     }
 
-                    $this->log(vsprintf("Successfully finishing of synchronization client ID %s.", array($this->Input->get("id"))), __CLASS__ . " " . __FUNCTION__, "INFO");
+                    $this->log(vsprintf("Successfully finishing of synchronization client ID %s.", array(\Input::get("id"))), __CLASS__ . " " . __FUNCTION__, "INFO");
 
                     $this->objData->setState(SyncCtoEnum::WORK_OK);
                     $this->objData->setDescription($GLOBALS['TL_LANG']['tl_syncCto_sync']["step_5"]['description_1']);
@@ -4988,7 +5043,7 @@ class SyncCtoModuleClient extends BackendModule
         {
             $this->objStepPool->step++;
 
-            $this->log(vsprintf("Error on synchronization client ID %s with msg: %s", array($this->Input->get("id"), $exc->getMessage())), __CLASS__ . " " . __FUNCTION__, "ERROR");
+            $this->log(vsprintf("Error on synchronization client ID %s with msg: %s", array(\Input::get("id"), $exc->getMessage())), __CLASS__ . " " . __FUNCTION__, "ERROR");
         }
     }
 
@@ -5116,7 +5171,7 @@ class SyncCtoModuleClient extends BackendModule
 
                         // Set finished msg
                         // Set success information
-                        $arrClientLink = $this->Database
+                        $arrClientLink = \Database::getInstance()
                             ->prepare("SELECT * FROM tl_synccto_clients WHERE id=?")
                             ->limit(1)
                             ->execute($this->intClientID)
@@ -5371,7 +5426,7 @@ class SyncCtoModuleClient extends BackendModule
                     $this->objData->setHtml($compare);
 
                     // Set finished msg
-                    $arrClientLink = $this->Database
+                    $arrClientLink = \Database::getInstance()
                         ->prepare("SELECT * FROM tl_synccto_clients WHERE id=?")
                         ->limit(1)
                         ->execute($this->intClientID)
@@ -5391,7 +5446,7 @@ class SyncCtoModuleClient extends BackendModule
         {
             $this->objStepPool->step++;
 
-            $this->log(vsprintf("Error on synchronization client ID %s with msg: %s", array($this->Input->get("id"), $exc->getMessage())), __CLASS__ . " " . __FUNCTION__, "ERROR");
+            $this->log(vsprintf("Error on synchronization client ID %s with msg: %s", array(\Input::get("id"), $exc->getMessage())), __CLASS__ . " " . __FUNCTION__, "ERROR");
         }
     }
 

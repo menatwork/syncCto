@@ -12,7 +12,7 @@
 /**
  * Helper class for syncCto. Callback functions, small global helper functions.
  */
-class SyncCtoHelper extends Backend
+class SyncCtoHelper extends \Backend
 {
     /* -------------------------------------------------------------------------
      * Vars
@@ -41,7 +41,7 @@ class SyncCtoHelper extends Backend
     /**
      * Constructor
      */
-    protected function __construct()
+    public function __construct()
     {
         // Import
         $this->import("BackendUser");
@@ -654,7 +654,7 @@ class SyncCtoHelper extends Backend
             $arrRequiredExtensions = array(
                 'ctoCommunication'  => 'ctoCommunication',
                 'MultiColumnWizard' => 'multicolumnwizard',
-                'DC_General'        => 'generalDriver',
+                'DC_General'        => 'dc-general',
                 'ZipArchiveCto'     => 'ZipArchiveCto'
             );
 
@@ -1380,8 +1380,10 @@ class SyncCtoHelper extends Backend
      * Check if the post of the submited form is empty and set error or unset error
      *
      * @param array $arrCheckSubmit
+     *
+     * @param array $arrData
      */
-    public function checkSubmit($arrCheckSubmit)
+    public function checkSubmit($arrCheckSubmit, $arrData)
     {
         $arrPostUnset = array('FORM_SUBMIT', 'FORM_FIELDS', 'REQUEST_TOKEN', 'FORM_INPUTS', 'postUnset', 'error', 'redirectUrl');
 
@@ -1390,25 +1392,23 @@ class SyncCtoHelper extends Backend
             $arrPostUnset = array_merge($arrPostUnset, $arrCheckSubmit['postUnset']);
         }
 
-        $arrPost = $_POST;
-
         foreach ($arrPostUnset AS $value)
         {
-            if (array_key_exists($value, $arrPost))
+            if (array_key_exists($value, $arrData))
             {
-                unset($arrPost[$value]);
+                unset($arrData[$value]);
             }
         }
 
-        foreach ($arrPost AS $strKey => $value)
+        foreach ($arrData AS $strKey => $value)
         {
             if (empty($value))
             {
-                unset($arrPost[$strKey]);
+                unset($arrData[$strKey]);
             }
         }
 
-        if (count($arrPost) > 0)
+        if (count($arrData) > 0)
         {
             if (is_array($_SESSION["TL_ERROR"]))
             {
@@ -1417,6 +1417,7 @@ class SyncCtoHelper extends Backend
                     unset($_SESSION["TL_ERROR"][$arrCheckSubmit['error']['key']]);
                 }
             }
+
             $this->redirect($arrCheckSubmit['redirectUrl']);
         }
         else
