@@ -38,10 +38,11 @@ class SyncCtoEnum
     /**
      * File Transmission
      */
-    
-    const FILETRANS_SEND    = 1;
-    const FILETRANS_SKIPPED = 2;
-    const FILETRANS_WAITING = 3;
+
+    const FILETRANS_MOVED   = 0; // The file is moved to the destination.
+    const FILETRANS_SEND    = 1; // The file is send to the client.
+    const FILETRANS_SKIPPED = 2; // The file is skipped, because of error or other things.
+    const FILETRANS_WAITING = 3; // The file is waiting.
 
     /**
      * DBAFS state
