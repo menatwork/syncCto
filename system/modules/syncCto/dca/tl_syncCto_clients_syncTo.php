@@ -15,16 +15,7 @@ $GLOBALS['TL_DCA']['tl_syncCto_clients_syncTo'] = array
     'config' => array
     (
         'dataContainer'           => 'General',
-        'closed'                  => true,
-        'disableSubmit'           => false,
-        'onload_callback' => array
-        (
-            array('SyncCtoTableSyncTo', 'onload_callback')
-        ),
-        'onsubmit_callback' => array
-        (
-            array('SyncCtoTableSyncTo', 'onsubmit_callback'),
-        )
+        'disableSubmit'           => false
     ),
     'dca_config'  => array
     (
@@ -32,7 +23,7 @@ $GLOBALS['TL_DCA']['tl_syncCto_clients_syncTo'] = array
         (
             'default' => array
             (
-                'class'           => 'GeneralDataSyncCto',
+                'class'           => 'ContaoCommunityAlliance\DcGeneral\Data\NoOpDataProvider',
                 'source'          => 'tl_syncCto_clients_syncTo'
             ),
         ),
@@ -53,7 +44,7 @@ $GLOBALS['TL_DCA']['tl_syncCto_clients_syncTo'] = array
     (
         'sync_options' => array
         (
-            'label'               => $GLOBALS['TL_LANG']['tl_syncCto_clients_syncTo']['sync_options'],
+            'label'               => &$GLOBALS['TL_LANG']['tl_syncCto_clients_syncTo']['sync_options'],
             'inputType'           => 'checkbox',
             'exclude'             => true,
             'reference'           => &$GLOBALS['TL_LANG']['SYC'],

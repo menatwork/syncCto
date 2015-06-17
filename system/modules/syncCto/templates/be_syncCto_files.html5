@@ -46,6 +46,61 @@
             } ?>
 
         <?php if(count($arrFileList) != 0): ?>
+        <p>
+            Pattern: <input id="selectPattern" type="text" placeholder="<?php echo $GLOBALS['TL_LANG']['MSC']['pattern']; ?>">
+            <button type="button" onclick="selectFiles(document.getElementById('<?php echo $i==1 ? 'normal' : 'big'; ?>filelist'), document.getElementById('selectPattern').value, false);"><?php echo $GLOBALS['TL_LANG']['MSC']['select']; ?></button>
+            <button type="button" onclick="selectFiles(document.getElementById('<?php echo $i==1 ? 'normal' : 'big'; ?>filelist'), document.getElementById('selectPattern').value, true);"><?php echo $GLOBALS['TL_LANG']['MSC']['unselect']; ?></button>
+            <button type="button" onclick="toggleFiles(document.getElementById('<?php echo $i==1 ? 'normal' : 'big'; ?>filelist'));"><?php echo $GLOBALS['TL_LANG']['MSC']['toggle']; ?></button>
+        </p>
+        <script>
+            function selectFiles(table, pattern, inverse)
+            {
+                try {
+                    var regexp = new RegExp(pattern);
+                }   
+                catch(e) {
+                    alert('<?php echo $GLOBALS['TL_LANG']['ERR']['pattern']; ?>');
+                    return false;
+                }
+
+                var checked = false;
+ 
+                for (var i=1; i<table.rows.length; i++)
+                {   
+                    var cells = table.rows[i].cells;
+                    var count = cells.length;
+                    var checkbox = cells[count-2].firstChild;
+                    var filename = cells[count-1].textContent.trim();
+ 
+                    if (regexp.test(filename))
+                        checkbox.checked = !inverse;
+ 
+                    if (checkbox.checked)
+                        checked = true;
+                }   
+ 
+                $$('input[name=delete]').set('disabled', !checked);
+            }   
+ 
+            function toggleFiles(table)
+            {   
+                var checked = false;
+ 
+                for (var i=1; i<table.rows.length; i++)
+                {   
+                    var cells = table.rows[i].cells;
+                    var count = cells.length;
+                    var checkbox = cells[count-2].firstChild;
+ 
+                    checkbox.checked = !checkbox.checked;
+ 
+                    if (checkbox.checked)
+                        checked = true;
+                }   
+ 
+                $$('input[name=delete]').set('disabled', !checked);
+            }   
+        </script>
         <h3><?php echo $GLOBALS['TL_LANG']['MSC'][(($i == 1) ? 'normal' : 'big') . '_files']; ?></h3>
         <table class="comparelist" id="<?php echo ($i == 1) ? 'normal' : 'big'; ?>filelist">
             <colgroup>

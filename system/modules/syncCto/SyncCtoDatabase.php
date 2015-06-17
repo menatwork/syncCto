@@ -12,7 +12,7 @@
 /**
  * Core class for database operation
  */
-class SyncCtoDatabase extends Backend
+class SyncCtoDatabase extends \Backend
 {
     /* -------------------------------------------------------------------------
      * Vars
@@ -107,7 +107,7 @@ class SyncCtoDatabase extends Backend
     /**
      * Constructor
      */
-    protected function __construct()
+    public function __construct()
     {
         parent::__construct();
 

@@ -9,14 +9,22 @@
  * @filesource
  */
 
+use ContaoCommunityAlliance\DcGeneral\Contao\View\Contao2BackendView\Event\GetEditModeButtonsEvent;
+use ContaoCommunityAlliance\DcGeneral\Event\PrePersistModelEvent;
+
 /**
  * Class for syncFrom configurations
  */
-class SyncCtoTableSyncFrom extends Backend
+class SyncCtoTableSyncFrom
 {
 
-    // Helper Classes
+    // Vars
     protected $objSyncCtoHelper;
+
+    /**
+     * Priority for the event.
+     */
+    const PRIORITY = 200;
 
     /**
      * Constructor
@@ -25,24 +33,15 @@ class SyncCtoTableSyncFrom extends Backend
     {
         $this->BackendUser      = BackendUser::getInstance();
         $this->objSyncCtoHelper = SyncCtoHelper::getInstance();
-
-        parent::__construct();
     }
 
     /**
-     * Set new and remove old buttons
-     *
-     * @param DataContainer $dc
+     * @param GetEditModeButtonsEvent $objEvent
      */
-    public function onload_callback(DataContainer $dc)
+    public static function addButton(GetEditModeButtonsEvent $objEvent)
     {
-        if (Input::getInstance()->get('act') == 'start' || get_class($dc) != 'DC_General')
-        {
-            return;
-        }
-
+        // Check the file cache.
         $strInitFilePath = '/system/config/initconfig.php';
-
         if (file_exists(TL_ROOT . $strInitFilePath))
         {
             $strFile        = new File($strInitFilePath);
@@ -61,44 +60,15 @@ class SyncCtoTableSyncFrom extends Backend
             }
         }
 
-        $dc->removeButton('save');
-        $dc->removeButton('saveNclose');
-
-        // Sync normal
-        $arrData = array
-        (
-            'id'              => 'start_sync',
-            'formkey'         => 'start_sync',
-            'class'           => '',
-            'accesskey'       => 'g',
-            'value'           => specialchars($GLOBALS['TL_LANG']['MSC']['sync']),
-            'button_callback' => array('SyncCtoTableSyncFrom', 'onsubmit_callback')
-        );
-
-        $dc->addButton('start_sync', $arrData);
-
-        // SyncAll
-        $arrData = array
-        (
-            'id'              => 'start_sync_all',
-            'formkey'         => 'start_sync_all',
-            'class'           => '',
-            'accesskey'       => 'g',
-            'value'           => specialchars($GLOBALS['TL_LANG']['MSC']['syncAll']),
-            'button_callback' => array('SyncCtoTableSyncFrom', 'onsubmit_callback_all')
-        );
-
-        $dc->addButton('start_sync_all', $arrData);
-
-
         // Update a field with last sync information
-        $objSyncTime = $this->Database->prepare("SELECT cl.syncFrom_tstamp as syncFrom_tstamp, user.name as syncFrom_user, user.username as syncFrom_alias
-                                                   FROM tl_synccto_clients as cl
-                                                   INNER JOIN tl_user as user
-                                                   ON cl.syncTo_user = user.id
-                                                   WHERE cl.id = ?")
+        $objSyncTime = \Database::getInstance()
+            ->prepare("SELECT cl.syncFrom_tstamp as syncFrom_tstamp, user.name as syncFrom_user, user.username as syncFrom_alias
+                         FROM tl_synccto_clients as cl
+                         INNER JOIN tl_user as user
+                         ON cl.syncTo_user = user.id
+                         WHERE cl.id = ?")
             ->limit(1)
-            ->execute($this->Input->get("id"));
+            ->execute(\Input::get("id"));
 
         if ($objSyncTime->syncFrom_tstamp != 0 && strlen($objSyncTime->syncFrom_user) != 0 && strlen($objSyncTime->syncFrom_alias) != 0)
         {
@@ -112,34 +82,76 @@ class SyncCtoTableSyncFrom extends Backend
             // Set data
             \Message::addInfo($strLastSync);
         }
+
+        // Set buttons.
+        $objEvent->setButtons(array
+            (
+                'start_sync'     => '<input type="submit" name="start_sync" id="start_sync" class="tl_submit" accesskey="s" value="' . specialchars($GLOBALS['TL_LANG']['MSC']['sync']) . '" />',
+                'start_sync_all' => '<input type="submit" name="start_sync_all" id="start_sync_all" class="tl_submit" accesskey="o" value="' . specialchars($GLOBALS['TL_LANG']['MSC']['syncAll']) . '" />'
+            )
+        );
     }
 
     /**
-     * Handle syncFrom configurations
+     * Function for exporting languages
      *
-     * @param DataContainer $dc
+     * @param PrePersistModelEvent $objEvent
+     *
+     * @throws RuntimeException If the submit type is unknown.
+     */
+    public function submit(PrePersistModelEvent $objEvent)
+    {
+        // Get the data from the DC.
+        $arrData = $objEvent->getModel()->getPropertiesAsArray();
+        foreach($arrData as $strKey => $mixData)
+        {
+            if(empty($mixData))
+            {
+                unset($arrData[$strKey]);
+            }
+        }
+
+        if (isset($_POST['start_sync']))
+        {
+            $this->runSync($arrData);
+        }
+        elseif (isset($_POST['start_sync_all']))
+        {
+            $this->runSyncAll($arrData);
+        }
+        else
+        {
+            throw new \RuntimeException('Unknown submit.');
+        }
+    }
+
+    /**
+     * Handle syncTo configurations
+     *
+     * @param array $arrData
      *
      * @return array
      */
-    public function onsubmit_callback(DataContainer $dc)
+    protected function runSync($arrData)
     {
-        $strWidgetID     = $dc->getWidgetID();
         $arrSyncSettings = array();
+		$arrSyncSettings["post_data"] = $arrData;
 
         // Automode off.
         $arrSyncSettings["automode"] = false;
 
-        // Synchronization type
-        if (is_array($this->Input->post("sync_options_" . $strWidgetID)) && count($this->Input->post("sync_options_" . $strWidgetID)) != 0)
+        // Synchronization type.
+        if (isset($arrData['sync_options']))
         {
-            $arrSyncSettings["syncCto_Type"] = $this->Input->post('sync_options_' . $strWidgetID);
+            $arrSyncSettings["syncCto_Type"] = $arrData['sync_options'];
         }
         else
         {
             $arrSyncSettings["syncCto_Type"] = array();
         }
 
-        if ($this->Input->post("database_check_" . $strWidgetID) == 1)
+        // Database.
+        if (isset($arrData['database_check']))
         {
             $arrSyncSettings["syncCto_SyncDatabase"] = true;
         }
@@ -148,25 +160,18 @@ class SyncCtoTableSyncFrom extends Backend
             $arrSyncSettings["syncCto_SyncDatabase"] = false;
         }
 
-        // Systemoperation execute
-        if ($this->Input->post("systemoperations_check_" . $strWidgetID) == 1)
+        // Systemoperation execute.
+        if (isset($arrData['systemoperations_check']) && isset($arrData['systemoperations_maintenance']))
         {
-            if (is_array($this->Input->post("systemoperations_maintenance_" . $strWidgetID)) && count($this->Input->post("systemoperations_maintenance_" . $strWidgetID)) != 0)
-            {
-                $arrSyncSettings["syncCto_Systemoperations_Maintenance"] = $this->Input->post("systemoperations_maintenance_" . $strWidgetID);
-            }
-            else
-            {
-                $arrSyncSettings["syncCto_Systemoperations_Maintenance"] = array();
-            }
+            $arrSyncSettings["syncCto_Systemoperations_Maintenance"] = $arrData['systemoperations_maintenance'];
         }
         else
         {
             $arrSyncSettings["syncCto_Systemoperations_Maintenance"] = array();
         }
 
-        // Attention flag
-        if ($this->Input->post("attentionFlag_" . $strWidgetID) == 1)
+        // Attention flag.
+        if (isset($arrData['attentionFlag']))
         {
             $arrSyncSettings["syncCto_AttentionFlag"] = true;
         }
@@ -175,35 +180,41 @@ class SyncCtoTableSyncFrom extends Backend
             $arrSyncSettings["syncCto_AttentionFlag"] = false;
         }
 
-        // Write all data
-        foreach ($_POST as $key => $value)
+        // Error msg.
+        if (isset($arrData['localconfig_error']))
         {
-            $strClearKey                                = str_replace("_" . $strWidgetID, "", $key);
-            $arrSyncSettings["post_data"][$strClearKey] = $this->Input->post($key);
+            $arrSyncSettings["syncCto_ShowError"] = true;
+        }
+        else
+        {
+            $arrSyncSettings["syncCto_ShowError"] = false;
         }
 
-        $this->Session->set("syncCto_SyncSettings_" . $dc->id, $arrSyncSettings);
+        // Save Session.
+        \Session::getInstance()->set("syncCto_SyncSettings_" . \Input::get('cid'), $arrSyncSettings);
 
+        // Check the vars.
         $this->objSyncCtoHelper->checkSubmit(array(
-            'postUnset'   => array('start_sync'),
-            'error'       => array(
-                'key'     => 'syncCto_submit_false',
-                'message' => $GLOBALS['TL_LANG']['ERR']['missing_tables']
+                'postUnset'   => array('start_sync'),
+                'error'       => array(
+                    'key'     => 'syncCto_submit_false',
+                    'message' => $GLOBALS['TL_LANG']['ERR']['no_functions']
+                ),
+                'redirectUrl' => \Environment::get('base') . "contao/main.php?do=synccto_clients&amp;table=tl_syncCto_clients_syncFrom&amp;act=start&amp;step=0&amp;id=" . \Input::get("cid")
             ),
-            'redirectUrl' => $this->Environment->base . "contao/main.php?do=synccto_clients&amp;table=tl_syncCto_clients_syncFrom&amp;act=start&amp;step=0&amp;id=" . $this->Input->get("id")
-        ));
+            $arrSyncSettings
+        );
     }
 
     /**
      * Handle syncTo configurations.
      *
-     * @param DataContainer $dc
+     * @param array $arrData
      *
      * @return array
      */
-    public function onsubmit_callback_all(DataContainer $dc)
+    protected function runSyncAll($arrData)
     {
-        $strWidgetID     = $dc->getWidgetID();
         $arrSyncSettings = array();
 
         // Set array.
@@ -220,24 +231,19 @@ class SyncCtoTableSyncFrom extends Backend
         $arrSyncSettings["syncCto_AttentionFlag"]                = false;
         $arrSyncSettings["syncCto_ShowError"]                    = false;
 
-        // Write all data
-        foreach ($_POST as $key => $value)
-        {
-            $strClearKey                                = str_replace("_" . $strWidgetID, "", $key);
-            $arrSyncSettings["post_data"][$strClearKey] = $this->Input->post($key);
-        }
-
         // Save Session
-        $this->Session->set("syncCto_SyncSettings_" . $dc->id, $arrSyncSettings);
+        \Session::getInstance()->set("syncCto_SyncSettings_" . \Input::get('cid'), $arrSyncSettings);
 
         $this->objSyncCtoHelper->checkSubmit(array(
-            'postUnset'   => array('start_sync'),
-            'error'       => array(
-                'key'     => 'syncCto_submit_false',
-                'message' => $GLOBALS['TL_LANG']['ERR']['missing_tables']
+                'postUnset'   => array('start_sync'),
+                'error'       => array(
+                    'key'     => 'syncCto_submit_false',
+                    'message' => $GLOBALS['TL_LANG']['ERR']['missing_tables']
+                ),
+                'redirectUrl' => \Environment::get('base') . "contao/main.php?do=synccto_clients&amp;table=tl_syncCto_clients_syncFrom&amp;act=start&amp;step=0&amp;id=" . \Input::get("cid")
             ),
-            'redirectUrl' => $this->Environment->base . "contao/main.php?do=synccto_clients&amp;table=tl_syncCto_clients_syncFrom&amp;act=start&amp;step=0&amp;id=" . $this->Input->get("id")
-        ));
+            $arrSyncSettings
+        );
     }
 
 }
