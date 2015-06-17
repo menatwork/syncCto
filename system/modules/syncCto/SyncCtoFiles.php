@@ -1819,6 +1819,7 @@ class SyncCtoFiles extends \Backend
                 if ($blnMovedFile)
                 {
                     $arrFileList[$key]['saved'] = true;
+                    $arrFileList[ $key ]['transmission'] = SyncCtoEnum::FILETRANS_MOVED;
                 }
                 else
                 {

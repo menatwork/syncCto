@@ -3339,6 +3339,7 @@ class SyncCtoModuleClient extends \BackendModule
                                 switch ($value["transmission"])
                                 {
                                     case SyncCtoEnum::FILETRANS_SEND:
+                                    case SyncCtoEnum::FILETRANS_MOVED:
                                         $intSendCount++;
                                         break;
 
@@ -3513,7 +3514,7 @@ class SyncCtoModuleClient extends \BackendModule
                                 {
                                     foreach ($arrLists as $key => $value)
                                     {
-                                        if ($value["transmission"] != SyncCtoEnum::FILETRANS_SEND)
+                                        if ($value["transmission"] != SyncCtoEnum::FILETRANS_SEND && $value["transmission"] != SyncCtoEnum::FILETRANS_MOVED)
                                         {
                                             continue;
                                         }
@@ -3576,7 +3577,7 @@ class SyncCtoModuleClient extends \BackendModule
                                 {
                                     foreach ($arrLists as $key => $value)
                                     {
-                                        if ($value["transmission"] != SyncCtoEnum::FILETRANS_SEND)
+                                        if ($value["transmission"] != SyncCtoEnum::FILETRANS_SEND && $value["transmission"] != SyncCtoEnum::FILETRANS_MOVED)
                                         {
                                             continue;
                                         }
