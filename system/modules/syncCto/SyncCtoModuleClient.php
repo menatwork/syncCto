@@ -713,7 +713,7 @@ class SyncCtoModuleClient extends \BackendModule
 
     protected function checkSyncFileList()
     {
-        if (!key_exists("syncCto_Type", $this->arrSyncSettings) || count($this->arrSyncSettings["syncCto_Type"]) == 0)
+        if (!array_key_exists("syncCto_Type", $this->arrSyncSettings) || count($this->arrSyncSettings["syncCto_Type"]) == 0)
         {
             return false;
         }
@@ -736,7 +736,7 @@ class SyncCtoModuleClient extends \BackendModule
 
     protected function checkSyncDatabase()
     {
-        if (!key_exists('syncCto_SyncDatabase', $this->arrSyncSettings))
+        if (!array_key_exists('syncCto_SyncDatabase', $this->arrSyncSettings))
         {
             return false;
         }
