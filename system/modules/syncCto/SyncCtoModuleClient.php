@@ -18,7 +18,7 @@ class SyncCtoModuleClient extends \BackendModule
      * Variablen
      */
 
-    // Vars     
+    // Vars
     protected $strTemplate = 'be_syncCto_steps';
     protected $objTemplateContent;
     protected $intClientID;
@@ -61,7 +61,7 @@ class SyncCtoModuleClient extends \BackendModule
     protected $objStepPool;
 
     /* -------------------------------------------------------------------------
-     * Getter / Setter 
+     * Getter / Setter
      */
 
     /**
@@ -252,7 +252,7 @@ class SyncCtoModuleClient extends \BackendModule
         $this->objSyncCtoCommunicationClient = SyncCtoCommunicationClient::getInstance();
         $this->objSyncCtoHelper              = SyncCtoHelper::getInstance();
 
-        // Load language 
+        // Load language
         $this->loadLanguageFile("tl_syncCto_steps");
         $this->loadLanguageFile("tl_syncCto_check");
 
@@ -465,7 +465,7 @@ class SyncCtoModuleClient extends \BackendModule
             }
         }
 
-        // Save all to session 
+        // Save all to session
         $this->saveStepPoolAll();
     }
 
@@ -912,7 +912,7 @@ class SyncCtoModuleClient extends \BackendModule
                 $this->saveTempLists();
                 break;
 
-            // File send 
+            // File send
             case 3:
                 $this->loadTempLists();
                 $this->pageSyncToShowStep3();
@@ -1112,7 +1112,7 @@ class SyncCtoModuleClient extends \BackendModule
                 $this->saveTempLists();
                 break;
 
-            // File send 
+            // File send
             case 3:
                 $this->loadTempLists();
                 $this->pageSyncFromShowStep3();
@@ -1456,7 +1456,7 @@ class SyncCtoModuleClient extends \BackendModule
                     $intClientPostLimit   = static::parseSize($arrClientParameter['post_max_size']);
                     $intLocalMemoryLimit  = static::parseSize(ini_get('memory_limit'));
 
-                    // Check if memory limit on server and client is enough for upload  
+                    // Check if memory limit on server and client is enough for upload
                     $intLimit = min($intClientUploadLimit, $intClientMemoryLimit, $intClientPostLimit, $intLocalMemoryLimit);
 
                     // Limit
@@ -1532,7 +1532,7 @@ class SyncCtoModuleClient extends \BackendModule
 
                     break;
 
-                // Import files    
+                // Import files
                 case 9:
                     $arrFiles = array(
                         "system/modules/syncCtoUpdater/SyncCtoAutoUpdater.php",
@@ -1614,7 +1614,7 @@ class SyncCtoModuleClient extends \BackendModule
             }
             catch (Exception $exc)
             {
-                // Nothing to do 
+                // Nothing to do
             }
 
             try
@@ -1623,7 +1623,7 @@ class SyncCtoModuleClient extends \BackendModule
             }
             catch (Exception $exc)
             {
-                // Nothing to do 
+                // Nothing to do
             }
 
             // Set stats
@@ -1632,11 +1632,11 @@ class SyncCtoModuleClient extends \BackendModule
             // Set stepe
             $this->intStep = 99;
 
-            // Set last to skipped        
+            // Set last to skipped
             $this->objData->setState(SyncCtoEnum::WORK_SKIPPED);
             $this->objData->setHtml("");
 
-            // Set Abort information 
+            // Set Abort information
             $this->objData->setStep(99);
             $this->objData->setTitle($GLOBALS['TL_LANG']['MSC']['abort']);
             $this->objData->setDescription($GLOBALS['TL_LANG']['tl_syncCto_sync']['abort']);
@@ -1985,7 +1985,7 @@ class SyncCtoModuleClient extends \BackendModule
                     $objTemp->forwardValue   = $GLOBALS['TL_LANG']['MSC']['apply'];
                     $objTemp->popupClassName = 'SyncCtoPopupFiles.php';
 
-                    // Build content 
+                    // Build content
                     $this->objData->setDescription(vsprintf($GLOBALS['TL_LANG']['tl_syncCto_sync']["step_2"]['description_4'], array($intCountMissing, $intCountNeed, $intCountDelete, $intCountIgnored, $this->getReadableSize($intTotalSizeNew), $this->getReadableSize($intTotalSizeChange), $this->getReadableSize($intTotalSizeDel))));
                     $this->objData->setHtml($objTemp->parse());
                     $this->booRefresh = false;
@@ -2075,7 +2075,7 @@ class SyncCtoModuleClient extends \BackendModule
 
         try
         {
-            // Timer 
+            // Timer
             $intStart = time();
 
             switch ($this->objStepPool->step)
@@ -2695,7 +2695,7 @@ class SyncCtoModuleClient extends \BackendModule
                     $objTemp->forwardValue   = $GLOBALS['TL_LANG']['MSC']['apply'];
                     $objTemp->popupClassName = 'SyncCtoPopupDB.php';
 
-                    // Build content 
+                    // Build content
                     $this->objData->setDescription($GLOBALS['TL_LANG']['tl_syncCto_sync']['step_4']['description_1']);
                     $this->objData->setHtml($objTemp->parse());
                     $this->booRefresh = false;
@@ -2772,7 +2772,7 @@ class SyncCtoModuleClient extends \BackendModule
                         }
                     }
 
-                    // Import SQL zip 
+                    // Import SQL zip
                     $this->objSyncCtoCommunicationClient->runSQLImport($this->objSyncCtoHelper->standardizePath($this->arrClientInformation["folders"]["tmp"], "sql", $this->objStepPool->zipname), $arrSQL);
 
                     $this->objStepPool->step++;
@@ -3455,7 +3455,7 @@ class SyncCtoModuleClient extends \BackendModule
                         $this->booFinished = true;
 
                         // Set finished msg
-                        // Set success information 
+                        // Set success information
                         $arrClientLink = \Database::getInstance()
                             ->prepare("SELECT * FROM tl_synccto_clients WHERE id=?")
                             ->limit(1)
@@ -4061,7 +4061,7 @@ class SyncCtoModuleClient extends \BackendModule
                     $objTemp->forwardValue   = $GLOBALS['TL_LANG']['MSC']['apply'];
                     $objTemp->popupClassName = 'SyncCtoPopupFiles.php';
 
-                    // Build content 
+                    // Build content
                     $this->objData->setDescription(vsprintf($GLOBALS['TL_LANG']['tl_syncCto_sync']["step_2"]['description_4'], array($intCountMissing, $intCountNeed, $intCountDelete, $intCountIgnored, $this->getReadableSize($intTotalSizeNew), $this->getReadableSize($intTotalSizeChange), $this->getReadableSize($intTotalSizeDel))));
                     $this->objData->setHtml($objTemp->parse());
                     $this->booRefresh = false;
@@ -4146,7 +4146,7 @@ class SyncCtoModuleClient extends \BackendModule
 
         try
         {
-            // Timer 
+            // Timer
             $intStart = time();
 
             switch ($this->objStepPool->step)
@@ -4742,7 +4742,7 @@ class SyncCtoModuleClient extends \BackendModule
                     $objTemp->forwardValue   = $GLOBALS['TL_LANG']['MSC']['apply'];
                     $objTemp->popupClassName = 'SyncCtoPopupDB.php';
 
-                    // Build content 
+                    // Build content
                     $this->objData->setDescription($GLOBALS['TL_LANG']['tl_syncCto_sync']['step_4']['description_1']);
                     $this->objData->setHtml($objTemp->parse());
                     $this->booRefresh = false;
