@@ -2943,6 +2943,9 @@ class SyncCtoModuleClient extends \BackendModule
         $this->strError = "";
         $this->objData->setState(SyncCtoEnum::WORK_WORK);
 
+        // Get the file list.
+        $fileList  = new \SyncCto\Sync\FileList\Base($this->arrListCompare);
+
         /* ---------------------------------------------------------------------
          * Run page
          */
@@ -2967,149 +2970,124 @@ class SyncCtoModuleClient extends \BackendModule
                     break;
 
                 /**
-                 * Delete files
+                 * Import files
                  */
                 case 3:
-                    if (is_array($this->arrListCompare) && (count($this->arrListCompare['core']) != 0 || count($this->arrListCompare['files']) != 0))
-                    {
-                        $arrDelete = array();
+                    // Reset the msg.
+                    $this->objData->setDescription($GLOBALS['TL_LANG']['tl_syncCto_sync']["step_5"]['description_2']);
+                    $this->setErrorMsg('');
 
-                        // Get the list for the deletion.
-                        foreach($this->arrListCompare as $strType => $arrLists)
+                    try
+                    {
+                        // Get the file list.
+                        $itCore    = $fileList->getTransferCore(true, false);
+                        $itPrivate = $fileList->getTransferPrivate(true, false);
+                        $itDbafs   = $fileList->getDbafs(true, false);
+                        $itOverall = $fileList->getTransferFiles(true, true);
+
+                        // Count some values.
+                        $waitingFiles = iterator_count($itCore) + iterator_count($itPrivate) + iterator_count($itDbafs);
+                        $overallFiles = iterator_count($itOverall);
+
+                        // Add the status.
+                        $this->objData->setDescription
+                        (
+                            sprintf
+                            (
+                                $GLOBALS['TL_LANG']['tl_syncCto_sync']["step_3"]['description_2'],
+                                ($overallFiles - $waitingFiles),
+                                $overallFiles
+                            )
+                        );
+
+                        // Check if we have some files.
+                        if ($waitingFiles == 0)
                         {
-                            foreach ($arrLists as $key => $value)
-                            {
-                                if ($value["state"] == SyncCtoEnum::FILESTATE_DELETE || $value["state"] == SyncCtoEnum::FILESTATE_FOLDER_DELETE)
-                                {
-                                    $arrDelete[$strType][$key] = $value;
-                                }
-                            }
+                            $this->objData->setHtml('');
+                            $this->objStepPool->step++;
+                            break;
                         }
 
-                        // Send the list for deleting the core files.
-                        if (is_array($arrDelete['core']) && count($arrDelete['core']) > 0)
+                        // Check for endless run.
+                        if($waitingFiles == $this->arrSyncSettings['last_transfer'])
                         {
-                            $arrTransmission = $this->objSyncCtoCommunicationClient->deleteFiles($arrDelete['core'], false);
+                            $this->objData->setHtml('');
+                            $this->objData->setDescription($GLOBALS['TL_LANG']['tl_syncCto_sync']["step_5"]['description_1']);
+                            $this->setError(true);
+                            $this->setErrorMsg('Error on moving files. Some files could not be moved.');
+                            break;
+                        }
+
+                        // Add the current count to the config.
+                        $this->arrSyncSettings['last_transfer'] = $waitingFiles;
+
+                        // Run core if we have files.
+                        if (iterator_count($itCore) != 0)
+                        {
+                            $arrTransmission = $this
+                                ->objSyncCtoCommunicationClient
+                                ->runFileImport(iterator_to_array($itCore), false);
+
                             foreach ($arrTransmission as $key => $value)
                             {
                                 $this->arrListCompare['core'][$key] = $value;
                             }
                         }
-
-                        // Send the list for deleting the core files.
-                        if (is_array($arrDelete['files']) && count($arrDelete['files']) > 0)
+                        // Run private if we have files.
+                        else if (iterator_count($itPrivate) != 0)
                         {
-                            $arrTransmission = $this->objSyncCtoCommunicationClient->deleteFiles($arrDelete['files'], true);
-                            foreach ($arrTransmission as $key => $value)
+                            // Get only 100 files.
+                            $itSupSet = new LimitIterator($itPrivate, 0, 100);
+                            $itSupSet = iterator_to_array($itSupSet);
+
+                            // Get the dbafs information.
+                            foreach ($itSupSet as $key => $value)
                             {
-                                $this->arrListCompare['files'][$key] = $value;
-                            }
-                        }
-                    }
-
-                    $this->objData->setDescription($GLOBALS['TL_LANG']['tl_syncCto_sync']["step_5"]['description_1']);
-                    $this->objStepPool->step++;
-                    break;
-
-                /**
-                 * Import Files
-                 */
-                case 4:
-                    if (is_array($this->arrListCompare) && (count($this->arrListCompare['core']) != 0 || count($this->arrListCompare['files']) != 0))
-                    {
-                        $arrImport = array();
-
-                        // For core file do it like all the time SIMPEL ....
-                        foreach ($this->arrListCompare['core'] as $key => $value)
-                        {
-                            // Skip some values.
-                            if(in_array($value["state"], array( SyncCtoEnum::FILESTATE_DELETE, SyncCtoEnum::FILESTATE_FOLDER_DELETE, SyncCtoEnum::FILESTATE_TOO_BIG_DELETE)))
-                            {
-                                continue;
-                            }
-
-                            // Only add valid ones.
-                            if ($value["transmission"] == SyncCtoEnum::FILETRANS_SEND)
-                            {
-                                $arrImport['core'][$key] = $value;
-                            }
-                        }
-
-                        // ...and now the support for the uuid und dbafs system
-                        foreach ($this->arrListCompare['files'] as $key => $value)
-                        {
-                            // Skip some values.
-                            if(in_array($value["state"], array(SyncCtoEnum::FILESTATE_DELETE, SyncCtoEnum::FILESTATE_FOLDER_DELETE, SyncCtoEnum::FILESTATE_TOO_BIG_DELETE, SyncCtoEnum::FILESTATE_DBAFS_CONFLICT)))
-                            {
-                                continue;
-                            }
-
-                            // Only add valid ones.
-                            if ($value["transmission"] == SyncCtoEnum::FILETRANS_SEND)
-                            {
-                                // Add the file to the import array.
-                                $arrImport['files'][$key] = $value;
-
                                 // Get the information from the tl_files.
                                 $objModel = \FilesModel::findByPath($value['path']);
 
                                 // Okay we have the file ...
-                                if($objModel != null)
+                                if ($objModel != null)
                                 {
-                                    $arrModelData = $objModel->row();
-                                    $arrModelData['pid'] = (strlen($arrModelData['pid'])) ? \String::binToUuid($arrModelData['pid']) : $arrModelData['pid'];
+                                    $arrModelData         = $objModel->row();
+                                    $arrModelData['pid']  = (strlen($arrModelData['pid'])) ? \String::binToUuid($arrModelData['pid']) : $arrModelData['pid'];
                                     $arrModelData['uuid'] = \String::binToUuid($arrModelData['uuid']);
-                                    $arrImport['files'][$key]['tl_files'] = $arrModelData;
                                 }
                                 // if not add it to the current DBAFS.
                                 else
                                 {
-                                    $objModel = \Dbafs::addResource($value['path']);
-                                    $arrModelData = $objModel->row();
-                                    $arrModelData['pid'] = (strlen($arrModelData['pid'])) ? \String::binToUuid($arrModelData['pid']) : $arrModelData['pid'];
+                                    $objModel             = \Dbafs::addResource($value['path']);
+                                    $arrModelData         = $objModel->row();
+                                    $arrModelData['pid']  = (strlen($arrModelData['pid'])) ? \String::binToUuid($arrModelData['pid']) : $arrModelData['pid'];
                                     $arrModelData['uuid'] = \String::binToUuid($arrModelData['uuid']);
-                                    $arrImport['files'][$key]['tl_files'] = $arrModelData;
                                 }
-                            }
-                        }
 
-                        // and at least, only update the dbafs for some files because this .... just hate me.
-                        foreach ($this->arrListCompare['files'] as $key => $value)
-                        {
-                            // Skip some values.
-                            if($value["state"] != SyncCtoEnum::FILESTATE_DBAFS_CONFLICT)
-                            {
-                                continue;
+                                $itSupSet[ $key ]['tl_files'] = $arrModelData;
                             }
 
-                            // Add the file to the import array.
-                            $arrImport['dbafs'][$key] = $value;
-                        }
+                            // Send the data to the client.
+                            $arrTransmission = $this
+                                ->objSyncCtoCommunicationClient
+                                ->runFileImport($itSupSet, true);
 
-                        // Import all /core data and write the data back in the compare list.
-                        if (is_array($arrImport['core']) && count($arrImport['core']) > 0)
-                        {
-                            $arrTransmission = $this->objSyncCtoCommunicationClient->runFileImport($arrImport['core'], false);
-                            foreach ($arrTransmission as $key => $value)
-                            {
-                                $this->arrListCompare['core'][$key] = $value;
-                            }
-                        }
-
-                        // Import all files data and write the data back in the compare list.
-                        if (is_array($arrImport['files']) && count($arrImport['files']) > 0)
-                        {
-                            $arrTransmission = $this->objSyncCtoCommunicationClient->runFileImport($arrImport['files'], true);
+                            // Add the information to the current list.
                             foreach ($arrTransmission as $key => $value)
                             {
                                 $this->arrListCompare['files'][$key] = $value;
                             }
                         }
-
-                        // Update the dbafs system.
-                        if (is_array($arrImport['dbafs']) && count($arrImport['dbafs']) > 0)
+                        // Run private if we have files.
+                        else if (iterator_count($itDbafs) != 0)
                         {
-                            $arrTransmission = $this->objSyncCtoCommunicationClient->updateDbafs($arrImport['dbafs']);
+                            // Get only 100 files.
+                            $itSupSet = new LimitIterator($itDbafs, 0, 100);
+
+                            // Send it to the client.
+                            $arrTransmission = $this
+                                ->objSyncCtoCommunicationClient
+                                ->updateDbafs(iterator_to_array($itSupSet));
+
+                            // Update the current list.
                             foreach ($arrTransmission as $key => $value)
                             {
                                 // Set the state.
@@ -3125,10 +3103,109 @@ class SyncCtoModuleClient extends \BackendModule
                                 $this->arrListCompare['files'][$key] = $value;
                             }
                         }
-
-                        $this->objStepPool->step++;
-                        break;
                     }
+                    catch (Exception $e)
+                    {
+                        $this->objData->setHtml('');
+                        $this->objData->setDescription($e->getMessage());
+                        $this->setError(true);
+                        $this->setErrorMsg('Error on moving files. Some files could not be moved.');
+                    }
+                    break;
+
+                /**
+                 * Delete Files
+                 */
+                case 4:
+                    // Reset the msg.
+                    $this->objData->setDescription($GLOBALS['TL_LANG']['tl_syncCto_sync']["step_5"]['description_2']);
+                    $this->setErrorMsg('');
+
+                    try
+                    {
+                        // Get the file list.
+                        $itCore    = $fileList->getDeletedCore(true);
+                        $itPrivate = $fileList->getDeletedPrivate(true);
+                        $itOverall = $fileList->getDeletedFiles(false);
+
+                        // Count some values.
+                        $waitingFiles = iterator_count($itCore) + iterator_count($itPrivate);
+                        $overallFiles = iterator_count($itOverall);
+
+                        // Add the status.
+                        $this->objData->setDescription
+                        (
+                            sprintf
+                            (
+                                $GLOBALS['TL_LANG']['tl_syncCto_sync']["step_3"]['description_2'],
+                                ($overallFiles - $waitingFiles),
+                                $overallFiles
+                            )
+                        );
+
+                        // Check if we have some files.
+                        if ($waitingFiles == 0)
+                        {
+                            $this->objData->setHtml('');
+                            $this->objData->setDescription($GLOBALS['TL_LANG']['tl_syncCto_sync']["step_5"]['description_1']);
+                            $this->objStepPool->step++;
+                            break;
+                        }
+
+                        // Check for endless run.
+                        if($waitingFiles == $this->arrSyncSettings['last_delete'])
+                        {
+                            $this->objData->setHtml('');
+                            $this->objData->setDescription($GLOBALS['TL_LANG']['tl_syncCto_sync']["step_5"]['description_1']);
+                            $this->setError(true);
+                            $this->setErrorMsg('Error on deleting files. Some files could not be deleted.');
+                            break;
+                        }
+
+                        // Add the current count to the config.
+                        $this->arrSyncSettings['last_delete'] = $waitingFiles;
+
+                        // Run core if we have files.
+                        if (iterator_count($itCore) != 0)
+                        {
+                            // Get only 100 files.
+                            $itSupSet = new LimitIterator($itCore, 0, 100);
+
+                            // Send them to the client.
+                            $arrTransmission = $this
+                                ->objSyncCtoCommunicationClient
+                                ->deleteFiles(iterator_to_array($itSupSet), false);
+
+                            // Add all information to the file list.
+                            foreach ($arrTransmission as $key => $value)
+                            {
+                                $this->arrListCompare['core'][ $key ] = $value;
+                            }
+                        }
+                        // Run private if we have files.
+                        else if (iterator_count($itPrivate) != 0)
+                        {
+                            // Get only 100 files.
+                            $itSupSet = new LimitIterator($itPrivate, 0, 100);
+
+                            // Send them to the client.
+                            $arrTransmission = $this
+                                ->objSyncCtoCommunicationClient
+                                ->deleteFiles(iterator_to_array($itSupSet), false);
+
+                            // Add all information to the file list.
+                            foreach ($arrTransmission as $key => $value)
+                            {
+                                $this->arrListCompare['files'][ $key ] = $value;
+                            }
+                        }
+                    }
+                    catch (Exception $e)
+                    {
+                        // If there was an error just go on. The endless protection will
+                        // handle any problem.
+                    }
+                    break;
 
                 case 5:
                     $this->objSyncCtoCommunicationClient->createCache();
