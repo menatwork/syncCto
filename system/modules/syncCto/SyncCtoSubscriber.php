@@ -149,15 +149,9 @@ class SyncCtoSubscriber
      */
     public static function registerListeners($listeners, $dispatcher, $suffixes = array(), $priority = 200)
     {
-        $eventSuffix = '';
-        foreach ($suffixes as $suffix)
-        {
-            $eventSuffix .= sprintf('[%s]', $suffix);
-        }
-
         foreach ($listeners as $event => $listener)
         {
-            $dispatcher->addListener($event . $eventSuffix, $listener, $priority);
+            $dispatcher->addListener($event, $listener, $priority);
         }
     }
 

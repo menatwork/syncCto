@@ -40,6 +40,10 @@ class SyncCtoTableBackupFile
      */
     public static function addButtonBackup(GetEditModeButtonsEvent $objEvent)
     {
+        if (!$objEvent->getEnvironment()->hasDataProvider('tl_syncCto_backup_file')) {
+            return;
+        }
+
         $objEvent->setButtons(array
             (
                 'start_backup' => '<input type="submit" name="start_backup" id="start_backup" class="tl_submit" accesskey="s" value="' . specialchars($GLOBALS['TL_LANG']['MSC']['apply']) . '" />'
@@ -52,6 +56,10 @@ class SyncCtoTableBackupFile
      */
     public static function addButtonRestore(GetEditModeButtonsEvent $objEvent)
     {
+        if (!$objEvent->getEnvironment()->hasDataProvider('tl_syncCto_restore_file')) {
+            return;
+        }
+
         $objEvent->setButtons(array
             (
                 'start_backup' => '<input type="submit" name="restore_backup" id="restore_backup" class="tl_submit" accesskey="s" value="' . specialchars($GLOBALS['TL_LANG']['MSC']['restore']) . '" />'
@@ -68,6 +76,10 @@ class SyncCtoTableBackupFile
      */
     public function submitBackup(PrePersistModelEvent $objEvent)
     {
+        if (!$objEvent->getEnvironment()->hasDataProvider('tl_syncCto_backup_file')) {
+            return;
+        }
+
         // Get the data from the DC.
         $arrData = $objEvent->getModel()->getPropertiesAsArray();
         foreach ($arrData as $strKey => $mixData)
@@ -120,6 +132,10 @@ class SyncCtoTableBackupFile
      */
     public function submitRestore(PrePersistModelEvent $objEvent)
     {
+        if (!$objEvent->getEnvironment()->hasDataProvider('tl_syncCto_restore_file')) {
+            return;
+        }
+
         // Get the data from the DC.
         $arrData = $objEvent->getModel()->getPropertiesAsArray();
         foreach ($arrData as $strKey => $mixData)
