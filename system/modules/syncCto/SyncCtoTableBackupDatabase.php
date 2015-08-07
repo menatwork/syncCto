@@ -41,6 +41,10 @@ class SyncCtoTableBackupDatabase extends SyncCtoTableBase
      */
     public static function addButtonBackup(GetEditModeButtonsEvent $objEvent)
     {
+        if (!$objEvent->getEnvironment()->hasDataProvider('tl_syncCto_backup_db')) {
+            return;
+        }
+
         $objEvent->setButtons(array
             (
                 'start_backup' => '<input type="submit" name="start_backup" id="start_backup" class="tl_submit" accesskey="s" value="' . specialchars($GLOBALS['TL_LANG']['MSC']['apply']) . '" />'
@@ -53,6 +57,10 @@ class SyncCtoTableBackupDatabase extends SyncCtoTableBase
      */
     public static function addButtonRestore(GetEditModeButtonsEvent $objEvent)
     {
+        if (!$objEvent->getEnvironment()->hasDataProvider('tl_syncCto_restore_db')) {
+            return;
+        }
+
         $objEvent->setButtons(array
             (
                 'start_backup' => '<input type="submit" name="restore_backup" id="restore_backup" class="tl_submit" accesskey="s" value="' . specialchars($GLOBALS['TL_LANG']['MSC']['restore']) . '" />'
@@ -69,6 +77,10 @@ class SyncCtoTableBackupDatabase extends SyncCtoTableBase
      */
     public function submitBackup(PrePersistModelEvent $objEvent)
     {
+        if (!$objEvent->getEnvironment()->hasDataProvider('tl_syncCto_backup_db')) {
+            return;
+        }
+
         // Get the data from the DC.
         $arrData = $objEvent->getModel()->getPropertiesAsArray();
         foreach ($arrData as $strKey => $mixData)
@@ -114,6 +126,10 @@ class SyncCtoTableBackupDatabase extends SyncCtoTableBase
      */
     public function submitRestore(PrePersistModelEvent $objEvent)
     {
+        if (!$objEvent->getEnvironment()->hasDataProvider('tl_syncCto_restore_db')) {
+            return;
+        }
+
         // Get the data from the DC.
         $arrData = $objEvent->getModel()->getPropertiesAsArray();
         foreach ($arrData as $strKey => $mixData)
@@ -164,6 +180,13 @@ class SyncCtoTableBackupDatabase extends SyncCtoTableBase
      */
     public function databaseTablesRecommended(GetPropertyOptionsEvent $event)
     {
+        if (
+            !$event->getEnvironment()->hasDataProvider('tl_syncCto_backup_db')
+            || !$event->getEnvironment()->hasDataProvider('database_tables_recommended')
+        ) {
+            return;
+        }
+
         $arrTableRecommended = $this->objSyncCtoHelper->databaseTablesRecommended();
 
         $arrStyledTableRecommended = array();
@@ -184,6 +207,13 @@ class SyncCtoTableBackupDatabase extends SyncCtoTableBase
      */
     public function databaseTablesNoneRecommendedWithHidden(GetPropertyOptionsEvent $event)
     {
+        if (
+            !$event->getEnvironment()->hasDataProvider('tl_syncCto_backup_db')
+            || !$event->getEnvironment()->hasDataProvider('database_tables_none_recommended')
+        ) {
+            return;
+        }
+
         $arrTableRecommended = $this->objSyncCtoHelper->databaseTablesNoneRecommendedWithHidden();
 
         $arrStyledTableRecommended = array();
