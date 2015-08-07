@@ -40,6 +40,10 @@ class SyncCtoTableSyncFrom
      */
     public static function addButton(GetEditModeButtonsEvent $objEvent)
     {
+        if (!$objEvent->getEnvironment()->hasDataProvider('tl_syncCto_clients_syncFrom')) {
+            return;
+        }
+
         // Check the file cache.
         $strInitFilePath = '/system/config/initconfig.php';
         if (file_exists(TL_ROOT . $strInitFilePath))
@@ -101,6 +105,10 @@ class SyncCtoTableSyncFrom
      */
     public function submit(PrePersistModelEvent $objEvent)
     {
+        if (!$objEvent->getEnvironment()->hasDataProvider('tl_syncCto_clients_syncFrom')) {
+            return;
+        }
+
         // Get the data from the DC.
         $arrData = $objEvent->getModel()->getPropertiesAsArray();
         foreach($arrData as $strKey => $mixData)
