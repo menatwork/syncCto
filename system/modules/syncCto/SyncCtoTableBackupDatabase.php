@@ -182,7 +182,7 @@ class SyncCtoTableBackupDatabase extends SyncCtoTableBase
     {
         if (
             !$event->getEnvironment()->hasDataProvider('tl_syncCto_backup_db')
-            || !$event->getEnvironment()->hasDataProvider('database_tables_recommended')
+            || $event->getPropertyName() != 'database_tables_recommended'
         ) {
             return;
         }
@@ -209,7 +209,7 @@ class SyncCtoTableBackupDatabase extends SyncCtoTableBase
     {
         if (
             !$event->getEnvironment()->hasDataProvider('tl_syncCto_backup_db')
-            || !$event->getEnvironment()->hasDataProvider('database_tables_none_recommended')
+            || $event->getPropertyName() != 'database_tables_none_recommended'
         ) {
             return;
         }
