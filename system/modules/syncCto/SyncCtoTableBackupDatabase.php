@@ -83,23 +83,20 @@ class SyncCtoTableBackupDatabase extends SyncCtoTableBase
 
         // Get the data from the DC.
         $arrData = $objEvent->getModel()->getPropertiesAsArray();
-        foreach ($arrData as $strKey => $mixData)
-        {
-            if (empty($mixData))
-            {
+        foreach ($arrData as $strKey => $mixData) {
+            if (empty($mixData)) {
                 unset($arrData[$strKey]);
             }
         }
 
         // Merge recommend and none recommend post arrays
         $arrBackupSettings['syncCto_BackupTables'] = array();
-        if (isset($arrData['database_tables_recommended']))
-        {
+        if (isset($arrData['database_tables_recommended'])) {
             $arrBackupSettings['syncCto_BackupTables'] = $arrData['database_tables_recommended'];
         }
-        if (isset($arrData['database_tables_none_recommended_']))
-        {
-            $arrBackupSettings['syncCto_BackupTables'] = array_merge($arrBackupSettings['syncCto_BackupTables'], $arrData['database_tables_none_recommended_']);
+        if (isset($arrData['database_tables_none_recommended_'])) {
+            $arrBackupSettings['syncCto_BackupTables'] = array_merge($arrBackupSettings['syncCto_BackupTables'],
+                $arrData['database_tables_none_recommended_']);
         }
 
         \Session::getInstance()->set('syncCto_BackupSettings', $arrBackupSettings);
@@ -132,32 +129,27 @@ class SyncCtoTableBackupDatabase extends SyncCtoTableBase
 
         // Get the data from the DC.
         $arrData = $objEvent->getModel()->getPropertiesAsArray();
-        foreach ($arrData as $strKey => $mixData)
-        {
-            if (empty($mixData))
-            {
+        foreach ($arrData as $strKey => $mixData) {
+            if (empty($mixData)) {
                 unset($arrData[$strKey]);
             }
         }
 
         // Check if a file is selected
-        if ($arrData['filelist'] == '')
-        {
+        if ($arrData['filelist'] == '') {
             \Message::addError($GLOBALS['TL_LANG']['ERR']['missing_file_selection']);
             \Controller::redirect(\Environment::get('base') . "contao/main.php?do=syncCto_backups&table=tl_syncCto_restore_db");
         }
 
         $objFileModel = \FilesModel::findByPk($arrData['filelist']);
-        if ($objFileModel == null)
-        {
+        if ($objFileModel == null) {
             \Message::addError(sprintf($GLOBALS['TL_LANG']['ERR']['unknown_file'], $arrData['filelist']));
             \Controller::redirect(\Environment::get('base') . "contao/main.php?do=syncCto_backups&table=tl_syncCto_restore_db");
         }
 
         // Check if file exists
         $arrData['filelist'] = \FilesModel::findByPk($arrData['filelist'])->path;
-        if (!file_exists(TL_ROOT . "/" . $arrData['filelist']))
-        {
+        if (!file_exists(TL_ROOT . "/" . $arrData['filelist'])) {
             \Message::addError(sprintf($GLOBALS['TL_LANG']['ERR']['unknown_file'], $arrData['filelist']));
             \Controller::redirect(\Environment::get('base') . "contao/main.php?do=syncCto_backups&table=tl_syncCto_restore_db");
         }
@@ -190,8 +182,7 @@ class SyncCtoTableBackupDatabase extends SyncCtoTableBase
         $arrTableRecommended = $this->objSyncCtoHelper->databaseTablesRecommended();
 
         $arrStyledTableRecommended = array();
-        foreach ($arrTableRecommended AS $strTableName => $arrTable)
-        {
+        foreach ($arrTableRecommended AS $strTableName => $arrTable) {
             $arrStyledTableRecommended[$strTableName] = $this->objSyncCtoHelper->getStyledTableMeta($arrTable);
         }
 
@@ -217,8 +208,7 @@ class SyncCtoTableBackupDatabase extends SyncCtoTableBase
         $arrTableRecommended = $this->objSyncCtoHelper->databaseTablesNoneRecommendedWithHidden();
 
         $arrStyledTableRecommended = array();
-        foreach ($arrTableRecommended AS $strTableName => $arrTable)
-        {
+        foreach ($arrTableRecommended AS $strTableName => $arrTable) {
             $arrStyledTableRecommended[$strTableName] = $this->objSyncCtoHelper->getStyledTableMeta($arrTable);
         }
 
