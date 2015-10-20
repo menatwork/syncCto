@@ -1576,11 +1576,11 @@ class SyncCtoDatabase extends \Backend
                             switch ($valueIndexes["Index_type"])
                             {
                                 case "FULLTEXT":
-                                    $return['TABLE_CREATE_DEFINITIONS'][$field["name"]] = "FULLTEXT KEY `" . $field['name'] . "` (`" . implode("`,`", $field["index_fields"]) . "`)";
+                                    $return['TABLE_CREATE_DEFINITIONS'][$field["name"]] = "FULLTEXT KEY `" . $field['name'] . "` (" . $this->getKeyFields($field["index_fields"]) . ")";
                                     break;
 
                                 default:
-                                    $return['TABLE_CREATE_DEFINITIONS'][$field["name"]] = "KEY `" . $field['name'] . "` (`" . implode("`,`", $field["index_fields"]) . "`)";
+                                    $return['TABLE_CREATE_DEFINITIONS'][$field["name"]] = "KEY `" . $field['name'] . "` (" . $this->getKeyFields($field["index_fields"]) . ")";
                                     break;
                             }
 
@@ -1651,6 +1651,37 @@ class SyncCtoDatabase extends \Backend
         }
 
         return $return;
+    }
+
+    /**
+     * Helper function which build the field list for the "KEY" area
+     * in the SQL.
+     *
+     * @param array $fieldList The list of keys.
+     *
+     * @return string The string.
+     */
+    private function getKeyFields($fieldList)
+    {
+        $return = array();
+
+        foreach($fieldList as $field)
+        {
+            if(preg_match("/.*\([0-9]+\)/i", $field))
+            {
+                $cutPosition = stripos($field, '(');
+                $name = substr($field, 0, $cutPosition);
+                $sub = substr($field, $cutPosition);
+
+                $return[] = sprintf('`%s` %s', $name, $sub);
+            }
+            else
+            {
+                $return[] = sprintf('`%s`', $field);
+            }
+        }
+
+        return implode(', ', $return);
     }
 
     /**
