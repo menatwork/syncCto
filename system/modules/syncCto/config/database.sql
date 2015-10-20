@@ -19,7 +19,7 @@ CREATE TABLE `tl_synccto_clients` (
     `address` text NOT NULL,
     `path` varchar(255) NOT NULL default '',
     `port` int(10) unsigned NOT NULL default '0',
-    `codifyengine` text NOT NULL,
+    `codifyengine` varchar(128) NOT NULL default '',
     `cookie` longtext NULL,
     `syncTo_user` int(10) unsigned NOT NULL default '0',
     `syncFrom_user` int(10) unsigned NOT NULL default '0',
