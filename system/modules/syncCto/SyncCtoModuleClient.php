@@ -4967,7 +4967,7 @@ class SyncCtoModuleClient extends \BackendModule
                             {
                                 if (in_array($value["state"], array(SyncCtoEnum::FILESTATE_DELETE, SyncCtoEnum::FILESTATE_FOLDER_DELETE)))
                                 {
-                                    $arrDelete[$strType][$key] = $this->arrListCompare[$key];
+                                    $arrDelete[$strType][$key] = $arrLists[$key];
                                 }
                             }
                         }
