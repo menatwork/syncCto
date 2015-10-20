@@ -94,6 +94,7 @@ class SyncCtoTableBackupDatabase extends SyncCtoTableBase
         if (isset($arrData['database_tables_recommended'])) {
             $arrBackupSettings['syncCto_BackupTables'] = $arrData['database_tables_recommended'];
         }
+
         if (isset($arrData['database_tables_none_recommended'])) {
             $arrBackupSettings['syncCto_BackupTables'] = array_merge($arrBackupSettings['syncCto_BackupTables'],
                 $arrData['database_tables_none_recommended']);

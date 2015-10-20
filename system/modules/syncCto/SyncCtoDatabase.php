@@ -5,7 +5,7 @@
  *
  * @copyright  MEN AT WORK 2014
  * @package    syncCto
- * @license    GNU/LGPL 
+ * @license    GNU/LGPL
  * @filesource
  */
 
@@ -20,7 +20,7 @@ class SyncCtoDatabase extends \Backend
 
     // Singelten pattern
     protected static $instance           = null;
-    // Vars 
+    // Vars
     protected $arrBackupTables;
     protected $arrHiddenTables;
     protected $strSuffixZipName   = "DB-Backup.zip";
@@ -28,18 +28,18 @@ class SyncCtoDatabase extends \Backend
     protected $strFilenameSQL     = "DB-Backup.sql";
     protected $strTimestampFormat;
     protected $intMaxMemoryUsage;
-    // Objects 
+    // Objects
     protected $objSyncCtoHelper;
     protected $Database;
 
     /**
-     * @var XMLReader 
+     * @var XMLReader
      */
     protected $objXMLReader;
 
     /**
      * List of default ignore values
-     * 
+     *
      * @var array
      */
     protected $arrDefaultValueFunctionIgnore = array(
@@ -49,8 +49,8 @@ class SyncCtoDatabase extends \Backend
 
     /**
      * List of default ignore values
-     * 
-     * @var array 
+     *
+     * @var array
      */
     protected $arrDefaultValueTypIgnore = array(
         'text',
@@ -68,8 +68,8 @@ class SyncCtoDatabase extends \Backend
 
     /**
      * A list with allowed keys for the field.
-     * 
-     * @var array 
+     *
+     * @var array
      */
     protected $arrAllowedFieldKeys = array(
         'name',
@@ -82,8 +82,8 @@ class SyncCtoDatabase extends \Backend
 
     /**
      * Search for special chars
-     * 
-     * @var array 
+     *
+     * @var array
      */
     protected $arrSearchFor = array(
         "\\",
@@ -92,8 +92,8 @@ class SyncCtoDatabase extends \Backend
 
     /**
      * Replace special chars with
-     * 
-     * @var array 
+     *
+     * @var array
      */
     protected $arrReplaceWith = array(
         "\\\\",
@@ -126,13 +126,13 @@ class SyncCtoDatabase extends \Backend
 
         // Load Helper
         $this->objSyncCtoHelper = SyncCtoHelper::getInstance();
-        $this->Database         = Database::getInstance();       
+        $this->Database         = Database::getInstance();
     }
 
     /**
      * Get instance of SyncCtoDatabase
-     * 
-     * @return SyncCtoDatabase 
+     *
+     * @return SyncCtoDatabase
      */
     public static function getInstance()
     {
@@ -146,9 +146,9 @@ class SyncCtoDatabase extends \Backend
 
     /**
      * Setter
-     * 
+     *
      * @param string $name
-     * @param string $value 
+     * @param string $value
      */
     public function __set($name, $value)
     {
@@ -188,9 +188,9 @@ class SyncCtoDatabase extends \Backend
 
     /**
      * Getter
-     * 
+     *
      * @param string $name
-     * @return string 
+     * @return string
      */
     public function __get($name)
     {
@@ -222,7 +222,7 @@ class SyncCtoDatabase extends \Backend
 
     /**
      * Drop tables
-     * 
+     *
      * @param array $arrTables List with tables
      * @param boolean $blnBackup if true the system will make a bakup from all tables
      */
@@ -251,9 +251,9 @@ class SyncCtoDatabase extends \Backend
 
     /**
      * Check if we have enough ram, if not, write all data to file
-     * 
+     *
      * @param XMLWriter $objXml
-     * @param resource $objGzFile 
+     * @param resource $objGzFile
      */
     protected function checkRAM(XMLWriter $objXml, $objGzFile)
     {
@@ -266,11 +266,11 @@ class SyncCtoDatabase extends \Backend
 
     /**
      * Function for creating a sql/xml dump file.
-     * 
+     *
      * @param array $mixTables Table or a list of tables for backup
      * @param string $strZip Name of zip file
      * @param bool $booTempFolder Should the tmp folde used instead of backupfolder
-     * @return void 
+     * @return void
      */
     public function runDump($mixTables, $booTempFolder, $booOnlyMachine = true)
     {
@@ -986,10 +986,10 @@ class SyncCtoDatabase extends \Backend
 
     /**
      * Restore database-backup from zip
-     * 
+     *
      * @param string $strRestoreFile Path to file like system/backup/backup.zip
-     * @param bool $booTruncate 
-     * @return type 
+     * @param bool $booTruncate
+     * @return type
      */
     public function runRestore($strRestoreFile, $arrSuffixSQL = null)
     {
@@ -1328,7 +1328,7 @@ class SyncCtoDatabase extends \Backend
 
             unset($arrSourceTables[$keySrcTables]);
         }
-        
+
         // Del Tables
         foreach ($arrMissingOnSource as $keyDesTables)
         {
@@ -1443,7 +1443,7 @@ class SyncCtoDatabase extends \Backend
      */
     public function getDiff($arrSrcTables, $arrDesTables)
     {
-        return abs(intval($arrSrcTables['count']) - intval($arrDesTables['count']));        
+        return abs(intval($arrSrcTables['count']) - intval($arrDesTables['count']));
     }
 
     /**
@@ -1498,8 +1498,8 @@ class SyncCtoDatabase extends \Backend
 
     /**
      * Return all timestamps from client and server from current and last sync
-     * 
-     * @return array 
+     *
+     * @return array
      */
     public function getAllTimeStamps($arrTimestampServer, $arrTimestampClient, $intClientID)
     {
@@ -1542,8 +1542,8 @@ class SyncCtoDatabase extends \Backend
 
     /**
      * Build a array with the structur of the database
-     * 
-     * @return array 
+     *
+     * @return array
      */
     public function getTableStructure($strTableName)
     {
@@ -1686,10 +1686,10 @@ class SyncCtoDatabase extends \Backend
 
     /**
      * Build a "CREATE TABLE" sql statemant
-     * 
+     *
      * @param array $arrTable Table Informations
      * @param type $strName Table name
-     * @return string 
+     * @return string
      */
     private function buildSQLTable($arrTable, $strName)
     {
@@ -1705,11 +1705,11 @@ class SyncCtoDatabase extends \Backend
 
     /**
      * Build a sql statement for "INSERT IGNORE INTO"
-     * 
+     *
      * @param type $strTable Table name
      * @param type $arrKeys Columnames
      * @param type $arrData Data for insert
-     * @return string 
+     * @return string
      */
     private function buildSQLInsert($strTable, $arrKeys, $arrData, $booPrepare = false)
     {
