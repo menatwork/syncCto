@@ -2610,8 +2610,11 @@ class SyncCtoModuleClient extends \BackendModule
                             }
 
                             unset($this->arrSyncSettings['syncCto_CompareTables']);
+                        }
 
-                            // Set the tl_files if we have the automode.
+                        // Set the tl_files if we have the automode or the checkbox is activate.
+                        if ($this->arrSyncSettings['automode'] || $this->arrSyncSettings['syncCto_SyncTlFiles'])
+                        {
                             $this->arrSyncSettings['syncCto_SyncTables'][] = 'tl_files';
                         }
 
@@ -4685,8 +4688,11 @@ class SyncCtoModuleClient extends \BackendModule
                             }
 
                             unset($this->arrSyncSettings['syncCto_CompareTables']);
+                        }
 
-                            // Set the tl_files if we have the automode.
+                        // Set the tl_files if we have the automode or the checkbox is activate.
+                        if ($this->arrSyncSettings['automode'] || $this->arrSyncSettings['syncCto_SyncTlFiles'])
+                        {
                             $this->arrSyncSettings['syncCto_SyncTables'][] = 'tl_files';
                         }
 
