@@ -3,12 +3,19 @@
 /**
  * Contao Open Source CMS
  *
- * Copyright (c) 2005-2014 Leo Feyer
+ * Copyright (c) 2005-2015 Leo Feyer
  *
- * @package SyncCto
- * @link    https://contao.org
- * @license http://www.gnu.org/licenses/lgpl-3.0.html LGPL
+ * @license LGPL-3.0+
  */
+
+
+/**
+ * Register the namespaces
+ */
+ClassLoader::addNamespaces(array
+(
+    'SyncCto',
+));
 
 
 /**
@@ -16,12 +23,11 @@
  */
 ClassLoader::addClasses(array
 (
-    'SyncCtoTableBackupFile'                    => 'system/modules/syncCto/SyncCtoTableBackupFile.php',
+    // Not yet moved.
     'GeneralDataSyncCto'                        => 'system/modules/syncCto/GeneralDataSyncCto.php',
     'SyncCtoFilterIteratorFolder'               => 'system/modules/syncCto/SyncCtoFilterIteratorFolder.php',
     'SyncCtoUpdater'                            => 'system/modules/syncCto/SyncCtoUpdater.php',
     'SyncCtoRunOnceEr'                          => 'system/modules/syncCto/SyncCtoRunOnceEr.php',
-    'SyncCtoSubscriber'                         => 'system/modules/syncCto/SyncCtoSubscriber.php',
     'InterfaceSyncCtoStep'                      => 'system/modules/syncCto/InterfaceSyncCtoStep.php',
     'SyncCtoTableSettings'                      => 'system/modules/syncCto/SyncCtoTableSettings.php',
     'SyncCtoPopupFiles'                         => 'system/modules/syncCto/SyncCtoPopupFiles.php',
@@ -29,27 +35,32 @@ ClassLoader::addClasses(array
     'SyncCtoEnum'                               => 'system/modules/syncCto/SyncCtoEnum.php',
     'SyncCtoCommunicationClient'                => 'system/modules/syncCto/SyncCtoCommunicationClient.php',
     'SyncCtoFilterIteratorBase'                 => 'system/modules/syncCto/SyncCtoFilterIteratorBase.php',
-    'StepPool'                                  => 'system/modules/syncCto/StepPool.php',
     'SyncCtoHelper'                             => 'system/modules/syncCto/SyncCtoHelper.php',
     'SyncCtoModuleClient'                       => 'system/modules/syncCto/SyncCtoModuleClient.php',
     'SyncCtoStats'                              => 'system/modules/syncCto/SyncCtoStats.php',
     'SyncCtoDatabase'                           => 'system/modules/syncCto/SyncCtoDatabase.php',
-    'SyncCtoTableSyncFrom'                      => 'system/modules/syncCto/SyncCtoTableSyncFrom.php',
-    'SyncCtoTableBackupDatabase'                => 'system/modules/syncCto/SyncCtoTableBackupDatabase.php',
+    'SyncCtoContaoAutomator'                    => 'system/modules/syncCto/SyncCtoContaoAutomator.php',
     'SyncCtoFilterIteratorFiles'                => 'system/modules/syncCto/SyncCtoFilterIteratorFiles.php',
     'SyncCtoModuleBackup'                       => 'system/modules/syncCto/SyncCtoModuleBackup.php',
     'SyncCtoAjax'                               => 'system/modules/syncCto/SyncCtoAjax.php',
-    'SyncCtoTableBase'                          => 'system/modules/syncCto/SyncCtoTableBase.php',
     'SyncCtoFiles'                              => 'system/modules/syncCto/SyncCtoFiles.php',
     'SyncCtoRPCFunctions'                       => 'system/modules/syncCto/SyncCtoRPCFunctions.php',
     'SyncCtoPopupDB'                            => 'system/modules/syncCto/SyncCtoPopupDB.php',
     'SyncCtoDatabaseUpdater'                    => 'system/modules/syncCto/SyncCtoDatabaseUpdater.php',
-    'SyncCtoTableSyncTo'                        => 'system/modules/syncCto/SyncCtoTableSyncTo.php',
     'ContentData'                               => 'system/modules/syncCto/ContentData.php',
-    'SyncCtoContaoAutomator'                    => 'system/modules/syncCto/SyncCtoContaoAutomator.php',
-    // Namespace start.
-    'SyncCto\Sync\FileList\Base'                => 'system/modules/syncCto/src/SyncCto/FileList/Base.php',
-    'SyncCto\Sync\FileList\FilterIterator\Base' => 'system/modules/syncCto/src/SyncCto/FileList/FilterIterator/Base.php',
+    'StepPool'                                  => 'system/modules/syncCto/StepPool.php',
+    // Helper
+    'SyncCto\Helper\PathBuilder'                => 'system/modules/syncCto/src/SyncCto/Helper/PathBuilder.php',
+    // FileList
+    'SyncCto\Sync\FileList\Base'                => 'system/modules/syncCto/src/SyncCto/Sync/FileList/Base.php',
+    'SyncCto\Sync\FileList\FilterIterator\Base' => 'system/modules/syncCto/src/SyncCto/Sync/FileList/FilterIterator/Base.php',
+    // Events
+    'SyncCto\DcGeneral\Events\Sync\From'        => 'system/modules/syncCto/src/SyncCto/DcGeneral/Events/Sync/From.php',
+    'SyncCto\DcGeneral\Events\Sync\To'          => 'system/modules/syncCto/src/SyncCto/DcGeneral/Events/Sync/To.php',
+    'SyncCto\DcGeneral\Events\Base'             => 'system/modules/syncCto/src/SyncCto/DcGeneral/Events/Base.php',
+    'SyncCto\DcGeneral\Events\Backup\File'      => 'system/modules/syncCto/src/SyncCto/DcGeneral/Events/Backup/File.php',
+    'SyncCto\DcGeneral\Events\Backup\Database'  => 'system/modules/syncCto/src/SyncCto/DcGeneral/Events/Backup/Database.php',
+    'SyncCto\DcGeneral\Events\Subscriber'  => 'system/modules/syncCto/src/SyncCto/DcGeneral/Events/Subscriber.php',
 ));
 
 
