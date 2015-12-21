@@ -37,7 +37,8 @@ $GLOBALS['TL_DCA']['tl_syncCto_clients_syncFrom'] = array
     // Sub Palettes
     'subpalettes' => array
     (
-        'systemoperations_check'  => 'systemoperations_maintenance',
+        'systemoperations_check' => 'systemoperations_maintenance',
+        'database_check'         => 'tl_files_check',
     ),
     // Fields
     'fields' => array
@@ -59,6 +60,16 @@ $GLOBALS['TL_DCA']['tl_syncCto_clients_syncFrom'] = array
             'label'               => &$GLOBALS['TL_LANG']['tl_syncCto_clients_syncFrom']['database_check'],
             'inputType'           => 'checkbox',
             'exclude'             => true,
+            'eval'      => array
+            (
+                'submitOnChange' => 'true'
+            )
+        ),
+        'tl_files_check'               => array
+        (
+            'label'     => &$GLOBALS['TL_LANG']['tl_syncCto_clients_syncFrom']['tl_files_check'],
+            'inputType' => 'checkbox',
+            'exclude'   => true
         ),
         'systemoperations_check' => array
         (
