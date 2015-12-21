@@ -985,15 +985,21 @@ class SyncCtoDatabase extends \Backend
     }
 
     /**
-     * Restore database-backup from zip
+     * Restore database-backup from zip.
      *
      * @param string $strRestoreFile Path to file like system/backup/backup.zip
-     * @param bool $booTruncate
+     *
+     * @param null   $arrSuffixSQL
+     *
      * @return type
+     *
+     * @throws Exception
+     *
+     * @internal param bool $booTruncate
      */
     public function runRestore($strRestoreFile, $arrSuffixSQL = null)
     {
-		// Load the path bulder.
+        // Load the path builder.
         $pathBuilder = new \SyncCto\Helper\PathBuilder();
 
         try
