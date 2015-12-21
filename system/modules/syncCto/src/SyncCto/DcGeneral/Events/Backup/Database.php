@@ -9,13 +9,19 @@
  * @filesource
  */
 
+namespace SyncCto\DcGeneral\Events\Backup;
+
 use ContaoCommunityAlliance\DcGeneral\Contao\View\Contao2BackendView\Event\GetEditModeButtonsEvent;
+use ContaoCommunityAlliance\DcGeneral\Contao\View\Contao2BackendView\Event\GetPropertyOptionsEvent;
 use ContaoCommunityAlliance\DcGeneral\Event\PrePersistModelEvent;
+use RuntimeException;
+use SyncCto\DcGeneral\Events\Base;
+use SyncCtoHelper;
 
 /**
  * Class for syncFrom configurations
  */
-class SyncCtoTableBackupFile
+class Database extends Base
 {
 
     // Vars
@@ -31,7 +37,7 @@ class SyncCtoTableBackupFile
      */
     public function __construct()
     {
-        $this->BackendUser      = BackendUser::getInstance();
+        $this->BackendUser      = \BackendUser::getInstance();
         $this->objSyncCtoHelper = SyncCtoHelper::getInstance();
     }
 
@@ -40,7 +46,7 @@ class SyncCtoTableBackupFile
      */
     public static function addButtonBackup(GetEditModeButtonsEvent $objEvent)
     {
-        if (!$objEvent->getEnvironment()->hasDataProvider('tl_syncCto_backup_file')) {
+        if (!$objEvent->getEnvironment()->hasDataProvider('tl_syncCto_backup_db')) {
             return;
         }
 
@@ -56,7 +62,7 @@ class SyncCtoTableBackupFile
      */
     public static function addButtonRestore(GetEditModeButtonsEvent $objEvent)
     {
-        if (!$objEvent->getEnvironment()->hasDataProvider('tl_syncCto_restore_file')) {
+        if (!$objEvent->getEnvironment()->hasDataProvider('tl_syncCto_restore_db')) {
             return;
         }
 
@@ -76,48 +82,39 @@ class SyncCtoTableBackupFile
      */
     public function submitBackup(PrePersistModelEvent $objEvent)
     {
-        if (!$objEvent->getEnvironment()->hasDataProvider('tl_syncCto_backup_file')) {
+        if (!$objEvent->getEnvironment()->hasDataProvider('tl_syncCto_backup_db')) {
             return;
         }
 
         // Get the data from the DC.
         $arrData = $objEvent->getModel()->getPropertiesAsArray();
-        foreach ($arrData as $strKey => $mixData)
-        {
-            if (empty($mixData))
-            {
+        foreach ($arrData as $strKey => $mixData) {
+            if (empty($mixData)) {
                 unset($arrData[$strKey]);
             }
         }
 
-        // Check if core or user backup is selected
-        if (!isset($arrData['core_files']) && !isset($arrData['user_files']))
-        {
-            \Message::addError($GLOBALS['TL_LANG']['ERR']['missing_file_selection']);
-            \Controller::redirect(\Environment::get('base') . "contao/main.php?do=syncCto_backups&table=tl_syncCto_backup_file");
+        // Merge recommend and none recommend post arrays
+        $arrBackupSettings['syncCto_BackupTables'] = array();
+        if (isset($arrData['database_tables_recommended'])) {
+            $arrBackupSettings['syncCto_BackupTables'] = $arrData['database_tables_recommended'];
         }
 
-        if (isset($arrData['user_files']) && is_array($arrData['filelist']) && count($arrData['filelist']) == 0)
-        {
-            \Message::addError($GLOBALS['TL_LANG']['ERR']['missing_file_selection']);
-            \Controller::redirect(\Environment::get('base') . "contao/main.php?do=syncCto_backups&table=tl_syncCto_backup_file");
+        if (isset($arrData['database_tables_none_recommended'])) {
+            $arrBackupSettings['syncCto_BackupTables'] = array_merge($arrBackupSettings['syncCto_BackupTables'],
+                $arrData['database_tables_none_recommended']);
         }
 
-        foreach ((array)$arrData['filelist'] as $key => $value)
-        {
-            $arrData['filelist'][$key] = Contao\FilesModel::findByPk($value)->path;
-        }
-
-        \Session::getInstance()->set("syncCto_BackupSettings", $arrData);
+        \Session::getInstance()->set('syncCto_BackupSettings', $arrBackupSettings);
 
         // Check the vars.
         $this->objSyncCtoHelper->checkSubmit(array(
                 'postUnset'   => array('start_backup'),
                 'error'       => array(
                     'key'     => 'syncCto_submit_false',
-                    'message' => $GLOBALS['TL_LANG']['ERR']['missing_tables']
+                    'message' => $GLOBALS['TL_LANG']['ERR']['no_functions']
                 ),
-                'redirectUrl' => \Environment::get('base') . "contao/main.php?do=syncCto_backups&table=tl_syncCto_backup_file&act=start"
+                'redirectUrl' => \Environment::get('base') . "contao/main.php?do=syncCto_backups&table=tl_syncCto_backup_db&act=start"
             ),
             $arrData
         );
@@ -132,38 +129,33 @@ class SyncCtoTableBackupFile
      */
     public function submitRestore(PrePersistModelEvent $objEvent)
     {
-        if (!$objEvent->getEnvironment()->hasDataProvider('tl_syncCto_restore_file')) {
+        if (!$objEvent->getEnvironment()->hasDataProvider('tl_syncCto_restore_db')) {
             return;
         }
 
         // Get the data from the DC.
         $arrData = $objEvent->getModel()->getPropertiesAsArray();
-        foreach ($arrData as $strKey => $mixData)
-        {
-            if (empty($mixData))
-            {
+        foreach ($arrData as $strKey => $mixData) {
+            if (empty($mixData)) {
                 unset($arrData[$strKey]);
             }
         }
 
         // Check if a file is selected
-        if ($arrData['filelist'] == '')
-        {
+        if ($arrData['filelist'] == '') {
             \Message::addError($GLOBALS['TL_LANG']['ERR']['missing_file_selection']);
             \Controller::redirect(\Environment::get('base') . "contao/main.php?do=syncCto_backups&table=tl_syncCto_restore_db");
         }
 
         $objFileModel = \FilesModel::findByPk($arrData['filelist']);
-        if ($objFileModel == null)
-        {
+        if ($objFileModel == null) {
             \Message::addError(sprintf($GLOBALS['TL_LANG']['ERR']['unknown_file'], $arrData['filelist']));
             \Controller::redirect(\Environment::get('base') . "contao/main.php?do=syncCto_backups&table=tl_syncCto_restore_db");
         }
 
         // Check if file exists
         $arrData['filelist'] = \FilesModel::findByPk($arrData['filelist'])->path;
-        if (!file_exists(TL_ROOT . "/" . $arrData['filelist']))
-        {
+        if (!file_exists(TL_ROOT . "/" . $arrData['filelist'])) {
             \Message::addError(sprintf($GLOBALS['TL_LANG']['ERR']['unknown_file'], $arrData['filelist']));
             \Controller::redirect(\Environment::get('base') . "contao/main.php?do=syncCto_backups&table=tl_syncCto_restore_db");
         }
@@ -174,7 +166,58 @@ class SyncCtoTableBackupFile
         \Session::getInstance()->set("syncCto_BackupSettings", $arrBackupSettings);
 
         // Redirect to the restore page.
-        \Controller::redirect(\Environment::get('base') . "contao/main.php?do=syncCto_backups&amp;table=tl_syncCto_restore_file&amp;act=start");
+        \Controller::redirect(\Environment::get('base') . "contao/main.php?do=syncCto_backups&table=tl_syncCto_restore_db&act=start");
     }
 
+    /**
+     * Get database tables recommended array
+     *
+     * @param GetPropertyOptionsEvent $event
+     *
+     * @return array
+     */
+    public function databaseTablesRecommended(GetPropertyOptionsEvent $event)
+    {
+        if (
+            !$event->getEnvironment()->hasDataProvider('tl_syncCto_backup_db')
+            || $event->getPropertyName() != 'database_tables_recommended'
+        ) {
+            return;
+        }
+
+        $arrTableRecommended = $this->objSyncCtoHelper->databaseTablesRecommended();
+
+        $arrStyledTableRecommended = array();
+        foreach ($arrTableRecommended AS $strTableName => $arrTable) {
+            $arrStyledTableRecommended[$strTableName] = $this->objSyncCtoHelper->getStyledTableMeta($arrTable);
+        }
+
+        $event->setOptions($arrStyledTableRecommended);
+    }
+
+    /**
+     * Get database tables none recommended with hidden array
+     *
+     * @param GetPropertyOptionsEvent $event
+     *
+     * @return array
+     */
+    public function databaseTablesNoneRecommendedWithHidden(GetPropertyOptionsEvent $event)
+    {
+        if (
+            !$event->getEnvironment()->hasDataProvider('tl_syncCto_backup_db')
+            || $event->getPropertyName() != 'database_tables_none_recommended'
+        ) {
+            return;
+        }
+
+        $arrTableRecommended = $this->objSyncCtoHelper->databaseTablesNoneRecommendedWithHidden();
+
+        $arrStyledTableRecommended = array();
+        foreach ($arrTableRecommended AS $strTableName => $arrTable) {
+            $arrStyledTableRecommended[$strTableName] = $this->objSyncCtoHelper->getStyledTableMeta($arrTable);
+        }
+
+        $event->setOptions($arrStyledTableRecommended);
+    }
 }
