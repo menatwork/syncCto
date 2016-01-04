@@ -5,16 +5,18 @@
  *
  * @copyright  MEN AT WORK 2014
  * @package    syncCto
- * @license    GNU/LGPL 
+ * @license    GNU/LGPL
  * @filesource
  */
+
+use ContaoCommunityAlliance\Contao\EventDispatcher\Event\CreateEventDispatcherEvent;
 
 $objInput = \Input::getInstance();
 
 /**
  * Current syncCto version
  */
-$GLOBALS['SYC_VERSION'] = '2.6.0';
+$GLOBALS['SYC_VERSION'] = '3.1.0';
 
 /**
  * Back end modules
@@ -67,7 +69,7 @@ array_insert($GLOBALS['BE_MOD'], $i + 1, array
  * DcGeneral event callbacks
  */
 
-$GLOBALS['TL_EVENTS'][\ContaoCommunityAlliance\Contao\EventDispatcher\Event\CreateEventDispatcherEvent::NAME][] = 'SyncCtoSubscriber::registerEvents';
+$GLOBALS['TL_EVENTS'][CreateEventDispatcherEvent::NAME][] = 'SyncCto\DcGeneral\Events\Subscriber::registerEvents';
 
 /**
  * Mime types
@@ -779,7 +781,7 @@ $GLOBALS["CTOCOM_FUNCTIONS"]["SYNCCTO_GET_PATHLIST"] = array
     "parameter"          => array("name"),
 );
 
-// Get SyncCto Version 
+// Get SyncCto Version
 $GLOBALS["CTOCOM_FUNCTIONS"]["SYNCCTO_VERSION"] = array
 (
     "class"              => "SyncCtoRPCFunctions",

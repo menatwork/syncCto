@@ -6,7 +6,10 @@
  * Date: 24.07.14
  * Time: 12:07
  */
-abstract class SyncCtoTableBase
+
+namespace SyncCto\DcGeneral\Events;
+
+abstract class Base
 {
     /**
      * Check if the file cache is active or not.
@@ -17,7 +20,7 @@ abstract class SyncCtoTableBase
         $strInitFilePath = '/system/config/initconfig.php';
         if (file_exists(TL_ROOT . $strInitFilePath))
         {
-            $strFile        = new File($strInitFilePath);
+            $strFile        = new \File($strInitFilePath);
             $arrFileContent = $strFile->getContentAsArray();
             foreach ($arrFileContent AS $strContent)
             {
@@ -33,4 +36,4 @@ abstract class SyncCtoTableBase
             }
         }
     }
-} 
+}

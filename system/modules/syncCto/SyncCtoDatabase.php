@@ -985,14 +985,23 @@ class SyncCtoDatabase extends \Backend
     }
 
     /**
-     * Restore database-backup from zip
+     * Restore database-backup from zip.
      *
      * @param string $strRestoreFile Path to file like system/backup/backup.zip
-     * @param bool $booTruncate
+     *
+     * @param null   $arrSuffixSQL
+     *
      * @return type
+     *
+     * @throws Exception
+     *
+     * @internal param bool $booTruncate
      */
     public function runRestore($strRestoreFile, $arrSuffixSQL = null)
     {
+        // Load the path builder.
+        $pathBuilder = new \SyncCto\Helper\PathBuilder();
+
         try
         {
             // Set time out for database. Ticket #2653
@@ -1015,7 +1024,12 @@ class SyncCtoDatabase extends \Backend
                     // Get structure
                     if ($objZipRead->getFile($this->strFilenameSyncCto))
                     {
-                        $objGzFile = new File("system/tmp/$this->strFilenameSyncCto.gz");
+                        $zipPath = $pathBuilder
+                            ->addPath('system/tmp')
+                            ->addUnknownPath(sprintf('%s.gz', $this->strFilenameSyncCto))
+                            ->getPath(false);
+
+                        $objGzFile = new File($zipPath);
                         $objGzFile->write($objZipRead->unzip());
                         $objGzFile->close();
 
@@ -1023,11 +1037,19 @@ class SyncCtoDatabase extends \Backend
                     }
                     else
                     {
+                        $strRestoreFile = $pathBuilder
+                            ->addUnknownPath($strRestoreFile)
+                            ->getPath(false);
+
                         $arrRestoreTables = $this->runRestoreFromSer($strRestoreFile);
                     }
                     break;
 
                 case "synccto":
+                    $strRestoreFile = $pathBuilder
+                        ->addUnknownPath($strRestoreFile)
+                        ->getPath(false);
+
                     $arrRestoreTables = $this->runRestoreFromXML($strRestoreFile);
                     break;
 
