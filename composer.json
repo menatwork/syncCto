@@ -31,7 +31,7 @@
 		"contao/core":">=3.2,<4.0",
 		"contao-community-alliance/composer-installer":"*",
 		"menatwork/contao-multicolumnwizard":"~3.2",
-		"menatwork/ctocommunication":"~1.2",
+		"menatwork/ctocommunication":"~2.0",
 		"contao-community-alliance/dc-general": "2.0.*@dev",
 		"menatwork/ziparchivecto":"~1.1"
 	},
