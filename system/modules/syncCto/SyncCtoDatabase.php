@@ -1005,16 +1005,23 @@ class SyncCtoDatabase extends \Backend
         try
         {
             // Set time out for database. Ticket #2653
-            if ($GLOBALS['TL_CONFIG']['syncCto_custom_settings'] == true
-                    && intval($GLOBALS['TL_CONFIG']['syncCto_wait_timeout']) > 0
-                    && intval($GLOBALS['TL_CONFIG']['syncCto_interactive_timeout']) > 0)
-            {
-                $this->Database->query('SET SESSION wait_timeout = GREATEST(' . intval($GLOBALS['TL_CONFIG']['syncCto_wait_timeout']) . ', @@wait_timeout), SESSION interactive_timeout = GREATEST(' . intval($GLOBALS['TL_CONFIG']['syncCto_interactive_timeout']) . ', @@wait_timeout);');
+            $tmpResult = \Database::getInstance()
+                    ->execute('SELECT @@SESSION.wait_timeout as wTimeout, @@SESSION.interactive_timeout as iTimeout');
+
+            $waitTimeOut = $tmpResult->wTimeout;
+            $interactiveTimeout = $tmpResult->iTimeout;
+
+            //overwrite the default values if higher ones are defined in the settings
+            if ($GLOBALS['TL_CONFIG']['syncCto_custom_settings'] == true && intval($GLOBALS['TL_CONFIG']['syncCto_wait_timeout']) > 0 &&
+                    intval($GLOBALS['TL_CONFIG']['syncCto_interactive_timeout']) > 0
+            ) {
+                $waitTimeOut = max($waitTimeOut, intval($GLOBALS['TL_CONFIG']['syncCto_wait_timeout']));
+                $interactiveTimeout = max(interactiveTimeout, intval($GLOBALS['TL_CONFIG']['syncCto_interactive_timeout']));
             }
-            else
-            {
-                $this->Database->query('SET SESSION wait_timeout = GREATEST(28000, @@wait_timeout), SESSION interactive_timeout = GREATEST(28000, @@wait_timeout);');
-            }
+
+            \Database::getInstance()
+                    ->prepare('SET SESSION wait_timeout = ?,SESSION interactive_timeout = ?;')
+                    ->execute($waitTimeOut, $interactiveTimeout);
 
             switch (pathinfo($strRestoreFile, PATHINFO_EXTENSION))
             {
