@@ -1016,12 +1016,12 @@ class SyncCtoDatabase extends \Backend
                     intval($GLOBALS['TL_CONFIG']['syncCto_interactive_timeout']) > 0
             ) {
                 $waitTimeOut = max($waitTimeOut, intval($GLOBALS['TL_CONFIG']['syncCto_wait_timeout']));
-                $interactiveTimeout = max(interactiveTimeout, intval($GLOBALS['TL_CONFIG']['syncCto_interactive_timeout']));
+                $interactiveTimeout = max($interactiveTimeout, intval($GLOBALS['TL_CONFIG']['syncCto_interactive_timeout']));
             }
 
             \Database::getInstance()
                     ->prepare('SET SESSION wait_timeout = ?,SESSION interactive_timeout = ?;')
-                    ->execute($waitTimeOut, $interactiveTimeout);
+                    ->execute(intval($waitTimeOut), intval($interactiveTimeout));
 
             switch (pathinfo($strRestoreFile, PATHINFO_EXTENSION))
             {
