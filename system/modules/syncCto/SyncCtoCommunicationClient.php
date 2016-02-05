@@ -14,7 +14,7 @@
  *
  * Extends CtoCommunication witch special RPC-Requests
  */
-class SyncCtoCommunicationClient extends CtoCommunication
+class SyncCtoCommunicationClient extends \CtoCommunication\Serivces\Server
 {
     /* -------------------------------------------------------------------------
      * Vars
@@ -69,7 +69,7 @@ class SyncCtoCommunicationClient extends CtoCommunication
     public function setClientBy($id)
     {
         // Load Client from database
-        $objClient = $this->Database->prepare("SELECT * FROM tl_synccto_clients WHERE id = %s")
+        $objClient = \Database::getInstance()->prepare("SELECT * FROM tl_synccto_clients WHERE id = %s")
             ->limit(1)
             ->execute((int)$id);
 
@@ -93,15 +93,12 @@ class SyncCtoCommunicationClient extends CtoCommunication
             $strUrl = $objClient->address . ":" . $objClient->port . $objClient->path . "/ctoCommunication.php";
         }
 
-        $this->setClient($strUrl, $objClient->codifyengine);
-        $this->setApiKey($objClient->apikey);
+        $this->setClient($strUrl, $objClient->apikey, $objClient->codifyengine);
 
         if ($objClient->http_auth == true)
         {
-            $this->import("Encryption");
-
             $this->strHTTPUser     = $objClient->http_username;
-            $this->strHTTPPassword = $this->Encryption->decrypt($objClient->http_password);
+            $this->strHTTPPassword = \Encryption::decrypt($objClient->http_password);
         }
 
         // Set debug modus for ctoCom.
@@ -146,7 +143,7 @@ class SyncCtoCommunicationClient extends CtoCommunication
      */
     public function referrerDisable()
     {
-        return $this->runServer("CTOCOM_REFERRER_DISABLE");
+        return $this->run("CTOCOM_REFERRER_DISABLE");
     }
 
     /**
@@ -156,7 +153,7 @@ class SyncCtoCommunicationClient extends CtoCommunication
      */
     public function referrerEnable()
     {
-        return $this->runServer("CTOCOM_REFERRER_ENABLE");
+        return $this->run("CTOCOM_REFERRER_ENABLE");
     }
 
     /* -------------------------------------------------------------------------
@@ -170,7 +167,7 @@ class SyncCtoCommunicationClient extends CtoCommunication
      */
     public function getVersionSyncCto()
     {
-        return $this->runServer("SYNCCTO_VERSION");
+        return $this->run("SYNCCTO_VERSION");
     }
 
     /**
@@ -180,7 +177,7 @@ class SyncCtoCommunicationClient extends CtoCommunication
      */
     public function getVersionContao()
     {
-        return $this->runServer("CONTAO_VERSION");
+        return $this->run("CONTAO_VERSION");
     }
 
     /**
@@ -190,7 +187,7 @@ class SyncCtoCommunicationClient extends CtoCommunication
      */
     public function getVersionCtoCommunication()
     {
-        return $this->runServer("CTOCOM_VERSION");
+        return $this->run("CTOCOM_VERSION");
     }
 
     /**
@@ -200,7 +197,7 @@ class SyncCtoCommunicationClient extends CtoCommunication
      */
     public function getClientParameter()
     {
-        return $this->runServer("SYNCCTO_PARAMETER");
+        return $this->run("SYNCCTO_PARAMETER");
     }
 
     /**
@@ -210,7 +207,7 @@ class SyncCtoCommunicationClient extends CtoCommunication
      */
     public function getPurgData()
     {
-        return $this->runServer("SYNCCTO_GET_PURGEDATA");
+        return $this->run("SYNCCTO_GET_PURGEDATA");
     }
 
     /**
@@ -227,7 +224,7 @@ class SyncCtoCommunicationClient extends CtoCommunication
             ),
         );
 
-        return $this->runServer("SYNCCTO_SET_ATTENTION_FLAG", $arrData);
+        return $this->run("SYNCCTO_SET_ATTENTION_FLAG", $arrData);
     }
 
     /**
@@ -244,7 +241,7 @@ class SyncCtoCommunicationClient extends CtoCommunication
             ),
         );
 
-        return $this->runServer("SYNCCTO_SET_DISPLAY_ERRORS_FLAG", $arrData);
+        return $this->run("SYNCCTO_SET_DISPLAY_ERRORS_FLAG", $arrData);
     }
 
     /* -------------------------------------------------------------------------
@@ -258,12 +255,12 @@ class SyncCtoCommunicationClient extends CtoCommunication
      */
     public function purgeTempFolder()
     {
-        return $this->runServer("SYNCCTO_PURGETEMP");
+        return $this->run("SYNCCTO_PURGETEMP");
     }
 
     public function purgeTempTables()
     {
-        return $this->runServer("SYNCCTO_PURGETEMP_TABLES");
+        return $this->run("SYNCCTO_PURGETEMP_TABLES");
     }
 
     /**
@@ -273,7 +270,7 @@ class SyncCtoCommunicationClient extends CtoCommunication
      */
     public function purgeCache()
     {
-        return $this->runServer("SYNCCTO_PURGE_CACHE");
+        return $this->run("SYNCCTO_PURGE_CACHE");
     }
 
     /**
@@ -283,7 +280,7 @@ class SyncCtoCommunicationClient extends CtoCommunication
      */
     public function createCache()
     {
-        return $this->runServer("SYNCCTO_CREATE_CACHE");
+        return $this->run("SYNCCTO_CREATE_CACHE");
     }
 
     /**
@@ -300,7 +297,7 @@ class SyncCtoCommunicationClient extends CtoCommunication
             )
         );
 
-        return $this->runServer("SYNCCTO_MAINTENANCE", $arrData);
+        return $this->run("SYNCCTO_MAINTENANCE", $arrData);
     }
 
     /**
@@ -310,7 +307,7 @@ class SyncCtoCommunicationClient extends CtoCommunication
      */
     public function runFinalOperations()
     {
-        return $this->runServer("SYNCCTO_EXECUTE_FINAL_OPERATIONS");
+        return $this->run("SYNCCTO_EXECUTE_FINAL_OPERATIONS");
     }
 
     /* -------------------------------------------------------------------------
@@ -361,7 +358,7 @@ class SyncCtoCommunicationClient extends CtoCommunication
             )
         );
 
-        return $this->runServer("SYNCCTO_CHECKSUM_COMPARE", $arrData);
+        return $this->run("SYNCCTO_CHECKSUM_COMPARE", $arrData);
     }
 
     /**
@@ -383,7 +380,7 @@ class SyncCtoCommunicationClient extends CtoCommunication
         // Set no codify engine
         $this->setCodifyEngine(SyncCtoEnum::CODIFY_EMPTY);
 
-        return $this->runServer("SYNCCTO_CHECKSUM_FILES", $arrData);
+        return $this->run("SYNCCTO_CHECKSUM_FILES", $arrData);
     }
 
     /**
@@ -396,7 +393,7 @@ class SyncCtoCommunicationClient extends CtoCommunication
         // Set no codify engine
         $this->setCodifyEngine(SyncCtoEnum::CODIFY_EMPTY);
 
-        return $this->runServer("SYNCCTO_CHECKSUM_CORE");
+        return $this->run("SYNCCTO_CHECKSUM_CORE");
     }
 
     /**
@@ -406,7 +403,7 @@ class SyncCtoCommunicationClient extends CtoCommunication
      */
     public function getChecksumFolderCore()
     {
-        return $this->runServer("SYNCCTO_CHECKSUM_FOLDERS_CORE");
+        return $this->run("SYNCCTO_CHECKSUM_FOLDERS_CORE");
     }
 
     /**
@@ -416,7 +413,7 @@ class SyncCtoCommunicationClient extends CtoCommunication
      */
     public function getChecksumFolderFiles()
     {
-        return $this->runServer("SYNCCTO_CHECKSUM_FOLDERS_FILES");
+        return $this->run("SYNCCTO_CHECKSUM_FOLDERS_FILES");
     }
 
     /**
@@ -457,7 +454,7 @@ class SyncCtoCommunicationClient extends CtoCommunication
             )
         );
 
-        return $this->runServer("SYNCCTO_CHECK_DELETE_FILE", $arrData);
+        return $this->run("SYNCCTO_CHECK_DELETE_FILE", $arrData);
     }
 
     /**
@@ -498,7 +495,7 @@ class SyncCtoCommunicationClient extends CtoCommunication
             )
         );
 
-        return $this->runServer("SYNCCTO_SEARCH_DELETE_FOLDERS", $arrData);
+        return $this->run("SYNCCTO_SEARCH_DELETE_FOLDERS", $arrData);
     }
 
     /**
@@ -553,7 +550,7 @@ class SyncCtoCommunicationClient extends CtoCommunication
             ),
         );
 
-        return $this->runServer("SYNCCTO_SEND_FILE", $arrData);
+        return $this->run("SYNCCTO_SEND_FILE", $arrData);
     }
 
     /**
@@ -609,7 +606,7 @@ class SyncCtoCommunicationClient extends CtoCommunication
             ),
         );
 
-        return $this->runServer("SYNCCTO_SEND_FILE", $arrData);
+        return $this->run("SYNCCTO_SEND_FILE", $arrData);
     }
 
     /**
@@ -635,7 +632,7 @@ class SyncCtoCommunicationClient extends CtoCommunication
             ),
         );
 
-        return $this->runServer("SYNCCTO_IMPORT_FILE", $arrData);
+        return $this->run("SYNCCTO_IMPORT_FILE", $arrData);
     }
 
     /**
@@ -654,7 +651,7 @@ class SyncCtoCommunicationClient extends CtoCommunication
             )
         );
 
-        return $this->runServer("SYNCCTO_UPDATE_DBAFS", $arrData);
+        return $this->run("SYNCCTO_UPDATE_DBAFS", $arrData);
     }
 
     /**
@@ -679,7 +676,7 @@ class SyncCtoCommunicationClient extends CtoCommunication
             ),
         );
 
-        return $this->runServer("SYNCCTO_DELETE_FILE", $arrData);
+        return $this->run("SYNCCTO_DELETE_FILE", $arrData);
     }
 
     /**
@@ -713,7 +710,7 @@ class SyncCtoCommunicationClient extends CtoCommunication
             ),
         );
 
-        return $this->runServer("SYNCCTO_REBUILD_SPLITFILE", $arrData);
+        return $this->run("SYNCCTO_REBUILD_SPLITFILE", $arrData);
     }
 
     /**
@@ -747,7 +744,7 @@ class SyncCtoCommunicationClient extends CtoCommunication
             ),
         );
 
-        return $this->runServer("SYNCCTO_SPLITFILE", $arrData);
+        return $this->run("SYNCCTO_SPLITFILE", $arrData);
     }
 
     /**
@@ -767,7 +764,7 @@ class SyncCtoCommunicationClient extends CtoCommunication
             ),
         );
 
-        $arrResult = $this->runServer("SYNCCTO_GET_FILE", $arrData);
+        $arrResult = $this->run("SYNCCTO_GET_FILE", $arrData);
 
         $objFile = new File($strSavePath);
         $objFile->write(base64_decode($arrResult["content"]));
@@ -798,7 +795,7 @@ class SyncCtoCommunicationClient extends CtoCommunication
             )
         );
 
-        return $this->runServer("SYNCCTO_GET_PATHLIST", $arrData);
+        return $this->run("SYNCCTO_GET_PATHLIST", $arrData);
     }
 
     /**
@@ -818,7 +815,7 @@ class SyncCtoCommunicationClient extends CtoCommunication
             )
         );
 
-        return $this->runServer("SYNCCTO_DBAFS_INFORMATION", $arrData);
+        return $this->run("SYNCCTO_DBAFS_INFORMATION", $arrData);
     }
 
     /* -------------------------------------------------------------------------
@@ -845,7 +842,7 @@ class SyncCtoCommunicationClient extends CtoCommunication
             ),
         );
 
-        return $this->runServer("SYNCCTO_IMPORT_DATABASE", $arrData);
+        return $this->run("SYNCCTO_IMPORT_DATABASE", $arrData);
     }
 
     public function runDatabaseDump($arrTables, $booTempFolder)
@@ -861,7 +858,7 @@ class SyncCtoCommunicationClient extends CtoCommunication
             ),
         );
 
-        return $this->runServer("SYNCCTO_RUN_DUMP", $arrData);
+        return $this->run("SYNCCTO_RUN_DUMP", $arrData);
     }
 
     /**
@@ -885,7 +882,7 @@ class SyncCtoCommunicationClient extends CtoCommunication
             ),
         );
 
-        return $this->runServer("SYNCCTO_DROP_TABLES", $arrData);
+        return $this->run("SYNCCTO_DROP_TABLES", $arrData);
     }
 
     /**
@@ -904,7 +901,7 @@ class SyncCtoCommunicationClient extends CtoCommunication
             )
         );
 
-        return $this->runServer("SYNCCTO_EXECUTE_SQL", $arrData);
+        return $this->run("SYNCCTO_EXECUTE_SQL", $arrData);
     }
 
     public function getClientTimestamp($arrTableList)
@@ -916,7 +913,7 @@ class SyncCtoCommunicationClient extends CtoCommunication
             ),
         );
 
-        return $this->runServer("SYNCCTO_TIMESTAMP", $arrData);
+        return $this->run("SYNCCTO_TIMESTAMP", $arrData);
     }
 
     /**
@@ -926,7 +923,7 @@ class SyncCtoCommunicationClient extends CtoCommunication
      */
     public function getRecommendedTables()
     {
-        return $this->runServer("SYNCCTO_RECOMMENDED_TABLES");
+        return $this->run("SYNCCTO_RECOMMENDED_TABLES");
     }
 
     /**
@@ -936,7 +933,7 @@ class SyncCtoCommunicationClient extends CtoCommunication
      */
     public function getNoneRecommendedTables()
     {
-        return $this->runServer("SYNCCTO_NONERECOMMENDED_TABLES");
+        return $this->run("SYNCCTO_NONERECOMMENDED_TABLES");
     }
 
 
@@ -947,7 +944,7 @@ class SyncCtoCommunicationClient extends CtoCommunication
      */
     public function getHiddenTables()
     {
-        return $this->runServer("SYNCCTO_HIDDEN_TABLES");
+        return $this->run("SYNCCTO_HIDDEN_TABLES");
     }
 
     /**
@@ -957,7 +954,7 @@ class SyncCtoCommunicationClient extends CtoCommunication
      */
     public function getPreparedHiddenTablesPlaceholder()
     {
-        return $this->runServer("SYNCCTO_HIDDEN_TABLES_PLACEHOLDER");
+        return $this->run("SYNCCTO_HIDDEN_TABLES_PLACEHOLDER");
     }
 
     /* -------------------------------------------------------------------------
@@ -992,7 +989,7 @@ class SyncCtoCommunicationClient extends CtoCommunication
             ),
         );
 
-        return $this->runServer("SYNCCTO_IMPORT_CONFIG", $arrData);
+        return $this->run("SYNCCTO_IMPORT_CONFIG", $arrData);
     }
 
     public function getLocalConfig()
@@ -1005,22 +1002,22 @@ class SyncCtoCommunicationClient extends CtoCommunication
         );
 
 
-        return $this->runServer("SYNCCTO_GET_CONFIG", $arrData);
+        return $this->run("SYNCCTO_GET_CONFIG", $arrData);
     }
 
     public function getPhpFunctions()
     {
-        return $this->runServer("SYNCCTO_GET_PHP_FUNCTIONS");
+        return $this->run("SYNCCTO_GET_PHP_FUNCTIONS");
     }
 
     public function getProFunctions()
     {
-        return $this->runServer("SYNCCTO_GET_PRO_FUNCTIONS");
+        return $this->run("SYNCCTO_GET_PRO_FUNCTIONS");
     }
 
     public function getPhpConfigurations()
     {
-        return $this->runServer("SYNCCTO_GET_PHP_CONFIGURATION");
+        return $this->run("SYNCCTO_GET_PHP_CONFIGURATION");
     }
 
     public function getExtendedInformation($strDateFormate)
@@ -1032,7 +1029,7 @@ class SyncCtoCommunicationClient extends CtoCommunication
             ),
         );
 
-        return $this->runServer("SYNCCTO_GET_EXTENDED_INFORMATIONS", $arrData);
+        return $this->run("SYNCCTO_GET_EXTENDED_INFORMATIONS", $arrData);
     }
 
     /**
@@ -1043,7 +1040,7 @@ class SyncCtoCommunicationClient extends CtoCommunication
      */
     public function createPathconfig()
     {
-        return $this->runServer("SYNCCTO_CREATE_PATHCONFIG");
+        return $this->run("SYNCCTO_CREATE_PATHCONFIG");
     }
 
     /* -------------------------------------------------------------------------
@@ -1059,7 +1056,7 @@ class SyncCtoCommunicationClient extends CtoCommunication
             ),
         );
 
-        return $this->runServer("SYNCCTO_AUTO_UPDATE", $arrData);
+        return $this->run("SYNCCTO_AUTO_UPDATE", $arrData);
     }
 
 }
