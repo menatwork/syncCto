@@ -3059,16 +3059,40 @@ class SyncCtoModuleClient extends \BackendModule
                                 if ($objModel != null)
                                 {
                                     $arrModelData         = $objModel->row();
-                                    $arrModelData['pid']  = (strlen($arrModelData['pid'])) ? \String::binToUuid($arrModelData['pid']) : $arrModelData['pid'];
-                                    $arrModelData['uuid'] = \String::binToUuid($arrModelData['uuid']);
+
+                                    // PHP 7 compatibility
+                                    // See #309 (https://github.com/contao/core-bundle/issues/309)
+                                    if (version_compare('3.5.5', VERSION, '>='))
+                                    {
+                                        $arrModelData['pid']  = (strlen($arrModelData['pid'])) ? \StringUtil::binToUuid($arrModelData['pid']) : $arrModelData['pid'];
+                                        $arrModelData['uuid'] = \StringUtil::binToUuid($arrModelData['uuid']);
+                                    }
+
+                                    else
+                                    {
+                                        $arrModelData['pid']  = (strlen($arrModelData['pid'])) ? \String::binToUuid($arrModelData['pid']) : $arrModelData['pid'];
+                                        $arrModelData['uuid'] = \String::binToUuid($arrModelData['uuid']);
+                                    }
                                 }
                                 // if not add it to the current DBAFS.
                                 else
                                 {
                                     $objModel             = \Dbafs::addResource($value['path']);
                                     $arrModelData         = $objModel->row();
-                                    $arrModelData['pid']  = (strlen($arrModelData['pid'])) ? \String::binToUuid($arrModelData['pid']) : $arrModelData['pid'];
-                                    $arrModelData['uuid'] = \String::binToUuid($arrModelData['uuid']);
+
+                                    // PHP 7 compatibility
+                                    // See #309 (https://github.com/contao/core-bundle/issues/309)
+                                    if (version_compare('3.5.5', VERSION, '>='))
+                                    {
+                                        $arrModelData['pid']  = (strlen($arrModelData['pid'])) ? \StringUtil::binToUuid($arrModelData['pid']) : $arrModelData['pid'];
+                                        $arrModelData['uuid'] = \StringUtil::binToUuid($arrModelData['uuid']);
+                                    }
+
+                                    else
+                                    {
+                                        $arrModelData['pid']  = (strlen($arrModelData['pid'])) ? \String::binToUuid($arrModelData['pid']) : $arrModelData['pid'];
+                                        $arrModelData['uuid'] = \String::binToUuid($arrModelData['uuid']);
+                                    }
                                 }
 
                                 $itSupSet[ $key ]['tl_files'] = $arrModelData;
