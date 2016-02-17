@@ -3062,7 +3062,7 @@ class SyncCtoModuleClient extends \BackendModule
 
                                     // PHP 7 compatibility
                                     // See #309 (https://github.com/contao/core-bundle/issues/309)
-                                    if (version_compare('3.5.5', VERSION, '>='))
+                                    if (version_compare('3.5.5', VERSION . '.' . BUILD, '>='))
                                     {
                                         $arrModelData['pid']  = (strlen($arrModelData['pid'])) ? \StringUtil::binToUuid($arrModelData['pid']) : $arrModelData['pid'];
                                         $arrModelData['uuid'] = \StringUtil::binToUuid($arrModelData['uuid']);
@@ -3082,7 +3082,7 @@ class SyncCtoModuleClient extends \BackendModule
 
                                     // PHP 7 compatibility
                                     // See #309 (https://github.com/contao/core-bundle/issues/309)
-                                    if (version_compare('3.5.5', VERSION, '>='))
+                                    if (version_compare('3.5.5', VERSION . '.' . BUILD, '>='))
                                     {
                                         $arrModelData['pid']  = (strlen($arrModelData['pid'])) ? \StringUtil::binToUuid($arrModelData['pid']) : $arrModelData['pid'];
                                         $arrModelData['uuid'] = \StringUtil::binToUuid($arrModelData['uuid']);
