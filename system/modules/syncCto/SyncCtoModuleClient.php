@@ -2583,6 +2583,13 @@ class SyncCtoModuleClient extends \BackendModule
 
                         $arrCompareList = $this->objSyncCtoDatabase->getFormatedCompareList($arrServerTables, $arrClientTables, $arrHiddenTables, $arrHiddenTablesPlaceholder, $arrAllTimeStamps['server'], $arrAllTimeStamps['client'], $arrAllowedTables, 'server', 'client');
 
+                        if(count($arrCompareList['recommended']) == 0 && count($arrCompareList['none_recommended']) == 0 && ($this->arrSyncSettings['syncCto_SyncTlFiles'] || $this->arrSyncSettings['automode'])){
+                            $this->arrSyncSettings['syncCto_SyncTables'][] = 'tl_files';
+                            $this->objStepPool->step = ($this->objStepPool->step + 2);
+
+                            break;
+                        }
+
                         if (count($arrCompareList['recommended']) == 0 && count($arrCompareList['none_recommended']) == 0)
                         {
                             $this->objData->setState(SyncCtoEnum::WORK_SKIPPED);
