@@ -2779,7 +2779,7 @@ class SyncCtoModuleClient extends \BackendModule
                                 $objCallbackClass = new $callback[0]();
                             }
 
-                            $mixReturn = $objCallbackClass->$callback[1]($this->intClientID, $this->arrSyncSettings['syncCto_SyncTables'], $arrSQL);
+                            $mixReturn = $objCallbackClass->{$callback[1]}($this->intClientID, $this->arrSyncSettings['syncCto_SyncTables'], $arrSQL);
 
                             if (!empty($mixReturn) && is_array($mixReturn))
                             {
@@ -2846,7 +2846,7 @@ class SyncCtoModuleClient extends \BackendModule
                                 $objCallbackClass = new $callback[0]();
                             }
 
-                            $mixReturn = $objCallbackClass->$callback[1]($this->intClientID, $arrSQL);
+                            $mixReturn = $objCallbackClass->{$callback[1]}($this->intClientID, $arrSQL);
 
                             if (!empty($mixReturn) && is_array($mixReturn))
                             {
@@ -3409,7 +3409,7 @@ class SyncCtoModuleClient extends \BackendModule
                                 $objCallbackClass = new $arrCurrentFunction[0]();
                             }
 
-                            $objCallbackClass->$arrCurrentFunction[1]($this, $this->intClientID);
+                            $objCallbackClass->{$arrCurrentFunction[1]}($this, $this->intClientID);
                         }
                         catch (Exception $exc)
                         {
@@ -4854,7 +4854,7 @@ class SyncCtoModuleClient extends \BackendModule
                                 $objCallbackClass = new $callback[0]();
                             }
 
-                            $mixReturn = $objCallbackClass->$callback[1]($this->intClientID, $this->arrSyncSettings['syncCto_SyncTables'], $arrSQL);
+                            $mixReturn = $objCallbackClass->{$callback[1]}($this->intClientID, $this->arrSyncSettings['syncCto_SyncTables'], $arrSQL);
 
                             if (!empty($mixReturn) && is_array($mixReturn))
                             {
