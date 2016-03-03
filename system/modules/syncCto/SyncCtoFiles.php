@@ -269,8 +269,21 @@ class SyncCtoFiles extends \Backend
         {
             $objModel                      = \Dbafs::addResource(str_replace('\\\\', '/', $strFilePath));
             $arrModelData                  = $objModel->row();
-            $arrModelData['uuid']          = \String::binToUuid($arrModelData['uuid']);
-            $arrModelData['pid']           = (strlen($arrModelData['pid'])) ? \String::binToUuid($arrModelData['pid']) : $arrModelData['pid'];
+
+            // PHP 7 compatibility
+            // See #309 (https://github.com/contao/core-bundle/issues/309)
+            if (version_compare('3.5.5', VERSION . '.' . BUILD, '>='))
+            {
+                $arrModelData['uuid']      = \StringUtil::binToUuid($arrModelData['uuid']);
+                $arrModelData['pid']       = (strlen($arrModelData['pid'])) ? \StringUtil::binToUuid($arrModelData['pid']) : $arrModelData['pid'];
+            }
+
+            else
+            {
+                $arrModelData['uuid']      = \String::binToUuid($arrModelData['uuid']);
+                $arrModelData['pid']       = (strlen($arrModelData['pid'])) ? \String::binToUuid($arrModelData['pid']) : $arrModelData['pid'];
+            }
+
             $arrModelData['tail']          = $this->getDbafsTailFor($arrModelData['pid']);
 
             return $arrModelData;
@@ -284,8 +297,21 @@ class SyncCtoFiles extends \Backend
         else
         {
             $arrModelData                  = $objModel->row();
-            $arrModelData['uuid']          = \String::binToUuid($arrModelData['uuid']);
-            $arrModelData['pid']           = (strlen($arrModelData['pid'])) ? \String::binToUuid($arrModelData['pid']) : $arrModelData['pid'];
+
+            // PHP 7 compatibility
+            // See #309 (https://github.com/contao/core-bundle/issues/309)
+            if (version_compare('3.5.5', VERSION . '.' . BUILD, '>='))
+            {
+                $arrModelData['uuid']      = \StringUtil::binToUuid($arrModelData['uuid']);
+                $arrModelData['pid']       = (strlen($arrModelData['pid'])) ? \StringUtil::binToUuid($arrModelData['pid']) : $arrModelData['pid'];
+            }
+
+            else
+            {
+                $arrModelData['uuid']      = \String::binToUuid($arrModelData['uuid']);
+                $arrModelData['pid']       = (strlen($arrModelData['pid'])) ? \String::binToUuid($arrModelData['pid']) : $arrModelData['pid'];
+            }
+
             $arrModelData['tail']          = $this->getDbafsTailFor($arrModelData['pid']);
 
             return $arrModelData;
@@ -324,8 +350,20 @@ class SyncCtoFiles extends \Backend
 
             // Bin to string cast.
             $arrModelData         = $objModel->row();
-            $arrModelData['uuid'] = \String::binToUuid($arrModelData['uuid']);
-            $arrModelData['pid']  = (strlen($arrModelData['pid'])) ? \String::binToUuid($arrModelData['pid']) : $arrModelData['pid'];
+
+            // PHP 7 compatibility
+            // See #309 (https://github.com/contao/core-bundle/issues/309)
+            if (version_compare('3.5.5', VERSION . '.' . BUILD, '>='))
+            {
+                $arrModelData['uuid'] = \StringUtil::binToUuid($arrModelData['uuid']);
+                $arrModelData['pid']  = (strlen($arrModelData['pid'])) ? \StringUtil::binToUuid($arrModelData['pid']) : $arrModelData['pid'];
+            }
+
+            else
+            {
+                $arrModelData['uuid'] = \String::binToUuid($arrModelData['uuid']);
+                $arrModelData['pid']  = (strlen($arrModelData['pid'])) ? \String::binToUuid($arrModelData['pid']) : $arrModelData['pid'];
+            }
 
             // Save to the array.
             $arrTail[$mixPID] = $arrModelData;
@@ -483,7 +521,18 @@ class SyncCtoFiles extends \Backend
 
                     // First add it to the dbafs.
                     $objLocaleData       = \Dbafs::addResource($arrFile['path']);
-                    $objLocaleData->uuid = \String::uuidToBin($arrFile['tl_files']['uuid']);
+
+                    // PHP 7 compatibility
+                    // See #309 (https://github.com/contao/core-bundle/issues/309)
+                    if (version_compare('3.5.5', VERSION . '.' . BUILD, '>='))
+                    {
+                        $objLocaleData->uuid = \StringUtil::uuidToBin($arrFile['tl_files']['uuid']);
+                    }
+
+                    else
+                    {
+                        $objLocaleData->uuid = \String::uuidToBin($arrFile['tl_files']['uuid']);
+                    }
                     $objLocaleData->meta = $arrFile['tl_files']['meta'];
                     $objLocaleData->save();
 
@@ -1728,7 +1777,19 @@ class SyncCtoFiles extends \Backend
                         {
                             // First add it to the dbafs.
                             $objLocaleData       = \Dbafs::addResource($strFileDestination);
-                            $objLocaleData->uuid = \String::uuidToBin($value['tl_files']['uuid']);
+
+                            // PHP 7 compatibility
+                            // See #309 (https://github.com/contao/core-bundle/issues/309)
+                            if (version_compare('3.5.5', VERSION . '.' . BUILD, '>='))
+                            {
+                                $objLocaleData->uuid = \StringUtil::uuidToBin($value['tl_files']['uuid']);
+                            }
+
+                            else
+                            {
+                                $objLocaleData->uuid = \String::uuidToBin($value['tl_files']['uuid']);
+                            }
+
                             $objLocaleData->meta = $value['tl_files']['meta'];
                             $objLocaleData->save();
 
@@ -1739,8 +1800,19 @@ class SyncCtoFiles extends \Backend
                     }
                     else
                     {
-                        // Get the readable UUID for the work.
-                        $strLocaleUUID = \String::binToUuid($objLocaleData->uuid);
+                        // PHP 7 compatibility
+                        // See #309 (https://github.com/contao/core-bundle/issues/309)
+                        if (version_compare('3.5.5', VERSION . '.' . BUILD, '>='))
+                        {
+                            // Get the readable UUID for the work.
+                            $strLocaleUUID = \StringUtil::binToUuid($objLocaleData->uuid);
+                        }
+
+                        else
+                        {
+                            // Get the readable UUID for the work.
+                            $strLocaleUUID = \String::binToUuid($objLocaleData->uuid);
+                        }
 
                         // Okay it seems we have already a file with this values.
                         if ($strLocaleUUID == $value['tl_files']['uuid'])
@@ -1797,7 +1869,19 @@ class SyncCtoFiles extends \Backend
                             {
                                 // First add it to the dbafs.
                                 $objLocaleData       = \Dbafs::addResource($strFileDestination);
-                                $objLocaleData->uuid = \String::uuidToBin($value['tl_files']['uuid']);
+
+                                // PHP 7 compatibility
+                                // See #309 (https://github.com/contao/core-bundle/issues/309)
+                                if (version_compare('3.5.5', VERSION . '.' . BUILD, '>='))
+                                {
+                                    $objLocaleData->uuid = \StringUtil::uuidToBin($value['tl_files']['uuid']);
+                                }
+
+                                else
+                                {
+                                    $objLocaleData->uuid = \String::uuidToBin($value['tl_files']['uuid']);
+                                }
+
                                 $objLocaleData->meta = $value['tl_files']['meta'];
                                 $objLocaleData->save();
 
