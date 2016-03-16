@@ -272,7 +272,7 @@ class SyncCtoFiles extends \Backend
 
             // PHP 7 compatibility
             // See #309 (https://github.com/contao/core-bundle/issues/309)
-            if (version_compare('3.5.5', VERSION . '.' . BUILD, '>='))
+            if (version_compare(VERSION . '.' . BUILD, '3.5.5', '>='))
             {
                 $arrModelData['uuid']      = \StringUtil::binToUuid($arrModelData['uuid']);
                 $arrModelData['pid']       = (strlen($arrModelData['pid'])) ? \StringUtil::binToUuid($arrModelData['pid']) : $arrModelData['pid'];
@@ -300,7 +300,7 @@ class SyncCtoFiles extends \Backend
 
             // PHP 7 compatibility
             // See #309 (https://github.com/contao/core-bundle/issues/309)
-            if (version_compare('3.5.5', VERSION . '.' . BUILD, '>='))
+            if (version_compare(VERSION . '.' . BUILD, '3.5.5', '>='))
             {
                 $arrModelData['uuid']      = \StringUtil::binToUuid($arrModelData['uuid']);
                 $arrModelData['pid']       = (strlen($arrModelData['pid'])) ? \StringUtil::binToUuid($arrModelData['pid']) : $arrModelData['pid'];
@@ -353,7 +353,7 @@ class SyncCtoFiles extends \Backend
 
             // PHP 7 compatibility
             // See #309 (https://github.com/contao/core-bundle/issues/309)
-            if (version_compare('3.5.5', VERSION . '.' . BUILD, '>='))
+            if (version_compare(VERSION . '.' . BUILD, '3.5.5', '>='))
             {
                 $arrModelData['uuid'] = \StringUtil::binToUuid($arrModelData['uuid']);
                 $arrModelData['pid']  = (strlen($arrModelData['pid'])) ? \StringUtil::binToUuid($arrModelData['pid']) : $arrModelData['pid'];
@@ -524,7 +524,7 @@ class SyncCtoFiles extends \Backend
 
                     // PHP 7 compatibility
                     // See #309 (https://github.com/contao/core-bundle/issues/309)
-                    if (version_compare('3.5.5', VERSION . '.' . BUILD, '>='))
+                    if (version_compare(VERSION . '.' . BUILD, '3.5.5', '>='))
                     {
                         $objLocaleData->uuid = \StringUtil::uuidToBin($arrFile['tl_files']['uuid']);
                     }
@@ -1780,7 +1780,7 @@ class SyncCtoFiles extends \Backend
 
                             // PHP 7 compatibility
                             // See #309 (https://github.com/contao/core-bundle/issues/309)
-                            if (version_compare('3.5.5', VERSION . '.' . BUILD, '>='))
+                            if (version_compare(VERSION . '.' . BUILD, '3.5.5', '>='))
                             {
                                 $objLocaleData->uuid = \StringUtil::uuidToBin($value['tl_files']['uuid']);
                             }
@@ -1802,7 +1802,7 @@ class SyncCtoFiles extends \Backend
                     {
                         // PHP 7 compatibility
                         // See #309 (https://github.com/contao/core-bundle/issues/309)
-                        if (version_compare('3.5.5', VERSION . '.' . BUILD, '>='))
+                        if (version_compare(VERSION . '.' . BUILD, '3.5.5', '>='))
                         {
                             // Get the readable UUID for the work.
                             $strLocaleUUID = \StringUtil::binToUuid($objLocaleData->uuid);
@@ -1872,7 +1872,7 @@ class SyncCtoFiles extends \Backend
 
                                 // PHP 7 compatibility
                                 // See #309 (https://github.com/contao/core-bundle/issues/309)
-                                if (version_compare('3.5.5', VERSION . '.' . BUILD, '>='))
+                                if (version_compare(VERSION . '.' . BUILD, '3.5.5', '>='))
                                 {
                                     $objLocaleData->uuid = \StringUtil::uuidToBin($value['tl_files']['uuid']);
                                 }
