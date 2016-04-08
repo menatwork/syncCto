@@ -199,7 +199,7 @@ $GLOBALS['SYC_CONFIG']['mime_types'] = array_merge((array) $GLOBALS['SYC_CONFIG'
 /**
  * Hooks
  */
-$GLOBALS['TL_HOOKS']['executePreActions'][]          = array('SyncCtoHelper', 'pingClientStatus');
+$GLOBALS['TL_HOOKS']['executePreActions'][]          = array('SyncCto\Helper\Ping', 'pingClientStatus');
 $GLOBALS['TL_HOOKS']['parseBackendTemplate'][]       = array('SyncCtoHelper', 'checkExtensions');
 $GLOBALS['TL_HOOKS']['parseBackendTemplate'][]       = array('SyncCtoHelper', 'checkLockStatus');
 $GLOBALS['TL_HOOKS']['addCustomRegexp'][]            = array('SyncCtoHelper', 'customRegexp');
