@@ -1,10 +1,12 @@
 <?php
 
 /**
- * Created by PhpStorm.
- * User: stefan.heimes
- * Date: 24.07.14
- * Time: 12:07
+ * Contao Open Source CMS
+ *
+ * @copyright  MEN AT WORK 2015
+ * @package    syncCto
+ * @license    GNU/LGPL
+ * @filesource
  */
 
 namespace SyncCto\DcGeneral\Events;
