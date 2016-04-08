@@ -3,7 +3,7 @@
 /**
  * Contao Open Source CMS
  *
- * @copyright  MEN AT WORK 2015
+ * @copyright  MEN AT WORK 2016
  * @package    syncCto
  * @license    GNU/LGPL
  * @filesource

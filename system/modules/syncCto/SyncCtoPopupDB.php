@@ -301,7 +301,7 @@ class SyncCtoPopupDB extends Backend
             }
         }
 
-        // Little mapping for names        
+        // Little mapping for names
         if (is_array($GLOBALS['SYC_CONFIG']['database_mapping']) && array_key_exists($strName, $GLOBALS['SYC_CONFIG']['database_mapping']))
         {
             $strRealSystemName = $GLOBALS['SYC_CONFIG']['database_mapping'][$strName];
