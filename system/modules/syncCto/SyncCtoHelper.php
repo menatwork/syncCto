@@ -779,7 +779,7 @@ class SyncCtoHelper extends \Backend
                     $this->log("Start executing TL_HOOK $callback[0] | $callback[1]", __CLASS__ . "|" . __FUNCTION__, TL_GENERAL);
 
                     $this->import($callback[0]);
-                    $this->$callback[0]->$callback[1]();
+                    $this->{$callback[0]}->{$callback[1]}();
 
                     $this->log("Finished executing TL_HOOK $callback[0] | $callback[1]", __CLASS__ . "|" . __FUNCTION__, TL_GENERAL);
                 }
