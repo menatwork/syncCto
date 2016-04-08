@@ -12,7 +12,7 @@
 /**
  * Helper class for syncCto. Callback functions, small global helper functions.
  */
-class SyncCtoHelper extends \Backend
+class SyncCtoHelper
 {
     /* -------------------------------------------------------------------------
      * Vars
@@ -23,6 +23,11 @@ class SyncCtoHelper extends \Backend
 
     // Objects
     protected $objSyncCtoDatabase;
+
+    /**
+     * @var \FrontendUser|\BackendUser
+     */
+    protected $user;
 
     // Cache
     protected $arrPreparedBlacklistFolder;
@@ -43,16 +48,16 @@ class SyncCtoHelper extends \Backend
      */
     public function __construct()
     {
-        // Import
-        $this->import("BackendUser");
-        $this->import("String");
-
-        // Parent
-        parent::__construct();
+        // If we are in the Backend-Mode use the BackendUser.
+        if(TL_MODE == 'FE'){
+            $this->user = \FrontendUser::getInstance();
+        } else{
+            $this->user = \BackendUser::getInstance();
+        }
 
         // Language
-        $this->loadLanguageFile("default");
-        $this->loadLanguageFile('tl_synccto_clients');
+        \Controller::loadLanguageFile("default");
+        \Controller::loadLanguageFile('tl_synccto_clients');
 
         // Instance a list for regex from the blacklist for folders.
         $this->arrPreparedBlacklistFolder = array();
@@ -457,9 +462,9 @@ class SyncCtoHelper extends \Backend
     public function addLegend($strContent, $strTemplate)
     {
         // Check some vars if we have the overview.
-        $strDo    = \Input::getInstance()->get('do');
-        $strTable = \Input::getInstance()->get('table');
-        $strAct   = \Input::getInstance()->get('act');
+        $strDo    = \Input::get('do');
+        $strTable = \Input::get('table');
+        $strAct   = \Input::get('act');
 
         if ($strDo == 'synccto_clients' && empty($strAct) && empty($strTable) && $strTemplate == 'be_main')
         {
@@ -515,7 +520,7 @@ class SyncCtoHelper extends \Backend
             // check for required extensions
             foreach ($arrRequiredExtensions as $key => $val)
             {
-                if (!in_array($val, \Config::getInstance()->getActiveModules()))
+                if (!in_array($val, \ModuleLoader::getActive()))
                 {
                     $_SESSION["TL_INFO"] = array_merge($_SESSION["TL_INFO"], array($val => 'Please install the required extension <strong>' . $key . '</strong>'));
                 }
@@ -529,7 +534,7 @@ class SyncCtoHelper extends \Backend
             }
 
             // Check syncCtoPro, if not set remove triggers.
-            if (!in_array('syncCtoPro', \Config::getInstance()->getActiveModules())
+            if (!in_array('syncCtoPro', \ModuleLoader::getActive())
                 && ($this->hasTrigger('tl_page') || $this->hasTrigger('tl_article') || $this->hasTrigger('tl_content'))
             )
             {
@@ -579,13 +584,13 @@ class SyncCtoHelper extends \Backend
      */
     public function getFileSyncOptions()
     {
-        if ($this->BackendUser->isAdmin)
+        if ($this->user->isAdmin)
         {
             return $GLOBALS['SYC_CONFIG']['sync_options'];
         }
         else
         {
-            $arrUserSyncOptions = $this->BackendUser->syncCto_sync_options;
+            $arrUserSyncOptions = $this->user->syncCto_sync_options;
 
             $arrSyncOption = array();
             foreach ($GLOBALS['SYC_CONFIG']['sync_options'] AS $fileType => $arrValue)
@@ -630,12 +635,12 @@ class SyncCtoHelper extends \Backend
             {
                 try
                 {
-                    $this->log("Start executing TL_HOOK $callback[0] | $callback[1]", __CLASS__ . "|" . __FUNCTION__, TL_GENERAL);
+                    \Controller::log("Start executing TL_HOOK $callback[0] | $callback[1]", __CLASS__ . "|" . __FUNCTION__, TL_GENERAL);
 
                     $this->import($callback[0]);
                     $this->{$callback[0]}->{$callback[1]}();
 
-                    $this->log("Finished executing TL_HOOK $callback[0] | $callback[1]", __CLASS__ . "|" . __FUNCTION__, TL_GENERAL);
+                    \Controller::log("Finished executing TL_HOOK $callback[0] | $callback[1]", __CLASS__ . "|" . __FUNCTION__, TL_GENERAL);
                 }
                 catch (Exception $exc)
                 {
@@ -644,12 +649,29 @@ class SyncCtoHelper extends \Backend
                         'info_msg' => "Error by: TL_HOOK $callback[0] | $callback[1] with Msg: " . $exc->getMessage()
                     );
 
-                    $this->log("Error by: TL_HOOK $callback[0] | $callback[1] with Msg: " . $exc->getMessage(), __CLASS__ . "|" . __FUNCTION__, TL_ERROR);
+                    \Controller::log("Error by: TL_HOOK $callback[0] | $callback[1] with Msg: " . $exc->getMessage(), __CLASS__ . "|" . __FUNCTION__, TL_ERROR);
                 }
             }
         }
 
         return $arrReturn;
+    }
+
+    /**
+     * Import a library and make it accessible by its name or an optional key
+     *
+     * @param string  $strClass The class name
+     * @param string  $strKey   An optional key to store the object under
+     * @param boolean $blnForce If true, existing objects will be overridden
+     */
+    protected function import($strClass, $strKey=null, $blnForce=false)
+    {
+        $strKey = $strKey ?: $strClass;
+
+        if ($blnForce || !isset($this->arrObjects[$strKey]))
+        {
+            $this->arrObjects[$strKey] = (in_array('getInstance', get_class_methods($strClass))) ? call_user_func(array($strClass, 'getInstance')) : new $strClass();
+        }
     }
 
     /* -------------------------------------------------------------------------
@@ -687,7 +709,7 @@ class SyncCtoHelper extends \Backend
         //first part
         foreach ($arrChunks as $chunkKey => $strChunk)
         {
-            $intCharCount += utf8_strlen($this->String->decodeEntities($strChunk));
+            $intCharCount += utf8_strlen(\StringUtil::decodeEntities($strChunk));
 
             if ($intCharCount++ <= $intNumberOfChars / 2)
             {
@@ -725,7 +747,7 @@ class SyncCtoHelper extends \Backend
         // Second path
         foreach (array_reverse($arrChunks) as $strChunk)
         {
-            $intCharCount += utf8_strlen($this->String->decodeEntities($strChunk));
+            $intCharCount += utf8_strlen(\StringUtil::decodeEntities($strChunk));
 
             if ($intCharCount++ <= $intNumberOfChars / 2)
             {
@@ -847,7 +869,7 @@ class SyncCtoHelper extends \Backend
     {
         $arrTables = array();
 
-        foreach ($this->Database->listTables() as $key => $value)
+        foreach (\Database::getInstance()->listTables() as $key => $value)
         {
             $arrTables[] = $value;
         }
@@ -865,7 +887,7 @@ class SyncCtoHelper extends \Backend
         $arrTables       = array();
         $arrTablesHidden = $this->getTablesHidden();
 
-        foreach ($this->Database->listTables() as $key => $value)
+        foreach (\Database::getInstance()->listTables() as $key => $value)
         {
             // Check if table is a hidden one.
             if (in_array($value, $arrTablesHidden) || preg_match("/synccto_temp_.*/", $value))
@@ -899,7 +921,7 @@ class SyncCtoHelper extends \Backend
             $arrBlacklist = array();
         }
 
-        $arrTablesPermission = $this->BackendUser->syncCto_tables;
+        $arrTablesPermission = $this->user->syncCto_tables;
 
         $arrTables = array();
 
@@ -910,7 +932,7 @@ class SyncCtoHelper extends \Backend
                 continue;
             }
 
-            if (is_array($arrTablesPermission) && !in_array($value, $arrTablesPermission) && $this->BackendUser->isAdmin != true)
+            if (is_array($arrTablesPermission) && !in_array($value, $arrTablesPermission) && $this->user->isAdmin != true)
             {
                 continue;
             }
@@ -935,7 +957,7 @@ class SyncCtoHelper extends \Backend
             $arrBlacklist = array();
         }
 
-        $arrTablesPermission = $this->BackendUser->syncCto_tables;
+        $arrTablesPermission = $this->user->syncCto_tables;
 
         $arrTables = array();
 
@@ -946,7 +968,7 @@ class SyncCtoHelper extends \Backend
                 continue;
             }
 
-            if (is_array($arrTablesPermission) && !in_array($value, $arrTablesPermission) && $this->BackendUser->isAdmin != true)
+            if (is_array($arrTablesPermission) && !in_array($value, $arrTablesPermission) && $this->user->isAdmin != true)
             {
                 continue;
             }
@@ -977,18 +999,18 @@ class SyncCtoHelper extends \Backend
             $arrHiddenlist = array();
         }
 
-        $arrTablesPermission = $this->BackendUser->syncCto_tables;
+        $arrTablesPermission = $this->user->syncCto_tables;
 
         $arrTables = array();
 
-        foreach ($this->Database->listTables() as $key => $value)
+        foreach (\Database::getInstance()->listTables() as $key => $value)
         {
             if (!in_array($value, $arrBlacklist) && !in_array($value, $arrHiddenlist) || preg_match("/synccto_temp_.*/", $value))
             {
                 continue;
             }
 
-            if (is_array($arrTablesPermission) && !in_array($value, $arrTablesPermission) && $this->BackendUser->isAdmin != true)
+            if (is_array($arrTablesPermission) && !in_array($value, $arrTablesPermission) && $this->user->isAdmin != true)
             {
                 continue;
             }
@@ -1011,9 +1033,9 @@ class SyncCtoHelper extends \Backend
     private function getTableMeta($strTableName)
     {
         // Count the entries.
-        $intCount = $this->Database
+        $intCount = \Database::getInstance()
             ->prepare("SELECT COUNT(*) as Count FROM $strTableName")
-            ->executeUncached()
+            ->execute()
             ->Count;
 
         // Try to build the id list.
@@ -1115,9 +1137,11 @@ class SyncCtoHelper extends \Backend
         $arrTimestamp = array();
 
         // Load all Tables.
-        $arrTables = $this->Database->listTables();
+        $arrTables = \Database::getInstance()->listTables();
 
-        $objDBSchema = $this->Database->prepare("SELECT TABLE_NAME, UPDATE_TIME FROM information_schema.TABLES WHERE TABLE_SCHEMA = ?")->executeUncached($GLOBALS['TL_CONFIG']['dbDatabase']);
+        $objDBSchema = \Database::getInstance()
+            ->prepare("SELECT TABLE_NAME, UPDATE_TIME FROM information_schema.TABLES WHERE TABLE_SCHEMA = ?")
+            ->execute($GLOBALS['TL_CONFIG']['dbDatabase']);
 
         $arrDBSchema = array();
         while ($objDBSchema->next())
@@ -1140,7 +1164,7 @@ class SyncCtoHelper extends \Backend
             }
 
             // Check if we have rows in table
-            $objCount = $this->Database->prepare("SELECT COUNT(*) as count FROM $strTable")->execute();
+            $objCount = \Database::getInstance()->prepare("SELECT COUNT(*) as count FROM $strTable")->execute();
             if ($objCount->count == 0)
             {
                 $arrTimestamp[$strTable] = 0;
@@ -1148,7 +1172,7 @@ class SyncCtoHelper extends \Backend
 
             // Load all fields
             $arrFields   = array();
-            $arrDBFields = $this->Database->listFields($strTable);
+            $arrDBFields = \Database::getInstance()->listFields($strTable);
 
             foreach ($arrDBFields as $arrField)
             {
@@ -1189,16 +1213,16 @@ class SyncCtoHelper extends \Backend
         {
             if ($key == "disableRefererCheck" && $value == true)
             {
-                $this->Config->update("\$GLOBALS['TL_CONFIG']['ctoCom_disableRefererCheck']", true);
+                \Config::getInstance()->update("\$GLOBALS['TL_CONFIG']['ctoCom_disableRefererCheck']", true);
             }
 
             if (in_array($key, $arrLocalConfig))
             {
-                $this->Config->update("\$GLOBALS['TL_CONFIG']['" . $key . "']", $value);
+                \Config::getInstance()->update("\$GLOBALS['TL_CONFIG']['" . $key . "']", $value);
             }
             else
             {
-                $this->Config->add("\$GLOBALS['TL_CONFIG']['" . $key . "']", $value);
+                \Config::getInstance()->add("\$GLOBALS['TL_CONFIG']['" . $key . "']", $value);
             }
         }
 
@@ -1208,25 +1232,26 @@ class SyncCtoHelper extends \Backend
     /**
      * Check for customer regular expression
      *
-     * @param type   $strRegexp
-     * @param type   $varValue
+     * @param string $strRegexp
+     *
+     * @param string $varValue
+     *
      * @param Widget $objWidget
      *
      * @return boolean
      */
     public function customRegexp($strRegexp, $varValue, Widget $objWidget)
     {
-        switch ($strRegexp)
-        {
+        switch ($strRegexp) {
             case 'colorRgb':
-                if (!preg_match('/^([0-9a-f]{3}|[0-9a-f]{6})$/i', $varValue))
-                {
+                if (!preg_match('/^([0-9a-f]{3}|[0-9a-f]{6})$/i', $varValue)) {
                     $objWidget->addError('Field ' . $objWidget->label . ' should be a color RGB code.');
                 }
 
                 return true;
                 break;
         }
+
         return false;
     }
 
@@ -1272,7 +1297,7 @@ class SyncCtoHelper extends \Backend
                 }
             }
 
-            $this->redirect($arrCheckSubmit['redirectUrl']);
+            \Backend::redirect($arrCheckSubmit['redirectUrl']);
         }
         else
         {
@@ -1301,15 +1326,15 @@ class SyncCtoHelper extends \Backend
     {
         // Drop Update.
         $strQuery = "DROP TRIGGER IF EXISTS `" . $strTable . "_AfterUpdateHashRefresh`";
-        $this->Database->query($strQuery);
+        \Database::getInstance()->query($strQuery);
 
         // Drop Insert.
         $strQuery = "DROP TRIGGER IF EXISTS `" . $strTable . "_AfterInsertHashRefresh`";
-        $this->Database->query($strQuery);
+        \Database::getInstance()->query($strQuery);
 
         // Drop Delete.
         $strQuery = "DROP TRIGGER IF EXISTS `" . $strTable . "_AfterDeleteHashRefresh`";
-        $this->Database->query($strQuery);
+        \Database::getInstance()->query($strQuery);
     }
 
     /**
@@ -1319,7 +1344,7 @@ class SyncCtoHelper extends \Backend
      */
     public function hasTrigger($strTable)
     {
-        $arrTriggers = $this->Database->query('SHOW TRIGGERS')->fetchEach('Trigger');
+        $arrTriggers = \Database::getInstance()->query('SHOW TRIGGERS')->fetchEach('Trigger');
 
         if (in_array($strTable . "_AfterUpdateHashRefresh", $arrTriggers))
         {

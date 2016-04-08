@@ -37,6 +37,12 @@ class Subscriber
      */
     public static function registerEvents(CreateEventDispatcherEvent $event)
     {
+        // Only register the events for the backend.
+        if(TL_MODE == 'FE'){
+            return;
+        }
+
+        // Get the event dispatcher from the current event.
         $dispatcher = $event->getEventDispatcher();
 
         /*
