@@ -56,7 +56,7 @@ class SyncCtoFiles extends \Backend
         $this->intMaxMemoryUsage = $this->intMaxMemoryUsage / 100 * 30;
 
         // Get execution limit
-        $this->intMaxExecutionTime = intval(ini_get('max_execution_time'));
+        $this->intMaxExecutionTime = SyncCtoHelper::parseRuntime(ini_get('max_execution_time'));
         $this->intMaxExecutionTime = intval($this->intMaxExecutionTime / 100 * 25);
 
         // Flags for file scanning.
