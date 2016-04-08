@@ -2149,6 +2149,7 @@ class SyncCtoModuleClient extends \BackendModule
                             }
                             catch (Exception $exc)
                             {
+                                $this->
                                 $this->arrListCompare[$strType][$key]["transmission"] = SyncCtoEnum::FILETRANS_SKIPPED;
                                 $this->arrListCompare[$strType][$key]["skipreason"]   = $exc->getMessage();
                             }
