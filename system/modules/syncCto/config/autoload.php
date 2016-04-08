@@ -51,6 +51,7 @@ ClassLoader::addClasses(array
     'StepPool'                                  => 'system/modules/syncCto/StepPool.php',
     // Helper
     'SyncCto\Helper\PathBuilder'                => 'system/modules/syncCto/src/SyncCto/Helper/PathBuilder.php',
+    'SyncCto\Helper\Ping'                       => 'system/modules/syncCto/src/SyncCto/Helper/Ping.php',
     // FileList
     'SyncCto\Sync\FileList\Base'                => 'system/modules/syncCto/src/SyncCto/Sync/FileList/Base.php',
     'SyncCto\Sync\FileList\FilterIterator\Base' => 'system/modules/syncCto/src/SyncCto/Sync/FileList/FilterIterator/Base.php',
