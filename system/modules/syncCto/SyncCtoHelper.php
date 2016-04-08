@@ -21,7 +21,7 @@ class SyncCtoHelper extends \Backend
     // instance
     protected static $instance = null;
 
-    // Objects   
+    // Objects
     protected $objSyncCtoDatabase;
 
     // Cache
@@ -121,6 +121,23 @@ class SyncCtoHelper extends \Backend
         }
 
         return $size;
+    }
+
+    /**
+     * Parse the time and return the int-val or PHP_INT_MAX if the value is 0 or -1.
+     *
+     * @param int $time The time to be parsed.
+     *
+     * @return int The time parsed as int.
+     */
+    static public function parseRuntime($time)
+    {
+        $time = intval($time);
+        if ($time == 0 || $time == -1) {
+            return PHP_INT_MAX;
+        }
+
+        return $time;
     }
 
     /* -------------------------------------------------------------------------
@@ -539,7 +556,7 @@ class SyncCtoHelper extends \Backend
                         $strServerBaseUrl .= $objClient->path;
                     }
 
-                    // ---- First check for Contao ---- 
+                    // ---- First check for Contao ----
 
                     $objRequest->send($strServerBaseUrl . '/contao/index.php');
                     if ($objRequest->code != '200')
@@ -553,7 +570,7 @@ class SyncCtoHelper extends \Backend
                         exit();
                     }
 
-                    // ---- Next CtoCom ---- 
+                    // ---- Next CtoCom ----
 
                     $objRequest->send($strServerBaseUrl . '/ctoCommunication.php?act=ping');
                     if ($objRequest->code != '200')
@@ -567,7 +584,7 @@ class SyncCtoHelper extends \Backend
                         exit();
                     }
 
-                    // ---- Next CtoCom Key + SyncCto ---- 
+                    // ---- Next CtoCom Key + SyncCto ----
 
                     $objSyncCtoClient = SyncCtoCommunicationClient::getInstance();
                     $objSyncCtoClient->setClientBy($intClientId);
