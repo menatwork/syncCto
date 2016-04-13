@@ -1508,7 +1508,7 @@ class SyncCtoFiles extends \Backend
                             if(is_array($arrCallback) && count($arrCallback) == 2)
                             {
                                 $this->import($arrCallback[0]);
-                                $this->{$arrCallback[0]}->{$arrCallback[1]()};
+                                $this->{$arrCallback[0]}->{$arrCallback[1]}();
                             }
                         }
                         break;
