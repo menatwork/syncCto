@@ -635,12 +635,50 @@ class SyncCtoHelper
             {
                 try
                 {
-                    \Controller::log("Start executing TL_HOOK $callback[0] | $callback[1]", __CLASS__ . "|" . __FUNCTION__, TL_GENERAL);
+                    // Add log.
+                    \Controller::log
+                    (
+                        "Start executing TL_HOOK $callback[0] | $callback[1]",
+                        __CLASS__ . "|" . __FUNCTION__
+                        , TL_GENERAL
+                    );
 
-                    $this->import($callback[0]);
-                    $this->{$callback[0]}->{$callback[1]}();
+                    // Get the reflection class.
+                    $objReflection = new \ReflectionClass($callback[0]);
 
-                    \Controller::log("Finished executing TL_HOOK $callback[0] | $callback[1]", __CLASS__ . "|" . __FUNCTION__, TL_GENERAL);
+                    // Check if we have a getiInstance or the normal new function.
+                    if ($objReflection->hasMethod("getInstance")) {
+                        $object = call_user_func_array
+                        (
+                            array
+                            (
+                                $callback[0],
+                                "getInstance"
+                            ),
+                            array()
+                        );
+
+                        call_user_func_array
+                        (
+                            array
+                            (
+                                $object,
+                                $callback[1]
+                            ),
+                            array()
+                        );
+                    } else {
+                        $object = new $callback[0];
+                        call_user_func_array(array($object, $callback[1]), array());
+                    }
+
+                    // Add final log.
+                    \Controller::log
+                    (
+                        "Finished executing TL_HOOK $callback[0] | $callback[1]",
+                        __CLASS__ . "|" . __FUNCTION__,
+                        TL_GENERAL
+                    );
                 }
                 catch (Exception $exc)
                 {
@@ -655,23 +693,6 @@ class SyncCtoHelper
         }
 
         return $arrReturn;
-    }
-
-    /**
-     * Import a library and make it accessible by its name or an optional key
-     *
-     * @param string  $strClass The class name
-     * @param string  $strKey   An optional key to store the object under
-     * @param boolean $blnForce If true, existing objects will be overridden
-     */
-    protected function import($strClass, $strKey=null, $blnForce=false)
-    {
-        $strKey = $strKey ?: $strClass;
-
-        if ($blnForce || !isset($this->arrObjects[$strKey]))
-        {
-            $this->arrObjects[$strKey] = (in_array('getInstance', get_class_methods($strClass))) ? call_user_func(array($strClass, 'getInstance')) : new $strClass();
-        }
     }
 
     /* -------------------------------------------------------------------------
