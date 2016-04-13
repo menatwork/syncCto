@@ -709,7 +709,11 @@ class SyncCtoHelper
         //first part
         foreach ($arrChunks as $chunkKey => $strChunk)
         {
-            $intCharCount += utf8_strlen(\StringUtil::decodeEntities($strChunk));
+            if (version_compare(VERSION . '.' . BUILD, '3.5.5', '>=')) {
+                $intCharCount += utf8_strlen(\StringUtil::decodeEntities($strChunk));
+            } else {
+                $intCharCount += utf8_strlen(\String::decodeEntities($strChunk));
+            }
 
             if ($intCharCount++ <= $intNumberOfChars / 2)
             {
@@ -747,7 +751,11 @@ class SyncCtoHelper
         // Second path
         foreach (array_reverse($arrChunks) as $strChunk)
         {
-            $intCharCount += utf8_strlen(\StringUtil::decodeEntities($strChunk));
+            if (version_compare(VERSION . '.' . BUILD, '3.5.5', '>=')) {
+                $intCharCount += utf8_strlen(\StringUtil::decodeEntities($strChunk));
+            } else {
+                $intCharCount += utf8_strlen(\String::decodeEntities($strChunk));
+            }
 
             if ($intCharCount++ <= $intNumberOfChars / 2)
             {
