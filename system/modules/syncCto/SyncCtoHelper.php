@@ -9,6 +9,8 @@
  * @filesource
  */
 
+use SyncCto\Contao\API as ContaoApi;
+
 /**
  * Helper class for syncCto. Callback functions, small global helper functions.
  */
@@ -18,10 +20,14 @@ class SyncCtoHelper
      * Vars
      */
 
-    // instance
+    /**
+     * @var null|SyncCtoHelper
+     */
     protected static $instance = null;
 
-    // Objects
+    /**
+     * @var SyncCtoDatabase
+     */
     protected $objSyncCtoDatabase;
 
     /**
@@ -1139,9 +1145,11 @@ class SyncCtoHelper
         $strReturn = '<span style="color: #' . $strColor . '; padding-left: 3px;">';
         $strReturn .= $strTableName;
         $strReturn .= '<span style="color:#a3a3a3;padding-left: 3px;">';
-        $strReturn .= '(' . $this->getReadableSize($intEntriesSize) . ', ' . vsprintf($GLOBALS['TL_LANG']['MSC']['entries'], array($intEntriesCount)) . ')';
+        $strReturn .= '(' . ContaoApi::getReadableSize($intEntriesSize) . ', '
+                      . vsprintf($GLOBALS['TL_LANG']['MSC']['entries'], array($intEntriesCount)) . ')';
         $strReturn .= '</span>';
         $strReturn .= '</span>';
+
         return $strReturn;
     }
 

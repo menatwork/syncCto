@@ -55,7 +55,7 @@ class Base extends FilterIterator
      *
      * @return array|null The values.
      */
-    public function  getStates()
+    public function getStates()
     {
         return $this->states;
     }
@@ -86,14 +86,12 @@ class Base extends FilterIterator
         $filterStates        = $this->getStates();
 
         // Check transmission if not null.
-        if ($filterTransmissions !== null && !in_array($file['transmission'], $this->getTransmissions()))
-        {
+        if ($filterTransmissions !== null && !in_array($file['transmission'], $this->getTransmissions())) {
             return false;
         }
 
         // Check the state if not null.
-        if ($filterStates !== null && !in_array($file['state'], $this->getStates()))
-        {
+        if ($filterStates !== null && !in_array($file['state'], $this->getStates())) {
             return false;
         }
 

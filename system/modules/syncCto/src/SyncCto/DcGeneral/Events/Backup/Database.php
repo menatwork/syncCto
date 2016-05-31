@@ -37,16 +37,23 @@ class Database extends Base
      */
     public function __construct()
     {
-        $this->BackendUser      = \BackendUser::getInstance();
         $this->objSyncCtoHelper = SyncCtoHelper::getInstance();
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function getContextProviderName()
+    {
+        return 'tl_syncCto_backup_db';
     }
 
     /**
      * @param GetEditModeButtonsEvent $objEvent
      */
-    public static function addButtonBackup(GetEditModeButtonsEvent $objEvent)
+    public function addButtonBackup(GetEditModeButtonsEvent $objEvent)
     {
-        if (!$objEvent->getEnvironment()->hasDataProvider('tl_syncCto_backup_db')) {
+        if (!$this->isRightContext($objEvent->getEnvironment(), 'tl_syncCto_backup_db')) {
             return;
         }
 
@@ -60,9 +67,9 @@ class Database extends Base
     /**
      * @param GetEditModeButtonsEvent $objEvent
      */
-    public static function addButtonRestore(GetEditModeButtonsEvent $objEvent)
+    public function addButtonRestore(GetEditModeButtonsEvent $objEvent)
     {
-        if (!$objEvent->getEnvironment()->hasDataProvider('tl_syncCto_restore_db')) {
+        if (!$this->isRightContext($objEvent->getEnvironment(), 'tl_syncCto_restore_db')) {
             return;
         }
 
@@ -82,7 +89,7 @@ class Database extends Base
      */
     public function submitBackup(PrePersistModelEvent $objEvent)
     {
-        if (!$objEvent->getEnvironment()->hasDataProvider('tl_syncCto_backup_db')) {
+        if (!$this->isRightContext($objEvent->getEnvironment(), 'tl_syncCto_backup_db')) {
             return;
         }
 
@@ -109,13 +116,13 @@ class Database extends Base
 
         // Check the vars.
         $this->objSyncCtoHelper->checkSubmit(array(
-                'postUnset'   => array('start_backup'),
-                'error'       => array(
-                    'key'     => 'syncCto_submit_false',
-                    'message' => $GLOBALS['TL_LANG']['ERR']['no_functions']
-                ),
-                'redirectUrl' => \Environment::get('base') . "contao/main.php?do=syncCto_backups&table=tl_syncCto_backup_db&act=start"
+            'postUnset'   => array('start_backup'),
+            'error'       => array(
+                'key'     => 'syncCto_submit_false',
+                'message' => $GLOBALS['TL_LANG']['ERR']['no_functions']
             ),
+            'redirectUrl' => \Environment::get('base') . "contao/main.php?do=syncCto_backups&table=tl_syncCto_backup_db&act=start"
+        ),
             $arrData
         );
     }
@@ -129,7 +136,7 @@ class Database extends Base
      */
     public function submitRestore(PrePersistModelEvent $objEvent)
     {
-        if (!$objEvent->getEnvironment()->hasDataProvider('tl_syncCto_restore_db')) {
+        if (!$this->isRightContext($objEvent->getEnvironment(), 'tl_syncCto_restore_db')) {
             return;
         }
 
@@ -178,10 +185,11 @@ class Database extends Base
      */
     public function databaseTablesRecommended(GetPropertyOptionsEvent $event)
     {
-        if (
-            !$event->getEnvironment()->hasDataProvider('tl_syncCto_backup_db')
-            || $event->getPropertyName() != 'database_tables_recommended'
-        ) {
+        if (!$this->isRightContext($event->getEnvironment())) {
+            return;
+        }
+
+        if ($event->getPropertyName() != 'database_tables_recommended') {
             return;
         }
 
@@ -204,10 +212,11 @@ class Database extends Base
      */
     public function databaseTablesNoneRecommendedWithHidden(GetPropertyOptionsEvent $event)
     {
-        if (
-            !$event->getEnvironment()->hasDataProvider('tl_syncCto_backup_db')
-            || $event->getPropertyName() != 'database_tables_none_recommended'
-        ) {
+        if (!$this->isRightContext($event->getEnvironment())) {
+            return;
+        }
+
+        if ($event->getPropertyName() != 'database_tables_none_recommended') {
             return;
         }
 

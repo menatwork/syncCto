@@ -14,12 +14,13 @@ namespace SyncCto\DcGeneral\Events\Sync;
 use ContaoCommunityAlliance\DcGeneral\Contao\View\Contao2BackendView\Event\GetEditModeButtonsEvent;
 use ContaoCommunityAlliance\DcGeneral\Event\PrePersistModelEvent;
 use RuntimeException;
+use SyncCto\DcGeneral\Events\Base;
 use SyncCtoHelper;
 
 /**
  * Class for syncTo configurations
  */
-class To
+class To extends Base
 {
     // Vars
     protected $objSyncCtoHelper;
@@ -38,27 +39,31 @@ class To
     }
 
     /**
+     * @inheritdoc
+     */
+    public function getContextProviderName()
+    {
+        return 'tl_syncCto_clients_syncTo';
+    }
+
+    /**
      * @param GetEditModeButtonsEvent $objEvent
      */
-    public static function addButton(GetEditModeButtonsEvent $objEvent)
+    public function addButton(GetEditModeButtonsEvent $objEvent)
     {
-        if (!$objEvent->getEnvironment()->hasDataProvider('tl_syncCto_clients_syncTo')) {
+        if (!$this->isRightContext($objEvent->getEnvironment())) {
             return;
         }
 
         // Check the file cache.
         $strInitFilePath = '/system/config/initconfig.php';
-        if (file_exists(TL_ROOT . $strInitFilePath))
-        {
+        if (file_exists(TL_ROOT . $strInitFilePath)) {
             $strFile        = new \File($strInitFilePath);
             $arrFileContent = $strFile->getContentAsArray();
-            foreach ($arrFileContent AS $strContent)
-            {
-                if (!preg_match("/(\/\*|\*|\*\/|\/\/)/", $strContent))
-                {
+            foreach ($arrFileContent AS $strContent) {
+                if (!preg_match("/(\/\*|\*|\*\/|\/\/)/", $strContent)) {
                     //system/tmp.
-                    if (preg_match("/system\/tmp/", $strContent))
-                    {
+                    if (preg_match("/system\/tmp/", $strContent)) {
                         // Set data.
                         \Message::addInfo($GLOBALS['TL_LANG']['MSC']['disabled_cache']);
                     }
@@ -76,13 +81,13 @@ class To
             ->limit(1)
             ->execute(\Input::get("id"));
 
-        if ($objSyncTime->syncTo_tstamp != 0 && strlen($objSyncTime->syncTo_user) != 0 && strlen($objSyncTime->syncTo_alias) != 0)
-        {
+        if ($objSyncTime->syncTo_tstamp != 0 && strlen($objSyncTime->syncTo_user) != 0 && strlen($objSyncTime->syncTo_alias) != 0) {
             $strLastSync = vsprintf($GLOBALS['TL_LANG']['MSC']['last_sync'], array(
                     date($GLOBALS['TL_CONFIG']['timeFormat'], $objSyncTime->syncTo_tstamp),
                     date($GLOBALS['TL_CONFIG']['dateFormat'], $objSyncTime->syncTo_tstamp),
                     $objSyncTime->syncTo_user,
-                    $objSyncTime->syncTo_alias)
+                    $objSyncTime->syncTo_alias
+                )
             );
 
             // Set data
@@ -107,30 +112,23 @@ class To
      */
     public function submit(PrePersistModelEvent $objEvent)
     {
-        if (!$objEvent->getEnvironment()->hasDataProvider('tl_syncCto_clients_syncTo')) {
+        if (!$this->isRightContext($objEvent->getEnvironment())) {
             return;
         }
 
         // Get the data from the DC.
         $arrData = $objEvent->getModel()->getPropertiesAsArray();
-        foreach($arrData as $strKey => $mixData)
-        {
-            if(empty($mixData))
-            {
+        foreach ($arrData as $strKey => $mixData) {
+            if (empty($mixData)) {
                 unset($arrData[$strKey]);
             }
         }
 
-        if(isset($_POST['start_sync']))
-        {
+        if (isset($_POST['start_sync'])) {
             $this->runSync($arrData);
-        }
-        elseif(isset($_POST['start_sync_all']))
-        {
+        } elseif (isset($_POST['start_sync_all'])) {
             $this->runSyncAll($arrData);
-        }
-        else
-        {
+        } else {
             throw new RuntimeException('Unknown submit.');
         }
     }
@@ -144,69 +142,51 @@ class To
      */
     protected function runSync($arrData)
     {
-        $arrSyncSettings = array();
+        $arrSyncSettings              = array();
         $arrSyncSettings["post_data"] = $arrData;
 
         // Automode off.
         $arrSyncSettings["automode"] = false;
 
         // Synchronization type.
-        if(isset($arrData['sync_options']))
-        {
+        if (isset($arrData['sync_options'])) {
             $arrSyncSettings["syncCto_Type"] = $arrData['sync_options'];
-        }
-        else
-        {
+        } else {
             $arrSyncSettings["syncCto_Type"] = array();
         }
 
         // Database.
-        if(isset($arrData['database_check']))
-        {
+        if (isset($arrData['database_check'])) {
             $arrSyncSettings["syncCto_SyncDatabase"] = true;
-        }
-        else
-        {
+        } else {
             $arrSyncSettings["syncCto_SyncDatabase"] = false;
         }
 
         // Database - tl_files
-        if(isset($arrData['tl_files_check']))
-        {
+        if (isset($arrData['tl_files_check'])) {
             $arrSyncSettings["syncCto_SyncTlFiles"] = true;
-        }
-        else
-        {
+        } else {
             $arrSyncSettings["syncCto_SyncTlFiles"] = false;
         }
 
         // Systemoperation execute.
-        if(isset($arrData['systemoperations_check']) && isset($arrData['systemoperations_maintenance']))
-        {
+        if (isset($arrData['systemoperations_check']) && isset($arrData['systemoperations_maintenance'])) {
             $arrSyncSettings["syncCto_Systemoperations_Maintenance"] = $arrData['systemoperations_maintenance'];
-        }
-        else
-        {
+        } else {
             $arrSyncSettings["syncCto_Systemoperations_Maintenance"] = array();
         }
 
         // Attention flag.
-        if(isset($arrData['attentionFlag']))
-        {
+        if (isset($arrData['attentionFlag'])) {
             $arrSyncSettings["syncCto_AttentionFlag"] = true;
-        }
-        else
-        {
+        } else {
             $arrSyncSettings["syncCto_AttentionFlag"] = false;
         }
 
         // Error msg.
-        if(isset($arrData['localconfig_error']))
-        {
+        if (isset($arrData['localconfig_error'])) {
             $arrSyncSettings["syncCto_ShowError"] = true;
-        }
-        else
-        {
+        } else {
             $arrSyncSettings["syncCto_ShowError"] = false;
         }
 
@@ -215,13 +195,13 @@ class To
 
         // Check the vars.
         $this->objSyncCtoHelper->checkSubmit(array(
-                'postUnset'   => array('start_sync'),
-                'error'       => array(
-                    'key'     => 'syncCto_submit_false',
-                    'message' => $GLOBALS['TL_LANG']['ERR']['no_functions']
-                ),
-                'redirectUrl' => \Environment::get('base') . "contao/main.php?do=synccto_clients&amp;table=tl_syncCto_clients_syncTo&amp;act=start&amp;step=0&amp;id=" . \Input::get("cid")
+            'postUnset'   => array('start_sync'),
+            'error'       => array(
+                'key'     => 'syncCto_submit_false',
+                'message' => $GLOBALS['TL_LANG']['ERR']['no_functions']
             ),
+            'redirectUrl' => \Environment::get('base') . "contao/main.php?do=synccto_clients&amp;table=tl_syncCto_clients_syncTo&amp;act=start&amp;step=0&amp;id=" . \Input::get("cid")
+        ),
             $arrSyncSettings
         );
     }
@@ -256,15 +236,14 @@ class To
         \Session::getInstance()->set("syncCto_SyncSettings_" . \Input::get('cid'), $arrSyncSettings);
 
         $this->objSyncCtoHelper->checkSubmit(array(
-                'postUnset'   => array('start_sync'),
-                'error'       => array(
-                    'key'     => 'syncCto_submit_false',
-                    'message' => $GLOBALS['TL_LANG']['ERR']['missing_tables']
-                ),
-                'redirectUrl' => \Environment::get('base') . "contao/main.php?do=synccto_clients&amp;table=tl_syncCto_clients_syncTo&amp;act=start&amp;step=0&amp;id=" . \Input::get("cid")
+            'postUnset'   => array('start_sync'),
+            'error'       => array(
+                'key'     => 'syncCto_submit_false',
+                'message' => $GLOBALS['TL_LANG']['ERR']['missing_tables']
             ),
+            'redirectUrl' => \Environment::get('base') . "contao/main.php?do=synccto_clients&amp;table=tl_syncCto_clients_syncTo&amp;act=start&amp;step=0&amp;id=" . \Input::get("cid")
+        ),
             $arrSyncSettings
         );
     }
-
 }
