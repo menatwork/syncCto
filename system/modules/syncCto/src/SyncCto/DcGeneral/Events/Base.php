@@ -22,17 +22,13 @@ abstract class Base
     {
         // Check the file cache.
         $strInitFilePath = '/system/config/initconfig.php';
-        if (file_exists(TL_ROOT . $strInitFilePath))
-        {
+        if (file_exists(TL_ROOT . $strInitFilePath)) {
             $strFile        = new \File($strInitFilePath);
             $arrFileContent = $strFile->getContentAsArray();
-            foreach ($arrFileContent AS $strContent)
-            {
-                if (!preg_match("/(\/\*|\*|\*\/|\/\/)/", $strContent))
-                {
+            foreach ($arrFileContent AS $strContent) {
+                if (!preg_match("/(\/\*|\*|\*\/|\/\/)/", $strContent)) {
                     //system/tmp.
-                    if (preg_match("/system\/tmp/", $strContent))
-                    {
+                    if (preg_match("/system\/tmp/", $strContent)) {
                         // Set data.
                         \Message::addInfo($GLOBALS['TL_LANG']['MSC']['disabled_cache']);
                     }

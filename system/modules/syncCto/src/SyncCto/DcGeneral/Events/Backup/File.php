@@ -94,29 +94,24 @@ class File extends Base
 
         // Get the data from the DC.
         $arrData = $objEvent->getModel()->getPropertiesAsArray();
-        foreach ($arrData as $strKey => $mixData)
-        {
-            if (empty($mixData))
-            {
+        foreach ($arrData as $strKey => $mixData) {
+            if (empty($mixData)) {
                 unset($arrData[$strKey]);
             }
         }
 
         // Check if core or user backup is selected
-        if (!isset($arrData['core_files']) && !isset($arrData['user_files']))
-        {
+        if (!isset($arrData['core_files']) && !isset($arrData['user_files'])) {
             \Message::addError($GLOBALS['TL_LANG']['ERR']['missing_file_selection']);
             \Controller::redirect(\Environment::get('base') . "contao/main.php?do=syncCto_backups&table=tl_syncCto_backup_file");
         }
 
-        if (isset($arrData['user_files']) && is_array($arrData['filelist']) && count($arrData['filelist']) == 0)
-        {
+        if (isset($arrData['user_files']) && is_array($arrData['filelist']) && count($arrData['filelist']) == 0) {
             \Message::addError($GLOBALS['TL_LANG']['ERR']['missing_file_selection']);
             \Controller::redirect(\Environment::get('base') . "contao/main.php?do=syncCto_backups&table=tl_syncCto_backup_file");
         }
 
-        foreach ((array)$arrData['filelist'] as $key => $value)
-        {
+        foreach ((array)$arrData['filelist'] as $key => $value) {
             $arrData['filelist'][$key] = \FilesModel::findByPk($value)->path;
         }
 
@@ -124,13 +119,13 @@ class File extends Base
 
         // Check the vars.
         $this->objSyncCtoHelper->checkSubmit(array(
-                'postUnset'   => array('start_backup'),
-                'error'       => array(
-                    'key'     => 'syncCto_submit_false',
-                    'message' => $GLOBALS['TL_LANG']['ERR']['missing_tables']
-                ),
-                'redirectUrl' => \Environment::get('base') . "contao/main.php?do=syncCto_backups&table=tl_syncCto_backup_file&act=start"
+            'postUnset'   => array('start_backup'),
+            'error'       => array(
+                'key'     => 'syncCto_submit_false',
+                'message' => $GLOBALS['TL_LANG']['ERR']['missing_tables']
             ),
+            'redirectUrl' => \Environment::get('base') . "contao/main.php?do=syncCto_backups&table=tl_syncCto_backup_file&act=start"
+        ),
             $arrData
         );
     }
@@ -150,32 +145,27 @@ class File extends Base
 
         // Get the data from the DC.
         $arrData = $objEvent->getModel()->getPropertiesAsArray();
-        foreach ($arrData as $strKey => $mixData)
-        {
-            if (empty($mixData))
-            {
+        foreach ($arrData as $strKey => $mixData) {
+            if (empty($mixData)) {
                 unset($arrData[$strKey]);
             }
         }
 
         // Check if a file is selected
-        if ($arrData['filelist'] == '')
-        {
+        if ($arrData['filelist'] == '') {
             \Message::addError($GLOBALS['TL_LANG']['ERR']['missing_file_selection']);
             \Controller::redirect(\Environment::get('base') . "contao/main.php?do=syncCto_backups&table=tl_syncCto_restore_db");
         }
 
         $objFileModel = \FilesModel::findByPk($arrData['filelist']);
-        if ($objFileModel == null)
-        {
+        if ($objFileModel == null) {
             \Message::addError(sprintf($GLOBALS['TL_LANG']['ERR']['unknown_file'], $arrData['filelist']));
             \Controller::redirect(\Environment::get('base') . "contao/main.php?do=syncCto_backups&table=tl_syncCto_restore_db");
         }
 
         // Check if file exists
         $arrData['filelist'] = \FilesModel::findByPk($arrData['filelist'])->path;
-        if (!file_exists(TL_ROOT . "/" . $arrData['filelist']))
-        {
+        if (!file_exists(TL_ROOT . "/" . $arrData['filelist'])) {
             \Message::addError(sprintf($GLOBALS['TL_LANG']['ERR']['unknown_file'], $arrData['filelist']));
             \Controller::redirect(\Environment::get('base') . "contao/main.php?do=syncCto_backups&table=tl_syncCto_restore_db");
         }
