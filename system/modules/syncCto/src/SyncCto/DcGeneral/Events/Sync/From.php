@@ -14,12 +14,13 @@ namespace SyncCto\DcGeneral\Events\Sync;
 use ContaoCommunityAlliance\DcGeneral\Contao\View\Contao2BackendView\Event\GetEditModeButtonsEvent;
 use ContaoCommunityAlliance\DcGeneral\Event\PrePersistModelEvent;
 use RuntimeException;
+use SyncCto\DcGeneral\Events\Base;
 use SyncCtoHelper;
 
 /**
  * Class for syncFrom configurations
  */
-class From
+class From extends Base
 {
 
     // Vars
@@ -39,12 +40,17 @@ class From
         $this->objSyncCtoHelper = SyncCtoHelper::getInstance();
     }
 
+    public function getContextProviderName()
+    {
+        return 'tl_syncCto_clients_syncFrom';
+    }
+
     /**
      * @param GetEditModeButtonsEvent $objEvent
      */
-    public static function addButton(GetEditModeButtonsEvent $objEvent)
+    public function addButton(GetEditModeButtonsEvent $objEvent)
     {
-        if (!$objEvent->getEnvironment()->hasDataProvider('tl_syncCto_clients_syncFrom')) {
+        if (!$this->isRightContext($objEvent->getEnvironment())) {
             return;
         }
 
@@ -109,7 +115,7 @@ class From
      */
     public function submit(PrePersistModelEvent $objEvent)
     {
-        if (!$objEvent->getEnvironment()->hasDataProvider('tl_syncCto_clients_syncFrom')) {
+        if (!$this->isRightContext($objEvent->getEnvironment())) {
             return;
         }
 
@@ -257,5 +263,4 @@ class From
             $arrSyncSettings
         );
     }
-
 }

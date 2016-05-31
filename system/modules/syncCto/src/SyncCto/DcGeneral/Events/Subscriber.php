@@ -38,7 +38,7 @@ class Subscriber
     public static function registerEvents(CreateEventDispatcherEvent $event)
     {
         // Only register the events for the backend.
-        if(TL_MODE == 'FE'){
+        if (TL_MODE == 'FE') {
             return;
         }
 
@@ -57,7 +57,6 @@ class Subscriber
                 => array(new To(), 'submit')
             ),
             $dispatcher,
-            array('tl_syncCto_clients_syncTo'),
             To::PRIORITY
         );
 
@@ -69,7 +68,6 @@ class Subscriber
                 => array(new From(), 'submit')
             ),
             $dispatcher,
-            array('tl_syncCto_clients_syncFrom'),
             From::PRIORITY
         );
 
@@ -81,7 +79,6 @@ class Subscriber
                 => array(new Database(), 'submitBackup')
             ),
             $dispatcher,
-            array('tl_syncCto_backup_db'),
             Database::PRIORITY
         );
 
@@ -93,7 +90,6 @@ class Subscriber
                 => array(new Database(), 'submitRestore')
             ),
             $dispatcher,
-            array('tl_syncCto_restore_db'),
             Database::PRIORITY
         );
 
@@ -105,7 +101,6 @@ class Subscriber
                 => array(new File(), 'submitBackup')
             ),
             $dispatcher,
-            array('tl_syncCto_backup_file'),
             File::PRIORITY
         );
 
@@ -117,7 +112,6 @@ class Subscriber
                 => array(new File(), 'submitRestore')
             ),
             $dispatcher,
-            array('tl_syncCto_restore_file'),
             File::PRIORITY
         );
 
@@ -129,16 +123,14 @@ class Subscriber
             array(
                 GetPropertyOptionsEvent::NAME => array(new Database(), 'databaseTablesRecommended')
             ),
-            $dispatcher,
-            array('tl_syncCto_backup_db', 'database_tables_recommended')
+            $dispatcher
         );
 
         self::registerListeners(
             array(
                 GetPropertyOptionsEvent::NAME => array(new Database(), 'databaseTablesNoneRecommendedWithHidden')
             ),
-            $dispatcher,
-            array('tl_syncCto_backup_db', 'database_tables_none_recommended')
+            $dispatcher
         );
     }
 
@@ -149,13 +141,11 @@ class Subscriber
      *
      * @param EventDispatcherInterface $dispatcher The event dispatcher to which the events shall be registered.
      *
-     * @param string[]                 $suffixes   The suffixes for the event names to use.
-     *
      * @param int                      $priority   The priority.
      *
      * @return void
      */
-    public static function registerListeners($listeners, $dispatcher, $suffixes = array(), $priority = 200)
+    public static function registerListeners($listeners, $dispatcher, $priority = 200)
     {
         foreach ($listeners as $event => $listener) {
             $dispatcher->addListener($event, $listener, $priority);

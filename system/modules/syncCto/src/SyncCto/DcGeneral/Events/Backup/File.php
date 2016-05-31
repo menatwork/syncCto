@@ -14,12 +14,13 @@ namespace SyncCto\DcGeneral\Events\Backup;
 use ContaoCommunityAlliance\DcGeneral\Contao\View\Contao2BackendView\Event\GetEditModeButtonsEvent;
 use ContaoCommunityAlliance\DcGeneral\Event\PrePersistModelEvent;
 use RuntimeException;
+use SyncCto\DcGeneral\Events\Base;
 use SyncCtoHelper;
 
 /**
  * Class for syncFrom configurations
  */
-class File
+class File extends Base
 {
 
     // Vars
@@ -35,16 +36,23 @@ class File
      */
     public function __construct()
     {
-        $this->BackendUser      = \BackendUser::getInstance();
         $this->objSyncCtoHelper = SyncCtoHelper::getInstance();
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function getContextProviderName()
+    {
+        return 'tl_syncCto_backup_file';
     }
 
     /**
      * @param GetEditModeButtonsEvent $objEvent
      */
-    public static function addButtonBackup(GetEditModeButtonsEvent $objEvent)
+    public function addButtonBackup(GetEditModeButtonsEvent $objEvent)
     {
-        if (!$objEvent->getEnvironment()->hasDataProvider('tl_syncCto_backup_file')) {
+        if (!$this->isRightContext($objEvent->getEnvironment())) {
             return;
         }
 
@@ -58,9 +66,9 @@ class File
     /**
      * @param GetEditModeButtonsEvent $objEvent
      */
-    public static function addButtonRestore(GetEditModeButtonsEvent $objEvent)
+    public function addButtonRestore(GetEditModeButtonsEvent $objEvent)
     {
-        if (!$objEvent->getEnvironment()->hasDataProvider('tl_syncCto_restore_file')) {
+        if (!$this->isRightContext($objEvent->getEnvironment(), 'tl_syncCto_restore_file')) {
             return;
         }
 
@@ -80,7 +88,7 @@ class File
      */
     public function submitBackup(PrePersistModelEvent $objEvent)
     {
-        if (!$objEvent->getEnvironment()->hasDataProvider('tl_syncCto_backup_file')) {
+        if (!$this->isRightContext($objEvent->getEnvironment())) {
             return;
         }
 
@@ -136,7 +144,7 @@ class File
      */
     public function submitRestore(PrePersistModelEvent $objEvent)
     {
-        if (!$objEvent->getEnvironment()->hasDataProvider('tl_syncCto_restore_file')) {
+        if (!$this->isRightContext($objEvent->getEnvironment(), 'tl_syncCto_restore_file')) {
             return;
         }
 
