@@ -11,12 +11,12 @@
 
 namespace SyncCto\Sync\FileList;
 
-use SyncCto\Sync\FileList\FilterIterator\Base as FilterIteratorBase;
 use AppendIterator;
-use ArrayObject;
 use ArrayIterator;
+use ArrayObject;
 use EmptyIterator;
 use FilterIterator;
+use SyncCto\Sync\FileList\FilterIterator\Base as FilterIteratorBase;
 
 class Base
 {
@@ -50,7 +50,7 @@ class Base
      */
     public function hasCoreFiles()
     {
-        return isset($this->fileList[ self::FILE_CORE ]) && count($this->fileList[ self::FILE_CORE ]);
+        return isset($this->fileList[self::FILE_CORE]) && count($this->fileList[self::FILE_CORE]);
     }
 
     /**
@@ -60,7 +60,7 @@ class Base
      */
     public function hasPrivateFiles()
     {
-        return isset($this->fileList[ self::FILE_PRIVATE ]) && count($this->fileList[ self::FILE_PRIVATE ]);
+        return isset($this->fileList[self::FILE_PRIVATE]) && count($this->fileList[self::FILE_PRIVATE]);
     }
 
     /**
@@ -96,22 +96,19 @@ class Base
 
         // Setup the transmission.
         $transmission = array();
-        if ($onlySend)
-        {
+        if ($onlySend) {
             $transmission[] = \SyncCtoEnum::FILETRANS_SEND;
         }
 
-        if ($onlyMoved)
-        {
+        if ($onlyMoved) {
             $transmission[] = \SyncCtoEnum::FILETRANS_MOVED;
         }
 
         // Private files.
-        if ($this->hasPrivateFiles())
-        {
+        if ($this->hasPrivateFiles()) {
             return new FilterIteratorBase
             (
-                new ArrayIterator($this->fileList[ self::FILE_PRIVATE ]),
+                new ArrayIterator($this->fileList[self::FILE_PRIVATE]),
                 $states,
                 (count($transmission) == 0) ? null : $transmission
             );
@@ -164,33 +161,29 @@ class Base
 
         // Setup the transmission.
         $transmission = array();
-        if ($onlySend)
-        {
+        if ($onlySend) {
             $transmission[] = \SyncCtoEnum::FILETRANS_SEND;
         }
 
-        if ($onlyMoved)
-        {
+        if ($onlyMoved) {
             $transmission[] = \SyncCtoEnum::FILETRANS_MOVED;
         }
 
         // Core files.
-        if ($type == self::FILE_CORE && $this->hasCoreFiles())
-        {
+        if ($type == self::FILE_CORE && $this->hasCoreFiles()) {
             return new FilterIteratorBase
             (
-                new ArrayIterator($this->fileList[ self::FILE_CORE ]),
+                new ArrayIterator($this->fileList[self::FILE_CORE]),
                 $states,
                 (count($transmission) == 0) ? null : $transmission
             );
         }
 
         // Private files.
-        if ($type == self::FILE_PRIVATE && $this->hasPrivateFiles())
-        {
+        if ($type == self::FILE_PRIVATE && $this->hasPrivateFiles()) {
             return new FilterIteratorBase
             (
-                new ArrayIterator($this->fileList[ self::FILE_PRIVATE ]),
+                new ArrayIterator($this->fileList[self::FILE_PRIVATE]),
                 $states,
                 (count($transmission) == 0) ? null : $transmission
             );
@@ -243,14 +236,12 @@ class Base
         $appendIterator = new AppendIterator();
 
         // Core files.
-        if ($this->hasCoreFiles())
-        {
+        if ($this->hasCoreFiles()) {
             $appendIterator->append($this->createTransferIterator($onlySend, $onlyMoved, self::FILE_CORE));
         }
 
         // Private files.
-        if ($this->hasPrivateFiles())
-        {
+        if ($this->hasPrivateFiles()) {
             $appendIterator->append($this->createTransferIterator($onlySend, $onlyMoved, self::FILE_PRIVATE));
         }
 
@@ -280,35 +271,30 @@ class Base
         );
 
         // Setup the transmission.
-        if ($onlyWaiting)
-        {
+        if ($onlyWaiting) {
             $transmission = array
             (
                 \SyncCtoEnum::FILETRANS_WAITING
             );
-        }
-        else
-        {
+        } else {
             $transmission = null;
         }
 
         // Core files.
-        if ($type == self::FILE_CORE && $this->hasCoreFiles())
-        {
+        if ($type == self::FILE_CORE && $this->hasCoreFiles()) {
             return new FilterIteratorBase
             (
-                new ArrayIterator($this->fileList[ self::FILE_CORE ]),
+                new ArrayIterator($this->fileList[self::FILE_CORE]),
                 $states,
                 (count($transmission) == 0) ? null : $transmission
             );
         }
 
         // Private files.
-        if ($type == self::FILE_PRIVATE && $this->hasPrivateFiles())
-        {
+        if ($type == self::FILE_PRIVATE && $this->hasPrivateFiles()) {
             return new FilterIteratorBase
             (
-                new ArrayIterator($this->fileList[ self::FILE_PRIVATE ]),
+                new ArrayIterator($this->fileList[self::FILE_PRIVATE]),
                 $states,
                 (count($transmission) == 0) ? null : $transmission
             );
@@ -355,14 +341,12 @@ class Base
         $appendIterator = new AppendIterator();
 
         // Core files.
-        if ($this->hasCoreFiles())
-        {
+        if ($this->hasCoreFiles()) {
             $appendIterator->append($this->createDeleteIterator($onlyWaiting, self::FILE_CORE));
         }
 
         // Private files.
-        if ($this->hasPrivateFiles())
-        {
+        if ($this->hasPrivateFiles()) {
             $appendIterator->append($this->createDeleteIterator($onlyWaiting, self::FILE_PRIVATE));
         }
 

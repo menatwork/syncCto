@@ -49,6 +49,8 @@ ClassLoader::addClasses(array
     'SyncCtoDatabaseUpdater'                    => 'system/modules/syncCto/SyncCtoDatabaseUpdater.php',
     'ContentData'                               => 'system/modules/syncCto/ContentData.php',
     'StepPool'                                  => 'system/modules/syncCto/StepPool.php',
+    // Contao
+    'SyncCto\Contao\API'                        => 'system/modules/syncCto/src/SyncCto/Contao/API.php',
     // Helper
     'SyncCto\Helper\PathBuilder'                => 'system/modules/syncCto/src/SyncCto/Helper/PathBuilder.php',
     'SyncCto\Helper\Ping'                       => 'system/modules/syncCto/src/SyncCto/Helper/Ping.php',
@@ -56,12 +58,12 @@ ClassLoader::addClasses(array
     'SyncCto\Sync\FileList\Base'                => 'system/modules/syncCto/src/SyncCto/Sync/FileList/Base.php',
     'SyncCto\Sync\FileList\FilterIterator\Base' => 'system/modules/syncCto/src/SyncCto/Sync/FileList/FilterIterator/Base.php',
     // Events
+    'SyncCto\DcGeneral\Events\Base'             => 'system/modules/syncCto/src/SyncCto/DcGeneral/Events/Base.php',
+    'SyncCto\DcGeneral\Events\Subscriber'       => 'system/modules/syncCto/src/SyncCto/DcGeneral/Events/Subscriber.php',
+    'SyncCto\DcGeneral\Events\Backup\Database'  => 'system/modules/syncCto/src/SyncCto/DcGeneral/Events/Backup/Database.php',
+    'SyncCto\DcGeneral\Events\Backup\File'      => 'system/modules/syncCto/src/SyncCto/DcGeneral/Events/Backup/File.php',
     'SyncCto\DcGeneral\Events\Sync\From'        => 'system/modules/syncCto/src/SyncCto/DcGeneral/Events/Sync/From.php',
     'SyncCto\DcGeneral\Events\Sync\To'          => 'system/modules/syncCto/src/SyncCto/DcGeneral/Events/Sync/To.php',
-    'SyncCto\DcGeneral\Events\Base'             => 'system/modules/syncCto/src/SyncCto/DcGeneral/Events/Base.php',
-    'SyncCto\DcGeneral\Events\Backup\File'      => 'system/modules/syncCto/src/SyncCto/DcGeneral/Events/Backup/File.php',
-    'SyncCto\DcGeneral\Events\Backup\Database'  => 'system/modules/syncCto/src/SyncCto/DcGeneral/Events/Backup/Database.php',
-    'SyncCto\DcGeneral\Events\Subscriber'  => 'system/modules/syncCto/src/SyncCto/DcGeneral/Events/Subscriber.php',
 ));
 
 
