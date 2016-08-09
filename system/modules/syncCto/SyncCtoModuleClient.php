@@ -2584,20 +2584,24 @@ class SyncCtoModuleClient extends \BackendModule
 
                         $arrCompareList = $this->objSyncCtoDatabase->getFormatedCompareList($arrServerTables, $arrClientTables, $arrHiddenTables, $arrHiddenTablesPlaceholder, $arrAllTimeStamps['server'], $arrAllTimeStamps['client'], $arrAllowedTables, 'server', 'client');
 
-                        if(count($arrCompareList['recommended']) == 0 && count($arrCompareList['none_recommended']) == 0 && ($this->arrSyncSettings['syncCto_SyncTlFiles'] || $this->arrSyncSettings['automode'])){
-                            $this->arrSyncSettings['syncCto_SyncTables'][] = 'tl_files';
-                            $this->objStepPool->step = ($this->objStepPool->step + 2);
+                        // Get the tables count.
+                        $countRecommended     = count($arrCompareList['recommended']);
+                        $countNoneRecommended = count($arrCompareList['none_recommended']);
 
-                            break;
-                        }
+                        // Check the next step.
+                        if ($countRecommended == 0 && $countNoneRecommended == 0) {
+                            if($this->arrSyncSettings['syncCto_SyncTlFiles'] || $this->arrSyncSettings['automode']){
+                                $this->arrSyncSettings['syncCto_SyncTables']['tl_files'] = 'tl_files';
+                                $this->objStepPool->step = ($this->objStepPool->step + 1);
 
-                        if (count($arrCompareList['recommended']) == 0 && count($arrCompareList['none_recommended']) == 0)
-                        {
-                            $this->objData->setState(SyncCtoEnum::WORK_SKIPPED);
-                            $this->objData->setHtml("");
-                            $this->intStep++;
+                                break;
+                            } else {
+                                $this->objData->setState(SyncCtoEnum::WORK_SKIPPED);
+                                $this->objData->setHtml("");
+                                $this->intStep++;
 
-                            break;
+                                break;
+                            }
                         }
 
                         $this->arrSyncSettings['syncCto_CompareTables'] = $arrCompareList;
@@ -2629,7 +2633,7 @@ class SyncCtoModuleClient extends \BackendModule
                         // Set the tl_files if we have the automode or the checkbox is activate.
                         if ($this->arrSyncSettings['automode'] || $this->arrSyncSettings['syncCto_SyncTlFiles'])
                         {
-                            $this->arrSyncSettings['syncCto_SyncTables'][] = 'tl_files';
+                            $this->arrSyncSettings['syncCto_SyncTables']['tl_files'] = 'tl_files';
                         }
 
                         $this->objStepPool->step++;
@@ -2667,20 +2671,26 @@ class SyncCtoModuleClient extends \BackendModule
                     }
 
                     // Check the post vars.
-                    if (($this->arrSyncSettings["automode"] || array_key_exists("forward", $_POST)) && !(count($this->arrSyncSettings['syncCto_SyncTables']) == 0 && count($this->arrSyncSettings['syncCto_SyncDeleteTables']) == 0))
-                    {
-                        // Go to next step
-                        $this->objData->setState(SyncCtoEnum::WORK_WORK);
-                        $this->objData->setHtml("");
-                        $this->booRefresh = true;
-                        $this->objStepPool->step++;
+                    if (array_key_exists("forward", $_POST) || $this->arrSyncSettings["automode"]) {
+                        // Add the tl_files table to the list.
+                        if ($this->arrSyncSettings['syncCto_SyncTlFiles'] || $this->arrSyncSettings["automode"]) {
+                            $this->arrSyncSettings['syncCto_SyncTables']['tl_files'] = 'tl_files';
+                        }
 
-                        break;
-                    }
-                    else
-                    {
-                        if (($this->arrSyncSettings["automode"] || array_key_exists("forward", $_POST)) && count($this->arrSyncSettings['syncCto_SyncTables']) == 0 && count($this->arrSyncSettings['syncCto_SyncDeleteTables']) == 0)
-                        {
+                        // Count the tables.
+                        $countTables       = count($this->arrSyncSettings['syncCto_SyncTables']);
+                        $countDeleteTables = count($this->arrSyncSettings['syncCto_SyncDeleteTables']);
+
+                        // Check if we have some tables.
+                        if (!($countTables == 0 && $countDeleteTables == 0)) {
+                            // Go to next step
+                            $this->objData->setState(SyncCtoEnum::WORK_WORK);
+                            $this->objData->setHtml("");
+                            $this->booRefresh = true;
+                            $this->objStepPool->step++;
+
+                            break;
+                        } else {
                             // Skip if no tables are selected
                             $this->objData->setState(SyncCtoEnum::WORK_SKIPPED);
                             $this->objData->setHtml("");
@@ -2689,18 +2699,13 @@ class SyncCtoModuleClient extends \BackendModule
 
                             break;
                         }
-                        else
-                        {
-                            if (array_key_exists("skip", $_POST))
-                            {
-                                $this->objData->setState(SyncCtoEnum::WORK_SKIPPED);
-                                $this->objData->setHtml("");
-                                $this->booRefresh = true;
-                                $this->intStep++;
+                    } elseif (array_key_exists("skip", $_POST)) {
+                        $this->objData->setState(SyncCtoEnum::WORK_SKIPPED);
+                        $this->objData->setHtml("");
+                        $this->booRefresh = true;
+                        $this->intStep++;
 
-                                break;
-                            }
-                        }
+                        break;
                     }
 
                     $objTemp                 = new BackendTemplate("be_syncCto_form");
