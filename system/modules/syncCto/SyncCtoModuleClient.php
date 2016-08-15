@@ -2477,8 +2477,10 @@ class SyncCtoModuleClient extends \BackendModule
                     break;
 
                 case 2:
-                    // Check user
-                    if (\BackendUser::getInstance()->isAdmin || \BackendUser::getInstance()->syncCto_tables != null)
+                    $isAdmin    = \BackendUser::getInstance()->isAdmin;
+                    $userTables = \BackendUser::getInstance()->syncCto_tables;
+
+                    if ($isAdmin || !empty($userTables))
                     {
                         // Load allowed tables for this user
                         if (\BackendUser::getInstance()->isAdmin)
@@ -2631,15 +2633,17 @@ class SyncCtoModuleClient extends \BackendModule
                         }
 
                         // Set the tl_files if we have the automode or the checkbox is activate.
-                        if ($this->arrSyncSettings['automode'] || $this->arrSyncSettings['syncCto_SyncTlFiles'])
-                        {
+                        if ($this->arrSyncSettings['automode'] || $this->arrSyncSettings['syncCto_SyncTlFiles']) {
                             $this->arrSyncSettings['syncCto_SyncTables']['tl_files'] = 'tl_files';
                         }
 
                         $this->objStepPool->step++;
-                    }
-                    else
-                    {
+                    } elseif (empty($userTables) && ($this->arrSyncSettings['syncCto_SyncTlFiles'] || $this->arrSyncSettings['automode'])) {
+                        $this->arrSyncSettings['syncCto_SyncTables']['tl_files'] = 'tl_files';
+                        $this->objStepPool->step                                 = ($this->objStepPool->step + 2);
+
+                        break;
+                    } else {
                         $this->objData->setState(SyncCtoEnum::WORK_SKIPPED);
                         $this->objData->setHtml("");
                         $this->intStep++;
