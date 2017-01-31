@@ -160,6 +160,13 @@ class From extends Base
         } else {
             $arrSyncSettings["syncCto_SyncDatabase"] = false;
         }
+        
+        // Database - tl_files
+        if (isset($arrData['tl_files_check'])) {
+            $arrSyncSettings["syncCto_SyncTlFiles"] = true;
+        } else {
+            $arrSyncSettings["syncCto_SyncTlFiles"] = false;
+        }
 
         // Systemoperation execute.
         if (isset($arrData['systemoperations_check']) && isset($arrData['systemoperations_maintenance'])) {
