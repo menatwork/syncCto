@@ -34,7 +34,7 @@ use ContaoCommunityAlliance\DcGeneral\View\ActionHandler\AbstractHandler;
  *
  * @package ContaoCommunityAlliance\DcGeneral\Contao\View\Contao2BackendView\ActionHandler
  */
-class SyncEditHandler extends AbstractHandler
+class BackupEditHandler extends AbstractHandler
 {
     const PRIORITY = 20000;
 
@@ -47,12 +47,26 @@ class SyncEditHandler extends AbstractHandler
      */
     public function process()
     {
-        $event  = $this->getEvent();
-        $action = $event->getAction();
+        $event        = $this->getEvent();
+        $action       = $event->getAction();
+        $environment  = $event
+            ->getEnvironment();
+        $dataProvider = $environment
+            ->getDataProvider();
+        $providerName = $dataProvider
+            ->getEmptyModel()
+            ->getProviderName();
+
+        $allowedProviderName = [
+            'tl_syncCto_backup_db',
+            'tl_syncCto_backup_file',
+            'tl_syncCto_restore_db',
+            'tl_syncCto_restore_file',
+        ];
 
         // Only handle if we do not have a manual sorting or we know where to insert.
         // Manual sorting is handled by clipboard.
-        if ($action->getName() !== 'startSync') {
+        if ($action !== 'edit' && !in_array($providerName, $allowedProviderName) ) {
             return;
         }
 
@@ -62,29 +76,21 @@ class SyncEditHandler extends AbstractHandler
             return;
         }
 
-        $environment   = $this->getEnvironment();
-        $inputProvider = $environment->getInputProvider();
-
-        $modelId      = ModelId::fromSerialized($inputProvider->getParameter('cid'));
-        $dataProvider = $environment->getDataProvider($modelId->getDataProviderName());
-
         $view = $environment->getView();
         if (!$view instanceof BaseView) {
             return;
         }
 
-        $this->checkRestoreVersion($modelId);
-
-        $model = $dataProvider->fetch($dataProvider->getEmptyConfig()->setId($modelId->getId()));
-        if (!$model) {
-            throw new DcGeneralRuntimeException('Could not retrieve model with id ' . $modelId->getSerialized());
-        }
-
-        $clone = clone $model;
-        $clone->setId($model->getId());
+        $model = $dataProvider->getEmptyModel();
+        $model->setId(1);
+        $clone = $dataProvider->getEmptyModel();
+        $clone->setId(1);
 
         $editMask = new EditMask($view, $model, $clone, null, null, $view->breadcrumb());
         $event->setResponse($editMask->execute());
+
+        // Break all other events. This is our and nobody else should handle this.
+        $event->stopPropagation();
     }
 
     /**

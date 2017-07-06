@@ -11,6 +11,7 @@
 
 use ContaoCommunityAlliance\DcGeneral\DcGeneralEvents;
 use ContaoCommunityAlliance\DcGeneral\Factory\Event\BuildDataDefinitionEvent;
+use SyncCto\DcGeneral\ActionHandler\BackupEditHandler;
 use SyncCto\DcGeneral\ActionHandler\SyncEditHandler;
 use SyncCto\DcGeneral\Dca\Builder\DataDefinitionBuilder;
 
@@ -32,7 +33,10 @@ if ('BE' === TL_MODE) {
             array(new SyncEditHandler(), 'handleEvent'),
             SyncEditHandler::PRIORITY
         ),
-
+        array(
+            array(new BackupEditHandler(), 'handleEvent'),
+            BackupEditHandler::PRIORITY
+        ),
     );
 }
 

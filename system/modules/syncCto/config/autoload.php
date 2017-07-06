@@ -61,6 +61,7 @@ ClassLoader::addClasses(array
     'SyncCto\DcGeneral\Dca\Builder\DataDefinitionBuilder' => 'system/modules/syncCto/src/SyncCto/DcGeneral/Dca/Builder/DataDefinitionBuilder.php',
     // ActionHandler
     'SyncCto\DcGeneral\ActionHandler\SyncEditHandler'     => 'system/modules/syncCto/src/SyncCto/DcGeneral/ActionHandler/SyncEditHandler.php',
+    'SyncCto\DcGeneral\ActionHandler\BackupEditHandler'  => 'system/modules/syncCto/src/SyncCto/DcGeneral/ActionHandler/BackupEditHandler.php',
     // Events
     'SyncCto\DcGeneral\Events\Base'                       => 'system/modules/syncCto/src/SyncCto/DcGeneral/Events/Base.php',
     'SyncCto\DcGeneral\Events\Subscriber'                 => 'system/modules/syncCto/src/SyncCto/DcGeneral/Events/Subscriber.php',
