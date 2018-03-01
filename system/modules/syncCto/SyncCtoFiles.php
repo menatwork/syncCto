@@ -284,7 +284,7 @@ class SyncCtoFiles extends \Backend
                 $arrModelData['pid']       = (strlen($arrModelData['pid'])) ? \String::binToUuid($arrModelData['pid']) : $arrModelData['pid'];
             }
 
-            $arrModelData['tail']          = $this->getDbafsTailFor($arrModelData['pid']);
+            //$arrModelData['tail']          = $this->getDbafsTailFor($arrModelData['pid']);
 
             return $arrModelData;
         }
@@ -312,7 +312,7 @@ class SyncCtoFiles extends \Backend
                 $arrModelData['pid']       = (strlen($arrModelData['pid'])) ? \String::binToUuid($arrModelData['pid']) : $arrModelData['pid'];
             }
 
-            $arrModelData['tail']          = $this->getDbafsTailFor($arrModelData['pid']);
+            //$arrModelData['tail']          = $this->getDbafsTailFor($arrModelData['pid']);
 
             return $arrModelData;
         }

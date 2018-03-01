@@ -2525,7 +2525,7 @@ class SyncCtoModuleClient extends \BackendModule
 
                             foreach ($arrClientTableH as $key => $value)
                             {
-                                if (!in_array($value['name'], $arrAllowedTables))
+                                if (!in_array($value, $arrAllowedTables))
                                 {
                                     unset($arrClientTableH[$key]);
                                 }
@@ -2549,7 +2549,7 @@ class SyncCtoModuleClient extends \BackendModule
 
                             foreach ($arrServerTableH as $key => $value)
                             {
-                                if (!in_array($value['name'], $arrAllowedTables))
+                                if (!in_array($value, $arrAllowedTables))
                                 {
                                     unset($arrServerTableH[$key]);
                                 }
@@ -4642,7 +4642,7 @@ class SyncCtoModuleClient extends \BackendModule
 
                             foreach ($arrClientTableH as $key => $value)
                             {
-                                if (!in_array($value['name'], $arrAllowedTables))
+                                if (!in_array($value, $arrAllowedTables))
                                 {
                                     unset($arrClientTableH[$key]);
                                 }
@@ -4666,7 +4666,7 @@ class SyncCtoModuleClient extends \BackendModule
 
                             foreach ($arrServerTableH as $key => $value)
                             {
-                                if (!in_array($value['name'], $arrAllowedTables))
+                                if (!in_array($value, $arrAllowedTables))
                                 {
                                     unset($arrServerTableH[$key]);
                                 }

@@ -8,6 +8,8 @@
  * @license    GNU/LGPL
  * @filesource
  */
+use ContaoCommunityAlliance\DcGeneral\Data\ModelId;
+
 $GLOBALS['TL_DCA']['tl_synccto_clients'] = array
 (
     // Config
@@ -89,7 +91,7 @@ $GLOBALS['TL_DCA']['tl_synccto_clients'] = array
             'syncFrom' => array
             (
                 'label'           => &$GLOBALS['TL_LANG']['tl_syncCto_clients']['syncFrom'],
-                'href'            => '&table=tl_syncCto_clients_syncFrom&act=edit',
+                'href'            => '&table=tl_syncCto_clients_syncFrom&act=startSync',
                 'icon'            => 'system/modules/syncCto/assets/images/nav/iconSyncFrom.png',
                 'attributes'      => 'onclick="if (!confirm(\'' . $GLOBALS['TL_LANG']['tl_syncCto_clients']['syncFromConfirm'] . '\')) return false; Backend.getScrollOffset();"',
                 'button_callback' => array('tl_synccto_clients', 'checkPermission_client_syncFrom'),
@@ -97,7 +99,7 @@ $GLOBALS['TL_DCA']['tl_synccto_clients'] = array
             'syncTo' => array
             (
                 'label'           => &$GLOBALS['TL_LANG']['tl_syncCto_clients']['syncTo'],
-                'href'            => '&table=tl_syncCto_clients_syncTo&act=edit',
+                'href'            => '&table=tl_syncCto_clients_syncTo&act=startSync',
                 'icon'            => 'system/modules/syncCto/assets/images/nav/iconSyncTo.png',
                 'button_callback' => array('tl_synccto_clients', 'checkPermission_client_syncTo'),
             ),
@@ -318,12 +320,10 @@ class tl_synccto_clients extends Backend
             }
         }
 
-        if(in_array($operations, array('syncTo', 'syncFrom')))
-        {
+        if (in_array($operations, array('syncTo', 'syncFrom'))) {
+            $tableName = sprintf('tl_syncCto_clients_%s', $operations);
             $strIdName = 'cid';
-        }
-        else
-        {
+        } else {
             $strIdName = 'id';
         }
 
@@ -348,11 +348,11 @@ class tl_synccto_clients extends Backend
                 }
 
                 $title = implode("<br/>", $arrNotices);
-                return '<a class="user-history" href="' . $this->addToUrl($href . '&amp;' . $strIdName . '=' . $row['id']) . '" title="' . specialchars($title) . '"' . $attributes . '>' . $this->generateImage($icon, $label) . '</a> ';
+                return '<a class="user-history" href="' . $this->addToUrl($href . '&amp;' . $strIdName . '=' . $this->getID($row['id'], $tableName)) . '" title="' . specialchars($title) . '"' . $attributes . '>' . $this->generateImage($icon, $label) . '</a> ';
             }
             else
             {
-                return '<a href="' . $this->addToUrl($href . '&amp;' . $strIdName . '=' . $row['id']) . '" title="' . specialchars($title) . '"' . $attributes . '>' . $this->generateImage($icon, $label) . '</a> ';
+                return '<a href="' . $this->addToUrl($href . '&amp;' . $strIdName . '=' . $this->getID($row['id'], $tableName)) . '" title="' . specialchars($title) . '"' . $attributes . '>' . $this->generateImage($icon, $label) . '</a> ';
             }
         }
         else if (preg_match("/\.png/i", $icon))
@@ -367,6 +367,28 @@ class tl_synccto_clients extends Backend
         {
             return $this->generateImage($icon) . ' ';
         }
+    }
+
+    /**
+     * Build the ID.
+     *
+     * @param string $id The id.
+     *
+     * @param string $tableName The table name.
+     *
+     * @return string The full id.
+     */
+    private function getID($id, $tableName)
+    {
+        // If we have no table just return the id.
+        if(empty($tableName)){
+            return $id;
+        }
+
+        // Build the DCG like ID.
+        $modelId = new ModelId($tableName, $id);
+
+        return $modelId->getSerialized();
     }
 
     /**

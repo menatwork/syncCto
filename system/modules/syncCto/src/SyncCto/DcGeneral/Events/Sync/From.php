@@ -12,6 +12,7 @@
 namespace SyncCto\DcGeneral\Events\Sync;
 
 use ContaoCommunityAlliance\DcGeneral\Contao\View\Contao2BackendView\Event\GetEditModeButtonsEvent;
+use ContaoCommunityAlliance\DcGeneral\Data\ModelId;
 use ContaoCommunityAlliance\DcGeneral\Event\PrePersistModelEvent;
 use RuntimeException;
 use SyncCto\DcGeneral\Events\Base;
@@ -141,6 +142,7 @@ class From extends Base
      */
     protected function runSync($arrData)
     {
+        $id                           = ModelId::fromSerialized(\Input::get('cid'));
         $arrSyncSettings              = array();
         $arrSyncSettings["post_data"] = $arrData;
 
@@ -159,6 +161,13 @@ class From extends Base
             $arrSyncSettings["syncCto_SyncDatabase"] = true;
         } else {
             $arrSyncSettings["syncCto_SyncDatabase"] = false;
+        }
+        
+        // Database - tl_files
+        if (isset($arrData['tl_files_check'])) {
+            $arrSyncSettings["syncCto_SyncTlFiles"] = true;
+        } else {
+            $arrSyncSettings["syncCto_SyncTlFiles"] = false;
         }
 
         // Systemoperation execute.
@@ -183,7 +192,7 @@ class From extends Base
         }
 
         // Save Session.
-        \Session::getInstance()->set("syncCto_SyncSettings_" . \Input::get('cid'), $arrSyncSettings);
+        \Session::getInstance()->set("syncCto_SyncSettings_" . $id->getId(), $arrSyncSettings);
 
         // Check the vars.
         $this->objSyncCtoHelper->checkSubmit(array(
@@ -192,7 +201,7 @@ class From extends Base
                 'key'     => 'syncCto_submit_false',
                 'message' => $GLOBALS['TL_LANG']['ERR']['no_functions']
             ),
-            'redirectUrl' => \Environment::get('base') . "contao/main.php?do=synccto_clients&amp;table=tl_syncCto_clients_syncFrom&amp;act=start&amp;step=0&amp;id=" . \Input::get("cid")
+            'redirectUrl' => \Environment::get('base') . "contao/main.php?do=synccto_clients&amp;table=tl_syncCto_clients_syncFrom&amp;act=start&amp;step=0&amp;id=" . $id->getId()
         ),
             $arrSyncSettings
         );
@@ -207,6 +216,7 @@ class From extends Base
      */
     protected function runSyncAll($arrData)
     {
+        $id              = ModelId::fromSerialized(\Input::get('cid'));
         $arrSyncSettings = array();
 
         // Set array.
@@ -224,7 +234,7 @@ class From extends Base
         $arrSyncSettings["syncCto_ShowError"]                    = false;
 
         // Save Session
-        \Session::getInstance()->set("syncCto_SyncSettings_" . \Input::get('cid'), $arrSyncSettings);
+        \Session::getInstance()->set("syncCto_SyncSettings_" . $id->getId(), $arrSyncSettings);
 
         $this->objSyncCtoHelper->checkSubmit(array(
             'postUnset'   => array('start_sync'),
@@ -232,7 +242,7 @@ class From extends Base
                 'key'     => 'syncCto_submit_false',
                 'message' => $GLOBALS['TL_LANG']['ERR']['missing_tables']
             ),
-            'redirectUrl' => \Environment::get('base') . "contao/main.php?do=synccto_clients&amp;table=tl_syncCto_clients_syncFrom&amp;act=start&amp;step=0&amp;id=" . \Input::get("cid")
+            'redirectUrl' => \Environment::get('base') . "contao/main.php?do=synccto_clients&amp;table=tl_syncCto_clients_syncFrom&amp;act=start&amp;step=0&amp;id=" . $id->getId()
         ),
             $arrSyncSettings
         );
