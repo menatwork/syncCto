@@ -6,10 +6,9 @@
  * @copyright  MEN AT WORK 2014
  * @package    syncCto
  * @license    GNU/LGPL
+ * @author     Sven Baumann 2018
  * @filesource
  */
-
-use ContaoCommunityAlliance\Contao\EventDispatcher\Event\CreateEventDispatcherEvent;
 
 $objInput = \Input::getInstance();
 
@@ -64,12 +63,6 @@ array_insert($GLOBALS['BE_MOD'], $i + 1, array
         )
     )
 ));
-
-/**
- * DcGeneral event callbacks
- */
-
-$GLOBALS['TL_EVENTS'][CreateEventDispatcherEvent::NAME][] = 'SyncCto\DcGeneral\Events\Subscriber::registerEvents';
 
 /**
  * Mime types
