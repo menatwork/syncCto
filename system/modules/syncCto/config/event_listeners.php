@@ -11,10 +11,12 @@
  */
 
 use ContaoCommunityAlliance\DcGeneral\Contao\View\Contao2BackendView\Event\GetEditModeButtonsEvent;
+use ContaoCommunityAlliance\DcGeneral\Contao\View\Contao2BackendView\Event\GetGlobalButtonsEvent;
 use ContaoCommunityAlliance\DcGeneral\Contao\View\Contao2BackendView\Event\GetPropertyOptionsEvent;
 use ContaoCommunityAlliance\DcGeneral\DcGeneralEvents;
 use ContaoCommunityAlliance\DcGeneral\Event\PrePersistModelEvent;
 use ContaoCommunityAlliance\DcGeneral\Factory\Event\BuildDataDefinitionEvent;
+use SyncCto\Contao\DataProvider\General\AllowBackButtonOnlyListener;
 use SyncCto\DcGeneral\ActionHandler\BackupEditHandler;
 use SyncCto\DcGeneral\ActionHandler\SyncEditHandler;
 use SyncCto\DcGeneral\Dca\Builder\DataDefinitionBuilder;
@@ -118,6 +120,28 @@ if ('BE' === TL_MODE) {
         array(
             array(new Database(), 'databaseTablesNoneRecommendedWithHidden'),
             Database::PRIORITY
+        )
+    );
+}
+
+// Register global buttons listener for backend scope only.
+if ('BE' === TL_MODE) {
+    $result[GetGlobalButtonsEvent::NAME] = array (
+        array(
+            array(new AllowBackButtonOnlyListener('tl_syncCto_backup_db'), 'handle'),
+            AllowBackButtonOnlyListener::PRIORITY
+        ),
+        array(
+            array(new AllowBackButtonOnlyListener('tl_syncCto_backup_file'), 'handle'),
+            AllowBackButtonOnlyListener::PRIORITY
+        ),
+        array(
+            array(new AllowBackButtonOnlyListener('tl_syncCto_restore_db'), 'handle'),
+            AllowBackButtonOnlyListener::PRIORITY
+        ),
+        array(
+            array(new AllowBackButtonOnlyListener('tl_syncCto_restore_file'), 'handle'),
+            AllowBackButtonOnlyListener::PRIORITY
         )
     );
 }

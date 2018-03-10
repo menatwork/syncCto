@@ -67,7 +67,7 @@ ClassLoader::addClasses(array
     'SyncCto\DcGeneral\Events\Backup\Database'            => 'system/modules/syncCto/src/SyncCto/DcGeneral/Events/Backup/Database.php',
     'SyncCto\DcGeneral\Events\Backup\File'                => 'system/modules/syncCto/src/SyncCto/DcGeneral/Events/Backup/File.php',
     'SyncCto\DcGeneral\Events\Sync\From'                  => 'system/modules/syncCto/src/SyncCto/DcGeneral/Events/Sync/From.php',
-    'SyncCto\DcGeneral\Events\Sync\To'                    => 'system/modules/syncCto/src/SyncCto/DcGeneral/Events/Sync/To.php',
+    'SyncCto\DcGeneral\Events\Sync\To'                    => 'system/modules/syncCto/src/SyncCto/DcGeneral/Events/Sync/To.php'
 ));
 
 
