@@ -5,7 +5,7 @@
  *
  * @copyright  MEN AT WORK 2014
  * @package    syncCto
- * @license    GNU/LGPL 
+ * @license    GNU/LGPL
  * @filesource
  */
 
@@ -25,7 +25,8 @@ $GLOBALS['TL_DCA']['tl_user']['fields']['syncCto_clients'] = array
     'exclude'                     => true,
     'inputType'                   => 'checkbox',
     'foreignKey'                  => 'tl_synccto_clients.title',
-    'eval'                        => array('multiple' => true)
+    'eval'                        => array('multiple' => true),
+    'sql'                         => 'blob NULL'
 );
 
 $GLOBALS['TL_DCA']['tl_user']['fields']['syncCto_clients_p'] = array
@@ -35,7 +36,8 @@ $GLOBALS['TL_DCA']['tl_user']['fields']['syncCto_clients_p'] = array
     'inputType'                   => 'checkbox',
     'options'                     => array('create', 'edit', 'copy', 'delete', 'showExtern', 'syncTo',  'syncFrom'),
     'reference'                   => &$GLOBALS['TL_LANG']['MSC'],
-    'eval'                        => array('multiple' => true)
+    'eval'                        => array('multiple' => true),
+    'sql'                         => 'blob NULL'
 );
 
 $GLOBALS['TL_DCA']['tl_user']['fields']['syncCto_sync_options'] = array
@@ -45,7 +47,8 @@ $GLOBALS['TL_DCA']['tl_user']['fields']['syncCto_sync_options'] = array
     'inputType'                   => 'checkbox',
     'reference'                   => &$GLOBALS['TL_LANG']['SYC'],
     'options_callback'            => array('SyncCtoHelper', 'getFileSyncOptions'),
-    'eval'                        => array('multiple' => true)
+    'eval'                        => array('multiple' => true),
+    'sql'                         => 'blob NULL'
 );
 
 $GLOBALS['TL_DCA']['tl_user']['fields']['syncCto_tables'] = array
@@ -55,6 +58,7 @@ $GLOBALS['TL_DCA']['tl_user']['fields']['syncCto_tables'] = array
     'exclude'                     => true,
     'eval'                        => array('multiple' => true),
     'options_callback'            => array('SyncCtoHelper', 'databaseTables'),
+    'sql'                         => 'blob NULL'
 );
 
 $GLOBALS['TL_DCA']['tl_user']['fields']['syncCto_useTranslatedNames'] = array
@@ -62,5 +66,6 @@ $GLOBALS['TL_DCA']['tl_user']['fields']['syncCto_useTranslatedNames'] = array
     'label'                       => &$GLOBALS['TL_LANG']['tl_user']['syncCto_useTranslatedNames'],
     'exclude'                     => true,
     'inputType'                   => 'checkbox',
-    'eval'                        => array('tl_class' => 'w50')
+    'eval'                        => array('tl_class' => 'w50'),
+    'sql'                         => 'blob NULL'
 );

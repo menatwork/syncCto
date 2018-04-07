@@ -23,6 +23,13 @@ $GLOBALS['TL_DCA']['tl_synccto_clients'] = array
             array('tl_synccto_clients', 'checkPermissionClient'),
             array('tl_synccto_clients', 'checkPermissionClientCreate'),
         ),
+        'sql' => array
+        (
+            'keys' => array
+            (
+                'id' => 'primary'
+            )
+        )
     ),
     // List
     'list' => array
@@ -118,13 +125,41 @@ $GLOBALS['TL_DCA']['tl_synccto_clients'] = array
     // Fields
     'fields' => array
     (
+        'id'               => array(
+            'sql'                 => 'int(10) unsigned NOT NULL auto_increment'
+        ),
+        'tstamp'           => array(
+            'sql'                 => "int(10) unsigned NOT NULL default '0'"
+        ),
+        'cookie'           => array(
+            'sql'                 => 'longtext NULL'
+        ),
+        'syncTo_user'      => array(
+            'sql'                 => "int(10) unsigned NOT NULL default '0'"
+        ),
+        'syncFrom_user'    => array(
+            'sql'                 => "int(10) unsigned NOT NULL default '0'"
+        ),
+        'syncTo_tstamp'    => array(
+            'sql'                 => "int(10) unsigned NOT NULL default '0'"
+        ),
+        'syncFrom_tstamp'  => array(
+            'sql'                 => "int(10) unsigned NOT NULL default '0'"
+        ),
+        'client_timestamp' => array(
+            'sql'                 => 'blob NULL'
+        ),
+        'server_timestamp' => array(
+            'sql'                 => 'blob NULL'
+        ),
         'apikey' => array
         (
             'label'               => &$GLOBALS['TL_LANG']['tl_syncCto_clients']['apikey'],
             'explanation'         => 'apiKey',
             'inputType'           => 'text',
             'exclude'             => true,
-            'eval'                => array('helpwizard' => true, 'mandatory' => true, 'maxlength' => '64', 'tl_class' => 'w50')
+            'eval'                => array('helpwizard' => true, 'mandatory' => true, 'maxlength' => '64', 'tl_class' => 'w50'),
+            'sql'                 => "varchar(64) NOT NULL default ''"
         ),
         'title' => array
         (
@@ -132,7 +167,8 @@ $GLOBALS['TL_DCA']['tl_synccto_clients'] = array
             'inputType'           => 'text',
             'search'              => true,
             'exclude'             => true,
-            'eval'                => array('mandatory' => true, 'maxlength' => '64', 'tl_class' => 'w50')
+            'eval'                => array('mandatory' => true, 'maxlength' => '64', 'tl_class' => 'w50'),
+            'sql'                 => "varchar(64) NOT NULL default ''"
         ),
         'address' => array
         (
@@ -141,7 +177,8 @@ $GLOBALS['TL_DCA']['tl_synccto_clients'] = array
             'default'             => 'http://',
             'search'              => true,
             'exclude'             => true,
-            'eval'                => array('trailingSlash' => false, 'mandatory' => true, 'tl_class' => 'w50')
+            'eval'                => array('trailingSlash' => false, 'mandatory' => true, 'tl_class' => 'w50'),
+            'sql'                 => 'text NOT NULL'
         ),
         'path' => array
         (
@@ -152,7 +189,8 @@ $GLOBALS['TL_DCA']['tl_synccto_clients'] = array
             'save_callback' => array
             (
                 array('tl_synccto_clients', 'checkFirstSlash')
-            )
+            ),
+            'sql'                 => "varchar(255) NOT NULL default ''"
         ),
         'port' => array
         (
@@ -161,7 +199,8 @@ $GLOBALS['TL_DCA']['tl_synccto_clients'] = array
             'search'              => true,
             'default'             => '80',
             'exclude'             => true,
-            'eval'                => array('rgxp' => 'digit', 'mandatory' => true, 'tl_class' => 'w50')
+            'eval'                => array('rgxp' => 'digit', 'mandatory' => true, 'tl_class' => 'w50'),
+            'sql'                 => "int(10) unsigned NOT NULL default '0'"
         ),
         'codifyengine' => array
         (
@@ -171,6 +210,7 @@ $GLOBALS['TL_DCA']['tl_synccto_clients'] = array
             'exclude'             => true,
             'options_callback'    => array("tl_synccto_clients", "callCodifyengines"),
             'eval'                => array('mandatory'  => true, 'tl_class'   => 'w50', 'helpwizard' => true),
+            'sql'                 => "varchar(128) NOT NULL default ''"
         ),
         'http_auth'  => array
         (
@@ -178,6 +218,7 @@ $GLOBALS['TL_DCA']['tl_synccto_clients'] = array
             'inputType'           => 'checkbox',
             'exclude'             => true,
             'eval'                => array('submitOnChange' => true, 'tl_class'       => 'clr'),
+            'sql'                 => "char(1) NOT NULL default ''"
         ),
         'http_username' => array
         (
@@ -185,6 +226,7 @@ $GLOBALS['TL_DCA']['tl_synccto_clients'] = array
             'inputType'           => 'text',
             'exclude'             => true,
             'eval'                => array('mandatory'     => true, 'tl_class'      => 'w50'),
+            'sql'                 => "varchar(128) NOT NULL default ''"
         ),
         'http_password' => array
         (
@@ -192,7 +234,8 @@ $GLOBALS['TL_DCA']['tl_synccto_clients'] = array
             'inputType'           => 'text',
             'exclude'             => true,
             'eval'                => array('mandatory' => true, 'encrypt'   => true, 'tl_class'  => 'w50'),
-        ),
+            'sql'                 => "varchar(128) NOT NULL default ''"
+        )
     )
 );
 
