@@ -1,14 +1,15 @@
 <?php
 
 // Interfaces
-use DcGeneral\Data\DriverInterface as DriverInterface;
-use DcGeneral\Data\ConfigInterface as ConfigInterface;
-use DcGeneral\Data\ModelInterface as ModelInterface;
 use DcGeneral\Data\CollectionInterface as CollectionInterface;
-// Classes
+use DcGeneral\Data\ConfigInterface as ConfigInterface;
+use DcGeneral\Data\DefaultCollection as DefaultCollection;
 use DcGeneral\Data\DefaultConfig as DefaultConfig;
 use DcGeneral\Data\DefaultModel as DefaultModel;
-use DcGeneral\Data\DefaultCollection as DefaultCollection;
+use DcGeneral\Data\DriverInterface as DriverInterface;
+use DcGeneral\Data\ModelInterface as ModelInterface;
+
+// Classes
 
 /**
  * Contao Open Source CMS
@@ -16,7 +17,7 @@ use DcGeneral\Data\DefaultCollection as DefaultCollection;
  * @see        InterfaceGeneralData
  * @copyright  MEN AT WORK 2014
  * @package    DC_General Drvier
- * @license    GNU/LGPL 
+ * @license    GNU/LGPL
  * @filesource
  */
 class GeneralDataSyncCto implements DriverInterface
@@ -47,7 +48,7 @@ class GeneralDataSyncCto implements DriverInterface
 
     public function __construct()
     {
-        
+
     }
 
     /* /////////////////////////////////////////////////////////////////////
@@ -64,7 +65,7 @@ class GeneralDataSyncCto implements DriverInterface
      */
     public function setBaseConfig(array $arrConfig)
     {
-        
+
     }
 
     /**
@@ -112,7 +113,7 @@ class GeneralDataSyncCto implements DriverInterface
      */
     public function delete($item)
     {
-        
+
     }
 
     /**
@@ -186,7 +187,7 @@ class GeneralDataSyncCto implements DriverInterface
 
     public function saveEach(CollectionInterface $objItems, $recursive = false)
     {
-        
+
     }
 
     /**
@@ -224,7 +225,7 @@ class GeneralDataSyncCto implements DriverInterface
 
     public function saveVersion(ModelInterface $objModel, $strUsername)
     {
-        
+
     }
 
     /**
@@ -235,7 +236,7 @@ class GeneralDataSyncCto implements DriverInterface
      */
     public function setVersionActive($mixID, $mixVersion)
     {
-        
+
     }
 
     /**
@@ -247,7 +248,7 @@ class GeneralDataSyncCto implements DriverInterface
      */
     public function getActiveVersion($mixID)
     {
-        
+
     }
 
     /**
@@ -271,7 +272,7 @@ class GeneralDataSyncCto implements DriverInterface
 
     protected function insertUndo($strSourceSQL, $strSaveSQL, $strTable)
     {
-        
+
     }
 
 }
