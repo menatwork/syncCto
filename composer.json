@@ -35,6 +35,9 @@
 		"contao-community-alliance/dc-general": "2.0.*@dev",
 		"menatwork/ziparchivecto":"~1.1"
 	},
+	"require-dev": {
+		"phpcq/all-tasks": "^1.2"
+	},
 	"autoload":{
 		"classmap":["system/"]
 	},
