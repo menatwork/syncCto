@@ -61,7 +61,8 @@
 			}
 		},
 		"branch-alias":{
-			"dev-contao3": "2.6.x-dev"
+			"dev-master": "3.2.x-dev",
+			"dev-dev": "3.3.x-dev"
 		}
 	}
 }
