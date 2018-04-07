@@ -27,13 +27,13 @@
 		"source":"https://github.com/menatwork/syncCto"
 	},
 	"require":{
-		"php":">=5.3",
-		"contao/core":">=3.2,<4.0",
-		"contao-community-alliance/composer-installer":"*",
-		"menatwork/contao-multicolumnwizard":"~3.2",
-		"menatwork/ctocommunication":"~2.0",
-		"contao-community-alliance/dc-general": "2.0.*@dev",
-		"menatwork/ziparchivecto":"~1.1"
+		"php": "^5.3 || ^7.0",
+		"contao/core": "^3.2",
+		"contao-community-alliance/composer-plugin": "^2.0",
+		"menatwork/contao-multicolumnwizard": "^3.2",
+		"menatwork/ctocommunication": "^2.0",
+		"contao-community-alliance/dc-general": "^2.0@beta",
+		"menatwork/ziparchivecto": "^1.1"
 	},
 	"require-dev": {
 		"phpcq/all-tasks": "^1.2"
