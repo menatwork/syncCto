@@ -11,6 +11,8 @@
 
 namespace SyncCto\Helper;
 
+use SyncCto\Contao\Communicator\Client;
+
 class Ping
 {
     /**
@@ -273,7 +275,7 @@ class Ping
      */
     protected function pingSyncCtoSystem()
     {
-        $objSyncCtoClient = \SyncCtoCommunicationClient::getInstance();
+        $objSyncCtoClient = Client::getInstance();
         $objSyncCtoClient->setClientBy($this->clientID);
 
         try {

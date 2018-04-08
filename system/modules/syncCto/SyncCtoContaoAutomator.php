@@ -7,64 +7,10 @@
  * @package    syncCto
  * @license    GNU/LGPL
  * @filesource
+ *
+ * @deprecated This class is deprecated since 3.3 and where remove in 4.0.
+ *             Use \SyncCto\Contao\Automator\Automator instead.
  */
-class SyncCtoContaoAutomator extends \Automator
+class SyncCtoContaoAutomator extends \SyncCto\Contao\Automator\Automator
 {
-
-    public function __construct()
-    {
-        parent::__construct();
-    }
-
-    /**
-     * Build the internal cache
-     */
-    public function generateInternalCache()
-    {
-        if ($GLOBALS['TL_CONFIG']['bypassCache'])
-        {
-            return;
-        }
-
-        // Purge
-        $this->purgeInternalCache();
-
-        // Rebuild
-        $this->generateConfigCache();
-        $this->generateDcaCache();
-        $this->generateLanguageCache();
-        $this->generateDcaExtracts();
-    }
-
-    /**
-     * Purge the internal cache
-     */
-    public function purgeInternalCache()
-    {
-        if ($GLOBALS['TL_CONFIG']['bypassCache'])
-        {
-            return;
-        }
-
-        parent::purgeInternalCache();
-    }
-
-    /**
-     * Build the internal cache
-     */
-    public function createInternalCache()
-    {
-        if ($GLOBALS['TL_CONFIG']['bypassCache'])
-        {
-            return;
-        }
-
-        // Rebuild
-        $this->generateConfigCache();
-        $this->generateDcaCache();
-        $this->generateLanguageCache();
-        $this->generateDcaExtracts();
-    }
-
-
-} 
+}

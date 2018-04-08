@@ -5,33 +5,16 @@
  *
  * @copyright  MEN AT WORK 2014
  * @package    syncCto
- * @license    GNU/LGPL 
+ * @license    GNU/LGPL
  * @filesource
+ *
+ * @deprecated This class is deprecated since 3.3 and where remove in 4.0.
+ *             Use \SyncCto\Filter\FilterIteratorFolder instead.
  */
 
 /**
  * Class for file filtering operations
  */
-class SyncCtoFilterIteratorFolder extends SyncCtoFilterIteratorBase
-{    
-
-    ////////////////////////////////////////////////////////////////////////////
-    // Core
-    ////////////////////////////////////////////////////////////////////////////
-
-    /**
-     * Check if we add the file to the list.
-     * Dirs only.
-     */
-    public function accept()
-    {   
-        if($this->current()->isDir())
-        {
-            return !$this->objSyncCtoFiles->isInBlackFolder($this->current()->getPathname());
-        }
-        else
-        {
-            return false;
-        }
-    }
+class SyncCtoFilterIteratorFolder extends \SyncCto\Filter\FilterIteratorFolder
+{
 }

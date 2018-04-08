@@ -5,38 +5,13 @@
  *
  * @copyright  MEN AT WORK 2014
  * @package    syncCto
- * @license    GNU/LGPL 
+ * @license    GNU/LGPL
  * @filesource
+ *
+ * @deprecated This class is deprecated since 3.3 and where remove in 4.0.
+ *             Use \SyncCto\InterfaceSyncCtoStep instead.
  */
 
-interface InterfaceSyncCtoStep
+interface InterfaceSyncCtoStep extends \SyncCto\InterfaceSyncCtoStep
 {
-
-    /**
-     * Call the syncTo function
-     */
-    public function syncTo();
-
-    /**
-     * Call the syncTo function
-     */
-    public function syncFrom();
-
-    /**
-     * Check if we have to run this function
-     */
-    public function checkSyncTo();
-
-    /**
-     * Check if we have to run this function
-     */
-    public function checkSyncFrom();
-    
-    /**
-     * Add the SyncCtoModuleClient for container things
-     * 
-     * @param SyncCtoModuleClient $syncCtoClient
-     */
-    public function setSyncCto(SyncCtoModuleClient $syncCtoClient);
-
 }

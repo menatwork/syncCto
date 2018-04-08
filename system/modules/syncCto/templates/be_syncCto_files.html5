@@ -22,7 +22,7 @@
     <div class="formbody">
         <input type="hidden" name="FORM_SUBMIT" value="<?php echo $this->formId; ?>" />
         <input type="hidden" name="REQUEST_TOKEN" value="<?php echo REQUEST_TOKEN; ?>">
-        
+
         <div class="submit_container">
             <input class="tl_submit" name="transfer" type="submit" value="<?php echo $GLOBALS['TL_LANG']['MSC']['apply']; ?>" />
             <input class="tl_submit" name="delete" type="submit" value="<?php echo $GLOBALS['TL_LANG']['MSC']['updateRemove']; ?>" />
@@ -57,49 +57,49 @@
             {
                 try {
                     var regexp = new RegExp(pattern);
-                }   
+                }
                 catch(e) {
                     alert('<?php echo $GLOBALS['TL_LANG']['ERR']['pattern']; ?>');
                     return false;
                 }
 
                 var checked = false;
- 
+
                 for (var i=1; i<table.rows.length; i++)
-                {   
+                {
                     var cells = table.rows[i].cells;
                     var count = cells.length;
                     var checkbox = cells[count-2].firstChild;
                     var filename = cells[count-1].textContent.trim();
- 
+
                     if (regexp.test(filename))
                         checkbox.checked = !inverse;
- 
+
                     if (checkbox.checked)
                         checked = true;
-                }   
- 
+                }
+
                 $$('input[name=delete]').set('disabled', !checked);
-            }   
- 
+            }
+
             function toggleFiles(table)
-            {   
+            {
                 var checked = false;
- 
+
                 for (var i=1; i<table.rows.length; i++)
-                {   
+                {
                     var cells = table.rows[i].cells;
                     var count = cells.length;
                     var checkbox = cells[count-2].firstChild;
- 
+
                     checkbox.checked = !checkbox.checked;
- 
+
                     if (checkbox.checked)
                         checked = true;
-                }   
- 
+                }
+
                 $$('input[name=delete]').set('disabled', !checked);
-            }   
+            }
         </script>
         <h3><?php echo $GLOBALS['TL_LANG']['MSC'][(($i == 1) ? 'normal' : 'big') . '_files']; ?></h3>
         <table class="comparelist" id="<?php echo ($i == 1) ? 'normal' : 'big'; ?>filelist">
@@ -131,15 +131,16 @@
                     <td class="checkbox"><?php if (empty($file["css_big"])): ?><input class="tl_checkbox" type="checkbox" name="del-file-<?php echo $key; ?>" value="<?php echo $key; ?>" /><?php else: ?> X <?php endif; ?></td>
                     <?php endif; ?>
                     <td class="last icon" title="<?php echo $file["path"]; ?>">
-                        <?php echo ($file['state'] > 99 && $file['state'] < 200)? $this->generateImage('folderC.gif') : $this->generateImage(SyncCtoFiles::getMimeInfo($file['path'], true, true)); ?>
-                        <span><?php echo SyncCtoHelper::getInstance()->substrCenter($file["path"], $this->maxLength); ?></span>
+                        <?php echo ($file['state'] > 99 && $file['state'] < 200)? $this->generateImage('folderC.gif') : $this->generateImage(
+                            \SyncCto\Contao\Finder\Finder::getMimeInfo($file['path'], true, true)); ?>
+                        <span><?php echo \SyncCto\Helper\Helper::getInstance()->substrCenter($file["path"], $this->maxLength); ?></span>
                     </td>
                </tr>
             <?php endforeach; ?>
             </tbody>
-        </table> 
+        </table>
         <?php endif; endfor; ?>
- 
+
         <div class="bottom submit_container">
             <input class="tl_submit" name="transfer" type="submit" value="<?php echo $GLOBALS['TL_LANG']['MSC']['apply']; ?>" />
             <input class="tl_submit" name="delete" type="submit" value="<?php echo $GLOBALS['TL_LANG']['MSC']['updateRemove']; ?>" />

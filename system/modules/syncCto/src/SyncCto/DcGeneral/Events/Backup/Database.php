@@ -16,7 +16,7 @@ use ContaoCommunityAlliance\DcGeneral\Contao\View\Contao2BackendView\Event\GetPr
 use ContaoCommunityAlliance\DcGeneral\Event\PrePersistModelEvent;
 use RuntimeException;
 use SyncCto\DcGeneral\Events\Base;
-use SyncCtoHelper;
+use SyncCto\Helper\Helper;
 
 /**
  * Class for syncFrom configurations
@@ -37,7 +37,7 @@ class Database extends Base
      */
     public function __construct()
     {
-        $this->objSyncCtoHelper = SyncCtoHelper::getInstance();
+        $this->objSyncCtoHelper = Helper::getInstance();
     }
 
     /**

@@ -7,72 +7,14 @@
  * @package    syncCto
  * @license    GNU/LGPL
  * @filesource
+ *
+ * @deprecated This class is deprecated since 3.3 and where remove in 4.0.
+ *             Use \SyncCto\Contao\Sync\StepPool instead.
  */
 
 /**
  * Class for step information
  */
-class StepPool
+class StepPool extends \SyncCto\Contao\Sync\StepPool
 {
-
-    protected $arrValues;
-    protected $intStepID;
-
-    /**
-     *
-     * @param type $arrStepPool
-     */
-    public function __construct($arrStepPool, $intStepID)
-    {
-        $this->arrValues = $arrStepPool;
-        $this->intStepID = $intStepID;
-    }
-
-    public function getArrValues()
-    {
-        return $this->arrValues;
-    }
-
-    public function setArrValues($arrValues)
-    {
-        $this->arrValues = $arrValues;
-    }
-
-    public function getIntStepID()
-    {
-        return $this->intStepID;
-    }
-
-    public function setIntStepID($intStepID)
-    {
-        $this->intStepID = $intStepID;
-    }
-
-    public function __get($name)
-    {
-        if ($this->arrValues == false || !is_array($this->arrValues))
-        {
-            return null;
-        }
-
-        if (key_exists($name, $this->arrValues))
-        {
-            return $this->arrValues[$name];
-        }
-        else
-        {
-            return null;
-        }
-    }
-
-    public function __set($name, $value)
-    {
-        if ($this->arrValues == false || !is_array($this->arrValues))
-        {
-            $this->arrValues = array();
-        }
-
-        return $this->arrValues[$name] = $value;
-    }
-
 }

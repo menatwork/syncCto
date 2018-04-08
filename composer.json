@@ -39,7 +39,7 @@
 		"phpcq/all-tasks": "^1.2"
 	},
 	"autoload":{
-		"classmap":["system/"]
+		"classmap":["system/", "system/modules/syncCto/src"]
 	},
 	"replace":{
 		"contao-legacy/synccto":"*"

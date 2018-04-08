@@ -16,7 +16,7 @@ use ContaoCommunityAlliance\DcGeneral\Data\ModelId;
 use ContaoCommunityAlliance\DcGeneral\Event\PrePersistModelEvent;
 use RuntimeException;
 use SyncCto\DcGeneral\Events\Base;
-use SyncCtoHelper;
+use SyncCto\Helper\Helper;
 
 /**
  * Class for syncFrom configurations
@@ -38,7 +38,7 @@ class From extends Base
     public function __construct()
     {
         $this->BackendUser      = \BackendUser::getInstance();
-        $this->objSyncCtoHelper = SyncCtoHelper::getInstance();
+        $this->objSyncCtoHelper = Helper::getInstance();
     }
 
     public function getContextProviderName()
@@ -162,7 +162,7 @@ class From extends Base
         } else {
             $arrSyncSettings["syncCto_SyncDatabase"] = false;
         }
-        
+
         // Database - tl_files
         if (isset($arrData['tl_files_check'])) {
             $arrSyncSettings["syncCto_SyncTlFiles"] = true;

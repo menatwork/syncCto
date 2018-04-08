@@ -16,6 +16,7 @@ use ArrayIterator;
 use ArrayObject;
 use EmptyIterator;
 use FilterIterator;
+use SyncCto\Config\Enum;
 use SyncCto\Sync\FileList\FilterIterator\Base as FilterIteratorBase;
 
 class Base
@@ -91,17 +92,17 @@ class Base
         // Setup the states.
         $states = array
         (
-            \SyncCtoEnum::FILESTATE_DBAFS_CONFLICT
+            Enum::FILESTATE_DBAFS_CONFLICT
         );
 
         // Setup the transmission.
         $transmission = array();
         if ($onlySend) {
-            $transmission[] = \SyncCtoEnum::FILETRANS_SEND;
+            $transmission[] = Enum::FILETRANS_SEND;
         }
 
         if ($onlyMoved) {
-            $transmission[] = \SyncCtoEnum::FILETRANS_MOVED;
+            $transmission[] = Enum::FILETRANS_MOVED;
         }
 
         // Private files.
@@ -152,21 +153,21 @@ class Base
         // Setup the states.
         $states = array
         (
-            \SyncCtoEnum:: FILESTATE_MISSING,
-            \SyncCtoEnum:: FILESTATE_NEED,
-            \SyncCtoEnum:: FILESTATE_TOO_BIG_MISSING,
-            \SyncCtoEnum:: FILESTATE_TOO_BIG_NEED,
-            \SyncCtoEnum:: FILESTATE_FOLDER
+            Enum:: FILESTATE_MISSING,
+            Enum:: FILESTATE_NEED,
+            Enum:: FILESTATE_TOO_BIG_MISSING,
+            Enum:: FILESTATE_TOO_BIG_NEED,
+            Enum:: FILESTATE_FOLDER
         );
 
         // Setup the transmission.
         $transmission = array();
         if ($onlySend) {
-            $transmission[] = \SyncCtoEnum::FILETRANS_SEND;
+            $transmission[] = Enum::FILETRANS_SEND;
         }
 
         if ($onlyMoved) {
-            $transmission[] = \SyncCtoEnum::FILETRANS_MOVED;
+            $transmission[] = Enum::FILETRANS_MOVED;
         }
 
         // Core files.
@@ -266,15 +267,15 @@ class Base
         // Setup the states.
         $states = array
         (
-            \SyncCtoEnum::FILESTATE_DELETE,
-            \SyncCtoEnum::FILESTATE_FOLDER_DELETE
+            Enum::FILESTATE_DELETE,
+            Enum::FILESTATE_FOLDER_DELETE
         );
 
         // Setup the transmission.
         if ($onlyWaiting) {
             $transmission = array
             (
-                \SyncCtoEnum::FILETRANS_WAITING
+                Enum::FILETRANS_WAITING
             );
         } else {
             $transmission = null;

@@ -16,7 +16,7 @@ use ContaoCommunityAlliance\DcGeneral\Data\ModelId;
 use ContaoCommunityAlliance\DcGeneral\Event\PrePersistModelEvent;
 use RuntimeException;
 use SyncCto\DcGeneral\Events\Base;
-use SyncCtoHelper;
+use SyncCto\Helper\Helper;
 
 /**
  * Class for syncTo configurations
@@ -36,7 +36,7 @@ class To extends Base
      */
     public function __construct()
     {
-        $this->objSyncCtoHelper = SyncCtoHelper::getInstance();
+        $this->objSyncCtoHelper = Helper::getInstance();
     }
 
     /**
