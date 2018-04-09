@@ -4800,7 +4800,7 @@ class Client extends BackendModule
 
                         break;
                     }
-                    else if (key_exists("skip", $_POST))
+                    else if (\array_key_exists("skip", $_POST))
                     {
                         $this->objData->setState(Enum::WORK_SKIPPED);
                         $this->objData->setHtml("");

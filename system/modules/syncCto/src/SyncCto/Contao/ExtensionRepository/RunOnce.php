@@ -120,7 +120,7 @@ class RunOnce extends \RepositoryBackendModule
     {
         $arrInstalledExtensions = $this->loadAllInstalledExtensions();
 
-        if (!key_exists("syncCto", $arrInstalledExtensions))
+        if (!\array_key_exists("syncCto", $arrInstalledExtensions))
         {
             throw new \Exception('syncCto is not installed via the Extension Repository, please only use the official version.');
         }
@@ -142,7 +142,7 @@ class RunOnce extends \RepositoryBackendModule
                 continue;
             }
 
-            if (key_exists($arrEntry['name'], $arrInstalledExtensions))
+            if (\array_key_exists($arrEntry['name'], $arrInstalledExtensions))
             {
                 $strExtensionName = $arrEntry['name'];
 

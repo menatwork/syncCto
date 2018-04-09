@@ -176,7 +176,7 @@ class RemoteProcedureCall extends Backend
      */
     public function setDisplayErrors($booState)
     {
-        if (key_exists("ctoCom_disableRefererCheck", $GLOBALS['TL_CONFIG']))
+        if (\array_key_exists("ctoCom_disableRefererCheck", $GLOBALS['TL_CONFIG']))
         {
             $this->Config->update("\$GLOBALS['TL_CONFIG']['displayErrors']", $booState);
         }
@@ -201,7 +201,7 @@ class RemoteProcedureCall extends Backend
      */
     public function checkDeleteFiles($strMD5, $strFilename)
     {
-        if (!key_exists($strFilename, $_FILES))
+        if (!\array_key_exists($strFilename, $_FILES))
         {
             throw new \Exception(\vsprintf($GLOBALS['TL_LANG']['ERR']['unknown_file'], array($strFilename)));
         }
@@ -235,7 +235,7 @@ class RemoteProcedureCall extends Backend
      */
     public function searchDeleteFolders($strMD5, $strFilename)
     {
-        if (!key_exists($strFilename, $_FILES))
+        if (!\array_key_exists($strFilename, $_FILES))
         {
             throw new \Exception(\vsprintf($GLOBALS['TL_LANG']['ERR']['unknown_file'], array($strFilename)));
         }
@@ -269,7 +269,7 @@ class RemoteProcedureCall extends Backend
      */
     public function runCecksumCompare($strMD5, $strFilename, $blnDisableDbafsConflicts)
     {
-        if (!key_exists($strFilename, $_FILES))
+        if (!\array_key_exists($strFilename, $_FILES))
         {
             throw new \Exception(\vsprintf($GLOBALS['TL_LANG']['ERR']['unknown_file'], array($strFilename)));
         }

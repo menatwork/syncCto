@@ -1219,7 +1219,7 @@ class Operation extends Backend
 
             // Write temp File
 
-            fputs($objTempfile, $strContent, \strlen($strContent));
+            \fwrite($objTempfile, $strContent, \strlen($strContent));
 
             unset($strContent);
 

@@ -57,7 +57,7 @@ class StepPool
             return null;
         }
 
-        if (key_exists($name, $this->arrValues))
+        if (\array_key_exists($name, $this->arrValues))
         {
             return $this->arrValues[$name];
         }

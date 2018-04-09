@@ -393,7 +393,7 @@ class AutoUpdater extends Backend
         {
             try
             {
-                if (key_exists($keyServer, $arrClientInformation['TABLE_FIELDS']))
+                if (\array_key_exists($keyServer, $arrClientInformation['TABLE_FIELDS']))
                 {
                     if ($valueServer != $arrClientInformation['TABLE_FIELDS'][$keyServer])
                     {
@@ -447,7 +447,7 @@ class AutoUpdater extends Backend
         {
             try
             {
-                if (key_exists($keyServer, $arrClientInformation['TABLE_CREATE_DEFINITIONS']))
+                if (\array_key_exists($keyServer, $arrClientInformation['TABLE_CREATE_DEFINITIONS']))
                 {
                     if ($valueServer != $arrClientInformation['TABLE_CREATE_DEFINITIONS'][$keyServer])
                     {
