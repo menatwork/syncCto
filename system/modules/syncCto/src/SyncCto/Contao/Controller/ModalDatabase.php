@@ -21,23 +21,23 @@ use Contao\Input;
 use Contao\Session;
 use SyncCto\Helper\Helper;
 
-$dir = dirname(isset($_SERVER['SCRIPT_FILENAME']) ? $_SERVER['SCRIPT_FILENAME'] : __FILE__);
+$dir = \dirname(isset($_SERVER['SCRIPT_FILENAME']) ? $_SERVER['SCRIPT_FILENAME'] : __FILE__);
 
-while ($dir && $dir != '.' && $dir != '/' && !is_file($dir . '/system/initialize.php'))
+while ($dir && $dir != '.' && $dir != '/' && !\is_file($dir . '/system/initialize.php'))
 {
-    $dir = dirname($dir);
+    $dir = \dirname($dir);
 }
 
-if (!is_file($dir . '/system/initialize.php'))
+if (!\is_file($dir . '/system/initialize.php'))
 {
-    header("HTTP/1.0 500 Internal Server Error");
-    header('Content-Type: text/html; charset=utf-8');
+    \header("HTTP/1.0 500 Internal Server Error");
+    \header('Content-Type: text/html; charset=utf-8');
     echo '<h1>500 Internal Server Error</h1>';
     echo '<p>Could not find initialize.php!</p>';
     exit(1);
 }
 
-define('TL_MODE', 'BE');
+\define('TL_MODE', 'BE');
 require($dir . '/system/initialize.php');
 
 /**
@@ -133,31 +133,31 @@ class ModalDatabase extends Backend
     public function showNormalDatabase()
     {
         // Delete functionality.
-        if (array_key_exists("delete", $_POST))
+        if (\array_key_exists("delete", $_POST))
         {
             // Make a array from 'serverTables' and 'serverDeleteTables'
             $arrRemoveTables = array();
 
-            if (is_array(Input::getInstance()->post('serverTables')) && count(Input::getInstance()->post('serverTables')) != 0)
+            if (\is_array(Input::getInstance()->post('serverTables')) && \count(Input::getInstance()->post('serverTables')) != 0)
             {
                 $arrRemoveTables = Input::getInstance()->post('serverTables');
             }
 
-            if (is_array(Input::getInstance()->post('serverDeleteTables')) && count(Input::getInstance()->post('serverDeleteTables')) != 0)
+            if (\is_array(Input::getInstance()->post('serverDeleteTables')) && \count(Input::getInstance()->post('serverDeleteTables')) != 0)
             {
-                $arrRemoveTables = array_merge($arrRemoveTables, Input::getInstance()->post('serverDeleteTables'));
+                $arrRemoveTables = \array_merge($arrRemoveTables, Input::getInstance()->post('serverDeleteTables'));
             }
 
             // Remove tables from the list.
             foreach ($arrRemoveTables as $value)
             {
-                if (isset($this->arrSyncSettings['syncCto_CompareTables']['recommended']) && array_key_exists($value, $this->arrSyncSettings['syncCto_CompareTables']['recommended']))
+                if (isset($this->arrSyncSettings['syncCto_CompareTables']['recommended']) && \array_key_exists($value, $this->arrSyncSettings['syncCto_CompareTables']['recommended']))
                 {
                     unset($this->arrSyncSettings['syncCto_CompareTables']['recommended'][$value]);
                 }
                 else
                 {
-                    if (isset($this->arrSyncSettings['syncCto_CompareTables']['nonRecommended']) && array_key_exists($value, $this->arrSyncSettings['syncCto_CompareTables']['nonRecommended']))
+                    if (isset($this->arrSyncSettings['syncCto_CompareTables']['nonRecommended']) && \array_key_exists($value, $this->arrSyncSettings['syncCto_CompareTables']['nonRecommended']))
                     {
                         unset($this->arrSyncSettings['syncCto_CompareTables']['nonRecommended'][$value]);
                     }
@@ -167,7 +167,7 @@ class ModalDatabase extends Backend
         // Close functionality.
         else
         {
-            if (array_key_exists("transfer", $_POST))
+            if (\array_key_exists("transfer", $_POST))
             {
                 foreach ($this->arrSyncSettings['syncCto_CompareTables'] as $arrType)
                 {
@@ -192,8 +192,8 @@ class ModalDatabase extends Backend
         }
 
         // If no table is found skip the view
-        if (count($this->arrSyncSettings['syncCto_CompareTables']['recommended']) == 0
-            && count($this->arrSyncSettings['syncCto_CompareTables']['nonRecommended']) == 0
+        if (\count($this->arrSyncSettings['syncCto_CompareTables']['recommended']) == 0
+            && \count($this->arrSyncSettings['syncCto_CompareTables']['nonRecommended']) == 0
         )
         {
             unset($this->arrSyncSettings['syncCto_CompareTables']);
@@ -253,7 +253,7 @@ class ModalDatabase extends Backend
      */
     public function lookUpName($strName)
     {
-        $strBase = str_replace('tl_', "", $strName);
+        $strBase = \str_replace('tl_', "", $strName);
 
         // If empty return a array.
         if ($strName == '-')
@@ -265,9 +265,9 @@ class ModalDatabase extends Backend
         }
 
         // Make a lookup in synccto language files
-        if (is_array($GLOBALS['TL_LANG']['tl_syncCto_database']) && array_key_exists($strName, $GLOBALS['TL_LANG']['tl_syncCto_database']))
+        if (\is_array($GLOBALS['TL_LANG']['tl_syncCto_database']) && \array_key_exists($strName, $GLOBALS['TL_LANG']['tl_syncCto_database']))
         {
-            if (is_array($GLOBALS['TL_LANG']['tl_syncCto_database'][$strName]))
+            if (\is_array($GLOBALS['TL_LANG']['tl_syncCto_database'][$strName]))
             {
                 return $this->formateLookUpName($strName, $GLOBALS['TL_LANG']['tl_syncCto_database'][$strName][0]);
             }
@@ -278,16 +278,16 @@ class ModalDatabase extends Backend
         }
 
         // Get MM name
-        if (in_array('metamodels', $this->Config->getActiveModules()) && preg_match("/^mm_/i", $strName))
+        if (\in_array('metamodels', $this->Config->getActiveModules()) && \preg_match("/^mm_/i", $strName))
         {
             try
             {
-//                if (!is_null(\MetaModels\Factory::byTableName($strName)))
+//                if (!\is_null(\MetaModels\Factory::byTableName($strName)))
 //                {
 //                    $objDCABuilder     = \MetaModels\Dca\MetaModelDcaBuilder::getInstance();
 //                    $objMetaModels     = \MetaModels\Factory::byTableName($strName);
 //                    $arrDCA            = $objDCABuilder->getDca($objMetaModels->get('id'));
-//                    $arrBackendcaption = deserialize($arrDCA['backendcaption']);
+//                    $arrBackendcaption = \deserialize($arrDCA['backendcaption']);
 //
 //                    $strReturn = $objMetaModels->getName();
 //
@@ -310,11 +310,11 @@ class ModalDatabase extends Backend
         }
 
         // Little mapping for names
-        if (is_array($GLOBALS['SYC_CONFIG']['database_mapping']) && array_key_exists($strName, $GLOBALS['SYC_CONFIG']['database_mapping']))
+        if (\is_array($GLOBALS['SYC_CONFIG']['database_mapping']) && \array_key_exists($strName, $GLOBALS['SYC_CONFIG']['database_mapping']))
         {
             $strRealSystemName = $GLOBALS['SYC_CONFIG']['database_mapping'][$strName];
 
-            if (is_array($GLOBALS['TL_LANG']['MOD'][$strRealSystemName]))
+            if (\is_array($GLOBALS['TL_LANG']['MOD'][$strRealSystemName]))
             {
                 return $this->formateLookUpName($strName, $GLOBALS['TL_LANG']['MOD'][$strRealSystemName][0]);
             }
@@ -325,9 +325,9 @@ class ModalDatabase extends Backend
         }
 
         // Search in mod language array for a translation
-        if (array_key_exists($strBase, $GLOBALS['TL_LANG']['MOD']))
+        if (\array_key_exists($strBase, $GLOBALS['TL_LANG']['MOD']))
         {
-            if (is_array($GLOBALS['TL_LANG']['MOD'][$strBase]))
+            if (\is_array($GLOBALS['TL_LANG']['MOD'][$strBase]))
             {
                 return $this->formateLookUpName($strName, $GLOBALS['TL_LANG']['MOD'][$strBase][0]);
             }
@@ -418,7 +418,7 @@ class ModalDatabase extends Backend
         $this->popupTemplate->language = $GLOBALS['TL_LANGUAGE'];
         $this->popupTemplate->title    = $GLOBALS['TL_CONFIG']['websiteTitle'];
         $this->popupTemplate->charset  = $GLOBALS['TL_CONFIG']['characterSet'];
-        $this->popupTemplate->headline = basename(utf8_convert_encoding($this->strFile, $GLOBALS['TL_CONFIG']['characterSet']));
+        $this->popupTemplate->headline = \basename(\utf8_convert_encoding($this->strFile, $GLOBALS['TL_CONFIG']['characterSet']));
 
 
         // Set default information
@@ -439,7 +439,7 @@ class ModalDatabase extends Backend
     protected function initGetParams()
     {
         // Get Client id
-        if (strlen(Input::getInstance()->get('id')) != 0)
+        if (\strlen(Input::getInstance()->get('id')) != 0)
         {
             $this->intClientID = intval(Input::getInstance()->get('id'));
         }
@@ -450,7 +450,7 @@ class ModalDatabase extends Backend
         }
 
         // Get next step
-        if (strlen(Input::getInstance()->get('step')) != 0)
+        if (\strlen(Input::getInstance()->get('step')) != 0)
         {
             $this->mixStep = Input::getInstance()->get('step');
         }
@@ -460,7 +460,7 @@ class ModalDatabase extends Backend
         }
 
         // Get direction
-        if (strlen(Input::getInstance()->get('direction')) != 0)
+        if (\strlen(Input::getInstance()->get('direction')) != 0)
         {
             $this->strMode = Input::getInstance()->get('direction');
         }
@@ -471,7 +471,7 @@ class ModalDatabase extends Backend
     {
         $this->arrSyncSettings = Session::getInstance()->get("syncCto_SyncSettings_" . $this->intClientID);
 
-        if (!is_array($this->arrSyncSettings))
+        if (!\is_array($this->arrSyncSettings))
         {
             $this->arrSyncSettings = array();
         }
@@ -479,7 +479,7 @@ class ModalDatabase extends Backend
 
     protected function saveSyncSettings()
     {
-        if (!is_array($this->arrSyncSettings))
+        if (!\is_array($this->arrSyncSettings))
         {
             $this->arrSyncSettings = array();
         }

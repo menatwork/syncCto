@@ -73,7 +73,7 @@ class Client extends Server
      *
      * @param int $id
      *
-     * @throws Exception
+     * @throws \Exception
      */
     public function setClientBy($id)
     {
@@ -89,8 +89,8 @@ class Client extends Server
         }
 
         // Clean url
-        $objClient->path = preg_replace("/\/\z/i", "", $objClient->path);
-        $objClient->path = preg_replace("/ctoCommunication.php\z/i", "", $objClient->path);
+        $objClient->path = \preg_replace("/\/\z/i", "", $objClient->path);
+        $objClient->path = \preg_replace("/ctoCommunication.php\z/i", "", $objClient->path);
 
         // Build path
         if ($objClient->path == "")
@@ -333,7 +333,7 @@ class Client extends Server
      */
     public function runCecksumCompare($arrChecksumList, $blnDisableDbafsConflicts = false)
     {
-        if (!is_array($arrChecksumList))
+        if (!\is_array($arrChecksumList))
         {
             throw new \Exception("File list is not a array.");
         }
@@ -342,24 +342,24 @@ class Client extends Server
         $strMime = "application/octet-stream";
 
         $objFile = new File($strPath);
-        $objFile->write(serialize($arrChecksumList));
+        $objFile->write(\serialize($arrChecksumList));
         $objFile->close();
 
         $arrData = array(
             array(
                 "name"  => "md5",
-                "value" => md5_file(TL_ROOT . "/" . $strPath),
+                "value" => \md5_file(TL_ROOT . "/" . $strPath),
             ),
             array(
                 "name"  => "file",
-                "value" => md5($strPath),
+                "value" => \md5($strPath),
             ),
             array(
                 "name"  => "disable_dbafs_conflicts",
                 "value" => $blnDisableDbafsConflicts
             ),
             array(
-                "name"     => md5($strPath),
+                "name"     => \md5($strPath),
                 "filename" => "syncList.syncCto",
                 "filepath" => TL_ROOT . "/" . $this->objSyncCtoHelper->standardizePath($GLOBALS['SYC_PATH']['tmp'], "syncList.syncCto"),
                 "mime"     => $strMime,
@@ -433,7 +433,7 @@ class Client extends Server
      */
     public function checkDeleteFiles($arrChecksumList)
     {
-        if (!is_array($arrChecksumList))
+        if (!\is_array($arrChecksumList))
         {
             throw new \Exception("Filelist is not a array.");
         }
@@ -442,20 +442,20 @@ class Client extends Server
         $strMime = "application/octet-stream";
 
         $objFile = new File($strPath);
-        $objFile->write(serialize($arrChecksumList));
+        $objFile->write(\serialize($arrChecksumList));
         $objFile->close();
 
         $arrData = array(
             array(
                 "name"  => "md5",
-                "value" => md5_file(TL_ROOT . "/" . $strPath),
+                "value" => \md5_file(TL_ROOT . "/" . $strPath),
             ),
             array(
                 "name"  => "file",
-                "value" => md5($strPath),
+                "value" => \md5($strPath),
             ),
             array(
-                "name"     => md5($strPath),
+                "name"     => \md5($strPath),
                 "filename" => "syncList.syncCto",
                 "filepath" => TL_ROOT . "/" . $strPath,
                 "mime"     => $strMime,
@@ -474,7 +474,7 @@ class Client extends Server
      */
     public function searchDeleteFolders($arrChecksumList)
     {
-        if (!is_array($arrChecksumList))
+        if (!\is_array($arrChecksumList))
         {
             throw new \Exception("Filelist is not a array.");
         }
@@ -483,20 +483,20 @@ class Client extends Server
         $strMime = "application/octet-stream";
 
         $objFile = new File($strPath);
-        $objFile->write(serialize($arrChecksumList));
+        $objFile->write(\serialize($arrChecksumList));
         $objFile->close();
 
         $arrData = array(
             array(
                 "name"  => "md5",
-                "value" => md5_file(TL_ROOT . "/" . $strPath),
+                "value" => \md5_file(TL_ROOT . "/" . $strPath),
             ),
             array(
                 "name"  => "file",
-                "value" => md5($strPath),
+                "value" => \md5($strPath),
             ),
             array(
-                "name"     => md5($strPath),
+                "name"     => \md5($strPath),
                 "filename" => "syncFolderList.syncCto",
                 "filepath" => TL_ROOT . "/" . $strPath,
                 "mime"     => $strMime,
@@ -516,21 +516,21 @@ class Client extends Server
     public function sendFile($strFolder, $strFile, $strMD5 = "", $intTyp = 1, $strSplitname = "")
     {
         // 5 min. time out.
-        @set_time_limit(3600);
+        @\set_time_limit(3600);
 
         //Build path
         $strFilePath = $this->objSyncCtoHelper->standardizePath($strFolder, $strFile);
 
         // Check file exsist
-        if (!file_exists(TL_ROOT . "/" . $strFilePath) || !is_file(TL_ROOT . "/" . $strFilePath))
+        if (!\file_exists(TL_ROOT . "/" . $strFilePath) || !\is_file(TL_ROOT . "/" . $strFilePath))
         {
-            throw new \Exception(vsprintf($GLOBALS['TL_LANG']['ERR']['unknown_file'], array($strFilePath)));
+            throw new \Exception(\vsprintf($GLOBALS['TL_LANG']['ERR']['unknown_file'], array($strFilePath)));
         }
 
         // MD5 file hash
         if ($strMD5 == "")
         {
-            $strMD5 = md5_file(TL_ROOT . "/" . $strFilePath);
+            $strMD5 = \md5_file(TL_ROOT . "/" . $strFilePath);
         }
 
         // Contenttyp
@@ -571,22 +571,22 @@ class Client extends Server
     public function sendFileNewDestination($strSource, $strDestination, $strMD5 = "", $intTyp = 1, $strSplitname = "")
     {
         // 5 min. time out.
-        @set_time_limit(3600);
+        @\set_time_limit(3600);
 
         //Build path
         $strSource      = $this->objSyncCtoHelper->standardizePath($strSource);
         $strDestination = $this->objSyncCtoHelper->standardizePath($strDestination);
 
         // Check file exsist
-        if (!file_exists(TL_ROOT . "/" . $strSource) || !is_file(TL_ROOT . "/" . $strSource))
+        if (!\file_exists(TL_ROOT . "/" . $strSource) || !\is_file(TL_ROOT . "/" . $strSource))
         {
-            throw new \Exception(vsprintf($GLOBALS['TL_LANG']['ERR']['unknown_file'], array($strSource)));
+            throw new \Exception(\vsprintf($GLOBALS['TL_LANG']['ERR']['unknown_file'], array($strSource)));
         }
 
         // MD5 file hash
         if ($strMD5 == "")
         {
-            $strMD5 = md5_file(TL_ROOT . "/" . $strSource);
+            $strMD5 = \md5_file(TL_ROOT . "/" . $strSource);
         }
 
         // Contenttyp
@@ -596,7 +596,7 @@ class Client extends Server
         $arrData = array(
             array(
                 "name"     => $strMD5,
-                "filename" => basename($strSource),
+                "filename" => \basename($strSource),
                 "filepath" => TL_ROOT . "/" . $strSource,
                 "mime"     => $strMime,
             ),
@@ -604,8 +604,8 @@ class Client extends Server
                 "name"  => "metafiles",
                 "value" => array(
                     $strMD5 => array(
-                        "folder"    => dirname($strDestination),
-                        "file"      => basename($strDestination),
+                        "folder"    => \dirname($strDestination),
+                        "file"      => \basename($strDestination),
                         "MD5"       => $strMD5,
                         "splitname" => $strSplitname,
                         "typ"       => $intTyp
@@ -775,10 +775,10 @@ class Client extends Server
         $arrResult = $this->run("SYNCCTO_GET_FILE", $arrData);
 
         $objFile = new File($strSavePath);
-        $objFile->write(base64_decode($arrResult["content"]));
+        $objFile->write(\base64_decode($arrResult["content"]));
         $objFile->close();
 
-        if (md5_file(TL_ROOT . "/" . $strSavePath) != $arrResult["md5"])
+        if (\md5_file(TL_ROOT . "/" . $strSavePath) != $arrResult["md5"])
         {
             throw new \Exception($GLOBALS['TL_LANG']['ERR']['checksum_error']);
         }
@@ -984,7 +984,7 @@ class Client extends Server
         // Kick blacklist entries
         foreach ($arrConfig as $key => $value)
         {
-            if (in_array($key, $arrConfigBlacklist))
+            if (\in_array($key, $arrConfigBlacklist))
             {
                 unset($arrConfig[$key]);
             }

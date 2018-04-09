@@ -259,7 +259,7 @@ class Backup extends BackendModule
     {
         $arrContenData =  Session::getInstance()->get("syncCto_Backup_Content");
 
-        if (is_array($arrContenData) && count($arrContenData) != 0)
+        if (\is_array($arrContenData) && \count($arrContenData) != 0)
         {
             $this->booError = $arrContenData["error"];
             $this->booAbort = $arrContenData["abort"];
@@ -295,7 +295,7 @@ class Backup extends BackendModule
     {
         $arrStepPool =  Session::getInstance()->get("syncCto_Backup_StepPool");
 
-        if ($arrStepPool == false || !is_array($arrStepPool))
+        if ($arrStepPool == false || !\is_array($arrStepPool))
         {
             $arrStepPool = array();
         }
@@ -326,13 +326,13 @@ class Backup extends BackendModule
         // Load Files
         $objFileList = new File($this->objSyncCtoHelper->standardizePath($GLOBALS['SYC_PATH']['tmp'], "syncfilelist-Backup.txt"));
         $strContent  = $objFileList->getContent();
-        if (strlen($strContent) == 0)
+        if (\strlen($strContent) == 0)
         {
             $this->arrListFile = array();
         }
         else
         {
-            $this->arrListFile = unserialize($strContent);
+            $this->arrListFile = \unserialize($strContent);
         }
         $objFileList->close();
     }
@@ -340,7 +340,7 @@ class Backup extends BackendModule
     protected function saveTempLists()
     {
         $objFileList = new File($this->objSyncCtoHelper->standardizePath($GLOBALS['SYC_PATH']['tmp'], "syncfilelist-Backup.txt"));
-        $objFileList->write(serialize($this->arrListFile));
+        $objFileList->write(\serialize($this->arrListFile));
         $objFileList->close();
     }
 
@@ -348,7 +348,7 @@ class Backup extends BackendModule
     {
         $this->arrBackupSettings =  Session::getInstance()->get("syncCto_BackupSettings");
 
-        if (!is_array($this->arrBackupSettings))
+        if (!\is_array($this->arrBackupSettings))
         {
             $this->arrBackupSettings = array();
         }
@@ -377,7 +377,7 @@ class Backup extends BackendModule
             $this->strHeadline = $GLOBALS['TL_LANG']['tl_syncCto_backup_db']['edit'];
             $this->strInformation = "";
             $this->intStep = 1;
-            $this->floStart = microtime(true);
+            $this->floStart = \microtime(true);
             $this->objData = new ContentData(array(), $this->intStep);
 
             // Reset some Sessions
@@ -409,9 +409,9 @@ class Backup extends BackendModule
 
                 // Run Dump
                 case 2:
-                    if(!file_exists(TL_ROOT . '/' . Helper::getInstance()->standardizePath($GLOBALS['SYC_PATH']['db'])))
+                    if(!\file_exists(TL_ROOT . '/' . Helper::getInstance()->standardizePath($GLOBALS['SYC_PATH']['db'])))
                     {
-                        throw new \Exception(sprintf($GLOBALS['TL_LANG']['ERR']['missing_file_folder'] , Helper::getInstance()->standardizePath($GLOBALS['SYC_PATH']['db'])));
+                        throw new \Exception(\sprintf($GLOBALS['TL_LANG']['ERR']['missing_file_folder'] , Helper::getInstance()->standardizePath($GLOBALS['SYC_PATH']['db'])));
                     }
 
                     $this->objStepPool->zipname = $this->objSyncCtoDatabase->runDump($this->arrBackupSettings['syncCto_BackupTables'], false, false);
@@ -429,7 +429,7 @@ class Backup extends BackendModule
                     $this->objData->setState(Enum::WORK_OK);
 
                     $strHTML = "<p class='tl_help'><br />";
-                    $strHTML .= "<a onclick=\"Backend.openModalIframe({'width':600,'title':'" . $this->objStepPool->zipname . "','url':this.href,'height':216});return false\" href='contao/popup.php?src=" . base64_encode($GLOBALS['TL_CONFIG']['uploadPath'] . "/syncCto_backups/database/" . $this->objStepPool->zipname) . "'>" . $GLOBALS['TL_LANG']['MSC']['fileDownload'] . "</a>";
+                    $strHTML .= "<a onclick=\"Backend.openModalIframe({'width':600,'title':'" . $this->objStepPool->zipname . "','url':this.href,'height':216});return false\" href='contao/popup.php?src=" . \base64_encode($GLOBALS['TL_CONFIG']['uploadPath'] . "/syncCto_backups/database/" . $this->objStepPool->zipname) . "'>" . $GLOBALS['TL_LANG']['MSC']['fileDownload'] . "</a>";
                     $strHTML .= "</p>";
 
                     $this->objData->setStep(2);
@@ -470,7 +470,7 @@ class Backup extends BackendModule
             $this->strHeadline = $GLOBALS['TL_LANG']['tl_syncCto_restore_db']['edit'];
             $this->strInformation = "";
             $this->intStep = 1;
-            $this->floStart = microtime(true);
+            $this->floStart = \microtime(true);
             $this->objData = new ContentData(array(), $this->intStep);
 
             // Reset some Sessions
@@ -547,7 +547,7 @@ class Backup extends BackendModule
             $this->strHeadline = $GLOBALS['TL_LANG']['tl_syncCto_backup_file']['edit'];
             $this->strInformation = "";
             $this->intStep = 1;
-            $this->floStart = microtime(true);
+            $this->floStart = \microtime(true);
             $this->objData = new ContentData(array(), $this->intStep);
 
             // Reset some Sessions
@@ -580,9 +580,9 @@ class Backup extends BackendModule
                     break;
 
                 case 2:
-                    if(!file_exists(TL_ROOT . '/' . Helper::getInstance()->standardizePath($GLOBALS['SYC_PATH']['file'])))
+                    if(!\file_exists(TL_ROOT . '/' . Helper::getInstance()->standardizePath($GLOBALS['SYC_PATH']['file'])))
                     {
-                        throw new \Exception(sprintf($GLOBALS['TL_LANG']['ERR']['missing_file_folder'] , Helper::getInstance()->standardizePath($GLOBALS['SYC_PATH']['file'])));
+                        throw new \Exception(\sprintf($GLOBALS['TL_LANG']['ERR']['missing_file_folder'] , Helper::getInstance()->standardizePath($GLOBALS['SYC_PATH']['file'])));
                     }
 
                     $arrResult                       = $this->objSyncCtoFiles->runDump($this->arrBackupSettings['backup_name'], $this->arrBackupSettings['core_files'], $this->arrBackupSettings['filelist']);
@@ -602,12 +602,12 @@ class Backup extends BackendModule
                     $this->objData->setState(Enum::WORK_OK);
 
                     $strHTML = "<p class='tl_help'><br />";
-                    $strHTML .= "<a onclick=\"Backend.openModalIframe({'width':600,'title':'" . $this->objStepPool->zipname . "','url':this.href,'height':216});return false\" href='contao/popup.php?src=" . base64_encode($GLOBALS['TL_CONFIG']['uploadPath'] . "/syncCto_backups/files/" . $this->objStepPool->zipname) . "'>" . $GLOBALS['TL_LANG']['MSC']['fileDownload'] . "</a>";
+                    $strHTML .= "<a onclick=\"Backend.openModalIframe({'width':600,'title':'" . $this->objStepPool->zipname . "','url':this.href,'height':216});return false\" href='contao/popup.php?src=" . \base64_encode($GLOBALS['TL_CONFIG']['uploadPath'] . "/syncCto_backups/files/" . $this->objStepPool->zipname) . "'>" . $GLOBALS['TL_LANG']['MSC']['fileDownload'] . "</a>";
                     $strHTML .= "</p>";
 
-                    if (count($this->objStepPool->skippedfiles) != 0)
+                    if (\count($this->objStepPool->skippedfiles) != 0)
                     {
-                        $strHTML = '<br /><p class="tl_help">' . count($this->objStepPool->skippedfiles) . $GLOBALS['TL_LANG']['MSC']['skipped_files'] . '</p>';
+                        $strHTML = '<br /><p class="tl_help">' . \count($this->objStepPool->skippedfiles) . $GLOBALS['TL_LANG']['MSC']['skipped_files'] . '</p>';
 
                         $strHTML .= '<ul class="fileinfo">';
                         foreach ($this->objStepPool->skippedfiles as $value)
@@ -654,7 +654,7 @@ class Backup extends BackendModule
             $this->strHeadline = $GLOBALS['TL_LANG']['tl_syncCto_restore_file']['edit'];
             $this->strInformation = "";
             $this->intStep = 1;
-            $this->floStart = microtime(true);
+            $this->floStart = \microtime(true);
             $this->objData = new ContentData(array(), $this->intStep);
 
             // Reset some Sessions
@@ -728,7 +728,7 @@ class Backup extends BackendModule
 
                     $this->objData->setStep(2);
                     $this->objData->setTitle($GLOBALS['TL_LANG']['MSC']['complete']);
-                    $this->objData->setDescription(vsprintf($GLOBALS['TL_LANG']['tl_syncCto_restore_file']['complete'], array($this->arrBackupSettings['backup_file'], $objDate->time, $objDate->date)));
+                    $this->objData->setDescription(\vsprintf($GLOBALS['TL_LANG']['tl_syncCto_restore_file']['complete'], array($this->arrBackupSettings['backup_file'], $objDate->time, $objDate->date)));
                     $this->objData->setState(Enum::WORK_OK);
                     break;
             }

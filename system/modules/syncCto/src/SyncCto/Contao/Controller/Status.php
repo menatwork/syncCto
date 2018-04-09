@@ -73,7 +73,7 @@ class Status extends Backend
      */
     public static function getInstance()
     {
-        if (is_null(self::$objInstance))
+        if (\is_null(self::$objInstance))
         {
             self::$objInstance = new self();
         }
@@ -148,11 +148,11 @@ class Status extends Backend
     {
         // Clean sync options
         $arrSyncOptions = array();
-        if (is_array($arrOptions['post_data']) && !empty($arrOptions['post_data']))
+        if (\is_array($arrOptions['post_data']) && !empty($arrOptions['post_data']))
         {
             foreach ($arrOptions['post_data'] as $key => $value)
             {
-                if (in_array($key, $this->arrSkippedValues))
+                if (\in_array($key, $this->arrSkippedValues))
                 {
                     continue;
                 }
@@ -163,7 +163,7 @@ class Status extends Backend
 
         // Build set array
         $arrSet = array(
-            'tstamp'         => time(),
+            'tstamp'         => \time(),
             'client_id'      => $intClient,
             'sync_user'      => $intUser,
             'sync_start'     => $intStart,

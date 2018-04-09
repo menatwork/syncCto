@@ -34,7 +34,7 @@ class RunOnce extends \RepositoryBackendModule
         {
             parent::__construct();
 
-            $this->strWSDL = trim($GLOBALS['TL_CONFIG']['repository_wsdl']);
+            $this->strWSDL = \trim($GLOBALS['TL_CONFIG']['repository_wsdl']);
 
             $this->client = new \SoapClient($this->strWSDL,
                             array(
@@ -84,9 +84,9 @@ class RunOnce extends \RepositoryBackendModule
         // Write meta (header)
         $objXml->startElement('metatags');
         $objXml->writeElement('version', $GLOBALS['SYC_VERSION']);
-        $objXml->writeElement('create_unix', time());
-        $objXml->writeElement('create_date', date('Y-m-d', time()));
-        $objXml->writeElement('create_time', date('H:i', time()));
+        $objXml->writeElement('create_unix', \time());
+        $objXml->writeElement('create_date', \date('Y-m-d', \time()));
+        $objXml->writeElement('create_time', \date('H:i', \time()));
         $objXml->endElement(); // End metatags
 
         foreach ($this->arrFiles as $strDependencies => $arrFiles)
@@ -133,11 +133,11 @@ class RunOnce extends \RepositoryBackendModule
 
         $arrDependenciesDone = array();
 
-        while (count($arrDependencies) != 0)
+        while (\count($arrDependencies) != 0)
         {
             $arrEntry = array_pop($arrDependencies);
 
-            if (in_array($arrEntry['name'], $arrDependenciesDone))
+            if (\in_array($arrEntry['name'], $arrDependenciesDone))
             {
                 continue;
             }
@@ -146,14 +146,14 @@ class RunOnce extends \RepositoryBackendModule
             {
                 $strExtensionName = $arrEntry['name'];
 
-                $arrDependencies                   = array_merge($arrDependencies, $this->getDependenciesFor($strExtensionName, $arrInstalledExtensions[$strExtensionName]['version']));
+                $arrDependencies                   = \array_merge($arrDependencies, $this->getDependenciesFor($strExtensionName, $arrInstalledExtensions[$strExtensionName]['version']));
                 $this->arrFiles[$strExtensionName] = $this->getFileListFor($strExtensionName, $arrInstalledExtensions[$strExtensionName]['version']);
             }
             else
             {
                 $strExtensionName = $arrEntry['name'];
 
-                $arrDependencies                   = array_merge($arrDependencies, $this->getDependenciesFor($strExtensionName, $arrEntry['version']));
+                $arrDependencies                   = \array_merge($arrDependencies, $this->getDependenciesFor($strExtensionName, $arrEntry['version']));
                 $this->arrFiles[$strExtensionName] = $this->getFileListFor($strExtensionName, $arrEntry['version']);
             }
 
@@ -204,7 +204,7 @@ class RunOnce extends \RepositoryBackendModule
 
         foreach ($arrExtensionList as $key => $value)
         {
-            if ($value->name == $strExtension && $value->version == $intVersion && is_array($value->dependencies))
+            if ($value->name == $strExtension && $value->version == $intVersion && \is_array($value->dependencies))
             {
                 $arrReturn = array();
 
@@ -249,9 +249,9 @@ class RunOnce extends \RepositoryBackendModule
      */
     public function standardizePath()
     {
-        $arrPath = func_get_args();
+        $arrPath = \func_get_args();
 
-        if (count($arrPath) == 0 || $arrPath == null || $arrPath == "")
+        if (\count($arrPath) == 0 || $arrPath == null || $arrPath == "")
         {
             return "";
         }
@@ -260,8 +260,8 @@ class RunOnce extends \RepositoryBackendModule
 
         foreach ($arrPath as $itPath)
         {
-            $itPath = str_replace(array(TL_ROOT, "\\"), array("", "/"), $itPath);
-            $itPath = explode("/", $itPath);
+            $itPath = \str_replace(array(TL_ROOT, "\\"), array("", "/"), $itPath);
+            $itPath = \explode("/", $itPath);
 
             foreach ($itPath as $itFolder)
             {
@@ -274,6 +274,6 @@ class RunOnce extends \RepositoryBackendModule
             }
         }
 
-        return preg_replace("/^\//i", "", $strVar);
+        return \preg_replace("/^\//i", "", $strVar);
     }
 }

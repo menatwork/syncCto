@@ -38,7 +38,7 @@ class PathBuilder
      */
     public function addPath($path, $separator = '/')
     {
-        if (is_array($path)) {
+        if (\is_array($path)) {
             $this->addArray($path);
         } else {
             $this->addString($path, $separator);
@@ -56,11 +56,11 @@ class PathBuilder
      */
     public function addUnknownPath($path)
     {
-        if (is_array($path)) {
+        if (\is_array($path)) {
             $this->addArray($path);
         } else {
             $wrongSeparator = ((DIRECTORY_SEPARATOR == '/') ? '\\' : '/');
-            $path           = str_replace($wrongSeparator, DIRECTORY_SEPARATOR, $path);
+            $path           = \str_replace($wrongSeparator, DIRECTORY_SEPARATOR, $path);
             $this->addString($path, DIRECTORY_SEPARATOR);
         }
 
@@ -78,7 +78,7 @@ class PathBuilder
     {
         // Build the path.
         $return = (($withTlRoot) ? TL_ROOT . DIRECTORY_SEPARATOR : '')
-                  . implode(DIRECTORY_SEPARATOR, $this->pathParts);
+                  . \implode(DIRECTORY_SEPARATOR, $this->pathParts);
 
         // Reset the array.
         $this->pathParts = array();
@@ -95,15 +95,15 @@ class PathBuilder
     protected function addArray($path)
     {
         // Trim all values.
-        $path = array_map(function ($value) {
-            return trim($value);
+        $path = \array_map(function ($value) {
+            return \trim($value);
         }, $path);
 
         // Remove empty.
-        $path = array_filter($path);
+        $path = \array_filter($path);
 
         // Add to the array.
-        $this->pathParts = array_merge($this->pathParts, $path);
+        $this->pathParts = \array_merge($this->pathParts, $path);
     }
 
     /**
@@ -116,7 +116,7 @@ class PathBuilder
     protected function addString($path, $separator = '/')
     {
         // Remove blanks and split.
-        $parts = trimsplit($separator, $path);
+        $parts = \trimsplit($separator, $path);
 
         // Add.
         $this->addArray($parts);

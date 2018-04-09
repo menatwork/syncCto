@@ -15,7 +15,7 @@ namespace SyncCto\Contao\Controller;
 use Contao\BackendModule;
 use Contao\DataContainer;
 
-if (!function_exists('posix_getpwuid'))
+if (!\function_exists('posix_getpwuid'))
 {
     function posix_getpwuid($int)
     {
@@ -79,15 +79,15 @@ class SystemCheck extends BackendModule
     public function getPhpConfigurations()
     {
         return array(
-            'safe_mode'              => ini_get('safe_mode'),
-            'max_execution_time'     => ini_get('max_execution_time'),
-            'memory_limit'           => $this->getSize(ini_get('memory_limit')),
-            'register_globals'       => ini_get('register_globals'),
-            'file_uploads'           => ini_get('file_uploads'),
-            'upload_max_filesize'    => $this->getSize(ini_get('upload_max_filesize')),
-            'post_max_size'          => $this->getSize(ini_get('post_max_size')),
-            'max_input_time'         => ini_get('max_input_time'),
-            'default_socket_timeout' => ini_get('default_socket_timeout'),
+            'safe_mode'              => \ini_get('safe_mode'),
+            'max_execution_time'     => \ini_get('max_execution_time'),
+            'memory_limit'           => $this->getSize(\ini_get('memory_limit')),
+            'register_globals'       => \ini_get('register_globals'),
+            'file_uploads'           => \ini_get('file_uploads'),
+            'upload_max_filesize'    => $this->getSize(\ini_get('upload_max_filesize')),
+            'post_max_size'          => $this->getSize(\ini_get('post_max_size')),
+            'max_input_time'         => \ini_get('max_input_time'),
+            'default_socket_timeout' => \ini_get('default_socket_timeout'),
             'suhosin'                => $this->checkSuhosin()
         );
     }
@@ -97,13 +97,13 @@ class SystemCheck extends BackendModule
         $blnIsActive = false;
 
         // Check php ini
-        if (ini_get('suhosin.session.max_id_length'))
+        if (\ini_get('suhosin.session.max_id_length'))
         {
             $blnIsActive = true;
         }
 
         // Check patch
-        if (defined("SUHOSIN_PATCH") && @constant("SUHOSIN_PATCH"))
+        if (\defined("SUHOSIN_PATCH") && @\constant("SUHOSIN_PATCH"))
         {
             $blnIsActive = true;
         }
@@ -119,13 +119,13 @@ class SystemCheck extends BackendModule
     public function getPhpFunctions()
     {
         return array(
-            'fsockopen'   => function_exists("fsockopen"),
-            'zip_archive' => class_exists('ZipArchive'),
-            'gmp'         => extension_loaded('gmp'),
-            'bcmath'      => extension_loaded('bcmath'),
-            'xmlwriter'   => class_exists('XMLWriter'),
-            'xmlreader'   => class_exists('XMLReader'),
-            'mcrypt'      => extension_loaded('mcrypt'),
+            'fsockopen'   => \function_exists("fsockopen"),
+            'zip_archive' => \class_exists('ZipArchive'),
+            'gmp'         => \extension_loaded('gmp'),
+            'bcmath'      => \extension_loaded('bcmath'),
+            'xmlwriter'   => \class_exists('XMLWriter'),
+            'xmlreader'   => \class_exists('XMLReader'),
+            'mcrypt'      => \extension_loaded('mcrypt'),
         );
     }
 
@@ -194,9 +194,9 @@ class SystemCheck extends BackendModule
         $arrReturn = array();
 
         // date_default_timezone_get
-        if (date_default_timezone_get())
+        if (\date_default_timezone_get())
         {
-            $arrReturn['date_default_timezone'] =  date_default_timezone_get();
+            $arrReturn['date_default_timezone'] =  \date_default_timezone_get();
         }
         else
         {
@@ -204,9 +204,9 @@ class SystemCheck extends BackendModule
         }
 
         // date.timezone
-        if (ini_get('date.timezone'))
+        if (\ini_get('date.timezone'))
         {
-            $arrReturn['date_ini_timezone'] =  ini_get('date.timezone');
+            $arrReturn['date_ini_timezone'] =  \ini_get('date.timezone');
         }
         else
         {
@@ -224,18 +224,18 @@ class SystemCheck extends BackendModule
         }
 
         // Time
-        $intCurrentTime                       = time();
+        $intCurrentTime                       = \time();
         $arrReturn['current_time']['time']    = $intCurrentTime;
-        $arrReturn['current_time']['formate'] = date($strTimeFormate, $intCurrentTime);
-        $arrReturn['current_time']['day']     = date('d', $intCurrentTime);
-        $arrReturn['current_time']['month']   = date('m', $intCurrentTime);
-        $arrReturn['current_time']['year']    = date('Y', $intCurrentTime);
-        $arrReturn['current_time']['houre']   = date('H', $intCurrentTime);
-        $arrReturn['current_time']['minute']  = date('i', $intCurrentTime);
-        $arrReturn['current_time']['second']  = date('s', $intCurrentTime);
+        $arrReturn['current_time']['formate'] = \date($strTimeFormate, $intCurrentTime);
+        $arrReturn['current_time']['day']     = \date('d', $intCurrentTime);
+        $arrReturn['current_time']['month']   = \date('m', $intCurrentTime);
+        $arrReturn['current_time']['year']    = \date('Y', $intCurrentTime);
+        $arrReturn['current_time']['houre']   = \date('H', $intCurrentTime);
+        $arrReturn['current_time']['minute']  = \date('i', $intCurrentTime);
+        $arrReturn['current_time']['second']  = \date('s', $intCurrentTime);
 
         // PHP
-        $arrReturn['php_version'] = phpversion();
+        $arrReturn['php_version'] = \phpversion();
 
         return $arrReturn;
     }
@@ -621,7 +621,7 @@ class SystemCheck extends BackendModule
                 // Check if same.
                 foreach ($value as $strTimeKey => $mixTimeValue)
                 {
-                    if (in_array($strTimeKey, array('time', 'formate', 'second')))
+                    if (\in_array($strTimeKey, array('time', 'formate', 'second')))
                     {
                         continue;
                     }

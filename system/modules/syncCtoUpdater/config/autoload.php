@@ -5,14 +5,14 @@
  *
  * @copyright  MEN AT WORK 2014
  * @package    syncCtoUpdater
- * @license    GNU/LGPL 
+ * @license    GNU/LGPL
  * @filesource
  */
 
 /**
  * Register the classes
  */
-ClassLoader::addClasses(array
+\Contao\ClassLoader::addClasses(array
 (
 	'SyncCtoAutoUpdater'      => 'system/modules/syncCtoUpdater/SyncCtoAutoUpdater.php',
 ));

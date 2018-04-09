@@ -10,7 +10,7 @@
  * @filesource
  */
 
-$objInput = \Input::getInstance();
+$objInput = \Contao\Input::getInstance();
 
 /**
  * Current syncCto version
@@ -20,8 +20,8 @@ $GLOBALS['SYC_VERSION'] = '3.2.0';
 /**
  * Back end modules
  */
-$i = array_search('system', array_keys($GLOBALS['BE_MOD']));
-array_insert($GLOBALS['BE_MOD'], $i + 1, array
+$i = \array_search('system', \array_keys($GLOBALS['BE_MOD']));
+\array_insert($GLOBALS['BE_MOD'], $i + 1, array
 (
     'syncCto' => array
     (
@@ -67,7 +67,7 @@ array_insert($GLOBALS['BE_MOD'], $i + 1, array
 /**
  * Mime types
  */
-$GLOBALS['SYC_CONFIG']['mime_types'] = array_merge((array) $GLOBALS['SYC_CONFIG']['mime_types'],
+$GLOBALS['SYC_CONFIG']['mime_types'] = \array_merge((array) $GLOBALS['SYC_CONFIG']['mime_types'],
     array
     (
         // Application files
@@ -219,7 +219,7 @@ if ($strDo == 'syncCto_backups' && $strTable != '' && ($strAct == 'edit' || $str
     unset($GLOBALS['BE_MOD']['syncCto']['syncCto_backups']['callback']);
 }
 
-if ($strDo == 'synccto_clients' && $strAct != 'start' && in_array($strTable, array('tl_syncCto_clients_syncTo', 'tl_syncCto_clients_syncFrom', 'tl_syncCto_clients_showExtern', '')) && TL_MODE == 'BE')
+if ($strDo == 'synccto_clients' && $strAct != 'start' && \in_array($strTable, array('tl_syncCto_clients_syncTo', 'tl_syncCto_clients_syncFrom', 'tl_syncCto_clients_showExtern', '')) && TL_MODE == 'BE')
 {
     unset($GLOBALS['BE_MOD']['syncCto']['synccto_clients']['callback']);
 }
@@ -243,12 +243,12 @@ $GLOBALS['SYC_SIZE']['limit_ignore'] = 838860800;
  */
 
 // Add some files to the blacklist for the DBAFS from contao.
-$arrFileSyncExclude = trimsplit(',', $GLOBALS['TL_CONFIG']['fileSyncExclude']);
+$arrFileSyncExclude = \trimsplit(',', $GLOBALS['TL_CONFIG']['fileSyncExclude']);
 $arrFileSyncExclude[] = 'syncCto_backups/debug';
-$GLOBALS['TL_CONFIG']['fileSyncExclude'] = implode(',', $arrFileSyncExclude);
+$GLOBALS['TL_CONFIG']['fileSyncExclude'] = \implode(',', $arrFileSyncExclude);
 
 // Tables
-$GLOBALS['SYC_CONFIG']['table_hidden'] = array_merge( (array) $GLOBALS['SYC_CONFIG']['table_hidden'], array
+$GLOBALS['SYC_CONFIG']['table_hidden'] = \array_merge( (array) $GLOBALS['SYC_CONFIG']['table_hidden'], array
 (
     'tl_files',
     'tl_log',
@@ -266,7 +266,7 @@ $GLOBALS['SYC_CONFIG']['table_hidden'] = array_merge( (array) $GLOBALS['SYC_CONF
 ));
 
 // Folders
-$GLOBALS['SYC_CONFIG']['folder_blacklist'] = array_merge( (array) $GLOBALS['SYC_CONFIG']['folder_blacklist'], array
+$GLOBALS['SYC_CONFIG']['folder_blacklist'] = \array_merge( (array) $GLOBALS['SYC_CONFIG']['folder_blacklist'], array
 (
     'assets/css/',
     'assets/images/',
@@ -283,7 +283,7 @@ $GLOBALS['SYC_CONFIG']['folder_blacklist'] = array_merge( (array) $GLOBALS['SYC_
 ));
 
 // Files only sync.
-$GLOBALS['SYC_CONFIG']['file_blacklist'] = array_merge( (array) $GLOBALS['SYC_CONFIG']['file_blacklist'], array
+$GLOBALS['SYC_CONFIG']['file_blacklist'] = \array_merge( (array) $GLOBALS['SYC_CONFIG']['file_blacklist'], array
 (
     'TL_ROOT/.htaccess',
     'TL_ROOT/.htpasswd',
@@ -294,7 +294,7 @@ $GLOBALS['SYC_CONFIG']['file_blacklist'] = array_merge( (array) $GLOBALS['SYC_CO
 ));
 
 // Local config
-$GLOBALS['SYC_CONFIG']['local_blacklist'] = array_merge( (array) $GLOBALS['SYC_CONFIG']['local_blacklist'], array
+$GLOBALS['SYC_CONFIG']['local_blacklist'] = \array_merge( (array) $GLOBALS['SYC_CONFIG']['local_blacklist'], array
 (
     'websitePath',
     'websiteTitle',
@@ -328,7 +328,7 @@ $GLOBALS['SYC_CONFIG']['local_blacklist'] = array_merge( (array) $GLOBALS['SYC_C
 /**
  * Whitelist
  */
-$GLOBALS['SYC_CONFIG']['folder_whitelist'] = array_merge( (array) $GLOBALS['SYC_CONFIG']['folder_whitelist'], array
+$GLOBALS['SYC_CONFIG']['folder_whitelist'] = \array_merge( (array) $GLOBALS['SYC_CONFIG']['folder_whitelist'], array
 (
     'assets',
     'composer',
@@ -355,7 +355,7 @@ $GLOBALS['SYC_CONFIG']['sync_options']['configfiles'][] =  'localconfig_update';
 /**
  * Maintance options
  */
-$GLOBALS['SYC_CONFIG']['maintance_options'] = array_merge( (array) $GLOBALS['SYC_CONFIG']['maintance_options'], array
+$GLOBALS['SYC_CONFIG']['maintance_options'] = \array_merge( (array) $GLOBALS['SYC_CONFIG']['maintance_options'], array
 (
     'temp_tables',
     'temp_folders',
@@ -373,7 +373,7 @@ $GLOBALS['SYC_PATH']['tmp']   = "system/tmp/";
 /**
  * Language mapping for database lookup
  */
-$GLOBALS['SYC_CONFIG']['database_mapping'] = array_merge( (array) $GLOBALS['SYC_CONFIG']['database_mapping'], array
+$GLOBALS['SYC_CONFIG']['database_mapping'] = \array_merge( (array) $GLOBALS['SYC_CONFIG']['database_mapping'], array
 (
     'tl_module'                 => 'modules',
     'tl_member_group'           => 'mgroup',

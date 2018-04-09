@@ -83,11 +83,11 @@ class RemoteProcedureCall extends Backend
     public function getClientParameter()
     {
         return array(
-            'max_execution_time' => ini_get('max_execution_time'),
-            'memory_limit' => ini_get('memory_limit'),
-            'file_uploads' => ini_get('file_uploads'),
-            'upload_max_filesize' => ini_get('upload_max_filesize'),
-            'post_max_size' => ini_get('post_max_size')
+            'max_execution_time' => \ini_get('max_execution_time'),
+            'memory_limit' => \ini_get('memory_limit'),
+            'file_uploads' => \ini_get('file_uploads'),
+            'upload_max_filesize' => \ini_get('upload_max_filesize'),
+            'post_max_size' => \ini_get('post_max_size')
         );
     }
 
@@ -105,7 +105,7 @@ class RemoteProcedureCall extends Backend
         // Kick blacklist entries
         foreach ($arrConfig as $key => $value)
         {
-            if (in_array($key, $arrConfigBlacklist))
+            if (\in_array($key, $arrConfigBlacklist))
             {
                 unset($arrConfig[$key]);
             }
@@ -157,7 +157,7 @@ class RemoteProcedureCall extends Backend
     {
         $arrLocalConfig = $this->objSyncCtoHelper->loadConfigs(Enum::LOADCONFIG_KEYS_ONLY);
 
-        if (in_array("\$GLOBALS['TL_CONFIG']['syncCto_attentionFlag']", $arrLocalConfig))
+        if (\in_array("\$GLOBALS['TL_CONFIG']['syncCto_attentionFlag']", $arrLocalConfig))
         {
             $this->Config->update("\$GLOBALS['TL_CONFIG']['syncCto_attentionFlag']", $booMode);
         }
@@ -203,10 +203,10 @@ class RemoteProcedureCall extends Backend
     {
         if (!key_exists($strFilename, $_FILES))
         {
-            throw new \Exception(vsprintf($GLOBALS['TL_LANG']['ERR']['unknown_file'], array($strFilename)));
+            throw new \Exception(\vsprintf($GLOBALS['TL_LANG']['ERR']['unknown_file'], array($strFilename)));
         }
 
-        if (md5_file($_FILES[$strFilename]["tmp_name"]) != $strMD5)
+        if (\md5_file($_FILES[$strFilename]["tmp_name"]) != $strMD5)
         {
             throw new \Exception($GLOBALS['TL_LANG']['ERR']['checksum_error']);
         }
@@ -215,10 +215,10 @@ class RemoteProcedureCall extends Backend
         $objFiles->move_uploaded_file($_FILES[$strFilename]["tmp_name"], $this->objSyncCtoHelper->standardizePath($GLOBALS['SYC_PATH']['tmp'], "syncListInc.syncCto"));
 
         $objFile         = new File($this->objSyncCtoHelper->standardizePath($GLOBALS['SYC_PATH']['tmp'], "syncListInc.syncCto"));
-        $arrChecksumList = unserialize($objFile->getContent());
+        $arrChecksumList = \unserialize($objFile->getContent());
         $objFile->close();
 
-        if (!is_array($arrChecksumList))
+        if (!\is_array($arrChecksumList))
         {
             throw new \Exception("Could not rebuild array.");
         }
@@ -237,10 +237,10 @@ class RemoteProcedureCall extends Backend
     {
         if (!key_exists($strFilename, $_FILES))
         {
-            throw new \Exception(vsprintf($GLOBALS['TL_LANG']['ERR']['unknown_file'], array($strFilename)));
+            throw new \Exception(\vsprintf($GLOBALS['TL_LANG']['ERR']['unknown_file'], array($strFilename)));
         }
 
-        if (md5_file($_FILES[$strFilename]["tmp_name"]) != $strMD5)
+        if (\md5_file($_FILES[$strFilename]["tmp_name"]) != $strMD5)
         {
             throw new \Exception($GLOBALS['TL_LANG']['ERR']['checksum_error']);
         }
@@ -249,10 +249,10 @@ class RemoteProcedureCall extends Backend
         $objFiles->move_uploaded_file($_FILES[$strFilename]["tmp_name"], $this->objSyncCtoHelper->standardizePath($GLOBALS['SYC_PATH']['tmp'], "syncFolderListInc.syncCto"));
 
         $objFile         = new File($this->objSyncCtoHelper->standardizePath($GLOBALS['SYC_PATH']['tmp'], "syncFolderListInc.syncCto"));
-        $arrChecksumList = unserialize($objFile->getContent());
+        $arrChecksumList = \unserialize($objFile->getContent());
         $objFile->close();
 
-        if (!is_array($arrChecksumList))
+        if (!\is_array($arrChecksumList))
         {
             throw new \Exception("Could not rebuild array.");
         }
@@ -271,10 +271,10 @@ class RemoteProcedureCall extends Backend
     {
         if (!key_exists($strFilename, $_FILES))
         {
-            throw new \Exception(vsprintf($GLOBALS['TL_LANG']['ERR']['unknown_file'], array($strFilename)));
+            throw new \Exception(\vsprintf($GLOBALS['TL_LANG']['ERR']['unknown_file'], array($strFilename)));
         }
 
-        if (md5_file($_FILES[$strFilename]["tmp_name"]) != $strMD5)
+        if (\md5_file($_FILES[$strFilename]["tmp_name"]) != $strMD5)
         {
             throw new \Exception($GLOBALS['TL_LANG']['ERR']['checksum_error']);
         }
@@ -283,10 +283,10 @@ class RemoteProcedureCall extends Backend
         $objFiles->move_uploaded_file($_FILES[$strFilename]["tmp_name"], $this->objSyncCtoHelper->standardizePath($GLOBALS['SYC_PATH']['tmp'], "syncListInc.syncCto"));
 
         $objFile         = new File($this->objSyncCtoHelper->standardizePath($GLOBALS['SYC_PATH']['tmp'], "syncListInc.syncCto"));
-        $arrChecksumList = unserialize($objFile->getContent());
+        $arrChecksumList = \unserialize($objFile->getContent());
         $objFile->close();
 
-        if (!is_array($arrChecksumList))
+        if (!\is_array($arrChecksumList))
         {
             throw new \Exception("Could not rebuild array.");
         }
@@ -302,7 +302,7 @@ class RemoteProcedureCall extends Backend
      */
     public function executeSQL($arrSQL)
     {
-        if (!is_array($arrSQL))
+        if (!\is_array($arrSQL))
         {
             return false;
         }
@@ -312,7 +312,7 @@ class RemoteProcedureCall extends Backend
         foreach ($arrSQL as $key => $value)
         {
             $mixDatabase = $this->Database->prepare($value['prepare']);
-            call_user_func_array(array($mixDatabase, "execute"), $value["execute"]);
+            \call_user_func_array(array($mixDatabase, "execute"), $value["execute"]);
         }
 
         return $arrResponse;

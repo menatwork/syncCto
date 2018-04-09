@@ -12,9 +12,9 @@
 /**
  * Extend default palette
  */
-$GLOBALS['TL_DCA']['tl_user']['palettes']['extend'] = str_replace('disable', '{syncCto_legend},syncCto_clients,syncCto_clients_p,syncCto_sync_options;{syncCto_tables_legend},syncCto_tables;{account_legend},disable', $GLOBALS['TL_DCA']['tl_user']['palettes']['extend']);
-$GLOBALS['TL_DCA']['tl_user']['palettes']['custom'] = str_replace('disable,', '{syncCto_legend},syncCto_clients,syncCto_clients_p,syncCto_sync_options;{syncCto_tables_legend},syncCto_tables;{account_legend},disable', $GLOBALS['TL_DCA']['tl_user']['palettes']['custom']);
-$GLOBALS['TL_DCA']['tl_user']['palettes']['login']  = str_replace('useCE', 'useCE,syncCto_useTranslatedNames', $GLOBALS['TL_DCA']['tl_user']['palettes']['login']);
+$GLOBALS['TL_DCA']['tl_user']['palettes']['extend'] = \str_replace('disable', '{syncCto_legend},syncCto_clients,syncCto_clients_p,syncCto_sync_options;{syncCto_tables_legend},syncCto_tables;{account_legend},disable', $GLOBALS['TL_DCA']['tl_user']['palettes']['extend']);
+$GLOBALS['TL_DCA']['tl_user']['palettes']['custom'] = \str_replace('disable,', '{syncCto_legend},syncCto_clients,syncCto_clients_p,syncCto_sync_options;{syncCto_tables_legend},syncCto_tables;{account_legend},disable', $GLOBALS['TL_DCA']['tl_user']['palettes']['custom']);
+$GLOBALS['TL_DCA']['tl_user']['palettes']['login']  = \str_replace('useCE', 'useCE,syncCto_useTranslatedNames', $GLOBALS['TL_DCA']['tl_user']['palettes']['login']);
 
 /**
  * Add fields to tl_user

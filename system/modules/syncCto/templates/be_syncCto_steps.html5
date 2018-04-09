@@ -6,7 +6,7 @@
 
 <div class="tl_formbody_edit">
 
-    <?php if (strlen($this->information) != 0): ?>
+    <?php if (\strlen($this->information) != 0): ?>
         <p class="info tl_info"><?php echo $this->information; ?></p>
     <?php endif; ?>
 
@@ -14,13 +14,13 @@
         <div class="<?php echo ($key == 1) ? "tl_tbox" : "tl_box"; ?> block">
             <h1 id="step<?php echo $key; ?>" class="headline">
                 <img src="system/modules/syncCto/assets/images/steps/icon<?php echo $value["state"]; ?>.gif" alt="" />
-                <span><?php echo vsprintf($value["title"], array($i)) ?></span>
+                <span><?php echo \vsprintf($value["title"], array($i)) ?></span>
             </h1>
             <p class="tl_help"><?php echo $value["description"]; ?></p>
-            <?php if (strlen($value["msg"])) : ?>
+            <?php if (\strlen($value["msg"])) : ?>
             <p class="tl_help"><?php echo $value["msg"]; ?></p>
             <?php endif; ?>
-            <?php if (strlen($value["html"]) != 0) : ?>
+            <?php if (\strlen($value["html"]) != 0) : ?>
             <?php echo $value["html"]; ?>
             <?php endif; ?>
         </div>
@@ -41,8 +41,8 @@
         <div class="tl_box block">
             <h1><?php echo $GLOBALS['TL_LANG']['MSC']['debug_mode']; ?></h1>
             <p class="debug tl_help">
-                <?php echo vsprintf($GLOBALS['TL_LANG']['MSC']['run_time'], array(number_format(microtime(true) - $this->start, 2))); ?><br />
-                <?php echo vsprintf($GLOBALS['TL_LANG']['MSC']['memory_limit'], array($this->getReadableSize(memory_get_peak_usage(true)))); ?><br /><br />
+                <?php echo \vsprintf($GLOBALS['TL_LANG']['MSC']['run_time'], array(number_format(\microtime(true) - $this->start, 2))); ?><br />
+                <?php echo \vsprintf($GLOBALS['TL_LANG']['MSC']['memory_limit'], array($this->getReadableSize(memory_get_peak_usage(true)))); ?><br /><br />
                 <?php echo $GLOBALS['TL_LANG']['MSC']['step']; ?>: <?php echo $this->step; ?><br />
                 <?php echo $GLOBALS['TL_LANG']['MSC']['substep']; ?>: <?php echo $this->subStep; ?>
             </p>
@@ -55,7 +55,7 @@
         <?php if ($this->error): ?>
             <a href="<?php echo $this->tryAgainLink; ?>" onclick="$(this).setProperty('text', '<?php echo $GLOBALS['TL_LANG']['MSC']['repeat_sync']['1']; ?>');" class="tl_submit"><?php echo $GLOBALS['TL_LANG']['MSC']['repeat_sync']['0']; ?></a>
             <?php if ($this->modeAll): ?>
-            <a href="<?php echo $this->nextClientLink; ?>" onclick="$(this).setProperty('text', '<?php echo $GLOBALS['TL_LANG']['MSC']['next_sync']['1']; ?>');" class="tl_submit"><?php echo $GLOBALS['TL_LANG']['MSC']['next_sync']['0']; ?></a>        
+            <a href="<?php echo $this->nextClientLink; ?>" onclick="$(this).setProperty('text', '<?php echo $GLOBALS['TL_LANG']['MSC']['next_sync']['1']; ?>');" class="tl_submit"><?php echo $GLOBALS['TL_LANG']['MSC']['next_sync']['0']; ?></a>
             <?php endif; ?>
         <?php endif; ?>
         </div>
@@ -63,7 +63,7 @@
 
    <?php if ($this->showNextControl && $this->modeAll): ?>
         <div class="tl_tbox" id="buttons">
-            <a href="<?php echo $this->nextClientLink; ?>" onclick="$(this).setProperty('text', '<?php echo $GLOBALS['TL_LANG']['MSC']['next_sync']['1']; ?>');" class="tl_submit"><?php echo $GLOBALS['TL_LANG']['MSC']['next_sync']['0']; ?></a>        
+            <a href="<?php echo $this->nextClientLink; ?>" onclick="$(this).setProperty('text', '<?php echo $GLOBALS['TL_LANG']['MSC']['next_sync']['1']; ?>');" class="tl_submit"><?php echo $GLOBALS['TL_LANG']['MSC']['next_sync']['0']; ?></a>
         </div>
     <?php endif; ?>
 

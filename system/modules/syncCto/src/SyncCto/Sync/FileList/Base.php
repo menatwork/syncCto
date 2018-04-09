@@ -11,11 +11,6 @@
 
 namespace SyncCto\Sync\FileList;
 
-use AppendIterator;
-use ArrayIterator;
-use ArrayObject;
-use EmptyIterator;
-use FilterIterator;
 use SyncCto\Config\Enum;
 use SyncCto\Sync\FileList\FilterIterator\Base as FilterIteratorBase;
 
@@ -30,7 +25,7 @@ class Base
     /**
      * The list with all files.
      *
-     * @var ArrayObject
+     * @var \ArrayObject
      */
     private $fileList = null;
 
@@ -41,7 +36,7 @@ class Base
      */
     public function __construct(&$fileList)
     {
-        $this->fileList = new ArrayObject((is_array($fileList)) ? $fileList : array());
+        $this->fileList = new \ArrayObject((\is_array($fileList)) ? $fileList : array());
     }
 
     /**
@@ -51,7 +46,7 @@ class Base
      */
     public function hasCoreFiles()
     {
-        return isset($this->fileList[self::FILE_CORE]) && count($this->fileList[self::FILE_CORE]);
+        return isset($this->fileList[self::FILE_CORE]) && \count($this->fileList[self::FILE_CORE]);
     }
 
     /**
@@ -61,7 +56,7 @@ class Base
      */
     public function hasPrivateFiles()
     {
-        return isset($this->fileList[self::FILE_PRIVATE]) && count($this->fileList[self::FILE_PRIVATE]);
+        return isset($this->fileList[self::FILE_PRIVATE]) && \count($this->fileList[self::FILE_PRIVATE]);
     }
 
     /**
@@ -85,7 +80,7 @@ class Base
      *
      * @param bool $onlyMoved Flag that only files which are moved to there destination add to the list.
      *
-     * @return AppendIterator The filter iterator.
+     * @return \AppendIterator The filter iterator.
      */
     protected function createDbafsIterator($onlySend, $onlyMoved)
     {
@@ -109,14 +104,14 @@ class Base
         if ($this->hasPrivateFiles()) {
             return new FilterIteratorBase
             (
-                new ArrayIterator($this->fileList[self::FILE_PRIVATE]),
+                new \ArrayIterator($this->fileList[self::FILE_PRIVATE]),
                 $states,
-                (count($transmission) == 0) ? null : $transmission
+                (\count($transmission) == 0) ? null : $transmission
             );
         }
 
         // Return a empty one.
-        return new EmptyIterator();
+        return new \EmptyIterator();
     }
 
     /**
@@ -126,7 +121,7 @@ class Base
      *
      * @param bool $onlyMoved Flag that only files which are moved to there destination add to the list.
      *
-     * @return FilterIterator The filter iterator.
+     * @return \FilterIterator The filter iterator.
      */
     public function getDbafs($onlySend, $onlyMoved)
     {
@@ -146,7 +141,7 @@ class Base
      *
      * @param string $type      The type e.g. core or files.
      *
-     * @return AppendIterator The filter iterator.
+     * @return \AppendIterator The filter iterator.
      */
     protected function createTransferIterator($onlySend, $onlyMoved, $type)
     {
@@ -174,9 +169,9 @@ class Base
         if ($type == self::FILE_CORE && $this->hasCoreFiles()) {
             return new FilterIteratorBase
             (
-                new ArrayIterator($this->fileList[self::FILE_CORE]),
+                new \ArrayIterator($this->fileList[self::FILE_CORE]),
                 $states,
-                (count($transmission) == 0) ? null : $transmission
+                (\count($transmission) == 0) ? null : $transmission
             );
         }
 
@@ -184,14 +179,14 @@ class Base
         if ($type == self::FILE_PRIVATE && $this->hasPrivateFiles()) {
             return new FilterIteratorBase
             (
-                new ArrayIterator($this->fileList[self::FILE_PRIVATE]),
+                new \ArrayIterator($this->fileList[self::FILE_PRIVATE]),
                 $states,
-                (count($transmission) == 0) ? null : $transmission
+                (\count($transmission) == 0) ? null : $transmission
             );
         }
 
         // Return a empty one.
-        return new EmptyIterator();
+        return new \EmptyIterator();
     }
 
     /**
@@ -201,7 +196,7 @@ class Base
      *
      * @param bool $onlyMoved Flag that only files which are moved to there destination add to the list.
      *
-     * @return FilterIterator The filter iterator.
+     * @return \FilterIterator The filter iterator.
      */
     public function getTransferCore($onlySend, $onlyMoved)
     {
@@ -215,7 +210,7 @@ class Base
      *
      * @param bool $onlyMoved Flag that only files which are moved to there destination add to the list.
      *
-     * @return FilterIterator The filter iterator.
+     * @return \FilterIterator The filter iterator.
      */
     public function getTransferPrivate($onlySend, $onlyMoved)
     {
@@ -229,12 +224,12 @@ class Base
      *
      * @param bool $onlyMoved Flag that only files which are moved to there destination add to the list.
      *
-     * @return AppendIterator The filter iterator.
+     * @return \AppendIterator The filter iterator.
      */
     public function getTransferFiles($onlySend, $onlyMoved)
     {
         // Create an new append iterator.
-        $appendIterator = new AppendIterator();
+        $appendIterator = new \AppendIterator();
 
         // Core files.
         if ($this->hasCoreFiles()) {
@@ -260,7 +255,7 @@ class Base
      *
      * @param string $type        The type e.g. core or files.
      *
-     * @return AppendIterator The filter iterator.
+     * @return \AppendIterator The filter iterator.
      */
     protected function createDeleteIterator($onlyWaiting, $type)
     {
@@ -285,9 +280,9 @@ class Base
         if ($type == self::FILE_CORE && $this->hasCoreFiles()) {
             return new FilterIteratorBase
             (
-                new ArrayIterator($this->fileList[self::FILE_CORE]),
+                new \ArrayIterator($this->fileList[self::FILE_CORE]),
                 $states,
-                (count($transmission) == 0) ? null : $transmission
+                (\count($transmission) == 0) ? null : $transmission
             );
         }
 
@@ -295,14 +290,14 @@ class Base
         if ($type == self::FILE_PRIVATE && $this->hasPrivateFiles()) {
             return new FilterIteratorBase
             (
-                new ArrayIterator($this->fileList[self::FILE_PRIVATE]),
+                new \ArrayIterator($this->fileList[self::FILE_PRIVATE]),
                 $states,
-                (count($transmission) == 0) ? null : $transmission
+                (\count($transmission) == 0) ? null : $transmission
             );
         }
 
         // Return a empty one.
-        return new EmptyIterator();
+        return new \EmptyIterator();
     }
 
     /**
@@ -310,7 +305,7 @@ class Base
      *
      * @param bool $onlyWaiting Flag if only waiting files should returned,
      *
-     * @return FilterIterator The filter iterator.
+     * @return \FilterIterator The filter iterator.
      */
     public function getDeletedCore($onlyWaiting)
     {
@@ -322,7 +317,7 @@ class Base
      *
      * @param bool $onlyWaiting Flag if only waiting files should returned,
      *
-     * @return FilterIterator The filter iterator.
+     * @return \FilterIterator The filter iterator.
      */
     public function getDeletedPrivate($onlyWaiting)
     {
@@ -334,12 +329,12 @@ class Base
      *
      * @param bool $onlyWaiting Flag if only waiting files should returned,
      *
-     * @return AppendIterator The filter iterator.
+     * @return \AppendIterator The filter iterator.
      */
     public function getDeletedFiles($onlyWaiting)
     {
         // Create an new append iterator.
-        $appendIterator = new AppendIterator();
+        $appendIterator = new \AppendIterator();
 
         // Core files.
         if ($this->hasCoreFiles()) {

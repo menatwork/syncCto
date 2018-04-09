@@ -128,7 +128,7 @@ class Updater extends Backend
     protected function addFiles()
     {
         // Check if xml exists
-        if (!file_exists(TL_ROOT . '/' . $GLOBALS['TL_CONFIG']['uploadPath'] . '/syncCto_backups/dependencies.xml'))
+        if (!\file_exists(TL_ROOT . '/' . $GLOBALS['TL_CONFIG']['uploadPath'] . '/syncCto_backups/dependencies.xml'))
         {
             throw new \Exception("Missing dependencies.xml for autoupdater.");
         }
@@ -155,23 +155,23 @@ class Updater extends Backend
                         // Check if file is in blacklist
                         foreach ($this->arrBlackFiles as $strBlackfile)
                         {
-                            if (preg_match('^' . $strBlackfile . '^i', $objXMLReader->value))
+                            if (\preg_match('^' . $strBlackfile . '^i', $objXMLReader->value))
                             {
                                 continue;
                             }
                         }
 
                         // Remove the TL_ROOT and the first '/'
-                        $strPath = preg_replace("/^TL_ROOT\//i", "", $objXMLReader->value, 1);
+                        $strPath = \preg_replace("/^TL_ROOT\//i", "", $objXMLReader->value, 1);
 
                         // If we have a sql parse it
-                        if (preg_match("/\.sql$/i", $strPath))
+                        if (\preg_match("/\.sql$/i", $strPath))
                         {
                             $this->parseSQL($strPath);
                         }
 
                         // If file exists add it to archive
-                        if (file_exists(TL_ROOT . "/" . $strPath))
+                        if (\file_exists(TL_ROOT . "/" . $strPath))
                         {
                             if (!$this->objZipArchive->addFile($strPath, "FILES/" . $strPath))
                             {
@@ -199,7 +199,7 @@ class Updater extends Backend
     protected function parseSQL($strPath)
     {
         // Check if exists
-        if (!file_exists(TL_ROOT . "/" . $strPath))
+        if (!\file_exists(TL_ROOT . "/" . $strPath))
         {
             return;
         }
@@ -210,11 +210,11 @@ class Updater extends Backend
         foreach ($objFile->getContentAsArray() as $key => $value)
         {
             // Search for 'Create Table'
-            if (preg_match("/.*CREATE TABLE `.*` \(.*/", $value))
+            if (\preg_match("/.*CREATE TABLE `.*` \(.*/", $value))
             {
-                $value = trim($value);
+                $value = \trim($value);
                 $arrCreate = preg_split("/(.*CREATE TABLE `|` \(.*)/", $value);
-                $this->arrTables[] =  trim($arrCreate[1]);
+                $this->arrTables[] =  \trim($arrCreate[1]);
             }
         }
     }
@@ -237,9 +237,9 @@ class Updater extends Backend
         // Write meta (header)
         $objXml->startElement('metatags');
         $objXml->writeElement('version', $GLOBALS['SYC_VERSION']);
-        $objXml->writeElement('create_unix', time());
-        $objXml->writeElement('create_date', date('Y-m-d', time()));
-        $objXml->writeElement('create_time', date('H:i', time()));
+        $objXml->writeElement('create_unix', \time());
+        $objXml->writeElement('create_date', \date('Y-m-d', \time()));
+        $objXml->writeElement('create_time', \date('H:i', \time()));
         $objXml->endElement(); // End metatags
 
         $objXml->startElement('structure');
@@ -250,7 +250,7 @@ class Updater extends Backend
             $arrStructure = $this->objSyncCtoDatabase->getTableStructure($TableName);
 
             // Check if empty
-            if (count($arrStructure) == 0)
+            if (\count($arrStructure) == 0)
             {
                 continue;
             }
@@ -259,7 +259,7 @@ class Updater extends Backend
             $objXml->writeAttribute("name", $TableName);
 
             $objXml->startElement('fields');
-            if (is_array($arrStructure['TABLE_FIELDS']))
+            if (\is_array($arrStructure['TABLE_FIELDS']))
             {
                 foreach ($arrStructure['TABLE_FIELDS'] as $keyField => $valueField)
                 {
@@ -272,7 +272,7 @@ class Updater extends Backend
             $objXml->endElement(); // End fields
 
             $objXml->startElement('definitions');
-            if (is_array($arrStructure['TABLE_CREATE_DEFINITIONS']))
+            if (\is_array($arrStructure['TABLE_CREATE_DEFINITIONS']))
             {
                 foreach ($arrStructure['TABLE_CREATE_DEFINITIONS'] as $keyField => $valueField)
                 {

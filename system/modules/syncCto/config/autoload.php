@@ -12,7 +12,7 @@
 /**
  * Register the namespaces
  */
-ClassLoader::addNamespaces(array
+\Contao\ClassLoader::addNamespaces(array
 (
     'SyncCto',
 ));
@@ -21,7 +21,7 @@ ClassLoader::addNamespaces(array
 /**
  * Register the classes
  */
-ClassLoader::addClasses(array
+\Contao\ClassLoader::addClasses(array
 (
     // Not yet moved.
     'GeneralDataSyncCto'                                  => 'system/modules/syncCto/GeneralDataSyncCto.php',
@@ -74,7 +74,7 @@ ClassLoader::addClasses(array
 /**
  * Register the templates
  */
-TemplateLoader::addFiles(array
+\Contao\TemplateLoader::addFiles(array
 (
     'be_syncCto_steps'      => 'system/modules/syncCto/templates',
     'be_syncCto_check'      => 'system/modules/syncCto/templates',

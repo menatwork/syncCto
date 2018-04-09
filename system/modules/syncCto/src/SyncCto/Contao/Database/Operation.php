@@ -124,13 +124,13 @@ class Operation extends Backend
 
         // Init some vars
         $this->arrBackupTables = array();
-        $this->strTimestampFormat = str_replace(array_keys($GLOBALS['SYC_CONFIG']['folder_file_replacement']), array_values($GLOBALS['SYC_CONFIG']['folder_file_replacement']), $GLOBALS['TL_CONFIG']['datimFormat']);
-        $this->intMaxMemoryUsage = Client::parseSize(ini_get('memory_limit'));
+        $this->strTimestampFormat = \str_replace(\array_keys($GLOBALS['SYC_CONFIG']['folder_file_replacement']), \array_values($GLOBALS['SYC_CONFIG']['folder_file_replacement']), $GLOBALS['TL_CONFIG']['datimFormat']);
+        $this->intMaxMemoryUsage = Client::parseSize(\ini_get('memory_limit'));
         $this->intMaxMemoryUsage = $this->intMaxMemoryUsage / 100 * 80;
 
         // Load hidden tables
-        $this->arrHiddenTables = deserialize($GLOBALS['SYC_CONFIG']['table_hidden']);
-        if (!is_array($this->arrHiddenTables))
+        $this->arrHiddenTables = \deserialize($GLOBALS['SYC_CONFIG']['table_hidden']);
+        if (!\is_array($this->arrHiddenTables))
         {
             $this->arrHiddenTables = array();
         }
@@ -166,7 +166,7 @@ class Operation extends Backend
         switch ($name)
         {
             case "backupTables":
-                if (!is_array($value))
+                if (!\is_array($value))
                 {
                     $this->arrBackupTables[] = $value;
                 }
@@ -249,7 +249,7 @@ class Operation extends Backend
 
         foreach ($arrTables as $value)
         {
-            if (in_array($value, $arrKnownTables))
+            if (\in_array($value, $arrKnownTables))
             {
                 $this->Database->query("DROP TABLE $value");
             }
@@ -271,7 +271,7 @@ class Operation extends Backend
         if ($this->intMaxMemoryUsage < memory_get_usage(true))
         {
             $strXMLFlush = $objXml->flush(true);
-            gzputs($objGzFile, $strXMLFlush, strlen($strXMLFlush));
+            \gzputs($objGzFile, $strXMLFlush, \strlen($strXMLFlush));
         }
     }
 
@@ -286,7 +286,7 @@ class Operation extends Backend
     public function runDump($mixTables, $booTempFolder, $booOnlyMachine = true)
     {
         // Set time limit to unlimited
-        set_time_limit(0);
+        \set_time_limit(0);
 
         // Set limit for db query. Ticket #163
         if ($GLOBALS['TL_CONFIG']['syncCto_custom_settings'] == true && intval($GLOBALS['TL_CONFIG']['syncCto_db_query_limt']) > 0)
@@ -299,9 +299,9 @@ class Operation extends Backend
         }
 
         // Add to the backup array all tables
-        if (is_array($mixTables))
+        if (\is_array($mixTables))
         {
-            $this->arrBackupTables = array_merge($this->arrBackupTables, $mixTables);
+            $this->arrBackupTables = \array_merge($this->arrBackupTables, $mixTables);
         }
         else if ($mixTables != "" && $mixTables != null)
         {
@@ -309,10 +309,10 @@ class Operation extends Backend
         }
 
         // make the backup array unique
-        $this->arrBackupTables = array_unique($this->arrBackupTables);
+        $this->arrBackupTables = \array_unique($this->arrBackupTables);
 
         // Check if we have some tables for backup
-        if (!is_array($this->arrBackupTables) || $this->arrBackupTables == null || count($this->arrBackupTables) == 0)
+        if (!\is_array($this->arrBackupTables) || $this->arrBackupTables == null || \count($this->arrBackupTables) == 0)
         {
             throw new \Exception("No tables found for backup.");
         }
@@ -321,7 +321,7 @@ class Operation extends Backend
         $arrTables = $this->Database->listTables();
 
         // Write some tempfiles
-        $strRandomToken = md5(time() . " | " . rand(0, 65535));
+        $strRandomToken = \md5(\time() . " | " . \rand(0, 65535));
 
         // Write SQL file
         if ($booOnlyMachine == false)
@@ -336,7 +336,7 @@ class Operation extends Backend
         $objGzFile->close();
 
         // Compression
-        $objGzFile = gzopen(TL_ROOT . "/" . $this->objSyncCtoHelper->standardizePath($GLOBALS['SYC_PATH']['tmp'], "TempSyncCtoDump.$strRandomToken"), "wb");
+        $objGzFile = \gzopen(TL_ROOT . "/" . $this->objSyncCtoHelper->standardizePath($GLOBALS['SYC_PATH']['tmp'], "TempSyncCtoDump.$strRandomToken"), "wb");
 
         // Create XML File
         $objXml = new \XMLWriter();
@@ -351,9 +351,9 @@ class Operation extends Backend
         // Write meta (header)
         $objXml->startElement('metatags');
         $objXml->writeElement('version', $GLOBALS['SYC_VERSION']);
-        $objXml->writeElement('create_unix', time());
-        $objXml->writeElement('create_date', date('Y-m-d', time()));
-        $objXml->writeElement('create_time', date('H:i', time()));
+        $objXml->writeElement('create_unix', \time());
+        $objXml->writeElement('create_date', \date('Y-m-d', \time()));
+        $objXml->writeElement('create_time', \date('H:i', \time()));
         $objXml->endElement(); // End metatags
 
         $objXml->startElement('structure');
@@ -361,7 +361,7 @@ class Operation extends Backend
         foreach ($arrTables as $key => $TableName)
         {
             // Check if the current table marked as backup
-            if (!in_array($TableName, $this->arrBackupTables))
+            if (!\in_array($TableName, $this->arrBackupTables))
             {
                 continue;
             }
@@ -370,7 +370,7 @@ class Operation extends Backend
             $arrStructure = $this->getTableStructure($TableName);
 
             // Check if empty
-            if (count($arrStructure) == 0)
+            if (\count($arrStructure) == 0)
             {
                 continue;
             }
@@ -379,7 +379,7 @@ class Operation extends Backend
             $objXml->writeAttribute("name", $TableName);
 
             $objXml->startElement('fields');
-            if (is_array($arrStructure['TABLE_FIELDS']))
+            if (\is_array($arrStructure['TABLE_FIELDS']))
             {
                 foreach ($arrStructure['TABLE_FIELDS'] as $keyField => $valueField)
                 {
@@ -392,7 +392,7 @@ class Operation extends Backend
             $objXml->endElement(); // End fields
 
             $objXml->startElement('definitions');
-            if (is_array($arrStructure['TABLE_CREATE_DEFINITIONS']))
+            if (\is_array($arrStructure['TABLE_CREATE_DEFINITIONS']))
             {
                 foreach ($arrStructure['TABLE_CREATE_DEFINITIONS'] as $keyField => $valueField)
                 {
@@ -413,7 +413,7 @@ class Operation extends Backend
 
         // Push structure into file.
         $strXMLFlush = $objXml->flush(true);
-        gzputs($objGzFile, $strXMLFlush, strlen($strXMLFlush));
+        \gzputs($objGzFile, $strXMLFlush, \strlen($strXMLFlush));
 
         $objXml->endElement(); // End structure
 
@@ -422,13 +422,13 @@ class Operation extends Backend
         foreach ($arrTables as $key => $TableName)
         {
             // Check if the current table marked as backup
-            if (!in_array($TableName, $this->arrBackupTables))
+            if (!\in_array($TableName, $this->arrBackupTables))
             {
                 continue;
             }
 
             // Check if table is in blacklist
-            if (!in_array($TableName, $this->arrBackupTables))
+            if (!\in_array($TableName, $this->arrBackupTables))
             {
                 continue;
             }
@@ -455,7 +455,7 @@ class Operation extends Backend
             {
                 // Push into file.
                 $strXMLFlush = $objXml->flush(true);
-                gzputs($objGzFile, $strXMLFlush, strlen($strXMLFlush));
+                \gzputs($objGzFile, $strXMLFlush, \strlen($strXMLFlush));
 
                 $objData = $this->Database
                         ->prepare("SELECT * FROM $TableName")
@@ -484,7 +484,7 @@ class Operation extends Backend
                         }
                         else if ($field_data != "")
                         {
-                            switch (strtolower($arrFieldMeta[$field_key]['type']))
+                            switch (\strtolower($arrFieldMeta[$field_key]['type']))
                             {
                                 case 'binary':
                                 case 'varbinary':
@@ -493,7 +493,7 @@ class Operation extends Backend
                                 case 'mediumblob':
                                 case 'longblob':
                                     $objXml->writeAttribute("type", "blob");
-                                    $objXml->text("0x" . bin2hex($field_data));
+                                    $objXml->text("0x" . \bin2hex($field_data));
                                     break;
 
                                 case 'tinyint':
@@ -533,13 +533,13 @@ class Operation extends Backend
                                 case 'enum':
                                 case 'set':
                                     $objXml->writeAttribute("type", "text");
-                                    $objXml->writeCdata(base64_encode(str_replace($this->arrSearchFor, $this->arrReplaceWith, $field_data)));
+                                    $objXml->writeCdata(\base64_encode(\str_replace($this->arrSearchFor, $this->arrReplaceWith, $field_data)));
 
                                     break;
 
                                 default:
                                     $objXml->writeAttribute("type", "default");
-                                    $objXml->writeCdata(base64_encode(str_replace($this->arrSearchFor, $this->arrReplaceWith, $field_data)));
+                                    $objXml->writeCdata(\base64_encode(\str_replace($this->arrSearchFor, $this->arrReplaceWith, $field_data)));
                                     break;
                             }
                         }
@@ -564,14 +564,14 @@ class Operation extends Backend
         $objXml->endElement(); // End database
 
         $strXMLFlush = $objXml->flush(true);
-        gzputs($objGzFile, $strXMLFlush, strlen($strXMLFlush));
-        gzclose($objGzFile);
+        \gzputs($objGzFile, $strXMLFlush, \strlen($strXMLFlush));
+        \gzclose($objGzFile);
 
         if ($booOnlyMachine == false)
         {
             // Write header for sql file
-            $today = date("Y-m-d");
-            $time  = date("H:i:s");
+            $today = \date("Y-m-d");
+            $time  = \date("H:i:s");
 
             // Write Header
             $string .= "-- syncCto SQL Dump\r\n";
@@ -593,7 +593,7 @@ class Operation extends Backend
             foreach ($arrTables as $key => $TableName)
             {
                 // Check if table is in blacklist
-                if (!in_array($TableName, $this->arrBackupTables))
+                if (!\in_array($TableName, $this->arrBackupTables))
                 {
                     continue;
                 }
@@ -602,7 +602,7 @@ class Operation extends Backend
                 $arrStructure = $this->getTableStructure($TableName);
 
                 // Check if empty
-                if (count($arrStructure) == 0)
+                if (\count($arrStructure) == 0)
                 {
                     continue;
                 }
@@ -667,7 +667,7 @@ class Operation extends Backend
                     if ($i == 0)
                     {
                         $strSQL .= "INSERT IGNORE INTO " . $TableName . " (`";
-                        $strSQL .= implode("`, `", array_keys($arrFieldMeta));
+                        $strSQL .= \implode("`, `", \array_keys($arrFieldMeta));
                         $strSQL .= "`) VALUES";
                     }
 
@@ -676,7 +676,7 @@ class Operation extends Backend
                     {
                         $arrTableData = array();
 
-                        foreach (array_keys($arrFieldMeta) as $fieldName)
+                        foreach (\array_keys($arrFieldMeta) as $fieldName)
                         {
                             if (!isset($row[$fieldName]))
                             {
@@ -684,13 +684,13 @@ class Operation extends Backend
                             }
                             else if ($row[$fieldName] != "")
                             {
-                                switch (strtolower($arrFieldMeta[$fieldName]['type']))
+                                switch (\strtolower($arrFieldMeta[$fieldName]['type']))
                                 {
                                     case 'blob':
                                     case 'tinyblob':
                                     case 'mediumblob':
                                     case 'longblob':
-                                        $arrTableData[] = "0x" . bin2hex($row[$fieldName]);
+                                        $arrTableData[] = "0x" . \bin2hex($row[$fieldName]);
                                         break;
 
                                     case 'smallint':
@@ -700,13 +700,13 @@ class Operation extends Backend
 
                                     case 'text':
                                     case 'mediumtext':
-                                        if (strpos($row[$fieldName], "'") != false)
+                                        if (\strpos($row[$fieldName], "'") != false)
                                         {
-                                            $arrTableData[] = "0x" . bin2hex($row[$fieldName]);
+                                            $arrTableData[] = "0x" . \bin2hex($row[$fieldName]);
                                             break;
                                         }
                                     default:
-                                        $arrTableData[] = "'" . str_replace($this->arrSearchFor, $this->arrReplaceWith, $row[$fieldName]) . "'";
+                                        $arrTableData[] = "'" . \str_replace($this->arrSearchFor, $this->arrReplaceWith, $row[$fieldName]) . "'";
                                         break;
                                 }
                             }
@@ -719,14 +719,14 @@ class Operation extends Backend
                         if ($booFirstEntry == true)
                         {
                             $booFirstEntry = false;
-                            $strSQL .= "\r\n(" . implode(", ", $arrTableData) . ")";
+                            $strSQL .= "\r\n(" . \implode(", ", $arrTableData) . ")";
                         }
                         else
                         {
-                            $strSQL .= ",\r\n(" . implode(", ", $arrTableData) . ")";
+                            $strSQL .= ",\r\n(" . \implode(", ", $arrTableData) . ")";
                         }
 
-                        if (strlen($strSQL) > 100000)
+                        if (\strlen($strSQL) > 100000)
                         {
                             $objFileSQL->append($strSQL, "");
                             $objFileSQL->close();
@@ -734,7 +734,7 @@ class Operation extends Backend
                         }
                     }
 
-                    if (strlen($strSQL) != 0)
+                    if (\strlen($strSQL) != 0)
                     {
                         $objFileSQL->append($strSQL, "");
                         $objFileSQL->close();
@@ -749,7 +749,7 @@ class Operation extends Backend
             $objFileSQL->close();
         }
 
-        $strFilename = date($this->strTimestampFormat) . "_" . $this->strSuffixZipName;
+        $strFilename = \date($this->strTimestampFormat) . "_" . $this->strSuffixZipName;
 
         if ($booTempFolder)
         {
@@ -897,7 +897,7 @@ class Operation extends Backend
                         case "field":
                             if ($strCurrentNodeAttributeType == "text" || $strCurrentNodeAttributeType == "default")
                             {
-                                $arrValues[$intCounter][$strCurrentNodeAttributeName] = "'" . base64_decode($this->objXMLReader->value) . "'";
+                                $arrValues[$intCounter][$strCurrentNodeAttributeName] = "'" . \base64_decode($this->objXMLReader->value) . "'";
                             }
                             else
                             {
@@ -923,7 +923,7 @@ class Operation extends Backend
                             $strCurrentNodeAttributeName = $this->objXMLReader->getAttribute("name");
                             $strCurrentNodeAttributeType = $this->objXMLReader->getAttribute("type");
 
-                            if (!in_array($strCurrentNodeAttributeName, $arrFields))
+                            if (!\in_array($strCurrentNodeAttributeName, $arrFields))
                             {
                                 $arrFields[] = $strCurrentNodeAttributeName;
                             }
@@ -936,10 +936,10 @@ class Operation extends Backend
                     {
                         case "row":
                             $intCounter++;
-                            if (count($arrValues) >= $intMaxInsert)
+                            if (\count($arrValues) >= $intMaxInsert)
                             {
                                 $strBody = "INSERT INTO synccto_temp_" . $strCurrentTable . " (`";
-                                $strBody .= implode("`, `", $arrFields);
+                                $strBody .= \implode("`, `", $arrFields);
                                 $strBody .= "`) VALUES \n";
 
                                 foreach ($arrValues as $keyValue => $valueValue)
@@ -950,10 +950,10 @@ class Operation extends Backend
                                         $arrInsertValue[] = $valueValue[$valueField];
                                     }
 
-                                    $strBody .= "(" . implode(",", $arrInsertValue) . "),\n";
+                                    $strBody .= "(" . \implode(",", $arrInsertValue) . "),\n";
                                 }
 
-                                $strBody = preg_replace("/,\\n$/", "", $strBody);
+                                $strBody = \preg_replace("/,\\n$/", "", $strBody);
 
                                 $this->Database->query($strBody);
 
@@ -962,13 +962,13 @@ class Operation extends Backend
                             break;
 
                         case "table":
-                            if (count($arrValues) == 0)
+                            if (\count($arrValues) == 0)
                             {
                                 break;
                             }
 
                             $strBody = "INSERT INTO synccto_temp_" . $strCurrentTable . " (`";
-                            $strBody .= implode("`, `", $arrFields);
+                            $strBody .= \implode("`, `", $arrFields);
                             $strBody .= "`) VALUES \n";
 
                             foreach ($arrValues as $keyValue => $valueValue)
@@ -979,10 +979,10 @@ class Operation extends Backend
                                     $arrInsertValue[] = $valueValue[$valueField];
                                 }
 
-                                $strBody .= "(" . implode(",", $arrInsertValue) . "),\n";
+                                $strBody .= "(" . \implode(",", $arrInsertValue) . "),\n";
                             }
 
-                            $strBody = preg_replace("/,\\n$/", "", $strBody);
+                            $strBody = \preg_replace("/,\\n$/", "", $strBody);
 
                             $this->Database->query($strBody);
 
@@ -1034,7 +1034,7 @@ class Operation extends Backend
                     ->prepare('SET SESSION wait_timeout = ?,SESSION interactive_timeout = ?;')
                     ->execute(intval($waitTimeOut), intval($interactiveTimeout));
 
-            switch (pathinfo($strRestoreFile, PATHINFO_EXTENSION))
+            switch (\pathinfo($strRestoreFile, PATHINFO_EXTENSION))
             {
                 case "zip":
                     $objZipRead = new ZipReader($strRestoreFile);
@@ -1044,7 +1044,7 @@ class Operation extends Backend
                     {
                         $zipPath = $pathBuilder
                             ->addPath('system/tmp')
-                            ->addUnknownPath(sprintf('%s.gz', $this->strFilenameSyncCto))
+                            ->addUnknownPath(\sprintf('%s.gz', $this->strFilenameSyncCto))
                             ->getPath(false);
 
                         $objGzFile = new File($zipPath);
@@ -1077,7 +1077,7 @@ class Operation extends Backend
             }
 
             // After insert, call some SQL
-            if (is_array($arrSuffixSQL))
+            if (\is_array($arrSuffixSQL))
             {
                 foreach ($arrSuffixSQL as $key => $value)
                 {
@@ -1097,7 +1097,7 @@ class Operation extends Backend
             // Drop synccto_temp tables
             foreach ($this->Database->listTables() as $key => $value)
             {
-                if (preg_match("/synccto_temp_.*/", $value))
+                if (\preg_match("/synccto_temp_.*/", $value))
                 {
                     $this->Database->query("DROP TABLE IF EXISTS $value");
                 }
@@ -1109,7 +1109,7 @@ class Operation extends Backend
         // Drop synccto_temp tables
         foreach ($this->Database->listTables() as $key => $value)
         {
-            if (preg_match("/synccto_temp_.*/", $value))
+            if (\preg_match("/synccto_temp_.*/", $value))
             {
                 $this->Database->query("DROP TABLE IF EXISTS $value");
             }
@@ -1121,15 +1121,15 @@ class Operation extends Backend
     protected function runRestoreFromXML($strRestoreFile)
     {
         // Unzip XML
-        $objGzFile = gzopen(TL_ROOT . "/" . $strRestoreFile, "r");
+        $objGzFile = \gzopen(TL_ROOT . "/" . $strRestoreFile, "r");
 
-        $objXMLFile = new File("system/tmp/" . basename($strRestoreFile) . ".xml");
+        $objXMLFile = new File("system/tmp/" . \basename($strRestoreFile) . ".xml");
         $objXMLFile->write("");
         $objXMLFile->close();
 
         while (true)
         {
-            $strConten = gzread($objGzFile, 500000);
+            $strConten = \gzread($objGzFile, 500000);
 
             if ($strConten == false || empty($strConten))
             {
@@ -1142,7 +1142,7 @@ class Operation extends Backend
 
         // Read XML
         $this->objXMLReader = new \XMLReader();
-        $this->objXMLReader->open(TL_ROOT . "/system/tmp/" . basename($strRestoreFile) . ".xml");
+        $this->objXMLReader->open(TL_ROOT . "/system/tmp/" . \basename($strRestoreFile) . ".xml");
 
         while ($this->objXMLReader->read())
         {
@@ -1171,7 +1171,7 @@ class Operation extends Backend
     protected function runRestoreFromSer($strRestoreFile)
     {
         $objZipArchive    = new \ZipArchiveCto();
-        $objTempfile      = tmpfile();
+        $objTempfile      = \tmpfile();
         $arrRestoreTables = array();
 
         try
@@ -1186,7 +1186,7 @@ class Operation extends Backend
             }
 
             $mixTables = $objZipArchive->getFromName($this->strFilenameTable);
-            $mixTables = trimsplit("\n", $mixTables);
+            $mixTables = \trimsplit("\n", $mixTables);
 
             // Create temp tables
             foreach ($mixTables as $key => $value)
@@ -1196,9 +1196,9 @@ class Operation extends Backend
                     continue;
                 }
 
-                $value = unserialize($value);
+                $value = \unserialize($value);
 
-                if (!is_array($value))
+                if (!\is_array($value))
                 {
                     throw new \Exception("Could not load SQL file table. Maybe damaged?");
                 }
@@ -1219,41 +1219,41 @@ class Operation extends Backend
 
             // Write temp File
 
-            fputs($objTempfile, $strContent, strlen($strContent));
+            fputs($objTempfile, $strContent, \strlen($strContent));
 
             unset($strContent);
 
             // Set pointer on position zero
-            rewind($objTempfile);
+            \rewind($objTempfile);
 
             $i       = 0;
-            while ($mixLine = fgets($objTempfile))
+            while ($mixLine = \fgets($objTempfile))
             {
                 $i++;
 
-                if (empty($mixLine) || strlen($mixLine) == 0)
+                if (empty($mixLine) || \strlen($mixLine) == 0)
                 {
                     continue;
                 }
 
-                $mixLine = json_decode(@gzuncompress(base64_decode($mixLine)), true);
+                $mixLine = \json_decode(@\gzuncompress(\base64_decode($mixLine)), true);
 
                 if ($mixLine == FALSE)
                 {
                     throw new \Exception("Could not load SQL file inserts or unzip it. Maybe damaged on line $i?");
                 }
 
-                if (!is_array($mixLine))
+                if (!\is_array($mixLine))
                 {
                     throw new \Exception("Could not load SQL file inserts. Maybe damaged on line $i?");
                 }
 
-                $strSQL = $this->buildSQLInsert("synccto_temp_" . $mixLine['table'], array_keys($mixLine['values']), $mixLine['values'], true);
+                $strSQL = $this->buildSQLInsert("synccto_temp_" . $mixLine['table'], \array_keys($mixLine['values']), $mixLine['values'], true);
                 $this->Database->query($strSQL);
             }
 
             $objZipArchive->close();
-            fclose($objTempfile);
+            \fclose($objTempfile);
 
             return $arrRestoreTables;
         }
@@ -1265,7 +1265,7 @@ class Operation extends Backend
             }
 
             $objZipArchive->close();
-            fclose($objTempfile);
+            \fclose($objTempfile);
 
             throw $exc;
         }
@@ -1301,11 +1301,11 @@ class Operation extends Backend
     public function getFormatedCompareList($arrSourceTables, $arrDesTables, $arrHiddenTables, $arrHiddenTablePlaceholder, $arrSourceTS, $arrDesTS, $arrAllowedTables, $strSrcName, $strDesName)
     {
         // Remove hidden tables or tables without permission.
-        if (is_array($arrHiddenTables) && count($arrHiddenTables) != 0)
+        if (\is_array($arrHiddenTables) && \count($arrHiddenTables) != 0)
         {
             foreach ($arrSourceTables as $key => $value)
             {
-                if (in_array($key, $arrHiddenTables) || (is_array($arrAllowedTables) && in_array($key, $arrAllowedTables)))
+                if (\in_array($key, $arrHiddenTables) || (\is_array($arrAllowedTables) && \in_array($key, $arrAllowedTables)))
                 {
                     unset($arrSourceTables[$key]);
                 }
@@ -1313,7 +1313,7 @@ class Operation extends Backend
 
             foreach ($arrDesTables as $key => $value)
             {
-                if (in_array($key, $arrHiddenTables) || (is_array($arrAllowedTables) && in_array($key, $arrAllowedTables)))
+                if (\in_array($key, $arrHiddenTables) || (\is_array($arrAllowedTables) && \in_array($key, $arrAllowedTables)))
                 {
                     unset($arrDesTables[$key]);
                 }
@@ -1321,14 +1321,14 @@ class Operation extends Backend
         }
 
         // Remove hidden tables based on the regex.
-        if (is_array($arrHiddenTablePlaceholder) && count($arrHiddenTablePlaceholder) != 0)
+        if (\is_array($arrHiddenTablePlaceholder) && \count($arrHiddenTablePlaceholder) != 0)
         {
             foreach ($arrHiddenTablePlaceholder as $strRegex)
             {
                 // Run each and check it with the given name.
                 foreach ($arrSourceTables as $key => $value)
                 {
-                    if (preg_match('/^' . $strRegex . '$/', $key))
+                    if (\preg_match('/^' . $strRegex . '$/', $key))
                     {
                         unset($arrSourceTables[$key]);
                     }
@@ -1337,7 +1337,7 @@ class Operation extends Backend
                 // Run each and check it with the given name.
                 foreach ($arrDesTables as $key => $value)
                 {
-                    if (preg_match('/^' . $strRegex . '$/', $key))
+                    if (\preg_match('/^' . $strRegex . '$/', $key))
                     {
                         unset($arrDesTables[$key]);
                     }
@@ -1348,8 +1348,8 @@ class Operation extends Backend
         $arrCompareList = array();
 
         // Make a diff
-        $arrMissingOnDes    = array_diff(array_keys($arrSourceTables), array_keys($arrDesTables));
-        $arrMissingOnSource = array_diff(array_keys($arrDesTables), array_keys($arrSourceTables));
+        $arrMissingOnDes    = \array_diff(\array_keys($arrSourceTables), \array_keys($arrDesTables));
+        $arrMissingOnSource = \array_diff(\array_keys($arrDesTables), \array_keys($arrSourceTables));
 
         // New Tables
         foreach ($arrMissingOnDes as $keySrcTables)
@@ -1359,7 +1359,7 @@ class Operation extends Backend
             $arrCompareList[$strType][$keySrcTables][$strSrcName]['name']    = $keySrcTables;
             $arrCompareList[$strType][$keySrcTables][$strSrcName]['tooltip'] = $this->getReadableSize($arrSourceTables[$keySrcTables]['size'])
                     . ', '
-                    . vsprintf(($arrSourceTables[$keySrcTables]['count'] == 1) ? $GLOBALS['TL_LANG']['MSC']['entry'] : $GLOBALS['TL_LANG']['MSC']['entries'], array($arrSourceTables[$keySrcTables]['count']));
+                    . \vsprintf(($arrSourceTables[$keySrcTables]['count'] == 1) ? $GLOBALS['TL_LANG']['MSC']['entry'] : $GLOBALS['TL_LANG']['MSC']['entries'], array($arrSourceTables[$keySrcTables]['count']));
 
             $arrCompareList[$strType][$keySrcTables][$strSrcName]['class'] = 'none';
 
@@ -1377,7 +1377,7 @@ class Operation extends Backend
             $arrCompareList[$strType][$keyDesTables][$strDesName]['name']    = $keyDesTables;
             $arrCompareList[$strType][$keyDesTables][$strSrcName]['tooltip'] = $this->getReadableSize($arrDesTables[$keyDesTables]['size'])
                     . ', '
-                    . vsprintf(($arrDesTables[$keyDesTables]['count'] == 1) ? $GLOBALS['TL_LANG']['MSC']['entry'] : $GLOBALS['TL_LANG']['MSC']['entries'], array($arrDesTables[$keyDesTables]['count']));
+                    . \vsprintf(($arrDesTables[$keyDesTables]['count'] == 1) ? $GLOBALS['TL_LANG']['MSC']['entry'] : $GLOBALS['TL_LANG']['MSC']['entries'], array($arrDesTables[$keyDesTables]['count']));
 
             $arrCompareList[$strType][$keyDesTables][$strDesName]['class'] = 'none';
 
@@ -1396,30 +1396,30 @@ class Operation extends Backend
             $arrCompareList[$strType][$keySrcTable][$strSrcName]['name']    = $keySrcTable;
             $arrCompareList[$strType][$keySrcTable][$strSrcName]['tooltip'] = $this->getReadableSize($valueSrcTable['size'])
                     . ', '
-                    . vsprintf(($valueSrcTable['count'] == 1) ? $GLOBALS['TL_LANG']['MSC']['entry'] : $GLOBALS['TL_LANG']['MSC']['entries'], array($valueSrcTable['count']));
+                    . \vsprintf(($valueSrcTable['count'] == 1) ? $GLOBALS['TL_LANG']['MSC']['entry'] : $GLOBALS['TL_LANG']['MSC']['entries'], array($valueSrcTable['count']));
 
             $valueClientTable = $arrDesTables[$keySrcTable];
 
             $arrCompareList[$strType][$keySrcTable][$strDesName]['name']    = $keySrcTable;
             $arrCompareList[$strType][$keySrcTable][$strDesName]['tooltip'] = $this->getReadableSize($valueClientTable['size'])
                     . ', '
-                    . vsprintf(($valueClientTable['count'] == 1) ? $GLOBALS['TL_LANG']['MSC']['entry'] : $GLOBALS['TL_LANG']['MSC']['entries'], array($valueClientTable['count']));
+                    . \vsprintf(($valueClientTable['count'] == 1) ? $GLOBALS['TL_LANG']['MSC']['entry'] : $GLOBALS['TL_LANG']['MSC']['entries'], array($valueClientTable['count']));
 
             // Get some diff information
             $arrNewId     = $this->getDiffId($valueClientTable, $valueSrcTable);
             $arrDeletedId = $this->getDiffId($valueSrcTable, $valueClientTable);
-            $intDiffId    = count($arrNewId) + count($arrDeletedId);
+            $intDiffId    = \count($arrNewId) + \count($arrDeletedId);
             $intDiff      = $this->getDiff($valueSrcTable, $valueClientTable);
 
             // Add 'entry' or 'entries' to diff
             $arrCompareList[$strType][$keySrcTable]['diffCount']     = $intDiff;
             $arrCompareList[$strType][$keySrcTable]['diffCountId']   = $intDiffId;
-            $arrCompareList[$strType][$keySrcTable]['diff']          = vsprintf(($intDiff == 1) ? $GLOBALS['TL_LANG']['MSC']['entry'] : $GLOBALS['TL_LANG']['MSC']['entries'], array($intDiff));
+            $arrCompareList[$strType][$keySrcTable]['diff']          = \vsprintf(($intDiff == 1) ? $GLOBALS['TL_LANG']['MSC']['entry'] : $GLOBALS['TL_LANG']['MSC']['entries'], array($intDiff));
             $arrCompareList[$strType][$keySrcTable]['diffNewId']     = $arrNewId;
             $arrCompareList[$strType][$keySrcTable]['diffDeletedId'] = $arrDeletedId;
 
             // Check timestamps
-            if (array_key_exists($keySrcTable, $arrSourceTS['current']) && array_key_exists($keySrcTable, $arrSourceTS['lastSync']))
+            if (\array_key_exists($keySrcTable, $arrSourceTS['current']) && \array_key_exists($keySrcTable, $arrSourceTS['lastSync']))
             {
                 if ($arrSourceTS['current'][$keySrcTable] == $arrSourceTS['lastSync'][$keySrcTable])
                 {
@@ -1435,7 +1435,7 @@ class Operation extends Backend
                 $arrCompareList[$strType][$keySrcTable][$strSrcName]['class'] = 'no-sync';
             }
 
-            if (array_key_exists($keySrcTable, $arrDesTS['current']) && array_key_exists($keySrcTable, $arrDesTS['lastSync']))
+            if (\array_key_exists($keySrcTable, $arrDesTS['current']) && \array_key_exists($keySrcTable, $arrDesTS['lastSync']))
             {
                 if ($arrDesTS['current'][$keySrcTable] == $arrDesTS['lastSync'][$keySrcTable])
                 {
@@ -1483,7 +1483,7 @@ class Operation extends Backend
      */
     public function getDiff($arrSrcTables, $arrDesTables)
     {
-        return abs(intval($arrSrcTables['count']) - intval($arrDesTables['count']));
+        return \abs(intval($arrSrcTables['count']) - intval($arrDesTables['count']));
     }
 
     /**
@@ -1533,7 +1533,7 @@ class Operation extends Backend
         }
 
         // Make a diff from both id arrays.
-        return array_diff($arrDesId, $arrSrcId);
+        return \array_diff($arrDesId, $arrSrcId);
     }
 
     /**
@@ -1553,9 +1553,9 @@ class Operation extends Backend
                     ->execute($intClientID)
                     ->fetchAllAssoc();
 
-            if (strlen($mixLastTableTimestamp[0][$location . "_timestamp"]) != 0)
+            if (\strlen($mixLastTableTimestamp[0][$location . "_timestamp"]) != 0)
             {
-                $arrLocationLastTableTimstamp[$location] = unserialize($mixLastTableTimestamp[0][$location . "_timestamp"]);
+                $arrLocationLastTableTimstamp[$location] = \unserialize($mixLastTableTimestamp[0][$location . "_timestamp"]);
             }
             else
             {
@@ -1601,11 +1601,11 @@ class Operation extends Backend
             {
                 if ($field["name"] == "PRIMARY")
                 {
-                    $return['TABLE_CREATE_DEFINITIONS'][$field["name"]] = "PRIMARY KEY (`" . implode("`,`", $field["index_fields"]) . "`)";
+                    $return['TABLE_CREATE_DEFINITIONS'][$field["name"]] = "PRIMARY KEY (`" . \implode("`,`", $field["index_fields"]) . "`)";
                 }
                 else if ($field["index"] == "UNIQUE")
                 {
-                    $return['TABLE_CREATE_DEFINITIONS'][$field["name"]] = "UNIQUE KEY `" . $field["name"] . "` (`" . implode("`,`", $field["index_fields"]) . "`)";
+                    $return['TABLE_CREATE_DEFINITIONS'][$field["name"]] = "UNIQUE KEY `" . $field["name"] . "` (`" . \implode("`,`", $field["index_fields"]) . "`)";
                 }
                 else if ($field["index"] == "KEY")
                 {
@@ -1638,28 +1638,28 @@ class Operation extends Backend
             $field['name'] = '`' . $field['name'] . '`';
 
             // Field type
-            if (strlen($field['length']))
+            if (\strlen($field['length']))
             {
-                $field['type'] .= '(' . $field['length'] . (strlen($field['precision']) ? ',' . $field['precision'] : '') . ')';
+                $field['type'] .= '(' . $field['length'] . (\strlen($field['precision']) ? ',' . $field['precision'] : '') . ')';
 
                 unset($field['length']);
                 unset($field['precision']);
             }
 
             // Default values
-            if (in_array(strtolower($field['type']), $this->arrDefaultValueTypIgnore) || stristr($field['extra'], 'auto_increment'))
+            if (\in_array(\strtolower($field['type']), $this->arrDefaultValueTypIgnore) || \stristr($field['extra'], 'auto_increment'))
             {
                 unset($field['default']);
             }
-            else if (strtolower($field['default']) == 'null')
+            else if (\strtolower($field['default']) == 'null')
             {
                 $field['default'] = "default NULL";
             }
-            else if (is_null($field['default']))
+            else if (\is_null($field['default']))
             {
                 $field['default'] = "";
             }
-            else if (in_array(strtoupper($field['default']), $this->arrDefaultValueFunctionIgnore))
+            else if (\in_array(\strtoupper($field['default']), $this->arrDefaultValueFunctionIgnore))
             {
                 $field['default'] = "default " . $field['default'];
             }
@@ -1669,12 +1669,12 @@ class Operation extends Backend
             }
 
             // Remove elements from the list, we did not want.
-            foreach (array_diff(array_keys($field), $this->arrAllowedFieldKeys) as $strKeyForUnset)
+            foreach (\array_diff(\array_keys($field), $this->arrAllowedFieldKeys) as $strKeyForUnset)
             {
                 unset($field[$strKeyForUnset]);
             }
 
-            $return['TABLE_FIELDS'][$name] = trim(implode(' ', $field));
+            $return['TABLE_FIELDS'][$name] = \trim(\implode(' ', $field));
         }
 
         // Table status
@@ -1685,7 +1685,7 @@ class Operation extends Backend
             if ($row['Name'] != $strTableName)
                 continue;
 
-            $return['TABLE_OPTIONS'] = " ENGINE=" . $row['Engine'] . " DEFAULT CHARSET=" . substr($row['Collation'], 0, strpos($row['Collation'], "_")) . "";
+            $return['TABLE_OPTIONS'] = " ENGINE=" . $row['Engine'] . " DEFAULT CHARSET=" . \substr($row['Collation'], 0, \strpos($row['Collation'], "_")) . "";
             if ($row['Auto_increment'] != "")
                 $return['TABLE_OPTIONS'] .= " AUTO_INCREMENT=" . $row['Auto_increment'] . " ";
         }
@@ -1707,21 +1707,21 @@ class Operation extends Backend
 
         foreach($fieldList as $field)
         {
-            if(preg_match("/.*\([0-9]+\)/i", $field))
+            if(\preg_match("/.*\([0-9]+\)/i", $field))
             {
-                $cutPosition = stripos($field, '(');
-                $name = substr($field, 0, $cutPosition);
-                $sub = substr($field, $cutPosition);
+                $cutPosition = \stripos($field, '(');
+                $name = \substr($field, 0, $cutPosition);
+                $sub = \substr($field, $cutPosition);
 
-                $return[] = sprintf('`%s` %s', $name, $sub);
+                $return[] = \sprintf('`%s` %s', $name, $sub);
             }
             else
             {
-                $return[] = sprintf('`%s`', $field);
+                $return[] = \sprintf('`%s`', $field);
             }
         }
 
-        return implode(', ', $return);
+        return \implode(', ', $return);
     }
 
     /**
@@ -1733,10 +1733,10 @@ class Operation extends Backend
      */
     private function buildSQLTable($arrTable, $strName)
     {
-        $string = "CREATE TABLE `" . $strName . "` (\n  " . implode(",\n  ", $arrTable['TABLE_FIELDS']) . (count($arrTable['TABLE_CREATE_DEFINITIONS']) ? ',' : '') . "\n";
+        $string = "CREATE TABLE `" . $strName . "` (\n  " . \implode(",\n  ", $arrTable['TABLE_FIELDS']) . (\count($arrTable['TABLE_CREATE_DEFINITIONS']) ? ',' : '') . "\n";
 
         if (is_Array($arrTable['TABLE_CREATE_DEFINITIONS']))
-            $string .= "  " . implode(",\n  ", $arrTable['TABLE_CREATE_DEFINITIONS']) . "\n";
+            $string .= "  " . \implode(",\n  ", $arrTable['TABLE_CREATE_DEFINITIONS']) . "\n";
 
         $string .= ")" . $arrTable['TABLE_OPTIONS'] . ";";
 
@@ -1754,10 +1754,10 @@ class Operation extends Backend
     private function buildSQLInsert($strTable, $arrKeys, $arrData, $booPrepare = false)
     {
         $strBody = "INSERT IGNORE INTO " . $strTable . " (`";
-        $strBody .= implode("`, `", $arrKeys);
+        $strBody .= \implode("`, `", $arrKeys);
         $strBody .= "`) VALUES ( ";
 
-        for ($i = 0; $i < count($arrKeys); $i++)
+        for ($i = 0; $i < \count($arrKeys); $i++)
         {
             if (isset($arrData[$arrKeys[$i]]))
             {
@@ -1768,7 +1768,7 @@ class Operation extends Backend
                 $strBody .= "''";
             }
 
-            if ($i < count($arrKeys) - 1)
+            if ($i < \count($arrKeys) - 1)
                 $strBody .= ", ";
         }
 

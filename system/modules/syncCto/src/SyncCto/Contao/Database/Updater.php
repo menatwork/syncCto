@@ -38,7 +38,7 @@ class Updater extends Installer
         parent::__construct();
 
         // Load allowed actions from config file.
-        $this->arrAllowedAction = deserialize($GLOBALS['TL_CONFIG']['syncCto_auto_db_updater'], true);
+        $this->arrAllowedAction = \deserialize($GLOBALS['TL_CONFIG']['syncCto_auto_db_updater'], true);
     }
 
     /**
@@ -60,7 +60,7 @@ class Updater extends Installer
         // Remove not allowed actions
         foreach ($sql_command as $strAction => $strOperation)
         {
-            if (!in_array($strAction, $this->arrAllowedAction))
+            if (!\in_array($strAction, $this->arrAllowedAction))
             {
                 unset($sql_command[$strAction]);
             }
@@ -106,7 +106,7 @@ class Updater extends Installer
 
             foreach ($this->arrError as $key => $value)
             {
-                $strError .= sprintf("%i. %s. | ", $key + 1, $value['error']);
+                $strError .= \sprintf("%i. %s. | ", $key + 1, $value['error']);
             }
 
             throw new \Exception('There was an error on updating the database: ' . $strError);

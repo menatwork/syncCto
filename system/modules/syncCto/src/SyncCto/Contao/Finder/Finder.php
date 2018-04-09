@@ -64,17 +64,17 @@ class Finder extends Backend
         // Init
         $this->objSyncCtoHelper   = Helper::getInstance();
         $this->objFiles           = Files::getInstance();
-        $this->strTimestampFormat = str_replace(array(':', ' '), array('', '_'), $GLOBALS['TL_CONFIG']['datimFormat']);
+        $this->strTimestampFormat = \str_replace(array(':', ' '), array('', '_'), $GLOBALS['TL_CONFIG']['datimFormat']);
 
         // Load blacklists and whitelists
         $this->arrRootFolderList  = $this->objSyncCtoHelper->getWhitelistFolder();
 
         // Get memory limit
-        $this->intMaxMemoryUsage = Client::parseSize(ini_get('memory_limit'));
+        $this->intMaxMemoryUsage = Client::parseSize(\ini_get('memory_limit'));
         $this->intMaxMemoryUsage = $this->intMaxMemoryUsage / 100 * 30;
 
         // Get execution limit
-        $this->intMaxExecutionTime = Helper::parseRuntime(ini_get('max_execution_time'));
+        $this->intMaxExecutionTime = Helper::parseRuntime(\ini_get('max_execution_time'));
         $this->intMaxExecutionTime = intval($this->intMaxExecutionTime / 100 * 25);
 
         // Flags for file scanning.
@@ -159,7 +159,7 @@ class Finder extends Backend
         foreach ($this->objSyncCtoHelper->getPreparedBlacklistFolder() as $value)
         {
             // Search with preg for values
-            if (preg_match("/^" . $value . "/i", $strPath . '/') != 0)
+            if (\preg_match("/^" . $value . "/i", $strPath . '/') != 0)
             {
                 return true;
             }
@@ -181,13 +181,13 @@ class Finder extends Backend
         foreach ($this->objSyncCtoHelper->getPreparedBlacklistFiles() as $value)
         {
             // Check if the preg starts with a TL_ROOT
-            if (preg_match("/^TL_ROOT/i", $value))
+            if (\preg_match("/^TL_ROOT/i", $value))
             {
                 // Remove the TL_ROOT
-                $value = preg_replace("/TL_ROOT\\\\\//i", "", $value);
+                $value = \preg_replace("/TL_ROOT\\\\\//i", "", $value);
 
                 // Search with preg for values
-                if (preg_match("/^" . $value . "$/i", $strPath) != 0)
+                if (\preg_match("/^" . $value . "$/i", $strPath) != 0)
                 {
                     return true;
                 }
@@ -195,7 +195,7 @@ class Finder extends Backend
             else
             {
                 // Search with preg for values
-                if (preg_match("/" . $value . "$/i", $strPath) != 0)
+                if (\preg_match("/" . $value . "$/i", $strPath) != 0)
                 {
                     return true;
                 }
@@ -221,7 +221,7 @@ class Finder extends Backend
     public function getDbafsInformationFor($arrFileList, $blnAutoAdd = true)
     {
         // Check if we have array.
-        if (!is_array($arrFileList) || count($arrFileList) == 0)
+        if (!\is_array($arrFileList) || \count($arrFileList) == 0)
         {
             return $arrFileList;
         }
@@ -239,7 +239,7 @@ class Finder extends Backend
             }
 
             // Check if we have this file in the filesystem.
-            if ( !file_exists($strFullPath) )
+            if ( !\file_exists($strFullPath) )
             {
                 continue;
             }
@@ -274,32 +274,32 @@ class Finder extends Backend
         }
 
         // Check if we have this file in the filesystem.
-        if(!$blnSkipExistsCheck && !file_exists($strFullFilePath))
+        if(!$blnSkipExistsCheck && !\file_exists($strFullFilePath))
         {
             return null;
         }
 
         // Get the information from the tl_files.
-        $objModel = FilesModel::findByPath(str_replace('\\\\', '/', $strFilePath));
+        $objModel = FilesModel::findByPath(\str_replace('\\\\', '/', $strFilePath));
 
         // If the file is not in the dbafs and
         if ($objModel == null && $blnAutoAdd)
         {
-            $objModel                      = Dbafs::addResource(str_replace('\\\\', '/', $strFilePath));
+            $objModel                      = Dbafs::addResource(\str_replace('\\\\', '/', $strFilePath));
             $arrModelData                  = $objModel->row();
 
             // PHP 7 compatibility
             // See #309 (https://github.com/contao/core-bundle/issues/309)
-            if (version_compare(VERSION . '.' . BUILD, '3.5.5', '>='))
+            if (\version_compare(VERSION . '.' . BUILD, '3.5.5', '>='))
             {
                 $arrModelData['uuid']      = StringUtil::binToUuid($arrModelData['uuid']);
-                $arrModelData['pid']       = (strlen($arrModelData['pid'])) ? StringUtil::binToUuid($arrModelData['pid']) : $arrModelData['pid'];
+                $arrModelData['pid']       = (\strlen($arrModelData['pid'])) ? StringUtil::binToUuid($arrModelData['pid']) : $arrModelData['pid'];
             }
 
             else
             {
                 $arrModelData['uuid']      = String::binToUuid($arrModelData['uuid']);
-                $arrModelData['pid']       = (strlen($arrModelData['pid'])) ? String::binToUuid($arrModelData['pid']) : $arrModelData['pid'];
+                $arrModelData['pid']       = (\strlen($arrModelData['pid'])) ? String::binToUuid($arrModelData['pid']) : $arrModelData['pid'];
             }
 
             //$arrModelData['tail']          = $this->getDbafsTailFor($arrModelData['pid']);
@@ -318,16 +318,16 @@ class Finder extends Backend
 
             // PHP 7 compatibility
             // See #309 (https://github.com/contao/core-bundle/issues/309)
-            if (version_compare(VERSION . '.' . BUILD, '3.5.5', '>='))
+            if (\version_compare(VERSION . '.' . BUILD, '3.5.5', '>='))
             {
                 $arrModelData['uuid']      = StringUtil::binToUuid($arrModelData['uuid']);
-                $arrModelData['pid']       = (strlen($arrModelData['pid'])) ? StringUtil::binToUuid($arrModelData['pid']) : $arrModelData['pid'];
+                $arrModelData['pid']       = (\strlen($arrModelData['pid'])) ? StringUtil::binToUuid($arrModelData['pid']) : $arrModelData['pid'];
             }
 
             else
             {
                 $arrModelData['uuid']      = String::binToUuid($arrModelData['uuid']);
-                $arrModelData['pid']       = (strlen($arrModelData['pid'])) ? String::binToUuid($arrModelData['pid']) : $arrModelData['pid'];
+                $arrModelData['pid']       = (\strlen($arrModelData['pid'])) ? String::binToUuid($arrModelData['pid']) : $arrModelData['pid'];
             }
 
             //$arrModelData['tail']          = $this->getDbafsTailFor($arrModelData['pid']);
@@ -371,23 +371,23 @@ class Finder extends Backend
 
             // PHP 7 compatibility
             // See #309 (https://github.com/contao/core-bundle/issues/309)
-            if (version_compare(VERSION . '.' . BUILD, '3.5.5', '>='))
+            if (\version_compare(VERSION . '.' . BUILD, '3.5.5', '>='))
             {
                 $arrModelData['uuid'] = StringUtil::binToUuid($arrModelData['uuid']);
-                $arrModelData['pid']  = (strlen($arrModelData['pid'])) ? StringUtil::binToUuid($arrModelData['pid']) : $arrModelData['pid'];
+                $arrModelData['pid']  = (\strlen($arrModelData['pid'])) ? StringUtil::binToUuid($arrModelData['pid']) : $arrModelData['pid'];
             }
 
             else
             {
                 $arrModelData['uuid'] = String::binToUuid($arrModelData['uuid']);
-                $arrModelData['pid']  = (strlen($arrModelData['pid'])) ? String::binToUuid($arrModelData['pid']) : $arrModelData['pid'];
+                $arrModelData['pid']  = (\strlen($arrModelData['pid'])) ? String::binToUuid($arrModelData['pid']) : $arrModelData['pid'];
             }
 
             // Save to the array.
             $arrTail[$mixPID] = $arrModelData;
 
             // Id we have no pid return.
-            if(strlen($arrModelData['pid']) == 0)
+            if(\strlen($arrModelData['pid']) == 0)
             {
                 return $arrTail;
             }
@@ -426,7 +426,7 @@ class Finder extends Backend
         }
 
         // Get the same keys.
-        $arrSameFolders = array_intersect(array_keys($arrFoldersLeft), array_keys($arrFoldersRight));
+        $arrSameFolders = \array_intersect(\array_keys($arrFoldersLeft), \array_keys($arrFoldersRight));
 
         // Run each and found out if the uuid is same.
         foreach ($arrSameFolders as $strKey)
@@ -441,7 +441,7 @@ class Finder extends Backend
         }
 
         // Check the missing
-        $arrMissingRight = array_diff(array_keys($arrFoldersLeft), array_keys($arrFoldersRight));
+        $arrMissingRight = \array_diff(\array_keys($arrFoldersLeft), \array_keys($arrFoldersRight));
         foreach ($arrMissingRight as $strKey)
         {
             if ($arrFoldersLeft[$strKey]['uuid'] != $arrFoldersRight[$strKey]['uuid'])
@@ -454,7 +454,7 @@ class Finder extends Backend
         }
 
         // Check the missing
-        $arrMissingLeft = array_diff(array_keys($arrFoldersRight), array_keys($arrFoldersLeft));
+        $arrMissingLeft = \array_diff(\array_keys($arrFoldersRight), \array_keys($arrFoldersLeft));
         foreach ($arrMissingLeft as $strKey)
         {
             if ($arrFoldersLeft[$strKey]['uuid'] != $arrFoldersRight[$strKey]['uuid'])
@@ -485,15 +485,15 @@ class Finder extends Backend
             if($arrFile['dbafs_state'] == Enum::DBAFS_DATA_CONFLICT)
             {
                 // Get the information from the tl_files.
-                $objModel       = FilesModel::findByPath(str_replace('\\\\', '/', $arrFile['path']));
+                $objModel       = FilesModel::findByPath(\str_replace('\\\\', '/', $arrFile['path']));
 
                 // If we have no data for this, skip it.
                 if($objModel == null)
                 {
                     $arrFileList[$key]['saved']        = false;
-                    $arrFileList[$key]['error']        = sprintf('Can not find the model for ' . $arrFile['path']);
+                    $arrFileList[$key]['error']        = \sprintf('Can not find the model for ' . $arrFile['path']);
                     $arrFileList[$key]['transmission'] = Enum::FILETRANS_SKIPPED;
-                    $arrFileList[$key]['skipreason']   = sprintf($GLOBALS['TL_LANG']['ERR']['unknown_file'], $arrFile['path']);
+                    $arrFileList[$key]['skipreason']   = \sprintf($GLOBALS['TL_LANG']['ERR']['unknown_file'], $arrFile['path']);
                     continue;
                 }
 
@@ -508,21 +508,21 @@ class Finder extends Backend
             else
             {
                 // Get information about the current file information.
-                $arrDestinationInformation = pathinfo($arrFile['path']);
+                $arrDestinationInformation = \pathinfo($arrFile['path']);
 
                 // Try to rename it to _1 or _2 and so on.
                 $strNewDestinationName = null;
                 $intFileNumber         = 1;
                 for ($i = 1; $i < 100; $i++)
                 {
-                    $strNewDestinationName = sprintf('%s' . DIRECTORY_SEPARATOR . '%s_%s.%s',
+                    $strNewDestinationName = \sprintf('%s' . DIRECTORY_SEPARATOR . '%s_%s.%s',
                         $arrDestinationInformation['dirname'],
                         $arrDestinationInformation['filename'],
                         $i,
                         $arrDestinationInformation['extension']
                     );
 
-                    if (!file_exists(TL_ROOT . DIRECTORY_SEPARATOR . $strNewDestinationName))
+                    if (!\file_exists(TL_ROOT . DIRECTORY_SEPARATOR . $strNewDestinationName))
                     {
                         $intFileNumber = $i;
                         break;
@@ -542,7 +542,7 @@ class Finder extends Backend
 
                     // PHP 7 compatibility
                     // See #309 (https://github.com/contao/core-bundle/issues/309)
-                    if (version_compare(VERSION . '.' . BUILD, '3.5.5', '>='))
+                    if (\version_compare(VERSION . '.' . BUILD, '3.5.5', '>='))
                     {
                         $objLocaleData->uuid = StringUtil::uuidToBin($arrFile['tl_files']['uuid']);
                     }
@@ -557,14 +557,14 @@ class Finder extends Backend
                     // Add a status report for debugging and co.
                     $arrFileList[$key]['saved']           = true;
                     $arrFileList[$key]['dbafs']['msg']    = $GLOBALS['TL_LANG']['ERR']['dbafs_uuid_conflict'];
-                    $arrFileList[$key]['dbafs']['error']  = sprintf($GLOBALS['TL_LANG']['ERR']['dbafs_uuid_conflict_rename'], $intFileNumber);
+                    $arrFileList[$key]['dbafs']['error']  = \sprintf($GLOBALS['TL_LANG']['ERR']['dbafs_uuid_conflict_rename'], $intFileNumber);
                     $arrFileList[$key]['dbafs']['rename'] = $strNewDestinationName;
                     $arrFileList[$key]['dbafs']['state']  = Enum::DBAFS_CONFLICT;
                 }
                 else
                 {
                     $arrFileList[$key]['saved']        = false;
-                    $arrFileList[$key]['error']        = sprintf('Can not move file - %s. Exception message: %s', $arrFile["path"], 'Unable to move.');
+                    $arrFileList[$key]['error']        = \sprintf('Can not move file - %s. Exception message: %s', $arrFile["path"], 'Unable to move.');
                     $arrFileList[$key]['transmission'] = Enum::FILETRANS_SKIPPED;
                     $arrFileList[$key]['skipreason']   = $GLOBALS['TL_LANG']['ERR']['cant_move_files'];
                 }
@@ -600,7 +600,7 @@ class Finder extends Backend
             }
 
             // Get file information.
-            $strRelativePath = preg_replace('?' . $this->objSyncCtoHelper->getPreparedTlRoot() . '/?', '', $objFile->getPathname(), 1);
+            $strRelativePath = \preg_replace('?' . $this->objSyncCtoHelper->getPreparedTlRoot() . '/?', '', $objFile->getPathname(), 1);
             $strFullPath     = $objFile->getPathname();
             $intSize         = $objFile->getSize();
             $intLasModified  = $objFile->getMTime();
@@ -608,7 +608,7 @@ class Finder extends Backend
             // Get metadata.
             if ($intSize < 0 && $intSize != 0)
             {
-                $arrChecksum[md5($strRelativePath)] = array(
+                $arrChecksum[\md5($strRelativePath)] = array(
                     "path"         => $strRelativePath,
                     "checksum"     => 0,
                     "size"         => -1,
@@ -619,7 +619,7 @@ class Finder extends Backend
             }
             else if ($intSize >= $GLOBALS['SYC_SIZE']['limit_ignore'])
             {
-                $arrChecksum[md5($strRelativePath)] = array(
+                $arrChecksum[\md5($strRelativePath)] = array(
                     "path"         => $strRelativePath,
                     "checksum"     => 0,
                     "size"         => $intSize,
@@ -630,9 +630,9 @@ class Finder extends Backend
             }
             else if ($intSize >= $GLOBALS['SYC_SIZE']['limit'])
             {
-                $arrChecksum[md5($strRelativePath)] = array(
+                $arrChecksum[\md5($strRelativePath)] = array(
                     "path"         => $strRelativePath,
-                    "checksum"     => md5_file($strFullPath),
+                    "checksum"     => \md5_file($strFullPath),
                     "size"         => $intSize,
                     "state"        => Enum::FILESTATE_TOO_BIG,
                     "transmission" => Enum::FILETRANS_WAITING,
@@ -641,9 +641,9 @@ class Finder extends Backend
             }
             else
             {
-                $arrChecksum[md5($strRelativePath)] = array(
+                $arrChecksum[\md5($strRelativePath)] = array(
                     "path"         => $strRelativePath,
-                    "checksum"     => md5_file($strFullPath),
+                    "checksum"     => \md5_file($strFullPath),
                     "size"         => $intSize,
                     "state"        => Enum::FILESTATE_FILE,
                     "transmission" => Enum::FILETRANS_WAITING,
@@ -676,9 +676,9 @@ class Finder extends Backend
         // Check each file
         foreach ($this->getFolderList($booCore, $booFiles) as $objFolder)
         {
-            $strRelativePath = preg_replace('?' . $this->objSyncCtoHelper->getPreparedTlRoot() . '/?', '', $objFolder->getPathname(), 1);
+            $strRelativePath = \preg_replace('?' . $this->objSyncCtoHelper->getPreparedTlRoot() . '/?', '', $objFolder->getPathname(), 1);
 
-            $arrChecksum[md5($strRelativePath)] = array(
+            $arrChecksum[\md5($strRelativePath)] = array(
                 "path"         => $strRelativePath,
                 "checksum"     => 0,
                 "size"         => 0,
@@ -728,9 +728,9 @@ class Finder extends Backend
         // Write meta (header)
         $objXml->startElement('metatags');
         $objXml->writeElement('version', $GLOBALS['SYC_VERSION']);
-        $objXml->writeElement('create_unix', time());
-        $objXml->writeElement('create_date', date('Y-m-d', time()));
-        $objXml->writeElement('create_time', date('H:i', time()));
+        $objXml->writeElement('create_unix', \time());
+        $objXml->writeElement('create_date', \date('Y-m-d', \time()));
+        $objXml->writeElement('create_time', \date('H:i', \time()));
         $objXml->endElement(); // End metatags
 
         $objXml->startElement('files');
@@ -745,7 +745,7 @@ class Finder extends Backend
             }
 
             // Get fileinformation.
-            $strRelativePath = preg_replace('?' . $this->objSyncCtoHelper->getPreparedTlRoot() . '/?', '', $objFile->getPathname(), 1);
+            $strRelativePath = \preg_replace('?' . $this->objSyncCtoHelper->getPreparedTlRoot() . '/?', '', $objFile->getPathname(), 1);
             $intSize         = $objFile->getSize();
 
             if ($intSize < 0 && $intSize != 0)
@@ -757,7 +757,7 @@ class Finder extends Backend
                 if ($intInformations == Enum::FILEINFORMATION_SMALL)
                 {
                     $objXml->startElement('file');
-                    $objXml->writeAttribute("id", md5($strRelativePath));
+                    $objXml->writeAttribute("id", \md5($strRelativePath));
                     $objXml->writeAttribute("ai", $i);
                     $objXml->text($strRelativePath);
                     $objXml->endElement(); // End file
@@ -765,7 +765,7 @@ class Finder extends Backend
                 else if ($intInformations == Enum::FILEINFORMATION_BIG)
                 {
                     $objXml->startElement('file');
-                    $objXml->writeAttribute("id", md5($strRelativePath));
+                    $objXml->writeAttribute("id", \md5($strRelativePath));
                     $objXml->writeAttribute("ai", $i);
                     $objXml->text($strRelativePath);
                     $objXml->endElement(); // End file
@@ -787,7 +787,7 @@ class Finder extends Backend
         $objFileXML->append($objXml->flush(true), "");
         $objFileXML->close();
 
-        if(file_exists(TL_ROOT . DIRECTORY_SEPARATOR . $strXMLFile))
+        if(\file_exists(TL_ROOT . DIRECTORY_SEPARATOR . $strXMLFile))
         {
             return true;
         }
@@ -865,9 +865,9 @@ class Finder extends Backend
                 $arrFileList[$key]        = $arrChecksumList[$key];
                 $arrFileList[$key]['raw'] = 'file bombastic';
             }
-            else if (file_exists($this->objSyncCtoHelper->getFullPath($value['path'])))
+            else if (\file_exists($this->objSyncCtoHelper->getFullPath($value['path'])))
             {
-                if (md5_file($this->objSyncCtoHelper->getFullPath($value['path'])) == $value['checksum'])
+                if (\md5_file($this->objSyncCtoHelper->getFullPath($value['path'])) == $value['checksum'])
                 {
                     // Do nothing
                 }
@@ -962,7 +962,7 @@ class Finder extends Backend
         {
             $valueItem["path"] = $this->objSyncCtoHelper->standardizePath($valueItem["path"]);
 
-            if (!file_exists($this->objSyncCtoHelper->getFullPath($valueItem["path"])))
+            if (!\file_exists($this->objSyncCtoHelper->getFullPath($valueItem["path"])))
             {
                 $arrFolderList[$keyItem]          = $valueItem;
                 $arrFolderList[$keyItem]["state"] = Enum::FILESTATE_FOLDER_DELETE;
@@ -986,7 +986,7 @@ class Finder extends Backend
         {
             $valueItem["path"] = $this->objSyncCtoHelper->standardizePath($valueItem["path"]);
 
-            if (!file_exists($this->objSyncCtoHelper->getFullPath($valueItem["path"])))
+            if (!\file_exists($this->objSyncCtoHelper->getFullPath($valueItem["path"])))
             {
                 $arrReturn[$keyItem]          = $valueItem;
                 $arrReturn[$keyItem]["state"] = Enum::FILESTATE_DELETE;
@@ -1024,15 +1024,15 @@ class Finder extends Backend
     {
         if ($strZip == "")
         {
-            $strFilename = date($this->strTimestampFormat) . "_" . $this->strSuffixZipName;
+            $strFilename = \date($this->strTimestampFormat) . "_" . $this->strSuffixZipName;
         }
         else
         {
-            $strFilename = standardize(str_replace(array(" "), array("_"), preg_replace("/\.zip\z/i", "", $strZip))) . ".zip";
+            $strFilename = \standardize(\str_replace(array(" "), array("_"), \preg_replace("/\.zip\z/i", "", $strZip))) . ".zip";
         }
 
         // Replace special chars from the filename..
-        $strFilename = str_replace(array_keys($GLOBALS['SYC_CONFIG']['folder_file_replacement']), array_values($GLOBALS['SYC_CONFIG']['folder_file_replacement']), $strFilename);
+        $strFilename = \str_replace(\array_keys($GLOBALS['SYC_CONFIG']['folder_file_replacement']), \array_values($GLOBALS['SYC_CONFIG']['folder_file_replacement']), $strFilename);
 
         $strPath = $this->objSyncCtoHelper->standardizePath($GLOBALS['SYC_PATH']['file'], $strFilename);
 
@@ -1057,7 +1057,7 @@ class Finder extends Backend
                 }
 
                 // Build path without tl_root.
-                $strFile = preg_replace('?' . $this->objSyncCtoHelper->getPreparedTlRoot() . '/?', '', $objFile->getPathname(), 1);
+                $strFile = \preg_replace('?' . $this->objSyncCtoHelper->getPreparedTlRoot() . '/?', '', $objFile->getPathname(), 1);
 
                 // Skip all symlinked files.
                 if ($objFile->isLink())
@@ -1081,7 +1081,7 @@ class Finder extends Backend
             $strFullFilePath = $this->objSyncCtoHelper->getFullPath($file);
 
             // Scan folders.
-            if (file_exists($strFullFilePath) && is_dir($strFullFilePath))
+            if (\file_exists($strFullFilePath) && \is_dir($strFullFilePath))
             {
                 // Scann.
                 $objDirectoryIt  = new \RecursiveDirectoryIterator($strFullFilePath, $this->strRDIFlags);
@@ -1099,7 +1099,7 @@ class Finder extends Backend
                     }
 
                     // Build path without tl_root.
-                    $strFile = preg_replace('?' . $this->objSyncCtoHelper->getPreparedTlRoot() . '/?', '', $objFile->getPathname(), 1);
+                    $strFile = \preg_replace('?' . $this->objSyncCtoHelper->getPreparedTlRoot() . '/?', '', $objFile->getPathname(), 1);
 
                     // Add file to zip.
                     if ($objZipArchive->addFile($strFile, $strFile) == false)
@@ -1109,7 +1109,7 @@ class Finder extends Backend
                 }
             }
             // Add files.
-            else if (file_exists($strFullFilePath))
+            else if (\file_exists($strFullFilePath))
             {
                 if ($objZipArchive->addFile($file, $file) == false)
                 {
@@ -1123,7 +1123,7 @@ class Finder extends Backend
 
         if ($objZipArchive->status != $objZipArchive::ER_OK || $objZipArchive->statusSys != $objZipArchive::ER_OK)
         {
-            $strError = sprintf(
+            $strError = \sprintf(
                 "Error during zip creation with message \"%s\"  || Status (%s): %s || System (%s): %s ",
                 $objZipArchive->getStatusString(),
                 $objZipArchive->status,
@@ -1149,10 +1149,10 @@ class Finder extends Backend
      */
     public function runIncrementalDump($srtXMLFilelist, $strZipFolder, $strZipFile = null, $intMaxFilesPerRun = 5)
     {
-        $floatTimeStart = microtime(true);
+        $floatTimeStart = \microtime(true);
 
         // Check if filelist exists
-        if (!file_exists(TL_ROOT . DIRECTORY_SEPARATOR . $srtXMLFilelist))
+        if (!\file_exists(TL_ROOT . DIRECTORY_SEPARATOR . $srtXMLFilelist))
         {
             throw new \Exception("File not found: " + $srtXMLFilelist);
         }
@@ -1160,11 +1160,11 @@ class Finder extends Backend
         // Create, check zip name
         if ($strZipFile == null || $strZipFile == "")
         {
-            $strZipFile = date($this->strTimestampFormat) . "_" . $this->strSuffixZipName;
+            $strZipFile = \date($this->strTimestampFormat) . "_" . $this->strSuffixZipName;
         }
         else
         {
-            $strZipFile = str_replace(array(" "), array("_"), preg_replace("/\.zip\z/i", "", $strZipFile)) . ".zip";
+            $strZipFile = \str_replace(array(" "), array("_"), \preg_replace("/\.zip\z/i", "", $strZipFile)) . ".zip";
         }
 
         // Build Path
@@ -1204,7 +1204,7 @@ class Finder extends Backend
         foreach ($objFilesList as $file)
         {
             // Check if file exists
-            if (file_exists(TL_ROOT . DIRECTORY_SEPARATOR . $file->nodeValue))
+            if (\file_exists(TL_ROOT . DIRECTORY_SEPARATOR . $file->nodeValue))
             {
                 $objZipArchive->addFile($file->nodeValue, $file->nodeValue);
             }
@@ -1222,7 +1222,7 @@ class Finder extends Backend
             }
 
             // Check time out
-            if ((microtime(true) - $floatTimeStart) > $this->intMaxExecutionTime)
+            if ((\microtime(true) - $floatTimeStart) > $this->intMaxExecutionTime)
             {
                 break;
             }
@@ -1270,7 +1270,7 @@ class Finder extends Backend
 
         if (($mixError = $objZipArchive->open($strRestoreFile)) !== true)
         {
-            $strError = sprintf(
+            $strError = \sprintf(
                 "%s %s || Status (%s): %s || System (%s): %s  ",
                 $GLOBALS['TL_LANG']['ERR']['cant_extract_file'],
                 $objZipArchive->getErrorDescription($mixError),
@@ -1302,7 +1302,7 @@ class Finder extends Backend
 
         $objZipArchive->close();
 
-        if (count($arrErrorFiles) == 0)
+        if (\count($arrErrorFiles) == 0)
         {
             return true;
         }
@@ -1374,7 +1374,7 @@ class Finder extends Backend
                 $strFullPath = TL_ROOT . DIRECTORY_SEPARATOR . $this->objSyncCtoHelper->standardizePath($value);
 
                 // Check if the folder exists.
-                if (!file_exists($strFullPath) || !is_dir($strFullPath))
+                if (!\file_exists($strFullPath) || !\is_dir($strFullPath))
                 {
                     continue;
                 }
@@ -1429,7 +1429,7 @@ class Finder extends Backend
                 $strFullPath = TL_ROOT . DIRECTORY_SEPARATOR . $this->objSyncCtoHelper->standardizePath($value);
 
                 // Check if the folder exists.
-                if(!file_exists($strFullPath) || !is_dir($strFullPath))
+                if(!\file_exists($strFullPath) || !\is_dir($strFullPath))
                 {
                     continue;
                 }
@@ -1523,7 +1523,7 @@ class Finder extends Backend
                         foreach ($GLOBALS['TL_PURGE']['tables'] as $key => $config)
                         {
                             $arrCallback = $config['callback'];
-                            if(is_array($arrCallback) && count($arrCallback) == 2)
+                            if(\is_array($arrCallback) && \count($arrCallback) == 2)
                             {
                                 $this->import($arrCallback[0]);
                                 $this->{$arrCallback[0]}->{$arrCallback[1]}();
@@ -1536,7 +1536,7 @@ class Finder extends Backend
                         foreach ($GLOBALS['TL_PURGE']['folders'] as $key => $config)
                         {
                             $arrCallback = $config['callback'];
-                            if(is_array($arrCallback) && count($arrCallback) == 2)
+                            if(\is_array($arrCallback) && \count($arrCallback) == 2)
                             {
                                 $this->import($arrCallback[0]);
                                 $this->{$arrCallback[0]}->{$arrCallback[1]}();
@@ -1554,7 +1554,7 @@ class Finder extends Backend
                         foreach ($GLOBALS['TL_PURGE']['custom'] as $key => $config)
                         {
                             $arrCallback = $config['callback'];
-                            if(is_array($arrCallback) && count($arrCallback) == 2)
+                            if(\is_array($arrCallback) && \count($arrCallback) == 2)
                             {
                                 $this->import($arrCallback[0]);
                                 $this->{$arrCallback[0]}->{$arrCallback[1]}();
@@ -1570,7 +1570,7 @@ class Finder extends Backend
         }
 
         // HOOK: take additional maintenance
-        if (isset($GLOBALS['TL_HOOKS']['syncAdditionalMaintenance']) && is_array($GLOBALS['TL_HOOKS']['syncAdditionalMaintenance']))
+        if (isset($GLOBALS['TL_HOOKS']['syncAdditionalMaintenance']) && \is_array($GLOBALS['TL_HOOKS']['syncAdditionalMaintenance']))
         {
             foreach ($GLOBALS['TL_HOOKS']['syncAdditionalMaintenance'] as $callback)
             {
@@ -1586,7 +1586,7 @@ class Finder extends Backend
             }
         }
 
-        if (count($arrReturn["info_msg"]) != 0)
+        if (\count($arrReturn["info_msg"]) != 0)
         {
             return $arrReturn;
         }
@@ -1615,16 +1615,16 @@ class Finder extends Backend
         // Cast to int, we only accept int here.
         $intSizeLimit = intval($intSizeLimit);
 
-        @set_time_limit(3600);
+        @\set_time_limit(3600);
 
         if ($intSizeLimit < 500 * 1024)
         {
-            throw new \Exception(vsprintf($GLOBALS['TL_LANG']['ERR']['min_size_limit'], array("500KiB")));
+            throw new \Exception(\vsprintf($GLOBALS['TL_LANG']['ERR']['min_size_limit'], array("500KiB")));
         }
 
-        if (!file_exists(TL_ROOT . DIRECTORY_SEPARATOR . $strSrcFile))
+        if (!\file_exists(TL_ROOT . DIRECTORY_SEPARATOR . $strSrcFile))
         {
-            throw new \Exception(vsprintf($GLOBALS['TL_LANG']['ERR']['unknown_file'], array($strSrcFile)));
+            throw new \Exception(\vsprintf($GLOBALS['TL_LANG']['ERR']['unknown_file'], array($strSrcFile)));
         }
 
         $objFolder = new Folder($strDesFolder);
@@ -1643,12 +1643,12 @@ class Finder extends Backend
 
             if ($fp === FALSE)
             {
-                throw new \Exception(vsprintf($GLOBALS['TL_LANG']['ERR']['cant_open'], array($strSrcFile)));
+                throw new \Exception(\vsprintf($GLOBALS['TL_LANG']['ERR']['cant_open'], array($strSrcFile)));
             }
 
             if (fseek($fp, $i * $intSizeLimit, SEEK_SET) === -1)
             {
-                throw new \Exception(vsprintf($GLOBALS['TL_LANG']['ERR']['cant_open'], array($strSrcFile)));
+                throw new \Exception(\vsprintf($GLOBALS['TL_LANG']['ERR']['cant_open'], array($strSrcFile)));
             }
 
             if (feof($fp) === TRUE)
@@ -1657,8 +1657,8 @@ class Finder extends Backend
                 break;
             }
 
-            $data = fread($fp, $intSizeLimit);
-            fclose($fp);
+            $data = \fread($fp, $intSizeLimit);
+            \fclose($fp);
             unset($fp);
 
             $objFileWrite = new File($this->objSyncCtoHelper->standardizePath($strDesFolder, $strDesFile . ".sync" . $i));
@@ -1693,7 +1693,7 @@ class Finder extends Backend
         $strSavePath = $this->objSyncCtoHelper->standardizePath($GLOBALS['SYC_PATH']['tmp'], "sync", $strMovepath);
 
         // Create Folder
-        $objFolder = new Folder(dirname($strSavePath));
+        $objFolder = new Folder(\dirname($strSavePath));
 
         // Run for each part file
         for ($i = 0; $i < $intSplitcount; $i++)
@@ -1702,32 +1702,32 @@ class Finder extends Backend
             $strReadFile = $this->objSyncCtoHelper->standardizePath($GLOBALS['SYC_PATH']['tmp'], $strSplitname, $strSplitname . ".sync" . $i);
 
             // Check if file exists
-            if (!file_exists(TL_ROOT . DIRECTORY_SEPARATOR . $strReadFile))
+            if (!\file_exists(TL_ROOT . DIRECTORY_SEPARATOR . $strReadFile))
             {
-                throw new \Exception(vsprintf($GLOBALS['TL_LANG']['ERR']['unknown_file'], array($strSplitname . ".sync" . $i)));
+                throw new \Exception(\vsprintf($GLOBALS['TL_LANG']['ERR']['unknown_file'], array($strSplitname . ".sync" . $i)));
             }
 
             // Create new file objects
             $objFilePart  = new File($strReadFile);
-            $hanFileWhole = fopen(TL_ROOT . DIRECTORY_SEPARATOR . $strSavePath, "a+");
+            $hanFileWhole = \fopen(TL_ROOT . DIRECTORY_SEPARATOR . $strSavePath, "a+");
 
             // Write part file to main file
-            fwrite($hanFileWhole, $objFilePart->getContent());
+            \fwrite($hanFileWhole, $objFilePart->getContent());
 
             // Close objects
             $objFilePart->close();
-            fclose($hanFileWhole);
+            \fclose($hanFileWhole);
 
             // Free up memory
             unset($objFilePart);
             unset($hanFileWhole);
 
             // wait
-            sleep(1);
+            \sleep(1);
         }
 
         // Check MD5 Checksum
-        if (md5_file(TL_ROOT . DIRECTORY_SEPARATOR . $strSavePath) != $strMD5)
+        if (\md5_file(TL_ROOT . DIRECTORY_SEPARATOR . $strSavePath) != $strMD5)
         {
             throw new \Exception($GLOBALS['TL_LANG']['ERR']['checksum_error']);
         }
@@ -1756,17 +1756,17 @@ class Finder extends Backend
                 $strTempFile  = $this->objSyncCtoHelper->standardizePath($GLOBALS['SYC_PATH']['tmp'], "sync", $value["path"]);
 
                 // Check if the tmp file exists.
-                if (!file_exists(TL_ROOT . DIRECTORY_SEPARATOR . $strTempFile))
+                if (!\file_exists(TL_ROOT . DIRECTORY_SEPARATOR . $strTempFile))
                 {
                     $arrFileList[$key]['saved']       = false;
-                    $arrFileList[$key]['error']       = sprintf($GLOBALS['TL_LANG']['ERR']['unknown_file'], $strTempFile);
+                    $arrFileList[$key]['error']       = \sprintf($GLOBALS['TL_LANG']['ERR']['unknown_file'], $strTempFile);
                     $arrFileList[$key]['skipreasons'] = $GLOBALS['TL_LANG']['ERR']['missing_file_information'];
 
                     continue;
                 }
 
                 // Generate the folder if not already there.
-                $strFolderPath = dirname($value["path"]);
+                $strFolderPath = \dirname($value["path"]);
                 if ($strFolderPath != ".")
                 {
                     $objFolder = new Folder($strFolderPath);
@@ -1798,7 +1798,7 @@ class Finder extends Backend
 
                             // PHP 7 compatibility
                             // See #309 (https://github.com/contao/core-bundle/issues/309)
-                            if (version_compare(VERSION . '.' . BUILD, '3.5.5', '>='))
+                            if (\version_compare(VERSION . '.' . BUILD, '3.5.5', '>='))
                             {
                                 $objLocaleData->uuid = StringUtil::uuidToBin($value['tl_files']['uuid']);
                             }
@@ -1820,7 +1820,7 @@ class Finder extends Backend
                     {
                         // PHP 7 compatibility
                         // See #309 (https://github.com/contao/core-bundle/issues/309)
-                        if (version_compare(VERSION . '.' . BUILD, '3.5.5', '>='))
+                        if (\version_compare(VERSION . '.' . BUILD, '3.5.5', '>='))
                         {
                             // Get the readable UUID for the work.
                             $strLocaleUUID = StringUtil::binToUuid($objLocaleData->uuid);
@@ -1854,21 +1854,21 @@ class Finder extends Backend
                         elseif ($strLocaleUUID != $value['tl_files']['uuid'])
                         {
                             // Get information about the current file information.
-                            $arrDestinationInformation = pathinfo($strFileDestination);
+                            $arrDestinationInformation = \pathinfo($strFileDestination);
 
                             // Try to rename it to _1 or _2 and so on.
                             $strNewDestinationName = null;
                             $intFileNumber         = 1;
                             for ($i = 1; $i < 100; $i++)
                             {
-                                $strNewDestinationName = sprintf('%s' . DIRECTORY_SEPARATOR . '%s_%s.%s',
+                                $strNewDestinationName = \sprintf('%s' . DIRECTORY_SEPARATOR . '%s_%s.%s',
                                     $arrDestinationInformation['dirname'],
                                     $arrDestinationInformation['filename'],
                                     $i,
                                     $arrDestinationInformation['extension']
                                 );
 
-                                if (!file_exists(TL_ROOT . DIRECTORY_SEPARATOR . $strNewDestinationName))
+                                if (!\file_exists(TL_ROOT . DIRECTORY_SEPARATOR . $strNewDestinationName))
                                 {
                                     $intFileNumber = $i;
                                     break;
@@ -1890,7 +1890,7 @@ class Finder extends Backend
 
                                 // PHP 7 compatibility
                                 // See #309 (https://github.com/contao/core-bundle/issues/309)
-                                if (version_compare(VERSION . '.' . BUILD, '3.5.5', '>='))
+                                if (\version_compare(VERSION . '.' . BUILD, '3.5.5', '>='))
                                 {
                                     $objLocaleData->uuid = StringUtil::uuidToBin($value['tl_files']['uuid']);
                                 }
@@ -1905,7 +1905,7 @@ class Finder extends Backend
 
                                 // Add a status report for debugging and co.
                                 $arrFileList[$key]['dbafs']['msg']    = $GLOBALS['TL_LANG']['ERR']['dbafs_uuid_conflict'];
-                                $arrFileList[$key]['dbafs']['error']  = sprintf($GLOBALS['TL_LANG']['ERR']['dbafs_uuid_conflict_rename'], $intFileNumber);
+                                $arrFileList[$key]['dbafs']['error']  = \sprintf($GLOBALS['TL_LANG']['ERR']['dbafs_uuid_conflict_rename'], $intFileNumber);
                                 $arrFileList[$key]['dbafs']['rename'] = $strNewDestinationName;
                                 $arrFileList[$key]['dbafs']['state']  = Enum::DBAFS_CONFLICT;
                             }
@@ -1926,7 +1926,7 @@ class Finder extends Backend
                 else
                 {
                     $arrFileList[$key]['saved']        = false;
-                    $arrFileList[$key]['error']        = sprintf($GLOBALS['TL_LANG']['ERR']['cant_move_file'], $strFileSource, $strFileDestination);
+                    $arrFileList[$key]['error']        = \sprintf($GLOBALS['TL_LANG']['ERR']['cant_move_file'], $strFileSource, $strFileDestination);
                     $arrFileList[$key]['transmission'] = Enum::FILETRANS_SKIPPED;
                     $arrFileList[$key]['skipreason']   = $GLOBALS['TL_LANG']['ERR']['cant_move_files'];
                 }
@@ -1934,7 +1934,7 @@ class Finder extends Backend
             catch (\Exception $e)
             {
                 $arrFileList[$key]['saved']        = false;
-                $arrFileList[$key]['error']        = sprintf('Can not move file - %s. Exception message: %s', $value["path"], $e->getMessage());
+                $arrFileList[$key]['error']        = \sprintf('Can not move file - %s. Exception message: %s', $value["path"], $e->getMessage());
                 $arrFileList[$key]['transmission'] = Enum::FILETRANS_SKIPPED;
                 $arrFileList[$key]['skipreason']   = $GLOBALS['TL_LANG']['ERR']['cant_move_files'];
             }
@@ -1956,7 +1956,7 @@ class Finder extends Backend
      */
     public function deleteFiles($arrFileList, $blnIsDbafs)
     {
-        if (count($arrFileList) != 0)
+        if (\count($arrFileList) != 0)
         {
             // Run each entry in the list..
             foreach ($arrFileList as $key => $value)
@@ -1967,7 +1967,7 @@ class Finder extends Backend
 
                 try
                 {
-                    if (!file_exists($strFullPath))
+                    if (!\file_exists($strFullPath))
                     {
                         $arrFileList[$key]['transmission'] = Enum::FILETRANS_SEND;
 
@@ -1978,7 +1978,7 @@ class Finder extends Backend
                         }
                     }
                     // Check if we have a file.
-                    elseif (is_file($strFullPath))
+                    elseif (\is_file($strFullPath))
                     {
                         // Delete the file.
                         if ($this->objFiles->delete($strPath))
@@ -2001,7 +2001,7 @@ class Finder extends Backend
 
                     }
                     // .. else we have a folder and remove this with all files inside.
-                    elseif (is_dir($strFullPath))
+                    elseif (\is_dir($strFullPath))
                     {
                         $this->objFiles->rrdir($strPath);
                         $arrFileList[$key]['transmission'] = Enum::FILETRANS_SEND;
@@ -2016,7 +2016,7 @@ class Finder extends Backend
                 catch (\Exception $exc)
                 {
                     $arrFileList[$key]['transmission'] = Enum::FILETRANS_SKIPPED;
-                    $arrFileList[$key]['error']        = sprintf('Can not delete file - %s. Exception message: %s', $strPath, $exc->getMessage());
+                    $arrFileList[$key]['error']        = \sprintf('Can not delete file - %s. Exception message: %s', $strPath, $exc->getMessage());
                     $arrFileList[$key]['skipreason']   = $GLOBALS['TL_LANG']['ERR']['cant_delete_file'];
                 }
             }
@@ -2034,7 +2034,7 @@ class Finder extends Backend
      */
     public function saveFiles($arrMetafiles)
     {
-        if (!is_array($arrMetafiles) || count($_FILES) == 0)
+        if (!\is_array($arrMetafiles) || \count($_FILES) == 0)
         {
             throw new \Exception($GLOBALS['TL_LANG']['ERR']['missing_file_information']);
         }
@@ -2043,7 +2043,7 @@ class Finder extends Backend
 
         foreach ($_FILES as $key => $value)
         {
-            if (!array_key_exists($key, $arrMetafiles))
+            if (!\array_key_exists($key, $arrMetafiles))
             {
                 throw new \Exception($GLOBALS['TL_LANG']['ERR']['missing_file_information']);
             }
@@ -2075,13 +2075,13 @@ class Finder extends Backend
                     break;
             }
 
-            $objFolder = new Folder(dirname($strSaveFile));
+            $objFolder = new Folder(\dirname($strSaveFile));
 
             if ($this->objFiles->move_uploaded_file($value["tmp_name"], $strSaveFile) === FALSE)
             {
-                throw new \Exception(vsprintf($GLOBALS['TL_LANG']['ERR']['cant_move_file'], array($value["tmp_name"], $strSaveFile)));
+                throw new \Exception(\vsprintf($GLOBALS['TL_LANG']['ERR']['cant_move_file'], array($value["tmp_name"], $strSaveFile)));
             }
-            else if ($key != md5_file(TL_ROOT . DIRECTORY_SEPARATOR . $strSaveFile))
+            else if ($key != \md5_file(TL_ROOT . DIRECTORY_SEPARATOR . $strSaveFile))
             {
                 throw new \Exception($GLOBALS['TL_LANG']['ERR']['checksum_error']);
             }
@@ -2106,16 +2106,16 @@ class Finder extends Backend
         $strPath = $this->objSyncCtoHelper->standardizePath($strPath);
         $strFullPath = $this->objSyncCtoHelper->getFullPath($strPath);
 
-        if (!file_exists($strFullPath))
+        if (!\file_exists($strFullPath))
         {
-            throw new \Exception(vsprintf($GLOBALS['TL_LANG']['ERR']['unknown_file'], array($strPath)));
+            throw new \Exception(\vsprintf($GLOBALS['TL_LANG']['ERR']['unknown_file'], array($strPath)));
         }
 
         $objFile    = new File($strPath);
-        $strContent = base64_encode($objFile->getContent());
+        $strContent = \base64_encode($objFile->getContent());
         $objFile->close();
 
-        return array("md5"     => md5_file($strFullPath), "content" => $strContent);
+        return array("md5"     => \md5_file($strFullPath), "content" => $strContent);
     }
 
     /**
@@ -2133,7 +2133,7 @@ class Finder extends Backend
     {
         if ($blnResolveExtension)
         {
-            $arrFileInfo  = pathinfo($strExtension);
+            $arrFileInfo  = \pathinfo($strExtension);
             $strExtension = $arrFileInfo['extension'];
         }
 
@@ -2141,9 +2141,9 @@ class Finder extends Backend
         $arrMimeTypes = $GLOBALS['SYC_CONFIG']['mime_types'];
 
         // Extend the default lookup array.
-        if (!empty($GLOBALS['TL_MIME']) && is_array($GLOBALS['TL_MIME']))
+        if (!empty($GLOBALS['TL_MIME']) && \is_array($GLOBALS['TL_MIME']))
         {
-            $arrMimeTypes = array_merge($GLOBALS['SYC_CONFIG']['mime_types'], $GLOBALS['TL_MIME']);
+            $arrMimeTypes = \array_merge($GLOBALS['SYC_CONFIG']['mime_types'], $GLOBALS['TL_MIME']);
         }
 
         // Fallback to application/octet-stream.

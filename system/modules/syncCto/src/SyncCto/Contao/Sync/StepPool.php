@@ -52,7 +52,7 @@ class StepPool
 
     public function __get($name)
     {
-        if ($this->arrValues == false || !is_array($this->arrValues))
+        if ($this->arrValues == false || !\is_array($this->arrValues))
         {
             return null;
         }
@@ -69,7 +69,7 @@ class StepPool
 
     public function __set($name, $value)
     {
-        if ($this->arrValues == false || !is_array($this->arrValues))
+        if ($this->arrValues == false || !\is_array($this->arrValues))
         {
             $this->arrValues = array();
         }

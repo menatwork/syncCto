@@ -11,6 +11,8 @@
 
 namespace SyncCto\DcGeneral\Events;
 
+use Contao\File;
+use Contao\Message;
 use ContaoCommunityAlliance\DcGeneral\EnvironmentInterface;
 
 abstract class Base
@@ -22,15 +24,15 @@ abstract class Base
     {
         // Check the file cache.
         $strInitFilePath = '/system/config/initconfig.php';
-        if (file_exists(TL_ROOT . $strInitFilePath)) {
-            $strFile        = new \File($strInitFilePath);
+        if (\file_exists(TL_ROOT . $strInitFilePath)) {
+            $strFile        = new File($strInitFilePath);
             $arrFileContent = $strFile->getContentAsArray();
             foreach ($arrFileContent AS $strContent) {
-                if (!preg_match("/(\/\*|\*|\*\/|\/\/)/", $strContent)) {
+                if (!\preg_match("/(\/\*|\*|\*\/|\/\/)/", $strContent)) {
                     //system/tmp.
-                    if (preg_match("/system\/tmp/", $strContent)) {
+                    if (\preg_match("/system\/tmp/", $strContent)) {
                         // Set data.
-                        \Message::addInfo($GLOBALS['TL_LANG']['MSC']['disabled_cache']);
+                        Message::addInfo($GLOBALS['TL_LANG']['MSC']['disabled_cache']);
                     }
                 }
             }

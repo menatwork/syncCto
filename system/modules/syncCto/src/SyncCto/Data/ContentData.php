@@ -28,7 +28,7 @@ class ContentData
     {
         $this->arrValues = $arrContentData;
 
-        if (!is_array($this->arrValues))
+        if (!\is_array($this->arrValues))
         {
             $this->arrValues = array();
         }

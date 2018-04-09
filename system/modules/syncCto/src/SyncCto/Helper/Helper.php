@@ -86,25 +86,25 @@ class Helper
         $this->arrPreparedBlacklistFolder = array();
         foreach ($this->getBlacklistFolder() as $key => $value)
         {
-            $this->arrPreparedBlacklistFolder[$key] = str_replace($this->arrSearch, $this->arrReplace, $value);
+            $this->arrPreparedBlacklistFolder[$key] = \str_replace($this->arrSearch, $this->arrReplace, $value);
         }
 
         // Instance a list for regex from the blacklist for files.
         $this->arrPreparedBlacklistFiles = array();
         foreach ($this->getBlacklistFile() as $key => $value)
         {
-            $this->arrPreparedBlacklistFiles[$key] = str_replace($this->arrSearch, $this->arrReplace, $value);
+            $this->arrPreparedBlacklistFiles[$key] = \str_replace($this->arrSearch, $this->arrReplace, $value);
         }
 
         // Instance a list for regex from the hidden table list.
         $this->arrPreparedHiddenTablePlaceholder = array();
         foreach ($this->getHiddenTablePlaceholder() as $key => $value)
         {
-            $this->arrPreparedHiddenTablePlaceholder[$key] = str_replace($this->arrSearch, $this->arrReplace, $value);
+            $this->arrPreparedHiddenTablePlaceholder[$key] = \str_replace($this->arrSearch, $this->arrReplace, $value);
         }
 
         // Replace some elements in TL_ROOT for regex.
-        $this->strPreparedTlRoot = str_replace('\\', '\\\\', TL_ROOT);
+        $this->strPreparedTlRoot = \str_replace('\\', '\\\\', TL_ROOT);
     }
 
     /**
@@ -136,8 +136,8 @@ class Helper
      */
     static public function parseSize($size)
     {
-        $size = trim($size);
-        $last = strtolower($size[strlen($size) - 1]);
+        $size = \trim($size);
+        $last = \strtolower($size[\strlen($size) - 1]);
         switch ($last)
         {
             // The 'G' modifier is available since PHP 5.1.0
@@ -183,16 +183,16 @@ class Helper
      */
     private function mergeConfigs($arrLocalconfig, $arrSyncCtoConfig)
     {
-        if (is_array($arrLocalconfig) && is_array($arrSyncCtoConfig))
+        if (\is_array($arrLocalconfig) && \is_array($arrSyncCtoConfig))
         {
-            $arrLocalconfig   = array_filter($arrLocalconfig, 'strlen');
-            $arrSyncCtoConfig = array_filter($arrSyncCtoConfig, 'strlen');
+            $arrLocalconfig   = \array_filter($arrLocalconfig, 'strlen');
+            $arrSyncCtoConfig = \array_filter($arrSyncCtoConfig, 'strlen');
 
-            return array_keys(array_flip(array_merge($arrLocalconfig, $arrSyncCtoConfig)));
+            return \array_keys(\array_flip(\array_merge($arrLocalconfig, $arrSyncCtoConfig)));
         }
         else
         {
-            if (!is_array($arrLocalconfig) && is_array($arrSyncCtoConfig))
+            if (!\is_array($arrLocalconfig) && \is_array($arrSyncCtoConfig))
             {
                 return $arrSyncCtoConfig;
             }
@@ -221,14 +221,14 @@ class Helper
 
         // Read the local configuration file
         $strMode = 'top';
-        $resFile = fopen(TL_ROOT . '/system/config/localconfig.php', 'rb');
+        $resFile = \fopen(TL_ROOT . '/system/config/localconfig.php', 'rb');
 
         $arrData = array();
 
-        while (!feof($resFile))
+        while (!\feof($resFile))
         {
-            $strLine = fgets($resFile);
-            $strTrim = trim($strLine);
+            $strLine = \fgets($resFile);
+            $strTrim = \trim($strLine);
 
             if ($strTrim == '?>')
             {
@@ -257,24 +257,24 @@ class Helper
             }
             elseif ($strTrim != '')
             {
-                $arrChunks = array_map('trim', explode('=', $strLine, 2));
+                $arrChunks = \array_map('trim', \explode('=', $strLine, 2));
 
                 if ($intTyp == Enum::LOADCONFIG_KEYS_ONLY)
                 {
-                    $arrData[] = str_replace(array("$", "GLOBALS['TL_CONFIG']['", "']"), array("", "", ""), $arrChunks[0]);
+                    $arrData[] = \str_replace(array("$", "GLOBALS['TL_CONFIG']['", "']"), array("", "", ""), $arrChunks[0]);
                 }
                 else
                 {
                     if ($intTyp == Enum::LOADCONFIG_KEY_VALUE)
                     {
-                        $key           = str_replace(array("$", "GLOBALS['TL_CONFIG']['", "']"), array("", "", ""), $arrChunks[0]);
+                        $key           = \str_replace(array("$", "GLOBALS['TL_CONFIG']['", "']"), array("", "", ""), $arrChunks[0]);
                         $arrData[$key] = $GLOBALS['TL_CONFIG'][$key];
                     }
                 }
             }
         }
 
-        fclose($resFile);
+        \fclose($resFile);
 
         return $arrData;
     }
@@ -292,13 +292,13 @@ class Helper
     public function createPathconfig()
     {
         // Check if we have the file
-        if (file_exists(TL_ROOT . '/system/config/pathconfig.php'))
+        if (\file_exists(TL_ROOT . '/system/config/pathconfig.php'))
         {
             return true;
         }
 
         // Check localconfig
-        if (!file_exists(TL_ROOT . '/system/config/localconfig.php'))
+        if (!\file_exists(TL_ROOT . '/system/config/localconfig.php'))
         {
             throw new\Exception('Missing localconfig.php');
         }
@@ -317,7 +317,7 @@ class Helper
             // Check if we have the path
             if (TL_PATH === null || TL_PATH == "")
             {
-                $objFile->write("<?php\n\n// Relative path to the installation\nreturn '" . preg_replace('/\/ctoCommunication.php\?.*$/i', '', Environment::get('requestUri')) . "';\n");
+                $objFile->write("<?php\n\n// Relative path to the installation\nreturn '" . \preg_replace('/\/ctoCommunication.php\?.*$/i', '', Environment::get('requestUri')) . "';\n");
             }
             else
             {
@@ -328,7 +328,7 @@ class Helper
         }
         catch (\Exception $e)
         {
-            log_message($e->getMessage());
+            \log_message($e->getMessage());
             throw $e;
         }
 
@@ -353,7 +353,7 @@ class Helper
 
     public function getBlacklistFolder()
     {
-        $arrLocalconfig   = deserialize($GLOBALS['TL_CONFIG']['syncCto_folder_blacklist']);
+        $arrLocalconfig   = \deserialize($GLOBALS['TL_CONFIG']['syncCto_folder_blacklist']);
         $arrSyncCtoConfig = $GLOBALS['SYC_CONFIG']['folder_blacklist'];
 
         return $this->mergeConfigs($arrLocalconfig, $arrSyncCtoConfig);
@@ -371,7 +371,7 @@ class Helper
 
     public function getBlacklistFile()
     {
-        $arrLocalconfig   = deserialize($GLOBALS['TL_CONFIG']['syncCto_file_blacklist']);
+        $arrLocalconfig   = \deserialize($GLOBALS['TL_CONFIG']['syncCto_file_blacklist']);
         $arrSyncCtoConfig = $GLOBALS['SYC_CONFIG']['file_blacklist'];
 
         return $this->mergeConfigs($arrLocalconfig, $arrSyncCtoConfig);
@@ -389,7 +389,7 @@ class Helper
 
     public function getWhitelistFolder()
     {
-        $arrLocalconfig   = deserialize($GLOBALS['TL_CONFIG']['syncCto_folder_whitelist']);
+        $arrLocalconfig   = \deserialize($GLOBALS['TL_CONFIG']['syncCto_folder_whitelist']);
         $arrSyncCtoConfig = $GLOBALS['SYC_CONFIG']['folder_whitelist'];
 
         return $this->mergeConfigs($arrLocalconfig, $arrSyncCtoConfig);
@@ -397,7 +397,7 @@ class Helper
 
     public function getBlacklistLocalconfig()
     {
-        $arrLocalconfig   = deserialize($GLOBALS['TL_CONFIG']['syncCto_local_blacklist']);
+        $arrLocalconfig   = \deserialize($GLOBALS['TL_CONFIG']['syncCto_local_blacklist']);
         $arrSyncCtoConfig = $GLOBALS['SYC_CONFIG']['local_blacklist'];
 
         return $this->mergeConfigs($arrLocalconfig, $arrSyncCtoConfig);
@@ -405,7 +405,7 @@ class Helper
 
     public function getTablesHidden()
     {
-        $arrLocalconfig   = deserialize($GLOBALS['TL_CONFIG']['syncCto_hidden_tables']);
+        $arrLocalconfig   = \deserialize($GLOBALS['TL_CONFIG']['syncCto_hidden_tables']);
         $arrSyncCtoConfig = $GLOBALS['SYC_CONFIG']['table_hidden'];
 
         return $this->mergeConfigs($arrLocalconfig, $arrSyncCtoConfig);
@@ -421,8 +421,8 @@ class Helper
         $arrReturn = array();
 
         // Get the entries from the loclconfig and add them to the list.
-        $arrHiddenTableConfig = deserialize($GLOBALS['TL_CONFIG']['syncCto_hidden_tables_placeholder']);
-        if(is_array($arrHiddenTableConfig) && count($arrHiddenTableConfig) != 0)
+        $arrHiddenTableConfig = \deserialize($GLOBALS['TL_CONFIG']['syncCto_hidden_tables_placeholder']);
+        if(\is_array($arrHiddenTableConfig) && \count($arrHiddenTableConfig) != 0)
         {
             foreach ($arrHiddenTableConfig as$value)
             {
@@ -453,7 +453,7 @@ class Helper
     public function isTableHiddenByPlaceholder($strTable)
     {
         // Check if we have entries.
-        if (count($this->arrPreparedHiddenTablePlaceholder) == 0)
+        if (\count($this->arrPreparedHiddenTablePlaceholder) == 0)
         {
             return false;
         }
@@ -461,7 +461,7 @@ class Helper
         // Run each and check it with the given name.
         foreach ($this->arrPreparedHiddenTablePlaceholder as $arrEntry)
         {
-            if (preg_match('/^' . $arrEntry . '$/', $strTable))
+            if (\preg_match('/^' . $arrEntry . '$/', $strTable))
             {
                 return true;
             }
@@ -493,10 +493,10 @@ class Helper
         if ($strDo == 'synccto_clients' && empty($strAct) && empty($strTable) && $strTemplate == 'be_main')
         {
             // Split on the form | globale btn
-            $arrContent = explode('<div id="tl_buttons">', $strContent, 2);
+            $arrContent = \explode('<div id="tl_buttons">', $strContent, 2);
 
             // Check if we have 2 elements.
-            if (count($arrContent) != 2)
+            if (\count($arrContent) != 2)
             {
                 return $strContent;
             }
@@ -528,7 +528,7 @@ class Helper
     {
         if ($strTemplate == 'be_main')
         {
-            if (!is_array($_SESSION["TL_INFO"]))
+            if (!\is_array($_SESSION["TL_INFO"]))
             {
                 $_SESSION["TL_INFO"] = array();
             }
@@ -544,13 +544,13 @@ class Helper
             // check for required extensions
             foreach ($arrRequiredExtensions as $key => $val)
             {
-                if (!in_array($val, ModuleLoader::getActive()))
+                if (!\in_array($val, ModuleLoader::getActive()))
                 {
-                    $_SESSION["TL_INFO"] = array_merge($_SESSION["TL_INFO"], array($val => 'Please install the required extension <strong>' . $key . '</strong>'));
+                    $_SESSION["TL_INFO"] = \array_merge($_SESSION["TL_INFO"], array($val => 'Please install the required extension <strong>' . $key . '</strong>'));
                 }
                 else
                 {
-                    if (is_array($_SESSION["TL_INFO"]) && array_key_exists($val, $_SESSION["TL_INFO"]))
+                    if (\is_array($_SESSION["TL_INFO"]) && \array_key_exists($val, $_SESSION["TL_INFO"]))
                     {
                         unset($_SESSION["TL_INFO"][$val]);
                     }
@@ -558,7 +558,7 @@ class Helper
             }
 
             // Check syncCtoPro, if not set remove triggers.
-            if (!in_array('syncCtoPro', ModuleLoader::getActive())
+            if (!\in_array('syncCtoPro', ModuleLoader::getActive())
                 && ($this->hasTrigger('tl_page') || $this->hasTrigger('tl_article') || $this->hasTrigger('tl_content'))
             )
             {
@@ -585,10 +585,10 @@ class Helper
         {
             $objTemplate = new BackendTemplate("be_syncCto_attention");
 
-            preg_match('/<div.*id=\"header\".*>/i', $strContent, $arrHeader);
-            preg_match('{<div\s+id="header"\s*>((?:(?:(?!<div[^>]*>|</div>).)++|<div[^>]*>(?1)</div>)*)</div>}si', $strContent, $arrInnderDiv);
+            \preg_match('/<div.*id=\"header\".*>/i', $strContent, $arrHeader);
+            \preg_match('{<div\s+id="header"\s*>((?:(?:(?!<div[^>]*>|</div>).)++|<div[^>]*>(?1)</div>)*)</div>}si', $strContent, $arrInnderDiv);
             $strNew        = $arrHeader[0] . $arrInnderDiv[1] . $objTemplate->parse() . '</div>';
-            $strNewContent = preg_replace('{<div\s+id="header"\s*>((?:(?:(?!<div[^>]*>|</div>).)++|<div[^>]*>(?1)</div>)*)</div>}si', $strNew, $strContent, 1);
+            $strNewContent = \preg_replace('{<div\s+id="header"\s*>((?:(?:(?!<div[^>]*>|</div>).)++|<div[^>]*>(?1)</div>)*)</div>}si', $strNew, $strContent, 1);
             if ($strNewContent == "" && $arrInnderDiv[1] != '' && $arrHeader[0] != '')
             {
                 return $strContent;
@@ -621,9 +621,9 @@ class Helper
             {
                 foreach ($arrValue AS $strRight)
                 {
-                    if (in_array($strRight, $arrUserSyncOptions))
+                    if (\in_array($strRight, $arrUserSyncOptions))
                     {
-                        if (!array_key_exists($fileType, $arrSyncOption))
+                        if (!\array_key_exists($fileType, $arrSyncOption))
                         {
                             $arrSyncOption[$fileType] = array();
                         }
@@ -653,7 +653,7 @@ class Helper
         $arrReturn = array();
 
         // HOOK: do some last operations
-        if (isset($GLOBALS['TL_HOOKS']['syncExecuteFinalOperations']) && is_array($GLOBALS['TL_HOOKS']['syncExecuteFinalOperations']))
+        if (isset($GLOBALS['TL_HOOKS']['syncExecuteFinalOperations']) && \is_array($GLOBALS['TL_HOOKS']['syncExecuteFinalOperations']))
         {
             foreach ($GLOBALS['TL_HOOKS']['syncExecuteFinalOperations'] as $callback)
             {
@@ -672,7 +672,7 @@ class Helper
 
                     // Check if we have a getiInstance or the normal new function.
                     if ($objReflection->hasMethod("getInstance")) {
-                        $object = call_user_func_array
+                        $object = \call_user_func_array
                         (
                             array
                             (
@@ -682,7 +682,7 @@ class Helper
                             array()
                         );
 
-                        call_user_func_array
+                        \call_user_func_array
                         (
                             array
                             (
@@ -693,7 +693,7 @@ class Helper
                         );
                     } else {
                         $object = new $callback[0];
-                        call_user_func_array(array($object, $callback[1]), array());
+                        \call_user_func_array(array($object, $callback[1]), array());
                     }
 
                     // Add final log.
@@ -707,7 +707,7 @@ class Helper
                 catch (\Exception $exc)
                 {
                     $arrReturn [] = array(
-                        'callback' => implode("|", $callback),
+                        'callback' => \implode("|", $callback),
                         'info_msg' => "Error by: TL_HOOK $callback[0] | $callback[1] with Msg: " . $exc->getMessage()
                     );
 
@@ -738,26 +738,26 @@ class Helper
      */
     public function substrCenter($strString, $intNumberOfChars, $strEllipsis = ' […] ')
     {
-        $strString = preg_replace('/[\t\n\r]+/', ' ', $strString);
-        $strString = strip_tags($strString);
+        $strString = \preg_replace('/[\t\n\r]+/', ' ', $strString);
+        $strString = \strip_tags($strString);
 
-        if (utf8_strlen($strString) <= $intNumberOfChars)
+        if (\utf8_strlen($strString) <= $intNumberOfChars)
         {
             return $strString;
         }
 
         $intCharCount   = 0;
         $arrWords       = array();
-        $arrChunks      = preg_split('/\s+/', $strString);
+        $arrChunks      = \preg_split('/\s+/', $strString);
         $blnAddEllipsis = false;
 
         //first part
         foreach ($arrChunks as $chunkKey => $strChunk)
         {
-            if (version_compare(VERSION . '.' . BUILD, '3.5.5', '>=')) {
-                $intCharCount += utf8_strlen(StringUtil::decodeEntities($strChunk));
+            if (\version_compare(VERSION . '.' . BUILD, '3.5.5', '>=')) {
+                $intCharCount += \utf8_strlen(StringUtil::decodeEntities($strChunk));
             } else {
-                $intCharCount += utf8_strlen(String::decodeEntities($strChunk));
+                $intCharCount += \utf8_strlen(String::decodeEntities($strChunk));
             }
 
             if ($intCharCount++ <= $intNumberOfChars / 2)
@@ -773,7 +773,7 @@ class Helper
             // with utf8_substr() so the method does not return an empty string.
             if (empty($arrWords))
             {
-                $arrWords[] = utf8_substr($strChunk, 0, $intNumberOfChars / 2);
+                $arrWords[] = \utf8_substr($strChunk, 0, $intNumberOfChars / 2);
             }
 
             if ($strEllipsis !== false)
@@ -794,12 +794,12 @@ class Helper
         $arrWordsPt2  = array();
 
         // Second path
-        foreach (array_reverse($arrChunks) as $strChunk)
+        foreach (\array_reverse($arrChunks) as $strChunk)
         {
-            if (version_compare(VERSION . '.' . BUILD, '3.5.5', '>=')) {
-                $intCharCount += utf8_strlen(StringUtil::decodeEntities($strChunk));
+            if (\version_compare(VERSION . '.' . BUILD, '3.5.5', '>=')) {
+                $intCharCount += \utf8_strlen(StringUtil::decodeEntities($strChunk));
             } else {
-                $intCharCount += utf8_strlen(String::decodeEntities($strChunk));
+                $intCharCount += \utf8_strlen(String::decodeEntities($strChunk));
             }
 
             if ($intCharCount++ <= $intNumberOfChars / 2)
@@ -812,12 +812,12 @@ class Helper
             // with utf8_substr() so the method does not return an empty string.
             if (empty($arrWordsPt2))
             {
-                $arrWordsPt2[] = utf8_substr($strChunk, utf8_strlen($strChunk) - ($intNumberOfChars / 2), utf8_strlen($strChunk));
+                $arrWordsPt2[] = \utf8_substr($strChunk, \utf8_strlen($strChunk) - ($intNumberOfChars / 2), \utf8_strlen($strChunk));
             }
             break;
         }
 
-        return implode(' ', $arrWords) . ($blnAddEllipsis ? $strEllipsis : '') . implode(' ', array_reverse($arrWordsPt2));
+        return \implode(' ', $arrWords) . ($blnAddEllipsis ? $strEllipsis : '') . \implode(' ', \array_reverse($arrWordsPt2));
     }
 
     /**
@@ -828,7 +828,7 @@ class Helper
      */
     public function standardizePath()
     {
-        $arrPath = func_get_args();
+        $arrPath = \func_get_args();
 
         if (empty($arrPath))
         {
@@ -840,11 +840,11 @@ class Helper
         foreach ($arrPath as $itPath)
         {
             // Make all directory separator to one type.
-            $itPath = str_replace('\\', '/', $itPath);
+            $itPath = \str_replace('\\', '/', $itPath);
             // Replace some chars.
-            $itPath = preg_replace('?^' . str_replace('\\', '\\\\', TL_ROOT) . '?i', '', $itPath);
+            $itPath = \preg_replace('?^' . \str_replace('\\', '\\\\', TL_ROOT) . '?i', '', $itPath);
             // Explode all elements.
-            $itPath = explode('/', $itPath);
+            $itPath = \explode('/', $itPath);
 
             // Run each part and check some none valid elements.
             foreach ($itPath as $itFolder)
@@ -860,7 +860,7 @@ class Helper
         }
 
         // Build the new path. Use the system directory separator.
-        return implode(DIRECTORY_SEPARATOR, $arrReturn);
+        return \implode(DIRECTORY_SEPARATOR, $arrReturn);
     }
 
     /**
@@ -878,7 +878,7 @@ class Helper
         }
 
         // Check if we have a separator at the start.
-        if ( stripos($strPath, DIRECTORY_SEPARATOR) === 0 )
+        if ( \stripos($strPath, DIRECTORY_SEPARATOR) === 0 )
         {
             return TL_ROOT . $strPath;
         }
@@ -904,11 +904,11 @@ class Helper
         // Check the separator.
         if ( DIRECTORY_SEPARATOR == '/' )
         {
-            return preg_match('/' . $strUploadPath . '\//i', $strPath);
+            return \preg_match('/' . $strUploadPath . '\//i', $strPath);
         }
         else
         {
-            return preg_match('/' . $strUploadPath . '\\\\/i', $strPath);
+            return \preg_match('/' . $strUploadPath . '\\\\/i', $strPath);
         }
     }
 
@@ -943,7 +943,7 @@ class Helper
         foreach (Database::getInstance()->listTables() as $key => $value)
         {
             // Check if table is a hidden one.
-            if (in_array($value, $arrTablesHidden) || preg_match("/synccto_temp_.*/", $value))
+            if (\in_array($value, $arrTablesHidden) || \preg_match("/synccto_temp_.*/", $value))
             {
                 continue;
             }
@@ -968,8 +968,8 @@ class Helper
     public function databaseTablesRecommended()
     {
         // Recommended tables
-        $arrBlacklist = deserialize($GLOBALS['TL_CONFIG']['syncCto_database_tables']);
-        if (!is_array($arrBlacklist))
+        $arrBlacklist = \deserialize($GLOBALS['TL_CONFIG']['syncCto_database_tables']);
+        if (!\is_array($arrBlacklist))
         {
             $arrBlacklist = array();
         }
@@ -980,12 +980,12 @@ class Helper
 
         foreach ($this->databaseTables() as $key => $value)
         {
-            if (in_array($value, $arrBlacklist) || preg_match("/synccto_temp_.*/", $value))
+            if (\in_array($value, $arrBlacklist) || \preg_match("/synccto_temp_.*/", $value))
             {
                 continue;
             }
 
-            if (is_array($arrTablesPermission) && !in_array($value, $arrTablesPermission) && $this->user->isAdmin != true)
+            if (\is_array($arrTablesPermission) && !\in_array($value, $arrTablesPermission) && $this->user->isAdmin != true)
             {
                 continue;
             }
@@ -1004,8 +1004,8 @@ class Helper
     public function databaseTablesNoneRecommended()
     {
         // None recommended tables
-        $arrBlacklist = deserialize($GLOBALS['TL_CONFIG']['syncCto_database_tables']);
-        if (!is_array($arrBlacklist))
+        $arrBlacklist = \deserialize($GLOBALS['TL_CONFIG']['syncCto_database_tables']);
+        if (!\is_array($arrBlacklist))
         {
             $arrBlacklist = array();
         }
@@ -1016,12 +1016,12 @@ class Helper
 
         foreach ($this->databaseTables() as $key => $value)
         {
-            if (!in_array($value, $arrBlacklist) || preg_match("/synccto_temp_.*/", $value))
+            if (!\in_array($value, $arrBlacklist) || \preg_match("/synccto_temp_.*/", $value))
             {
                 continue;
             }
 
-            if (is_array($arrTablesPermission) && !in_array($value, $arrTablesPermission) && $this->user->isAdmin != true)
+            if (\is_array($arrTablesPermission) && !\in_array($value, $arrTablesPermission) && $this->user->isAdmin != true)
             {
                 continue;
             }
@@ -1040,14 +1040,14 @@ class Helper
     public function databaseTablesNoneRecommendedWithHidden()
     {
         // None recommended tables
-        $arrBlacklist = deserialize($GLOBALS['TL_CONFIG']['syncCto_database_tables']);
-        if (!is_array($arrBlacklist))
+        $arrBlacklist = \deserialize($GLOBALS['TL_CONFIG']['syncCto_database_tables']);
+        if (!\is_array($arrBlacklist))
         {
             $arrBlacklist = array();
         }
 
-        $arrHiddenlist = deserialize($GLOBALS['SYC_CONFIG']['table_hidden']);
-        if (!is_array($arrHiddenlist))
+        $arrHiddenlist = \deserialize($GLOBALS['SYC_CONFIG']['table_hidden']);
+        if (!\is_array($arrHiddenlist))
         {
             $arrHiddenlist = array();
         }
@@ -1058,12 +1058,12 @@ class Helper
 
         foreach (Database::getInstance()->listTables() as $key => $value)
         {
-            if (!in_array($value, $arrBlacklist) && !in_array($value, $arrHiddenlist) || preg_match("/synccto_temp_.*/", $value))
+            if (!\in_array($value, $arrBlacklist) && !\in_array($value, $arrHiddenlist) || \preg_match("/synccto_temp_.*/", $value))
             {
                 continue;
             }
 
-            if (is_array($arrTablesPermission) && !in_array($value, $arrTablesPermission) && $this->user->isAdmin != true)
+            if (\is_array($arrTablesPermission) && !\in_array($value, $arrTablesPermission) && $this->user->isAdmin != true)
             {
                 continue;
             }
@@ -1164,7 +1164,7 @@ class Helper
         $strReturn .= $strTableName;
         $strReturn .= '<span style="color:#a3a3a3;padding-left: 3px;">';
         $strReturn .= '(' . ContaoApi::getReadableSize($intEntriesSize) . ', '
-                      . vsprintf($GLOBALS['TL_LANG']['MSC']['entries'], array($intEntriesCount)) . ')';
+                      . \vsprintf($GLOBALS['TL_LANG']['MSC']['entries'], array($intEntriesCount)) . ')';
         $strReturn .= '</span>';
         $strReturn .= '</span>';
 
@@ -1179,7 +1179,7 @@ class Helper
     public function getDatabaseTablesTimestamp($mixTableNames = array())
     {
         // If we have only a string for tablenames set it as array
-        if (!is_array($mixTableNames))
+        if (!\is_array($mixTableNames))
         {
             $arrTableNames = array($mixTableNames);
         }
@@ -1207,13 +1207,13 @@ class Helper
         foreach ($arrTables as $strTable)
         {
             // Skip hidden tables
-            if (in_array($strTable, $GLOBALS['SYC_CONFIG']['table_hidden']))
+            if (\in_array($strTable, $GLOBALS['SYC_CONFIG']['table_hidden']))
             {
                 continue;
             }
 
             // Check if we search some special tables
-            if (is_array($arrTableNames) && count($arrTableNames) != 0 && !in_array($strTable, $arrTableNames))
+            if (\is_array($arrTableNames) && \count($arrTableNames) != 0 && !\in_array($strTable, $arrTableNames))
             {
                 continue;
             }
@@ -1243,7 +1243,7 @@ class Helper
             $arrTimestamp[$strTable] = $arrDBSchema[$strTable];
         }
 
-        if (!is_array($mixTableNames))
+        if (!\is_array($mixTableNames))
         {
             return $arrTimestamp[$mixTableNames];
         }
@@ -1271,7 +1271,7 @@ class Helper
                 Config::getInstance()->update("\$GLOBALS['TL_CONFIG']['ctoCom_disableRefererCheck']", true);
             }
 
-            if (in_array($key, $arrLocalConfig))
+            if (\in_array($key, $arrLocalConfig))
             {
                 Config::getInstance()->update("\$GLOBALS['TL_CONFIG']['" . $key . "']", $value);
             }
@@ -1299,7 +1299,7 @@ class Helper
     {
         switch ($strRegexp) {
             case 'colorRgb':
-                if (!preg_match('/^([0-9a-f]{3}|[0-9a-f]{6})$/i', $varValue)) {
+                if (!\preg_match('/^([0-9a-f]{3}|[0-9a-f]{6})$/i', $varValue)) {
                     $objWidget->addError('Field ' . $objWidget->label . ' should be a color RGB code.');
                 }
 
@@ -1321,14 +1321,14 @@ class Helper
     {
         $arrPostUnset = array('FORM_SUBMIT', 'FORM_FIELDS', 'REQUEST_TOKEN', 'FORM_INPUTS', 'postUnset', 'error', 'redirectUrl');
 
-        if (is_array($arrCheckSubmit['postUnset']))
+        if (\is_array($arrCheckSubmit['postUnset']))
         {
-            $arrPostUnset = array_merge($arrPostUnset, $arrCheckSubmit['postUnset']);
+            $arrPostUnset = \array_merge($arrPostUnset, $arrCheckSubmit['postUnset']);
         }
 
         foreach ($arrPostUnset AS $value)
         {
-            if (array_key_exists($value, $arrData))
+            if (\array_key_exists($value, $arrData))
             {
                 unset($arrData[$value]);
             }
@@ -1342,11 +1342,11 @@ class Helper
             }
         }
 
-        if (count($arrData) > 0)
+        if (\count($arrData) > 0)
         {
-            if (is_array($_SESSION["TL_ERROR"]))
+            if (\is_array($_SESSION["TL_ERROR"]))
             {
-                if (array_key_exists($arrCheckSubmit['error']['key'], $_SESSION["TL_ERROR"]))
+                if (\array_key_exists($arrCheckSubmit['error']['key'], $_SESSION["TL_ERROR"]))
                 {
                     unset($_SESSION["TL_ERROR"][$arrCheckSubmit['error']['key']]);
                 }
@@ -1356,12 +1356,12 @@ class Helper
         }
         else
         {
-            if (!is_array($_SESSION["TL_ERROR"]))
+            if (!\is_array($_SESSION["TL_ERROR"]))
             {
                 $_SESSION["TL_ERROR"] = array();
             }
 
-            if (!array_key_exists($arrCheckSubmit['error']['key'], $_SESSION["TL_ERROR"]))
+            if (!\array_key_exists($arrCheckSubmit['error']['key'], $_SESSION["TL_ERROR"]))
             {
                 $_SESSION["TL_ERROR"][$arrCheckSubmit['error']['key']] = $arrCheckSubmit['error']['message'];
             }
@@ -1401,17 +1401,17 @@ class Helper
     {
         $arrTriggers = Database::getInstance()->query('SHOW TRIGGERS')->fetchEach('Trigger');
 
-        if (in_array($strTable . "_AfterUpdateHashRefresh", $arrTriggers))
+        if (\in_array($strTable . "_AfterUpdateHashRefresh", $arrTriggers))
         {
             return true;
         }
 
-        if (in_array($strTable . "_AfterInsertHashRefresh", $arrTriggers))
+        if (\in_array($strTable . "_AfterInsertHashRefresh", $arrTriggers))
         {
             return true;
         }
 
-        if (in_array($strTable . "_AfterDeleteHashRefresh", $arrTriggers))
+        if (\in_array($strTable . "_AfterDeleteHashRefresh", $arrTriggers))
         {
             return true;
         }

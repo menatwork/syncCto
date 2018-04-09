@@ -44,7 +44,7 @@ class TableSettings extends Backend
         {
             if(Helper::getInstance()->isTableHiddenByPlaceholder($strTable))
             {
-                $arrReturn[$strTable] = sprintf($GLOBALS['TL_LANG']['tl_syncCto_settings']['hide_by_regex'], $strTable);
+                $arrReturn[$strTable] = \sprintf($GLOBALS['TL_LANG']['tl_syncCto_settings']['hide_by_regex'], $strTable);
             }
             else
             {
@@ -66,26 +66,26 @@ class TableSettings extends Backend
     protected function saveMcwEntries($strValue, $strConfigKey)
     {
         $arrConfigEntries = $GLOBALS['SYC_CONFIG'][$strConfigKey];
-        $arrList          = deserialize($strValue);
+        $arrList          = \deserialize($strValue);
         $arrSaveList      = array();
 
-        if (is_array($arrSaveList) && count($arrList) > 0)
+        if (\is_array($arrSaveList) && \count($arrList) > 0)
         {
             foreach ($arrList AS $key => $arrValue)
             {
                 foreach ($arrValue AS $value)
                 {
-                    if(!in_array($value, $arrConfigEntries))
+                    if(!\in_array($value, $arrConfigEntries))
                     {
                         $arrSaveList[$key] = $value;
                     }
                 }
             }
 
-            return serialize($arrSaveList);
+            return \serialize($arrSaveList);
         }
 
-        return serialize(array());
+        return \serialize(array());
     }
 
     /**
@@ -98,23 +98,23 @@ class TableSettings extends Backend
     protected function saveEntries($strValue, $strConfigKey)
     {
         $arrConfigEntries = $GLOBALS['SYC_CONFIG'][$strConfigKey];
-        $arrList          = deserialize($strValue);
+        $arrList          = \deserialize($strValue);
         $arrSaveList      = array();
 
-        if (is_array($arrSaveList) && count($arrList) > 0)
+        if (\is_array($arrSaveList) && \count($arrList) > 0)
         {
             foreach ($arrList AS $key => $strValue)
             {
-                if(!in_array($strValue, $arrConfigEntries))
+                if(!\in_array($strValue, $arrConfigEntries))
                 {
                     $arrSaveList[$key] = $strValue;
                 }
             }
 
-            return serialize($arrSaveList);
+            return \serialize($arrSaveList);
         }
 
-        return serialize(array());
+        return \serialize(array());
     }
 
     /**
@@ -132,15 +132,15 @@ class TableSettings extends Backend
         {
             $this->loadDataContainer('tl_settings');
         }
-        $arrDcaFields = array_keys($GLOBALS['TL_DCA']['tl_settings']['fields']);
+        $arrDcaFields = \array_keys($GLOBALS['TL_DCA']['tl_settings']['fields']);
 
         // Merge all.
-        $arrReturn = array_keys(array_flip(array_merge($arrLocalconfig, $arrDcaFields)));
+        $arrReturn = \array_keys(\array_flip(\array_merge($arrLocalconfig, $arrDcaFields)));
 
         // Sort.
-        natcasesort($arrReturn);
+        \natcasesort($arrReturn);
 
-        return array_values($arrReturn);
+        return \array_values($arrReturn);
     }
 
     /**

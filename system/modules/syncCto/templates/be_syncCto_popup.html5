@@ -5,7 +5,7 @@
 <title><?php echo $this->title; ?> - Contao Open Source CMS <?php echo VERSION; ?></title>
 <base href="<?php echo $this->base; ?>">
 <?php echo $this->stylesheets; ?>
-<?php if(version_compare(VERSION, "3.5", '>=')): ?><script><?php echo $this->getLocaleString() ?></script><?php endif; ?>
+<?php if(\version_compare(VERSION, "3.5", '>=')): ?><script><?php echo $this->getLocaleString() ?></script><?php endif; ?>
 <?php echo $this->javascripts; ?>
 </head>
 <body class="<?php echo $this->ua; ?>">

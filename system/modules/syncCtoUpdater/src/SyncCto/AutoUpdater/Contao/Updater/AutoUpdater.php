@@ -74,7 +74,7 @@ class AutoUpdater extends Backend
      */
     protected function checkExtensions()
     {
-        if (file_exists(TL_ROOT . "/system/modules/ZipArchiveCto/ZipArchiveCto.php"))
+        if (\file_exists(TL_ROOT . "/system/modules/ZipArchiveCto/ZipArchiveCto.php"))
         {
             $this->booZipArchiveCto = true;
         }
@@ -88,7 +88,7 @@ class AutoUpdater extends Backend
     public function update($strZipPath)
     {
         // Check if update archive exists
-        if (!file_exists(TL_ROOT . "/" . $strZipPath))
+        if (!\file_exists(TL_ROOT . "/" . $strZipPath))
         {
             throw new \Exception("Update archive was not found: '$strZipPath'.");
         }
@@ -101,12 +101,12 @@ class AutoUpdater extends Backend
         // Update database
         $mixResult = $this->updateDatabase($strZipPath);
 
-        if ($mixResult !== true && is_array($mixResult))
+        if ($mixResult !== true && \is_array($mixResult))
         {
-            $arrErrors = array_merge($arrErrors, $mixResult);
+            $arrErrors = \array_merge($arrErrors, $mixResult);
         }
 
-        if (count($arrErrors) == 0)
+        if (\count($arrErrors) == 0)
         {
             return true;
         }
@@ -165,13 +165,13 @@ class AutoUpdater extends Backend
             $filename = $objZipArchive->getNameIndex($i);
 
             // Check if the file part of the folder "FILES"
-            if (!preg_match("/^" . self::ZIP_FILE_PATH . "\//i", $filename))
+            if (!\preg_match("/^" . self::ZIP_FILE_PATH . "\//i", $filename))
             {
                 continue;
             }
 
             // Build path
-            $movePath   = preg_replace("/^" . self::ZIP_FILE_PATH . "\//i", "", $filename);
+            $movePath   = \preg_replace("/^" . self::ZIP_FILE_PATH . "\//i", "", $filename);
             $targetPath = self::TEMP_PATH . 'syncCtoAutoUpdate/';
 
 
@@ -206,12 +206,12 @@ class AutoUpdater extends Backend
         foreach ($objZipReader->getFileList() as $value)
         {
             // Check if the file part of the folder "FILES"
-            if (!preg_match("/^" . self::ZIP_FILE_PATH . "\//i", $value))
+            if (!\preg_match("/^" . self::ZIP_FILE_PATH . "\//i", $value))
             {
                 continue;
             }
 
-            $movePath   = preg_replace("/^" . self::ZIP_FILE_PATH . "\//i", "", $value);
+            $movePath   = \preg_replace("/^" . self::ZIP_FILE_PATH . "\//i", "", $value);
             $targetPath = self::TEMP_PATH . 'syncCtoAutoUpdate/' . $movePath;
 
             $arrMoveList[$targetPath] = $movePath;
@@ -240,7 +240,7 @@ class AutoUpdater extends Backend
 
         foreach ($arrMoveList as $key => $value)
         {
-            $strFolderPath = dirname($value);
+            $strFolderPath = \dirname($value);
 
             if ($strFolderPath != ".")
             {
@@ -312,9 +312,9 @@ class AutoUpdater extends Backend
                     {
                         case "table":
                             $mixResult = $this->compareDatabase($strTableName, $arrFieldList, $arrDefList, $strOptions);
-                            if ($mixResult !== true && is_array($mixResult))
+                            if ($mixResult !== true && \is_array($mixResult))
                             {
-                                $arrError = array_merge($arrError, $mixResult);
+                                $arrError = \array_merge($arrError, $mixResult);
                             }
                             break;
                     }
@@ -322,7 +322,7 @@ class AutoUpdater extends Backend
             }
         }
 
-        if (count($arrError) == 0)
+        if (\count($arrError) == 0)
         {
             return true;
         }
@@ -345,12 +345,12 @@ class AutoUpdater extends Backend
     {
         $arrError = array();
 
-        if (in_array($strTableName, $this->Database->listTables()))
+        if (\in_array($strTableName, $this->Database->listTables()))
         {
             $mixResult = $this->compareStructur($strTableName, $arrFieldList, $arrDefList);
-            if ($mixResult !== true && is_array($mixResult))
+            if ($mixResult !== true && \is_array($mixResult))
             {
-                $arrError = array_merge($arrError, $mixResult);
+                $arrError = \array_merge($arrError, $mixResult);
             }
         }
         else
@@ -361,11 +361,11 @@ class AutoUpdater extends Backend
             }
             catch (\Exception $exc)
             {
-                $arrError = array_merge($arrError, array($strTableName => $exc->getMessage()));
+                $arrError = \array_merge($arrError, array($strTableName => $exc->getMessage()));
             }
         }
 
-        if (count($arrError) == 0)
+        if (\count($arrError) == 0)
         {
             return true;
         }
@@ -451,7 +451,7 @@ class AutoUpdater extends Backend
                 {
                     if ($valueServer != $arrClientInformation['TABLE_CREATE_DEFINITIONS'][$keyServer])
                     {
-                        if (preg_match("/^PRIMARY/i", $valueServer))
+                        if (\preg_match("/^PRIMARY/i", $valueServer))
                         {
                             // Remove
                             $this->Database
@@ -464,7 +464,7 @@ class AutoUpdater extends Backend
                                     ->execute();
                         }
 
-                        if (preg_match("/^INDEX/i", $valueServer))
+                        if (\preg_match("/^INDEX/i", $valueServer))
                         {
                             // Remove
                             $this->Database
@@ -477,7 +477,7 @@ class AutoUpdater extends Backend
                                     ->execute();
                         }
 
-                        if (preg_match("/^KEY/i", $valueServer))
+                        if (\preg_match("/^KEY/i", $valueServer))
                         {
                             // Remove
                             $this->Database
@@ -497,7 +497,7 @@ class AutoUpdater extends Backend
                 }
                 else
                 {
-                    if (preg_match("/^PRIMARY/i", $valueServer))
+                    if (\preg_match("/^PRIMARY/i", $valueServer))
                     {
                         // Add
                         $this->Database
@@ -505,7 +505,7 @@ class AutoUpdater extends Backend
                                 ->execute();
                     }
 
-                    if (preg_match("/^INDEX/i", $valueServer))
+                    if (\preg_match("/^INDEX/i", $valueServer))
                     {
                         // Add
                         $this->Database
@@ -513,7 +513,7 @@ class AutoUpdater extends Backend
                                 ->execute();
                     }
 
-                    if (preg_match("/^KEY/i", $valueServer))
+                    if (\preg_match("/^KEY/i", $valueServer))
                     {
                         // Add
                         $this->Database
@@ -537,7 +537,7 @@ class AutoUpdater extends Backend
         {
             try
             {
-                if (preg_match("/^PRIMARY/i", $valueCleint))
+                if (\preg_match("/^PRIMARY/i", $valueCleint))
                 {
                     // Remove
                     $this->Database
@@ -545,7 +545,7 @@ class AutoUpdater extends Backend
                             ->execute();
                 }
 
-                if (preg_match("/^INDEX/i", $valueCleint))
+                if (\preg_match("/^INDEX/i", $valueCleint))
                 {
                     // Remove
                     $this->Database
@@ -553,7 +553,7 @@ class AutoUpdater extends Backend
                             ->execute();
                 }
 
-                if (preg_match("/^KEY/i", $valueCleint))
+                if (\preg_match("/^KEY/i", $valueCleint))
                 {
                     // Remove
                     $this->Database
@@ -567,7 +567,7 @@ class AutoUpdater extends Backend
             }
         }
 
-        if (count($arrError) == 0)
+        if (\count($arrError) == 0)
         {
             return true;
         }
@@ -588,10 +588,10 @@ class AutoUpdater extends Backend
      */
     private function buildSQLTable($strTableName, $arrFieldList, $arrDefList, $strOptions)
     {
-        $string = "CREATE TABLE `" . $strTableName . "` (\n  " . implode(",\n  ", $arrFieldList) . (count($arrDefList) ? ',' : '') . "\n";
+        $string = "CREATE TABLE `" . $strTableName . "` (\n  " . \implode(",\n  ", $arrFieldList) . (\count($arrDefList) ? ',' : '') . "\n";
 
-        if (is_Array($arrDefList))
-            $string .= "  " . implode(",\n  ", $arrDefList) . "\n";
+        if (\is_array($arrDefList))
+            $string .= "  " . \implode(",\n  ", $arrDefList) . "\n";
 
         $string .= ")" . $strOptions . ";";
 
@@ -620,11 +620,11 @@ class AutoUpdater extends Backend
             {
                 if ($field["name"] == "PRIMARY")
                 {
-                    $return['TABLE_CREATE_DEFINITIONS'][$field["name"]] = "PRIMARY KEY (`" . implode("`,`", $field["index_fields"]) . "`)";
+                    $return['TABLE_CREATE_DEFINITIONS'][$field["name"]] = "PRIMARY KEY (`" . \implode("`,`", $field["index_fields"]) . "`)";
                 }
                 else if ($field["index"] == "UNIQUE")
                 {
-                    $return['TABLE_CREATE_DEFINITIONS'][$field["name"]] = "UNIQUE KEY `" . $field["name"] . "` (`" . implode("`,`", $field["index_fields"]) . "`)";
+                    $return['TABLE_CREATE_DEFINITIONS'][$field["name"]] = "UNIQUE KEY `" . $field["name"] . "` (`" . \implode("`,`", $field["index_fields"]) . "`)";
                 }
                 else if ($field["index"] == "KEY")
                 {
@@ -635,11 +635,11 @@ class AutoUpdater extends Backend
                             switch ($valueIndexes["Index_type"])
                             {
                                 case "FULLTEXT":
-                                    $return['TABLE_CREATE_DEFINITIONS'][$field["name"]] = "FULLTEXT KEY `" . $field['name'] . "` (`" . implode("`,`", $field["index_fields"]) . "`)";
+                                    $return['TABLE_CREATE_DEFINITIONS'][$field["name"]] = "FULLTEXT KEY `" . $field['name'] . "` (`" . \implode("`,`", $field["index_fields"]) . "`)";
                                     break;
 
                                 default:
-                                    $return['TABLE_CREATE_DEFINITIONS'][$field["name"]] = "KEY `" . $field['name'] . "` (`" . implode("`,`", $field["index_fields"]) . "`)";
+                                    $return['TABLE_CREATE_DEFINITIONS'][$field["name"]] = "KEY `" . $field['name'] . "` (`" . \implode("`,`", $field["index_fields"]) . "`)";
                                     break;
                             }
 
@@ -657,28 +657,28 @@ class AutoUpdater extends Backend
             $field['name'] = '`' . $field['name'] . '`';
 
             // Field type
-            if (strlen($field['length']))
+            if (\strlen($field['length']))
             {
-                $field['type'] .= '(' . $field['length'] . (strlen($field['precision']) ? ',' . $field['precision'] : '') . ')';
+                $field['type'] .= '(' . $field['length'] . (\strlen($field['precision']) ? ',' . $field['precision'] : '') . ')';
 
                 unset($field['length']);
                 unset($field['precision']);
             }
 
             // Default values
-            if (in_array(strtolower($field['type']), $this->arrDefaultValueTypIgnore) || stristr($field['extra'], 'auto_increment'))
+            if (\in_array(\strtolower($field['type']), $this->arrDefaultValueTypIgnore) || \stristr($field['extra'], 'auto_increment'))
             {
                 unset($field['default']);
             }
-            else if (strtolower($field['default']) == 'null')
+            else if (\strtolower($field['default']) == 'null')
             {
                 $field['default'] = "default NULL";
             }
-            else if (is_null($field['default']))
+            else if (\is_null($field['default']))
             {
                 $field['default'] = "";
             }
-            else if (in_array(strtoupper($field['default']), $this->arrDefaultValueFunctionIgnore))
+            else if (\in_array(\strtoupper($field['default']), $this->arrDefaultValueFunctionIgnore))
             {
                 $field['default'] = "default " . $field['default'];
             }
@@ -687,7 +687,7 @@ class AutoUpdater extends Backend
                 $field['default'] = "default '" . $field['default'] . "'";
             }
 
-            $return['TABLE_FIELDS'][$name] = trim(implode(' ', $field));
+            $return['TABLE_FIELDS'][$name] = \trim(\implode(' ', $field));
         }
 
         // Table status
@@ -698,7 +698,7 @@ class AutoUpdater extends Backend
             if ($row['Name'] != $strTableName)
                 continue;
 
-            $return['TABLE_OPTIONS'] = " ENGINE=" . $row['Engine'] . " DEFAULT CHARSET=" . substr($row['Collation'], 0, strpos($row['Collation'], "_")) . "";
+            $return['TABLE_OPTIONS'] = " ENGINE=" . $row['Engine'] . " DEFAULT CHARSET=" . \substr($row['Collation'], 0, \strpos($row['Collation'], "_")) . "";
             if ($row['Auto_increment'] != "")
                 $return['TABLE_OPTIONS'] .= " AUTO_INCREMENT=" . $row['Auto_increment'] . " ";
         }

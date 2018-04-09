@@ -40,7 +40,7 @@ class SyncctoClients extends Backend
         $this->objBackendUser = BackendUser::getInstance();
 
         // Check if we have 'BackendUserHistory'
-        if (in_array('backendUserHistory', Config::getInstance()->getActiveModules()))
+        if (\in_array('backendUserHistory', Config::getInstance()->getActiveModules()))
         {
             $this->blnUserBackendHistory = true;
             $this->objBackendHistory     = BackendUserHistory::getInstance();
@@ -56,9 +56,9 @@ class SyncctoClients extends Backend
      */
     public function __call($name, $arguments)
     {
-        $arrSplitName = explode("_", $name);
+        $arrSplitName = \explode("_", $name);
 
-        if (count($arrSplitName) != 3)
+        if (\count($arrSplitName) != 3)
         {
             return FALSE;
         }
@@ -106,7 +106,7 @@ class SyncctoClients extends Backend
                 while ($objResult->next())
                 {
                     $blnFoundOne = false;
-                    $arrUrl = deserialize($objResult->url);
+                    $arrUrl = \deserialize($objResult->url);
 
                     // Check do and id
                     if ($arrUrl['do'] == 'synccto_clients' && $arrUrl['id'] == $row['id'])
@@ -135,15 +135,15 @@ class SyncctoClients extends Backend
                         if($blnFoundOne == true)
                         {
                             $blnUserIsWorking = true;
-                            $arrNotices[] = sprintf($GLOBALS['TL_LANG']['MSC']['editWarning'], $objResult->username,  date($GLOBALS['TL_CONFIG']['timeFormat'], $objResult->tstamp), $row['id']);
+                            $arrNotices[] = \sprintf($GLOBALS['TL_LANG']['MSC']['editWarning'], $objResult->username,  \date($GLOBALS['TL_CONFIG']['timeFormat'], $objResult->tstamp), $row['id']);
                         }
                     }
                 }
             }
         }
 
-        if (in_array($operations, array('syncTo', 'syncFrom'))) {
-            $tableName = sprintf('tl_syncCto_clients_%s', $operations);
+        if (\in_array($operations, array('syncTo', 'syncFrom'))) {
+            $tableName = \sprintf('tl_syncCto_clients_%s', $operations);
             $strIdName = 'cid';
         } else {
             $strIdName = 'id';
@@ -169,21 +169,21 @@ class SyncctoClients extends Backend
                         break;
                 }
 
-                $title = implode("<br/>", $arrNotices);
-                return '<a class="user-history" href="' . $this->addToUrl($href . '&amp;' . $strIdName . '=' . $this->getID($row['id'], $tableName)) . '" title="' . specialchars($title) . '"' . $attributes . '>' . $this->generateImage($icon, $label) . '</a> ';
+                $title = \implode("<br/>", $arrNotices);
+                return '<a class="user-history" href="' . $this->addToUrl($href . '&amp;' . $strIdName . '=' . $this->getID($row['id'], $tableName)) . '" title="' . \specialchars($title) . '"' . $attributes . '>' . $this->generateImage($icon, $label) . '</a> ';
             }
             else
             {
-                return '<a href="' . $this->addToUrl($href . '&amp;' . $strIdName . '=' . $this->getID($row['id'], $tableName)) . '" title="' . specialchars($title) . '"' . $attributes . '>' . $this->generateImage($icon, $label) . '</a> ';
+                return '<a href="' . $this->addToUrl($href . '&amp;' . $strIdName . '=' . $this->getID($row['id'], $tableName)) . '" title="' . \specialchars($title) . '"' . $attributes . '>' . $this->generateImage($icon, $label) . '</a> ';
             }
         }
-        else if (preg_match("/\.png/i", $icon))
+        else if (\preg_match("/\.png/i", $icon))
         {
-            return $this->generateImage(preg_replace('/\.png$/i', '_.png', $icon)) . ' ';
+            return $this->generateImage(\preg_replace('/\.png$/i', '_.png', $icon)) . ' ';
         }
-        else if (preg_match("/\.gif/i", $icon))
+        else if (\preg_match("/\.gif/i", $icon))
         {
-            return $this->generateImage(preg_replace('/\.gif$/i', '_.gif', $icon)) . ' ';
+            return $this->generateImage(\preg_replace('/\.gif$/i', '_.gif', $icon)) . ' ';
         }
         else
         {
@@ -224,7 +224,7 @@ class SyncctoClients extends Backend
         }
 
         // Set root IDs
-        if (!is_array($this->objBackendUser->syncCto_clients) || count($this->objBackendUser->syncCto_clients) < 1)
+        if (!\is_array($this->objBackendUser->syncCto_clients) || \count($this->objBackendUser->syncCto_clients) < 1)
         {
             $root = array(0);
         }
@@ -235,7 +235,7 @@ class SyncctoClients extends Backend
 
         $GLOBALS['TL_DCA']['tl_synccto_clients']['list']['sorting']['root'] = $root;
 
-        if ($this->objBackendUser->hasAccess($this->Input->get('act'), 'syncCto_clients_p') == true || strlen($this->Input->get('act')) == 0)
+        if ($this->objBackendUser->hasAccess($this->Input->get('act'), 'syncCto_clients_p') == true || \strlen($this->Input->get('act')) == 0)
         {
             return;
         }
@@ -253,7 +253,7 @@ class SyncctoClients extends Backend
     {
         if (!$this->objBackendUser->hasAccess('create', 'syncCto_clients_p'))
         {
-            $GLOBALS['TL_DCA']['tl_synccto_clients']['config'] = array_unique(array_merge(array('closed' => true), $GLOBALS['TL_DCA']['tl_synccto_clients']['config']));
+            $GLOBALS['TL_DCA']['tl_synccto_clients']['config'] = \array_unique(\array_merge(array('closed' => true), $GLOBALS['TL_DCA']['tl_synccto_clients']['config']));
         }
     }
 
@@ -275,7 +275,7 @@ class SyncctoClients extends Backend
             $arrReturn[$key] = $value["name"];
         }
 
-        asort($arrReturn);
+        \asort($arrReturn);
 
         return $arrReturn;
     }
@@ -295,7 +295,7 @@ class SyncctoClients extends Backend
         }
         else
         {
-            if (preg_match("/^\//", $strValue))
+            if (\preg_match("/^\//", $strValue))
             {
                 return $strValue;
             }
@@ -319,10 +319,10 @@ class SyncctoClients extends Backend
     {
         $intMaxChars = 65;
         $intMinChars = 30;
-        $intLeft     = $intMaxChars - (strlen($row['title']) + strlen($row['id']));
-        $intLeft     = max($intLeft , $intMinChars);
+        $intLeft     = $intMaxChars - (\strlen($row['title']) + \strlen($row['id']));
+        $intLeft     = \max($intLeft , $intMinChars);
 
         $strAddress  = Helper::getInstance()->substrCenter($row['address'] . $row['path'], $intLeft, ' [...] ');
-        return str_replace('[URL]', $strAddress, $label);
+        return \str_replace('[URL]', $strAddress, $label);
     }
 }

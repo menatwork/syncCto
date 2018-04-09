@@ -66,7 +66,7 @@ class BackupEditHandler extends AbstractHandler
 
         // Only handle if we do not have a manual sorting or we know where to insert.
         // Manual sorting is handled by clipboard.
-        if ($action !== 'edit' && !in_array($providerName, $allowedProviderName) ) {
+        if ($action !== 'edit' && !\in_array($providerName, $allowedProviderName) ) {
             return;
         }
 
@@ -113,7 +113,7 @@ class BackupEditHandler extends AbstractHandler
         $modelId = ModelId::fromSerialized($inputProvider->getParameter('id'));
 
         $this->getEvent()->setResponse(
-            sprintf(
+            \sprintf(
                 '<div style="text-align:center; font-weight:bold; padding:40px;">
                     You have no permission for edit model %s.
                 </div>',
@@ -155,7 +155,7 @@ class BackupEditHandler extends AbstractHandler
             $model = $dataProvider->getVersion($modelId->getId(), $modelVersion);
 
             if ($model === null) {
-                $message = sprintf(
+                $message = \sprintf(
                     'Could not load version %s of record ID %s from %s',
                     $modelVersion,
                     $modelId->getId(),

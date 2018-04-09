@@ -11,6 +11,10 @@
 
 namespace SyncCto\Helper;
 
+use Contao\Controller;
+use Contao\Database;
+use Contao\Input;
+use Contao\Request;
 use SyncCto\Contao\Communicator\Client;
 
 class Ping
@@ -114,7 +118,7 @@ class Ping
      */
     protected function loadClientId()
     {
-        $clientId = \Input::post('clientID');
+        $clientId = Input::post('clientID');
 
         if (empty($clientId)) {
             return false;
@@ -133,7 +137,7 @@ class Ping
     protected function loadClient()
     {
         // Load Client from database.
-        $objClient = \Database::getInstance()
+        $objClient = Database::getInstance()
             ->prepare('SELECT * FROM tl_synccto_clients WHERE id = %s')
             ->limit(1)
             ->execute($this->clientID);
@@ -154,7 +158,7 @@ class Ping
     protected function initRequest()
     {
         // Setup request class.
-        $this->request = new \Request();
+        $this->request = new Request();
 
         if ($this->client->http_auth == true) {
             $this->request->username = $this->client->http_username;
@@ -162,11 +166,11 @@ class Ping
         }
 
         // Build base link.
-        $this->client->path = preg_replace("/\/\z/i", "", $this->client->path);
-        $this->client->path = preg_replace("/ctoCommunication.php\z/", "", $this->client->path);
+        $this->client->path = \preg_replace("/\/\z/i", "", $this->client->path);
+        $this->client->path = \preg_replace("/ctoCommunication.php\z/", "", $this->client->path);
 
         $this->clientBaseUrl = $this->client->address . ":" . $this->client->port;
-        if (strlen($this->client->path)) {
+        if (\strlen($this->client->path)) {
             $this->clientBaseUrl .= $this->client->path;
         }
     }
@@ -189,10 +193,10 @@ class Ping
     public function pingClientStatus($strAction)
     {
         // Close the session handling.
-        session_write_close();
+        \session_write_close();
 
         // Init some more things.
-        \Controller::loadLanguageFile('tl_synccto_clients');
+        Controller::loadLanguageFile('tl_synccto_clients');
 
         // Check if the current call is one for use.
         if ($strAction != 'syncCtoPing') {
@@ -284,7 +288,7 @@ class Ping
             // Check Version of syncCto.
             try {
                 $mixVersion = $objSyncCtoClient->getVersionSyncCto();
-                if (strlen($mixVersion) == 0) {
+                if (\strlen($mixVersion) == 0) {
                     throw new \Exception('Missing syncCto Version.');
                 }
             } catch (\Exception $exc) {
@@ -337,7 +341,7 @@ class Ping
             $output['msg']     = $this->msg;
         }
 
-        echo json_encode($output);
+        echo \json_encode($output);
         exit();
     }
 }

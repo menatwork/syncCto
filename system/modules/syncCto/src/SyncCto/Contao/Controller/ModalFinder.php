@@ -18,26 +18,27 @@ use Contao\Backend;
 use Contao\BackendTemplate;
 use Contao\BackendUser;
 use Contao\File;
+use Contao\Input;
 use SyncCto\Config\Enum;
 use SyncCto\Helper\Helper;
 
-$dir = dirname(isset($_SERVER['SCRIPT_FILENAME']) ? $_SERVER['SCRIPT_FILENAME'] : __FILE__);
+$dir = \dirname(isset($_SERVER['SCRIPT_FILENAME']) ? $_SERVER['SCRIPT_FILENAME'] : __FILE__);
 
-while ($dir && $dir != '.' && $dir != '/' && !is_file($dir . '/system/initialize.php'))
+while ($dir && $dir != '.' && $dir != '/' && !\is_file($dir . '/system/initialize.php'))
 {
-    $dir = dirname($dir);
+    $dir = \dirname($dir);
 }
 
-if (!is_file($dir . '/system/initialize.php'))
+if (!\is_file($dir . '/system/initialize.php'))
 {
-    header("HTTP/1.0 500 Internal Server Error");
-    header('Content-Type: text/html; charset=utf-8');
+    \header("HTTP/1.0 500 Internal Server Error");
+    \header('Content-Type: text/html; charset=utf-8');
     echo '<h1>500 Internal Server Error</h1>';
     echo '<p>Could not find initialize.php!</p>';
     exit(1);
 }
 
-define('TL_MODE', 'BE');
+\define('TL_MODE', 'BE');
 require($dir . '/system/initialize.php');
 
 /**
@@ -107,7 +108,7 @@ class ModalFinder extends Backend
     protected function showFiles()
     {
         // Delete functinality
-        if (array_key_exists("delete", $_POST))
+        if (\array_key_exists("delete", $_POST))
         {
             foreach ($_POST as $key => $value)
             {
@@ -124,7 +125,7 @@ class ModalFinder extends Backend
         // Close functinality
         else
         {
-            if (array_key_exists("transfer", $_POST))
+            if (\array_key_exists("transfer", $_POST))
             {
                 $this->mixStep = self::STEP_CLOSE_FILES;
                 return;
@@ -132,7 +133,7 @@ class ModalFinder extends Backend
         }
 
         // Check if filelist is empty and close
-        if (count($this->arrListCompare['core']) == 0 && count($this->arrListCompare['files']) == 0)
+        if (\count($this->arrListCompare['core']) == 0 && \count($this->arrListCompare['files']) == 0)
         {
             $this->mixStep = self::STEP_CLOSE_FILES;
             return;
@@ -191,7 +192,7 @@ class ModalFinder extends Backend
                     $value['dbafs_conflict'] = true;
                 }
 
-                if (in_array($value["state"],
+                if (\in_array($value["state"],
                     array(
                         Enum::FILESTATE_TOO_BIG_DELETE,
                         Enum::FILESTATE_TOO_BIG_MISSING,
@@ -221,8 +222,8 @@ class ModalFinder extends Backend
             }
         }
 
-        uasort($arrBigFiles, array($this, 'sort'));
-        uasort($arrNormalFiles, array($this, 'sort'));
+        \uasort($arrBigFiles, array($this, 'sort'));
+        \uasort($arrNormalFiles, array($this, 'sort'));
 
         // Language array for filestate
         $arrLanguageTags                                  = array();
@@ -301,7 +302,7 @@ class ModalFinder extends Backend
         $this->popupTemplate->language = $GLOBALS['TL_LANGUAGE'];
         $this->popupTemplate->title    = $GLOBALS['TL_CONFIG']['websiteTitle'];
         $this->popupTemplate->charset  = $GLOBALS['TL_CONFIG']['characterSet'];
-        $this->popupTemplate->headline = basename(utf8_convert_encoding($this->strFile, $GLOBALS['TL_CONFIG']['characterSet']));
+        $this->popupTemplate->headline = \basename(\utf8_convert_encoding($this->strFile, $GLOBALS['TL_CONFIG']['characterSet']));
 
         // Set default information
         $this->Template->id   = $this->intClientID;
@@ -321,25 +322,25 @@ class ModalFinder extends Backend
     {
         $objFileList = new File($this->objSyncCtoHelper->standardizePath($GLOBALS['SYC_PATH']['tmp'], "syncfilelist-ID-" . $this->intClientID . ".txt"));
         $strContent  = $objFileList->getContent();
-        if (strlen($strContent) == 0)
+        if (\strlen($strContent) == 0)
         {
             $this->arrListFile = array();
         }
         else
         {
-            $this->arrListFile = unserialize($strContent);
+            $this->arrListFile = \unserialize($strContent);
         }
         $objFileList->close();
 
         $objCompareList = new File($this->objSyncCtoHelper->standardizePath($GLOBALS['SYC_PATH']['tmp'], "synccomparelist-ID-" . $this->intClientID . ".txt"));
         $strContent     = $objCompareList->getContent();
-        if (strlen($strContent) == 0)
+        if (\strlen($strContent) == 0)
         {
             $this->arrListCompare = array();
         }
         else
         {
-            $this->arrListCompare = unserialize($strContent);
+            $this->arrListCompare = \unserialize($strContent);
         }
 
         $objCompareList->close();
@@ -351,11 +352,11 @@ class ModalFinder extends Backend
     protected function saveTempLists()
     {
         $objFileList = new File($this->objSyncCtoHelper->standardizePath($GLOBALS['SYC_PATH']['tmp'], "syncfilelist-ID-" . $this->intClientID . ".txt"));
-        $objFileList->write(serialize($this->arrListFile));
+        $objFileList->write(\serialize($this->arrListFile));
         $objFileList->close();
 
         $objCompareList = new File($this->objSyncCtoHelper->standardizePath($GLOBALS['SYC_PATH']['tmp'], "synccomparelist-ID-" . $this->intClientID . ".txt"));
-        $objCompareList->write(serialize($this->arrListCompare));
+        $objCompareList->write(\serialize($this->arrListCompare));
         $objCompareList->close();
     }
 
@@ -366,7 +367,7 @@ class ModalFinder extends Backend
     {
         $this->arrClientInformation = $this->Session->get("syncCto_ClientInformation_" . $this->intClientID);
 
-        if (!is_array($this->arrClientInformation))
+        if (!\is_array($this->arrClientInformation))
         {
             $this->arrClientInformation = array();
         }
@@ -378,7 +379,7 @@ class ModalFinder extends Backend
     protected function initGetParams()
     {
         // Get Client id
-        if (strlen(\Input::get("id")) != 0)
+        if (\strlen(\Input::get("id")) != 0)
         {
             $this->intClientID = intval(\Input::get("id"));
         }
@@ -392,9 +393,9 @@ class ModalFinder extends Backend
         $this->loadClientInformation();
 
         // Get next step
-        if (strlen(\Input::get("step")) != 0)
+        if (\strlen(\Input::get("step")) != 0)
         {
-            $this->mixStep = \Input::get("step");
+            $this->mixStep = Input::get("step");
         }
         else
         {
