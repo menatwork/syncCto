@@ -13,7 +13,7 @@
  * @package    menatwork/synccto
  * @author     Sven Baumann <baumann.sv@gmail.com>
  * @copyright  2014-2018 MEN AT WORK.
- * @license    hhttps://github.com/BlackForest/skeleton-bundle/blob/master/LICENSE LGPL-3.0-or-later
+ * @license    https://github.com/menatwork/syncCto/blob/master/LICENSE LGPL-3.0-or-later
  * @filesource
  */
 
@@ -21,7 +21,6 @@ namespace SyncCto\Contao\DataProvider\General;
 
 use ContaoCommunityAlliance\DcGeneral\Contao\View\Contao2BackendView\Event\GetGlobalButtonsEvent;
 use ContaoCommunityAlliance\DcGeneral\EnvironmentInterface;
-
 
 /**
  * This trait has the basic method to allow only the back button.

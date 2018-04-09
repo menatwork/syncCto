@@ -1,14 +1,24 @@
 <?php
 
 /**
- * Contao Open Source CMS
+ * This file is part of menatwork/synccto.
  *
- * @copyright  MEN AT WORK 2014
- * @package    syncCto
- * @license    GNU/LGPL 
+ * (c) 2014-2018 MEN AT WORK.
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ *
+ * This project is provided in good faith and hope to be usable by anyone.
+ *
+ * @package    menatwork/synccto
+ * @author     Stefan Heimes <stefan_heimes@hotmail.com>
+ * @author     Andreas Isaak <andy.jared@googlemail.com>
+ * @author     Sven Baumann <baumann.sv@gmail.com>
+ * @copyright  2014-2018 MEN AT WORK.
+ * @license    https://github.com/menatwork/syncCto/blob/master/LICENSE LGPL-3.0-or-later
  * @filesource
  */
- 
+
 /**
  * Headline
  */
@@ -29,13 +39,13 @@ $GLOBALS['TL_LANG']['tl_syncCto_check']['description']              = 'Descripti
 $GLOBALS['TL_LANG']['tl_syncCto_check']['on']                       = 'On';
 $GLOBALS['TL_LANG']['tl_syncCto_check']['off']                      = 'Off';
 $GLOBALS['TL_LANG']['tl_syncCto_check']['safemode']                 = 'Safe mode';
-$GLOBALS['TL_LANG']['tl_syncCto_check']['met']                      = array('Maximum execution time', 'Recommended setting is 0, 30 or greater.'); 
+$GLOBALS['TL_LANG']['tl_syncCto_check']['met']                      = array('Maximum execution time', 'Recommended setting is 0, 30 or greater.');
 $GLOBALS['TL_LANG']['tl_syncCto_check']['memory_limit']             = array('Memory limit', 'Recommended setting is 128,0 MB or greater.');
-$GLOBALS['TL_LANG']['tl_syncCto_check']['register_globals']         = 'Register globals'; 
-$GLOBALS['TL_LANG']['tl_syncCto_check']['file_uploads']             = 'File uploads'; 
+$GLOBALS['TL_LANG']['tl_syncCto_check']['register_globals']         = 'Register globals';
+$GLOBALS['TL_LANG']['tl_syncCto_check']['file_uploads']             = 'File uploads';
 $GLOBALS['TL_LANG']['tl_syncCto_check']['umf']                      = array('Upload maximum filesize', 'Recommended setting is 8,0 MB or greater.');
 $GLOBALS['TL_LANG']['tl_syncCto_check']['pms']                      = array('Post maximum size', 'Recommended setting is 8,0 MB or greater.');
-$GLOBALS['TL_LANG']['tl_syncCto_check']['mit']                      = array('Maximum input time', 'Recommended setting is -1, 60 or greater.'); 
+$GLOBALS['TL_LANG']['tl_syncCto_check']['mit']                      = array('Maximum input time', 'Recommended setting is -1, 60 or greater.');
 $GLOBALS['TL_LANG']['tl_syncCto_check']['dst']                      = array('Default socket timeout', 'Recommended setting is 30 or greater.');
 $GLOBALS['TL_LANG']['tl_syncCto_check']['fsocket']                  = 'Fsockopen';
 $GLOBALS['TL_LANG']['tl_syncCto_check']['zip_archive']              = 'ZipArchive';
