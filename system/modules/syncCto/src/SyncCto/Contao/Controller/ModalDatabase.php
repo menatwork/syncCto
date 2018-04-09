@@ -18,6 +18,7 @@ use Contao\Backend;
 use Contao\BackendTemplate;
 use Contao\BackendUser;
 use Contao\Input;
+use Contao\ModuleLoader;
 use Contao\Session;
 use SyncCto\Helper\Helper;
 
@@ -71,9 +72,9 @@ class ModalDatabase extends Backend
         parent::__construct();
 
         // Set language from get or user
-        if (Input::getInstance()->get('language') != '')
+        if (Input::get('language') != '')
         {
-            $GLOBALS['TL_LANGUAGE'] = Input::getInstance()->get('language');
+            $GLOBALS['TL_LANGUAGE'] = Input::get('language');
         }
         else
         {
@@ -138,14 +139,14 @@ class ModalDatabase extends Backend
             // Make a array from 'serverTables' and 'serverDeleteTables'
             $arrRemoveTables = array();
 
-            if (\is_array(Input::getInstance()->post('serverTables')) && \count(Input::getInstance()->post('serverTables')) != 0)
+            if (\is_array(Input::post('serverTables')) && \count(Input::post('serverTables')) != 0)
             {
-                $arrRemoveTables = Input::getInstance()->post('serverTables');
+                $arrRemoveTables = Input::post('serverTables');
             }
 
-            if (\is_array(Input::getInstance()->post('serverDeleteTables')) && \count(Input::getInstance()->post('serverDeleteTables')) != 0)
+            if (\is_array(Input::post('serverDeleteTables')) && \count(Input::post('serverDeleteTables')) != 0)
             {
-                $arrRemoveTables = \array_merge($arrRemoveTables, Input::getInstance()->post('serverDeleteTables'));
+                $arrRemoveTables = \array_merge($arrRemoveTables, Input::post('serverDeleteTables'));
             }
 
             // Remove tables from the list.
@@ -278,7 +279,7 @@ class ModalDatabase extends Backend
         }
 
         // Get MM name
-        if (\in_array('metamodels', $this->Config->getActiveModules()) && \preg_match("/^mm_/i", $strName))
+        if (\in_array('metamodels', ModuleLoader::getActive()) && \preg_match("/^mm_/i", $strName))
         {
             try
             {
@@ -439,9 +440,9 @@ class ModalDatabase extends Backend
     protected function initGetParams()
     {
         // Get Client id
-        if (\strlen(Input::getInstance()->get('id')) != 0)
+        if (\strlen(Input::get('id')) != 0)
         {
-            $this->intClientID = (int) Input::getInstance()->get('id');
+            $this->intClientID = (int) Input::get('id');
         }
         else
         {
@@ -450,9 +451,9 @@ class ModalDatabase extends Backend
         }
 
         // Get next step
-        if (\strlen(Input::getInstance()->get('step')) != 0)
+        if (\strlen(Input::get('step')) != 0)
         {
-            $this->mixStep = Input::getInstance()->get('step');
+            $this->mixStep = Input::get('step');
         }
         else
         {
@@ -460,9 +461,9 @@ class ModalDatabase extends Backend
         }
 
         // Get direction
-        if (\strlen(Input::getInstance()->get('direction')) != 0)
+        if (\strlen(Input::get('direction')) != 0)
         {
-            $this->strMode = Input::getInstance()->get('direction');
+            $this->strMode = Input::get('direction');
         }
 
     }

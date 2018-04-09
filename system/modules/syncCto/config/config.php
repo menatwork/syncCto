@@ -10,8 +10,6 @@
  * @filesource
  */
 
-$objInput = \Contao\Input::getInstance();
-
 /**
  * Current syncCto version
  */
@@ -210,9 +208,9 @@ $GLOBALS['TL_PERMISSIONS'][] = 'syncCto_tables';
 /**
  * Callbacks are only used for overview screen
  */
-$strDo    = $objInput->get("do");
-$strTable = $objInput->get("table");
-$strAct   = $objInput->get("act");
+$strDo    = \Contao\Input::get("do");
+$strTable = \Contao\Input::get("table");
+$strAct   = \Contao\Input::get("act");
 
 if ($strDo == 'syncCto_backups' && $strTable != '' && ($strAct == 'edit' || $strAct == 'create') && TL_MODE == 'BE')
 {

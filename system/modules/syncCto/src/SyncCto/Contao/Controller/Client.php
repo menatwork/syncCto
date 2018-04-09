@@ -14,13 +14,13 @@ namespace SyncCto\Contao\Controller;
 use Contao\BackendModule;
 use Contao\BackendTemplate;
 use Contao\BackendUser;
-use Contao\Config;
 use Contao\Database;
 use Contao\DataContainer;
 use Contao\Environment;
 use Contao\File;
 use Contao\Folder;
 use Contao\Input;
+use Contao\ModuleLoader;
 use Contao\Session;
 use Contao\String;
 use Contao\StringUtil;
@@ -881,7 +881,7 @@ class Client extends BackendModule
 
             // Check if we have pro features
             case 5:
-                if (\in_array('syncCtoPro', Config::getInstance()->getActiveModules()))
+                if (\in_array('syncCtoPro', ModuleLoader::getActive()))
                 {
                     $objStepPro = SyncCtoStepDatabaseDiff::getInstance();
                     $objStepPro->setSyncCto($this);
@@ -1082,7 +1082,7 @@ class Client extends BackendModule
 
             // Check if we have pro features
             case 5:
-                if (\in_array('syncCtoPro', Config::getInstance()->getActiveModules()))
+                if (\in_array('syncCtoPro', ModuleLoader::getActive()))
                 {
                     $objStepPro = SyncCtoStepDatabaseDiff::getInstance();
                     $objStepPro->setSyncCto($this);
@@ -1399,7 +1399,7 @@ class Client extends BackendModule
                  */
                 case 4:
                     // Check if the composer is enabled if enabled skip the auto update.
-                    if(!\in_array('!composer', Config::getInstance()->getActiveModules()))
+                    if(!\in_array('!composer', ModuleLoader::getActive()))
                     {
                         // Check syncCto
                         $strVersion                                    = $this->objSyncCtoCommunicationClient->getVersionSyncCto();
@@ -2676,7 +2676,7 @@ class Client extends BackendModule
 
                 case 3:
                     // Unset some tables for pro feature
-                    if (!$this->arrSyncSettings["automode"] && \in_array('syncCtoPro', Config::getInstance()->getActiveModules()) && \array_key_exists('forward', $_POST) && $this->arrSyncSettings['post_data']['database_pages_check'] == true)
+                    if (!$this->arrSyncSettings["automode"] && \in_array('syncCtoPro', ModuleLoader::getActive()) && \array_key_exists('forward', $_POST) && $this->arrSyncSettings['post_data']['database_pages_check'] == true)
                     {
                         if (($mixKey = \array_search('tl_page', $this->arrSyncSettings['syncCto_SyncTables'])) !== false)
                         {

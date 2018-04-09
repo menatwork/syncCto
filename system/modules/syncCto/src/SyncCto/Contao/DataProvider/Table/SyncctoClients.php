@@ -13,8 +13,8 @@ namespace SyncCto\Contao\DataProvider\Table;
 
 use Contao\Backend;
 use Contao\BackendUser;
-use Contao\Config;
 use Contao\DataContainer;
+use Contao\ModuleLoader;
 use ContaoCommunityAlliance\DcGeneral\Data\ModelId;
 use SyncCto\Helper\Helper;
 
@@ -40,7 +40,7 @@ class SyncctoClients extends Backend
         $this->objBackendUser = BackendUser::getInstance();
 
         // Check if we have 'BackendUserHistory'
-        if (\in_array('backendUserHistory', Config::getInstance()->getActiveModules()))
+        if (\in_array('backendUserHistory', ModuleLoader::getActive()))
         {
             $this->blnUserBackendHistory = true;
             $this->objBackendHistory     = BackendUserHistory::getInstance();
