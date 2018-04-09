@@ -161,7 +161,7 @@ class Helper
      */
     static public function parseRuntime($time)
     {
-        $time = intval($time);
+        $time = (int) $time;
         if ($time == 0 || $time == -1) {
             return PHP_INT_MAX;
         }
@@ -1119,10 +1119,10 @@ class Helper
                 }
                 else
                 {
-                    $arrIdParts[] = array(
-                        'start' => intval($intStart),
-                        'end'   => intval($intLast),
-                    );
+                    $arrIdParts[] = [
+                        'start' => (int) $intStart,
+                        'end'   => (int) $intLast,
+                    ];
 
                     $intStart = $objIds->id;
                     $intLast  = $objIds->id;
@@ -1130,8 +1130,8 @@ class Helper
             }
 
             $arrIdParts[] = array(
-                'start' => intval($intStart),
-                'end'   => intval($intLast),
+                'start' => (int) $intStart,
+                'end'   => (int) $intLast,
             );
         }
 

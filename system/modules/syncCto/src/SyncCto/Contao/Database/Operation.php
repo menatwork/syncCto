@@ -289,9 +289,9 @@ class Operation extends Backend
         \set_time_limit(0);
 
         // Set limit for db query. Ticket #163
-        if ($GLOBALS['TL_CONFIG']['syncCto_custom_settings'] == true && intval($GLOBALS['TL_CONFIG']['syncCto_db_query_limt']) > 0)
+        if ($GLOBALS['TL_CONFIG']['syncCto_custom_settings'] == true && (int) $GLOBALS['TL_CONFIG']['syncCto_db_query_limt'] > 0)
         {
-            $intElementsPerRequest = intval($GLOBALS['TL_CONFIG']['syncCto_db_query_limt']);
+            $intElementsPerRequest = (int) $GLOBALS['TL_CONFIG']['syncCto_db_query_limt'];
         }
         else
         {
@@ -1023,16 +1023,17 @@ class Operation extends Backend
             $interactiveTimeout = $tmpResult->iTimeout;
 
             //overwrite the default values if higher ones are defined in the settings
-            if ($GLOBALS['TL_CONFIG']['syncCto_custom_settings'] == true && intval($GLOBALS['TL_CONFIG']['syncCto_wait_timeout']) > 0 &&
-                    intval($GLOBALS['TL_CONFIG']['syncCto_interactive_timeout']) > 0
+            if ($GLOBALS['TL_CONFIG']['syncCto_custom_settings'] == true && (int) $GLOBALS['TL_CONFIG']['syncCto_wait_timeout'] > 0 &&
+                        (int) $GLOBALS['TL_CONFIG']['syncCto_interactive_timeout'] > 0
             ) {
-                $waitTimeOut = max($waitTimeOut, intval($GLOBALS['TL_CONFIG']['syncCto_wait_timeout']));
-                $interactiveTimeout = max($interactiveTimeout, intval($GLOBALS['TL_CONFIG']['syncCto_interactive_timeout']));
+                $waitTimeOut = max($waitTimeOut, (int) $GLOBALS['TL_CONFIG']['syncCto_wait_timeout']);
+                $interactiveTimeout = max($interactiveTimeout, (int) $GLOBALS['TL_CONFIG']['syncCto_interactive_timeout']
+                );
             }
 
             Database::getInstance()
                     ->prepare('SET SESSION wait_timeout = ?,SESSION interactive_timeout = ?;')
-                    ->execute(intval($waitTimeOut), intval($interactiveTimeout));
+                    ->execute((int) $waitTimeOut, (int) $interactiveTimeout);
 
             switch (\pathinfo($strRestoreFile, PATHINFO_EXTENSION))
             {
@@ -1483,7 +1484,7 @@ class Operation extends Backend
      */
     public function getDiff($arrSrcTables, $arrDesTables)
     {
-        return \abs(intval($arrSrcTables['count']) - intval($arrDesTables['count']));
+        return \abs((int) $arrSrcTables['count'] - (int) $arrDesTables['count']);
     }
 
     /**
@@ -1505,13 +1506,13 @@ class Operation extends Backend
         {
             if($arrIdRange['start'] == $arrIdRange['end'])
             {
-                $arrSrcId[] = intval($arrIdRange['start']);
+                $arrSrcId[] = (int) $arrIdRange['start'];
             }
             else
             {
                 for($i = $arrIdRange['start'] ; $i < ($arrIdRange['end'] + 1) ; $i++)
                 {
-                    $arrSrcId[] = intval($i);
+                    $arrSrcId[] = (int) $i;
                 }
             }
         }
@@ -1521,13 +1522,13 @@ class Operation extends Backend
         {
             if($arrIdRange['start'] == $arrIdRange['end'])
             {
-                $arrDesId[] = intval($arrIdRange['start']);
+                $arrDesId[] = (int) $arrIdRange['start'];
             }
             else
             {
                 for($i = $arrIdRange['start'] ; $i < ($arrIdRange['end'] + 1) ; $i++)
                 {
-                    $arrDesId[] = intval($i);
+                    $arrDesId[] = (int) $i;
                 }
             }
         }

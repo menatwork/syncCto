@@ -379,9 +379,9 @@ class ModalFinder extends Backend
     protected function initGetParams()
     {
         // Get Client id
-        if (\strlen(\Input::get("id")) != 0)
+        if (\strlen(Input::get("id")) != 0)
         {
-            $this->intClientID = intval(\Input::get("id"));
+            $this->intClientID = (int) Input::get("id");
         }
         else
         {
@@ -393,7 +393,7 @@ class ModalFinder extends Backend
         $this->loadClientInformation();
 
         // Get next step
-        if (\strlen(\Input::get("step")) != 0)
+        if (\strlen(Input::get("step")) != 0)
         {
             $this->mixStep = Input::get("step");
         }

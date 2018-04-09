@@ -158,7 +158,7 @@ class Backup extends BackendModule
         }
         else
         {
-            $this->intStep = intval(Input::get("step"));
+            $this->intStep = (int) Input::get("step");
         }
 
         // Set template

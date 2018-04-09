@@ -75,7 +75,7 @@ class Finder extends Backend
 
         // Get execution limit
         $this->intMaxExecutionTime = Helper::parseRuntime(\ini_get('max_execution_time'));
-        $this->intMaxExecutionTime = intval($this->intMaxExecutionTime / 100 * 25);
+        $this->intMaxExecutionTime = (int) $this->intMaxExecutionTime / 100 * 25;
 
         // Flags for file scanning.
         $this->strRDIFlags = \RecursiveDirectoryIterator::FOLLOW_SYMLINKS | \RecursiveDirectoryIterator::SKIP_DOTS | \RecursiveDirectoryIterator::UNIX_PATHS;
@@ -1613,7 +1613,7 @@ class Finder extends Backend
     public function splitFiles($strSrcFile, $strDesFolder, $strDesFile, $intSizeLimit)
     {
         // Cast to int, we only accept int here.
-        $intSizeLimit = intval($intSizeLimit);
+        $intSizeLimit = (int) $intSizeLimit;
 
         @\set_time_limit(3600);
 

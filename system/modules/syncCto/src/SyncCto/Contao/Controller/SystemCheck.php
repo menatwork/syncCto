@@ -309,7 +309,7 @@ class SystemCheck extends BackendModule
 
         // Memory limit
         $memory_limit = $arrConfigurations['memory_limit'];
-        $ok           = (intval($memory_limit) >= 134217728);
+        $ok           = ((int) $memory_limit >= 134217728);
         $return .= '<tr class="' . ($ok ? 'ok' : 'warning') . '">';
         $return .= '<td>' . $GLOBALS['TL_LANG']['tl_syncCto_check']['memory_limit'][0] . '</td>';
         $return .= '<td class="dot">' . ($ok ? '&nbsp;' : '&#149;') . '</td>';
@@ -339,7 +339,7 @@ class SystemCheck extends BackendModule
 
         // Upload maximum filesize
         $upload_max_filesize = $arrConfigurations['upload_max_filesize'];
-        $ok                  = (intval($upload_max_filesize) >= 8388608);
+        $ok                  = ((int) $upload_max_filesize >= 8388608);
         $return .= '<tr class="' . ($ok ? 'ok' : 'warning') . '">';
         $return .= '<td>' . $GLOBALS['TL_LANG']['tl_syncCto_check']['umf'][0] . '</td>';
         $return .= '<td class="dot">' . ($ok ? '&nbsp;' : '&#149;') . '</td>';
@@ -349,7 +349,7 @@ class SystemCheck extends BackendModule
 
         // Post maximum size
         $post_max_size = $arrConfigurations['post_max_size'];
-        $ok            = (intval($post_max_size) >= 8388608);
+        $ok            = ((int) $post_max_size >= 8388608);
         $return .= '<tr class="' . ($ok ? 'ok' : 'warning') . '">';
         $return .= '<td>' . $GLOBALS['TL_LANG']['tl_syncCto_check']['pms'][0] . '</td>';
         $return .= '<td class="dot">' . ($ok ? '&nbsp;' : '&#149;') . '</td>';
@@ -359,7 +359,7 @@ class SystemCheck extends BackendModule
 
         // Maximum input time
         $max_input_time = $arrConfigurations['max_input_time'];
-        $ok             = ($max_input_time == '-1' || (intval($max_input_time) >= 60));
+        $ok             = ($max_input_time == '-1' || ((int) $max_input_time >= 60));
         $return .= '<tr class="' . ($ok ? 'ok' : 'warning') . '">';
         $return .= '<td>' . $GLOBALS['TL_LANG']['tl_syncCto_check']['mit'][0] . '</td>';
         $return .= '<td class="dot">' . ($ok ? '&nbsp;' : '&#149;') . '</td>';
@@ -369,7 +369,7 @@ class SystemCheck extends BackendModule
 
         // Default socket timeout
         $default_socket_timeout = $arrConfigurations['default_socket_timeout'];
-        $ok                     = (intval($default_socket_timeout) >= 32);
+        $ok                     = ((int) $default_socket_timeout >= 32);
         $return .= '<tr class="' . ($ok ? 'ok' : 'warning') . '">';
         $return .= '<td>' . $GLOBALS['TL_LANG']['tl_syncCto_check']['dst'][0] . '</td>';
         $return .= '<td class="dot">' . ($ok ? '&nbsp;' : '&#149;') . '</td>';

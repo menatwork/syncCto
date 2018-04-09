@@ -441,7 +441,7 @@ class ModalDatabase extends Backend
         // Get Client id
         if (\strlen(Input::getInstance()->get('id')) != 0)
         {
-            $this->intClientID = intval(Input::getInstance()->get('id'));
+            $this->intClientID = (int) Input::getInstance()->get('id');
         }
         else
         {

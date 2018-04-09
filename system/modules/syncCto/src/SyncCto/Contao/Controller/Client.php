@@ -306,20 +306,20 @@ class Client extends BackendModule
         }
         else
         {
-            $this->intStep = intval(Input::get("step"));
+            $this->intStep = (int) Input::get("step");
         }
 
         // Get Client id or check if we in allmode
         if (\strlen(Input::get("id")) != 0 && Input::get("mode") != 'all')
         {
-            $this->intClientID = intval(Input::get("id"));
+            $this->intClientID = (int) Input::get("id");
         }
         else
         {
             if (\strlen(Input::get("id")) != 0 && Input::get("mode") == 'all' && Input::get("next") != '1')
             {
                 $this->blnAllMode  = true;
-                $this->intClientID = intval(Input::get("id"));
+                $this->intClientID = (int) Input::get("id");
             }
             else
             {
@@ -339,7 +339,7 @@ class Client extends BackendModule
         // Set client for communication
         try
         {
-            $arrClientInformations      = $this->objSyncCtoCommunicationClient->setClientBy(intval($this->intClientID));
+            $arrClientInformations      = $this->objSyncCtoCommunicationClient->setClientBy((int) $this->intClientID);
             $this->Template->clientName = $arrClientInformations["title"];
         }
         catch (\Exception $exc)
@@ -373,16 +373,15 @@ class Client extends BackendModule
         $interactiveTimeout = $tmpResult->iTimeout;
 
         //overwrite the default values if higher ones are defined in the settings
-        if ($GLOBALS['TL_CONFIG']['syncCto_custom_settings'] == true && intval($GLOBALS['TL_CONFIG']['syncCto_wait_timeout']) > 0 &&
-                intval($GLOBALS['TL_CONFIG']['syncCto_interactive_timeout']) > 0
+        if ($GLOBALS['TL_CONFIG']['syncCto_custom_settings'] == true && (int) $GLOBALS['TL_CONFIG']['syncCto_wait_timeout'] > 0 && (int) $GLOBALS['TL_CONFIG']['syncCto_interactive_timeout'] > 0
         ) {
-            $waitTimeOut = max($waitTimeOut, intval($GLOBALS['TL_CONFIG']['syncCto_wait_timeout']));
-            $interactiveTimeout = max($interactiveTimeout, intval($GLOBALS['TL_CONFIG']['syncCto_interactive_timeout']));
+            $waitTimeOut = max($waitTimeOut, (int) $GLOBALS['TL_CONFIG']['syncCto_wait_timeout']);
+            $interactiveTimeout = max($interactiveTimeout, (int) $GLOBALS['TL_CONFIG']['syncCto_interactive_timeout']);
         }
 
         Database::getInstance()
                 ->prepare('SET SESSION wait_timeout = ?,SESSION interactive_timeout = ?;')
-                ->execute(intval($waitTimeOut), intval($interactiveTimeout));
+                ->execute((int) $waitTimeOut, (int) $interactiveTimeout);
 
         if (Input::get("abort") == "true")
         {

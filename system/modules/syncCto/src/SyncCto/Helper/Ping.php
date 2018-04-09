@@ -124,7 +124,7 @@ class Ping
             return false;
         }
 
-        $this->clientID = intval($clientId);
+        $this->clientID = (int) $clientId;
 
         return true;
     }

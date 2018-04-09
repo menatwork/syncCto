@@ -92,7 +92,7 @@ class Ajax extends Client
                 throw new \Exception("No client id was send.");
             }
 
-            $this->intClientID = intval($this->Input->post("id"));
+            $this->intClientID = (int) $this->Input->post("id");
 
             // Load and check compare list
             $this->loadTempList();
