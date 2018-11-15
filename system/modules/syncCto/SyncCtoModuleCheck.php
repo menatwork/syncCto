@@ -5,7 +5,7 @@
  *
  * @copyright  MEN AT WORK 2014
  * @package    syncCto
- * @license    GNU/LGPL 
+ * @license    GNU/LGPL
  * @filesource
  */
 
@@ -40,8 +40,8 @@ class SyncCtoModuleCheck extends BackendModule
 
     /**
      * Constructor
-     * 
-     * @param DataContainer $objDc 
+     *
+     * @param DataContainer $objDc
      */
     public function __construct(DataContainer $objDCA = null)
     {
@@ -68,7 +68,7 @@ class SyncCtoModuleCheck extends BackendModule
 
     /**
      * Get a list with informations about some php vars
-     * 
+     *
      * @return array
      */
     public function getPhpConfigurations()
@@ -96,7 +96,7 @@ class SyncCtoModuleCheck extends BackendModule
         {
             $blnIsActive = true;
         }
-        
+
         // Check patch
         if (defined("SUHOSIN_PATCH") && @constant("SUHOSIN_PATCH"))
         {
@@ -108,7 +108,7 @@ class SyncCtoModuleCheck extends BackendModule
 
     /**
      * Get a list with informations about the required functions
-     * 
+     *
      * @return array
      */
     public function getPhpFunctions()
@@ -126,7 +126,7 @@ class SyncCtoModuleCheck extends BackendModule
 
     /**
      * Run a little test for MySQL Trigger
-     * 
+     *
      * @return array
      */
     public function getMySqlFunctions()
@@ -177,7 +177,7 @@ class SyncCtoModuleCheck extends BackendModule
             'error_delete' => $strErrorDelete,
         );
     }
-    
+
     public function getExtendedInformation($strTimeFormate = null)
     {
         // Set the time formate.
@@ -237,7 +237,7 @@ class SyncCtoModuleCheck extends BackendModule
 
     /**
      * Replace the m/g/ etc. from php ini
-     * 
+     *
      * @param mix $strValue
      * @return int
      */
@@ -248,7 +248,7 @@ class SyncCtoModuleCheck extends BackendModule
 
     /**
      * Return true if the Safe Mode Hack is required
-     * 
+     *
      * @return boolean
      */
     public function requiresSafeModeHack()
@@ -258,7 +258,7 @@ class SyncCtoModuleCheck extends BackendModule
 
     /**
      * Check all PHP extensions and return the result as string
-     * 
+     *
      * @return string
      */
     public function checkPhpConfiguration($arrConfigurations)
@@ -389,7 +389,7 @@ class SyncCtoModuleCheck extends BackendModule
 
     /**
      * Check all PHP function/class and return the result as string
-     * 
+     *
      * @return string
      */
     public function checkPhpFunctions($arrFunctions)
@@ -484,7 +484,7 @@ class SyncCtoModuleCheck extends BackendModule
             $return .= '<td>' . $GLOBALS['TL_LANG']['tl_syncCto_check']['setting_on'] . '</td>';
             $return .= '</tr>';
         }
-        
+
         $return .= '</table>';
 
         return $return;
@@ -527,7 +527,7 @@ class SyncCtoModuleCheck extends BackendModule
             {
                 $this->log('Error by checking trigger functions for syncCto Pro. ' . $arrFunctions['error_create'], __CLASS__ . '|' . __FUNCTION__, TL_ERROR);
             }
-            
+
             $return .= '<tr class="' . ($ok ? 'ok' : 'warning') . '">';
             $return .= '<td colspan="4">' . $GLOBALS['TL_LANG']['tl_syncCto_check']['trigger_information'] . '</td>';
             $return .= '</tr>';
@@ -549,7 +549,7 @@ class SyncCtoModuleCheck extends BackendModule
         $return .= '<th>' . $GLOBALS['TL_LANG']['tl_syncCto_check']['parameter'] . '</th>';
         $return .= '<th>' . $GLOBALS['TL_LANG']['tl_syncCto_check']['value'] . '</th>';
         $return .= '</tr>';
-        
+
         foreach ($arrExtendedFunctions as $key => $value)
         {
             if(isset($GLOBALS['TL_LANG']['tl_syncCto_check']['extendedInformation_desc'][$key]))
@@ -578,10 +578,10 @@ class SyncCtoModuleCheck extends BackendModule
         }
 
         $return .= '</table>';
-        
+
         return $return;
     }
-    
+
     public function compareExtendedInformation($arrServerExtendedFunctions, $arrClientExtendedFunctions)
     {
         $return .= '<table width="100%" cellspacing="0" cellpadding="0" class="extensions" summary="">';
@@ -597,7 +597,7 @@ class SyncCtoModuleCheck extends BackendModule
         $return .= '<th>' . $GLOBALS['TL_LANG']['tl_syncCto_check']['value_server'] . '</th>';
         $return .= '<th>' . $GLOBALS['TL_LANG']['tl_syncCto_check']['value_client'] . '</th>';
         $return .= '</tr>';
-        
+
         foreach ($arrServerExtendedFunctions as $key => $value)
         {
             if (isset($GLOBALS['TL_LANG']['tl_syncCto_check']['extendedInformation_desc'][$key]))
@@ -622,11 +622,11 @@ class SyncCtoModuleCheck extends BackendModule
                     }
 
                     if ($mixTimeValue != $arrClientExtendedFunctions[$key][$strTimeKey])
-                    {                        
+                    {
                         $blnSame = false;
                     }
                 }
-                
+
                 // Build html.
                 $return .= '<tr class="' . (($blnSame) ? 'ok' : 'warning') . '">';
                 $return .= '<td>' . $strTitle . '</td>';

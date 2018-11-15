@@ -5,7 +5,7 @@
  *
  * @copyright  MEN AT WORK 2014
  * @package    syncCto
- * @license    GNU/LGPL 
+ * @license    GNU/LGPL
  * @filesource
  */
 
@@ -37,9 +37,9 @@ class SyncCtoRPCFunctions extends Backend
 
         $this->Config = Config::getInstance();
 
-        $this->objSyncCtoFiles = SyncCtoFiles::getInstance();
+        $this->objSyncCtoFiles    = SyncCtoFiles::getInstance();
         $this->objSyncCtoDatabase = SyncCtoDatabase::getInstance();
-        $this->objSyncCtoHelper = SyncCtoHelper::getInstance();
+        $this->objSyncCtoHelper   = SyncCtoHelper::getInstance();
 
         $this->loadLanguageFile("default");
 
@@ -47,12 +47,12 @@ class SyncCtoRPCFunctions extends Backend
     }
 
     /* -------------------------------------------------------------------------
-     * RPC Functions - Helper 
+     * RPC Functions - Helper
      */
-    
+
     /**
      * Send the version number of this syncCto
-     * 
+     *
      * @return string
      */
     public function getVersionSyncCto()
@@ -62,25 +62,26 @@ class SyncCtoRPCFunctions extends Backend
 
     /**
      * Send informations about this php instalation
-     * 
+     *
      * @return array
      */
     public function getClientParameter()
     {
         return array(
-            'max_execution_time' => ini_get('max_execution_time'),
-            'memory_limit' => ini_get('memory_limit'),
-            'file_uploads' => ini_get('file_uploads'),
+            'max_execution_time'  => ini_get('max_execution_time'),
+            'memory_limit'        => ini_get('memory_limit'),
+            'file_uploads'        => ini_get('file_uploads'),
             'upload_max_filesize' => ini_get('upload_max_filesize'),
-            'post_max_size' => ini_get('post_max_size')
+            'post_max_size'       => ini_get('post_max_size')
         );
     }
 
     /**
      * Return localconfig
-     * 
+     *
      * @param array $arrConfigBlacklist Blacklist entries for localconfig
-     * @return array 
+     *
+     * @return array
      */
     public function getLocalConfig($arrConfigBlacklist)
     {
@@ -88,10 +89,8 @@ class SyncCtoRPCFunctions extends Backend
         $arrConfig = $this->objSyncCtoHelper->loadConfigs(SyncCtoEnum::LOADCONFIG_KEY_VALUE);
 
         // Kick blacklist entries
-        foreach ($arrConfig as $key => $value)
-        {
-            if (in_array($key, $arrConfigBlacklist))
-            {
+        foreach ($arrConfig as $key => $value) {
+            if (in_array($key, $arrConfigBlacklist)) {
                 unset($arrConfig[$key]);
             }
         }
@@ -101,25 +100,22 @@ class SyncCtoRPCFunctions extends Backend
 
     /**
      * Return a list of all syncCto path or a special path.
-     * 
+     *
      * @param stirng $strName - Null or the name of a path like db,file,debug,tmp
+     *
      * @return [array|string]
      */
     public function getPathList($strName = null)
     {
-        if ($strName == null)
-        {
+        if ($strName == null) {
             return array(
-                'db' => $GLOBALS['SYC_PATH']['db'],
-                'file' => $GLOBALS['SYC_PATH']['file'],
+                'db'    => $GLOBALS['SYC_PATH']['db'],
+                'file'  => $GLOBALS['SYC_PATH']['file'],
                 'debug' => $GLOBALS['SYC_PATH']['debug'],
-                'tmp' => $GLOBALS['SYC_PATH']['tmp']
+                'tmp'   => $GLOBALS['SYC_PATH']['tmp']
             );
-        }
-        else
-        {
-            switch ($strName)
-            {
+        } else {
+            switch ($strName) {
                 case 'db':
                 case 'file':
                 case 'debug':
@@ -134,20 +130,18 @@ class SyncCtoRPCFunctions extends Backend
 
     /**
      * Set the syncFrom flag in der localconfig
-     * 
+     *
      * @param boolean $booMode
-     * @return boolean 
+     *
+     * @return boolean
      */
     public function setAttentionFlag($booMode)
     {
         $arrLocalConfig = $this->objSyncCtoHelper->loadConfigs(SyncCtoEnum::LOADCONFIG_KEYS_ONLY);
 
-        if (in_array("\$GLOBALS['TL_CONFIG']['syncCto_attentionFlag']", $arrLocalConfig))
-        {
+        if (in_array("\$GLOBALS['TL_CONFIG']['syncCto_attentionFlag']", $arrLocalConfig)) {
             $this->Config->update("\$GLOBALS['TL_CONFIG']['syncCto_attentionFlag']", $booMode);
-        }
-        else
-        {
+        } else {
             $this->Config->add("\$GLOBALS['TL_CONFIG']['syncCto_attentionFlag']", $booMode);
         }
 
@@ -156,17 +150,16 @@ class SyncCtoRPCFunctions extends Backend
 
     /**
      * Set the displayErrors flag
+     *
      * @param boolean $booState
-     * @return boolean 
+     *
+     * @return boolean
      */
     public function setDisplayErrors($booState)
     {
-        if (key_exists("ctoCom_disableRefererCheck", $GLOBALS['TL_CONFIG']))
-        {
+        if (key_exists("ctoCom_disableRefererCheck", $GLOBALS['TL_CONFIG'])) {
             $this->Config->update("\$GLOBALS['TL_CONFIG']['displayErrors']", $booState);
-        }
-        else
-        {
+        } else {
             $this->Config->add("\$GLOBALS['TL_CONFIG']['displayErrors']", $booState);
         }
 
@@ -179,66 +172,66 @@ class SyncCtoRPCFunctions extends Backend
 
     /**
      * Get file and rebuild the array for checking delete files
-     * 
+     *
      * @param string $strMD5
      * @param string $strFilename
-     * @return mixed 
+     *
+     * @return mixed
      */
     public function checkDeleteFiles($strMD5, $strFilename)
     {
-        if (!key_exists($strFilename, $_FILES))
-        {
+        if (!key_exists($strFilename, $_FILES)) {
             throw new Exception(vsprintf($GLOBALS['TL_LANG']['ERR']['unknown_file'], array($strFilename)));
         }
 
-        if (md5_file($_FILES[$strFilename]["tmp_name"]) != $strMD5)
-        {
+        if (md5_file($_FILES[$strFilename]["tmp_name"]) != $strMD5) {
             throw new Exception($GLOBALS['TL_LANG']['ERR']['checksum_error']);
         }
 
         $objFiles = Files::getInstance();
-        $objFiles->move_uploaded_file($_FILES[$strFilename]["tmp_name"], $this->objSyncCtoHelper->standardizePath($GLOBALS['SYC_PATH']['tmp'], "syncListInc.syncCto"));
+        $objFiles->move_uploaded_file($_FILES[$strFilename]["tmp_name"],
+            $this->objSyncCtoHelper->standardizePath($GLOBALS['SYC_PATH']['tmp'], "syncListInc.syncCto"));
 
-        $objFile         = new File($this->objSyncCtoHelper->standardizePath($GLOBALS['SYC_PATH']['tmp'], "syncListInc.syncCto"));
+        $objFile         = new File($this->objSyncCtoHelper->standardizePath($GLOBALS['SYC_PATH']['tmp'],
+            "syncListInc.syncCto"));
         $arrChecksumList = unserialize($objFile->getContent());
         $objFile->close();
 
-        if (!is_array($arrChecksumList))
-        {
+        if (!is_array($arrChecksumList)) {
             throw new Exception("Could not rebuild array.");
         }
 
         return $this->objSyncCtoFiles->checkDeleteFiles($arrChecksumList);
     }
-    
+
     /**
      * Get file and rebuild the array for checking delete files
-     * 
+     *
      * @param string $strMD5
      * @param string $strFilename
-     * @return mixed 
+     *
+     * @return mixed
      */
     public function searchDeleteFolders($strMD5, $strFilename)
     {
-        if (!key_exists($strFilename, $_FILES))
-        {
+        if (!key_exists($strFilename, $_FILES)) {
             throw new Exception(vsprintf($GLOBALS['TL_LANG']['ERR']['unknown_file'], array($strFilename)));
         }
 
-        if (md5_file($_FILES[$strFilename]["tmp_name"]) != $strMD5)
-        {
+        if (md5_file($_FILES[$strFilename]["tmp_name"]) != $strMD5) {
             throw new Exception($GLOBALS['TL_LANG']['ERR']['checksum_error']);
         }
 
         $objFiles = Files::getInstance();
-        $objFiles->move_uploaded_file($_FILES[$strFilename]["tmp_name"], $this->objSyncCtoHelper->standardizePath($GLOBALS['SYC_PATH']['tmp'], "syncFolderListInc.syncCto"));
+        $objFiles->move_uploaded_file($_FILES[$strFilename]["tmp_name"],
+            $this->objSyncCtoHelper->standardizePath($GLOBALS['SYC_PATH']['tmp'], "syncFolderListInc.syncCto"));
 
-        $objFile         = new File($this->objSyncCtoHelper->standardizePath($GLOBALS['SYC_PATH']['tmp'], "syncFolderListInc.syncCto"));
+        $objFile         = new File($this->objSyncCtoHelper->standardizePath($GLOBALS['SYC_PATH']['tmp'],
+            "syncFolderListInc.syncCto"));
         $arrChecksumList = unserialize($objFile->getContent());
         $objFile->close();
 
-        if (!is_array($arrChecksumList))
-        {
+        if (!is_array($arrChecksumList)) {
             throw new Exception("Could not rebuild array.");
         }
 
@@ -247,32 +240,32 @@ class SyncCtoRPCFunctions extends Backend
 
     /**
      * Get filelist and rebuild the array and run checksum compare.
-     * 
+     *
      * @param string $strMD5
      * @param string $strFilename
-     * @return mixed 
+     *
+     * @return mixed
      */
     public function runCecksumCompare($strMD5, $strFilename, $blnDisableDbafsConflicts)
     {
-        if (!key_exists($strFilename, $_FILES))
-        {
+        if (!key_exists($strFilename, $_FILES)) {
             throw new Exception(vsprintf($GLOBALS['TL_LANG']['ERR']['unknown_file'], array($strFilename)));
         }
 
-        if (md5_file($_FILES[$strFilename]["tmp_name"]) != $strMD5)
-        {
+        if (md5_file($_FILES[$strFilename]["tmp_name"]) != $strMD5) {
             throw new Exception($GLOBALS['TL_LANG']['ERR']['checksum_error']);
         }
 
         $objFiles = Files::getInstance();
-        $objFiles->move_uploaded_file($_FILES[$strFilename]["tmp_name"], $this->objSyncCtoHelper->standardizePath($GLOBALS['SYC_PATH']['tmp'], "syncListInc.syncCto"));
+        $objFiles->move_uploaded_file($_FILES[$strFilename]["tmp_name"],
+            $this->objSyncCtoHelper->standardizePath($GLOBALS['SYC_PATH']['tmp'], "syncListInc.syncCto"));
 
-        $objFile         = new File($this->objSyncCtoHelper->standardizePath($GLOBALS['SYC_PATH']['tmp'], "syncListInc.syncCto"));
+        $objFile         = new File($this->objSyncCtoHelper->standardizePath($GLOBALS['SYC_PATH']['tmp'],
+            "syncListInc.syncCto"));
         $arrChecksumList = unserialize($objFile->getContent());
         $objFile->close();
 
-        if (!is_array($arrChecksumList))
-        {
+        if (!is_array($arrChecksumList)) {
             throw new Exception("Could not rebuild array.");
         }
 
@@ -281,21 +274,21 @@ class SyncCtoRPCFunctions extends Backend
 
     /**
      * Execute a SQL command
-     * 
-     * @param array $arrSQL <p>array([ID] => <br/>array("prepare" => [String(SQL)], "execute" => array([mix]) ) <br/>)</p>
+     *
+     * @param array $arrSQL <p>array([ID] => <br/>array("prepare" => [String(SQL)], "execute" => array([mix]) )
+     *                      <br/>)</p>
+     *
      * @return array <p>array([ID] => [mix])</p>
      */
     public function executeSQL($arrSQL)
     {
-        if (!is_array($arrSQL))
-        {
+        if (!is_array($arrSQL)) {
             return false;
         }
 
         $arrResponse = array();
 
-        foreach ($arrSQL as $key => $value)
-        {
+        foreach ($arrSQL as $key => $value) {
             $mixDatabase = $this->Database->prepare($value['prepare']);
             call_user_func_array(array($mixDatabase, "execute"), $value["execute"]);
         }
