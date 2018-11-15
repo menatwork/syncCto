@@ -156,7 +156,7 @@ class Ping
 
         if ($this->client->http_auth == true) {
             $this->request->username = $this->client->http_username;
-            $this->request->password = \Encryption::decrypt($this->client->http_password);
+            $this->request->password = $this->client->http_password;
         }
 
         // Build base link.

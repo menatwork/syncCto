@@ -20,7 +20,6 @@ class SyncCtoRPCFunctions extends Backend
     protected $objSyncCtoDatabase;
     protected $objSyncCtoMeasurement;
     protected $BackendUser;
-    protected $Encryption;
     protected $Config;
 
     /* -------------------------------------------------------------------------
@@ -36,7 +35,6 @@ class SyncCtoRPCFunctions extends Backend
 
         parent::__construct();
 
-        $this->Encryption = Encryption::getInstance();
         $this->Config = Config::getInstance();
 
         $this->objSyncCtoFiles = SyncCtoFiles::getInstance();
