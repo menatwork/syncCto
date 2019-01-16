@@ -97,7 +97,7 @@ class SyncCtoCommunicationClient extends \CtoCommunication\Serivces\Server
 
         if ($objClient->http_auth == true)
         {
-            $this->setHttpAuth($objClient->http_username, \Encryption::decrypt($objClient->http_password));
+            $this->setHttpAuth($objClient->http_username, $objClient->http_password);
         }
 
         // Set debug modus for ctoCom.
