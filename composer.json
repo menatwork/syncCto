@@ -29,9 +29,8 @@
     "php": "^5.6 || ^7.0",
     "contao/core-bundle": "^4.4.8",
     "menatwork/contao-multicolumnwizard-bundle": "~3.2",
-    "menatwork/ctocommunication": "~3.0",
-    "contao-community-alliance/dc-general": "2.1.*@dev",
-    "menatwork/ziparchivecto": "~1.1"
+    "menatwork/ctocommunication": "dev-feature/contao4",
+    "contao-community-alliance/dc-general": "^2.1.3"
   },
   "require-dev": {
     "phpcq/all-tasks": "~1.2",
