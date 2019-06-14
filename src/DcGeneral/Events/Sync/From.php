@@ -142,7 +142,7 @@ class From extends Base
      */
     protected function runSync($arrData)
     {
-        $id                           = ModelId::fromSerialized(\Input::get('cid'));
+        $id                           = ModelId::fromSerialized(\Input::get('id'));
         $arrSyncSettings              = array();
         $arrSyncSettings["post_data"] = $arrData;
 
@@ -216,7 +216,7 @@ class From extends Base
      */
     protected function runSyncAll($arrData)
     {
-        $id              = ModelId::fromSerialized(\Input::get('cid'));
+        $id              = ModelId::fromSerialized(\Input::get('id'));
         $arrSyncSettings = array();
 
         // Set array.

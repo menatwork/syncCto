@@ -322,7 +322,7 @@ class tl_synccto_clients extends Backend
 
         if (in_array($operations, array('syncTo', 'syncFrom'))) {
             $tableName = sprintf('tl_syncCto_clients_%s', $operations);
-            $strIdName = 'cid';
+            $strIdName = 'id';
         } else {
             $strIdName = 'id';
         }

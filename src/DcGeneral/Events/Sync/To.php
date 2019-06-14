@@ -217,7 +217,7 @@ class To extends Base
      */
     protected function runSyncAll($arrData)
     {
-        $id              = ModelId::fromSerialized(\Input::get('cid'));
+        $id              = ModelId::fromSerialized(\Input::get('id'));
         $arrSyncSettings = array();
 
         // Set array.
