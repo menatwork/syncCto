@@ -5,17 +5,18 @@
  *
  * @copyright  MEN AT WORK 2014
  * @package    syncCto
- * @license    GNU/LGPL 
+ * @license    GNU/LGPL
  * @filesource
  */
 
 $GLOBALS['TL_DCA']['tl_syncCto_backup_db'] = array
 (
     // Config
-    'config' => array
+    'config'     => array
     (
-        'dataContainer'           => 'General',
-        'disableSubmit'           => false
+        'dataContainer'    => 'General',
+        'disableSubmit'    => false,
+        'enableVersioning' => false
     ),
     'dca_config' => array
     (
@@ -29,26 +30,26 @@ $GLOBALS['TL_DCA']['tl_syncCto_backup_db'] = array
         ),
     ),
     // Palettes
-    'palettes' => array
+    'palettes'   => array
     (
-        'default'                 => '{table_recommend_legend},database_tables_recommended;{table_none_recommend_legend:hide},database_tables_none_recommended;'
+        'default' => '{table_recommend_legend},database_tables_recommended;{table_none_recommend_legend:hide},database_tables_none_recommended;'
     ),
     // Fields
-    'fields' => array
+    'fields'     => array
     (
-        'database_tables_recommended' => array
+        'database_tables_recommended'      => array
         (
-            'label'               => &$GLOBALS['TL_LANG']['tl_syncCto_backup_db']['database_tables_recommended'],
-            'inputType'           => 'checkbox',
-            'exclude'             => true,
-            'eval'                => array('multiple' => true)
+            'label'     => &$GLOBALS['TL_LANG']['tl_syncCto_backup_db']['database_tables_recommended'],
+            'inputType' => 'checkbox',
+            'exclude'   => true,
+            'eval'      => array('multiple' => true)
         ),
         'database_tables_none_recommended' => array
         (
-            'label'               => &$GLOBALS['TL_LANG']['tl_syncCto_backup_db']['database_tables_none_recommended'],
-            'inputType'           => 'checkbox',
-            'exclude'             => true,
-            'eval'                => array('multiple' => true)
+            'label'     => &$GLOBALS['TL_LANG']['tl_syncCto_backup_db']['database_tables_none_recommended'],
+            'inputType' => 'checkbox',
+            'exclude'   => true,
+            'eval'      => array('multiple' => true)
         )
     )
 );

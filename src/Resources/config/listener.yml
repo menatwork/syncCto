@@ -1,1 +1,87 @@
 services:
+  MenAtWork\SyncCto\DcGeneral\Events\Sync\To:
+    tags:
+      - name: kernel.event_listener
+        event: dc-general.view.contao2backend.get-edit-mode-buttons
+        method: addButton
+        priority: 200
+      - name: kernel.event_listener
+        event: dc-general.model.pre-persist
+        method: submit
+        priority: 200
+
+  MenAtWork\SyncCto\DcGeneral\Events\Sync\From:
+    tags:
+      - name: kernel.event_listener
+        event: dc-general.view.contao2backend.get-edit-mode-buttons
+        method: addButton
+        priority: 200
+      - name: kernel.event_listener
+        event: dc-general.model.pre-persist
+        method: submit
+        priority: 200
+
+  MenAtWork\SyncCto\DcGeneral\Events\Backup\Database:
+    tags:
+      - name: kernel.event_listener
+        event: dc-general.view.contao2backend.get-edit-mode-buttons
+        method: addButtonBackup
+        priority: 200
+      - name: kernel.event_listener
+        event: dc-general.model.pre-persist
+        method: submitBackup
+        priority: 200
+      - name: kernel.event_listener
+        event: dc-general.view.contao2backend.get-edit-mode-buttons
+        method: addButtonRestore
+        priority: 200
+      - name: kernel.event_listener
+        event: dc-general.model.pre-persist
+        method: submitRestore
+        priority: 200
+      - name: kernel.event_listener
+        event: dc-general.view.contao2backend.get-property-options
+        method: databaseTablesRecommended
+      - name: kernel.event_listener
+        event: dc-general.view.contao2backend.get-property-options
+        method: databaseTablesNoneRecommendedWithHidden
+
+  MenAtWork\SyncCto\DcGeneral\Events\Backup\File:
+    tags:
+      - name: kernel.event_listener
+        event: dc-general.view.contao2backend.get-edit-mode-buttons
+        method: addButtonRestore
+        priority: 200
+      - name: kernel.event_listener
+        event: dc-general.model.pre-persist
+        method: submitRestore
+        priority: 200
+      - name: kernel.event_listener
+        event: dc-general.view.contao2backend.get-edit-mode-buttons
+        method: addButtonRestore
+        priority: 200
+      - name: kernel.event_listener
+        event: dc-general.model.pre-persist
+        method: submitRestore
+        priority: 200
+
+  MenAtWork\SyncCto\DcGeneral\Dca\Builder\DataDefinitionBuilder:
+    tags:
+      - name: kernel.event_listener
+        event: dc-general.factory.build-data-definition
+        method: process
+        priority: -200
+
+  MenAtWork\SyncCto\DcGeneral\ActionHandler\SyncEditHandler:
+    tags:
+      - name: kernel.event_listener
+        event: dc-general.action
+        method: handleEvent
+        priority: 20000
+
+  MenAtWork\SyncCto\DcGeneral\ActionHandler\BackupEditHandler:
+    tags:
+      - name: kernel.event_listener
+        event: dc-general.action
+        method: handleEvent
+        priority: 20000

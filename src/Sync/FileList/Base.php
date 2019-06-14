@@ -16,7 +16,7 @@ use ArrayIterator;
 use ArrayObject;
 use EmptyIterator;
 use FilterIterator;
-use SyncCto\Sync\FileList\FilterIterator\Base as FilterIteratorBase;
+use MenAtWork\SyncCto\Sync\FileList\FilterIterator\Base as FilterIteratorBase;
 
 class Base
 {

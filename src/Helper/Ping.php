@@ -161,7 +161,6 @@ class Ping
 
         // Build base link.
         $this->client->path = preg_replace("/\/\z/i", "", $this->client->path);
-        $this->client->path = preg_replace("/ctoCommunication.php\z/", "", $this->client->path);
 
         $this->clientBaseUrl = $this->client->address . ":" . $this->client->port;
         if (strlen($this->client->path)) {
@@ -256,13 +255,13 @@ class Ping
      */
     protected function pingCtoCom()
     {
-        $this->sendRequest('/ctoCommunication.php?act=ping');
+        $this->sendRequest('?act=ping');
         if ($this->request->code != '200') {
             $this->addState
             (
                 2,
                 $GLOBALS['TL_LANG']['tl_synccto_clients']['state']['blue'],
-                'Missing ctoCommunication.php'
+                'Missing ctoCommunication'
             );
             $this->output();
         }

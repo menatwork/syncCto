@@ -3,7 +3,7 @@
 
     <?php if($this->close): ?>
 
-    <img class="loader" src="<?php echo $this->Environment->base; ?>system/modules/syncCto/assets/images/steps/loader.gif" alt="" />
+    <img class="loader" src="<?php echo $this->Environment->base; ?>bundles/synccto/images/steps/loader.gif" alt="" />
     <script>
     window.addEvent("domready",function(){
         window.parent.document.getElement('input[name=forward]').click();

@@ -14,7 +14,7 @@ namespace MenAtWork\SyncCto\DcGeneral\Events\Backup;
 use ContaoCommunityAlliance\DcGeneral\Contao\View\Contao2BackendView\Event\GetEditModeButtonsEvent;
 use ContaoCommunityAlliance\DcGeneral\Event\PrePersistModelEvent;
 use RuntimeException;
-use SyncCto\DcGeneral\Events\Base;
+use MenAtWork\SyncCto\DcGeneral\Events\Base;
 use SyncCtoHelper;
 
 /**

@@ -64,27 +64,22 @@ class SyncEditHandler extends AbstractHandler
 
         $environment   = $this->getEnvironment();
         $inputProvider = $environment->getInputProvider();
-
-        $modelId      = ModelId::fromSerialized($inputProvider->getParameter('cid'));
-        $dataProvider = $environment->getDataProvider($modelId->getDataProviderName());
-
-        $view = $environment->getView();
+        $view          = $environment->getView();
         if (!$view instanceof BaseView) {
+
             return;
         }
 
-        $this->checkRestoreVersion($modelId);
-
-        $model = $dataProvider->fetch($dataProvider->getEmptyConfig()->setId($modelId->getId()));
-        if (!$model) {
-            throw new DcGeneralRuntimeException('Could not retrieve model with id ' . $modelId->getSerialized());
-        }
-
-        $clone = clone $model;
-        $clone->setId($model->getId());
-
-        $editMask = new EditMask($view, $model, $clone, null, null, $view->breadcrumb());
+        $editMask = new EditMask(
+            $view,
+            $environment->getDataProvider()->getEmptyModel(),
+            $clone,
+            null,
+            null,
+            $view->breadcrumb()
+        );
         $event->setResponse($editMask->execute());
+        $event->stopPropagation();
     }
 
     /**

@@ -21,7 +21,7 @@ if (!function_exists('posix_getpwuid'))
 /**
  * Class for systemcheck
  */
-class SyncCtoModuleCheck extends BackendModule
+class SyncCtoModuleCheck extends \Contao\BackendModule
 {
 
     /**

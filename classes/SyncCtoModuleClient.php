@@ -257,7 +257,7 @@ class SyncCtoModuleClient extends \BackendModule
         $this->loadLanguageFile("tl_syncCto_check");
 
         // Load CSS
-        $GLOBALS['TL_CSS'][] = 'system/modules/syncCto/assets/css/steps.css';
+        $GLOBALS['TL_CSS'][] = 'bundles/synccto/css/steps.css';
 
         // Init classes.
         $this->User = \BackendUser::getInstance();
@@ -318,8 +318,7 @@ class SyncCtoModuleClient extends \BackendModule
             $arrClientInformations      = $this->objSyncCtoCommunicationClient->setClientBy(intval($this->intClientID));
             $this->Template->clientName = $arrClientInformations["title"];
         }
-        catch (Exception $exc)
-        {
+catch (Exception $exc){throw $exc;
             $_SESSION["TL_ERROR"] = array($GLOBALS['TL_LANG']['ERR']['client_set']);
             $this->log($exc->getMessage(), __CLASS__ . " | " . __FUNCTION__, TL_ERROR);
             $this->redirect("contao/main.php?do=synccto_clients");
@@ -625,13 +624,29 @@ class SyncCtoModuleClient extends \BackendModule
     protected function initTempLists()
     {
         // Load Files
-        $objFileList = new File($this->objSyncCtoHelper->standardizePath($GLOBALS['SYC_PATH']['tmp'], "syncfilelist-ID-" . $this->intClientID . ".txt"));
-        $objFileList->delete();
-        $objFileList->close();
+        $path = $this
+            ->objSyncCtoHelper
+            ->standardizePath(
+                $GLOBALS['SYC_PATH']['tmp'],
+                "syncfilelist-ID-" . $this->intClientID . ".txt"
+            );
+        if (file_exists(TL_ROOT . DIRECTORY_SEPARATOR . $path)) {
+            $objFileList = new File($path);
+            $objFileList->delete();
+            $objFileList->close();
+        }
 
-        $objCompareList = new File($this->objSyncCtoHelper->standardizePath($GLOBALS['SYC_PATH']['tmp'], "synccomparelist-ID-" . $this->intClientID . ".txt"));
-        $objCompareList->delete();
-        $objCompareList->close();
+        $path = $this
+            ->objSyncCtoHelper
+            ->standardizePath(
+                $GLOBALS['SYC_PATH']['tmp'],
+                "synccomparelist-ID-" . $this->intClientID . ".txt"
+            );
+        if (file_exists(TL_ROOT . DIRECTORY_SEPARATOR . $path)) {
+            $objCompareList = new File($path);
+            $objCompareList->delete();
+            $objCompareList->close();
+        }
     }
 
     protected function loadTempLists()
@@ -1293,8 +1308,7 @@ class SyncCtoModuleClient extends \BackendModule
                     break;
             }
         }
-        catch (Exception $exc)
-        {
+        catch (Exception $exc){
             $this->log(vsprintf("Error on synchronization client ID %s", array(\Input::get("id"))), __CLASS__ . " " . __FUNCTION__, "ERROR");
 
             $this->booError = true;

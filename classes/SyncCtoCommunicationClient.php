@@ -14,7 +14,7 @@
  *
  * Extends CtoCommunication witch special RPC-Requests
  */
-class SyncCtoCommunicationClient extends \CtoCommunication\Serivces\Server
+class SyncCtoCommunicationClient extends \MenAtWork\CtoCommunicationBundle\Controller\Server
 {
     /* -------------------------------------------------------------------------
      * Vars
@@ -81,16 +81,15 @@ class SyncCtoCommunicationClient extends \CtoCommunication\Serivces\Server
 
         // Clean url
         $objClient->path = preg_replace("/\/\z/i", "", $objClient->path);
-        $objClient->path = preg_replace("/ctoCommunication.php\z/i", "", $objClient->path);
 
         // Build path
         if ($objClient->path == "")
         {
-            $strUrl = $objClient->address . ":" . $objClient->port . "/ctoCommunication.php";
+            $strUrl = $objClient->address . ":" . $objClient->port;
         }
         else
         {
-            $strUrl = $objClient->address . ":" . $objClient->port . $objClient->path . "/ctoCommunication.php";
+            $strUrl = $objClient->address . ":" . $objClient->port . $objClient->path;
         }
 
         $this->setClient($strUrl, $objClient->apikey, $objClient->codifyengine);

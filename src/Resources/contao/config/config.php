@@ -9,8 +9,6 @@
  * @filesource
  */
 
-use ContaoCommunityAlliance\Contao\EventDispatcher\Event\CreateEventDispatcherEvent;
-
 $objInput = \Input::getInstance();
 
 /**
@@ -29,7 +27,7 @@ array_insert($GLOBALS['BE_MOD'], $i + 1, array
         'syncCto_settings' => array
         (
             'tables'            => array('tl_syncCto_settings'),
-            'icon'              => 'system/modules/syncCto/assets/images/nav/iconSettings.png'
+            'icon'              => 'bundles/synccto/images/nav/iconSettings.png'
         ),
         'synccto_clients' => array
         (
@@ -40,9 +38,9 @@ array_insert($GLOBALS['BE_MOD'], $i + 1, array
                 'tl_syncCto_clients_syncFrom',
                 'tl_syncCto_clients_showExtern'
             ),
-            'icon'              => 'system/modules/syncCto/assets/images/nav/iconClients.png',
+            'icon'              => 'bundles/synccto/images/nav/iconClients.png',
             'callback'          => 'SyncCtoModuleClient',
-            'stylesheet'        => 'system/modules/syncCto/assets/css/systemcheck.css',
+            'stylesheet'        => 'bundles/synccto/css/systemcheck.css',
         ),
         'syncCto_backups' => array
         (
@@ -53,23 +51,17 @@ array_insert($GLOBALS['BE_MOD'], $i + 1, array
                 'tl_syncCto_restore_file',
                 'tl_syncCto_restore_db'
             ),
-            'icon'              => 'system/modules/syncCto/assets/images/nav/iconBackups.png',
+            'icon'              => 'bundles/synccto/images/nav/iconBackups.png',
             'callback'          => 'SyncCtoModuleBackup',
         ),
         'syncCto_check' => array
         (
-            'icon'              => 'system/modules/syncCto/assets/images/nav/iconCheck.png',
+            'icon'              => 'bundles/synccto/images/nav/iconCheck.png',
             'callback'          => 'SyncCtoModuleCheck',
-            'stylesheet'        => 'system/modules/syncCto/assets/css/systemcheck.css',
+            'stylesheet'        => 'bundles/synccto/css/systemcheck.css',
         )
     )
 ));
-
-/**
- * DcGeneral event callbacks
- */
-
-$GLOBALS['TL_EVENTS'][CreateEventDispatcherEvent::NAME][] = 'SyncCto\DcGeneral\Events\Subscriber::registerEvents';
 
 /**
  * Mime types
@@ -199,7 +191,7 @@ $GLOBALS['SYC_CONFIG']['mime_types'] = array_merge((array) $GLOBALS['SYC_CONFIG'
 /**
  * Hooks
  */
-$GLOBALS['TL_HOOKS']['executePreActions'][]          = array('SyncCto\Helper\Ping', 'pingClientStatus');
+$GLOBALS['TL_HOOKS']['executePreActions'][]          = array('MenAtWork\SyncCto\Helper\Ping', 'pingClientStatus');
 $GLOBALS['TL_HOOKS']['parseBackendTemplate'][]       = array('SyncCtoHelper', 'checkExtensions');
 $GLOBALS['TL_HOOKS']['parseBackendTemplate'][]       = array('SyncCtoHelper', 'checkLockStatus');
 $GLOBALS['TL_HOOKS']['addCustomRegexp'][]            = array('SyncCtoHelper', 'customRegexp');
@@ -236,7 +228,7 @@ if ($strDo == 'synccto_clients' && $strAct != 'start' && in_array($strTable, arr
  */
 if($GLOBALS['TL_CONFIG']['syncCto_attentionFlag'] == true)
 {
-    $GLOBALS['TL_CSS'][] = 'system/modules/syncCto/assets/css/attention.css';
+    $GLOBALS['TL_CSS'][] = 'bundles/synccto/css/attention.css';
 }
 
 // Size limit for files in bytes, will be checked
@@ -350,9 +342,9 @@ $GLOBALS['SYC_CONFIG']['folder_whitelist'] = array_merge( (array) $GLOBALS['SYC_
 /**
  * Sync options
  */
-// Core
-$GLOBALS['SYC_CONFIG']['sync_options']['core'][] =  'core_change';
-$GLOBALS['SYC_CONFIG']['sync_options']['core'][] =  'core_delete';
+// Core ! The core isn't possible since we have a compser system. We have to rewrite some functions here first.
+//$GLOBALS['SYC_CONFIG']['sync_options']['core'][] =  'core_change';
+//$GLOBALS['SYC_CONFIG']['sync_options']['core'][] =  'core_delete';
 // User
 $GLOBALS['SYC_CONFIG']['sync_options']['user'][] =  'user_change';
 $GLOBALS['SYC_CONFIG']['sync_options']['user'][] =  'user_delete';

@@ -73,7 +73,7 @@ class SyncCtoModuleBackup extends \BackendModule
         $this->loadLanguageFile('tl_syncCto_steps');
         
         // Load CSS
-        $GLOBALS['TL_CSS'][] = 'system/modules/syncCto/assets/css/steps.css';
+        $GLOBALS['TL_CSS'][] = 'bundles/synccto/css/steps.css';
                
         // Import
         $this->import('BackendUser', 'User');

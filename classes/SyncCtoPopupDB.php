@@ -394,14 +394,14 @@ class SyncCtoPopupDB extends Backend
 
         // Set stylesheets
         $GLOBALS['TL_CSS'][] = 'system/themes/' . $this->getTheme() . '/basic.css';
-        $GLOBALS['TL_CSS'][] = 'system/modules/syncCto/assets/css/compare.css';
+        $GLOBALS['TL_CSS'][] = 'bundles/synccto/css/compare.css';
 
         // Set javascript
         $GLOBALS['TL_JAVASCRIPT'][] = 'assets/mootools/core/' . MOOTOOLS . '/mootools-core.js';
         $GLOBALS['TL_JAVASCRIPT'][] = 'assets/mootools/core/' . MOOTOOLS . '/mootools-more.js';
         $GLOBALS['TL_JAVASCRIPT'][] = 'assets/mootools/mootao/Mootao.js';
         $GLOBALS['TL_JAVASCRIPT'][] = 'assets/contao/js/core.js';
-        $GLOBALS['TL_JAVASCRIPT'][] = 'system/modules/syncCto/assets/js/compare.js';
+        $GLOBALS['TL_JAVASCRIPT'][] = 'bundles/synccto/js/compare.js';
 
         // Set wrapper template information
         $this->popupTemplate           = new BackendTemplate("be_syncCto_popup");

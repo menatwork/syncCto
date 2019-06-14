@@ -15,7 +15,7 @@ use ContaoCommunityAlliance\DcGeneral\Contao\View\Contao2BackendView\Event\GetEd
 use ContaoCommunityAlliance\DcGeneral\Data\ModelId;
 use ContaoCommunityAlliance\DcGeneral\Event\PrePersistModelEvent;
 use RuntimeException;
-use SyncCto\DcGeneral\Events\Base;
+use MenAtWork\SyncCto\DcGeneral\Events\Base;
 use SyncCtoHelper;
 
 /**
@@ -143,7 +143,7 @@ class To extends Base
      */
     protected function runSync($arrData)
     {
-        $id                           = ModelId::fromSerialized(\Input::get('cid'));
+        $id                           = ModelId::fromSerialized(\Input::get('id'));
         $arrSyncSettings              = array();
         $arrSyncSettings["post_data"] = $arrData;
 

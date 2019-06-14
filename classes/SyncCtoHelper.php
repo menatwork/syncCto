@@ -9,7 +9,7 @@
  * @filesource
  */
 
-use SyncCto\Contao\API as ContaoApi;
+use MenAtWork\SyncCto\Contao\API as ContaoApi;
 
 /**
  * Helper class for syncCto. Callback functions, small global helper functions.
@@ -299,7 +299,7 @@ class SyncCtoHelper
             // Check if we have the path
             if (TL_PATH === null || TL_PATH == "")
             {
-                $objFile->write("<?php\n\n// Relative path to the installation\nreturn '" . preg_replace('/\/ctoCommunication.php\?.*$/i', '', Environment::getInstance()->requestUri) . "';\n");
+                $objFile->write("<?php\n\n// Relative path to the installation\nreturn '" . preg_replace('/\/ctoCommunication\?.*$/i', '', Environment::getInstance()->requestUri) . "';\n");
             }
             else
             {

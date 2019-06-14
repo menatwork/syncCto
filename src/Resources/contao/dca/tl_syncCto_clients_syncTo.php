@@ -11,11 +11,13 @@
 
 $GLOBALS['TL_DCA']['tl_syncCto_clients_syncTo'] = array
 (
-    // Config
     'config'      => array
     (
-        'dataContainer' => 'General',
-        'disableSubmit' => false
+        'dataContainer'    => 'General',
+        'ptable'           => 'tl_synccto_clients',
+        'switchToEdit'     => false,
+        'enableVersioning' => false,
+        'closed'           => false
     ),
     // Palettes
     'palettes'    => array

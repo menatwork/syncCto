@@ -15,7 +15,20 @@ $GLOBALS['TL_DCA']['tl_syncCto_clients_syncFrom'] = array
     'config'      => array
     (
         'dataContainer' => 'General',
-        'disableSubmit' => false
+        'forceEdit'     => true,
+        'disableSubmit' => false,
+    ),
+    // DcG configuration
+    'dca_config'  => array
+    (
+        'data_provider' => array
+        (
+            'default' => array
+            (
+                'class'  => '\ContaoCommunityAlliance\DcGeneral\Data\NoOpDataProvider',
+                'source' => 'tl_syncCto_clients_syncFrom'
+            ),
+        ),
     ),
     // Palettes
     'palettes'    => array

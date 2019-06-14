@@ -73,34 +73,34 @@ function sendNextRequest(_strToken, _objElement)
                       {
                           if (json.success == false || json.value == 0)
                           {
-                              item.setProperty('src', 'system/modules/syncCto/assets/images/js/gray.png');
+                              item.setProperty('src', 'bundles/synccto/images/js/gray.png');
                               item.setProperty('title', json.msg);
                           }
                           else if (json.value == 1)
                           {
-                              item.setProperty('src', 'system/modules/syncCto/assets/images/js/red.png');
+                              item.setProperty('src', 'bundles/synccto/images/js/red.png');
                               item.setProperty('title', json.msg);
                           }
                           else if (json.value == 2)
                           {
-                              item.setProperty('src', 'system/modules/syncCto/assets/images/js/blue.png');
+                              item.setProperty('src', 'bundles/synccto/images/js/blue.png');
                               item.setProperty('title', json.msg);
                           }
                           else if (json.value == 3)
                           {
-                              item.setProperty('src', 'system/modules/syncCto/assets/images/js/orange.png');
+                              item.setProperty('src', 'bundles/synccto/images/js/orange.png');
                               item.setProperty('title', json.msg);
                           }
                           else if (json.value == 4)
                           {
-                              item.setProperty('src', 'system/modules/syncCto/assets/images/js/green.png');
+                              item.setProperty('src', 'bundles/synccto/images/js/green.png');
                               item.setProperty('title', json.msg);
                           }
                       }.bind(item),
         onFailure:    function (responseTree, responseElements, response, js)
                       {
                           // On error show red point.
-                          item.setProperty('src', 'system/modules/syncCto/assets/images/js/red.png');
+                          item.setProperty('src', 'bundles/synccto/images/js/red.png');
                       }.bind(item)
     }).send();
 }
