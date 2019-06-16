@@ -191,7 +191,7 @@ $GLOBALS['TL_DCA']['tl_synccto_clients'] = array
             'label'               => &$GLOBALS['TL_LANG']['tl_syncCto_clients']['http_password'],
             'inputType'           => 'text',
             'exclude'             => true,
-            'eval'                => array('mandatory' => true, 'encrypt'   => true, 'tl_class'  => 'w50'),
+            'eval'                => array('mandatory' => true, 'tl_class'  => 'w50'),
         ),
     )
 );

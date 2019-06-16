@@ -277,7 +277,7 @@ class Base
                 \SyncCtoEnum::FILETRANS_WAITING
             );
         } else {
-            $transmission = null;
+            $transmission = array();
         }
 
         // Core files.
