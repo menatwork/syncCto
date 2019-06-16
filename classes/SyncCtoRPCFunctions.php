@@ -195,7 +195,6 @@ class SyncCtoRPCFunctions extends Backend
         $objFile         = new File($this->objSyncCtoHelper->standardizePath($GLOBALS['SYC_PATH']['tmp'],
             "syncListInc.syncCto"));
         $arrChecksumList = unserialize($objFile->getContent());
-        $objFile->close();
 
         if (!is_array($arrChecksumList)) {
             throw new Exception("Could not rebuild array.");
@@ -229,7 +228,6 @@ class SyncCtoRPCFunctions extends Backend
         $objFile         = new File($this->objSyncCtoHelper->standardizePath($GLOBALS['SYC_PATH']['tmp'],
             "syncFolderListInc.syncCto"));
         $arrChecksumList = unserialize($objFile->getContent());
-        $objFile->close();
 
         if (!is_array($arrChecksumList)) {
             throw new Exception("Could not rebuild array.");
@@ -263,7 +261,6 @@ class SyncCtoRPCFunctions extends Backend
         $objFile         = new File($this->objSyncCtoHelper->standardizePath($GLOBALS['SYC_PATH']['tmp'],
             "syncListInc.syncCto"));
         $arrChecksumList = unserialize($objFile->getContent());
-        $objFile->close();
 
         if (!is_array($arrChecksumList)) {
             throw new Exception("Could not rebuild array.");

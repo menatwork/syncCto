@@ -268,6 +268,11 @@ class SyncCtoFiles extends \Backend
         if ($objModel == null && $blnAutoAdd)
         {
             $objModel                      = \Dbafs::addResource(str_replace('\\\\', '/', $strFilePath));
+            // Double check if the file was added or not.
+            if($objModel === null){
+                return null;
+            }
+
             $arrModelData                  = $objModel->row();
 
             // PHP 7 compatibility
@@ -1493,6 +1498,8 @@ class SyncCtoFiles extends \Backend
             "success"  => false,
             "info_msg" => array()
         );
+
+        return $arrReturn;
 
         foreach ($arrSettings as $value)
         {

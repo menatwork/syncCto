@@ -27,13 +27,13 @@ class SyncCtoContaoAutomator extends \Automator
         }
 
         // Purge
-        $this->purgeInternalCache();
+//        $this->purgeInternalCache();
 
         // Rebuild
-        $this->generateConfigCache();
-        $this->generateDcaCache();
-        $this->generateLanguageCache();
-        $this->generateDcaExtracts();
+//        $this->generateConfigCache();
+//        $this->generateDcaCache();
+//        $this->generateLanguageCache();
+//        $this->generateDcaExtracts();
     }
 
     /**
@@ -60,10 +60,10 @@ class SyncCtoContaoAutomator extends \Automator
         }
 
         // Rebuild
-        $this->generateConfigCache();
-        $this->generateDcaCache();
-        $this->generateLanguageCache();
-        $this->generateDcaExtracts();
+//        $this->generateConfigCache();
+//        $this->generateDcaCache();
+//        $this->generateLanguageCache();
+//        $this->generateDcaExtracts();
     }
 
 

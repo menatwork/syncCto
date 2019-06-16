@@ -9,6 +9,8 @@
  * @filesource
  */
 
+use MenAtWork\SyncCto\Sync\FileList\Base;
+
 /**
  * Class for client interaction
  */
@@ -633,7 +635,6 @@ catch (Exception $exc){throw $exc;
         if (file_exists(TL_ROOT . DIRECTORY_SEPARATOR . $path)) {
             $objFileList = new File($path);
             $objFileList->delete();
-            $objFileList->close();
         }
 
         $path = $this
@@ -645,36 +646,53 @@ catch (Exception $exc){throw $exc;
         if (file_exists(TL_ROOT . DIRECTORY_SEPARATOR . $path)) {
             $objCompareList = new File($path);
             $objCompareList->delete();
-            $objCompareList->close();
         }
     }
 
+    /**
+     * Load the temp files into the memory.
+     *
+     * @return void
+     *
+     * @throws \Exception
+     */
     protected function loadTempLists()
     {
         // Load Files
-        $objFileList = new File($this->objSyncCtoHelper->standardizePath($GLOBALS['SYC_PATH']['tmp'], "syncfilelist-ID-" . $this->intClientID . ".txt"));
-        $strContent  = $objFileList->getContent();
-        if (strlen($strContent) == 0)
-        {
-            $this->arrListFile = array();
+        $filePath   = $this->objSyncCtoHelper->standardizePath(
+            $GLOBALS['SYC_PATH']['tmp'],
+            "syncfilelist-ID-" . $this->intClientID . ".txt"
+        );
+        $strContent = '';
+
+        if (file_exists(TL_ROOT . DIRECTORY_SEPARATOR . $filePath)) {
+            $objFileList = new File($filePath);
+            $strContent  = $objFileList->getContent();
         }
-        else
-        {
+
+        if (strlen($strContent) == 0) {
+            $this->arrListFile = array();
+        } else {
             $this->arrListFile = unserialize($strContent);
         }
-        $objFileList->close();
 
-        $objCompareList = new File($this->objSyncCtoHelper->standardizePath($GLOBALS['SYC_PATH']['tmp'], "synccomparelist-ID-" . $this->intClientID . ".txt"));
-        $strContent     = $objCompareList->getContent();
-        if (strlen($strContent) == 0)
-        {
-            $this->arrListCompare = array();
+        // Load Files
+        $filePath   = $this->objSyncCtoHelper->standardizePath(
+            $GLOBALS['SYC_PATH']['tmp'],
+            "synccomparelist-ID-" . $this->intClientID . ".txt"
+        );
+        $strContent = '';
+
+        if (file_exists(TL_ROOT . DIRECTORY_SEPARATOR . $filePath)) {
+            $objCompareList = new File($filePath);
+            $strContent     = $objCompareList->getContent();
         }
-        else
-        {
+
+        if (strlen($strContent) == 0) {
+            $this->arrListCompare = array();
+        } else {
             $this->arrListCompare = unserialize($strContent);
         }
-        $objCompareList->close();
     }
 
     protected function saveTempLists()
@@ -2984,7 +3002,7 @@ catch (Exception $exc){throw $exc;
         $this->objData->setState(SyncCtoEnum::WORK_WORK);
 
         // Get the file list.
-        $fileList  = new \SyncCto\Sync\FileList\Base($this->arrListCompare);
+        $fileList  = new Base($this->arrListCompare);
 
         /* ---------------------------------------------------------------------
          * Run page
