@@ -18,7 +18,7 @@
 
 <?php else: ?>
 
-<form id="filelist_form" action="<?php echo $this->Environment->base; ?>system/modules/syncCto/SyncCtoPopupFiles.php?id=<?php echo $this->id; ?>&amp;step=<?php echo $this->step; ?>" method="post">
+<form id="filelist_form" action="<?php echo $this->Environment->base; ?>syncCto/filesPopup?id=<?php echo $this->id; ?>&amp;step=<?php echo $this->step; ?>" method="post">
     <div class="formbody">
         <input type="hidden" name="FORM_SUBMIT" value="<?php echo $this->formId; ?>" />
         <input type="hidden" name="REQUEST_TOKEN" value="<?php echo REQUEST_TOKEN; ?>">

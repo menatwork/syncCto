@@ -115,8 +115,10 @@ class SyncCtoPopupDB extends Backend
             $this->showError();
         }
 
-        // Output template
-        $this->output();
+        return $this;
+
+//        // Output template
+//        $this->output();
     }
 
     /**
@@ -386,7 +388,7 @@ class SyncCtoPopupDB extends Backend
     /**
      * Output templates
      */
-    public function output()
+    public function getOutput()
     {
         // Clear all we want a clear array for this windows.
         $GLOBALS['TL_CSS']        = array();
@@ -397,11 +399,12 @@ class SyncCtoPopupDB extends Backend
         $GLOBALS['TL_CSS'][] = 'bundles/synccto/css/compare.css';
 
         // Set javascript
-        $GLOBALS['TL_JAVASCRIPT'][] = 'assets/mootools/core/' . MOOTOOLS . '/mootools-core.js';
-        $GLOBALS['TL_JAVASCRIPT'][] = 'assets/mootools/core/' . MOOTOOLS . '/mootools-more.js';
-        $GLOBALS['TL_JAVASCRIPT'][] = 'assets/mootools/mootao/Mootao.js';
-        $GLOBALS['TL_JAVASCRIPT'][] = 'assets/contao/js/core.js';
+        $GLOBALS['TL_JAVASCRIPT'][] = 'assets/mootools/js/mootools-core.min.js';
+        $GLOBALS['TL_JAVASCRIPT'][] = 'assets/mootools/js/mootools-more.min.js';
+//        $GLOBALS['TL_JAVASCRIPT'][] = 'assets/mootools/mootao/Mootao.js';
+//        $GLOBALS['TL_JAVASCRIPT'][] = 'assets/contao/js/core.js';
         $GLOBALS['TL_JAVASCRIPT'][] = 'bundles/synccto/js/compare.js';
+        $GLOBALS['TL_JAVASCRIPT'][] = 'bundles/synccto/js/htmltable.js';
 
         // Set wrapper template information
         $this->popupTemplate           = new BackendTemplate("be_syncCto_popup");
@@ -420,7 +423,8 @@ class SyncCtoPopupDB extends Backend
 
         // Output template
         $this->popupTemplate->content = $this->Template->parse();
-        $this->popupTemplate->output();
+
+        return $this->popupTemplate->getResponse()->getContent();
     }
 
     // Helper functions --------------------------------------------------------
@@ -481,8 +485,8 @@ class SyncCtoPopupDB extends Backend
 
 }
 
-/**
- * Instantiate controller
- */
-$objPopup = new SyncCtoPopupDB();
-$objPopup->run();
+///**
+// * Instantiate controller
+// */
+//$objPopup = new SyncCtoPopupDB();
+//$objPopup->run();

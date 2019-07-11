@@ -8,26 +8,22 @@
  * @license    GNU/LGPL
  * @filesource
  */
-
 /**
  * Initialize the system
  */
 $dir = dirname(isset($_SERVER['SCRIPT_FILENAME']) ? $_SERVER['SCRIPT_FILENAME'] : __FILE__);
 
-while ($dir && $dir != '.' && $dir != '/' && !is_file($dir . '/system/initialize.php'))
-{
+while ($dir && $dir != '.' && $dir != '/' && !is_file($dir . '/system/initialize.php')) {
     $dir = dirname($dir);
 }
 
-if (!is_file($dir . '/system/initialize.php'))
-{
+if (!is_file($dir . '/system/initialize.php')) {
     header("HTTP/1.0 500 Internal Server Error");
     header('Content-Type: text/html; charset=utf-8');
     echo '<h1>500 Internal Server Error</h1>';
     echo '<p>Could not find initialize.php!</p>';
     exit(1);
 }
-
 define('TL_MODE', 'BE');
 require($dir . '/system/initialize.php');
 
@@ -73,59 +69,51 @@ class SyncCtoPopupFiles extends \Backend
      */
     public function run()
     {
-        if ($this->mixStep == self::STEP_SHOW_FILES)
-        {
+        if ($this->mixStep == self::STEP_SHOW_FILES) {
             $this->loadTempLists();
             $this->showFiles();
             $this->saveTempLists();
             unset($_POST);
         }
 
-        if ($this->mixStep == self::STEP_CLOSE_FILES)
-        {
+        if ($this->mixStep == self::STEP_CLOSE_FILES) {
             $this->showClose();
         }
 
-        if ($this->mixStep == self::STEP_ERROR_FILES)
-        {
+        if ($this->mixStep == self::STEP_ERROR_FILES) {
             $this->showError();
         }
 
-        // Output template
-        $this->output();
+//        // Output template
+//        $this->output();
+        return $this;
     }
 
     protected function showFiles()
     {
         // Delete functinality
-        if (array_key_exists("delete", $_POST))
-        {
-            foreach ($_POST as $key => $value)
-            {
-                if (isset($this->arrListCompare['core'][$value]))
-                {
+        if (array_key_exists("delete", $_POST)) {
+            foreach ($_POST as $key => $value) {
+                if (isset($this->arrListCompare['core'][$value])) {
                     unset($this->arrListCompare['core'][$value]);
                 }
-                if (isset($this->arrListCompare['files'][$value]))
-                {
+                if (isset($this->arrListCompare['files'][$value])) {
                     unset($this->arrListCompare['files'][$value]);
                 }
             }
-        }
-        // Close functinality
-        else
-        {
-            if (array_key_exists("transfer", $_POST))
-            {
+        } // Close functinality
+        else {
+            if (array_key_exists("transfer", $_POST)) {
                 $this->mixStep = self::STEP_CLOSE_FILES;
+
                 return;
             }
         }
 
         // Check if filelist is empty and close
-        if (count($this->arrListCompare['core']) == 0 && count($this->arrListCompare['files']) == 0)
-        {
+        if (count($this->arrListCompare['core']) == 0 && count($this->arrListCompare['files']) == 0) {
             $this->mixStep = self::STEP_CLOSE_FILES;
+
             return;
         }
 
@@ -141,16 +129,13 @@ class SyncCtoPopupFiles extends \Backend
         $intTotalSizeChange = 0;
 
         // Lists
-        $arrNormalFiles = array();
-        $arrBigFiles    = array();
+        $arrNormalFiles = [];
+        $arrBigFiles    = [];
 
         // Build list
-        foreach ($this->arrListCompare as $strType => $arrLists)
-        {
-            foreach ($arrLists as $key => $value)
-            {
-                switch ($value['state'])
-                {
+        foreach ($this->arrListCompare as $strType => $arrLists) {
+            foreach ($arrLists as $key => $value) {
+                switch ($value['state']) {
                     case SyncCtoEnum::FILESTATE_TOO_BIG_MISSING:
                     case SyncCtoEnum::FILESTATE_MISSING:
                         $intCountMissing++;
@@ -176,47 +161,38 @@ class SyncCtoPopupFiles extends \Backend
                 }
 
                 // Check for dbafs conflict.
-                if($value["state"] == SyncCtoEnum::FILESTATE_DBAFS_CONFLICT || isset($value["dbafs_state"]) || isset($value["dbafs_tail_state"]))
-                {
+                if ($value["state"] == SyncCtoEnum::FILESTATE_DBAFS_CONFLICT || isset($value["dbafs_state"]) || isset($value["dbafs_tail_state"])) {
                     $intCountDbafsConflict++;
                     $value['dbafs_conflict'] = true;
                 }
 
                 if (in_array($value["state"],
-                    array(
-                        SyncCtoEnum::FILESTATE_TOO_BIG_DELETE,
-                        SyncCtoEnum::FILESTATE_TOO_BIG_MISSING,
-                        SyncCtoEnum::FILESTATE_TOO_BIG_NEED,
-                        SyncCtoEnum::FILESTATE_TOO_BIG_SAME,
-                        SyncCtoEnum::FILESTATE_BOMBASTIC_BIG
-                    ))
-                )
-                {
+                             [
+                                 SyncCtoEnum::FILESTATE_TOO_BIG_DELETE,
+                                 SyncCtoEnum::FILESTATE_TOO_BIG_MISSING,
+                                 SyncCtoEnum::FILESTATE_TOO_BIG_NEED,
+                                 SyncCtoEnum::FILESTATE_TOO_BIG_SAME,
+                                 SyncCtoEnum::FILESTATE_BOMBASTIC_BIG,
+                             ])
+                ) {
                     $arrBigFiles[$key] = $value;
-                }
-                else
-                {
-                    if ($value["split"] == 1)
-                    {
+                } else {
+                    if ($value["split"] == 1) {
                         $arrBigFiles[$key] = $value;
-                    }
-                    elseif ($value["size"] > $this->arrClientInformation["upload_sizeLimit"])
-                    {
+                    } else if ($value["size"] > $this->arrClientInformation["upload_sizeLimit"]) {
                         $arrBigFiles[$key] = $value;
-                    }
-                    else
-                    {
+                    } else {
                         $arrNormalFiles[$key] = $value;
                     }
                 }
             }
         }
 
-        uasort($arrBigFiles, array($this, 'sort'));
-        uasort($arrNormalFiles, array($this, 'sort'));
+        uasort($arrBigFiles, [ $this, 'sort' ]);
+        uasort($arrNormalFiles, [ $this, 'sort' ]);
 
         // Language array for filestate
-        $arrLanguageTags                                         = array();
+        $arrLanguageTags                                         = [];
         $arrLanguageTags[SyncCtoEnum::FILESTATE_MISSING]         = $GLOBALS['TL_LANG']['MSC']['create'];
         $arrLanguageTags[SyncCtoEnum::FILESTATE_NEED]            = $GLOBALS['TL_LANG']['MSC']['overrideSelected'];
         $arrLanguageTags[SyncCtoEnum::FILESTATE_DELETE]          = $GLOBALS['TL_LANG']['MSC']['delete'];
@@ -267,21 +243,21 @@ class SyncCtoPopupFiles extends \Backend
     /**
      * Output templates
      */
-    public function output()
+    public function getOutput()
     {
         // Clear all we want a clear array for this windows.
-        $GLOBALS['TL_CSS']        = array();
-        $GLOBALS['TL_JAVASCRIPT'] = array();
+        $GLOBALS['TL_CSS']        = [];
+        $GLOBALS['TL_JAVASCRIPT'] = [];
 
         // Set stylesheets
         $GLOBALS['TL_CSS'][] = 'system/themes/' . $this->getTheme() . '/basic.css';
         $GLOBALS['TL_CSS'][] = 'bundles/synccto/css/compare.css';
 
         // Set javascript
-        $GLOBALS['TL_JAVASCRIPT'][] = 'assets/mootools/core/' . MOOTOOLS . '/mootools-core.js';
-        $GLOBALS['TL_JAVASCRIPT'][] = 'assets/mootools/core/' . MOOTOOLS . '/mootools-more.js';
-        $GLOBALS['TL_JAVASCRIPT'][] = 'assets/mootools/mootao/Mootao.js';
-        $GLOBALS['TL_JAVASCRIPT'][] = 'assets/contao/js/core.js';
+        $GLOBALS['TL_JAVASCRIPT'][] = 'assets/mootools/js/mootools-core.min.js';
+        $GLOBALS['TL_JAVASCRIPT'][] = 'assets/mootools/js/mootools-more.min.js';
+//        $GLOBALS['TL_JAVASCRIPT'][] = 'assets/mootools/mootao/Mootao.js';
+//        $GLOBALS['TL_JAVASCRIPT'][] = 'assets/contao/js/core.js';
         $GLOBALS['TL_JAVASCRIPT'][] = 'bundles/synccto/js/compare.js';
         $GLOBALS['TL_JAVASCRIPT'][] = 'bundles/synccto/js/htmltable.js';
 
@@ -300,7 +276,8 @@ class SyncCtoPopupFiles extends \Backend
 
         // Output template
         $this->popupTemplate->content = $this->Template->parse();
-        $this->popupTemplate->output();
+
+        return $this->popupTemplate->getResponse()->getContent();
     }
 
     // Helper functions --------------------------------------------------------
@@ -312,28 +289,22 @@ class SyncCtoPopupFiles extends \Backend
     {
         $objFileList = new File($this->objSyncCtoHelper->standardizePath($GLOBALS['SYC_PATH']['tmp'], "syncfilelist-ID-" . $this->intClientID . ".txt"));
         $strContent  = $objFileList->getContent();
-        if (strlen($strContent) == 0)
-        {
-            $this->arrListFile = array();
-        }
-        else
-        {
+        if (strlen($strContent) == 0) {
+            $this->arrListFile = [];
+        } else {
             $this->arrListFile = unserialize($strContent);
         }
-        $objFileList->close();
+//        $objFileList->close();
 
         $objCompareList = new File($this->objSyncCtoHelper->standardizePath($GLOBALS['SYC_PATH']['tmp'], "synccomparelist-ID-" . $this->intClientID . ".txt"));
         $strContent     = $objCompareList->getContent();
-        if (strlen($strContent) == 0)
-        {
-            $this->arrListCompare = array();
-        }
-        else
-        {
+        if (strlen($strContent) == 0) {
+            $this->arrListCompare = [];
+        } else {
             $this->arrListCompare = unserialize($strContent);
         }
 
-        $objCompareList->close();
+//        $objCompareList->close();
     }
 
     /**
@@ -343,11 +314,11 @@ class SyncCtoPopupFiles extends \Backend
     {
         $objFileList = new File($this->objSyncCtoHelper->standardizePath($GLOBALS['SYC_PATH']['tmp'], "syncfilelist-ID-" . $this->intClientID . ".txt"));
         $objFileList->write(serialize($this->arrListFile));
-        $objFileList->close();
+//        $objFileList->close();
 
         $objCompareList = new File($this->objSyncCtoHelper->standardizePath($GLOBALS['SYC_PATH']['tmp'], "synccomparelist-ID-" . $this->intClientID . ".txt"));
         $objCompareList->write(serialize($this->arrListCompare));
-        $objCompareList->close();
+//        $objCompareList->close();
     }
 
     /**
@@ -357,9 +328,8 @@ class SyncCtoPopupFiles extends \Backend
     {
         $this->arrClientInformation = $this->Session->get("syncCto_ClientInformation_" . $this->intClientID);
 
-        if (!is_array($this->arrClientInformation))
-        {
-            $this->arrClientInformation = array();
+        if (!is_array($this->arrClientInformation)) {
+            $this->arrClientInformation = [];
         }
     }
 
@@ -369,13 +339,11 @@ class SyncCtoPopupFiles extends \Backend
     protected function initGetParams()
     {
         // Get Client id
-        if (strlen(\Input::getInstance()->get("id")) != 0)
-        {
+        if (strlen(\Input::getInstance()->get("id")) != 0) {
             $this->intClientID = intval(\Input::getInstance()->get("id"));
-        }
-        else
-        {
+        } else {
             $this->mixStep = self::STEP_ERROR_FILES;
+
             return;
         }
 
@@ -383,12 +351,9 @@ class SyncCtoPopupFiles extends \Backend
         $this->loadClientInformation();
 
         // Get next step
-        if (strlen(\Input::getInstance()->get("step")) != 0)
-        {
+        if (strlen(\Input::getInstance()->get("step")) != 0) {
             $this->mixStep = \Input::getInstance()->get("step");
-        }
-        else
-        {
+        } else {
             $this->mixStep = self::STEP_SHOW_FILES;
         }
     }
@@ -403,8 +368,7 @@ class SyncCtoPopupFiles extends \Backend
      */
     public function sort($a, $b)
     {
-        if ($a["state"] == $b["state"])
-        {
+        if ($a["state"] == $b["state"]) {
             return 0;
         }
 
@@ -416,6 +380,6 @@ class SyncCtoPopupFiles extends \Backend
 /**
  * Instantiate controller
  */
-$objPopup = new SyncCtoPopupFiles();
-$objPopup->run();
+//$objPopup = new SyncCtoPopupFiles();
+//$objPopup->run();
 ?>

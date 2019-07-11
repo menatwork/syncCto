@@ -9,6 +9,8 @@
  * @filesource
  */
 
+use MenAtWork\SyncCto\Helper\PathBuilder;
+
 /**
  * Core class for database operation
  */
@@ -19,7 +21,7 @@ class SyncCtoDatabase extends \Backend
      */
 
     // Singelten pattern
-    protected static $instance           = null;
+    protected static $instance = null;
     // Vars
     protected $arrBackupTables;
     protected $arrHiddenTables;
@@ -42,17 +44,17 @@ class SyncCtoDatabase extends \Backend
      *
      * @var array
      */
-    protected $arrDefaultValueFunctionIgnore = array(
+    protected $arrDefaultValueFunctionIgnore = [
         "NOW",
         "CURRENT_TIMESTAMP",
-    );
+    ];
 
     /**
      * List of default ignore values
      *
      * @var array
      */
-    protected $arrDefaultValueTypIgnore = array(
+    protected $arrDefaultValueTypIgnore = [
         'text',
         'tinytext',
         'mediumtext',
@@ -63,42 +65,42 @@ class SyncCtoDatabase extends \Backend
         'longblob',
         'time',
         'date',
-        'datetime'
-    );
+        'datetime',
+    ];
 
     /**
      * A list with allowed keys for the field.
      *
      * @var array
      */
-    protected $arrAllowedFieldKeys = array(
+    protected $arrAllowedFieldKeys = [
         'name',
         'type',
         'attributes',
         'null',
         'extra',
-        'default'
-    );
+        'default',
+    ];
 
     /**
      * Search for special chars
      *
      * @var array
      */
-    protected $arrSearchFor = array(
+    protected $arrSearchFor = [
         "\\",
-        "'"
-    );
+        "'",
+    ];
 
     /**
      * Replace special chars with
      *
      * @var array
      */
-    protected $arrReplaceWith = array(
+    protected $arrReplaceWith = [
         "\\\\",
-        "\\'"
-    );
+        "\\'",
+    ];
 
     /* -------------------------------------------------------------------------
      * Core
@@ -112,16 +114,15 @@ class SyncCtoDatabase extends \Backend
         parent::__construct();
 
         // Init some vars
-        $this->arrBackupTables = array();
+        $this->arrBackupTables    = [];
         $this->strTimestampFormat = str_replace(array_keys($GLOBALS['SYC_CONFIG']['folder_file_replacement']), array_values($GLOBALS['SYC_CONFIG']['folder_file_replacement']), $GLOBALS['TL_CONFIG']['datimFormat']);
-        $this->intMaxMemoryUsage = SyncCtoModuleClient::parseSize(ini_get('memory_limit'));
-        $this->intMaxMemoryUsage = $this->intMaxMemoryUsage / 100 * 80;
+        $this->intMaxMemoryUsage  = SyncCtoModuleClient::parseSize(ini_get('memory_limit'));
+        $this->intMaxMemoryUsage  = $this->intMaxMemoryUsage / 100 * 80;
 
         // Load hidden tables
         $this->arrHiddenTables = deserialize($GLOBALS['SYC_CONFIG']['table_hidden']);
-        if (!is_array($this->arrHiddenTables))
-        {
-            $this->arrHiddenTables = array();
+        if (!is_array($this->arrHiddenTables)) {
+            $this->arrHiddenTables = [];
         }
 
         // Load Helper
@@ -136,8 +137,7 @@ class SyncCtoDatabase extends \Backend
      */
     public static function getInstance()
     {
-        if (self::$instance == null)
-        {
+        if (self::$instance == null) {
             self::$instance = new SyncCtoDatabase();
         }
 
@@ -152,15 +152,11 @@ class SyncCtoDatabase extends \Backend
      */
     public function __set($name, $value)
     {
-        switch ($name)
-        {
+        switch ($name) {
             case "backupTables":
-                if (!is_array($value))
-                {
+                if (!is_array($value)) {
                     $this->arrBackupTables[] = $value;
-                }
-                else
-                {
+                } else {
                     $this->arrBackupTables = $value;
                 }
                 break;
@@ -190,12 +186,12 @@ class SyncCtoDatabase extends \Backend
      * Getter
      *
      * @param string $name
+     *
      * @return string
      */
     public function __get($name)
     {
-        switch ($name)
-        {
+        switch ($name) {
             case "backupTables":
                 return $this->arrBackupTables;
 
@@ -223,23 +219,20 @@ class SyncCtoDatabase extends \Backend
     /**
      * Drop tables
      *
-     * @param array $arrTables List with tables
+     * @param array   $arrTables List with tables
      * @param boolean $blnBackup if true the system will make a bakup from all tables
      */
     public function dropTable($arrTables, $blnBackup = true)
     {
-        if ($blnBackup == true)
-        {
+        if ($blnBackup == true) {
             $this->strSuffixZipName = 'Auto-DB-Backup_RPC-Drop.zip';
             $this->runDump($arrTables, false);
         }
 
         $arrKnownTables = $this->Database->listTables();
 
-        foreach ($arrTables as $value)
-        {
-            if (in_array($value, $arrKnownTables))
-            {
+        foreach ($arrTables as $value) {
+            if (in_array($value, $arrKnownTables)) {
                 $this->Database->query("DROP TABLE $value");
             }
         }
@@ -253,12 +246,11 @@ class SyncCtoDatabase extends \Backend
      * Check if we have enough ram, if not, write all data to file
      *
      * @param XMLWriter $objXml
-     * @param resource $objGzFile
+     * @param resource  $objGzFile
      */
     protected function checkRAM(XMLWriter $objXml, $objGzFile)
     {
-        if ($this->intMaxMemoryUsage < memory_get_usage(true))
-        {
+        if ($this->intMaxMemoryUsage < memory_get_usage(true)) {
             $strXMLFlush = $objXml->flush(true);
             gzputs($objGzFile, $strXMLFlush, strlen($strXMLFlush));
         }
@@ -267,9 +259,10 @@ class SyncCtoDatabase extends \Backend
     /**
      * Function for creating a sql/xml dump file.
      *
-     * @param array $mixTables Table or a list of tables for backup
-     * @param string $strZip Name of zip file
-     * @param bool $booTempFolder Should the tmp folde used instead of backupfolder
+     * @param array  $mixTables     Table or a list of tables for backup
+     * @param string $strZip        Name of zip file
+     * @param bool   $booTempFolder Should the tmp folde used instead of backupfolder
+     *
      * @return void
      */
     public function runDump($mixTables, $booTempFolder, $booOnlyMachine = true)
@@ -278,22 +271,16 @@ class SyncCtoDatabase extends \Backend
         set_time_limit(0);
 
         // Set limit for db query. Ticket #163
-        if ($GLOBALS['TL_CONFIG']['syncCto_custom_settings'] == true && intval($GLOBALS['TL_CONFIG']['syncCto_db_query_limt']) > 0)
-        {
+        if ($GLOBALS['TL_CONFIG']['syncCto_custom_settings'] == true && intval($GLOBALS['TL_CONFIG']['syncCto_db_query_limt']) > 0) {
             $intElementsPerRequest = intval($GLOBALS['TL_CONFIG']['syncCto_db_query_limt']);
-        }
-        else
-        {
+        } else {
             $intElementsPerRequest = 500;
         }
 
         // Add to the backup array all tables
-        if (is_array($mixTables))
-        {
+        if (is_array($mixTables)) {
             $this->arrBackupTables = array_merge($this->arrBackupTables, $mixTables);
-        }
-        else if ($mixTables != "" && $mixTables != null)
-        {
+        } else if ($mixTables != "" && $mixTables != null) {
             $this->arrBackupTables[] = $mixTables;
         }
 
@@ -301,8 +288,7 @@ class SyncCtoDatabase extends \Backend
         $this->arrBackupTables = array_unique($this->arrBackupTables);
 
         // Check if we have some tables for backup
-        if (!is_array($this->arrBackupTables) || $this->arrBackupTables == null || count($this->arrBackupTables) == 0)
-        {
+        if (!is_array($this->arrBackupTables) || $this->arrBackupTables == null || count((array) $this->arrBackupTables) == 0) {
             throw new Exception("No tables found for backup.");
         }
 
@@ -313,8 +299,7 @@ class SyncCtoDatabase extends \Backend
         $strRandomToken = md5(time() . " | " . rand(0, 65535));
 
         // Write SQL file
-        if ($booOnlyMachine == false)
-        {
+        if ($booOnlyMachine == false) {
             $objFileSQL = new File($this->objSyncCtoHelper->standardizePath($GLOBALS['SYC_PATH']['tmp'], "TempSQLDump.$strRandomToken"));
             $objFileSQL->write("");
         }
@@ -347,11 +332,9 @@ class SyncCtoDatabase extends \Backend
 
         $objXml->startElement('structure');
 
-        foreach ($arrTables as $key => $TableName)
-        {
+        foreach ($arrTables as $key => $TableName) {
             // Check if the current table marked as backup
-            if (!in_array($TableName, $this->arrBackupTables))
-            {
+            if (!in_array($TableName, $this->arrBackupTables)) {
                 continue;
             }
 
@@ -359,8 +342,7 @@ class SyncCtoDatabase extends \Backend
             $arrStructure = $this->getTableStructure($TableName);
 
             // Check if empty
-            if (count($arrStructure) == 0)
-            {
+            if (count((array) $arrStructure) == 0) {
                 continue;
             }
 
@@ -368,10 +350,8 @@ class SyncCtoDatabase extends \Backend
             $objXml->writeAttribute("name", $TableName);
 
             $objXml->startElement('fields');
-            if (is_array($arrStructure['TABLE_FIELDS']))
-            {
-                foreach ($arrStructure['TABLE_FIELDS'] as $keyField => $valueField)
-                {
+            if (is_array($arrStructure['TABLE_FIELDS'])) {
+                foreach ($arrStructure['TABLE_FIELDS'] as $keyField => $valueField) {
                     $objXml->startElement('field');
                     $objXml->writeAttribute("name", $keyField);
                     $objXml->text($valueField);
@@ -381,10 +361,8 @@ class SyncCtoDatabase extends \Backend
             $objXml->endElement(); // End fields
 
             $objXml->startElement('definitions');
-            if (is_array($arrStructure['TABLE_CREATE_DEFINITIONS']))
-            {
-                foreach ($arrStructure['TABLE_CREATE_DEFINITIONS'] as $keyField => $valueField)
-                {
+            if (is_array($arrStructure['TABLE_CREATE_DEFINITIONS'])) {
+                foreach ($arrStructure['TABLE_CREATE_DEFINITIONS'] as $keyField => $valueField) {
                     $objXml->startElement('def');
                     $objXml->writeAttribute("name", $keyField);
                     $objXml->text($valueField);
@@ -408,29 +386,24 @@ class SyncCtoDatabase extends \Backend
 
         $objXml->startElement('data');
 
-        foreach ($arrTables as $key => $TableName)
-        {
+        foreach ($arrTables as $key => $TableName) {
             // Check if the current table marked as backup
-            if (!in_array($TableName, $this->arrBackupTables))
-            {
+            if (!in_array($TableName, $this->arrBackupTables)) {
                 continue;
             }
 
             // Check if table is in blacklist
-            if (!in_array($TableName, $this->arrBackupTables))
-            {
+            if (!in_array($TableName, $this->arrBackupTables)) {
                 continue;
             }
 
             // Get fields
             $fields = $this->Database->listFields($TableName);
 
-            $arrFieldMeta = array();
+            $arrFieldMeta = [];
 
-            foreach ($fields as $key => $value)
-            {
-                if ($value["type"] == "index")
-                {
+            foreach ($fields as $key => $value) {
+                if ($value["type"] == "index") {
                     continue;
                 }
 
@@ -440,41 +413,33 @@ class SyncCtoDatabase extends \Backend
             $objXml->startElement('table');
             $objXml->writeAttribute('name', $TableName);
 
-            for ($i = 0; true; $i++)
-            {
+            for ($i = 0; true; $i++) {
                 // Push into file.
                 $strXMLFlush = $objXml->flush(true);
                 gzputs($objGzFile, $strXMLFlush, strlen($strXMLFlush));
 
                 $objData = $this->Database
-                        ->prepare("SELECT * FROM $TableName")
-                        ->limit($intElementsPerRequest, ($i * $intElementsPerRequest))
-                        ->executeUncached();
+                    ->prepare("SELECT * FROM $TableName")
+                    ->limit($intElementsPerRequest, ($i * $intElementsPerRequest))
+                    ->executeUncached();
 
-                if ($objData->numRows == 0)
-                {
+                if ($objData->numRows == 0) {
                     break;
                 }
 
-                while ($row = $objData->fetchAssoc())
-                {
+                while ($row = $objData->fetchAssoc()) {
                     $objXml->startElement('row');
                     $objXml->writeAttribute("id", $row["id"]);
 
-                    foreach ($row as $field_key => $field_data)
-                    {
+                    foreach ($row as $field_key => $field_data) {
                         $objXml->startElement('field');
                         $objXml->writeAttribute("name", $field_key);
 
-                        if (!isset($field_data))
-                        {
+                        if (!isset($field_data)) {
                             $objXml->writeAttribute("type", "null");
                             $objXml->text("NULL");
-                        }
-                        else if ($field_data != "")
-                        {
-                            switch (strtolower($arrFieldMeta[$field_key]['type']))
-                            {
+                        } else if ($field_data != "") {
+                            switch (strtolower($arrFieldMeta[$field_key]['type'])) {
                                 case 'binary':
                                 case 'varbinary':
                                 case 'blob':
@@ -531,9 +496,7 @@ class SyncCtoDatabase extends \Backend
                                     $objXml->writeCdata(base64_encode(str_replace($this->arrSearchFor, $this->arrReplaceWith, $field_data)));
                                     break;
                             }
-                        }
-                        else
-                        {
+                        } else {
                             $objXml->writeAttribute("type", "empty");
                             $objXml->text("''");
                         }
@@ -556,14 +519,13 @@ class SyncCtoDatabase extends \Backend
         gzputs($objGzFile, $strXMLFlush, strlen($strXMLFlush));
         gzclose($objGzFile);
 
-        if ($booOnlyMachine == false)
-        {
+        if ($booOnlyMachine == false) {
             // Write header for sql file
             $today = date("Y-m-d");
             $time  = date("H:i:s");
 
             // Write Header
-            $string .= "-- syncCto SQL Dump\r\n";
+            $string = "-- syncCto SQL Dump\r\n";
             $string .= "-- Version " . $GLOBALS['SYC_VERSION'] . "\r\n";
             $string .= "-- http://men-at-work.de\r\n";
             $string .= "-- \r\n";
@@ -579,11 +541,9 @@ class SyncCtoDatabase extends \Backend
             $string = "";
 
             // Run each table
-            foreach ($arrTables as $key => $TableName)
-            {
+            foreach ($arrTables as $key => $TableName) {
                 // Check if table is in blacklist
-                if (!in_array($TableName, $this->arrBackupTables))
-                {
+                if (!in_array($TableName, $this->arrBackupTables)) {
                     continue;
                 }
 
@@ -591,8 +551,7 @@ class SyncCtoDatabase extends \Backend
                 $arrStructure = $this->getTableStructure($TableName);
 
                 // Check if empty
-                if (count($arrStructure) == 0)
-                {
+                if (count((array) $arrStructure) == 0) {
                     continue;
                 }
 
@@ -612,35 +571,30 @@ class SyncCtoDatabase extends \Backend
                 // Get fields
                 $fields = $this->Database->listFields($TableName);
 
-                $arrFieldMeta = array();
+                $arrFieldMeta = [];
 
-                foreach ($fields as $key => $value)
-                {
-                    if ($value["type"] == "index")
-                    {
+                foreach ($fields as $key => $value) {
+                    if ($value["type"] == "index") {
                         continue;
                     }
 
                     $arrFieldMeta[$value["name"]] = $value;
                 }
 
-                $booFirstEntry         = true;
+                $booFirstEntry = true;
 
-                for ($i = 0; true; $i++)
-                {
+                for ($i = 0; true; $i++) {
                     $objData = $this->Database
-                            ->prepare("SELECT * FROM $TableName")
-                            ->limit($intElementsPerRequest, ($i * $intElementsPerRequest))
-                            ->executeUncached();
+                        ->prepare("SELECT * FROM $TableName")
+                        ->limit($intElementsPerRequest, ($i * $intElementsPerRequest))
+                        ->executeUncached();
 
                     $strSQL = "";
 
                     // Check if we have some files
-                    if ($objData->numRows == 0)
-                    {
+                    if ($objData->numRows == 0) {
                         // if end reach insert ';'
-                        if ($booFirstEntry != true)
-                        {
+                        if ($booFirstEntry != true) {
                             $strSQL .= ";\r\n\r\n";
                         }
 
@@ -653,28 +607,21 @@ class SyncCtoDatabase extends \Backend
                     }
 
                     // Start INSERT INTO
-                    if ($i == 0)
-                    {
+                    if ($i == 0) {
                         $strSQL .= "INSERT IGNORE INTO " . $TableName . " (`";
                         $strSQL .= implode("`, `", array_keys($arrFieldMeta));
                         $strSQL .= "`) VALUES";
                     }
 
                     // Run through each row
-                    while ($row = $objData->fetchAssoc())
-                    {
-                        $arrTableData = array();
+                    while ($row = $objData->fetchAssoc()) {
+                        $arrTableData = [];
 
-                        foreach (array_keys($arrFieldMeta) as $fieldName)
-                        {
-                            if (!isset($row[$fieldName]))
-                            {
+                        foreach (array_keys($arrFieldMeta) as $fieldName) {
+                            if (!isset($row[$fieldName])) {
                                 $arrTableData[] = "NULL";
-                            }
-                            else if ($row[$fieldName] != "")
-                            {
-                                switch (strtolower($arrFieldMeta[$fieldName]['type']))
-                                {
+                            } else if ($row[$fieldName] != "") {
+                                switch (strtolower($arrFieldMeta[$fieldName]['type'])) {
                                     case 'blob':
                                     case 'tinyblob':
                                     case 'mediumblob':
@@ -689,8 +636,7 @@ class SyncCtoDatabase extends \Backend
 
                                     case 'text':
                                     case 'mediumtext':
-                                        if (strpos($row[$fieldName], "'") != false)
-                                        {
+                                        if (strpos($row[$fieldName], "'") != false) {
                                             $arrTableData[] = "0x" . bin2hex($row[$fieldName]);
                                             break;
                                         }
@@ -698,33 +644,26 @@ class SyncCtoDatabase extends \Backend
                                         $arrTableData[] = "'" . str_replace($this->arrSearchFor, $this->arrReplaceWith, $row[$fieldName]) . "'";
                                         break;
                                 }
-                            }
-                            else
-                            {
+                            } else {
                                 $arrTableData[] = "''";
                             }
                         }
 
-                        if ($booFirstEntry == true)
-                        {
+                        if ($booFirstEntry == true) {
                             $booFirstEntry = false;
-                            $strSQL .= "\r\n(" . implode(", ", $arrTableData) . ")";
-                        }
-                        else
-                        {
+                            $strSQL        .= "\r\n(" . implode(", ", $arrTableData) . ")";
+                        } else {
                             $strSQL .= ",\r\n(" . implode(", ", $arrTableData) . ")";
                         }
 
-                        if (strlen($strSQL) > 100000)
-                        {
+                        if (strlen($strSQL) > 100000) {
                             $objFileSQL->append($strSQL, "");
                             $objFileSQL->close();
                             $strSQL = "";
                         }
                     }
 
-                    if (strlen($strSQL) != 0)
-                    {
+                    if (strlen($strSQL) != 0) {
                         $objFileSQL->append($strSQL, "");
                         $objFileSQL->close();
                         $strSQL = "";
@@ -733,27 +672,22 @@ class SyncCtoDatabase extends \Backend
             }
         }
 
-        if ($booOnlyMachine == false)
-        {
+        if ($booOnlyMachine == false) {
             $objFileSQL->close();
         }
 
         $strFilename = date($this->strTimestampFormat) . "_" . $this->strSuffixZipName;
 
-        if ($booTempFolder)
-        {
+        if ($booTempFolder) {
             $strPath = $GLOBALS['SYC_PATH']['tmp'];
-        }
-        else
-        {
+        } else {
             $strPath = $GLOBALS['SYC_PATH']['db'];
         }
 
         $objZipArchive = new ZipArchiveCto();
         $objZipArchive->open($strPath . $strFilename, ZipArchiveCto::CREATE);
 
-        if ($booOnlyMachine == false)
-        {
+        if ($booOnlyMachine == false) {
             $objZipArchive->addFile("system/tmp/TempSQLDump.$strRandomToken", $this->strFilenameSQL);
         }
 
@@ -763,8 +697,7 @@ class SyncCtoDatabase extends \Backend
 
         $objFiles = Files::getInstance();
 
-        if ($booOnlyMachine == false)
-        {
+        if ($booOnlyMachine == false) {
             $objFiles->delete("system/tmp/TempSQLDump.$strRandomToken");
         }
         $objFiles->delete("system/tmp/TempSyncCtoDump.$strRandomToken");
@@ -775,21 +708,18 @@ class SyncCtoDatabase extends \Backend
     protected function doRestoreStructure()
     {
         // Buffer
-        $arrTables = array();
+        $arrTables = [];
 
         // Current Values
         $strCurrentTable         = "";
         $strCurrentNodeAttribute = "";
         $strCurrentNodeName      = "";
 
-        while ($this->objXMLReader->read())
-        {
-            switch ($this->objXMLReader->nodeType)
-            {
+        while ($this->objXMLReader->read()) {
+            switch ($this->objXMLReader->nodeType) {
                 case XMLReader::TEXT:
                 case XMLReader::CDATA:
-                    switch ($strCurrentNodeName)
-                    {
+                    switch ($strCurrentNodeName) {
                         case "field":
                             $arrTables[$strCurrentTable]['TABLE_FIELDS'][$strCurrentNodeAttribute] = $this->objXMLReader->value;
                             break;
@@ -807,8 +737,7 @@ class SyncCtoDatabase extends \Backend
                 case XMLReader::ELEMENT:
                     $strCurrentNodeName = $this->objXMLReader->localName;
 
-                    switch ($this->objXMLReader->localName)
-                    {
+                    switch ($this->objXMLReader->localName) {
                         case "table":
                             $strCurrentTable = $this->objXMLReader->getAttribute("name");
                             break;
@@ -822,17 +751,13 @@ class SyncCtoDatabase extends \Backend
                     break;
 
                 case XMLReader::END_ELEMENT:
-                    switch ($this->objXMLReader->localName)
-                    {
+                    switch ($this->objXMLReader->localName) {
                         case "structure":
-                            $arrRestored = array();
+                            $arrRestored = [];
 
-                            try
-                            {
-                                foreach ($arrTables as $key => $value)
-                                {
-                                    if (empty($value))
-                                    {
+                            try {
+                                foreach ($arrTables as $key => $value) {
+                                    if (empty($value)) {
                                         continue;
                                     }
 
@@ -841,11 +766,8 @@ class SyncCtoDatabase extends \Backend
 
                                     $arrRestored[] = $key;
                                 }
-                            }
-                            catch (Exception $exc)
-                            {
-                                foreach ($arrRestored as $key => $value)
-                                {
+                            } catch (Exception $exc) {
+                                foreach ($arrRestored as $key => $value) {
                                     $this->Database->query("DROP TABLE IF EXISTS " . "synccto_temp_" . $value);
                                 }
 
@@ -865,8 +787,8 @@ class SyncCtoDatabase extends \Backend
         $intMaxInsert = 1000;
 
         // Buffer
-        $arrValues = array();
-        $arrFields = array();
+        $arrValues = [];
+        $arrFields = [];
 
         // Current Values
         $strCurrentTable             = "";
@@ -875,21 +797,15 @@ class SyncCtoDatabase extends \Backend
         $strCurrentNodeName          = "";
         $intCounter                  = 0;
 
-        while ($this->objXMLReader->read())
-        {
-            switch ($this->objXMLReader->nodeType)
-            {
+        while ($this->objXMLReader->read()) {
+            switch ($this->objXMLReader->nodeType) {
                 case XMLReader::TEXT:
                 case XMLReader::CDATA:
-                    switch ($strCurrentNodeName)
-                    {
+                    switch ($strCurrentNodeName) {
                         case "field":
-                            if ($strCurrentNodeAttributeType == "text" || $strCurrentNodeAttributeType == "default")
-                            {
+                            if ($strCurrentNodeAttributeType == "text" || $strCurrentNodeAttributeType == "default") {
                                 $arrValues[$intCounter][$strCurrentNodeAttributeName] = "'" . base64_decode($this->objXMLReader->value) . "'";
-                            }
-                            else
-                            {
+                            } else {
                                 $arrValues[$intCounter][$strCurrentNodeAttributeName] = $this->objXMLReader->value;
                             }
 
@@ -899,21 +815,19 @@ class SyncCtoDatabase extends \Backend
 
                 case XMLReader::ELEMENT:
                     $strCurrentNodeName = $this->objXMLReader->localName;
-                    switch ($this->objXMLReader->localName)
-                    {
+                    switch ($this->objXMLReader->localName) {
                         case "table":
                             $strCurrentTable = $this->objXMLReader->getAttribute("name");
-                            $arrValues       = array();
-                            $arrFields = array();
-                            $intCounter = 0;
+                            $arrValues       = [];
+                            $arrFields       = [];
+                            $intCounter      = 0;
                             break;
 
                         case "field":
                             $strCurrentNodeAttributeName = $this->objXMLReader->getAttribute("name");
                             $strCurrentNodeAttributeType = $this->objXMLReader->getAttribute("type");
 
-                            if (!in_array($strCurrentNodeAttributeName, $arrFields))
-                            {
+                            if (!in_array($strCurrentNodeAttributeName, $arrFields)) {
                                 $arrFields[] = $strCurrentNodeAttributeName;
                             }
                             break;
@@ -921,21 +835,17 @@ class SyncCtoDatabase extends \Backend
                     break;
 
                 case XMLReader::END_ELEMENT:
-                    switch ($this->objXMLReader->localName)
-                    {
+                    switch ($this->objXMLReader->localName) {
                         case "row":
                             $intCounter++;
-                            if (count($arrValues) >= $intMaxInsert)
-                            {
+                            if (count($arrValues) >= $intMaxInsert) {
                                 $strBody = "INSERT INTO synccto_temp_" . $strCurrentTable . " (`";
                                 $strBody .= implode("`, `", $arrFields);
                                 $strBody .= "`) VALUES \n";
 
-                                foreach ($arrValues as $keyValue => $valueValue)
-                                {
-                                    $arrInsertValue = array();
-                                    foreach ($arrFields as $keyField => $valueField)
-                                    {
+                                foreach ($arrValues as $keyValue => $valueValue) {
+                                    $arrInsertValue = [];
+                                    foreach ($arrFields as $keyField => $valueField) {
                                         $arrInsertValue[] = $valueValue[$valueField];
                                     }
 
@@ -946,13 +856,12 @@ class SyncCtoDatabase extends \Backend
 
                                 $this->Database->query($strBody);
 
-                                $arrValues = array();
+                                $arrValues = [];
                             }
                             break;
 
                         case "table":
-                            if (count($arrValues) == 0)
-                            {
+                            if (count((array) $arrValues) == 0) {
                                 break;
                             }
 
@@ -960,11 +869,9 @@ class SyncCtoDatabase extends \Backend
                             $strBody .= implode("`, `", $arrFields);
                             $strBody .= "`) VALUES \n";
 
-                            foreach ($arrValues as $keyValue => $valueValue)
-                            {
-                                $arrInsertValue = array();
-                                foreach ($arrFields as $keyField => $valueField)
-                                {
+                            foreach ($arrValues as $keyValue => $valueValue) {
+                                $arrInsertValue = [];
+                                foreach ($arrFields as $keyField => $valueField) {
                                     $arrInsertValue[] = $valueValue[$valueField];
                                 }
 
@@ -975,7 +882,7 @@ class SyncCtoDatabase extends \Backend
 
                             $this->Database->query($strBody);
 
-                            $arrValues = array();
+                            $arrValues = [];
 
                             break;
                     }
@@ -1000,37 +907,34 @@ class SyncCtoDatabase extends \Backend
     public function runRestore($strRestoreFile, $arrSuffixSQL = null)
     {
         // Load the path builder.
-        $pathBuilder = new \SyncCto\Helper\PathBuilder();
+        $pathBuilder = new PathBuilder();
 
-        try
-        {
+        try {
             // Set time out for database. Ticket #2653
             $tmpResult = \Database::getInstance()
-                    ->execute('SELECT @@SESSION.wait_timeout as wTimeout, @@SESSION.interactive_timeout as iTimeout');
+                ->execute('SELECT @@SESSION.wait_timeout as wTimeout, @@SESSION.interactive_timeout as iTimeout');
 
-            $waitTimeOut = $tmpResult->wTimeout;
+            $waitTimeOut        = $tmpResult->wTimeout;
             $interactiveTimeout = $tmpResult->iTimeout;
 
             //overwrite the default values if higher ones are defined in the settings
             if ($GLOBALS['TL_CONFIG']['syncCto_custom_settings'] == true && intval($GLOBALS['TL_CONFIG']['syncCto_wait_timeout']) > 0 &&
-                    intval($GLOBALS['TL_CONFIG']['syncCto_interactive_timeout']) > 0
+                intval($GLOBALS['TL_CONFIG']['syncCto_interactive_timeout']) > 0
             ) {
-                $waitTimeOut = max($waitTimeOut, intval($GLOBALS['TL_CONFIG']['syncCto_wait_timeout']));
+                $waitTimeOut        = max($waitTimeOut, intval($GLOBALS['TL_CONFIG']['syncCto_wait_timeout']));
                 $interactiveTimeout = max($interactiveTimeout, intval($GLOBALS['TL_CONFIG']['syncCto_interactive_timeout']));
             }
 
             \Database::getInstance()
-                    ->prepare('SET SESSION wait_timeout = ?,SESSION interactive_timeout = ?;')
-                    ->execute(intval($waitTimeOut), intval($interactiveTimeout));
+                ->prepare('SET SESSION wait_timeout = ?,SESSION interactive_timeout = ?;')
+                ->execute(intval($waitTimeOut), intval($interactiveTimeout));
 
-            switch (pathinfo($strRestoreFile, PATHINFO_EXTENSION))
-            {
+            switch (pathinfo($strRestoreFile, PATHINFO_EXTENSION)) {
                 case "zip":
                     $objZipRead = new ZipReader($strRestoreFile);
 
                     // Get structure
-                    if ($objZipRead->getFile($this->strFilenameSyncCto))
-                    {
+                    if ($objZipRead->getFile($this->strFilenameSyncCto)) {
                         $zipPath = $pathBuilder
                             ->addPath('system/tmp')
                             ->addUnknownPath(sprintf('%s.gz', $this->strFilenameSyncCto))
@@ -1041,9 +945,7 @@ class SyncCtoDatabase extends \Backend
                         $objGzFile->close();
 
                         $arrRestoreTables = $this->runRestoreFromXML("system/tmp/$this->strFilenameSyncCto.gz");
-                    }
-                    else
-                    {
+                    } else {
                         $strRestoreFile = $pathBuilder
                             ->addUnknownPath($strRestoreFile)
                             ->getPath(false);
@@ -1066,28 +968,21 @@ class SyncCtoDatabase extends \Backend
             }
 
             // After insert, call some SQL
-            if (is_array($arrSuffixSQL))
-            {
-                foreach ($arrSuffixSQL as $key => $value)
-                {
+            if (is_array($arrSuffixSQL)) {
+                foreach ($arrSuffixSQL as $key => $value) {
                     $this->Database->query($value['query']);
                 }
             }
 
             // Rename temp tables
-            foreach ($arrRestoreTables as $key => $value)
-            {
+            foreach ($arrRestoreTables as $key => $value) {
                 $this->Database->query("DROP TABLE IF EXISTS " . $value);
                 $this->Database->query("RENAME TABLE " . "synccto_temp_" . $value . " TO " . $value);
             }
-        }
-        catch (Exception $exc)
-        {
+        } catch (Exception $exc) {
             // Drop synccto_temp tables
-            foreach ($this->Database->listTables() as $key => $value)
-            {
-                if (preg_match("/synccto_temp_.*/", $value))
-                {
+            foreach ($this->Database->listTables() as $key => $value) {
+                if (preg_match("/synccto_temp_.*/", $value)) {
                     $this->Database->query("DROP TABLE IF EXISTS $value");
                 }
             }
@@ -1096,10 +991,8 @@ class SyncCtoDatabase extends \Backend
         }
 
         // Drop synccto_temp tables
-        foreach ($this->Database->listTables() as $key => $value)
-        {
-            if (preg_match("/synccto_temp_.*/", $value))
-            {
+        foreach ($this->Database->listTables() as $key => $value) {
+            if (preg_match("/synccto_temp_.*/", $value)) {
                 $this->Database->query("DROP TABLE IF EXISTS $value");
             }
         }
@@ -1116,12 +1009,10 @@ class SyncCtoDatabase extends \Backend
         $objXMLFile->write("");
         $objXMLFile->close();
 
-        while (true)
-        {
+        while (true) {
             $strConten = gzread($objGzFile, 500000);
 
-            if ($strConten == false || empty($strConten))
-            {
+            if ($strConten == false || empty($strConten)) {
                 break;
             }
 
@@ -1133,13 +1024,10 @@ class SyncCtoDatabase extends \Backend
         $this->objXMLReader = new XMLReader();
         $this->objXMLReader->open(TL_ROOT . "/system/tmp/" . basename($strRestoreFile) . ".xml");
 
-        while ($this->objXMLReader->read())
-        {
-            switch ($this->objXMLReader->nodeType)
-            {
+        while ($this->objXMLReader->read()) {
+            switch ($this->objXMLReader->nodeType) {
                 case XMLReader::ELEMENT:
-                    switch ($this->objXMLReader->localName)
-                    {
+                    switch ($this->objXMLReader->localName) {
                         case "structure":
                             $arrRestoreTables = $this->doRestoreStructure();
                             break;
@@ -1161,16 +1049,14 @@ class SyncCtoDatabase extends \Backend
     {
         $objZipArchive    = new ZipArchiveCto();
         $objTempfile      = tmpfile();
-        $arrRestoreTables = array();
+        $arrRestoreTables = [];
 
-        try
-        {
+        try {
             // Open ZIP Archive
             $objZipArchive->open($strRestoreFile);
 
             // Get structure
-            if ($objZipArchive->locateName($this->strFilenameTable) === false)
-            {
+            if ($objZipArchive->locateName($this->strFilenameTable) === false) {
                 throw new Exception("Could not load SQL file table. Maybe damaged?");
             }
 
@@ -1178,17 +1064,14 @@ class SyncCtoDatabase extends \Backend
             $mixTables = trimsplit("\n", $mixTables);
 
             // Create temp tables
-            foreach ($mixTables as $key => $value)
-            {
-                if (empty($value))
-                {
+            foreach ($mixTables as $key => $value) {
+                if (empty($value)) {
                     continue;
                 }
 
                 $value = unserialize($value);
 
-                if (!is_array($value))
-                {
+                if (!is_array($value)) {
                     throw new Exception("Could not load SQL file table. Maybe damaged?");
                 }
 
@@ -1199,8 +1082,7 @@ class SyncCtoDatabase extends \Backend
             }
 
             // Get insert
-            if ($objZipArchive->locateName($this->strFilenameInsert) === false)
-            {
+            if ($objZipArchive->locateName($this->strFilenameInsert) === false) {
                 throw new Exception("Could not load SQL file inserts. Maybe damaged?");
             }
 
@@ -1215,25 +1097,21 @@ class SyncCtoDatabase extends \Backend
             // Set pointer on position zero
             rewind($objTempfile);
 
-            $i       = 0;
-            while ($mixLine = fgets($objTempfile))
-            {
+            $i = 0;
+            while ($mixLine = fgets($objTempfile)) {
                 $i++;
 
-                if (empty($mixLine) || strlen($mixLine) == 0)
-                {
+                if (empty($mixLine) || strlen($mixLine) == 0) {
                     continue;
                 }
 
                 $mixLine = json_decode(@gzuncompress(base64_decode($mixLine)), true);
 
-                if ($mixLine == FALSE)
-                {
+                if ($mixLine == FALSE) {
                     throw new Exception("Could not load SQL file inserts or unzip it. Maybe damaged on line $i?");
                 }
 
-                if (!is_array($mixLine))
-                {
+                if (!is_array($mixLine)) {
                     throw new Exception("Could not load SQL file inserts. Maybe damaged on line $i?");
                 }
 
@@ -1245,11 +1123,8 @@ class SyncCtoDatabase extends \Backend
             fclose($objTempfile);
 
             return $arrRestoreTables;
-        }
-        catch (Exception $exc)
-        {
-            foreach ($arrRestoreTables as $key => $value)
-            {
+        } catch (Exception $exc) {
+            foreach ($arrRestoreTables as $key => $value) {
                 $this->Database->query("DROP TABLE IF EXISTS " . "synccto_temp_" . $value);
             }
 
@@ -1273,13 +1148,15 @@ class SyncCtoDatabase extends \Backend
      *
      * @param array  $arrHiddenTables           A list with hidden tables. Merged from source and destination.
      *
-     * @param array  $arrHiddenTablePlaceholder A list with regex expressions for the filter. The same like the $arrHiddenTables.
+     * @param array  $arrHiddenTablePlaceholder A list with regex expressions for the filter. The same like the
+     *                                          $arrHiddenTables.
      *
      * @param array  $arrSourceTS               List with timestamps from the source.
      *
      * @param array  $arrDesTS                  List with timestamps from the destination.
      *
-     * @param array  $arrAllowedTables          List with allowed tables. For example based on the user settings/rights.
+     * @param array  $arrAllowedTables          List with allowed tables. For example based on the user
+     *                                          settings/rights.
      *
      * @param string $strSrcName                Name of the source e.g. client or server.
      *
@@ -1290,65 +1167,53 @@ class SyncCtoDatabase extends \Backend
     public function getFormatedCompareList($arrSourceTables, $arrDesTables, $arrHiddenTables, $arrHiddenTablePlaceholder, $arrSourceTS, $arrDesTS, $arrAllowedTables, $strSrcName, $strDesName)
     {
         // Remove hidden tables or tables without permission.
-        if (is_array($arrHiddenTables) && count($arrHiddenTables) != 0)
-        {
-            foreach ($arrSourceTables as $key => $value)
-            {
-                if (in_array($key, $arrHiddenTables) || (is_array($arrAllowedTables) && in_array($key, $arrAllowedTables)))
-                {
+        if (is_array($arrHiddenTables) && count((array) $arrHiddenTables) != 0) {
+            foreach ($arrSourceTables as $key => $value) {
+                if (in_array($key, $arrHiddenTables) || (is_array($arrAllowedTables) && in_array($key, $arrAllowedTables))) {
                     unset($arrSourceTables[$key]);
                 }
             }
 
-            foreach ($arrDesTables as $key => $value)
-            {
-                if (in_array($key, $arrHiddenTables) || (is_array($arrAllowedTables) && in_array($key, $arrAllowedTables)))
-                {
+            foreach ($arrDesTables as $key => $value) {
+                if (in_array($key, $arrHiddenTables) || (is_array($arrAllowedTables) && in_array($key, $arrAllowedTables))) {
                     unset($arrDesTables[$key]);
                 }
             }
         }
 
         // Remove hidden tables based on the regex.
-        if (is_array($arrHiddenTablePlaceholder) && count($arrHiddenTablePlaceholder) != 0)
-        {
-            foreach ($arrHiddenTablePlaceholder as $strRegex)
-            {
+        if (is_array($arrHiddenTablePlaceholder) && count((array) $arrHiddenTablePlaceholder) != 0) {
+            foreach ($arrHiddenTablePlaceholder as $strRegex) {
                 // Run each and check it with the given name.
-                foreach ($arrSourceTables as $key => $value)
-                {
-                    if (preg_match('/^' . $strRegex . '$/', $key))
-                    {
+                foreach ($arrSourceTables as $key => $value) {
+                    if (preg_match('/^' . $strRegex . '$/', $key)) {
                         unset($arrSourceTables[$key]);
                     }
                 }
 
                 // Run each and check it with the given name.
-                foreach ($arrDesTables as $key => $value)
-                {
-                    if (preg_match('/^' . $strRegex . '$/', $key))
-                    {
+                foreach ($arrDesTables as $key => $value) {
+                    if (preg_match('/^' . $strRegex . '$/', $key)) {
                         unset($arrDesTables[$key]);
                     }
                 }
             }
         }
 
-        $arrCompareList = array();
+        $arrCompareList = [];
 
         // Make a diff
         $arrMissingOnDes    = array_diff(array_keys($arrSourceTables), array_keys($arrDesTables));
         $arrMissingOnSource = array_diff(array_keys($arrDesTables), array_keys($arrSourceTables));
 
         // New Tables
-        foreach ($arrMissingOnDes as $keySrcTables)
-        {
+        foreach ($arrMissingOnDes as $keySrcTables) {
             $strType = $arrSourceTables[$keySrcTables]['type'];
 
             $arrCompareList[$strType][$keySrcTables][$strSrcName]['name']    = $keySrcTables;
             $arrCompareList[$strType][$keySrcTables][$strSrcName]['tooltip'] = $this->getReadableSize($arrSourceTables[$keySrcTables]['size'])
-                    . ', '
-                    . vsprintf(($arrSourceTables[$keySrcTables]['count'] == 1) ? $GLOBALS['TL_LANG']['MSC']['entry'] : $GLOBALS['TL_LANG']['MSC']['entries'], array($arrSourceTables[$keySrcTables]['count']));
+                . ', '
+                . vsprintf(($arrSourceTables[$keySrcTables]['count'] == 1) ? $GLOBALS['TL_LANG']['MSC']['entry'] : $GLOBALS['TL_LANG']['MSC']['entries'], [ $arrSourceTables[$keySrcTables]['count'] ]);
 
             $arrCompareList[$strType][$keySrcTables][$strSrcName]['class'] = 'none';
 
@@ -1359,14 +1224,13 @@ class SyncCtoDatabase extends \Backend
         }
 
         // Del Tables
-        foreach ($arrMissingOnSource as $keyDesTables)
-        {
+        foreach ($arrMissingOnSource as $keyDesTables) {
             $strType = $arrDesTables[$keyDesTables]['type'];
 
             $arrCompareList[$strType][$keyDesTables][$strDesName]['name']    = $keyDesTables;
             $arrCompareList[$strType][$keyDesTables][$strSrcName]['tooltip'] = $this->getReadableSize($arrDesTables[$keyDesTables]['size'])
-                    . ', '
-                    . vsprintf(($arrDesTables[$keyDesTables]['count'] == 1) ? $GLOBALS['TL_LANG']['MSC']['entry'] : $GLOBALS['TL_LANG']['MSC']['entries'], array($arrDesTables[$keyDesTables]['count']));
+                . ', '
+                . vsprintf(($arrDesTables[$keyDesTables]['count'] == 1) ? $GLOBALS['TL_LANG']['MSC']['entry'] : $GLOBALS['TL_LANG']['MSC']['entries'], [ $arrDesTables[$keyDesTables]['count'] ]);
 
             $arrCompareList[$strType][$keyDesTables][$strDesName]['class'] = 'none';
 
@@ -1378,81 +1242,66 @@ class SyncCtoDatabase extends \Backend
         }
 
         // Tables which exist on both systems
-        foreach ($arrSourceTables as $keySrcTable => $valueSrcTable)
-        {
+        foreach ($arrSourceTables as $keySrcTable => $valueSrcTable) {
             $strType = $valueSrcTable['type'];
 
             $arrCompareList[$strType][$keySrcTable][$strSrcName]['name']    = $keySrcTable;
             $arrCompareList[$strType][$keySrcTable][$strSrcName]['tooltip'] = $this->getReadableSize($valueSrcTable['size'])
-                    . ', '
-                    . vsprintf(($valueSrcTable['count'] == 1) ? $GLOBALS['TL_LANG']['MSC']['entry'] : $GLOBALS['TL_LANG']['MSC']['entries'], array($valueSrcTable['count']));
+                . ', '
+                . vsprintf(($valueSrcTable['count'] == 1) ? $GLOBALS['TL_LANG']['MSC']['entry'] : $GLOBALS['TL_LANG']['MSC']['entries'], [ $valueSrcTable['count'] ]);
 
             $valueClientTable = $arrDesTables[$keySrcTable];
 
             $arrCompareList[$strType][$keySrcTable][$strDesName]['name']    = $keySrcTable;
             $arrCompareList[$strType][$keySrcTable][$strDesName]['tooltip'] = $this->getReadableSize($valueClientTable['size'])
-                    . ', '
-                    . vsprintf(($valueClientTable['count'] == 1) ? $GLOBALS['TL_LANG']['MSC']['entry'] : $GLOBALS['TL_LANG']['MSC']['entries'], array($valueClientTable['count']));
+                . ', '
+                . vsprintf(($valueClientTable['count'] == 1) ? $GLOBALS['TL_LANG']['MSC']['entry'] : $GLOBALS['TL_LANG']['MSC']['entries'], [ $valueClientTable['count'] ]);
 
             // Get some diff information
             $arrNewId     = $this->getDiffId($valueClientTable, $valueSrcTable);
             $arrDeletedId = $this->getDiffId($valueSrcTable, $valueClientTable);
-            $intDiffId    = count($arrNewId) + count($arrDeletedId);
+            $intDiffId    = count((array) $arrNewId) + count($arrDeletedId);
             $intDiff      = $this->getDiff($valueSrcTable, $valueClientTable);
 
             // Add 'entry' or 'entries' to diff
             $arrCompareList[$strType][$keySrcTable]['diffCount']     = $intDiff;
             $arrCompareList[$strType][$keySrcTable]['diffCountId']   = $intDiffId;
-            $arrCompareList[$strType][$keySrcTable]['diff']          = vsprintf(($intDiff == 1) ? $GLOBALS['TL_LANG']['MSC']['entry'] : $GLOBALS['TL_LANG']['MSC']['entries'], array($intDiff));
+            $arrCompareList[$strType][$keySrcTable]['diff']          = vsprintf(($intDiff == 1) ? $GLOBALS['TL_LANG']['MSC']['entry'] : $GLOBALS['TL_LANG']['MSC']['entries'], [ $intDiff ]);
             $arrCompareList[$strType][$keySrcTable]['diffNewId']     = $arrNewId;
             $arrCompareList[$strType][$keySrcTable]['diffDeletedId'] = $arrDeletedId;
 
             // Check timestamps
-            if (array_key_exists($keySrcTable, $arrSourceTS['current']) && array_key_exists($keySrcTable, $arrSourceTS['lastSync']))
-            {
-                if ($arrSourceTS['current'][$keySrcTable] == $arrSourceTS['lastSync'][$keySrcTable])
-                {
+            if (array_key_exists($keySrcTable, $arrSourceTS['current']) && array_key_exists($keySrcTable, $arrSourceTS['lastSync'])) {
+                if ($arrSourceTS['current'][$keySrcTable] == $arrSourceTS['lastSync'][$keySrcTable]) {
                     $arrCompareList[$strType][$keySrcTable][$strSrcName]['class'] = 'unchanged';
-                }
-                else
-                {
+                } else {
                     $arrCompareList[$strType][$keySrcTable][$strSrcName]['class'] = 'changed';
                 }
-            }
-            else
-            {
+            } else {
                 $arrCompareList[$strType][$keySrcTable][$strSrcName]['class'] = 'no-sync';
             }
 
-            if (array_key_exists($keySrcTable, $arrDesTS['current']) && array_key_exists($keySrcTable, $arrDesTS['lastSync']))
-            {
-                if ($arrDesTS['current'][$keySrcTable] == $arrDesTS['lastSync'][$keySrcTable])
-                {
+            if (array_key_exists($keySrcTable, $arrDesTS['current']) && array_key_exists($keySrcTable, $arrDesTS['lastSync'])) {
+                if ($arrDesTS['current'][$keySrcTable] == $arrDesTS['lastSync'][$keySrcTable]) {
                     $arrCompareList[$strType][$keySrcTable][$strDesName]['class'] = 'unchanged';
-                }
-                else
-                {
+                } else {
                     $arrCompareList[$strType][$keySrcTable][$strDesName]['class'] = 'changed';
                 }
-            }
-            else
-            {
+            } else {
                 $arrCompareList[$strType][$keySrcTable][$strDesName]['class'] = 'no-sync';
             }
 
             // Check CSS
-            if ($arrCompareList[$strType][$keySrcTable][$strSrcName]['class'] == 'changed' && $arrCompareList[$strType][$keySrcTable]['client']['class'] == 'changed')
-            {
+            if ($arrCompareList[$strType][$keySrcTable][$strSrcName]['class'] == 'changed' && $arrCompareList[$strType][$keySrcTable]['client']['class'] == 'changed') {
                 $arrCompareList[$strType][$keySrcTable][$strSrcName]['class'] = 'changed-both';
                 $arrCompareList[$strType][$keySrcTable][$strDesName]['class'] = 'changed-both';
             }
 
             // Check if we have some changes
             if ($arrCompareList[$strType][$keySrcTable][$strSrcName]['class'] == 'unchanged'
-                    && $arrCompareList[$strType][$keySrcTable][$strDesName]['class'] == 'unchanged'
-                    && $arrCompareList[$strType][$keySrcTable]['diffCount'] == 0
-            )
-            {
+                && $arrCompareList[$strType][$keySrcTable][$strDesName]['class'] == 'unchanged'
+                && $arrCompareList[$strType][$keySrcTable]['diffCount'] == 0
+            ) {
                 unset($arrCompareList[$strType][$keySrcTable]);
                 continue;
             }
@@ -1486,36 +1335,26 @@ class SyncCtoDatabase extends \Backend
      */
     public function getDiffId($arrSrcTables, $arrDesTables)
     {
-        $arrSrcId = array();
-        $arrDesId = array();
+        $arrSrcId = [];
+        $arrDesId = [];
 
         // Rebuild the id list.
-        foreach($arrSrcTables['ids'] as $arrIdRange)
-        {
-            if($arrIdRange['start'] == $arrIdRange['end'])
-            {
+        foreach ($arrSrcTables['ids'] as $arrIdRange) {
+            if ($arrIdRange['start'] == $arrIdRange['end']) {
                 $arrSrcId[] = intval($arrIdRange['start']);
-            }
-            else
-            {
-                for($i = $arrIdRange['start'] ; $i < ($arrIdRange['end'] + 1) ; $i++)
-                {
+            } else {
+                for ($i = $arrIdRange['start']; $i < ($arrIdRange['end'] + 1); $i++) {
                     $arrSrcId[] = intval($i);
                 }
             }
         }
 
         // Rebuild the id list.
-        foreach($arrDesTables['ids'] as $arrIdRange)
-        {
-            if($arrIdRange['start'] == $arrIdRange['end'])
-            {
+        foreach ($arrDesTables['ids'] as $arrIdRange) {
+            if ($arrIdRange['start'] == $arrIdRange['end']) {
                 $arrDesId[] = intval($arrIdRange['start']);
-            }
-            else
-            {
-                for($i = $arrIdRange['start'] ; $i < ($arrIdRange['end'] + 1) ; $i++)
-                {
+            } else {
+                for ($i = $arrIdRange['start']; $i < ($arrIdRange['end'] + 1); $i++) {
                     $arrDesId[] = intval($i);
                 }
             }
@@ -1532,37 +1371,33 @@ class SyncCtoDatabase extends \Backend
      */
     public function getAllTimeStamps($arrTimestampServer, $arrTimestampClient, $intClientID)
     {
-        $arrLocationLastTableTimstamp = array('server' => array(), 'client' => array());
+        $arrLocationLastTableTimstamp = [ 'server' => [], 'client' => [] ];
 
-        foreach ($arrLocationLastTableTimstamp AS $location => $v)
-        {
+        foreach ($arrLocationLastTableTimstamp AS $location => $v) {
             $mixLastTableTimestamp = $this->Database
-                    ->prepare("SELECT " . $location . "_timestamp FROM tl_synccto_clients WHERE id=?")
-                    ->limit(1)
-                    ->execute($intClientID)
-                    ->fetchAllAssoc();
+                ->prepare("SELECT " . $location . "_timestamp FROM tl_synccto_clients WHERE id=?")
+                ->limit(1)
+                ->execute($intClientID)
+                ->fetchAllAssoc();
 
-            if (strlen($mixLastTableTimestamp[0][$location . "_timestamp"]) != 0)
-            {
+            if (strlen($mixLastTableTimestamp[0][$location . "_timestamp"]) != 0) {
                 $arrLocationLastTableTimstamp[$location] = unserialize($mixLastTableTimestamp[0][$location . "_timestamp"]);
-            }
-            else
-            {
-                $arrLocationLastTableTimstamp[$location] = array();
+            } else {
+                $arrLocationLastTableTimstamp[$location] = [];
             }
         }
 
         // Return the arrays
-        return array(
-            'server' => array(
+        return [
+            'server' => [
                 'current'  => $arrTimestampServer,
-                'lastSync' => $arrLocationLastTableTimstamp['server']
-            ),
-            'client'   => array(
+                'lastSync' => $arrLocationLastTableTimstamp['server'],
+            ],
+            'client' => [
                 'current'  => $arrTimestampClient,
-                'lastSync' => $arrLocationLastTableTimstamp['client']
-            )
-        );
+                'lastSync' => $arrLocationLastTableTimstamp['client'],
+            ],
+        ];
     }
 
     /* -------------------------------------------------------------------------
@@ -1576,7 +1411,7 @@ class SyncCtoDatabase extends \Backend
      */
     public function getTableStructure($strTableName)
     {
-        $return = array();
+        $return = [];
 
         // Get list of fields
         $fields = $this->Database->listFields($strTableName);
@@ -1584,26 +1419,16 @@ class SyncCtoDatabase extends \Backend
         // Get list of indicies
         $arrIndexes = $this->Database->prepare("SHOW INDEX FROM `$strTableName`")->executeUncached()->fetchAllAssoc();
 
-        foreach ($fields as $field)
-        {
-            if ($field["type"] == "index")
-            {
-                if ($field["name"] == "PRIMARY")
-                {
+        foreach ($fields as $field) {
+            if ($field["type"] == "index") {
+                if ($field["name"] == "PRIMARY") {
                     $return['TABLE_CREATE_DEFINITIONS'][$field["name"]] = "PRIMARY KEY (`" . implode("`,`", $field["index_fields"]) . "`)";
-                }
-                else if ($field["index"] == "UNIQUE")
-                {
+                } else if ($field["index"] == "UNIQUE") {
                     $return['TABLE_CREATE_DEFINITIONS'][$field["name"]] = "UNIQUE KEY `" . $field["name"] . "` (`" . implode("`,`", $field["index_fields"]) . "`)";
-                }
-                else if ($field["index"] == "KEY")
-                {
-                    foreach ($arrIndexes as $valueIndexes)
-                    {
-                        if ($valueIndexes["Key_name"] == $field["name"])
-                        {
-                            switch ($valueIndexes["Index_type"])
-                            {
+                } else if ($field["index"] == "KEY") {
+                    foreach ($arrIndexes as $valueIndexes) {
+                        if ($valueIndexes["Key_name"] == $field["name"]) {
+                            switch ($valueIndexes["Index_type"]) {
                                 case "FULLTEXT":
                                     $return['TABLE_CREATE_DEFINITIONS'][$field["name"]] = "FULLTEXT KEY `" . $field['name'] . "` (" . $this->getKeyFields($field["index_fields"]) . ")";
                                     break;
@@ -1627,8 +1452,7 @@ class SyncCtoDatabase extends \Backend
             $field['name'] = '`' . $field['name'] . '`';
 
             // Field type
-            if (strlen($field['length']))
-            {
+            if (strlen($field['length'])) {
                 $field['type'] .= '(' . $field['length'] . (strlen($field['precision']) ? ',' . $field['precision'] : '') . ')';
 
                 unset($field['length']);
@@ -1636,30 +1460,20 @@ class SyncCtoDatabase extends \Backend
             }
 
             // Default values
-            if (in_array(strtolower($field['type']), $this->arrDefaultValueTypIgnore) || stristr($field['extra'], 'auto_increment'))
-            {
+            if (in_array(strtolower($field['type']), $this->arrDefaultValueTypIgnore) || stristr($field['extra'], 'auto_increment')) {
                 unset($field['default']);
-            }
-            else if (strtolower($field['default']) == 'null')
-            {
+            } else if (strtolower($field['default']) == 'null') {
                 $field['default'] = "default NULL";
-            }
-            else if (is_null($field['default']))
-            {
+            } else if (is_null($field['default'])) {
                 $field['default'] = "";
-            }
-            else if (in_array(strtoupper($field['default']), $this->arrDefaultValueFunctionIgnore))
-            {
+            } else if (in_array(strtoupper($field['default']), $this->arrDefaultValueFunctionIgnore)) {
                 $field['default'] = "default " . $field['default'];
-            }
-            else
-            {
+            } else {
                 $field['default'] = "default '" . $field['default'] . "'";
             }
 
             // Remove elements from the list, we did not want.
-            foreach (array_diff(array_keys($field), $this->arrAllowedFieldKeys) as $strKeyForUnset)
-            {
+            foreach (array_diff(array_keys($field), $this->arrAllowedFieldKeys) as $strKeyForUnset) {
                 unset($field[$strKeyForUnset]);
             }
 
@@ -1669,8 +1483,7 @@ class SyncCtoDatabase extends \Backend
         // Table status
         $objStatus = $this->Database->prepare("SHOW TABLE STATUS")->executeUncached();
 
-        while ($row = $objStatus->fetchAssoc())
-        {
+        while ($row = $objStatus->fetchAssoc()) {
             if ($row['Name'] != $strTableName)
                 continue;
 
@@ -1692,20 +1505,16 @@ class SyncCtoDatabase extends \Backend
      */
     private function getKeyFields($fieldList)
     {
-        $return = array();
+        $return = [];
 
-        foreach($fieldList as $field)
-        {
-            if(preg_match("/.*\([0-9]+\)/i", $field))
-            {
+        foreach ($fieldList as $field) {
+            if (preg_match("/.*\([0-9]+\)/i", $field)) {
                 $cutPosition = stripos($field, '(');
-                $name = substr($field, 0, $cutPosition);
-                $sub = substr($field, $cutPosition);
+                $name        = substr($field, 0, $cutPosition);
+                $sub         = substr($field, $cutPosition);
 
                 $return[] = sprintf('`%s` %s', $name, $sub);
-            }
-            else
-            {
+            } else {
                 $return[] = sprintf('`%s`', $field);
             }
         }
@@ -1717,12 +1526,13 @@ class SyncCtoDatabase extends \Backend
      * Build a "CREATE TABLE" sql statemant
      *
      * @param array $arrTable Table Informations
-     * @param type $strName Table name
+     * @param type  $strName  Table name
+     *
      * @return string
      */
     private function buildSQLTable($arrTable, $strName)
     {
-        $string = "CREATE TABLE `" . $strName . "` (\n  " . implode(",\n  ", $arrTable['TABLE_FIELDS']) . (count($arrTable['TABLE_CREATE_DEFINITIONS']) ? ',' : '') . "\n";
+        $string = "CREATE TABLE `" . $strName . "` (\n  " . implode(",\n  ", $arrTable['TABLE_FIELDS']) . (count((array) $arrTable['TABLE_CREATE_DEFINITIONS']) ? ',' : '') . "\n";
 
         if (is_Array($arrTable['TABLE_CREATE_DEFINITIONS']))
             $string .= "  " . implode(",\n  ", $arrTable['TABLE_CREATE_DEFINITIONS']) . "\n";
@@ -1736,8 +1546,9 @@ class SyncCtoDatabase extends \Backend
      * Build a sql statement for "INSERT IGNORE INTO"
      *
      * @param type $strTable Table name
-     * @param type $arrKeys Columnames
-     * @param type $arrData Data for insert
+     * @param type $arrKeys  Columnames
+     * @param type $arrData  Data for insert
+     *
      * @return string
      */
     private function buildSQLInsert($strTable, $arrKeys, $arrData, $booPrepare = false)
@@ -1746,29 +1557,22 @@ class SyncCtoDatabase extends \Backend
         $strBody .= implode("`, `", $arrKeys);
         $strBody .= "`) VALUES ( ";
 
-        for ($i = 0; $i < count($arrKeys); $i++)
-        {
-            if (isset($arrData[$arrKeys[$i]]))
-            {
+        for ($i = 0; $i < count((array) $arrKeys); $i++) {
+            if (isset($arrData[$arrKeys[$i]])) {
                 $strBody .= $arrData[$arrKeys[$i]];
-            }
-            else
-            {
+            } else {
                 $strBody .= "''";
             }
 
-            if ($i < count($arrKeys) - 1)
+            if ($i < count((array) $arrKeys) - 1)
                 $strBody .= ", ";
         }
 
         $strBody .= ")";
 
-        if ($booPrepare)
-        {
+        if ($booPrepare) {
             return $strBody;
-        }
-        else
-        {
+        } else {
             return $strBody;
         }
     }
