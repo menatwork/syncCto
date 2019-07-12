@@ -12,7 +12,10 @@
 namespace MenAtWork\SyncCto\Controller;
 
 
+use MenAtWork\SyncCto\Helper\Ping;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use SyncCtoPopupDB;
@@ -23,9 +26,10 @@ use SyncCtoPopupFiles;
  * @Route("/syncCto", defaults={"_scope" = "backend"})
  *
  * Class PopupController
+ *
  * @package MenAtWork\SyncCto\Controller
  */
-class PopupController extends AbstractController
+class ApiController extends AbstractController
 {
 
     /**
@@ -35,6 +39,8 @@ class PopupController extends AbstractController
      */
     public function filesPopupAction()
     {
+        $this->container->get('contao.framework')->initialize();
+
         $objPopup = new SyncCtoPopupFiles();
 
         return new Response(
@@ -49,6 +55,8 @@ class PopupController extends AbstractController
      */
     public function databasePopupAction()
     {
+        $this->container->get('contao.framework')->initialize();
+
         $objPopup = new SyncCtoPopupDB();
 
         return new Response(
@@ -56,4 +64,21 @@ class PopupController extends AbstractController
         );
     }
 
+    /**
+     * @Route("/api/1.0/ping", name="maw.sync_cto.api.1_0.ping")
+     *
+     * @param Request $request The request.
+     *
+     * @return JsonResponse
+     */
+    public function pingAction(Request $request)
+    {
+        $this->container->get('contao.framework')->initialize();
+
+        $ping = new Ping();
+
+        return new JsonResponse(
+            $ping->pingClientStatus($request->get('clientID'))
+        );
+    }
 }

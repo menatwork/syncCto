@@ -11,6 +11,11 @@
 
 namespace MenAtWork\SyncCto\Helper;
 
+/**
+ * Class Ping
+ *
+ * @package MenAtWork\SyncCto\Helper
+ */
 class Ping
 {
     /**
@@ -77,6 +82,15 @@ class Ping
     protected $msg = '';
 
     /**
+     * Ping constructor.
+     */
+    public function __construct()
+    {
+        // Init some more things.
+        \Controller::loadLanguageFile('tl_synccto_clients');
+    }
+
+    /**
      * Add the error and set all flags.
      *
      * @param string $msg The messages.
@@ -106,24 +120,6 @@ class Ping
     }
 
     /**
-     * Get the client ID from post.
-     *
-     * @return bool Return true if we have a number or false on error.
-     */
-    protected function loadClientId()
-    {
-        $clientId = \Input::post('clientID');
-
-        if (empty($clientId)) {
-            return false;
-        }
-
-        $this->clientID = intval($clientId);
-
-        return true;
-    }
-
-    /**
      * Load the data for the client from the database.
      *
      * @return bool True means we have some data, false no data found.
@@ -132,9 +128,9 @@ class Ping
     {
         // Load Client from database.
         $objClient = \Database::getInstance()
-            ->prepare('SELECT * FROM tl_synccto_clients WHERE id = %s')
-            ->limit(1)
-            ->execute($this->clientID);
+                              ->prepare('SELECT * FROM tl_synccto_clients WHERE id = %s')
+                              ->limit(1)
+                              ->execute($this->clientID);
 
         // Check if a client was loaded
         if ($objClient->numRows == 0) {
@@ -181,77 +177,45 @@ class Ping
     /**
      * Ping the current client status
      *
-     * @param string $strAction
+     * @param int $clientId The client id to check.
+     *
+     * @return array An array with th status information.
      */
-    public function pingClientStatus($strAction)
+    public function pingClientStatus($clientId)
     {
-        // Close the session handling.
-        session_write_close();
-
-        // Init some more things.
-        \Controller::loadLanguageFile('tl_synccto_clients');
-
-        // Check if the current call is one for use.
-        if ($strAction != 'syncCtoPing') {
-            return;
-        }
-
         // Check if we have the id. If not end here.
-        if (!$this->loadClientId()) {
-            $this->addFatalError('Missing client id.');
-            $this->output();
-        }
+        $this->clientID = intval($clientId);
 
         // Check if we have the entry in the database.
         if (!$this->loadClient()) {
             $this->addFatalError('Unknown client id.');
-            $this->output();
+
+            return $this->output();
         }
 
-        // Run all pings.
-        $this->ping();
-    }
-
-    /**
-     * Run all sub tasks for the ping.
-     */
-    protected function ping()
-    {
         try {
             $this->initRequest();
-            $this->pingContaoBackend();
             $this->pingCtoCom();
             $this->pingSyncCtoSystem();
 
             // State: Green => All systems ready.
             $this->addState(4, $GLOBALS['TL_LANG']['tl_synccto_clients']['state']['green'], '');
+        } catch (\ErrorException $exc) {
+            // Nothing to do, just don't run the default exception.
         } catch (\Exception $exc) {
             // Error.
             $this->addFatalError($exc->getMessage() . " " . $exc->getFile() . " on " . $exc->getLine());
         }
 
-        $this->output();
-    }
-
-    /**
-     * Ping the Contao Backend.
-     */
-    protected function pingContaoBackend()
-    {
-        $this->sendRequest('/contao/index.php');
-        if ($this->request->code != '200') {
-            $this->addState
-            (
-                1,
-                $GLOBALS['TL_LANG']['tl_synccto_clients']['state']['red'],
-                'Missing contao.'
-            );
-            $this->output();
-        }
+        return $this->output();
     }
 
     /**
      * Ping the ctoCom class.
+     *
+     * @return void
+     *
+     * @throws \ErrorException
      */
     protected function pingCtoCom()
     {
@@ -263,12 +227,15 @@ class Ping
                 $GLOBALS['TL_LANG']['tl_synccto_clients']['state']['blue'],
                 'Missing ctoCommunication'
             );
-            $this->output();
+
+            throw new \ErrorException();
         }
     }
 
     /**
      * Ping the SyncCto sub system.
+     *
+     * @throws \Exception
      */
     protected function pingSyncCtoSystem()
     {
@@ -292,7 +259,8 @@ class Ping
                     $GLOBALS['TL_LANG']['tl_synccto_clients']['state']['blue'],
                     $exc->getMessage()
                 );
-                $this->output();
+
+                throw new \ErrorException();
             }
 
             $objSyncCtoClient->stopConnection();
@@ -304,12 +272,15 @@ class Ping
                 $GLOBALS['TL_LANG']['tl_synccto_clients']['state']['orange'],
                 $exc->getMessage()
             );
-            $this->output();
+
+            throw new \ErrorException();
         }
     }
 
     /**
      * Output function for the ajax request.
+     *
+     * @return array An array with the status information.
      */
     protected function output()
     {
@@ -334,7 +305,6 @@ class Ping
             $output['msg']     = $this->msg;
         }
 
-        echo json_encode($output);
-        exit();
+        return $output;
     }
 }

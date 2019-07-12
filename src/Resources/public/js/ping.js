@@ -65,7 +65,7 @@ function sendNextRequest(_strToken, _objElement)
     // Send new request for ping
     new Request.JSON({
         method:       'post',
-        url:          window.location.href,
+        url:          'syncCto/api/1.0/ping',
         data:         data,
         evalScripts:  false,
         evalResponse: false,
