@@ -1,20 +1,33 @@
 <!DOCTYPE html>
 <html lang="<?php echo $this->language; ?>">
-<head>
-<meta charset="<?php echo $this->charset; ?>">
-<title><?php echo $this->title; ?> - Contao Open Source CMS <?php echo VERSION; ?></title>
-<base href="<?php echo $this->base; ?>">
-<?php echo $this->stylesheets; ?>
-<?php if(version_compare(VERSION, "3.5", '>=')): ?><script><?php echo $this->getLocaleString() ?></script><?php endif; ?>
-<?php echo $this->javascripts; ?>
-</head>
-<body class="<?php echo $this->ua; ?>">
+    <head>
+        <meta charset="<?php echo $this->charset; ?>">
+        <title><?php echo $this->title; ?> - Contao Open Source CMS <?php echo VERSION; ?></title>
+        <base href="<?php echo $this->base; ?>">
+        <meta name="generator" content="Contao Open Source CMS">
+        <meta name="viewport" content="width=device-width,initial-scale=1.0,shrink-to-fit=no">
+        <meta name="referrer" content="origin">
 
-<div id="container">
-    <div id="main">
-        <?php echo $this->content; ?>
-    </div>
-</div>
+        <link rel="stylesheet" href="<?= TL_ASSETS_URL ?>system/themes/<?= $this->theme ?>/fonts.css">
+        <link rel="stylesheet" href="<?= TL_ASSETS_URL ?>system/themes/<?= $this->theme ?>/basic.css">
+        <link rel="stylesheet" href="<?= TL_ASSETS_URL ?>system/themes/<?= $this->theme ?>/popup.css">
+        <?= $this->stylesheets ?>
 
-</body>
+        <script><?= $this->getLocaleString() ?></script>
+        <script src="<?= TL_ASSETS_URL ?>assets/mootools/js/mootools.min.js"></script>
+        <script src="<?= TL_ASSETS_URL ?>bundles/contaocore/mootao.min.js"></script>
+        <script src="<?= TL_ASSETS_URL ?>bundles/contaocore/core.min.js"></script>
+        <script><?= $this->getDateString() ?></script>
+        <?= $this->javascripts ?>
+
+    </head>
+    <body class="<?= $this->ua ?> popup">
+
+        <div id="container" class="cf">
+            <div id="main">
+                <?php echo $this->content; ?>
+            </div>
+        </div>
+
+    </body>
 </html>
