@@ -64,6 +64,8 @@ class SyncCtoCommunicationClient extends \MenAtWork\CtoCommunicationBundle\Contr
      *
      * @param int $id
      *
+     * @return array
+     *
      * @throws Exception
      */
     public function setClientBy($id)

@@ -42,18 +42,18 @@ array_insert($GLOBALS['BE_MOD'], $i + 1, array
             'callback'          => 'SyncCtoModuleClient',
             'stylesheet'        => 'bundles/synccto/css/systemcheck.css',
         ),
-        'syncCto_backups' => array
-        (
-            'tables' => array
-            (
-                'tl_syncCto_backup_file',
-                'tl_syncCto_backup_db',
-                'tl_syncCto_restore_file',
-                'tl_syncCto_restore_db'
-            ),
-            'icon'              => 'bundles/synccto/images/nav/iconBackups.png',
-            'callback'          => 'SyncCtoModuleBackup',
-        ),
+//        'syncCto_backups' => array
+//        (
+//            'tables' => array
+//            (
+//                'tl_syncCto_backup_file',
+//                'tl_syncCto_backup_db',
+//                'tl_syncCto_restore_file',
+//                'tl_syncCto_restore_db'
+//            ),
+//            'icon'              => 'bundles/synccto/images/nav/iconBackups.png',
+//            'callback'          => 'SyncCtoModuleBackup',
+//        ),
         'syncCto_check' => array
         (
             'icon'              => 'bundles/synccto/images/nav/iconCheck.png',
