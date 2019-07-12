@@ -2732,8 +2732,10 @@ class SyncCtoModuleClient extends \BackendModule
                         $itOverall = $fileList->getTransferFiles(true, true);
 
                         // Count some values.
-                        $waitingFiles = iterator_count((array)$itCore) + iterator_count((array)$itPrivate) + iterator_count((array)$itDbafs);
-                        $overallFiles = iterator_count((array)$itOverall);
+                        $waitingFiles = iterator_count($itCore)
+                                        + iterator_count($itPrivate)
+                                        + iterator_count($itDbafs);
+                        $overallFiles = iterator_count($itOverall);
 
                         // Add the status.
                         $this->objData->setDescription
@@ -2766,7 +2768,7 @@ class SyncCtoModuleClient extends \BackendModule
                         $this->arrSyncSettings['last_transfer'] = $waitingFiles;
 
                         // Run core if we have files.
-                        if (iterator_count((array)$itCore) != 0) {
+                        if (iterator_count($itCore) != 0) {
                             $arrTransmission = $this
                                 ->objSyncCtoCommunicationClient
                                 ->runFileImport(iterator_to_array($itCore), false);
@@ -2774,8 +2776,7 @@ class SyncCtoModuleClient extends \BackendModule
                             foreach ($arrTransmission as $key => $value) {
                                 $this->arrListCompare['core'][$key] = $value;
                             }
-                        } // Run private if we have files.
-                        else if (iterator_count((array)$itPrivate) != 0) {
+                        } else if (iterator_count($itPrivate) != 0) { // Run private if we have files.
                             // Get only 100 files.
                             $itSupSet = new LimitIterator($itPrivate, 0, 100);
                             $itSupSet = iterator_to_array($itSupSet);
@@ -2826,8 +2827,7 @@ class SyncCtoModuleClient extends \BackendModule
                             foreach ($arrTransmission as $key => $value) {
                                 $this->arrListCompare['files'][$key] = $value;
                             }
-                        } // Run private if we have files.
-                        else if (iterator_count((array)$itDbafs) != 0) {
+                        } else if (iterator_count($itDbafs) != 0) { // Run private if we have files.
                             // Get only 100 files.
                             $itSupSet = new LimitIterator($itDbafs, 0, 100);
 
@@ -2871,8 +2871,8 @@ class SyncCtoModuleClient extends \BackendModule
                         $itOverall = $fileList->getDeletedFiles(false);
 
                         // Count some values.
-                        $waitingFiles = iterator_count((array)$itCore) + iterator_count((array)$itPrivate);
-                        $overallFiles = iterator_count((array)$itOverall);
+                        $waitingFiles = iterator_count($itCore) + iterator_count($itPrivate);
+                        $overallFiles = iterator_count($itOverall);
 
                         // Add the status.
                         $this->objData->setDescription
@@ -2906,7 +2906,7 @@ class SyncCtoModuleClient extends \BackendModule
                         $this->arrSyncSettings['last_delete'] = $waitingFiles;
 
                         // Run core if we have files.
-                        if (iterator_count((array)$itCore) != 0) {
+                        if (iterator_count($itCore) != 0) {
                             // Get only 100 files.
                             $itSupSet = new LimitIterator($itCore, 0, 100);
 
@@ -2920,7 +2920,7 @@ class SyncCtoModuleClient extends \BackendModule
                                 $this->arrListCompare['core'][$key] = $value;
                             }
                         } // Run private if we have files.
-                        else if (iterator_count((array)$itPrivate) != 0) {
+                        else if (iterator_count($itPrivate) != 0) {
                             // Get only 100 files.
                             $itSupSet = new LimitIterator($itPrivate, 0, 100);
 
