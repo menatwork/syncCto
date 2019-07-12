@@ -15,7 +15,6 @@ use AppendIterator;
 use ArrayIterator;
 use ArrayObject;
 use EmptyIterator;
-use FilterIterator;
 use MenAtWork\SyncCto\Sync\FileList\FilterIterator\Base as FilterIteratorBase;
 
 class Base
@@ -84,7 +83,7 @@ class Base
      *
      * @param bool $onlyMoved Flag that only files which are moved to there destination add to the list.
      *
-     * @return AppendIterator The filter iterator.
+     * @return EmptyIterator|FilterIteratorBase The filter iterator.
      */
     protected function createDbafsIterator($onlySend, $onlyMoved)
     {
@@ -125,7 +124,7 @@ class Base
      *
      * @param bool $onlyMoved Flag that only files which are moved to there destination add to the list.
      *
-     * @return FilterIterator The filter iterator.
+     * @return EmptyIterator|FilterIteratorBase The filter iterator.
      */
     public function getDbafs($onlySend, $onlyMoved)
     {
@@ -145,7 +144,7 @@ class Base
      *
      * @param string $type      The type e.g. core or files.
      *
-     * @return AppendIterator The filter iterator.
+     * @return EmptyIterator|FilterIteratorBase The filter iterator.
      */
     protected function createTransferIterator($onlySend, $onlyMoved, $type)
     {
@@ -200,7 +199,7 @@ class Base
      *
      * @param bool $onlyMoved Flag that only files which are moved to there destination add to the list.
      *
-     * @return FilterIterator The filter iterator.
+     * @return EmptyIterator|FilterIteratorBase The filter iterator.
      */
     public function getTransferCore($onlySend, $onlyMoved)
     {
@@ -214,7 +213,7 @@ class Base
      *
      * @param bool $onlyMoved Flag that only files which are moved to there destination add to the list.
      *
-     * @return FilterIterator The filter iterator.
+     * @return EmptyIterator|FilterIteratorBase The filter iterator.
      */
     public function getTransferPrivate($onlySend, $onlyMoved)
     {
@@ -259,7 +258,7 @@ class Base
      *
      * @param string $type        The type e.g. core or files.
      *
-     * @return AppendIterator The filter iterator.
+     * @return EmptyIterator|FilterIteratorBase The filter iterator.
      */
     protected function createDeleteIterator($onlyWaiting, $type)
     {
@@ -309,7 +308,7 @@ class Base
      *
      * @param bool $onlyWaiting Flag if only waiting files should returned,
      *
-     * @return FilterIterator The filter iterator.
+     * @return EmptyIterator|FilterIteratorBase The filter iterator.
      */
     public function getDeletedCore($onlyWaiting)
     {
@@ -321,7 +320,7 @@ class Base
      *
      * @param bool $onlyWaiting Flag if only waiting files should returned,
      *
-     * @return FilterIterator The filter iterator.
+     * @return EmptyIterator|FilterIteratorBase The filter iterator.
      */
     public function getDeletedPrivate($onlyWaiting)
     {
