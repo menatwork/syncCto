@@ -842,7 +842,7 @@ class SyncCtoHelper
         }
 
         // Build the new path. Use the system directory separator.
-        return implode(DIRECTORY_SEPARATOR, $arrReturn);
+        return implode(SYNCCTO_DIRECTORY_SEPARATOR, $arrReturn);
     }
 
     /**
@@ -860,13 +860,14 @@ class SyncCtoHelper
         }
 
         // Check if we have a separator at the start.
-        if ( stripos($strPath, DIRECTORY_SEPARATOR) === 0 )
+        if ( stripos($strPath, DIRECTORY_SEPARATOR) === 0
+            || stripos($strPath, SYNCCTO_DIRECTORY_SEPARATOR) === 0)
         {
             return TL_ROOT . $strPath;
         }
         else
         {
-            return TL_ROOT . DIRECTORY_SEPARATOR . $strPath;
+            return TL_ROOT . SYNCCTO_DIRECTORY_SEPARATOR . $strPath;
         }
     }
 
@@ -884,7 +885,7 @@ class SyncCtoHelper
         $strUploadPath = $this->standardizePath($GLOBALS['TL_CONFIG']['uploadPath']);
 
         // Check the separator.
-        if ( DIRECTORY_SEPARATOR == '/' )
+        if ( SYNCCTO_DIRECTORY_SEPARATOR == '/' )
         {
             return preg_match('/' . $strUploadPath . '\//i', $strPath);
         }

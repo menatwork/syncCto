@@ -497,14 +497,14 @@ class SyncCtoFiles extends \Backend
                 $intFileNumber         = 1;
                 for ($i = 1; $i < 100; $i++)
                 {
-                    $strNewDestinationName = sprintf('%s' . DIRECTORY_SEPARATOR . '%s_%s.%s',
+                    $strNewDestinationName = sprintf('%s' . SYNCCTO_DIRECTORY_SEPARATOR . '%s_%s.%s',
                         $arrDestinationInformation['dirname'],
                         $arrDestinationInformation['filename'],
                         $i,
                         $arrDestinationInformation['extension']
                     );
 
-                    if (!file_exists(TL_ROOT . DIRECTORY_SEPARATOR . $strNewDestinationName))
+                    if (!file_exists(TL_ROOT . SYNCCTO_DIRECTORY_SEPARATOR . $strNewDestinationName))
                     {
                         $intFileNumber = $i;
                         break;
@@ -769,7 +769,7 @@ class SyncCtoFiles extends \Backend
         $objFileXML->append($objXml->flush(true), "");
         $objFileXML->close();
 
-        if(file_exists(TL_ROOT . DIRECTORY_SEPARATOR . $strXMLFile))
+        if(file_exists(TL_ROOT . SYNCCTO_DIRECTORY_SEPARATOR . $strXMLFile))
         {
             return true;
         }
@@ -1134,7 +1134,7 @@ class SyncCtoFiles extends \Backend
         $floatTimeStart = microtime(true);
 
         // Check if filelist exists
-        if (!file_exists(TL_ROOT . DIRECTORY_SEPARATOR . $srtXMLFilelist))
+        if (!file_exists(TL_ROOT . SYNCCTO_DIRECTORY_SEPARATOR . $srtXMLFilelist))
         {
             throw new Exception("File not found: " + $srtXMLFilelist);
         }
@@ -1155,7 +1155,7 @@ class SyncCtoFiles extends \Backend
 
         // Open XML Reader
         $objXml = new DOMDocument("1.0", "UTF-8");
-        $objXml->load(TL_ROOT . DIRECTORY_SEPARATOR . $srtXMLFilelist);
+        $objXml->load(TL_ROOT . SYNCCTO_DIRECTORY_SEPARATOR . $srtXMLFilelist);
 
         // Check if we have some files
         if ($objXml->getElementsByTagName("file")->length == 0)
@@ -1186,7 +1186,7 @@ class SyncCtoFiles extends \Backend
         foreach ($objFilesList as $file)
         {
             // Check if file exists
-            if (file_exists(TL_ROOT . DIRECTORY_SEPARATOR . $file->nodeValue))
+            if (file_exists(TL_ROOT . SYNCCTO_DIRECTORY_SEPARATOR . $file->nodeValue))
             {
                 $objZipArchive->addFile($file->nodeValue, $file->nodeValue);
             }
@@ -1217,7 +1217,7 @@ class SyncCtoFiles extends \Backend
         }
 
         // Close XML and zip
-        $objXml->save(TL_ROOT . DIRECTORY_SEPARATOR . $srtXMLFilelist);
+        $objXml->save(TL_ROOT . SYNCCTO_DIRECTORY_SEPARATOR . $srtXMLFilelist);
         $objZipArchive->close();
 
         if ($objXml->getElementsByTagName("file")->length == 0)
@@ -1311,7 +1311,7 @@ class SyncCtoFiles extends \Backend
         foreach ($arrFolders as $strFolder)
         {
             // Scann.
-            $objDirectoryIt  = new RecursiveDirectoryIterator(TL_ROOT . DIRECTORY_SEPARATOR . $this->objSyncCtoHelper->standardizePath($strFolder), $this->strRDIFlags);
+            $objDirectoryIt  = new RecursiveDirectoryIterator(TL_ROOT . SYNCCTO_DIRECTORY_SEPARATOR . $this->objSyncCtoHelper->standardizePath($strFolder), $this->strRDIFlags);
             $objFilterIt     = new SyncCtoFilterIteratorBase($objDirectoryIt);
             $objRecursiverIt = new RecursiveIteratorIterator($objFilterIt, RecursiveIteratorIterator::SELF_FIRST);
 
@@ -1353,7 +1353,7 @@ class SyncCtoFiles extends \Backend
             // Scann allowed root folders.
             foreach ($this->arrRootFolderList as $value)
             {
-                $strFullPath = TL_ROOT . DIRECTORY_SEPARATOR . $this->objSyncCtoHelper->standardizePath($value);
+                $strFullPath = TL_ROOT . SYNCCTO_DIRECTORY_SEPARATOR . $this->objSyncCtoHelper->standardizePath($value);
 
                 // Check if the folder exists.
                 if (!file_exists($strFullPath) || !is_dir($strFullPath))
@@ -1374,7 +1374,7 @@ class SyncCtoFiles extends \Backend
         if ($booFiles == true)
         {
             // Scann.
-            $objDirectoryIt  = new RecursiveDirectoryIterator(TL_ROOT . DIRECTORY_SEPARATOR . $this->objSyncCtoHelper->standardizePath($GLOBALS['TL_CONFIG']['uploadPath']), $this->strRDIFlags);
+            $objDirectoryIt  = new RecursiveDirectoryIterator(TL_ROOT . SYNCCTO_DIRECTORY_SEPARATOR . $this->objSyncCtoHelper->standardizePath($GLOBALS['TL_CONFIG']['uploadPath']), $this->strRDIFlags);
             $objFilterIt     = new SyncCtoFilterIteratorBase($objDirectoryIt);
             $objRecursiverIt = new RecursiveIteratorIterator($objFilterIt, RecursiveIteratorIterator::SELF_FIRST);
 
@@ -1408,7 +1408,7 @@ class SyncCtoFiles extends \Backend
         {
             foreach ($this->arrRootFolderList as $value)
             {
-                $strFullPath = TL_ROOT . DIRECTORY_SEPARATOR . $this->objSyncCtoHelper->standardizePath($value);
+                $strFullPath = TL_ROOT . SYNCCTO_DIRECTORY_SEPARATOR . $this->objSyncCtoHelper->standardizePath($value);
 
                 // Check if the folder exists.
                 if(!file_exists($strFullPath) || !is_dir($strFullPath))
@@ -1429,7 +1429,7 @@ class SyncCtoFiles extends \Backend
         if ($booFiles == true)
         {
             // Scann.
-            $objDirectoryIt  = new RecursiveDirectoryIterator(TL_ROOT . DIRECTORY_SEPARATOR . $this->objSyncCtoHelper->standardizePath($GLOBALS['TL_CONFIG']['uploadPath']), $this->strRDIFlags);
+            $objDirectoryIt  = new RecursiveDirectoryIterator(TL_ROOT . SYNCCTO_DIRECTORY_SEPARATOR . $this->objSyncCtoHelper->standardizePath($GLOBALS['TL_CONFIG']['uploadPath']), $this->strRDIFlags);
             $objFilterIt     = new SyncCtoFilterIteratorFolder($objDirectoryIt);
             $objRecursiverIt = new RecursiveIteratorIterator($objFilterIt, RecursiveIteratorIterator::SELF_FIRST);
 
@@ -1604,7 +1604,7 @@ class SyncCtoFiles extends \Backend
             throw new Exception(vsprintf($GLOBALS['TL_LANG']['ERR']['min_size_limit'], array("500KiB")));
         }
 
-        if (!file_exists(TL_ROOT . DIRECTORY_SEPARATOR . $strSrcFile))
+        if (!file_exists(TL_ROOT . SYNCCTO_DIRECTORY_SEPARATOR . $strSrcFile))
         {
             throw new Exception(vsprintf($GLOBALS['TL_LANG']['ERR']['unknown_file'], array($strSrcFile)));
         }
@@ -1621,7 +1621,7 @@ class SyncCtoFiles extends \Backend
         $i      = 0;
         for ($i; $booRun; $i++)
         {
-            $fp = fopen(TL_ROOT . DIRECTORY_SEPARATOR . $strSrcFile, "rb");
+            $fp = fopen(TL_ROOT . SYNCCTO_DIRECTORY_SEPARATOR . $strSrcFile, "rb");
 
             if ($fp === FALSE)
             {
@@ -1684,14 +1684,14 @@ class SyncCtoFiles extends \Backend
             $strReadFile = $this->objSyncCtoHelper->standardizePath($GLOBALS['SYC_PATH']['tmp'], $strSplitname, $strSplitname . ".sync" . $i);
 
             // Check if file exists
-            if (!file_exists(TL_ROOT . DIRECTORY_SEPARATOR . $strReadFile))
+            if (!file_exists(TL_ROOT . SYNCCTO_DIRECTORY_SEPARATOR . $strReadFile))
             {
                 throw new Exception(vsprintf($GLOBALS['TL_LANG']['ERR']['unknown_file'], array($strSplitname . ".sync" . $i)));
             }
 
             // Create new file objects
             $objFilePart  = new File($strReadFile);
-            $hanFileWhole = fopen(TL_ROOT . DIRECTORY_SEPARATOR . $strSavePath, "a+");
+            $hanFileWhole = fopen(TL_ROOT . SYNCCTO_DIRECTORY_SEPARATOR . $strSavePath, "a+");
 
             // Write part file to main file
             fwrite($hanFileWhole, $objFilePart->getContent());
@@ -1709,7 +1709,7 @@ class SyncCtoFiles extends \Backend
         }
 
         // Check MD5 Checksum
-        if (md5_file(TL_ROOT . DIRECTORY_SEPARATOR . $strSavePath) != $strMD5)
+        if (md5_file(TL_ROOT . SYNCCTO_DIRECTORY_SEPARATOR . $strSavePath) != $strMD5)
         {
             throw new Exception($GLOBALS['TL_LANG']['ERR']['checksum_error']);
         }
@@ -1738,7 +1738,7 @@ class SyncCtoFiles extends \Backend
                 $strTempFile  = $this->objSyncCtoHelper->standardizePath($GLOBALS['SYC_PATH']['tmp'], "sync", $value["path"]);
 
                 // Check if the tmp file exists.
-                if (!file_exists(TL_ROOT . DIRECTORY_SEPARATOR . $strTempFile))
+                if (!file_exists(TL_ROOT . SYNCCTO_DIRECTORY_SEPARATOR . $strTempFile))
                 {
                     $arrFileList[$key]['saved']       = false;
                     $arrFileList[$key]['error']       = sprintf($GLOBALS['TL_LANG']['ERR']['unknown_file'], $strTempFile);
@@ -1843,14 +1843,14 @@ class SyncCtoFiles extends \Backend
                             $intFileNumber         = 1;
                             for ($i = 1; $i < 100; $i++)
                             {
-                                $strNewDestinationName = sprintf('%s' . DIRECTORY_SEPARATOR . '%s_%s.%s',
+                                $strNewDestinationName = sprintf('%s' . SYNCCTO_DIRECTORY_SEPARATOR . '%s_%s.%s',
                                     $arrDestinationInformation['dirname'],
                                     $arrDestinationInformation['filename'],
                                     $i,
                                     $arrDestinationInformation['extension']
                                 );
 
-                                if (!file_exists(TL_ROOT . DIRECTORY_SEPARATOR . $strNewDestinationName))
+                                if (!file_exists(TL_ROOT . SYNCCTO_DIRECTORY_SEPARATOR . $strNewDestinationName))
                                 {
                                     $intFileNumber = $i;
                                     break;
@@ -2063,7 +2063,7 @@ class SyncCtoFiles extends \Backend
             {
                 throw new Exception(vsprintf($GLOBALS['TL_LANG']['ERR']['cant_move_file'], array($value["tmp_name"], $strSaveFile)));
             }
-            else if ($key != md5_file(TL_ROOT . DIRECTORY_SEPARATOR . $strSaveFile))
+            else if ($key != md5_file(TL_ROOT . SYNCCTO_DIRECTORY_SEPARATOR . $strSaveFile))
             {
                 throw new Exception($GLOBALS['TL_LANG']['ERR']['checksum_error']);
             }

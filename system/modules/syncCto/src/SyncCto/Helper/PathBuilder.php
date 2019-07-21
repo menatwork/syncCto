@@ -60,8 +60,8 @@ class PathBuilder
             $this->addArray($path);
         } else {
             $wrongSeparator = ((DIRECTORY_SEPARATOR == '/') ? '\\' : '/');
-            $path           = str_replace($wrongSeparator, DIRECTORY_SEPARATOR, $path);
-            $this->addString($path, DIRECTORY_SEPARATOR);
+            $path           = str_replace($wrongSeparator, SYNCCTO_DIRECTORY_SEPARATOR, $path);
+            $this->addString($path, SYNCCTO_DIRECTORY_SEPARATOR);
         }
 
         return $this;
@@ -77,8 +77,8 @@ class PathBuilder
     public function getPath($withTlRoot = true)
     {
         // Build the path.
-        $return = (($withTlRoot) ? TL_ROOT . DIRECTORY_SEPARATOR : '')
-                  . implode(DIRECTORY_SEPARATOR, $this->pathParts);
+        $return = (($withTlRoot) ? TL_ROOT . SYNCCTO_DIRECTORY_SEPARATOR : '')
+                  . implode(SYNCCTO_DIRECTORY_SEPARATOR, $this->pathParts);
 
         // Reset the array.
         $this->pathParts = array();

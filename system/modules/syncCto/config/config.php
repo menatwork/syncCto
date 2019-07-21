@@ -9,6 +9,8 @@
  * @filesource
  */
 
+define('SYNCCTO_DIRECTORY_SEPARATOR', '/');
+
 use ContaoCommunityAlliance\Contao\EventDispatcher\Event\CreateEventDispatcherEvent;
 
 $objInput = \Input::getInstance();
