@@ -3,15 +3,14 @@
 namespace MenAtWork\SyncCto\DependencyInjection;
 
 use Symfony\Component\Config\FileLocator;
-use Contao\CoreBundle\DependencyInjection\Configuration;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\DependencyInjection\Extension\Extension;
 use Symfony\Component\DependencyInjection\Loader\YamlFileLoader;
-use Symfony\Component\HttpKernel\DependencyInjection\ConfigurableExtension;
 
 /**
  * Class MultiColumnWizardExtension
  */
-class SyncCtoExtension extends ConfigurableExtension
+class SyncCtoExtension extends Extension
 {
     /**
      * The config files.
@@ -20,7 +19,7 @@ class SyncCtoExtension extends ConfigurableExtension
      */
     private $files = [
         'listener.yml',
-//        'services.yml',
+        'services.yml',
     ];
 
     /**
@@ -33,24 +32,10 @@ class SyncCtoExtension extends ConfigurableExtension
 
     /**
      * {@inheritdoc}
+     *
+     * @throws \Exception
      */
-    public function getConfiguration(array $config, ContainerBuilder $container)
-    {
-        // Add the resource to the container
-        parent::getConfiguration($config, $container);
-
-        return new Configuration(
-            $container->getParameter('kernel.debug'),
-            $container->getParameter('kernel.project_dir'),
-            $container->getParameter('kernel.root_dir'),
-            $container->getParameter('kernel.default_locale')
-        );
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    protected function loadInternal(array $mergedConfig, ContainerBuilder $container)
+    public function load(array $configs, ContainerBuilder $container)
     {
         $loader = new YamlFileLoader(
             $container,
