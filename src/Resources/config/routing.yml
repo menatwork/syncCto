@@ -1,3 +1,11 @@
-contao:
-    resource: "@SyncCtoBundle/Controller"
-    type: annotation
+maw.sync_cto.popup.files:
+  path:     /syncCto/popup/files
+  defaults: { _controller: MenAtWork\SyncCto\Controller\FilePopupController::runAction, _scope: backend, _token_check: true }
+
+maw.sync_cto.popup.database:
+  path:     /syncCto/popup/database
+  defaults: { _controller: MenAtWork\SyncCto\Controller\DatabasePopupController::runAction, _scope: backend, _token_check: true }
+
+maw.sync_cto.api.1_0.ping:
+  path:     /syncCto/api/1.0/ping
+  defaults: { _controller: MenAtWork\SyncCto\Controller\ApiController::pingAction, _scope: backend, _token_check: true }

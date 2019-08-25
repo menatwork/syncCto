@@ -17,8 +17,15 @@
     <?php endif; ?>
 
 <?php else: ?>
+    <?php $url = sprintf(
+        '%s%ssyncCto/popup/files?id=%s&amp;step=%s',
+        $this->Environment->base,
+        ((\Contao\System::getContainer()->getParameter('kernel.environment') == 'dev') ? 'app_dev.php/' : false),
+        $this->id,
+        $this->step
+    ); ?>
 
-<form id="filelist_form" action="<?php echo $this->Environment->base; ?>syncCto/filesPopup?id=<?php echo $this->id; ?>&amp;step=<?php echo $this->step; ?>" method="post">
+<form id="filelist_form" action="<?php echo $url; ?>" method="post">
     <div class="formbody">
         <input type="hidden" name="FORM_SUBMIT" value="<?php echo $this->formId; ?>" />
         <input type="hidden" name="REQUEST_TOKEN" value="<?php echo REQUEST_TOKEN; ?>">

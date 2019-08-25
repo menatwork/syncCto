@@ -11,7 +11,6 @@
 
 namespace MenAtWork\SyncCto\Controller;
 
-
 use MenAtWork\SyncCto\Helper\Ping;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -22,9 +21,6 @@ use SyncCtoPopupDB;
 use SyncCtoPopupFiles;
 
 /**
- *
- * @Route("/syncCto", defaults={"_scope" = "backend"})
- *
  * Class PopupController
  *
  * @package MenAtWork\SyncCto\Controller
@@ -33,8 +29,6 @@ class ApiController extends AbstractController
 {
 
     /**
-     * @Route("/filesPopup", name="maw.sync_cto.popup_files")
-     *
      * @return Response
      */
     public function filesPopupAction()
@@ -49,8 +43,6 @@ class ApiController extends AbstractController
     }
 
     /**
-     * @Route("/databasePopup", name="maw.sync_cto.popup_database")
-     *
      * @return Response
      */
     public function databasePopupAction()
@@ -65,8 +57,6 @@ class ApiController extends AbstractController
     }
 
     /**
-     * @Route("/api/1.0/ping", name="maw.sync_cto.api.1_0.ping")
-     *
      * @param Request $request The request.
      *
      * @return JsonResponse

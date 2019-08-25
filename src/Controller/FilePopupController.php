@@ -8,31 +8,22 @@
  * @license    GNU/LGPL
  * @filesource
  */
-/**
- * Initialize the system
- */
-$dir = dirname(isset($_SERVER['SCRIPT_FILENAME']) ? $_SERVER['SCRIPT_FILENAME'] : __FILE__);
 
-while ($dir && $dir != '.' && $dir != '/' && !is_file($dir . '/system/initialize.php')) {
-    $dir = dirname($dir);
-}
+namespace MenAtWork\SyncCto\Controller;
 
-if (!is_file($dir . '/system/initialize.php')) {
-    header("HTTP/1.0 500 Internal Server Error");
-    header('Content-Type: text/html; charset=utf-8');
-    echo '<h1>500 Internal Server Error</h1>';
-    echo '<p>Could not find initialize.php!</p>';
-    exit(1);
-}
-define('TL_MODE', 'BE');
-require($dir . '/system/initialize.php');
+use Contao\Backend;
+use Contao\BackendTemplate;
+use Contao\Environment;
+use Contao\File;
+use Contao\Session;
+use SyncCtoEnum;
+use SyncCtoHelper;
 
 /**
  * Class SyncCtoPopupFiles
  */
-class SyncCtoPopupFiles extends \Backend
+class FilePopupController
 {
-
     // Vars
     protected $intClientID;
     // Helper Classes
@@ -43,32 +34,22 @@ class SyncCtoPopupFiles extends \Backend
     protected $arrClientInformation;
 
     // defines
-
     const STEP_SHOW_FILES  = 'Sf';
     const STEP_CLOSE_FILES = 'cl';
     const STEP_ERROR_FILES = 'er';
 
     /**
-     * Initialize the object
-     */
-    public function __construct()
-    {
-        \BackendUser::getInstance()->authenticate();
-
-        parent::__construct();
-
-        $this->loadLanguageFile('default');
-
-        $this->objSyncCtoHelper = SyncCtoHelper::getInstance();
-
-        $this->initGetParams();
-    }
-
-    /**
      * Load the template list and go through the steps
      */
-    public function run()
+    public function runAction()
     {
+        \System::getContainer()->get('contao.framework')->initialize();
+        \System::loadLanguageFile('default');
+        \BackendUser::getInstance()->authenticate();
+
+        $this->objSyncCtoHelper = SyncCtoHelper::getInstance();
+        $this->initGetParams();
+
         if ($this->mixStep == self::STEP_SHOW_FILES) {
             $this->loadTempLists();
             $this->showFiles();
@@ -84,9 +65,50 @@ class SyncCtoPopupFiles extends \Backend
             $this->showError();
         }
 
-//        // Output template
-//        $this->output();
-        return $this;
+        return $this->getResponse();
+    }
+
+    /**
+     * Output templates
+     */
+    public function getResponse()
+    {
+        // Clear all we want a clear array for this windows.
+        $GLOBALS['TL_CSS']        = [];
+        $GLOBALS['TL_JAVASCRIPT'] = [];
+
+        // Set stylesheets
+        $GLOBALS['TL_CSS'][] = 'system/themes/' . Backend::getTheme() . '/basic.css';
+        $GLOBALS['TL_CSS'][] = 'bundles/synccto/css/compare.css';
+
+        // Set javascript
+        $GLOBALS['TL_JAVASCRIPT'][] = 'assets/mootools/js/mootools-core.min.js';
+        $GLOBALS['TL_JAVASCRIPT'][] = 'assets/mootools/js/mootools-more.min.js';
+        $GLOBALS['TL_JAVASCRIPT'][] = 'bundles/synccto/js/compare.js';
+        $GLOBALS['TL_JAVASCRIPT'][] = 'bundles/synccto/js/htmltable.js';
+
+        // Set wrapper template information
+        $this->popupTemplate           = new BackendTemplate("be_syncCto_popup");
+        $this->popupTemplate->theme    = Backend::getTheme();
+        $this->popupTemplate->base     = Environment::get('base');
+        $this->popupTemplate->language = $GLOBALS['TL_LANGUAGE'];
+        $this->popupTemplate->title    = $GLOBALS['TL_CONFIG']['websiteTitle'];
+        $this->popupTemplate->charset  = $GLOBALS['TL_CONFIG']['characterSet'];
+        $this->popupTemplate->headline = basename(
+            utf8_convert_encoding(
+                $this->strFile,
+                $GLOBALS['TL_CONFIG']['characterSet']
+            )
+        );
+
+        // Set default information
+        $this->Template->id   = $this->intClientID;
+        $this->Template->step = $this->mixStep;
+
+        // Output template
+        $this->popupTemplate->content = $this->Template->parse();
+
+        return $this->popupTemplate->getResponse();
     }
 
     protected function showFiles()
@@ -167,19 +189,19 @@ class SyncCtoPopupFiles extends \Backend
                 }
 
                 if (in_array($value["state"],
-                             [
-                                 SyncCtoEnum::FILESTATE_TOO_BIG_DELETE,
-                                 SyncCtoEnum::FILESTATE_TOO_BIG_MISSING,
-                                 SyncCtoEnum::FILESTATE_TOO_BIG_NEED,
-                                 SyncCtoEnum::FILESTATE_TOO_BIG_SAME,
-                                 SyncCtoEnum::FILESTATE_BOMBASTIC_BIG,
-                             ])
+                    [
+                        SyncCtoEnum::FILESTATE_TOO_BIG_DELETE,
+                        SyncCtoEnum::FILESTATE_TOO_BIG_MISSING,
+                        SyncCtoEnum::FILESTATE_TOO_BIG_NEED,
+                        SyncCtoEnum::FILESTATE_TOO_BIG_SAME,
+                        SyncCtoEnum::FILESTATE_BOMBASTIC_BIG,
+                    ])
                 ) {
                     $arrBigFiles[$key] = $value;
                 } else {
                     if ($value["split"] == 1) {
                         $arrBigFiles[$key] = $value;
-                    } else if ($value["size"] > $this->arrClientInformation["upload_sizeLimit"]) {
+                    } elseif ($value["size"] > $this->arrClientInformation["upload_sizeLimit"]) {
                         $arrBigFiles[$key] = $value;
                     } else {
                         $arrNormalFiles[$key] = $value;
@@ -188,8 +210,8 @@ class SyncCtoPopupFiles extends \Backend
             }
         }
 
-        uasort($arrBigFiles, [ $this, 'sort' ]);
-        uasort($arrNormalFiles, [ $this, 'sort' ]);
+        uasort($arrBigFiles, [$this, 'sort']);
+        uasort($arrNormalFiles, [$this, 'sort']);
 
         // Language array for filestate
         $arrLanguageTags                                         = [];
@@ -240,85 +262,48 @@ class SyncCtoPopupFiles extends \Backend
         $this->Template->error    = true;
     }
 
-    /**
-     * Output templates
-     */
-    public function getOutput()
-    {
-        // Clear all we want a clear array for this windows.
-        $GLOBALS['TL_CSS']        = [];
-        $GLOBALS['TL_JAVASCRIPT'] = [];
-
-        // Set stylesheets
-        $GLOBALS['TL_CSS'][] = 'system/themes/' . $this->getTheme() . '/basic.css';
-        $GLOBALS['TL_CSS'][] = 'bundles/synccto/css/compare.css';
-
-        // Set javascript
-        $GLOBALS['TL_JAVASCRIPT'][] = 'assets/mootools/js/mootools-core.min.js';
-        $GLOBALS['TL_JAVASCRIPT'][] = 'assets/mootools/js/mootools-more.min.js';
-//        $GLOBALS['TL_JAVASCRIPT'][] = 'assets/mootools/mootao/Mootao.js';
-//        $GLOBALS['TL_JAVASCRIPT'][] = 'assets/contao/js/core.js';
-        $GLOBALS['TL_JAVASCRIPT'][] = 'bundles/synccto/js/compare.js';
-        $GLOBALS['TL_JAVASCRIPT'][] = 'bundles/synccto/js/htmltable.js';
-
-        // Set wrapper template information
-        $this->popupTemplate           = new BackendTemplate("be_syncCto_popup");
-        $this->popupTemplate->theme    = $this->getTheme();
-        $this->popupTemplate->base     = $this->Environment->base;
-        $this->popupTemplate->language = $GLOBALS['TL_LANGUAGE'];
-        $this->popupTemplate->title    = $GLOBALS['TL_CONFIG']['websiteTitle'];
-        $this->popupTemplate->charset  = $GLOBALS['TL_CONFIG']['characterSet'];
-        $this->popupTemplate->headline = basename(utf8_convert_encoding($this->strFile, $GLOBALS['TL_CONFIG']['characterSet']));
-
-        // Set default information
-        $this->Template->id   = $this->intClientID;
-        $this->Template->step = $this->mixStep;
-
-        // Output template
-        $this->popupTemplate->content = $this->Template->parse();
-
-        return $this->popupTemplate->getResponse()->getContent();
-    }
-
     // Helper functions --------------------------------------------------------
 
     /**
      * Load temporary filelist
+     *
+     * @throws \Exception
      */
     protected function loadTempLists()
     {
-        $objFileList = new File($this->objSyncCtoHelper->standardizePath($GLOBALS['SYC_PATH']['tmp'], "syncfilelist-ID-" . $this->intClientID . ".txt"));
+        $objFileList = new File($this->objSyncCtoHelper->standardizePath($GLOBALS['SYC_PATH']['tmp'],
+            "syncfilelist-ID-" . $this->intClientID . ".txt"));
         $strContent  = $objFileList->getContent();
         if (strlen($strContent) == 0) {
             $this->arrListFile = [];
         } else {
             $this->arrListFile = unserialize($strContent);
         }
-//        $objFileList->close();
 
-        $objCompareList = new File($this->objSyncCtoHelper->standardizePath($GLOBALS['SYC_PATH']['tmp'], "synccomparelist-ID-" . $this->intClientID . ".txt"));
+        $objCompareList = new File($this->objSyncCtoHelper->standardizePath($GLOBALS['SYC_PATH']['tmp'],
+            "synccomparelist-ID-" . $this->intClientID . ".txt"));
         $strContent     = $objCompareList->getContent();
         if (strlen($strContent) == 0) {
             $this->arrListCompare = [];
         } else {
             $this->arrListCompare = unserialize($strContent);
         }
-
-//        $objCompareList->close();
     }
 
     /**
      * Save temporary filelist
+     *
+     * @throws \Exception
      */
     protected function saveTempLists()
     {
-        $objFileList = new File($this->objSyncCtoHelper->standardizePath($GLOBALS['SYC_PATH']['tmp'], "syncfilelist-ID-" . $this->intClientID . ".txt"));
+        $objFileList = new File($this->objSyncCtoHelper->standardizePath($GLOBALS['SYC_PATH']['tmp'],
+            "syncfilelist-ID-" . $this->intClientID . ".txt"));
         $objFileList->write(serialize($this->arrListFile));
-//        $objFileList->close();
 
-        $objCompareList = new File($this->objSyncCtoHelper->standardizePath($GLOBALS['SYC_PATH']['tmp'], "synccomparelist-ID-" . $this->intClientID . ".txt"));
+        $objCompareList = new File($this->objSyncCtoHelper->standardizePath($GLOBALS['SYC_PATH']['tmp'],
+            "synccomparelist-ID-" . $this->intClientID . ".txt"));
         $objCompareList->write(serialize($this->arrListCompare));
-//        $objCompareList->close();
     }
 
     /**
@@ -326,7 +311,7 @@ class SyncCtoPopupFiles extends \Backend
      */
     protected function loadClientInformation()
     {
-        $this->arrClientInformation = $this->Session->get("syncCto_ClientInformation_" . $this->intClientID);
+        $this->arrClientInformation = Session::getInstance()->get("syncCto_ClientInformation_" . $this->intClientID);
 
         if (!is_array($this->arrClientInformation)) {
             $this->arrClientInformation = [];
@@ -376,10 +361,3 @@ class SyncCtoPopupFiles extends \Backend
     }
 
 }
-
-/**
- * Instantiate controller
- */
-//$objPopup = new SyncCtoPopupFiles();
-//$objPopup->run();
-?>

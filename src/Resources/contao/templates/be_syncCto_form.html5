@@ -1,7 +1,18 @@
 <script>
     function openSyncCtoPopUp()
     {
-        var url = '<?php echo $this->Environment->base . 'syncCto/' .  $this->popupClassName . '?id=' . $this->id . '&direction=' . $this->direction . '&language=' . BackendUser::getInstance()->language; ?>';
+        <?php
+            $url = sprintf(
+                    '%s%ssyncCto/%s?id=%s&direction=%s&language=%s',
+                $this->Environment->base,
+                ((\Contao\System::getContainer()->getParameter('kernel.environment') == 'dev') ? 'app_dev.php/' : false),
+                $this->popupClassName,
+                $this->id,
+                $this->direction,
+                BackendUser::getInstance()->language
+            );
+        ?>
+        var url = '<?= $url; ?>';
         var h = Math.max(document.documentElement.clientHeight, window.innerHeight || 0);
         Backend.openModalIframe({'title':'<?php echo $GLOBALS['TL_LANG']['tl_syncCto_sync']['popup']; ?>','url':url,'width':935, 'height':(h / 100 * 90)})
     }

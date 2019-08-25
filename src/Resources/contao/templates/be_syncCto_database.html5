@@ -21,7 +21,7 @@
 
 <?php else: ?>
 
-<form id="db_form" action="<?php echo $this->Environment->base; ?>syncCto/databasePopup?id=<?php echo $this->id; ?>&amp;step=<?php echo $this->step; ?>&amp;direction=<?php echo $this->direction ?>" method="post">
+    <form id="db_form" action="<?php echo $this->Environment->base; ?><?php if(\Contao\System::getContainer()->getParameter('kernel.environment') == 'dev'):  ?>app_dev.php/<?php endif; ?>syncCto/popup/database?id=<?php echo $this->id; ?>&amp;step=<?php echo $this->step; ?>&amp;direction=<?php echo $this->direction ?>" method="post">
     <div class="formbody">
         <input type="hidden" name="FORM_SUBMIT" value="<?php echo $this->formId; ?>" />
         <input type="hidden" name="REQUEST_TOKEN" value="<?php echo REQUEST_TOKEN; ?>">

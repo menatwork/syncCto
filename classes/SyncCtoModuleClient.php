@@ -1848,7 +1848,7 @@ class SyncCtoModuleClient extends \BackendModule
                     $objTemp->headline       = $GLOBALS['TL_LANG']['MSC']['totalsize'];
                     $objTemp->cssId          = 'syncCto_filelist_form';
                     $objTemp->forwardValue   = $GLOBALS['TL_LANG']['MSC']['apply'];
-                    $objTemp->popupClassName = 'filesPopup';
+                    $objTemp->popupClassName = 'popup/files';
 
                     // Build content
                     $this->objData->setDescription(vsprintf($GLOBALS['TL_LANG']['tl_syncCto_sync']["step_2"]['description_4'], [ $intCountMissing, $intCountNeed, $intCountDelete, $intCountIgnored, $this->getReadableSize($intTotalSizeNew), $this->getReadableSize($intTotalSizeChange), $this->getReadableSize($intTotalSizeDel) ]));
@@ -1986,7 +1986,6 @@ class SyncCtoModuleClient extends \BackendModule
                                 $this->objSyncCtoCommunicationClient->sendFile(dirname($value["path"]), str_replace(dirname($value["path"]) . "/", "", $value["path"]), $value["checksum"], SyncCtoEnum::UPLOAD_SYNC_TEMP);
                                 $this->arrListCompare[$strType][$key]["transmission"] = SyncCtoEnum::FILETRANS_SEND;
                             } catch (Exception $exc) {
-                                $this->
                                 $this->arrListCompare[$strType][$key]["transmission"] = SyncCtoEnum::FILETRANS_SKIPPED;
                                 $this->arrListCompare[$strType][$key]["skipreason"]   = $exc->getMessage();
                             }
@@ -2474,7 +2473,7 @@ class SyncCtoModuleClient extends \BackendModule
                     $objTemp->headline       = $GLOBALS['TL_LANG']['MSC']['totalsize'];
                     $objTemp->cssId          = 'syncCto_database_form';
                     $objTemp->forwardValue   = $GLOBALS['TL_LANG']['MSC']['apply'];
-                    $objTemp->popupClassName = 'databasePopup';
+                    $objTemp->popupClassName = 'popup/database';
 
                     // Build content
                     $this->objData->setDescription($GLOBALS['TL_LANG']['tl_syncCto_sync']['step_4']['description_1']);
@@ -3694,7 +3693,7 @@ class SyncCtoModuleClient extends \BackendModule
                     $objTemp->headline       = $GLOBALS['TL_LANG']['MSC']['totalsize'];
                     $objTemp->cssId          = 'syncCto_filelist_form';
                     $objTemp->forwardValue   = $GLOBALS['TL_LANG']['MSC']['apply'];
-                    $objTemp->popupClassName = 'filesPopup';
+                    $objTemp->popupClassName = 'popup/files';
 
                     // Build content
                     $this->objData->setDescription(vsprintf($GLOBALS['TL_LANG']['tl_syncCto_sync']["step_2"]['description_4'], [ $intCountMissing, $intCountNeed, $intCountDelete, $intCountIgnored, $this->getReadableSize($intTotalSizeNew), $this->getReadableSize($intTotalSizeChange), $this->getReadableSize($intTotalSizeDel) ]));
@@ -4270,7 +4269,7 @@ class SyncCtoModuleClient extends \BackendModule
                     $objTemp->headline       = $GLOBALS['TL_LANG']['MSC']['totalsize'];
                     $objTemp->cssId          = 'syncCto_database_form';
                     $objTemp->forwardValue   = $GLOBALS['TL_LANG']['MSC']['apply'];
-                    $objTemp->popupClassName = 'databasePopup';
+                    $objTemp->popupClassName = 'popup/database';
 
                     // Build content
                     $this->objData->setDescription($GLOBALS['TL_LANG']['tl_syncCto_sync']['step_4']['description_1']);
