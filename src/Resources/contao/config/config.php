@@ -26,39 +26,40 @@ array_insert($GLOBALS['BE_MOD'], $i + 1, array
     (
         'syncCto_settings' => array
         (
-            'tables'            => array('tl_syncCto_settings'),
-            'icon'              => 'bundles/synccto/images/nav/iconSettings.png'
+            'tables' => array('tl_syncCto_settings'),
+            'icon'   => 'bundles/synccto/images/nav/iconSettings.png'
         ),
-        'synccto_clients' => array
+        'synccto_clients'  => array
         (
-            'tables' => array
+            'tables'     => array
             (
                 'tl_synccto_clients',
                 'tl_syncCto_clients_syncTo',
                 'tl_syncCto_clients_syncFrom',
                 'tl_syncCto_clients_showExtern'
             ),
-            'icon'              => 'bundles/synccto/images/nav/iconClients.png',
-            'callback'          => 'SyncCtoModuleClient',
-            'stylesheet'        => 'bundles/synccto/css/systemcheck.css',
+            'icon'       => 'bundles/synccto/images/nav/iconClients.png',
+            'callback'   => 'SyncCtoModuleClient',
+            'stylesheet' => 'bundles/synccto/css/systemcheck.css',
         ),
-//        'syncCto_backups' => array
-//        (
-//            'tables' => array
-//            (
-//                'tl_syncCto_backup_file',
-//                'tl_syncCto_backup_db',
-//                'tl_syncCto_restore_file',
-//                'tl_syncCto_restore_db'
-//            ),
-//            'icon'              => 'bundles/synccto/images/nav/iconBackups.png',
-//            'callback'          => 'SyncCtoModuleBackup',
-//        ),
-        'syncCto_check' => array
+        //        'syncCto_backups' => array
+        //        (
+        //            'tables' => array
+        //            (
+        //                'tl_syncCto_backup_file',
+        //                'tl_syncCto_backup_db',
+        //                'tl_syncCto_restore_file',
+        //                'tl_syncCto_restore_db'
+        //            ),
+        //            'icon'              => 'bundles/synccto/images/nav/iconBackups.png',
+        //            'callback'          => 'SyncCtoModuleBackup',
+        //        ),
+        'syncCto_check'    => array
         (
-            'icon'              => 'bundles/synccto/images/nav/iconCheck.png',
-            'callback'          => 'SyncCtoModuleCheck',
-            'stylesheet'        => 'bundles/synccto/css/systemcheck.css',
+            'icon'       => 'bundles/synccto/images/nav/iconCheck.png',
+            'callback'   => 'SyncCtoModuleCheck',
+            'stylesheet' => 'bundles/synccto/css/systemcheck.css',
+            'style'      => 'hidden'
         )
     )
 ));
@@ -66,7 +67,7 @@ array_insert($GLOBALS['BE_MOD'], $i + 1, array
 /**
  * Mime types
  */
-$GLOBALS['SYC_CONFIG']['mime_types'] = array_merge((array) $GLOBALS['SYC_CONFIG']['mime_types'],
+$GLOBALS['SYC_CONFIG']['mime_types'] = array_merge((array)$GLOBALS['SYC_CONFIG']['mime_types'],
     array
     (
         // Application files
@@ -213,21 +214,23 @@ $strDo    = $objInput->get("do");
 $strTable = $objInput->get("table");
 $strAct   = $objInput->get("act");
 
-if ($strDo == 'syncCto_backups' && $strTable != '' && ($strAct == 'edit' || $strAct == 'create') && TL_MODE == 'BE')
-{
+if ($strDo == 'syncCto_backups' && $strTable != '' && ($strAct == 'edit' || $strAct == 'create') && TL_MODE == 'BE') {
     unset($GLOBALS['BE_MOD']['syncCto']['syncCto_backups']['callback']);
 }
 
-if ($strDo == 'synccto_clients' && $strAct != 'start' && in_array($strTable, array('tl_syncCto_clients_syncTo', 'tl_syncCto_clients_syncFrom', 'tl_syncCto_clients_showExtern', '')) && TL_MODE == 'BE')
-{
+if ($strDo == 'synccto_clients' && $strAct != 'start' && in_array($strTable, array(
+        'tl_syncCto_clients_syncTo',
+        'tl_syncCto_clients_syncFrom',
+        'tl_syncCto_clients_showExtern',
+        ''
+    )) && TL_MODE == 'BE') {
     unset($GLOBALS['BE_MOD']['syncCto']['synccto_clients']['callback']);
 }
 
 /**
  * Include attention CSS
  */
-if($GLOBALS['TL_CONFIG']['syncCto_attentionFlag'] == true)
-{
+if ($GLOBALS['TL_CONFIG']['syncCto_attentionFlag'] == true) {
     $GLOBALS['TL_CSS'][] = 'bundles/synccto/css/attention.css';
 }
 
@@ -242,12 +245,12 @@ $GLOBALS['SYC_SIZE']['limit_ignore'] = 838860800;
  */
 
 // Add some files to the blacklist for the DBAFS from contao.
-$arrFileSyncExclude = trimsplit(',', $GLOBALS['TL_CONFIG']['fileSyncExclude']);
-$arrFileSyncExclude[] = 'syncCto_backups/debug';
+$arrFileSyncExclude                      = trimsplit(',', $GLOBALS['TL_CONFIG']['fileSyncExclude']);
+$arrFileSyncExclude[]                    = 'syncCto_backups/debug';
 $GLOBALS['TL_CONFIG']['fileSyncExclude'] = implode(',', $arrFileSyncExclude);
 
 // Tables
-$GLOBALS['SYC_CONFIG']['table_hidden'] = array_merge( (array) $GLOBALS['SYC_CONFIG']['table_hidden'], array
+$GLOBALS['SYC_CONFIG']['table_hidden'] = array_merge((array)$GLOBALS['SYC_CONFIG']['table_hidden'], array
 (
     'tl_files',
     'tl_log',
@@ -265,7 +268,7 @@ $GLOBALS['SYC_CONFIG']['table_hidden'] = array_merge( (array) $GLOBALS['SYC_CONF
 ));
 
 // Folders
-$GLOBALS['SYC_CONFIG']['folder_blacklist'] = array_merge( (array) $GLOBALS['SYC_CONFIG']['folder_blacklist'], array
+$GLOBALS['SYC_CONFIG']['folder_blacklist'] = array_merge((array)$GLOBALS['SYC_CONFIG']['folder_blacklist'], array
 (
     'assets/css/',
     'assets/images/',
@@ -282,10 +285,12 @@ $GLOBALS['SYC_CONFIG']['folder_blacklist'] = array_merge( (array) $GLOBALS['SYC_
 ));
 
 // Files only sync.
-$GLOBALS['SYC_CONFIG']['file_blacklist'] = array_merge( (array) $GLOBALS['SYC_CONFIG']['file_blacklist'], array
+$GLOBALS['SYC_CONFIG']['file_blacklist'] = array_merge((array)$GLOBALS['SYC_CONFIG']['file_blacklist'], array
 (
+    'TL_ROOT/.env',
     'TL_ROOT/.htaccess',
     'TL_ROOT/.htpasswd',
+    'TL_ROOT/composer.phar',
     'localconfig.php',
     'pathconfig.php',
     'system/cron/cron.txt',
@@ -293,7 +298,7 @@ $GLOBALS['SYC_CONFIG']['file_blacklist'] = array_merge( (array) $GLOBALS['SYC_CO
 ));
 
 // Local config
-$GLOBALS['SYC_CONFIG']['local_blacklist'] = array_merge( (array) $GLOBALS['SYC_CONFIG']['local_blacklist'], array
+$GLOBALS['SYC_CONFIG']['local_blacklist'] = array_merge((array)$GLOBALS['SYC_CONFIG']['local_blacklist'], array
 (
     'websitePath',
     'websiteTitle',
@@ -327,34 +332,34 @@ $GLOBALS['SYC_CONFIG']['local_blacklist'] = array_merge( (array) $GLOBALS['SYC_C
 /**
  * Whitelist
  */
-$GLOBALS['SYC_CONFIG']['folder_whitelist'] = array_merge( (array) $GLOBALS['SYC_CONFIG']['folder_whitelist'], array
+$GLOBALS['SYC_CONFIG']['folder_whitelist'] = array_merge((array)$GLOBALS['SYC_CONFIG']['folder_whitelist'], array
 (
-    'assets',
-    'composer',
-    'contao',
-    'plugins',
-    'share',
-    'system',
+//    'assets',
+//    'composer',
+//    'contao',
+//    'plugins',
+//    'share',
+//    'system',
     'templates',
-    'typolight',
+//    'typolight',
 ));
 
 /**
  * Sync options
  */
 // Core ! The core isn't possible since we have a compser system. We have to rewrite some functions here first.
-//$GLOBALS['SYC_CONFIG']['sync_options']['core'][] =  'core_change';
-//$GLOBALS['SYC_CONFIG']['sync_options']['core'][] =  'core_delete';
+$GLOBALS['SYC_CONFIG']['sync_options']['core'][] =  'core_change';
+$GLOBALS['SYC_CONFIG']['sync_options']['core'][] =  'core_delete';
 // User
-$GLOBALS['SYC_CONFIG']['sync_options']['user'][] =  'user_change';
-$GLOBALS['SYC_CONFIG']['sync_options']['user'][] =  'user_delete';
+$GLOBALS['SYC_CONFIG']['sync_options']['user'][] = 'user_change';
+$GLOBALS['SYC_CONFIG']['sync_options']['user'][] = 'user_delete';
 // User
-$GLOBALS['SYC_CONFIG']['sync_options']['configfiles'][] =  'localconfig_update';
+$GLOBALS['SYC_CONFIG']['sync_options']['configfiles'][] = 'localconfig_update';
 
 /**
  * Maintance options
  */
-$GLOBALS['SYC_CONFIG']['maintance_options'] = array_merge( (array) $GLOBALS['SYC_CONFIG']['maintance_options'], array
+$GLOBALS['SYC_CONFIG']['maintance_options'] = array_merge((array)$GLOBALS['SYC_CONFIG']['maintance_options'], array
 (
     'temp_tables',
     'temp_folders',
@@ -372,15 +377,15 @@ $GLOBALS['SYC_PATH']['tmp']   = "system/tmp/";
 /**
  * Language mapping for database lookup
  */
-$GLOBALS['SYC_CONFIG']['database_mapping'] = array_merge( (array) $GLOBALS['SYC_CONFIG']['database_mapping'], array
+$GLOBALS['SYC_CONFIG']['database_mapping'] = array_merge((array)$GLOBALS['SYC_CONFIG']['database_mapping'], array
 (
-    'tl_module'                 => 'modules',
-    'tl_member_group'           => 'mgroup',
-    'tl_user_group'             => 'group',
-    'tl_repository_installs'    => 'repository_manager',
-    'tl_task'                   => 'tasks',
-    'tl_theme'                  => 'themes',
-    'tl_style_sheet'            => 'css'
+    'tl_module'              => 'modules',
+    'tl_member_group'        => 'mgroup',
+    'tl_user_group'          => 'group',
+    'tl_repository_installs' => 'repository_manager',
+    'tl_task'                => 'tasks',
+    'tl_theme'               => 'themes',
+    'tl_style_sheet'         => 'css'
 ));
 
 /**
@@ -388,10 +393,10 @@ $GLOBALS['SYC_CONFIG']['database_mapping'] = array_merge( (array) $GLOBALS['SYC_
  */
 
 // Default
-$GLOBALS['SYC_CONFIG']['folder_file_replacement'][' ']  = '_';
+$GLOBALS['SYC_CONFIG']['folder_file_replacement'][' '] = '_';
 
 // Windows / Unix
-$GLOBALS['SYC_CONFIG']['folder_file_replacement']['/']  = '-';
+$GLOBALS['SYC_CONFIG']['folder_file_replacement']['/'] = '-';
 
 // Windows only
 $GLOBALS['SYC_CONFIG']['folder_file_replacement']['\\'] = '-';
@@ -412,28 +417,28 @@ $GLOBALS['SYC_CONFIG']['folder_file_replacement']['|']  = '_';
 // Import config
 $GLOBALS["CTOCOM_FUNCTIONS"]["SYNCCTO_IMPORT_CONFIG"] = array
 (
-    "class"              => "SyncCtoHelper",
-    "function"           => "importConfig",
-    "typ"                => "POST",
-    "parameter"          => array("configlist"),
+    "class"     => "SyncCtoHelper",
+    "function"  => "importConfig",
+    "typ"       => "POST",
+    "parameter" => array("configlist"),
 );
 
 // Get config
 $GLOBALS["CTOCOM_FUNCTIONS"]["SYNCCTO_GET_CONFIG"] = array
 (
-    "class"              => "SyncCtoRPCFunctions",
-    "function"           => "getLocalConfig",
-    "typ"                => "POST",
-    "parameter"          => array("ConfigBlacklist"),
+    "class"     => "SyncCtoRPCFunctions",
+    "function"  => "getLocalConfig",
+    "typ"       => "POST",
+    "parameter" => array("ConfigBlacklist"),
 );
 
 // Get config
 $GLOBALS["CTOCOM_FUNCTIONS"]["SYNCCTO_CREATE_PATHCONFIG"] = array
 (
-    "class"              => "SyncCtoHelper",
-    "function"           => "createPathconfig",
-    "typ"                => "GET",
-    "parameter"          => false,
+    "class"     => "SyncCtoHelper",
+    "function"  => "createPathconfig",
+    "typ"       => "GET",
+    "parameter" => false,
 );
 
 // - Database ------------------------------------------------------------------
@@ -441,82 +446,82 @@ $GLOBALS["CTOCOM_FUNCTIONS"]["SYNCCTO_CREATE_PATHCONFIG"] = array
 // Run Dump
 $GLOBALS["CTOCOM_FUNCTIONS"]["SYNCCTO_RUN_DUMP"] = array
 (
-    "class"              => "SyncCtoDatabase",
-    "function"           => "runDump",
-    "typ"                => "POST",
-    "parameter"          => array("tables", "tempfolder"),
+    "class"     => "SyncCtoDatabase",
+    "function"  => "runDump",
+    "typ"       => "POST",
+    "parameter" => array("tables", "tempfolder"),
 );
 
 // Execute SQL
 $GLOBALS["CTOCOM_FUNCTIONS"]["SYNCCTO_EXECUTE_SQL"] = array
 (
-    "class"              => "SyncCtoRPCFunctions",
-    "function"           => "executeSQL",
-    "typ"                => "POST",
-    "parameter"          => array("sql"),
+    "class"     => "SyncCtoRPCFunctions",
+    "function"  => "executeSQL",
+    "typ"       => "POST",
+    "parameter" => array("sql"),
 );
 
 // Load none recommended tables from client
 $GLOBALS["CTOCOM_FUNCTIONS"]["SYNCCTO_NONERECOMMENDED_TABLES"] = array
 (
-    "class"              => "SyncCtoHelper",
-    "function"           => "databaseTablesNoneRecommended",
-    "typ"                => "POST",
-    "parameter"          => false,
+    "class"     => "SyncCtoHelper",
+    "function"  => "databaseTablesNoneRecommended",
+    "typ"       => "POST",
+    "parameter" => false,
 );
 
 // Load recommended tables from client
 $GLOBALS["CTOCOM_FUNCTIONS"]["SYNCCTO_RECOMMENDED_TABLES"] = array
 (
-    "class"              => "SyncCtoHelper",
-    "function"           => "databaseTablesRecommended",
-    "typ"                => "POST",
-    "parameter"          => false,
+    "class"     => "SyncCtoHelper",
+    "function"  => "databaseTablesRecommended",
+    "typ"       => "POST",
+    "parameter" => false,
 );
 
 // Load recommended tables from client
 $GLOBALS["CTOCOM_FUNCTIONS"]["SYNCCTO_HIDDEN_TABLES"] = array
 (
-    "class"              => "SyncCtoHelper",
-    "function"           => "getTablesHidden",
-    "typ"                => "GET",
-    "parameter"          => false,
+    "class"     => "SyncCtoHelper",
+    "function"  => "getTablesHidden",
+    "typ"       => "GET",
+    "parameter" => false,
 );
 
 // Load recommended tables from client
 $GLOBALS["CTOCOM_FUNCTIONS"]["SYNCCTO_HIDDEN_TABLES_PLACEHOLDER"] = array
 (
-    "class"              => "SyncCtoHelper",
-    "function"           => "getPreparedHiddenTablesPlaceholder",
-    "typ"                => "GET",
-    "parameter"          => false,
+    "class"     => "SyncCtoHelper",
+    "function"  => "getPreparedHiddenTablesPlaceholder",
+    "typ"       => "GET",
+    "parameter" => false,
 );
 
 // Get client timestamp
 $GLOBALS["CTOCOM_FUNCTIONS"]["SYNCCTO_TIMESTAMP"] = array
 (
-    "class"              => "SyncCtoHelper",
-    "function"           => "getDatabaseTablesTimestamp",
-    "typ"                => "POST",
-    "parameter"          => array("TableList"),
+    "class"     => "SyncCtoHelper",
+    "function"  => "getDatabaseTablesTimestamp",
+    "typ"       => "POST",
+    "parameter" => array("TableList"),
 );
 
 // Import a SQL Zip file into database
 $GLOBALS["CTOCOM_FUNCTIONS"]["SYNCCTO_IMPORT_DATABASE"] = array
 (
-    "class"              => "SyncCtoDatabase",
-    "function"           => "runRestore",
-    "typ"                => "POST",
-    "parameter"          => array("filepath", "additionalSQL"),
+    "class"     => "SyncCtoDatabase",
+    "function"  => "runRestore",
+    "typ"       => "POST",
+    "parameter" => array("filepath", "additionalSQL"),
 );
 
 // Drop tables
 $GLOBALS["CTOCOM_FUNCTIONS"]["SYNCCTO_DROP_TABLES"] = array
 (
-    "class"              => "SyncCtoDatabase",
-    "function"           => "dropTable",
-    "typ"                => "POST",
-    "parameter"          => array("tablelist", "backup"),
+    "class"     => "SyncCtoDatabase",
+    "function"  => "dropTable",
+    "typ"       => "POST",
+    "parameter" => array("tablelist", "backup"),
 );
 
 // - Files ---------------------------------------------------------------------
@@ -524,145 +529,145 @@ $GLOBALS["CTOCOM_FUNCTIONS"]["SYNCCTO_DROP_TABLES"] = array
 // Check for deleted files
 $GLOBALS["CTOCOM_FUNCTIONS"]["SYNCCTO_CHECK_DELETE_FILE"] = array
 (
-    "class"              => "SyncCtoRPCFunctions",
-    "function"           => "checkDeleteFiles",
-    "typ"                => "POST",
-    "parameter"          => array("md5", "file"),
+    "class"     => "SyncCtoRPCFunctions",
+    "function"  => "checkDeleteFiles",
+    "typ"       => "POST",
+    "parameter" => array("md5", "file"),
 );
 
 // Delete a files on a list
 $GLOBALS["CTOCOM_FUNCTIONS"]["SYNCCTO_DELETE_FILE"] = array
 (
-    "class"              => "SyncCtoFiles",
-    "function"           => "deleteFiles",
-    "typ"                => "POST",
-    "parameter"          => array("filelist", "dbafs"),
+    "class"     => "SyncCtoFiles",
+    "function"  => "deleteFiles",
+    "typ"       => "POST",
+    "parameter" => array("filelist", "dbafs"),
 );
 
 // Import files into contao file system
 $GLOBALS["CTOCOM_FUNCTIONS"]["SYNCCTO_IMPORT_FILE"] = array
 (
-    "class"              => "SyncCtoFiles",
-    "function"           => "moveTempFile",
-    "typ"                => "POST",
-    "parameter"          => array("filelist", "dbafs"),
+    "class"     => "SyncCtoFiles",
+    "function"  => "moveTempFile",
+    "typ"       => "POST",
+    "parameter" => array("filelist", "dbafs"),
 );
 
 // Import files into contao file system
 $GLOBALS["CTOCOM_FUNCTIONS"]["SYNCCTO_UPDATE_DBAFS"] = array
 (
-    "class"              => "SyncCtoFiles",
-    "function"           => "updateDbafs",
-    "typ"                => "POST",
-    "parameter"          => array("filelist"),
+    "class"     => "SyncCtoFiles",
+    "function"  => "updateDbafs",
+    "typ"       => "POST",
+    "parameter" => array("filelist"),
 );
 
 // Rebuild a split file
 $GLOBALS["CTOCOM_FUNCTIONS"]["SYNCCTO_REBUILD_SPLITFILE"] = array
 (
-    "class"              => "SyncCtoFiles",
-    "function"           => "rebuildSplitFiles",
-    "typ"                => "POST",
-    "parameter"          => array("splitname", "splitcount", "movepath", "md5"),
+    "class"     => "SyncCtoFiles",
+    "function"  => "rebuildSplitFiles",
+    "typ"       => "POST",
+    "parameter" => array("splitname", "splitcount", "movepath", "md5"),
 );
 
 // Split a file
 $GLOBALS["CTOCOM_FUNCTIONS"]["SYNCCTO_SPLITFILE"] = array
 (
-    "class"              => "SyncCtoFiles",
-    "function"           => "splitFiles",
-    "typ"                => "POST",
-    "parameter"          => array("splitname", "destfolder", "destfile", "limit"),
+    "class"     => "SyncCtoFiles",
+    "function"  => "splitFiles",
+    "typ"       => "POST",
+    "parameter" => array("splitname", "destfolder", "destfile", "limit"),
 );
 
 // Send a file
 $GLOBALS["CTOCOM_FUNCTIONS"]["SYNCCTO_SEND_FILE"] = array
 (
-    "class"              => "SyncCtoFiles",
-    "function"           => "saveFiles",
-    "typ"                => "POST",
-    "parameter"          => array("metafiles"),
+    "class"     => "SyncCtoFiles",
+    "function"  => "saveFiles",
+    "typ"       => "POST",
+    "parameter" => array("metafiles"),
 );
 
 // Get a file
 $GLOBALS["CTOCOM_FUNCTIONS"]["SYNCCTO_GET_FILE"] = array
 (
-    "class"              => "SyncCtoFiles",
-    "function"           => "getFile",
-    "typ"                => "POST",
-    "parameter"          => array("path"),
+    "class"     => "SyncCtoFiles",
+    "function"  => "getFile",
+    "typ"       => "POST",
+    "parameter" => array("path"),
 );
 
 // Compare 2 filelists
 $GLOBALS["CTOCOM_FUNCTIONS"]["SYNCCTO_CHECKSUM_COMPARE"] = array
 (
-    "class"              => "SyncCtoRPCFunctions",
-    "function"           => "runCecksumCompare",
-    "typ"                => "POST",
-    "parameter"          => array("md5", "file", "disable_dbafs_conflicts"),
+    "class"     => "SyncCtoRPCFunctions",
+    "function"  => "runCecksumCompare",
+    "typ"       => "POST",
+    "parameter" => array("md5", "file", "disable_dbafs_conflicts"),
 );
 
 // Get filelist of contao core
 $GLOBALS["CTOCOM_FUNCTIONS"]["SYNCCTO_CHECKSUM_CORE"] = array
 (
-    "class"              => "SyncCtoFiles",
-    "function"           => "runChecksumCore",
-    "typ"                => "GET",
-    "parameter"          => FALSE,
+    "class"     => "SyncCtoFiles",
+    "function"  => "runChecksumCore",
+    "typ"       => "GET",
+    "parameter" => false,
 );
 
 // Get filelist of file
 $GLOBALS["CTOCOM_FUNCTIONS"]["SYNCCTO_CHECKSUM_FILES"] = array
 (
-    "class"              => "SyncCtoFiles",
-    "function"           => "runChecksumFiles",
-    "typ"                => "POST",
-    "parameter"          => FALSE,
+    "class"     => "SyncCtoFiles",
+    "function"  => "runChecksumFiles",
+    "typ"       => "POST",
+    "parameter" => false,
 );
 
 // Get folderlist
 $GLOBALS["CTOCOM_FUNCTIONS"]["SYNCCTO_CHECKSUM_FOLDERS_CORE"] = array
 (
-    "class"              => "SyncCtoFiles",
-    "function"           => "runChecksumFolderCore",
-    "typ"                => "POST",
-    "parameter"          => FALSE,
+    "class"     => "SyncCtoFiles",
+    "function"  => "runChecksumFolderCore",
+    "typ"       => "POST",
+    "parameter" => false,
 );
 
 // Get folderlist
 $GLOBALS["CTOCOM_FUNCTIONS"]["SYNCCTO_CHECKSUM_FOLDERS_FILES"] = array
 (
-    "class"              => "SyncCtoFiles",
-    "function"           => "runChecksumFolderFiles",
-    "typ"                => "POST",
-    "parameter"          => FALSE,
+    "class"     => "SyncCtoFiles",
+    "function"  => "runChecksumFolderFiles",
+    "typ"       => "POST",
+    "parameter" => false,
 );
 
 // Search folders which could delete
 $GLOBALS["CTOCOM_FUNCTIONS"]["SYNCCTO_SEARCH_DELETE_FOLDERS"] = array
 (
-    "class"              => "SyncCtoRPCFunctions",
-    "function"           => "searchDeleteFolders",
-    "typ"                => "POST",
-    "parameter"          => array("md5", "file"),
+    "class"     => "SyncCtoRPCFunctions",
+    "function"  => "searchDeleteFolders",
+    "typ"       => "POST",
+    "parameter" => array("md5", "file"),
 );
 
 // Run a file backup
 $GLOBALS["CTOCOM_FUNCTIONS"]["SYNCCTO_FILEBACKUP"] = array
 (
-    "class"              => "SyncCtoFiles",
-    "function"           => "runDump",
-    "typ"                => "GET",
-    "parameter"          => FALSE,
+    "class"     => "SyncCtoFiles",
+    "function"  => "runDump",
+    "typ"       => "GET",
+    "parameter" => false,
 );
 
 // Get information from the DBAFS for some files.
 $GLOBALS["CTOCOM_FUNCTIONS"]["SYNCCTO_DBAFS_INFORMATION"] = array
 (
-    "class"              => "SyncCtoFiles",
-    "function"           => "getDbafsInformationFor",
-    "typ"                => "POST",
-    "parameter"          => array("files"),
+    "class"     => "SyncCtoFiles",
+    "function"  => "getDbafsInformationFor",
+    "typ"       => "POST",
+    "parameter" => array("files"),
 );
 
 // - Miscellaneous -------------------------------------------------------------
@@ -670,131 +675,131 @@ $GLOBALS["CTOCOM_FUNCTIONS"]["SYNCCTO_DBAFS_INFORMATION"] = array
 // Set displayErrors Flag
 $GLOBALS["CTOCOM_FUNCTIONS"]["SYNCCTO_SET_DISPLAY_ERRORS_FLAG"] = array
 (
-    "class"              => "SyncCtoRPCFunctions",
-    "function"           => "setDisplayErrors",
-    "typ"                => "POST",
-    "parameter"          => array("state"),
+    "class"     => "SyncCtoRPCFunctions",
+    "function"  => "setDisplayErrors",
+    "typ"       => "POST",
+    "parameter" => array("state"),
 );
 
 // Set the attention flag
 $GLOBALS["CTOCOM_FUNCTIONS"]["SYNCCTO_SET_ATTENTION_FLAG"] = array
 (
-    "class"              => "SyncCtoRPCFunctions",
-    "function"           => "setAttentionFlag",
-    "typ"                => "POST",
-    "parameter"          => array("state"),
+    "class"     => "SyncCtoRPCFunctions",
+    "function"  => "setAttentionFlag",
+    "typ"       => "POST",
+    "parameter" => array("state"),
 );
 
 // Clear temp folder
 $GLOBALS["CTOCOM_FUNCTIONS"]["SYNCCTO_PURGETEMP"] = array
 (
-    "class"              => "SyncCtoFiles",
-    "function"           => "purgeTemp",
-    "typ"                => "GET",
-    "parameter"          => FALSE,
+    "class"     => "SyncCtoFiles",
+    "function"  => "purgeTemp",
+    "typ"       => "GET",
+    "parameter" => false,
 );
 
 // Contao Cache.
 $GLOBALS["CTOCOM_FUNCTIONS"]["SYNCCTO_PURGE_CACHE"] = array
 (
-    "class"              => "SyncCtoContaoAutomator",
-    "function"           => "purgeInternalCache",
-    "typ"                => "GET",
-    "parameter"          => FALSE,
+    "class"     => "SyncCtoContaoAutomator",
+    "function"  => "purgeInternalCache",
+    "typ"       => "GET",
+    "parameter" => false,
 );
 
 // Contao Cache.
 $GLOBALS["CTOCOM_FUNCTIONS"]["SYNCCTO_CREATE_CACHE"] = array
 (
-    "class"              => "SyncCtoContaoAutomator",
-    "function"           => "createInternalCache",
-    "typ"                => "GET",
-    "parameter"          => FALSE,
+    "class"     => "SyncCtoContaoAutomator",
+    "function"  => "createInternalCache",
+    "typ"       => "GET",
+    "parameter" => false,
 );
 
 // Run maintenance
 $GLOBALS["CTOCOM_FUNCTIONS"]["SYNCCTO_MAINTENANCE"] = array
 (
-    "class"              => "SyncCtoFiles",
-    "function"           => "runMaintenance",
-    "typ"                => "POST",
-    "parameter"          => array("options"),
+    "class"     => "SyncCtoFiles",
+    "function"  => "runMaintenance",
+    "typ"       => "POST",
+    "parameter" => array("options"),
 );
 
 // Execute last step operations
 $GLOBALS["CTOCOM_FUNCTIONS"]["SYNCCTO_EXECUTE_FINAL_OPERATIONS"] = array
 (
-    "class"              => "SyncCtoHelper",
-    "function"           => "executeFinalOperations",
-    "typ"                => "GET",
-    "parameter"          => FALSE,
+    "class"     => "SyncCtoHelper",
+    "function"  => "executeFinalOperations",
+    "typ"       => "GET",
+    "parameter" => false,
 );
 
 // - Informations --------------------------------------------------------------
 
 $GLOBALS["CTOCOM_FUNCTIONS"]["SYNCCTO_GET_PHP_CONFIGURATION"] = array
 (
-    "class"              => "SyncCtoModuleCheck",
-    "function"           => "getPhpConfigurations",
-    "typ"                => "get",
-    "parameter"          => null,
+    "class"     => "SyncCtoModuleCheck",
+    "function"  => "getPhpConfigurations",
+    "typ"       => "get",
+    "parameter" => null,
 );
 
 $GLOBALS["CTOCOM_FUNCTIONS"]["SYNCCTO_GET_PHP_FUNCTIONS"] = array
 (
-    "class"              => "SyncCtoModuleCheck",
-    "function"           => "getPhpFunctions",
-    "typ"                => "get",
-    "parameter"          => null,
+    "class"     => "SyncCtoModuleCheck",
+    "function"  => "getPhpFunctions",
+    "typ"       => "get",
+    "parameter" => null,
 );
 
 $GLOBALS["CTOCOM_FUNCTIONS"]["SYNCCTO_GET_EXTENDED_INFORMATIONS"] = array
 (
-    "class"              => "SyncCtoModuleCheck",
-    "function"           => "getExtendedInformation",
-    "typ"                => "POST",
-    "parameter"          => array("DateFormate"),
+    "class"     => "SyncCtoModuleCheck",
+    "function"  => "getExtendedInformation",
+    "typ"       => "POST",
+    "parameter" => array("DateFormate"),
 );
 
 $GLOBALS["CTOCOM_FUNCTIONS"]["SYNCCTO_GET_PRO_FUNCTIONS"] = array
 (
-    "class"              => "SyncCtoModuleCheck",
-    "function"           => "getMySqlFunctions",
-    "typ"                => "get",
-    "parameter"          => null,
+    "class"     => "SyncCtoModuleCheck",
+    "function"  => "getMySqlFunctions",
+    "typ"       => "get",
+    "parameter" => null,
 );
 
 // Get folder path list
 $GLOBALS["CTOCOM_FUNCTIONS"]["SYNCCTO_GET_PATHLIST"] = array
 (
-    "class"              => "SyncCtoRPCFunctions",
-    "function"           => "getPathList",
-    "typ"                => "POST",
-    "parameter"          => array("name"),
+    "class"     => "SyncCtoRPCFunctions",
+    "function"  => "getPathList",
+    "typ"       => "POST",
+    "parameter" => array("name"),
 );
 
 // Get SyncCto Version
 $GLOBALS["CTOCOM_FUNCTIONS"]["SYNCCTO_VERSION"] = array
 (
-    "class"              => "SyncCtoRPCFunctions",
-    "function"           => "getVersionSyncCto",
-    "typ"                => "GET",
-    "parameter"          => FALSE,
+    "class"     => "SyncCtoRPCFunctions",
+    "function"  => "getVersionSyncCto",
+    "typ"       => "GET",
+    "parameter" => false,
 );
 
 // Get a list of parameter
 $GLOBALS["CTOCOM_FUNCTIONS"]["SYNCCTO_PARAMETER"] = array
 (
-    "class"              => "SyncCtoRPCFunctions",
-    "function"           => "getClientParameter",
-    "typ"                => "GET",
-    "parameter"          => FALSE,
+    "class"     => "SyncCtoRPCFunctions",
+    "function"  => "getClientParameter",
+    "typ"       => "GET",
+    "parameter" => false,
 );
 
 $GLOBALS["CTOCOM_FUNCTIONS"]["SYNCCTO_AUTO_UPDATE"] = array
 (
-    "class"             => "SyncCtoAutoUpdater",
-    "function"          => "update",
-    "typ"               => "POST",
-    "parameter"         => array("zipfile"),
+    "class"     => "SyncCtoAutoUpdater",
+    "function"  => "update",
+    "typ"       => "POST",
+    "parameter" => array("zipfile"),
 );
