@@ -2092,19 +2092,17 @@ class SyncCtoFiles extends \Backend
      */
     public function getFile($strPath)
     {
-        $strPath = $this->objSyncCtoHelper->standardizePath($strPath);
+        $strPath     = $this->objSyncCtoHelper->standardizePath($strPath);
         $strFullPath = $this->objSyncCtoHelper->getFullPath($strPath);
 
-        if (!file_exists($strFullPath))
-        {
+        if (!file_exists($strFullPath)) {
             throw new Exception(vsprintf($GLOBALS['TL_LANG']['ERR']['unknown_file'], array($strPath)));
         }
 
         $objFile    = new File($strPath);
         $strContent = base64_encode($objFile->getContent());
-        $objFile->close();
 
-        return array("md5"     => md5_file($strFullPath), "content" => $strContent);
+        return array("md5" => md5_file($strFullPath), "content" => $strContent);
     }
 
     /**

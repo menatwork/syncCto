@@ -333,9 +333,7 @@ class SyncCtoCommunicationClient extends \MenAtWork\CtoCommunicationBundle\Contr
         $strPath = $this->objSyncCtoHelper->standardizePath($GLOBALS['SYC_PATH']['tmp'], "syncList.syncCto");
         $strMime = "application/octet-stream";
 
-        $objFile = new File($strPath);
-        $objFile->write(serialize($arrChecksumList));
-        $objFile->close();
+        \Contao\File::putContent($strPath, serialize($arrChecksumList));
 
         $arrData = array(
             array(
@@ -433,9 +431,7 @@ class SyncCtoCommunicationClient extends \MenAtWork\CtoCommunicationBundle\Contr
         $strPath = $this->objSyncCtoHelper->standardizePath($GLOBALS['SYC_PATH']['tmp'], "syncList.syncCto");
         $strMime = "application/octet-stream";
 
-        $objFile = new File($strPath);
-        $objFile->write(serialize($arrChecksumList));
-        $objFile->close();
+        \Contao\File::putContent($strPath, serialize($arrChecksumList));
 
         $arrData = array(
             array(
@@ -474,9 +470,7 @@ class SyncCtoCommunicationClient extends \MenAtWork\CtoCommunicationBundle\Contr
         $strPath = $this->objSyncCtoHelper->standardizePath($GLOBALS['SYC_PATH']['tmp'], "syncFolderList.syncCto");
         $strMime = "application/octet-stream";
 
-        $objFile = new File($strPath);
-        $objFile->write(serialize($arrChecksumList));
-        $objFile->close();
+        \Contao\File::putContent($strPath, serialize($arrChecksumList));
 
         $arrData = array(
             array(
@@ -754,6 +748,7 @@ class SyncCtoCommunicationClient extends \MenAtWork\CtoCommunicationBundle\Contr
      * @param string $strSavePath
      *
      * @return boolean
+     * @throws \Exception
      */
     public function getFile($strPath, $strSavePath)
     {
@@ -765,13 +760,8 @@ class SyncCtoCommunicationClient extends \MenAtWork\CtoCommunicationBundle\Contr
         );
 
         $arrResult = $this->run("SYNCCTO_GET_FILE", $arrData);
-
-        $objFile = new File($strSavePath);
-        $objFile->write(base64_decode($arrResult["content"]));
-        $objFile->close();
-
-        if (md5_file(TL_ROOT . "/" . $strSavePath) != $arrResult["md5"])
-        {
+        \Contao\File::putContent($strSavePath, base64_decode($arrResult["content"]));
+        if (md5_file(TL_ROOT . "/" . $strSavePath) != $arrResult["md5"]) {
             throw new Exception($GLOBALS['TL_LANG']['ERR']['checksum_error']);
         }
 
