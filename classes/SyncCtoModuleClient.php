@@ -831,7 +831,7 @@ class SyncCtoModuleClient extends \BackendModule
 
             // Check if we have pro features
             case 5:
-                if (in_array('syncCtoPro', Config::getInstance()->getActiveModules())) {
+                if (array_key_exists('SyncCtoProBundle', \System::getContainer()->getParameter('kernel.bundles'))) {
                     $objStepPro = SyncCtoStepDatabaseDiff::getInstance();
                     $objStepPro->setSyncCto($this);
 
@@ -1008,7 +1008,7 @@ class SyncCtoModuleClient extends \BackendModule
 
             // Check if we have pro features
             case 5:
-                if (in_array('syncCtoPro', Config::getInstance()->getActiveModules())) {
+                if (array_key_exists('SyncCtoProBundle', \System::getContainer()->getParameter('kernel.bundles'))) {
                     $objStepPro = SyncCtoStepDatabaseDiff::getInstance();
                     $objStepPro->setSyncCto($this);
 
@@ -2411,7 +2411,10 @@ class SyncCtoModuleClient extends \BackendModule
 
                 case 3:
                     // Unset some tables for pro feature
-                    if (!$this->arrSyncSettings["automode"] && in_array('syncCtoPro', Config::getInstance()->getActiveModules()) && array_key_exists('forward', $_POST) && $this->arrSyncSettings['post_data']['database_pages_check'] == true) {
+                    if (!$this->arrSyncSettings["automode"]
+                        && array_key_exists('SyncCtoProBundle', \System::getContainer()->getParameter('kernel.bundles'))
+                        && array_key_exists('forward', $_POST)
+                        && $this->arrSyncSettings['post_data']['database_pages_check'] == true) {
                         if (($mixKey = array_search('tl_page', $this->arrSyncSettings['syncCto_SyncTables'])) !== false) {
                             unset($this->arrSyncSettings['syncCto_SyncTables'][$mixKey]);
                             $this->arrSyncSettings['syncCtoPro_tables_checked'][] = 'tl_page';
@@ -2552,7 +2555,6 @@ class SyncCtoModuleClient extends \BackendModule
                  * Drop Tables
                  */
                 case 7:
-
                     if (count((array) $this->arrSyncSettings['syncCto_SyncDeleteTables']) != 0) {
                         $arrKnownTables = \Database::getInstance()->listTables();
 
@@ -2575,7 +2577,6 @@ class SyncCtoModuleClient extends \BackendModule
                  * Hook for custom sql code
                  */
                 case 8:
-
                     if (isset($GLOBALS['TL_HOOKS']['syncDBUpdate']) && is_array($GLOBALS['TL_HOOKS']['syncDBUpdate'])) {
                         $arrSQL = [];
 
@@ -2801,20 +2802,26 @@ class SyncCtoModuleClient extends \BackendModule
                                 } // if not add it to the current DBAFS.
                                 else {
                                     $objModel     = \Dbafs::addResource($value['path']);
-                                    $arrModelData = $objModel->row();
+                                    if($objModel !== null){
+                                        $arrModelData = $objModel->row();
 
-                                    // PHP 7 compatibility
-                                    // See #309 (https://github.com/contao/core-bundle/issues/309)
-                                    if (version_compare(VERSION . '.' . BUILD, '3.5.5', '>=')) {
-                                        $arrModelData['pid']  = (strlen($arrModelData['pid'])) ? \StringUtil::binToUuid($arrModelData['pid']) : $arrModelData['pid'];
-                                        $arrModelData['uuid'] = \StringUtil::binToUuid($arrModelData['uuid']);
+                                        // PHP 7 compatibility
+                                        // See #309 (https://github.com/contao/core-bundle/issues/309)
+                                        if (version_compare(VERSION . '.' . BUILD, '3.5.5', '>=')) {
+                                            $arrModelData['pid']  = (strlen($arrModelData['pid'])) ? \StringUtil::binToUuid($arrModelData['pid']) : $arrModelData['pid'];
+                                            $arrModelData['uuid'] = \StringUtil::binToUuid($arrModelData['uuid']);
+                                        } else {
+                                            $arrModelData['pid']  = (strlen($arrModelData['pid'])) ? \String::binToUuid($arrModelData['pid']) : $arrModelData['pid'];
+                                            $arrModelData['uuid'] = \String::binToUuid($arrModelData['uuid']);
+                                        }
+
+                                        $itSupSet[$key]['tl_files'] = $arrModelData;
                                     } else {
-                                        $arrModelData['pid']  = (strlen($arrModelData['pid'])) ? \String::binToUuid($arrModelData['pid']) : $arrModelData['pid'];
-                                        $arrModelData['uuid'] = \String::binToUuid($arrModelData['uuid']);
+                                        $itSupSet[$key]['tl_files'] = [];
                                     }
                                 }
 
-                                $itSupSet[$key]['tl_files'] = $arrModelData;
+
                             }
 
                             // Send the data to the client.
