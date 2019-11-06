@@ -39,6 +39,14 @@ class FilePopupController
     const STEP_ERROR_FILES = 'er';
 
     /**
+     * FilePopupController constructor.
+     */
+    public function __construct()
+    {
+        \define('TL_ASSETS_URL', '');
+    }
+
+    /**
      * Load the template list and go through the steps
      */
     public function runAction()
@@ -332,7 +340,7 @@ class FilePopupController
             return;
         }
 
-        // Load information 
+        // Load information
         $this->loadClientInformation();
 
         // Get next step

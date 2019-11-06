@@ -48,6 +48,14 @@ class DatabasePopupController
     const STEP_ERROR_DB  = 'er';
 
     /**
+     * DatabasePopupController constructor.
+     */
+    public function __construct()
+    {
+        \define('TL_ASSETS_URL', '');
+    }
+
+    /**
      * Load the template list and go through the steps
      */
     public function runAction()

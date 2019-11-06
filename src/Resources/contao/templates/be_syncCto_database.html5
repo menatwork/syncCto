@@ -59,7 +59,7 @@
             <tr>
                 <td class="checkbox"><?php if($arrCompareTable['server'] != '-'): ?><input type="checkbox" class="tl_checkbox" name="<?php echo ($arrCompareTable['del'] == true) ? 'serverDeleteTables[]' : 'serverTables[]';?>" value="<?php echo $strTableName; ?>" /><?php endif; ?></td>
                 <td class="<?php echo $arrCompareTable['server']['class']; ?>" title="<?php echo $arrCompareTable['server']['iname']; ?> (<?php echo $arrCompareTable['server']['tooltip']; ?>)"><?php echo $arrCompareTable['server']['tname']; ?></td>
-                <td class="diff"><abbr title="<?php echo $GLOBALS['TL_LANG']['MSC']['difference_new']; ?>"><?php echo count($arrCompareTable['diffNewId']); ?></abbr> / <abbr title="<?php echo $GLOBALS['TL_LANG']['MSC']['difference_deleted']; ?>"><?php echo count($arrCompareTable['diffDeletedId']); ?></abbr></td>
+                <td class="diff"><abbr title="<?php echo $GLOBALS['TL_LANG']['MSC']['difference_new']; ?>"><?php echo count((array) $arrCompareTable['diffNewId']); ?></abbr> / <abbr title="<?php echo $GLOBALS['TL_LANG']['MSC']['difference_deleted']; ?>"><?php echo count((array) $arrCompareTable['diffDeletedId']); ?></abbr></td>
                 <td class="<?php echo $arrCompareTable['client']['class']; ?>" title="<?php echo $arrCompareTable['client']['iname']; ?> (<?php echo $arrCompareTable['client']['tooltip']; ?>)"><?php echo $arrCompareTable['client']['tname']; ?></td>
             </tr>
         <?php endforeach; ?>
