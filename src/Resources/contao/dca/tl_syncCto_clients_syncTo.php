@@ -11,13 +11,16 @@
 
 $GLOBALS['TL_DCA']['tl_syncCto_clients_syncTo'] = array
 (
-    'config'      => array
+    'config' => array
     (
         'dataContainer'    => 'General',
         'ptable'           => 'tl_synccto_clients',
+        'forceEdit'        => true,
+        'disableSubmit'    => false,
         'switchToEdit'     => false,
         'enableVersioning' => false,
-        'closed'           => false
+        'closed'           => false,
+        'onload_callback'  => [\MenAtWork\SyncCto\Contao\Table\Sync::class, 'onLoadCallback']
     ),
     // Palettes
     'palettes'    => array
