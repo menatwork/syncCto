@@ -80,6 +80,7 @@ class SyncCtoDatabase extends \Backend
         'null',
         'extra',
         'default',
+        'collation',
     ];
 
     /**
@@ -1420,6 +1421,7 @@ class SyncCtoDatabase extends \Backend
         $arrIndexes = $this->Database->prepare("SHOW INDEX FROM `$strTableName`")->executeUncached()->fetchAllAssoc();
 
         foreach ($fields as $field) {
+
             if ($field["type"] == "index") {
                 if ($field["name"] == "PRIMARY") {
                     $return['TABLE_CREATE_DEFINITIONS'][$field["name"]] = "PRIMARY KEY (`" . implode("`,`", $field["index_fields"]) . "`)";
@@ -1470,6 +1472,10 @@ class SyncCtoDatabase extends \Backend
                 $field['default'] = "default " . $field['default'];
             } else {
                 $field['default'] = "default '" . $field['default'] . "'";
+            }
+
+            if($field['collation'] !== null){
+                $field['collation'] = "COLLATE " . $field['collation'] ;
             }
 
             // Remove elements from the list, we did not want.
