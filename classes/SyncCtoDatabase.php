@@ -1490,12 +1490,18 @@ class SyncCtoDatabase extends \Backend
         $objStatus = $this->Database->prepare("SHOW TABLE STATUS")->executeUncached();
 
         while ($row = $objStatus->fetchAssoc()) {
-            if ($row['Name'] != $strTableName)
+            if ($row['Name'] != $strTableName) {
                 continue;
+            }
 
-            $return['TABLE_OPTIONS'] = " ENGINE=" . $row['Engine'] . " DEFAULT CHARSET=" . substr($row['Collation'], 0, strpos($row['Collation'], "_")) . "";
-            if ($row['Auto_increment'] != "")
+            $return['TABLE_OPTIONS'] =
+                " ENGINE=" . $row['Engine'] .
+                ((isset($row['Create_options'])) ? " " . $row['Create_options'] : '') .
+                " CHARSET=" . substr($row['Collation'], 0, strpos($row['Collation'], "_")) .
+                " COLLATE=" . $row['Collation'];
+            if ($row['Auto_increment'] != "") {
                 $return['TABLE_OPTIONS'] .= " AUTO_INCREMENT=" . $row['Auto_increment'] . " ";
+            }
         }
 
         return $return;
