@@ -3,9 +3,8 @@
     {
         <?php
             $url = sprintf(
-                    '%s%ssyncCto/%s?id=%s&direction=%s&language=%s',
+                    '%ssyncCto/%s?id=%s&direction=%s&language=%s',
                 $this->Environment->base,
-                ((\Contao\System::getContainer()->getParameter('kernel.environment') == 'dev') ? 'app_dev.php/' : false),
                 $this->popupClassName,
                 $this->id,
                 $this->direction,

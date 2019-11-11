@@ -18,9 +18,8 @@
 
 <?php else: ?>
     <?php $url = sprintf(
-        '%s%ssyncCto/popup/files?id=%s&amp;step=%s',
+        '%ssyncCto/popup/files?id=%s&amp;step=%s',
         $this->Environment->base,
-        ((\Contao\System::getContainer()->getParameter('kernel.environment') == 'dev') ? 'app_dev.php/' : false),
         $this->id,
         $this->step
     ); ?>
