@@ -36,8 +36,8 @@ $GLOBALS['TL_DCA']['tl_synccto_clients'] = array
         ),
         'label' => array
         (
-            'fields'              => array('title', 'id', 'address', 'path', 'id'),
-            'format'              => '<img class="ping" src="bundles/synccto/images/js/gray.png" alt="" /> %s <span style="color: #aaaaaa; padding-left: 3px;">(' . $GLOBALS['TL_LANG']['tl_syncCto_clients']['id'][0] . ': %s, ' . $GLOBALS['TL_LANG']['tl_syncCto_clients']['address'][0] . ': <span title="%s%s">[URL]</span><span class="client-id invisible">%s</span>)</span>',
+            'fields'              => array('title', 'id', 'address', 'port', 'id'),
+            'format'              => '<img class="ping" src="bundles/synccto/images/js/gray.png" alt="" /> %s <span style="color: #aaaaaa; padding-left: 3px;">(' . $GLOBALS['TL_LANG']['tl_syncCto_clients']['id'][0] . ': %s, ' . $GLOBALS['TL_LANG']['tl_syncCto_clients']['address'][0] . ': <span title="%s:%s">[URL]</span><span class="client-id invisible">%s</span>)</span>',
             'label_callback'      => array('tl_synccto_clients', 'setLabel')
         ),
         'global_operations' => array
@@ -109,7 +109,7 @@ $GLOBALS['TL_DCA']['tl_synccto_clients'] = array
     'palettes' => array
     (
         '__selector__'            => array('http_auth'),
-        'default'                 => '{client_legend},apikey,title;{connection_legend},address,path,port,codifyengine;{expert_legend:hide},http_auth',
+        'default'                 => '{client_legend},apikey,title;{connection_legend},address,port,codifyengine;{expert_legend:hide},http_auth',
     ),
     'subpalettes' => array
     (
@@ -142,17 +142,6 @@ $GLOBALS['TL_DCA']['tl_synccto_clients'] = array
             'search'              => true,
             'exclude'             => true,
             'eval'                => array('trailingSlash' => false, 'mandatory' => true, 'tl_class' => 'w50')
-        ),
-        'path' => array
-        (
-            'label'               => &$GLOBALS['TL_LANG']['tl_syncCto_clients']['path'],
-            'inputType'           => 'text',
-            'exclude'             => true,
-            'eval'                => array('trailingSlash' => false, 'tl_class' => 'w50'),
-            'save_callback' => array
-            (
-                array('tl_synccto_clients', 'checkFirstSlash')
-            )
         ),
         'port' => array
         (
@@ -500,7 +489,7 @@ class tl_synccto_clients extends Backend
         $intLeft     = $intMaxChars - (strlen($row['title']) + strlen($row['id']));
         $intLeft     = max($intLeft , $intMinChars);
 
-        $strAddress  = SyncCtoHelper::getInstance()->substrCenter($row['address'] . $row['path'], $intLeft, ' [...] ');
+        $strAddress  = SyncCtoHelper::getInstance()->substrCenter($row['address'] . ':' . $row['port'], $intLeft, ' [...] ');
         return str_replace('[URL]', $strAddress, $label);
     }
 }

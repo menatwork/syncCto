@@ -47,7 +47,6 @@ $GLOBALS['TL_LANG']['tl_synccto_clients']['state']['green']     = 'The host is o
 $GLOBALS['TL_LANG']['tl_syncCto_clients']['title']              = array('Title', 'Please enter the title of the client.');
 $GLOBALS['TL_LANG']['tl_syncCto_clients']['id']                 = array('ID', 'Client ID.');
 $GLOBALS['TL_LANG']['tl_syncCto_clients']['address']            = array('Domain', 'Please enter the complete address to the contao installation.');
-$GLOBALS['TL_LANG']['tl_syncCto_clients']['path']               = array('Server path', 'Please enter the path to the installation, if it is located in a subfolder.');
 $GLOBALS['TL_LANG']['tl_syncCto_clients']['port']               = array('Port number', 'Please enter the number of the HTTP port. Default is 80.');
 $GLOBALS['TL_LANG']['tl_syncCto_clients']['apikey']             = array('ctoCommunication API key', 'This key ensures the communication between the contao installations.');
 $GLOBALS['TL_LANG']['tl_syncCto_clients']['codifyengine']       = array('Encryption', 'Please choose the encryption engine.');

@@ -17,7 +17,6 @@ CREATE TABLE `tl_synccto_clients` (
     `title` varchar(64) NOT NULL default '',
     `apikey` varchar(64) NOT NULL default '',
     `address` text NOT NULL,
-    `path` varchar(255) NOT NULL default '',
     `port` int(10) unsigned NOT NULL default '0',
     `codifyengine` varchar(128) NOT NULL default '',
     `cookie` longtext NULL,

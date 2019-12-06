@@ -243,10 +243,10 @@ class DatabasePopupController
         $this->Template->error          = false;
 
         $objExtern = \Database::getInstance()
-            ->prepare('SELECT address, path FROM tl_synccto_clients WHERE id=?')
+            ->prepare('SELECT address, port FROM tl_synccto_clients WHERE id=?')
             ->execute($this->intClientID);
 
-        $this->Template->clientPath = $objExtern->address . $objExtern->path;
+        $this->Template->clientPath = $objExtern->address . ':' . $objExtern->port . '/ctoCommunication';
         $this->Template->serverPath = Environment::get('base');
     }
 

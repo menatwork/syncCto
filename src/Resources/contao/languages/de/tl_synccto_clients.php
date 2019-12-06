@@ -47,7 +47,6 @@ $GLOBALS['TL_LANG']['tl_synccto_clients']['state']['green']     = 'Alle Systeme 
 $GLOBALS['TL_LANG']['tl_syncCto_clients']['title']              = array('Titel', 'Hier können Sie den Titel des Clients eingeben.');
 $GLOBALS['TL_LANG']['tl_syncCto_clients']['id']                 = array('ID', 'ID des Clients.');
 $GLOBALS['TL_LANG']['tl_syncCto_clients']['address']            = array('Domain', 'Bitte geben Sie die Domain ein.');
-$GLOBALS['TL_LANG']['tl_syncCto_clients']['path']               = array('Serverpfad', 'Bitte geben Sie den Pfad zur Installation ein, falls sich diese in einem Unterordner befindet.');
 $GLOBALS['TL_LANG']['tl_syncCto_clients']['port']               = array('Portnummer', 'Bitte geben Sie die Nummer des HTTP-Ports ein. Standard ist 80.');
 $GLOBALS['TL_LANG']['tl_syncCto_clients']['apikey']             = array('ctoCommunication API Key', 'Dieser Schlüssel sichert die Kommunikation zwischen den Contao-Installationen ab.');
 $GLOBALS['TL_LANG']['tl_syncCto_clients']['codifyengine']       = array('Verschlüsselungs-Engine', 'Wählen Sie bitte die Verschlüsselungs-Engine aus.');

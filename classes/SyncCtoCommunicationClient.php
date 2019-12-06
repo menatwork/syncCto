@@ -81,18 +81,7 @@ class SyncCtoCommunicationClient extends \MenAtWork\CtoCommunicationBundle\Contr
             throw new Exception($GLOBALS['TL_LANG']['ERR']['unknown_client']);
         }
 
-        // Clean url
-        $objClient->path = preg_replace("/\/\z/i", "", $objClient->path);
-
-        // Build path
-        if ($objClient->path == "")
-        {
-            $strUrl = $objClient->address . ":" . $objClient->port;
-        }
-        else
-        {
-            $strUrl = $objClient->address . ":" . $objClient->port . $objClient->path;
-        }
+        $strUrl = $objClient->address . ":" . $objClient->port . '/ctoCommunication';
 
         $this->setClient($strUrl, $objClient->apikey, $objClient->codifyengine);
 
@@ -114,7 +103,6 @@ class SyncCtoCommunicationClient extends \MenAtWork\CtoCommunicationBundle\Contr
         $this->arrClientData = array(
             "title"   => $objClient->title,
             "address" => $objClient->address,
-            "path"    => $objClient->path,
             "port"    => $objClient->port
         );
 
@@ -124,7 +112,7 @@ class SyncCtoCommunicationClient extends \MenAtWork\CtoCommunicationBundle\Contr
     /**
      * Return a list with basic client informations
      *
-     * @return array {title, address, path, port}
+     * @return array {title, address, port}
      */
     public function getClientData()
     {
