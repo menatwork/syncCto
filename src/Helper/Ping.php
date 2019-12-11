@@ -155,13 +155,7 @@ class Ping
             $this->request->password = $this->client->http_password;
         }
 
-        // Build base link.
-        $this->client->path = preg_replace("/\/\z/i", "", $this->client->path);
-
-        $this->clientBaseUrl = $this->client->address . ":" . $this->client->port;
-        if (strlen($this->client->path)) {
-            $this->clientBaseUrl .= $this->client->path;
-        }
+        $this->clientBaseUrl = $this->client->address . ":" . $this->client->port . '/ctoCommunication';
     }
 
     /**
