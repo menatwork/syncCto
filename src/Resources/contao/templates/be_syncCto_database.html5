@@ -1,0 +1,78 @@
+<div id="tl_listing" class="tl_listing_container">
+<?php if($this->close || $this->error): ?>
+
+    <?php if($this->close): ?>
+
+    <img class="loader" src="<?php echo $this->Environment->base; ?>bundles/synccto/images/steps/loader.gif" alt="" />
+    <script>
+    window.addEvent("domready",function(){
+        window.parent.document.getElement('input[name=forward]').click();
+    });
+    </script>
+
+    <?php else: ?>
+
+    <p class="tl_error"><?php echo $this->text; ?></p>
+    <?php if(count($this->arrError) > 0): foreach($this->arrError AS $error): ?>
+    <p class="tl_error"><?php echo $error; ?></p>
+    <?php endforeach; endif; ?>
+
+    <?php endif; ?>
+
+<?php else: ?>
+
+    <form id="db_form" action="<?php echo $this->Environment->base; ?>syncCto/popup/database?id=<?php echo $this->id; ?>&amp;step=<?php echo $this->step; ?>&amp;direction=<?php echo $this->direction ?>" method="post">
+    <div class="formbody">
+        <input type="hidden" name="FORM_SUBMIT" value="<?php echo $this->formId; ?>" />
+        <input type="hidden" name="REQUEST_TOKEN" value="<?php echo REQUEST_TOKEN; ?>">
+
+        <div class="submit_container">
+            <input class="tl_submit" name="transfer" type="submit" value="<?php echo $GLOBALS['TL_LANG']['MSC']['apply']; ?>" />
+            <input class="tl_submit" name="delete" type="submit" value="<?php echo $GLOBALS['TL_LANG']['MSC']['updateRemove']; ?>" />
+        </div>
+
+        <div id="legend">
+            <p class="legend unchanged"><?php echo $GLOBALS['TL_LANG']['MSC']['unchanged']; ?></p>
+            <p class="legend changed"><?php echo $GLOBALS['TL_LANG']['MSC']['changed']; ?></p>
+            <p class="legend changed-both"><?php echo $GLOBALS['TL_LANG']['MSC']['both_changed']; ?></p>
+        </div>
+
+        <?php foreach($this->arrCompareList AS $strState => $arrCompareList): if(count($arrCompareList) == 0) continue; ?>
+        <h3><?php echo ($strState == 'recommended') ? $GLOBALS['TL_LANG']['MSC']['recom_tables'] : $GLOBALS['TL_LANG']['MSC']['nonrecom_tables']; ?></h3>
+        <table class="comparelist" id="<?php echo ($strState == 'recommended') ? 'recommended' : 'nonrecommended'; ?>">
+        <colgroup>
+            <col width="25px" />
+            <col width="45%" />
+            <col width="*" />
+            <col width="45%" />
+        </colgroup>
+        <thead>
+            <tr class="head">
+                <th class="checkbox"><input class="tl_checkbox" onclick="Backend.toggleCheckboxGroup(this, '<?php echo ($strState == 'recommended') ? 'recommended' : 'nonrecommended'; ?>')" type="checkbox" /></th>
+                <th class="server" title="<?php echo $this->serverPath; ?>"><?php echo $GLOBALS['TL_LANG']['MSC']['server']; ?></th>
+                <th class="direction"><img src="<?php echo $this->Environment->base; ?>bundles/synccto/images/steps/iconSync<?php echo $this->direction; ?>.png" alt="" /></th>
+                <th class="client" title="<?php echo $this->clientPath; ?>"><?php echo $GLOBALS['TL_LANG']['MSC']['client']; ?></th>
+            </tr>
+        </thead>
+        <tbody>
+        <?php foreach($arrCompareList AS $strTableName => $arrCompareTable): ?>
+            <tr>
+                <td class="checkbox"><?php if($arrCompareTable['server'] != '-'): ?><input type="checkbox" class="tl_checkbox" name="<?php echo ($arrCompareTable['del'] == true) ? 'serverDeleteTables[]' : 'serverTables[]';?>" value="<?php echo $strTableName; ?>" /><?php endif; ?></td>
+                <td class="<?php echo $arrCompareTable['server']['class']; ?>" title="<?php echo $arrCompareTable['server']['iname']; ?> (<?php echo $arrCompareTable['server']['tooltip']; ?>)"><?php echo $arrCompareTable['server']['tname']; ?></td>
+                <td class="diff"><abbr title="<?php echo $GLOBALS['TL_LANG']['MSC']['difference_new']; ?>"><?php echo count((array) $arrCompareTable['diffNewId']); ?></abbr> / <abbr title="<?php echo $GLOBALS['TL_LANG']['MSC']['difference_deleted']; ?>"><?php echo count((array) $arrCompareTable['diffDeletedId']); ?></abbr></td>
+                <td class="<?php echo $arrCompareTable['client']['class']; ?>" title="<?php echo $arrCompareTable['client']['iname']; ?> (<?php echo $arrCompareTable['client']['tooltip']; ?>)"><?php echo $arrCompareTable['client']['tname']; ?></td>
+            </tr>
+        <?php endforeach; ?>
+        </tbody>
+        </table>
+        <?php endforeach; ?> 
+        
+        <div class="bottom submit_container">
+            <input class="tl_submit" name="transfer" type="submit" value="<?php echo $GLOBALS['TL_LANG']['MSC']['apply']; ?>" />
+            <input class="tl_submit" name="delete" type="submit" value="<?php echo $GLOBALS['TL_LANG']['MSC']['updateRemove']; ?>" />
+        </div>
+    </div>
+</form>
+
+<?php endif; ?>
+</div>

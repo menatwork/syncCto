@@ -1,0 +1,157 @@
+<div id="tl_listing" class="tl_listing_container">
+<?php if($this->close || $this->error): ?>
+
+    <?php if($this->close): ?>
+
+    <img class="loader" src="<?php echo $this->Environment->base; ?>bundles/synccto/images/steps/loader.gif" alt="" />
+    <script>
+    window.addEvent("domready",function(){
+        window.parent.document.getElement('input[name=forward]').click();
+    });
+    </script>
+
+    <?php else: ?>
+
+    <p class="tl_error"><?php echo $this->text; ?></p>
+
+    <?php endif; ?>
+
+<?php else: ?>
+    <?php $url = sprintf(
+        '%ssyncCto/popup/files?id=%s&amp;step=%s',
+        $this->Environment->base,
+        $this->id,
+        $this->step
+    ); ?>
+
+<form id="filelist_form" action="<?php echo $url; ?>" method="post">
+    <div class="formbody">
+        <input type="hidden" name="FORM_SUBMIT" value="<?php echo $this->formId; ?>" />
+        <input type="hidden" name="REQUEST_TOKEN" value="<?php echo REQUEST_TOKEN; ?>">
+        
+        <div class="submit_container">
+            <input class="tl_submit" name="transfer" type="submit" value="<?php echo $GLOBALS['TL_LANG']['MSC']['apply']; ?>" />
+            <input class="tl_submit" name="delete" type="submit" value="<?php echo $GLOBALS['TL_LANG']['MSC']['updateRemove']; ?>" />
+        </div>
+
+        <div id="legend">
+            <?php if ($this->totalsizeNew): ?><p class="legend"><?php echo $GLOBALS['TL_LANG']['MSC']['create']; ?>: <?php echo $this->getReadableSize($this->totalsizeNew); ?></p><?php endif; ?>
+            <?php if ($this->totalsizeChange): ?><p class="legend"><?php echo $GLOBALS['TL_LANG']['MSC']['overrideSelected'] ; ?>: <?php echo $this->getReadableSize($this->totalsizeChange); ?></p><?php endif; ?>
+            <?php if ($this->totalsizeDel): ?><p class="legend"><?php echo $GLOBALS['TL_LANG']['MSC']['delete']; ?>: <?php echo $this->getReadableSize($this->totalsizeDel); ?></p><?php endif; ?>
+        </div>
+
+        <?php for($i = 1 ; $i <= 2 ; $i++):
+            switch ($i)
+            {
+                case 1:
+                    $arrFileList = $this->normalFilelist;
+                    break;
+                case 2:
+                    $arrFileList = $this->bigFilelist;
+                    break;
+            } ?>
+
+        <?php if(count($arrFileList) != 0): ?>
+        <p>
+            Pattern: <input id="selectPattern" type="text" placeholder="<?php echo $GLOBALS['TL_LANG']['MSC']['pattern']; ?>">
+            <button type="button" onclick="selectFiles(document.getElementById('<?php echo $i==1 ? 'normal' : 'big'; ?>filelist'), document.getElementById('selectPattern').value, false);"><?php echo $GLOBALS['TL_LANG']['MSC']['select']; ?></button>
+            <button type="button" onclick="selectFiles(document.getElementById('<?php echo $i==1 ? 'normal' : 'big'; ?>filelist'), document.getElementById('selectPattern').value, true);"><?php echo $GLOBALS['TL_LANG']['MSC']['unselect']; ?></button>
+            <button type="button" onclick="toggleFiles(document.getElementById('<?php echo $i==1 ? 'normal' : 'big'; ?>filelist'));"><?php echo $GLOBALS['TL_LANG']['MSC']['toggle']; ?></button>
+        </p>
+        <script>
+            function selectFiles(table, pattern, inverse)
+            {
+                try {
+                    var regexp = new RegExp(pattern);
+                }   
+                catch(e) {
+                    alert('<?php echo $GLOBALS['TL_LANG']['ERR']['pattern']; ?>');
+                    return false;
+                }
+
+                var checked = false;
+ 
+                for (var i=1; i<table.rows.length; i++)
+                {   
+                    var cells = table.rows[i].cells;
+                    var count = cells.length;
+                    var checkbox = cells[count-2].firstChild;
+                    var filename = cells[count-1].textContent.trim();
+ 
+                    if (regexp.test(filename))
+                        checkbox.checked = !inverse;
+ 
+                    if (checkbox.checked)
+                        checked = true;
+                }   
+ 
+                $$('input[name=delete]').set('disabled', !checked);
+            }   
+ 
+            function toggleFiles(table)
+            {   
+                var checked = false;
+ 
+                for (var i=1; i<table.rows.length; i++)
+                {   
+                    var cells = table.rows[i].cells;
+                    var count = cells.length;
+                    var checkbox = cells[count-2].firstChild;
+ 
+                    checkbox.checked = !checkbox.checked;
+ 
+                    if (checkbox.checked)
+                        checked = true;
+                }   
+ 
+                $$('input[name=delete]').set('disabled', !checked);
+            }   
+        </script>
+        <h3><?php echo $GLOBALS['TL_LANG']['MSC'][(($i == 1) ? 'normal' : 'big') . '_files']; ?></h3>
+        <table class="comparelist" id="<?php echo ($i == 1) ? 'normal' : 'big'; ?>filelist">
+            <colgroup>
+                <col width="15%" />
+                <col width="120" />
+                <col width="130" />
+                <col width="35" />
+                <col width="*" />
+            </colgroup>
+            <thead>
+                <tr class="head">
+                    <th class="state"><?php echo $GLOBALS['TL_LANG']['MSC']['state']; ?></th>
+                    <th class="filesize"><?php echo $GLOBALS['TL_LANG']['MSC']['fileSize']; ?></th>
+                    <th class="filetime"><?php echo $GLOBALS['TL_LANG']['MSC']['fileTime']; ?></th>
+                    <th class="checkbox table-th-nosort"><input class="tl_checkbox" onclick="Backend.toggleCheckboxGroup(this, '<?php echo ($i == 1) ? 'normal' : 'big'; ?>filelist')" type="checkbox" /></th>
+                    <th class="last"><?php echo $GLOBALS['TL_LANG']['MSC']['file']; ?></th>
+                </tr>
+            </thead>
+            <tbody>
+            <?php foreach ($arrFileList as $key => $file): ?>
+                <tr>
+                    <td class="state <?php echo $file["css"]; ?>"><?php echo $this->arrLangStates[$file["state"]]; ?><?php if($file["state"] != 200 && $file['dbafs_conflict']): ?> / <?php echo $GLOBALS['TL_LANG']['MSC']['dbafs_conflict']; endif; ?></td>
+                    <td class="filesize"><?php echo ($file["size"] == -1) ? "N.A." : $this->getReadableSize($file["size"]); ?></td>
+                    <td class="filetime"><?php echo \Date::parse($GLOBALS['TL_CONFIG']['datimFormat'], $file["lastModified"]); ?></td>
+                    <?php if($this->compare_complex == false): ?>
+                    <td class="checkbox"><input class="tl_checkbox" type="checkbox" name="del-file-<?php echo $key; ?>" value="<?php echo $key; ?>" /></td>
+                    <?php else: ?>
+                    <td class="checkbox"><?php if (empty($file["css_big"])): ?><input class="tl_checkbox" type="checkbox" name="del-file-<?php echo $key; ?>" value="<?php echo $key; ?>" /><?php else: ?> X <?php endif; ?></td>
+                    <?php endif; ?>
+                    <td class="last icon" title="<?php echo $file["path"]; ?>">
+                        <?php echo ($file['state'] > 99 && $file['state'] < 200)? $this->generateImage('folderC.gif') : $this->generateImage(SyncCtoFiles::getMimeInfo($file['path'], true, true)); ?>
+                        <span><?php echo SyncCtoHelper::getInstance()->substrCenter($file["path"], $this->maxLength); ?></span>
+                    </td>
+               </tr>
+            <?php endforeach; ?>
+            </tbody>
+        </table> 
+        <?php endif; endfor; ?>
+ 
+        <div class="bottom submit_container">
+            <input class="tl_submit" name="transfer" type="submit" value="<?php echo $GLOBALS['TL_LANG']['MSC']['apply']; ?>" />
+            <input class="tl_submit" name="delete" type="submit" value="<?php echo $GLOBALS['TL_LANG']['MSC']['updateRemove']; ?>" />
+        </div>
+    </div>
+</form>
+
+<?php endif; ?>
+</div>
