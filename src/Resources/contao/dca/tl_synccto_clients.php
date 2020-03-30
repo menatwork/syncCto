@@ -402,14 +402,16 @@ class tl_synccto_clients extends Backend
 
         $GLOBALS['TL_DCA']['tl_synccto_clients']['list']['sorting']['root'] = $root;
 
-        if ($this->objBackendUser->hasAccess($this->Input->get('act'), 'syncCto_clients_p') == true || strlen($this->Input->get('act')) == 0)
+        $table = $this->Input->get('table');
+		$table = str_replace('tl_syncCto_clients_', '', $table);		
+        if ($this->objBackendUser->hasAccess($table, 'syncCto_clients_p') == true || strlen($this->Input->get('act')) == 0)
         {
             return;
         }
         else
         {
             $this->log('Not enough permissions to ' . $this->Input->get('act') . ' syncCto clients', 'tl_syncCto_clients checkPermissionClient', TL_ERROR);
-            $this->redirect('contao/main.php?act=error');
+            $this->redirect('contao?act=error');
         }
     }
 
