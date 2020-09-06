@@ -1156,7 +1156,7 @@ class SyncCtoHelper
     /**
      * Return a list with all timestamps form tables
      *
-     * @param string /array $mixTableNames
+     * @param string|array $mixTableNames
      */
     public function getDatabaseTablesTimestamp($mixTableNames = array())
     {
@@ -1176,20 +1176,20 @@ class SyncCtoHelper
         // Load all Tables.
         $arrTables = \Database::getInstance()->listTables();
 
-        $objDBSchema = \Database::getInstance()
-            ->prepare("SELECT TABLE_NAME, UPDATE_TIME FROM information_schema.TABLES WHERE TABLE_SCHEMA = ?")
-            ->execute($GLOBALS['TL_CONFIG']['dbDatabase']);
-
+        // Load from the meta data of mysql the change date.
         $arrDBSchema = array();
-        while ($objDBSchema->next())
-        {
+        $objDBSchema = \Database::getInstance()
+                                ->prepare("SELECT TABLE_NAME, UPDATE_TIME FROM information_schema.TABLES WHERE TABLE_SCHEMA = ?")
+                                ->execute($GLOBALS['TL_CONFIG']['dbDatabase']);
+        while ($objDBSchema->next()) {
             $arrDBSchema[$objDBSchema->TABLE_NAME] = strtotime($objDBSchema->UPDATE_TIME);
         }
 
+        // We run now each table and try some method to find out, when we have some last changes.
         foreach ($arrTables as $strTable)
         {
             // Skip hidden tables
-            if (in_array($strTable, $GLOBALS['SYC_CONFIG']['table_hidden']))
+            if (in_array($strTable, $GLOBALS['SYC_CONFIG']['table_hidden'], false))
             {
                 continue;
             }
@@ -1201,38 +1201,40 @@ class SyncCtoHelper
             }
 
             // Check if we have rows in table
-            $objCount = \Database::getInstance()->prepare("SELECT COUNT(*) as count FROM $strTable")->execute();
-            if ($objCount->count == 0)
-            {
-                $arrTimestamp[$strTable] = 0;
+            $objCount                            = \Database::getInstance()
+                                                            ->prepare("SELECT COUNT(*) as count FROM $strTable")
+                                                            ->execute();
+            $arrTimestamp[$strTable]['rowCount'] = $objCount->count;
+
+            // Update date from the meta data.
+            $arrTimestamp[$strTable]['metaDate'] = $arrDBSchema[$strTable];
+
+            // Check the timestamp.
+            if (0 != $objCount->count && \Database::getInstance()->fieldExists('tstamp', $strTable)) {
+                $sql           = "SELECT max(tstamp) as lastUpdate FROM $strTable";
+                $objLastUpdate = \Database::getInstance()
+                                          ->prepare($sql)
+                                          ->execute();
+
+                $arrTimestamp[$strTable]['lastUpdate'] = $objLastUpdate->lastUpdate;
+            } else {
+                $arrTimestamp[$strTable]['lastUpdate'] = null;
             }
 
-            // Load all fields
-            $arrFields   = array();
-            $arrDBFields = \Database::getInstance()->listFields($strTable);
+            // Checksum.
+            if (0 != $objCount->count) {
+                $sql         = "CHECKSUM TABLE $strTable";
+                $objChecksum = \Database::getInstance()
+                                        ->prepare($sql)
+                                        ->execute();
 
-            foreach ($arrDBFields as $arrField)
-            {
-                // Skip field primary for contao 2.10 >
-                if ($arrField['name'] == "PRIMARY")
-                {
-                    break;
-                }
-
-                $arrFields[] = $arrField['name'];
+                $arrTimestamp[$strTable]['checksum'] = $objChecksum->Checksum;
+            } else {
+                $arrTimestamp[$strTable]['checksum'] = null;
             }
-
-            $arrTimestamp[$strTable] = $arrDBSchema[$strTable];
         }
 
-        if (!is_array($mixTableNames))
-        {
-            return $arrTimestamp[$mixTableNames];
-        }
-        else
-        {
-            return $arrTimestamp;
-        }
+        return (!is_array($mixTableNames)) ? $arrTimestamp[$mixTableNames] : $arrTimestamp;
     }
 
     /**

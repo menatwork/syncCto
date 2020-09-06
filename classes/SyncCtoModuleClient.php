@@ -2345,10 +2345,23 @@ class SyncCtoModuleClient extends \BackendModule
                         $arrClientTables            = array_merge($arrClientTableR, $arrClientTableNR);
                         $arrHiddenTables            = array_keys(array_flip(array_merge($arrServerTableH, $arrClientTableH)));
                         $arrHiddenTablesPlaceholder = array_keys(array_flip(array_merge($arrClientTableHP, $arrServerTableHP)));
-                        $arrAllTimeStamps           = $this->objSyncCtoDatabase->getAllTimeStamps($arrServerTimestamp, $arrClientTimestamp, $this->intClientID);
+                        $arrAllTimeStamps           = $this->objSyncCtoDatabase->getAllTimeStamps(
+                            $arrServerTimestamp,
+                            $arrClientTimestamp,
+                            $this->intClientID
+                        );
 
-
-                        $arrCompareList = $this->objSyncCtoDatabase->getFormatedCompareList($arrServerTables, $arrClientTables, $arrHiddenTables, $arrHiddenTablesPlaceholder, $arrAllTimeStamps['server'], $arrAllTimeStamps['client'], $arrAllowedTables, 'server', 'client');
+                        $arrCompareList    = \MenAtWork\SyncCto\Database\Diff::getFormatedCompareList(
+                            $arrServerTables,
+                            $arrClientTables,
+                            $arrHiddenTables,
+                            $arrHiddenTablesPlaceholder,
+                            $arrAllTimeStamps['server'],
+                            $arrAllTimeStamps['client'],
+                            $arrAllowedTables,
+                            'server',
+                            'client'
+                        );
 
                         // Get the tables count.
                         $countRecommended     = count((array) $arrCompareList['recommended']);
@@ -2361,13 +2374,13 @@ class SyncCtoModuleClient extends \BackendModule
                                 $this->objStepPool->step                                 = ($this->objStepPool->step + 1);
 
                                 break;
-                            } else {
-                                $this->objData->setState(SyncCtoEnum::WORK_SKIPPED);
-                                $this->objData->setHtml("");
-                                $this->intStep++;
-
-                                break;
                             }
+
+                            $this->objData->setState(SyncCtoEnum::WORK_SKIPPED);
+                            $this->objData->setHtml("");
+                            $this->intStep++;
+
+                            break;
                         }
 
                         $this->arrSyncSettings['syncCto_CompareTables'] = $arrCompareList;
