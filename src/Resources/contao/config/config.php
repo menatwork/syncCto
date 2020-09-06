@@ -443,6 +443,15 @@ $GLOBALS["CTOCOM_FUNCTIONS"]["SYNCCTO_CREATE_PATHCONFIG"] = array
 
 // - Database ------------------------------------------------------------------
 
+// Run table hashes
+$GLOBALS["CTOCOM_FUNCTIONS"]["SYNCCTO_DATABASE_HASH"] = array
+(
+    "class"     => "\MenAtWork\SyncCto\Database\Diff",
+    "function"  => "getHashForTables",
+    "typ"       => "POST",
+    "parameter" => array("tables"),
+);
+
 // Run Dump
 $GLOBALS["CTOCOM_FUNCTIONS"]["SYNCCTO_RUN_DUMP"] = array
 (

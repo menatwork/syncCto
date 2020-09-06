@@ -935,6 +935,16 @@ class SyncCtoCommunicationClient extends \MenAtWork\CtoCommunicationBundle\Contr
         return $this->run("SYNCCTO_HIDDEN_TABLES_PLACEHOLDER");
     }
 
+    /**
+     * Get a list with the hashes for the database.
+     *
+     * @return array
+     */
+    public function getTablesHash($tables)
+    {
+        return $this->run("SYNCCTO_DATABASE_HASH", $tables);
+    }
+
     /* -------------------------------------------------------------------------
      * Config Operations
      */
