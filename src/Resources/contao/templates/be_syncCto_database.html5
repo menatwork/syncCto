@@ -43,10 +43,10 @@
         <table class="comparelist" id="<?php echo ($strState == 'recommended') ? 'recommended' : 'nonrecommended'; ?>">
         <colgroup>
             <col width="25px" />
-            <col width="40%" />
+            <col width="35%" />
+            <col width="100px" />
+            <col width="35%" />
             <col width="*" />
-            <col width="40%" />
-            <col width="10%" />
         </colgroup>
         <thead>
             <tr class="head">
