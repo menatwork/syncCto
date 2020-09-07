@@ -28,6 +28,7 @@ use Contao\ManagerPlugin\Bundle\BundlePluginInterface;
 use Contao\ManagerPlugin\Bundle\Config\BundleConfig;
 use Contao\ManagerPlugin\Bundle\Parser\ParserInterface;
 use Contao\ManagerPlugin\Routing\RoutingPluginInterface;
+use MenAtWork\CtoCommunicationBundle\CtoCommunicationBundle;
 use MenAtWork\MultiColumnWizardBundle\MultiColumnWizardBundle;
 use MenAtWork\SyncCto\SyncCtoBundle;
 use Symfony\Component\Config\Loader\LoaderResolverInterface;
@@ -50,6 +51,7 @@ class Plugin implements BundlePluginInterface, RoutingPluginInterface
                             [
                                 ContaoCoreBundle::class,
                                 ContaoManagerBundle::class,
+                                CtoCommunicationBundle::class,
                             ]
                         )
                         ->setReplace(
