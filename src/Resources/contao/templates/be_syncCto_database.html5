@@ -61,7 +61,7 @@
                 <th class="server"><?= $GLOBALS['TL_LANG']['MSC']['table_names'] ?></th>
                 <th class="direction"><?= $GLOBALS['TL_LANG']['MSC']['ids_explanation'] ?></th>
                 <th class="client"><?= $GLOBALS['TL_LANG']['MSC']['table_names'] ?></th>
-                <th>Status</th>
+                <th><?= $GLOBALS['TL_LANG']['MSC']['state'] ?></th>
             </tr>
         </thead>
         <tbody>
