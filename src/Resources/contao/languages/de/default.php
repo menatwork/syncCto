@@ -5,7 +5,7 @@
  *
  * @copyright  MEN AT WORK 2014
  * @package    syncCto
- * @license    GNU/LGPL 
+ * @license    GNU/LGPL
  * @filesource
  */
 
@@ -102,4 +102,22 @@ $GLOBALS['TL_LANG']['MSC']['pattern']                    = 'Pattern (Regex)';
 $GLOBALS['TL_LANG']['MSC']['select']                     = 'Auswählen';
 $GLOBALS['TL_LANG']['MSC']['unselect']                   = 'Abwählen';
 $GLOBALS['TL_LANG']['MSC']['toggle']                     = 'Auswahl umkehren';
+$GLOBALS['TL_LANG']['MSC']['table_names']                = 'Tabellen Namen:';
+$GLOBALS['TL_LANG']['MSC']['ids_explanation']            = 'IDs - Neu/Gelöscht';
+$GLOBALS['TL_LANG']['MSC']['method']['meta']             = [
+    'Datenbank Änderungsdatum',
+    'Meta'
+];
+$GLOBALS['TL_LANG']['MSC']['method']['count']            = [
+    'Zeilen Anzahl',
+    'Count'
+];
+$GLOBALS['TL_LANG']['MSC']['method']['update']           = [
+    'Letzte Änderung von Contao',
+    'Update'
+];
+$GLOBALS['TL_LANG']['MSC']['method']['checksum']         = [
+    'Checksum von der Tabelle',
+    'Checksum'
+];
 

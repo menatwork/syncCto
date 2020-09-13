@@ -256,6 +256,9 @@ $GLOBALS['SYC_CONFIG']['table_hidden'] = array_merge((array)$GLOBALS['SYC_CONFIG
     'tl_log',
     'tl_lock',
     'tl_cron',
+    'tl_opt_in',
+    'tl_opt_in_related',
+    'tl_remember_me',
     'tl_session',
     'tl_search',
     'tl_search_index',
@@ -264,22 +267,13 @@ $GLOBALS['SYC_CONFIG']['table_hidden'] = array_merge((array)$GLOBALS['SYC_CONFIG
     'tl_comments',
     'tl_comments_notify',
     'tl_synccto_clients',
-    'tl_synccto_stats'
+    'tl_synccto_stats',
+    'tl_trusted_device'
 ));
 
 // Folders
 $GLOBALS['SYC_CONFIG']['folder_blacklist'] = array_merge((array)$GLOBALS['SYC_CONFIG']['folder_blacklist'], array
 (
-    'assets/css/',
-    'assets/images/',
-    'assets/js/',
-    'composer/cache/',
-    'system/cache/',
-    'system/backup/',
-    'system/html/',
-    'system/logs/',
-    'system/scripts/',
-    'system/tmp/',
     '*/syncCto_backups/',
     '*/.git'
 ));
@@ -290,43 +284,22 @@ $GLOBALS['SYC_CONFIG']['file_blacklist'] = array_merge((array)$GLOBALS['SYC_CONF
     'TL_ROOT/.env',
     'TL_ROOT/.htaccess',
     'TL_ROOT/.htpasswd',
-    'TL_ROOT/composer.phar',
-    'localconfig.php',
-    'pathconfig.php',
-    'system/cron/cron.txt',
+    'TL_ROOT/composer*',
     '.DS_Store'
 ));
 
 // Local config
 $GLOBALS['SYC_CONFIG']['local_blacklist'] = array_merge((array)$GLOBALS['SYC_CONFIG']['local_blacklist'], array
 (
-    'websitePath',
-    'websiteTitle',
-    'installPassword',
-    'disableRefererCheck',
-    'encryptionKey',
-    'dbDriver',
-    'dbHost',
-    'dbUser',
-    'dbPass',
-    'dbDatabase',
-    'dbPconnect',
-    'dbCharset',
-    'dbPort',
-    'dbSocket',
-    'displayErrors',
-    'debugMode',
-    'maintenanceMode',
     'ctoCom_APIKey',
     'ctoCom_disableRefererCheck',
     'ctoCom_responseLength',
     'ctoCom_handshake',
+    'disableCron',
+    'disableRefererCheck',
     'syncCto_debug_mode',
     'syncCto_attentionFlag',
-    'syncCto_auto_db_updater',
-    'liveUpdateId',
-    'disableCron',
-    'enableSearch'
+    'syncCto_auto_db_updater'
 ));
 
 /**
@@ -334,14 +307,7 @@ $GLOBALS['SYC_CONFIG']['local_blacklist'] = array_merge((array)$GLOBALS['SYC_CON
  */
 $GLOBALS['SYC_CONFIG']['folder_whitelist'] = array_merge((array)$GLOBALS['SYC_CONFIG']['folder_whitelist'], array
 (
-//    'assets',
-//    'composer',
-//    'contao',
-//    'plugins',
-//    'share',
-//    'system',
-    'templates',
-//    'typolight',
+    'templates'
 ));
 
 /**
@@ -442,6 +408,15 @@ $GLOBALS["CTOCOM_FUNCTIONS"]["SYNCCTO_CREATE_PATHCONFIG"] = array
 );
 
 // - Database ------------------------------------------------------------------
+
+// Run table hashes
+$GLOBALS["CTOCOM_FUNCTIONS"]["SYNCCTO_DATABASE_HASH"] = array
+(
+    "class"     => "\MenAtWork\SyncCto\Database\Diff",
+    "function"  => "getHashForTables",
+    "typ"       => "POST",
+    "parameter" => array("tables"),
+);
 
 // Run Dump
 $GLOBALS["CTOCOM_FUNCTIONS"]["SYNCCTO_RUN_DUMP"] = array
