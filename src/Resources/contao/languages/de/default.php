@@ -105,7 +105,7 @@ $GLOBALS['TL_LANG']['MSC']['toggle']                     = 'Auswahl umkehren';
 $GLOBALS['TL_LANG']['MSC']['table_names']                = 'Tabellen Namen:';
 $GLOBALS['TL_LANG']['MSC']['ids_explanation']            = 'IDs - Neu/Gelöscht';
 $GLOBALS['TL_LANG']['MSC']['method']['meta']             = [
-    'Datenbank Änderungsdamtu',
+    'Datenbank Änderungsdatum',
     'Meta'
 ];
 $GLOBALS['TL_LANG']['MSC']['method']['count']            = [
