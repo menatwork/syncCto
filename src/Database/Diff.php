@@ -53,14 +53,14 @@ class Diff
         if (is_array($arrHiddenTables) && count((array)$arrHiddenTables) != 0) {
             foreach ($arrSourceTables as $key => $value) {
                 if (in_array($key, $arrHiddenTables)
-                    || (is_array($arrAllowedTables) && in_array($key, $arrAllowedTables))) {
+                    || (is_array($arrAllowedTables) && !in_array($key, $arrAllowedTables))) {
                     unset($arrSourceTables[$key]);
                 }
             }
 
             foreach ($arrDesTables as $key => $value) {
                 if (in_array($key, $arrHiddenTables)
-                    || (is_array($arrAllowedTables) && in_array($key, $arrAllowedTables))) {
+                    || (is_array($arrAllowedTables) && !in_array($key, $arrAllowedTables))) {
                     unset($arrDesTables[$key]);
                 }
             }
