@@ -11,6 +11,7 @@
 
 namespace MenAtWork\SyncCto\DcGeneral\Events\Sync;
 
+use Contao\System;
 use ContaoCommunityAlliance\DcGeneral\Contao\View\Contao2BackendView\Event\GetEditModeButtonsEvent;
 use ContaoCommunityAlliance\DcGeneral\Data\ModelId;
 use ContaoCommunityAlliance\DcGeneral\Event\PrePersistModelEvent;
@@ -61,7 +62,7 @@ class To extends Base
         if (file_exists(TL_ROOT . $strInitFilePath)) {
             $strFile        = new \File($strInitFilePath);
             $arrFileContent = $strFile->getContentAsArray();
-            foreach ($arrFileContent AS $strContent) {
+            foreach ($arrFileContent as $strContent) {
                 if (!preg_match("/(\/\*|\*|\*\/|\/\/)/", $strContent)) {
                     //system/tmp.
                     if (preg_match("/system\/tmp/", $strContent)) {
@@ -74,13 +75,13 @@ class To extends Base
 
         // Update a field with last sync information
         $objSyncTime = \Database::getInstance()
-            ->prepare("SELECT cl.syncTo_tstamp as syncTo_tstamp, user.name as syncTo_user, user.username as syncTo_alias
+                                ->prepare("SELECT cl.syncTo_tstamp as syncTo_tstamp, user.name as syncTo_user, user.username as syncTo_alias
                             FROM tl_synccto_clients as cl
                             INNER JOIN tl_user as user
                             ON cl.syncTo_user = user.id
                             WHERE cl.id = ?")
-            ->limit(1)
-            ->execute(\Input::get("id"));
+                                ->limit(1)
+                                ->execute(\Input::get("id"));
 
         if ($objSyncTime->syncTo_tstamp != 0 && strlen($objSyncTime->syncTo_user) != 0 && strlen($objSyncTime->syncTo_alias) != 0) {
             $strLastSync = vsprintf($GLOBALS['TL_LANG']['MSC']['last_sync'], array(
@@ -193,7 +194,8 @@ class To extends Base
         }
 
         // Save Session.
-        \Session::getInstance()->set("syncCto_SyncSettings_" . $id->getId(), $arrSyncSettings);
+        $session = \Contao\System::getContainer()->get('session');
+        $session->set("syncCto_SyncSettings_" . $id->getId(), $arrSyncSettings);
 
         // Check the vars.
         $this->objSyncCtoHelper->checkSubmit(array(

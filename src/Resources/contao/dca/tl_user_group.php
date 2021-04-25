@@ -12,14 +12,7 @@
 /**
  * Extend default palette
  */
-$parts = explode(';', $GLOBALS['TL_DCA']['tl_user_group']['palettes']['default']);
-if(is_array($parts)){
-    \array_insert($parts, (count($parts) - 1), [
-        '{syncCto_legend},syncCto_clients,syncCto_clients_p,syncCto_sync_options',
-        '{syncCto_tables_legend},syncCto_tables'
-    ]);
-    $GLOBALS['TL_DCA']['tl_user_group']['palettes']['default'] = implode(';', $parts);
-}
+$GLOBALS['TL_DCA']['tl_user_group']['palettes']['default'] = str_replace('alexf;', '{syncCto_legend},syncCto_clients,syncCto_clients_p,syncCto_sync_options;{syncCto_tables_legend},syncCto_tables;{alexf_legend},alexf;', $GLOBALS['TL_DCA']['tl_user_group']['palettes']['default']);
 
 /**
  * Add fields to tl_user_group

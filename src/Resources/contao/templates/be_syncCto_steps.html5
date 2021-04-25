@@ -1,70 +1,101 @@
+<?php
+use MenAtWork\SyncCto\Steps\ContentData;
+use MenAtWork\SyncCto\Steps\StepData;
+
+/** @var ContentData $frontendData */
+$frontendData = $this->frontendData;
+?>
+
 <div id="tl_buttons">
-    <a onclick="Backend.getScrollOffset();" accesskey="b" title="<?php echo $GLOBALS['TL_LANG']['MSC']['backBT']; ?>" class="header_back" href="<?php echo $this->goBack; ?>"><?php echo $GLOBALS['TL_LANG']['MSC']['backBT']; ?></a>
+    <a onclick="Backend.getScrollOffset();"
+       accesskey="b"
+       title="<?= $GLOBALS['TL_LANG']['MSC']['backBT']; ?>"
+       class="header_back"
+       href="<?= $frontendData->getGoBack(); ?>">
+        <?= $GLOBALS['TL_LANG']['MSC']['backBT']; ?>
+    </a>
 </div>
 
-<h2 class="sub_headline"><?php echo $this->headline; ?> <?php echo (($this->direction == 'to')? '->' : (($this->direction == 'from')? '<-' : ' - ')); ?> <?php echo $this->clientName ?></h2>
-
+<h2 class="sub_headline">
+    <?= $frontendData->getHeadline(); ?> <?= $this->sourceClient ?> -> <?= $this->destinationClient ?>
+</h2>
 
 <div class="tl_formbody_edit synccto_steps">
-
-    <?php if (strlen($this->information) != 0): ?>
-        <p class="info tl_info"><?php echo $this->information; ?></p>
+    <?php if (strlen($frontendData->getInformation()) != 0): ?>
+        <p class="info tl_info"><?= $frontendData->getInformation(); ?></p>
     <?php endif; ?>
 
-    <?php $i = 0; foreach ($this->data as $key => $value): $i++; ?>
-        <div class="<?php echo ($key == 1) ? "tl_tbox" : "tl_box"; ?> block">
-            <h3 id="step<?php echo $key; ?>" class="headline">
-                <img src="bundles/synccto/images/steps/icon<?php echo $value["state"]; ?>.gif" alt="" />
-                <span><?php echo vsprintf($value["title"], array($i)) ?></span>
+    <?php
+    $i = 0;
+    /**
+     * @var int $key
+     * @var StepData $step
+     */
+    foreach ($this->steps as $key => $step): $i++; ?>
+        <div class="<?= ($key == 1) ? "tl_tbox" : "tl_box"; ?> block">
+            <h3 id="step<?= $key; ?>" class="headline">
+                <img src="bundles/synccto/images/steps/icon<?= $step->getState(); ?>.gif" alt=""/>
+                <span><?= vsprintf($step->getTitle(), array($i)) ?></span>
             </h3>
-            <p class="tl_help"><?php echo $value["description"]; ?></p>
-            <?php if (strlen($value["msg"])) : ?>
-            <p class="tl_help"><?php echo $value["msg"]; ?></p>
+            <p class="tl_help"><?= $step->getDescription(); ?></p>
+            <?php if (strlen($step->getMsg())) : ?>
+                <p class="tl_help"><?= $step->getMsg(); ?></p>
             <?php endif; ?>
-            <?php if (strlen($value["html"]) != 0) : ?>
-            <?php echo $value["html"]; ?>
+            <?php if (strlen($step->getHtml()) != 0) : ?>
+                <?= $step->getHtml(); ?>
             <?php endif; ?>
         </div>
     <?php endforeach; ?>
 
-    <?php if ($this->refresh == true && $this->error == false && $this->finished == false): ?>
-        <meta http-equiv="refresh" content="1; URL=<?php echo $this->Environment->base; ?><?php echo $this->url; ?>&amp;step=<?php echo $this->step ?>" />
+    <?php if ($frontendData->isRefresh() == true && $frontendData->isError() == false && $frontendData->isFinished() == false): ?>
+        <meta http-equiv="refresh"
+              content="1; URL=<?= $this->Environment->base; ?><?= $frontendData->getUrl(); ?>&amp;step=<?=  $frontendData->getStep() ?>"/>
     <?php endif; ?>
 
-    <?php if ($this->error) : ?>
+    <?php if ($frontendData->isError()) : ?>
         <div class="tl_box block">
-            <h4><?php echo $GLOBALS['TL_LANG']['MSC']['error']; ?></h4>
-            <p class="tl_help"><?php echo $this->error_msg; ?></p>
+            <h4><?= $GLOBALS['TL_LANG']['MSC']['error']; ?></h4>
+            <p class="tl_help"><?= $frontendData->getErrorMessage(); ?></p>
         </div>
     <?php endif; ?>
 
     <?php if ($GLOBALS['TL_CONFIG']['syncCto_debug_mode'] == true): ?>
         <div class="tl_box block">
-            <h3><?php echo $GLOBALS['TL_LANG']['MSC']['debug_mode']; ?></h3>
+            <h3><?= $GLOBALS['TL_LANG']['MSC']['debug_mode']; ?></h3>
             <p class="debug tl_help">
-                <?php echo vsprintf($GLOBALS['TL_LANG']['MSC']['run_time'], array(number_format(microtime(true) - $this->start, 2))); ?><br />
-                <?php echo vsprintf($GLOBALS['TL_LANG']['MSC']['memory_limit'], array($this->getReadableSize(memory_get_peak_usage(true)))); ?><br /><br />
-                <?php echo $GLOBALS['TL_LANG']['MSC']['step']; ?>: <?php echo $this->step; ?><br />
-                <?php echo $GLOBALS['TL_LANG']['MSC']['substep']; ?>: <?php echo $this->subStep; ?>
+                <?= vsprintf($GLOBALS['TL_LANG']['MSC']['run_time'],
+                    array(number_format(microtime(true) - $frontendData->getStart(), 2))); ?><br/>
+                <?= vsprintf($GLOBALS['TL_LANG']['MSC']['memory_limit'],
+                    array($this->getReadableSize(memory_get_peak_usage(true)))); ?><br/><br/>
+                <?= $GLOBALS['TL_LANG']['MSC']['step']; ?>: <?= $frontendData->getStep(); ?><br/>
+<!--                --><?//= $GLOBALS['TL_LANG']['MSC']['substep']; ?><!--: --><?//= $this->subStep; ?>
             </p>
         </div>
     <?php endif; ?>
 
     <?php if ($this->showControl == true): ?>
         <div class="tl_tbox" id="buttons">
-            <a href="<?php echo $this->abortLink; ?>" onclick="$(this).setProperty('text', '<?php echo $GLOBALS['TL_LANG']['MSC']['abort_sync']['1']; ?>');" class="tl_submit"><?php echo $GLOBALS['TL_LANG']['MSC']['abort_sync']['0']; ?></a>
-        <?php if ($this->error): ?>
-            <a href="<?php echo $this->tryAgainLink; ?>" onclick="$(this).setProperty('text', '<?php echo $GLOBALS['TL_LANG']['MSC']['repeat_sync']['1']; ?>');" class="tl_submit"><?php echo $GLOBALS['TL_LANG']['MSC']['repeat_sync']['0']; ?></a>
-            <?php if ($this->modeAll): ?>
-            <a href="<?php echo $this->nextClientLink; ?>" onclick="$(this).setProperty('text', '<?php echo $GLOBALS['TL_LANG']['MSC']['next_sync']['1']; ?>');" class="tl_submit"><?php echo $GLOBALS['TL_LANG']['MSC']['next_sync']['0']; ?></a>
+            <a href="<?= $this->abortLink; ?>"
+               onclick="$(this).setProperty('text', '<?= $GLOBALS['TL_LANG']['MSC']['abort_sync']['1']; ?>');"
+               class="tl_submit"><?= $GLOBALS['TL_LANG']['MSC']['abort_sync']['0']; ?></a>
+            <?php if ($this->error): ?>
+                <a href="<?= $this->tryAgainLink; ?>"
+                   onclick="$(this).setProperty('text', '<?= $GLOBALS['TL_LANG']['MSC']['repeat_sync']['1']; ?>');"
+                   class="tl_submit"><?= $GLOBALS['TL_LANG']['MSC']['repeat_sync']['0']; ?></a>
+                <?php if ($this->modeAll): ?>
+                    <a href="<?= $this->nextClientLink; ?>"
+                       onclick="$(this).setProperty('text', '<?= $GLOBALS['TL_LANG']['MSC']['next_sync']['1']; ?>');"
+                       class="tl_submit"><?= $GLOBALS['TL_LANG']['MSC']['next_sync']['0']; ?></a>
+                <?php endif; ?>
             <?php endif; ?>
-        <?php endif; ?>
         </div>
     <?php endif; ?>
 
-   <?php if ($this->showNextControl && $this->modeAll): ?>
+    <?php if ($this->showNextControl && $this->modeAll): ?>
         <div class="tl_tbox" id="buttons">
-            <a href="<?php echo $this->nextClientLink; ?>" onclick="$(this).setProperty('text', '<?php echo $GLOBALS['TL_LANG']['MSC']['next_sync']['1']; ?>');" class="tl_submit"><?php echo $GLOBALS['TL_LANG']['MSC']['next_sync']['0']; ?></a>
+            <a href="<?= $this->nextClientLink; ?>"
+               onclick="$(this).setProperty('text', '<?= $GLOBALS['TL_LANG']['MSC']['next_sync']['1']; ?>');"
+               class="tl_submit"><?= $GLOBALS['TL_LANG']['MSC']['next_sync']['0']; ?></a>
         </div>
     <?php endif; ?>
 
