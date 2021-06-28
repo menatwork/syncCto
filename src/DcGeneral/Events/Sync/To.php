@@ -11,6 +11,7 @@
 
 namespace MenAtWork\SyncCto\DcGeneral\Events\Sync;
 
+use Contao\BackendUser;
 use ContaoCommunityAlliance\DcGeneral\Contao\View\Contao2BackendView\Event\GetEditModeButtonsEvent;
 use ContaoCommunityAlliance\DcGeneral\Data\ModelId;
 use ContaoCommunityAlliance\DcGeneral\Event\PrePersistModelEvent;
@@ -47,8 +48,15 @@ class To extends Base
         return 'tl_syncCto_clients_syncTo';
     }
 
+    public function preSetValues()
+    {
+
+    }
+
     /**
      * @param GetEditModeButtonsEvent $objEvent
+     *
+     * @throws \Exception
      */
     public function addButton(GetEditModeButtonsEvent $objEvent)
     {
@@ -125,6 +133,19 @@ class To extends Base
             }
         }
 
+        // If a special right is set the diff or the thetl_files overwrite can be forced.
+        $backendUser          = BackendUser::getInstance();
+        $groupRightForceFiles = $backendUser->syncCto_force_dbafs_overwrite;
+        $groupRightForceDiff  = $backendUser->syncCto_force_diff;
+        if($groupRightForceFiles == true || (\is_array($groupRightForceFiles) && $groupRightForceFiles[0] == true)){
+            $arrData['tl_files_check'] = true;
+        }
+
+        if($groupRightForceDiff == true || (\is_array($groupRightForceDiff) && $groupRightForceDiff[0] == true)){
+            $arrData['database_pages_check'] = true;
+        }
+
+        // Check if all or the normal sync should be running.
         if (isset($_POST['start_sync'])) {
             $this->runSync($arrData);
         } elseif (isset($_POST['start_sync_all'])) {

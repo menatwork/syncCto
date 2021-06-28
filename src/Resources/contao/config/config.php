@@ -206,6 +206,7 @@ $GLOBALS['TL_PERMISSIONS'][] = 'syncCto_clients';
 $GLOBALS['TL_PERMISSIONS'][] = 'syncCto_clients_p';
 $GLOBALS['TL_PERMISSIONS'][] = 'syncCto_sync_options';
 $GLOBALS['TL_PERMISSIONS'][] = 'syncCto_tables';
+$GLOBALS['TL_PERMISSIONS'][] = 'syncCto_force_dbafs_overwrite';
 
 /**
  * Callbacks are only used for overview screen

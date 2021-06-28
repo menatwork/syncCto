@@ -22,6 +22,8 @@
 
 namespace MenAtWork\SyncCto\DcGeneral\Dca\Builder;
 
+use Contao\BackendUser;
+use Contao\Message;
 use ContaoCommunityAlliance\DcGeneral\Contao\Dca\Builder\Legacy\DcaReadingDataDefinitionBuilder;
 use ContaoCommunityAlliance\DcGeneral\DataDefinition\ContainerInterface;
 use ContaoCommunityAlliance\DcGeneral\DataDefinition\Definition\DataProviderDefinitionInterface;
@@ -35,15 +37,51 @@ class DataDefinitionBuilder extends DcaReadingDataDefinitionBuilder
     /**
      * Build a data definition and store it into the environments container.
      *
-     * @param ContainerInterface $container The data definition container to populate.
+     * @param ContainerInterface       $container The data definition container to populate.
      *
-     * @param BuildDataDefinitionEvent $event The event that has been triggered.
+     * @param BuildDataDefinitionEvent $event     The event that has been triggered.
      *
      * @return void
      */
     public function build(ContainerInterface $container, BuildDataDefinitionEvent $event)
     {
-        $providerDefinition = $container->getDataProviderDefinition();
+        $providerDefinition   = $container->getDataProviderDefinition();
+        $palettesDefinition   = $container->getPalettesDefinition()->getPaletteByName('default');
+        $backendUser          = BackendUser::getInstance();
+        $groupRightForceFiles = $backendUser->syncCto_force_dbafs_overwrite;
+        $groupRightForceDiff  = $backendUser->syncCto_force_diff;
+
+        // Check if we have to force the file overwrite.
+        if (
+            ($groupRightForceFiles == true || (\is_array($groupRightForceFiles) && $groupRightForceFiles[0] == true))
+            && $palettesDefinition
+            && $palettesDefinition->hasLegend('table')
+            && $palettesDefinition->getLegend('table')->hasProperty('tl_files_check')
+        ) {
+            Message::addInfo('tl_Files overwrite is per default enabled.');
+            $property = $palettesDefinition
+                ->getLegend('table')
+                ->getProperty('tl_files_check');
+            $palettesDefinition
+                ->getLegend('table')
+                ->removeProperty($property);
+        }
+
+        // Check if we have to force the diff.
+        if (
+            ($groupRightForceDiff == true || (\is_array($groupRightForceDiff) && $groupRightForceDiff[0] == true))
+            && $palettesDefinition
+            && $palettesDefinition->hasLegend('table')
+            && $palettesDefinition->getLegend('table')->hasProperty('database_pages_check')
+        ) {
+            Message::addInfo('Diff-Sync is per default enabled.');
+            $property = $palettesDefinition
+                ->getLegend('table')
+                ->getProperty('database_pages_check');
+            $palettesDefinition
+                ->getLegend('table')
+                ->removeProperty($property);
+        }
 
         // SyncTo setup.
         if ($providerDefinition->hasInformation('tl_syncCto_clients_syncTo')) {

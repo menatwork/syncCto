@@ -5,12 +5,12 @@
  *
  * @copyright  MEN AT WORK 2014
  * @package    syncCto
- * @license    GNU/LGPL 
+ * @license    GNU/LGPL
  * @filesource
  */
 
 /**
  * Legends
  */
-$GLOBALS['TL_LANG']['tl_user_group']['syncCto_legend']              = 'Client permissions';
-$GLOBALS['TL_LANG']['tl_user_group']['syncCto_tables_legend']       = 'Allowed tables';
+$GLOBALS['TL_LANG']['tl_user_group']['syncCto_legend']              = 'SyncCto - Client permissions';
+$GLOBALS['TL_LANG']['tl_user_group']['syncCto_tables_legend']       = 'SyncCto - Allowed tables';
