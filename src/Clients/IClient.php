@@ -2,6 +2,11 @@
 
 namespace MenAtWork\SyncCto\Clients;
 
+/**
+ * Interface IClient
+ *
+ * @package MenAtWork\SyncCto\Clients
+ */
 interface IClient
 {
     /**
@@ -9,14 +14,14 @@ interface IClient
      *
      * @param string $title
      *
-     * @return IClient
+     * @return IClient The current instance.
      */
     public function setTitle(string $title): IClient;
 
     /**
      * Get the title of this client.
      *
-     * @return string
+     * @return string The current title.
      */
     public function getTitle(): string;
 
@@ -28,9 +33,9 @@ interface IClient
      * Init the connection if needed.
      * This is not for daily connection more for the one time connection handshake and all.
      *
-     * @return mixed
+     * @return void
      */
-    public function startConnection();
+    public function startConnection(): void;
 
     /* -------------------------------------------------------------------------
      * Security function.
@@ -39,30 +44,30 @@ interface IClient
     /**
      * Enable the referrer check on the client
      *
-     * @return boolean
+     * @return bool
      */
-    public function referrerEnable();
+    public function referrerEnable(): bool;
 
     /**
      * Disable the referrer check on the client
      *
-     * @return boolean
+     * @return bool
      */
-    public function referrerDisable();
+    public function referrerDisable(): bool;
 
     /**
      * Set the attention flag from client
      *
-     * @param boolean $booState
+     * @param bool $booState
      */
-    public function setAttentionFlag($booState);
+    public function setAttentionFlag(bool $booState);
 
     /**
      * Set the reffere flag from client
      *
-     * @param boolean $booState
+     * @param bool $booState
      */
-    public function setDisplayErrors($booState);
+    public function setDisplayErrors(bool $booState);
 
     /* -------------------------------------------------------------------------
      * Information
@@ -73,39 +78,39 @@ interface IClient
      *
      * @return string
      */
-    public function getVersionSyncCto();
+    public function getVersionSyncCto(): string;
 
     /**
      * Get version from client contao
      *
      * @return string
      */
-    public function getVersionContao();
+    public function getVersionContao(): string;
 
     /**
      * Get version from client contao
      *
      * @return string
      */
-    public function getVersionCtoCommunication();
+    public function getVersionCtoCommunication(): string;
 
     /**
      * Get parameter from client
      *
      * @return array
      */
-    public function getClientParameter();
+    public function getClientParameter(): array;
 
     /**
      * Get informations for purgedata
      *
      * @return array
      */
-    public function getPurgData();
+    public function getPurgData(): array;
 
     /* -------------------------------------------------------------------------
-    * Maintance
-    */
+     * Maintance
+     */
 
     /**
      * Clear tempfolder
@@ -138,16 +143,16 @@ interface IClient
     /**
      * Use the contao function for maintance
      *
-     * @return boolean
+     * @return bool
      */
-    public function runMaintenance($arrSettings);
+    public function runMaintenance($arrSettings): bool;
 
     /**
      * Call the last operations on client side.
      *
      * @return array with information.
      */
-    public function runFinalOperations();
+    public function runFinalOperations(): array;
 
     /* -------------------------------------------------------------------------
      * File Operations
@@ -158,20 +163,22 @@ interface IClient
      *
      * @param array $arrChecksumList
      *
-     * @return array
-     * @throws \Exception
+     * @param bool  $blnDisableDbafsConflicts
      *
+     * @return array
+     *
+     * @throws \Exception
      */
-    public function runCecksumCompare($arrChecksumList, $blnDisableDbafsConflicts = false);
+    public function runCecksumCompare(array $arrChecksumList, $blnDisableDbafsConflicts = false): array;
 
     /**
      * Get a list with fileinformations from files
      *
-     * @param array $fileList
+     * @param array $arrFileList
      *
      * @return mixed
      */
-    public function getChecksumFiles($arrFileList = null);
+    public function getChecksumFiles($arrFileList = []);
 
     /**
      * Get a list with files from contao core
@@ -201,7 +208,7 @@ interface IClient
      *
      * @return array
      */
-    public function checkDeleteFiles($arrChecksumList);
+    public function checkDeleteFiles(array $arrFilelist): array;
 
     /**
      * Check for deleted files
@@ -210,25 +217,40 @@ interface IClient
      *
      * @return array
      */
-    public function searchDeleteFolders($arrChecksumList);
+    public function searchDeleteFolders(array $arrFilelist);
 
     /**
      * Send a file to the client
      *
+     * @param        $strFolder
      * @param string $strFile File + path. Start from TL_ROOT.
+     *
+     * @param string $strMD5
+     * @param int    $intTyp
+     * @param string $strSplitname
      *
      * @return bool [true|false]
      */
-    public function sendFile($strFolder, $strFile, $strMD5 = "", $intTyp = 1, $strSplitname = "");
+    public function sendFile($strFolder, string $strFile, $strMD5 = "", $intTyp = 1, $strSplitname = ""): bool;
 
     /**
      * Send a file to the client
      *
-     * @param string $strFile File + path. Start from TL_ROOT.
+     * @param        $strSource
+     * @param        $strDestination
+     * @param string $strMD5
+     * @param int    $intTyp
+     * @param string $strSplitname
      *
      * @return bool [true|false]
      */
-    public function sendFileNewDestination($strSource, $strDestination, $strMD5 = "", $intTyp = 1, $strSplitname = "");
+    public function sendFileNewDestination(
+        $strSource,
+        $strDestination,
+        $strMD5 = "",
+        $intTyp = 1,
+        $strSplitname = ""
+    ): bool;
 
     /**
      * Import files from temp folder to the target source. If we have tl_files the system
@@ -240,7 +262,7 @@ interface IClient
      *
      * @return array Return a array with information from the client.
      */
-    public function runFileImport($arrFileList, $blnIsDbafs);
+    public function runFileImport(array $arrFileList, bool $blnIsDbafs): array;
 
     /**
      * Update the DBAFS
@@ -249,7 +271,7 @@ interface IClient
      *
      * @return mixed
      */
-    public function updateDbafs($arrFileList);
+    public function updateDbafs(array $arrFileList);
 
     /**
      * Delete files
@@ -260,7 +282,7 @@ interface IClient
      *
      * @return array Return a array with information from the client.
      */
-    public function deleteFiles($arrFileList, $blnIsDbafs);
+    public function deleteFiles(array $arrFileList, bool $blnIsDbafs): array;
 
     /**
      * Build splitfiles back to one big file
@@ -275,7 +297,7 @@ interface IClient
      *
      * @return mixed
      */
-    public function buildSingleFile($strSplitname, $intSplitcount, $strMovepath, $strMD5);
+    public function buildSingleFile(string $strSplitname, int $intSplitcount, string $strMovepath, string $strMD5);
 
     /**
      * Build splitfiles back to one big file
@@ -290,7 +312,7 @@ interface IClient
      *
      * @return mixed
      */
-    public function runSplitFiles($strSrcFile, $strDesFolder, $strDesFile, $intSizeLimit);
+    public function runSplitFiles(string $strSplitname, int $intSplitcount, string $strMovepath, string $strMD5);
 
     /**
      * Get a file
@@ -303,7 +325,7 @@ interface IClient
      *
      * @throws \Exception
      */
-    public function getFile($strPath, $strSavePath);
+    public function getFile(string $strPath, string $strSavePath);
 
     /**
      * Get a list or a string with path information from
@@ -313,7 +335,7 @@ interface IClient
      *
      * @return mixed
      */
-    public function getPathList($strName = null);
+    public function getPathList(string $strName = '');
 
     /**
      * Get for a list of files the DBAFS information. If the file in not in the DBAFS
@@ -323,7 +345,7 @@ interface IClient
      *
      * @return array Return the file list with the information from the dbafs.
      */
-    public function getDbafsInformationFor($arrFiles);
+    public function getDbafsInformationFor(array $arrFiles);
 
     /* -------------------------------------------------------------------------
      * Database Operations

@@ -28,6 +28,45 @@ class PathBuilder
     protected $pathParts = array();
 
     /**
+     * Standardize path for folder
+     * No TL_ROOT, No starting /
+     *
+     * @return string the normalized path
+     */
+    public function standardizePath()
+    {
+        $arrPath = func_get_args();
+
+        if (empty($arrPath)) {
+            return "";
+        }
+
+        $arrReturn = array();
+
+        foreach ($arrPath as $itPath) {
+            // Make all directory separator to one type.
+            $itPath = str_replace('\\', '/', $itPath);
+            // Replace some chars.
+            $itPath = preg_replace('?^' . str_replace('\\', '\\\\', TL_ROOT) . '?i', '', $itPath);
+            // Explode all elements.
+            $itPath = explode('/', $itPath);
+
+            // Run each part and check some none valid elements.
+            foreach ($itPath as $itFolder) {
+                // Remove all elements we don't want.
+                if ($itFolder === '' || $itFolder === null || $itFolder == "." || $itFolder == "..") {
+                    continue;
+                }
+
+                $arrReturn[] = $itFolder;
+            }
+        }
+
+        // Build the new path. Use the system directory separator.
+        return implode(DIRECTORY_SEPARATOR, $arrReturn);
+    }
+
+    /**
      * Add a path part to the system.
      *
      * @param string|array $path
@@ -78,7 +117,7 @@ class PathBuilder
     {
         // Build the path.
         $return = (($withTlRoot) ? TL_ROOT . DIRECTORY_SEPARATOR : '')
-                  . implode(DIRECTORY_SEPARATOR, $this->pathParts);
+            . implode(DIRECTORY_SEPARATOR, $this->pathParts);
 
         // Reset the array.
         $this->pathParts = array();

@@ -4,14 +4,7 @@ services:
     arguments:
       - "@database_connection"
 
-  MenAtWork\SyncCto\Services\RunnerDataFactory:
+  MenAtWork\SyncCto\Services\SyncDataFactory:
     public: true
     arguments:
       - "@session"
-      - '@=service(''contao.framework'').getAdapter(''Contao\\StringUtil'')'
-
-  MenAtWork\SyncCto\Services\ContentDataFactory:
-    public: true
-    arguments:
-      - "@session"
-      - '@=service(''contao.framework'').getAdapter(''Contao\\StringUtil'')'

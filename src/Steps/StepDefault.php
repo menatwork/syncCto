@@ -1,74 +1,73 @@
-<?php
+<?php declare(strict_types=1);
 
 
 namespace MenAtWork\SyncCto\Steps;
 
-use MenAtWork\SyncCto\Clients\IClient;
+use MenAtWork\SyncCto\StepHandling\SyncDataContainer;
+use SyncCtoEnum;
 
 abstract class StepDefault implements IStep
 {
     /**
-     * @var ContentData
+     * @var SyncDataContainer
      */
-    protected $frontendContainer;
+    protected SyncDataContainer $syncDataContainer;
 
     /**
-     * @var StepData
+     * @var array
      */
-    protected $stepContainer;
+    protected array $syncSettings;
 
     /**
      * @inheritDoc
      */
-    public function setFrontendContainer(ContentData $container)
+    public function setSyncContainer(SyncDataContainer $container): void
     {
-        $this->frontendContainer = $container;
+        $this->syncDataContainer = $container;
     }
 
     /**
      * @inheritDoc
      */
-    public function setStepContainer(StepData $container)
+    public function setSyncSettings(array $syncSettings): void
     {
-        $this->stepContainer = $container;
+        $this->syncSettings = $syncSettings;
+    }
+
+    /**
+     * This little helper will reset all the states back to normal.
+     *
+     * @return void
+     */
+    protected function resetRunState(): void
+    {
+        $this->syncDataContainer->setStateRefresh(true);
+        $this->syncDataContainer->setStateFinished(false);
+        $this->syncDataContainer->setStateError(false);
+        $this->syncDataContainer->setErrorMessage('');
+    }
+
+    /**
+     * Something bad happen so stop the run here.
+     *
+     * @param string $errorMessage The error message.
+     *
+     * @return void
+     */
+    protected function setErrorState(string $errorMessage): void
+    {
+        $this->syncDataContainer->setStateRefresh(false);
+        $this->syncDataContainer->setStateFinished(false);
+        $this->syncDataContainer->setStateError(true);
+        $this->syncDataContainer->setErrorMessage($errorMessage);
+
+        $this->syncDataContainer->setStepState(SyncCtoEnum::WORK_ERROR);
     }
 
     /**
      * @inheritDoc
      */
-    public function beforeSyncStart()
-    {
-        return;
-    }
-
-    /**
-     * @inheritDoc
-     */
-    public function afterSyncFinished()
-    {
-        return;
-    }
-
-    /**
-     * @inheritDoc
-     */
-    public function afterSyncAbort()
-    {
-        return;
-    }
-
-    /**
-     * @inheritDoc
-     */
-    public function beforeRun()
-    {
-        return;
-    }
-
-    /**
-     * @inheritDoc
-     */
-    public function afterRun()
+    public function beforeSyncStart(): void
     {
         return;
     }
@@ -76,7 +75,7 @@ abstract class StepDefault implements IStep
     /**
      * @inheritDoc
      */
-    public function mustRun()
+    public function afterSyncFinished(): void
     {
         return;
     }
@@ -84,10 +83,42 @@ abstract class StepDefault implements IStep
     /**
      * @inheritDoc
      */
-    abstract public function setupStep();
+    public function afterSyncAbort(): void
+    {
+        return;
+    }
 
     /**
      * @inheritDoc
      */
-    abstract public function run($sourceClient, $destinationClient);
+    public function beforeRun(): void
+    {
+        return;
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function afterRun(): void
+    {
+        return;
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function mustRun(): bool
+    {
+        return true;
+    }
+
+    /**
+     * @inheritDoc
+     */
+    abstract public function setupStep(): void;
+
+    /**
+     * @inheritDoc
+     */
+    abstract public function run($sourceClient, $destinationClient): void;
 }

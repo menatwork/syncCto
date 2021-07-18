@@ -16,8 +16,8 @@ use \Contao\System;
 use \MenAtWork\SyncCto\Services\ClientFactory;
 use MenAtWork\SyncCto\Services\ContentDataFactory;
 use MenAtWork\SyncCto\Services\RunnerDataFactory;
-use MenAtWork\SyncCto\Steps\Runner;
-use MenAtWork\SyncCto\Steps\StepData;
+use MenAtWork\SyncCto\Services\SyncDataFactory;
+use MenAtWork\SyncCto\StepHandling\Runner;
 
 /**
  * Class for client interaction
@@ -57,14 +57,9 @@ class SyncCtoModuleClient extends \Contao\BackendModule
     private $clientFactory;
 
     /**
-     * @var ContentDataFactory
+     * @var SyncDataFactory
      */
-    private $contentDataFactory;
-
-    /**
-     * @var RunnerDataFactory
-     */
-    private $runnerDataFactory;
+    private $syncDataFactory;
 
     /**
      * @var Runner
@@ -99,9 +94,8 @@ class SyncCtoModuleClient extends \Contao\BackendModule
         System::loadLanguageFile('tl_syncCto_steps');
         System::loadLanguageFile('tl_syncCto_check');
 
-        $this->clientFactory      = System::getContainer()->get(ClientFactory::class);
-        $this->contentDataFactory = System::getContainer()->get(ContentDataFactory::class);
-        $this->runnerDataFactory  = System::getContainer()->get(RunnerDataFactory::class);
+        $this->clientFactory   = System::getContainer()->get(ClientFactory::class);
+        $this->syncDataFactory = System::getContainer()->get(SyncDataFactory::class);
     }
 
     /**
@@ -230,34 +224,36 @@ class SyncCtoModuleClient extends \Contao\BackendModule
         }
 
         if (0 == $step) {
-            $step      = 1;
             $url       = sprintf(
                 'contao/main.php?do=synccto_clients&amp;table=tl_syncCto_clients_syncTo&amp;act=start&amp;id=%s',
                 $clientId
             );
             $goBackUrl = \Environment::get('base') . "contao/main.php?do=synccto_clients";
 
-            $contentContainer = $this->contentDataFactory->createNewContainer();
-            $contentContainer->setError(false);
-            $contentContainer->setErrorMessage('');
-            $contentContainer->setAbort(false);
-            $contentContainer->setFinished(false);
-            $contentContainer->setRefresh(false);
-            $contentContainer->setUrl($url);
-            $contentContainer->setGoBack($goBackUrl);
-            $contentContainer->setHeadline($GLOBALS['TL_LANG']['tl_syncCto_sync']['edit'] ?? '');
-            $contentContainer->setInformation('');
-            $contentContainer->setStep($step);
-            $contentContainer->setStart(microtime(true));
+            $syncContainer = $this->syncDataFactory->createNewContainer();
+            $syncContainer
+                ->setStart(microtime(true))
+                ->setStep(1)
+                ->setUrl($url)
+                ->setGoBack($goBackUrl)
+                ->setHeadline($GLOBALS['TL_LANG']['tl_syncCto_sync']['edit'] ?? '')
+                ->setStateError(false)
+                ->setStateAbort(false)
+                ->setStateFinished(false)
+                ->setStateRefresh(true)
+                ->setErrorMessage('')
+                ->setInformation('');
+
 
             $this->resetClientInformation($clientId);
         } else {
-            $contentContainer = $this->contentDataFactory->loadContainer();
+            $syncContainer = $this->syncDataFactory->loadContainer();
             $this->loadClientInformation($clientId);
         }
 
-        $this->runner->setContentData($contentContainer);
         $this->loadSyncSettings($clientId);
+        $syncContainer->setSyncSettings($this->syncSettings);
+        $this->runner->setSyncData($syncContainer);
     }
 
     /**
@@ -265,7 +261,7 @@ class SyncCtoModuleClient extends \Contao\BackendModule
      */
     private function endRun(int $clientId): void
     {
-        $this->contentDataFactory->saveContainer($this->runner->getContentData());
+        $this->syncDataFactory->saveContainer($this->runner->getSyncData());
         $this->saveSyncSettings($clientId);
         $this->saveClientInformation($clientId);
     }
@@ -276,30 +272,14 @@ class SyncCtoModuleClient extends \Contao\BackendModule
     private function setTemplateVars()
     {
         // Controlling and links.
-        $this->Template->showControl    = true;
-        $this->Template->tryAgainLink   = \Environment::get('requestUri') . (($this->allMode) ? '&mode=all' : '');
-        $this->Template->abortLink      = \Environment::get('requestUri') . "&abort=true" . (($this->allMode) ? '&mode=all' : '');
-        $this->Template->nextClientLink = \Environment::get('requestUri') . "&abort=true" . (($this->allMode) ? '&mode=all&next=1' : '');
-
+        $contentData                       = $this->runner->getSyncData();
+        $this->Template->showControl       = true;
+        $this->Template->tryAgainLink      = \Environment::get('requestUri') . (($this->allMode) ? '&mode=all' : '');
+        $this->Template->abortLink         = \Environment::get('requestUri') . "&abort=true" . (($this->allMode) ? '&mode=all' : '');
+        $this->Template->nextClientLink    = \Environment::get('requestUri') . "&abort=true" . (($this->allMode) ? '&mode=all&next=1' : '');
         $this->Template->sourceClient      = $this->runner->getSource()->getTitle();
         $this->Template->destinationClient = $this->runner->getDestination()->getTitle();
-
-        $this->Template->frontendData = $this->runner->getContentData();
-        $this->Template->steps        = $this->runner->getContentData()->getAllStepContent();
-
-        $contentData            = $this->runner->getContentData();
-        $this->Template->goBack = $contentData->getGoBack();
-        $this->Template->data   = $contentData->getAllStepContent();
-//        $this->Template->subStep     = $this->objStepPool->step;
-        $this->Template->error       = $contentData->isError();
-        $this->Template->error_msg   = $contentData->getErrorMessage();
-        $this->Template->refresh     = $contentData->isRefresh();
-        $this->Template->url         = $contentData->getUrl();
-        $this->Template->start       = $contentData->getStart();
-        $this->Template->headline    = $contentData->getHeadline();
-        $this->Template->information = $contentData->getInformation();
-        $this->Template->finished    = $contentData->isFinished();
-        $this->Template->allMode     = false; // TODO
+        $this->Template->syncData          = $contentData;
     }
 }
 

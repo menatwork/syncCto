@@ -82,13 +82,13 @@ class ClientFactory
 
         $client->setTitle($clientData['title']);
 
-        $strUrl = $clientData['address'] . ":" . $clientData['port'] ?? 80 . '/ctoCommunication';
+        $strUrl = $clientData['address'] . ":" . ($clientData['port'] ?? 80) . '/ctoCommunication';
         $client->setUrl($strUrl);
         $client->setPort($clientData['port']);
         $client->setApiKey($clientData['apikey']);
         $client->setCodifyEngine($clientData['codifyengine']);
         if (true == $clientData['http_auth']) {
-            $client->setHttpAuth($clientData['http_username'], $clientData->http_password);
+            $client->setHttpAuth($clientData['http_username'], $clientData['http_password']);
         }
 
         // Set debug modus for ctoCom.

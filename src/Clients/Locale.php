@@ -14,86 +14,65 @@ class Locale implements ILocal
     /**
      * @inheritDoc
      */
-    public function startConnection()
+    public function startConnection(): void
     {
-        // TODO: Implement startConnection() method.
+        // Nothing to do for local.
     }
 
     /**
      * @inheritDoc
      */
-    public function referrerDisable()
+    public function referrerEnable(): bool
     {
-        // TODO: Implement referrerDisable() method.
+        return true;
     }
 
     /**
      * @inheritDoc
      */
-    public function referrerEnable()
+    public function referrerDisable(): bool
     {
-        // TODO: Implement referrerEnable() method.
+        return true;
     }
 
     /**
      * @inheritDoc
      */
-    public function getVersionSyncCto()
-    {
-        // TODO: Implement getVersionSyncCto() method.
-    }
-
-    /**
-     * @inheritDoc
-     */
-    public function getVersionContao()
-    {
-        // TODO: Implement getVersionContao() method.
-    }
-
-    /**
-     * @inheritDoc
-     */
-    public function getVersionCtoCommunication()
-    {
-        // TODO: Implement getVersionCtoCommunication() method.
-    }
-
-    /**
-     * @inheritDoc
-     */
-    public function getClientParameter()
-    {
-        // TODO: Implement getClientParameter() method.
-    }
-
-    /**
-     * @inheritDoc
-     */
-    public function getPurgData()
-    {
-        // TODO: Implement getPurgData() method.
-    }
-
-    /**
-     * @inheritDoc
-     */
-    public function setAttentionFlag($booState)
+    public function setAttentionFlag(bool $booState)
     {
         // TODO: Implement setAttentionFlag() method.
     }
 
-    /**
-     * @inheritDoc
-     */
-    public function setDisplayErrors($booState)
+    public function setDisplayErrors(bool $booState)
     {
         // TODO: Implement setDisplayErrors() method.
     }
 
-    /**
-     * @inheritDoc
-     */
+    public function getVersionSyncCto(): string
+    {
+        // TODO: Implement getVersionSyncCto() method.
+    }
+
+    public function getVersionContao(): string
+    {
+        // TODO: Implement getVersionContao() method.
+    }
+
+    public function getVersionCtoCommunication(): string
+    {
+        // TODO: Implement getVersionCtoCommunication() method.
+    }
+
+    public function getClientParameter(): array
+    {
+        // TODO: Implement getClientParameter() method.
+    }
+
+    public function getPurgData(): array
+    {
+        // TODO: Implement getPurgData() method.
+    }
+
     public function purgeTempFolder()
     {
         // TODO: Implement purgeTempFolder() method.
@@ -104,177 +83,116 @@ class Locale implements ILocal
         // TODO: Implement purgeTempTables() method.
     }
 
-    /**
-     * @inheritDoc
-     */
     public function purgeCache()
     {
         // TODO: Implement purgeCache() method.
     }
 
-    /**
-     * @inheritDoc
-     */
     public function createCache()
     {
         // TODO: Implement createCache() method.
     }
 
-    /**
-     * @inheritDoc
-     */
-    public function runMaintenance($arrSettings)
+    public function runMaintenance($arrSettings): bool
     {
         // TODO: Implement runMaintenance() method.
     }
 
-    /**
-     * @inheritDoc
-     */
-    public function runFinalOperations()
+    public function runFinalOperations(): array
     {
         // TODO: Implement runFinalOperations() method.
     }
 
-    /**
-     * @inheritDoc
-     */
-    public function runCecksumCompare($arrChecksumList, $blnDisableDbafsConflicts = false)
+    public function runCecksumCompare(array $arrChecksumList, $blnDisableDbafsConflicts = false): array
     {
         // TODO: Implement runCecksumCompare() method.
     }
 
-    /**
-     * @inheritDoc
-     */
-    public function getChecksumFiles($arrFileList = null)
+    public function getChecksumFiles($arrFileList = [])
     {
         // TODO: Implement getChecksumFiles() method.
     }
 
-    /**
-     * @inheritDoc
-     */
     public function getChecksumCore()
     {
         // TODO: Implement getChecksumCore() method.
     }
 
-    /**
-     * @inheritDoc
-     */
     public function getChecksumFolderCore()
     {
         // TODO: Implement getChecksumFolderCore() method.
     }
 
-    /**
-     * @inheritDoc
-     */
     public function getChecksumFolderFiles()
     {
         // TODO: Implement getChecksumFolderFiles() method.
     }
 
-    /**
-     * @inheritDoc
-     */
-    public function checkDeleteFiles($arrChecksumList)
+    public function checkDeleteFiles(array $arrFilelist): array
     {
         // TODO: Implement checkDeleteFiles() method.
     }
 
-    /**
-     * @inheritDoc
-     */
-    public function searchDeleteFolders($arrChecksumList)
+    public function searchDeleteFolders(array $arrFilelist)
     {
         // TODO: Implement searchDeleteFolders() method.
     }
 
-    /**
-     * @inheritDoc
-     */
-    public function sendFile($strFolder, $strFile, $strMD5 = "", $intTyp = 1, $strSplitname = "")
+    public function sendFile($strFolder, string $strFile, $strMD5 = "", $intTyp = 1, $strSplitname = ""): bool
     {
         // TODO: Implement sendFile() method.
     }
 
-    /**
-     * @inheritDoc
-     */
-    public function sendFileNewDestination($strSource, $strDestination, $strMD5 = "", $intTyp = 1, $strSplitname = "")
-    {
+    public function sendFileNewDestination(
+        $strSource,
+        $strDestination,
+        $strMD5 = "",
+        $intTyp = 1,
+        $strSplitname = ""
+    ): bool {
         // TODO: Implement sendFileNewDestination() method.
     }
 
-    /**
-     * @inheritDoc
-     */
-    public function runFileImport($arrFileList, $blnIsDbafs)
+    public function runFileImport(array $arrFileList, bool $blnIsDbafs): array
     {
         // TODO: Implement runFileImport() method.
     }
 
-    /**
-     * @inheritDoc
-     */
-    public function updateDbafs($arrFileList)
+    public function updateDbafs(array $arrFileList)
     {
         // TODO: Implement updateDbafs() method.
     }
 
-    /**
-     * @inheritDoc
-     */
-    public function deleteFiles($arrFileList, $blnIsDbafs)
+    public function deleteFiles(array $arrFileList, bool $blnIsDbafs): array
     {
         // TODO: Implement deleteFiles() method.
     }
 
-    /**
-     * @inheritDoc
-     */
-    public function buildSingleFile($strSplitname, $intSplitcount, $strMovepath, $strMD5)
+    public function buildSingleFile(string $strSplitname, int $intSplitcount, string $strMovepath, string $strMD5)
     {
         // TODO: Implement buildSingleFile() method.
     }
 
-    /**
-     * @inheritDoc
-     */
-    public function runSplitFiles($strSrcFile, $strDesFolder, $strDesFile, $intSizeLimit)
+    public function runSplitFiles(string $strSplitname, int $intSplitcount, string $strMovepath, string $strMD5)
     {
         // TODO: Implement runSplitFiles() method.
     }
 
-    /**
-     * @inheritDoc
-     */
-    public function getFile($strPath, $strSavePath)
+    public function getFile(string $strPath, string $strSavePath)
     {
         // TODO: Implement getFile() method.
     }
 
-    /**
-     * @inheritDoc
-     */
-    public function getPathList($strName = null)
+    public function getPathList(string $strName = '')
     {
         // TODO: Implement getPathList() method.
     }
 
-    /**
-     * @inheritDoc
-     */
-    public function getDbafsInformationFor($arrFiles)
+    public function getDbafsInformationFor(array $arrFiles)
     {
         // TODO: Implement getDbafsInformationFor() method.
     }
 
-    /**
-     * @inheritDoc
-     */
     public function runSQLImport($filename, $additionalSQL)
     {
         // TODO: Implement runSQLImport() method.
@@ -285,123 +203,73 @@ class Locale implements ILocal
         // TODO: Implement runDatabaseDump() method.
     }
 
-    /**
-     * @inheritDoc
-     */
     public function dropTable($arrTables, $blnBackup)
     {
         // TODO: Implement dropTable() method.
     }
 
-    /**
-     * @inheritDoc
-     */
     public function executeSQL($arrSQL)
     {
         // TODO: Implement executeSQL() method.
     }
 
-    /**
-     * @inheritDoc
-     */
     public function getRecommendedTables()
     {
         // TODO: Implement getRecommendedTables() method.
     }
 
-    /**
-     * @inheritDoc
-     */
     public function getNoneRecommendedTables()
     {
         // TODO: Implement getNoneRecommendedTables() method.
     }
 
-    /**
-     * @inheritDoc
-     */
     public function getHiddenTables()
     {
         // TODO: Implement getHiddenTables() method.
     }
 
-    /**
-     * @inheritDoc
-     */
     public function getPreparedHiddenTablesPlaceholder()
     {
         // TODO: Implement getPreparedHiddenTablesPlaceholder() method.
     }
 
-    /**
-     * @inheritDoc
-     */
     public function getTablesHash($tables)
     {
         // TODO: Implement getTablesHash() method.
     }
 
-    /**
-     * @inheritDoc
-     */
     public function runLocalConfigImport()
     {
         // TODO: Implement runLocalConfigImport() method.
     }
 
-    /**
-     * @inheritDoc
-     */
     public function getLocalConfig()
     {
         // TODO: Implement getLocalConfig() method.
     }
 
-    /**
-     * @inheritDoc
-     */
     public function getPhpFunctions()
     {
         // TODO: Implement getPhpFunctions() method.
     }
 
-    /**
-     * @inheritDoc
-     */
     public function getProFunctions()
     {
         // TODO: Implement getProFunctions() method.
     }
 
-    /**
-     * @inheritDoc
-     */
     public function getPhpConfigurations()
     {
         // TODO: Implement getPhpConfigurations() method.
     }
 
-    /**
-     * @inheritDoc
-     */
     public function getExtendedInformation($strDateFormate)
     {
         // TODO: Implement getExtendedInformation() method.
     }
 
-    /**
-     * @inheritDoc
-     */
     public function createPathconfig()
     {
         // TODO: Implement createPathconfig() method.
-    }
-
-    /**
-     * @inheritDoc
-     */
-    public function startAutoUpdater($strZipPath)
-    {
-        // TODO: Implement startAutoUpdater() method.
     }
 }

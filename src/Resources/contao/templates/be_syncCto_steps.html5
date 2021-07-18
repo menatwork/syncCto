@@ -1,9 +1,10 @@
 <?php
-use MenAtWork\SyncCto\Steps\ContentData;
-use MenAtWork\SyncCto\Steps\StepData;
 
-/** @var ContentData $frontendData */
-$frontendData = $this->frontendData;
+use MenAtWork\SyncCto\StepHandling\SyncDataContainer;
+use MenAtWork\SyncCto\StepHandling\StepData;
+
+/** @var SyncDataContainer $syncData */
+$syncData = $this->syncData;
 ?>
 
 <div id="tl_buttons">
@@ -11,27 +12,28 @@ $frontendData = $this->frontendData;
        accesskey="b"
        title="<?= $GLOBALS['TL_LANG']['MSC']['backBT']; ?>"
        class="header_back"
-       href="<?= $frontendData->getGoBack(); ?>">
+       href="<?= $syncData->getGoBack(); ?>">
         <?= $GLOBALS['TL_LANG']['MSC']['backBT']; ?>
     </a>
 </div>
 
 <h2 class="sub_headline">
-    <?= $frontendData->getHeadline(); ?> <?= $this->sourceClient ?> -> <?= $this->destinationClient ?>
+    <?= $syncData->getHeadline(); ?> <?= $this->sourceClient ?> -> <?= $this->destinationClient ?>
 </h2>
 
 <div class="tl_formbody_edit synccto_steps">
-    <?php if (strlen($frontendData->getInformation()) != 0): ?>
-        <p class="info tl_info"><?= $frontendData->getInformation(); ?></p>
+    <?php if (strlen($syncData->getInformation()) != 0): ?>
+        <p class="info tl_info"><?= $syncData->getInformation(); ?></p>
     <?php endif; ?>
 
     <?php
     $i = 0;
     /**
-     * @var int $key
+     * @var int      $key
      * @var StepData $step
      */
-    foreach ($this->steps as $key => $step): $i++; ?>
+    foreach ($syncData as $key => $step): dump($key, $step);
+        $i++; ?>
         <div class="<?= ($key == 1) ? "tl_tbox" : "tl_box"; ?> block">
             <h3 id="step<?= $key; ?>" class="headline">
                 <img src="bundles/synccto/images/steps/icon<?= $step->getState(); ?>.gif" alt=""/>
@@ -47,15 +49,16 @@ $frontendData = $this->frontendData;
         </div>
     <?php endforeach; ?>
 
-    <?php if ($frontendData->isRefresh() == true && $frontendData->isError() == false && $frontendData->isFinished() == false): ?>
+    <?php if ($syncData->isStateRefresh() == true && $syncData->isStateError() == false && $syncData->isStateFinished() == false): ?>
         <meta http-equiv="refresh"
-              content="1; URL=<?= $this->Environment->base; ?><?= $frontendData->getUrl(); ?>&amp;step=<?=  $frontendData->getStep() ?>"/>
+              content="100;
+              URL=<?= $this->Environment->base; ?><?= $syncData->getUrl(); ?>&amp;step=<?= $syncData->getStep() ?>"/>
     <?php endif; ?>
 
-    <?php if ($frontendData->isError()) : ?>
+    <?php if ($syncData->isStateError()) : ?>
         <div class="tl_box block">
             <h4><?= $GLOBALS['TL_LANG']['MSC']['error']; ?></h4>
-            <p class="tl_help"><?= $frontendData->getErrorMessage(); ?></p>
+            <p class="tl_help"><?= $syncData->getErrorMessage(); ?></p>
         </div>
     <?php endif; ?>
 
@@ -64,11 +67,11 @@ $frontendData = $this->frontendData;
             <h3><?= $GLOBALS['TL_LANG']['MSC']['debug_mode']; ?></h3>
             <p class="debug tl_help">
                 <?= vsprintf($GLOBALS['TL_LANG']['MSC']['run_time'],
-                    array(number_format(microtime(true) - $frontendData->getStart(), 2))); ?><br/>
+                    array(number_format(microtime(true) - $syncData->getStart(), 2))); ?><br/>
                 <?= vsprintf($GLOBALS['TL_LANG']['MSC']['memory_limit'],
                     array($this->getReadableSize(memory_get_peak_usage(true)))); ?><br/><br/>
-                <?= $GLOBALS['TL_LANG']['MSC']['step']; ?>: <?= $frontendData->getStep(); ?><br/>
-<!--                --><?//= $GLOBALS['TL_LANG']['MSC']['substep']; ?><!--: --><?//= $this->subStep; ?>
+                <?= $GLOBALS['TL_LANG']['MSC']['step']; ?>: <?= $syncData->getStep(); ?><br/>
+                <?= $GLOBALS['TL_LANG']['MSC']['substep']; ?>: <?= $syncData->getSubStep(); ?>
             </p>
         </div>
     <?php endif; ?>

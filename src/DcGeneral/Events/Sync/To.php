@@ -15,6 +15,7 @@ use Contao\System;
 use ContaoCommunityAlliance\DcGeneral\Contao\View\Contao2BackendView\Event\GetEditModeButtonsEvent;
 use ContaoCommunityAlliance\DcGeneral\Data\ModelId;
 use ContaoCommunityAlliance\DcGeneral\Event\PrePersistModelEvent;
+use MenAtWork\SyncCto\Contao\API;
 use RuntimeException;
 use MenAtWork\SyncCto\DcGeneral\Events\Base;
 use SyncCtoHelper;
@@ -144,68 +145,70 @@ class To extends Base
      */
     protected function runSync($arrData)
     {
-        $id                           = ModelId::fromSerialized(\Input::get('id'));
-        $arrSyncSettings              = array();
-        $arrSyncSettings["post_data"] = $arrData;
-
-        // Automode off.
-        $arrSyncSettings["automode"] = false;
+        $arrSyncSettings = [
+            'post_data'                            => $arrData,
+            'automode'                             => false,
+            'syncCto_Type'                         => [],
+            'syncCto_SyncDatabase'                 => false,
+            'syncCto_SyncTlFiles'                  => false,
+            'syncCto_Systemoperations_Maintenance' => [],
+            'syncCto_AttentionFlag'                => false,
+            'syncCto_ShowError'                    => false,
+            'run_id'                               => uniqid('sync.runner.to:', false)
+        ];
 
         // Synchronization type.
         if (isset($arrData['sync_options'])) {
             $arrSyncSettings["syncCto_Type"] = $arrData['sync_options'];
-        } else {
-            $arrSyncSettings["syncCto_Type"] = array();
         }
 
         // Database.
         if (isset($arrData['database_check'])) {
             $arrSyncSettings["syncCto_SyncDatabase"] = true;
-        } else {
-            $arrSyncSettings["syncCto_SyncDatabase"] = false;
         }
 
         // Database - tl_files
         if (isset($arrData['tl_files_check'])) {
             $arrSyncSettings["syncCto_SyncTlFiles"] = true;
-        } else {
-            $arrSyncSettings["syncCto_SyncTlFiles"] = false;
         }
 
         // Systemoperation execute.
         if (isset($arrData['systemoperations_check']) && isset($arrData['systemoperations_maintenance'])) {
             $arrSyncSettings["syncCto_Systemoperations_Maintenance"] = $arrData['systemoperations_maintenance'];
-        } else {
-            $arrSyncSettings["syncCto_Systemoperations_Maintenance"] = array();
         }
 
         // Attention flag.
         if (isset($arrData['attentionFlag'])) {
             $arrSyncSettings["syncCto_AttentionFlag"] = true;
-        } else {
-            $arrSyncSettings["syncCto_AttentionFlag"] = false;
         }
 
         // Error msg.
         if (isset($arrData['localconfig_error'])) {
             $arrSyncSettings["syncCto_ShowError"] = true;
-        } else {
-            $arrSyncSettings["syncCto_ShowError"] = false;
         }
 
         // Save Session.
-        $session = \Contao\System::getContainer()->get('session');
-        $session->set("syncCto_SyncSettings_" . $id->getId(), $arrSyncSettings);
+        $id = ModelId::fromSerialized(\Input::get('id'));
+        API::setSessionData(
+            \sprintf(
+                'syncCto_SyncSettings_%s',
+                $id->getId()
+            ),
+            $arrSyncSettings
+        );
 
         // Check the vars.
-        $this->objSyncCtoHelper->checkSubmit(array(
-            'postUnset'   => array('start_sync'),
-            'error'       => array(
-                'key'     => 'syncCto_submit_false',
-                'message' => $GLOBALS['TL_LANG']['ERR']['no_functions']
-            ),
-            'redirectUrl' => \Environment::get('base') . "contao/main.php?do=synccto_clients&amp;table=tl_syncCto_clients_syncTo&amp;act=start&amp;step=0&amp;id=" . $id->getId()
-        ),
+        $this->objSyncCtoHelper->checkSubmit(
+            [
+                'postUnset'   => ['start_sync'],
+                'error'       =>
+                    [
+                        'key'     => 'syncCto_submit_false',
+                        'message' => $GLOBALS['TL_LANG']['ERR']['no_functions']
+                    ],
+                'redirectUrl' => \Environment::get('base') .
+                    "contao/main.php?do=synccto_clients&amp;table=tl_syncCto_clients_syncTo&amp;act=start&amp;step=0&amp;id=" . $id->getId()
+            ],
             $arrSyncSettings
         );
     }

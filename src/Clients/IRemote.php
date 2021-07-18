@@ -1,9 +1,12 @@
-<?php
-
+<?php declare(strict_types=1);
 
 namespace MenAtWork\SyncCto\Clients;
 
-
+/**
+ * Interface IRemote
+ *
+ * @package MenAtWork\SyncCto\Clients
+ */
 interface IRemote extends IClient
 {
     /**
@@ -36,6 +39,7 @@ interface IRemote extends IClient
 
     /**
      * @param string $http_username
+     *
      * @param string $http_password
      *
      * @return \MenAtWork\SyncCto\Clients\IRemote

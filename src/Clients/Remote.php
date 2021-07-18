@@ -140,7 +140,7 @@ class Remote implements IRemote
     /**
      * @inheritDoc
      */
-    public function startConnection()
+    public function startConnection(): void
     {
         // Check if we have the client if so run.
         if ($this->client === null) {
@@ -157,7 +157,7 @@ class Remote implements IRemote
     /**
      * @inheritDoc
      */
-    public function referrerDisable()
+    public function referrerDisable(): bool
     {
         return $this->run("CTOCOM_REFERRER_DISABLE");
     }
@@ -165,7 +165,7 @@ class Remote implements IRemote
     /**
      * @inheritDoc
      */
-    public function referrerEnable()
+    public function referrerEnable(): bool
     {
         return $this->run("CTOCOM_REFERRER_ENABLE");
     }
@@ -177,7 +177,7 @@ class Remote implements IRemote
     /**
      * @inheritDoc
      */
-    public function getVersionSyncCto()
+    public function getVersionSyncCto(): string
     {
         return $this->run("SYNCCTO_VERSION");
     }
@@ -185,7 +185,7 @@ class Remote implements IRemote
     /**
      * @inheritDoc
      */
-    public function getVersionContao()
+    public function getVersionContao(): string
     {
         return $this->run("CONTAO_VERSION");
     }
@@ -193,7 +193,7 @@ class Remote implements IRemote
     /**
      * @inheritDoc
      */
-    public function getVersionCtoCommunication()
+    public function getVersionCtoCommunication(): string
     {
         return $this->run("CTOCOM_VERSION");
     }
@@ -201,7 +201,7 @@ class Remote implements IRemote
     /**
      * @inheritDoc
      */
-    public function getClientParameter()
+    public function getClientParameter(): array
     {
         return $this->run("SYNCCTO_PARAMETER");
     }
@@ -209,7 +209,7 @@ class Remote implements IRemote
     /**
      * @inheritDoc
      */
-    public function getPurgData()
+    public function getPurgData(): array
     {
         return $this->run("SYNCCTO_GET_PURGEDATA");
     }
@@ -217,7 +217,7 @@ class Remote implements IRemote
     /**
      * @inheritDoc
      */
-    public function setAttentionFlag($booState)
+    public function setAttentionFlag(bool $booState)
     {
         $arrData = array(
             array(
@@ -232,7 +232,7 @@ class Remote implements IRemote
     /**
      * @inheritDoc
      */
-    public function setDisplayErrors($booState)
+    public function setDisplayErrors(bool $booState)
     {
         $arrData = array(
             array(
@@ -283,7 +283,7 @@ class Remote implements IRemote
     /**
      * @inheritDoc
      */
-    public function runMaintenance($arrSettings)
+    public function runMaintenance($arrSettings): bool
     {
         $arrData = array(
             array(
@@ -298,7 +298,7 @@ class Remote implements IRemote
     /**
      * @inheritDoc
      */
-    public function runFinalOperations()
+    public function runFinalOperations(): array
     {
         return $this->run("SYNCCTO_EXECUTE_FINAL_OPERATIONS");
     }
@@ -310,7 +310,7 @@ class Remote implements IRemote
     /**
      * @inheritDoc
      */
-    public function runCecksumCompare($arrChecksumList, $blnDisableDbafsConflicts = false)
+    public function runCecksumCompare(array $arrChecksumList, $blnDisableDbafsConflicts = false): array
     {
         if (!is_array($arrChecksumList)) {
             throw new Exception("File list is not a array.");
@@ -394,7 +394,7 @@ class Remote implements IRemote
     /**
      * @inheritDoc
      */
-    public function checkDeleteFiles($arrChecksumList)
+    public function checkDeleteFiles(array $arrFilelist): array
     {
         if (!is_array($arrChecksumList)) {
             throw new Exception("Filelist is not a array.");
@@ -428,7 +428,7 @@ class Remote implements IRemote
     /**
      * @inheritDoc
      */
-    public function searchDeleteFolders($arrChecksumList)
+    public function searchDeleteFolders(array $arrFilelist)
     {
         if (!is_array($arrChecksumList)) {
             throw new Exception("Filelist is not a array.");
@@ -462,7 +462,7 @@ class Remote implements IRemote
     /**
      * @inheritDoc
      */
-    public function sendFile($strFolder, $strFile, $strMD5 = "", $intTyp = 1, $strSplitname = "")
+    public function sendFile($strFolder, string $strFile, $strMD5 = "", $intTyp = 1, $strSplitname = ""): bool
     {
         // 5 min. time out.
         @set_time_limit(3600);
@@ -511,8 +511,13 @@ class Remote implements IRemote
     /**
      * @inheritDoc
      */
-    public function sendFileNewDestination($strSource, $strDestination, $strMD5 = "", $intTyp = 1, $strSplitname = "")
-    {
+    public function sendFileNewDestination(
+        $strSource,
+        $strDestination,
+        $strMD5 = "",
+        $intTyp = 1,
+        $strSplitname = ""
+    ): bool {
         // 5 min. time out.
         @set_time_limit(3600);
 
@@ -561,7 +566,7 @@ class Remote implements IRemote
     /**
      * @inheritDoc
      */
-    public function runFileImport($arrFileList, $blnIsDbafs)
+    public function runFileImport(array $arrFileList, bool $blnIsDbafs): array
     {
         $arrData = array(
             array(
@@ -580,7 +585,7 @@ class Remote implements IRemote
     /**
      * @inheritDoc
      */
-    public function updateDbafs($arrFileList)
+    public function updateDbafs(array $arrFileList)
     {
         $arrData = array(
             array(
@@ -595,7 +600,7 @@ class Remote implements IRemote
     /**
      * @inheritDoc
      */
-    public function deleteFiles($arrFileList, $blnIsDbafs)
+    public function deleteFiles(array $arrFileList, bool $blnIsDbafs): array
     {
         $arrData = array(
             array(
@@ -614,7 +619,7 @@ class Remote implements IRemote
     /**
      * @inheritDoc
      */
-    public function buildSingleFile($strSplitname, $intSplitcount, $strMovepath, $strMD5)
+    public function buildSingleFile(string $strSplitname, int $intSplitcount, string $strMovepath, string $strMD5)
     {
         $arrData = array(
             array(
@@ -641,7 +646,7 @@ class Remote implements IRemote
     /**
      * @inheritDoc
      */
-    public function runSplitFiles($strSrcFile, $strDesFolder, $strDesFile, $intSizeLimit)
+    public function runSplitFiles(string $strSplitname, int $intSplitcount, string $strMovepath, string $strMD5)
     {
         $arrData = array(
             array(
@@ -668,7 +673,7 @@ class Remote implements IRemote
     /**
      * @inheritDoc
      */
-    public function getFile($strPath, $strSavePath)
+    public function getFile(string $strPath, string $strSavePath)
     {
         $arrData = array(
             array(
@@ -704,7 +709,7 @@ class Remote implements IRemote
     /**
      * @inheritDoc
      */
-    public function getDbafsInformationFor($arrFiles)
+    public function getDbafsInformationFor(array $arrFiles)
     {
         $arrData = array(
             array(
