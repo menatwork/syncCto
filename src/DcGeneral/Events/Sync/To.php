@@ -103,13 +103,17 @@ class To extends Base
             \Message::addInfo($strLastSync);
         }
 
+        $backendUser          = BackendUser::getInstance();
+        $groupRightForceFiles = $backendUser->syncCto_hide_auto_sync;
+
+        $buttons = [];
+        $buttons['start_sync'] = '<input type="submit" name="start_sync" id="start_sync" class="tl_submit" accesskey="s" value="' . specialchars($GLOBALS['TL_LANG']['MSC']['sync']) . '" />';
+        if($groupRightForceFiles != true){
+            $buttons['start_sync_all'] =  '<input type="submit" name="start_sync_all" id="start_sync_all" class="tl_submit" accesskey="o" value="' . specialchars($GLOBALS['TL_LANG']['MSC']['syncAll']) . '" />';
+        }
+
         // Set buttons.
-        $objEvent->setButtons(array
-            (
-                'start_sync'     => '<input type="submit" name="start_sync" id="start_sync" class="tl_submit" accesskey="s" value="' . specialchars($GLOBALS['TL_LANG']['MSC']['sync']) . '" />',
-                'start_sync_all' => '<input type="submit" name="start_sync_all" id="start_sync_all" class="tl_submit" accesskey="o" value="' . specialchars($GLOBALS['TL_LANG']['MSC']['syncAll']) . '" />'
-            )
-        );
+        $objEvent->setButtons($buttons);
     }
 
     /**

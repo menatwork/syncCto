@@ -11,6 +11,7 @@
 
 namespace MenAtWork\SyncCto\DcGeneral\Events\Sync;
 
+use Contao\BackendUser;
 use ContaoCommunityAlliance\DcGeneral\Contao\View\Contao2BackendView\Event\GetEditModeButtonsEvent;
 use ContaoCommunityAlliance\DcGeneral\Data\ModelId;
 use ContaoCommunityAlliance\DcGeneral\Event\PrePersistModelEvent;
@@ -60,7 +61,7 @@ class From extends Base
         if (file_exists(TL_ROOT . $strInitFilePath)) {
             $strFile        = new \File($strInitFilePath);
             $arrFileContent = $strFile->getContentAsArray();
-            foreach ($arrFileContent AS $strContent) {
+            foreach ($arrFileContent as $strContent) {
                 if (!preg_match("/(\/\*|\*|\*\/|\/\/)/", $strContent)) {
                     //system/tmp.
                     if (preg_match("/system\/tmp/", $strContent)) {
@@ -73,13 +74,13 @@ class From extends Base
 
         // Update a field with last sync information
         $objSyncTime = \Database::getInstance()
-            ->prepare("SELECT cl.syncFrom_tstamp as syncFrom_tstamp, user.name as syncFrom_user, user.username as syncFrom_alias
+                                ->prepare("SELECT cl.syncFrom_tstamp as syncFrom_tstamp, user.name as syncFrom_user, user.username as syncFrom_alias
                          FROM tl_synccto_clients as cl
                          INNER JOIN tl_user as user
                          ON cl.syncTo_user = user.id
                          WHERE cl.id = ?")
-            ->limit(1)
-            ->execute(\Input::get("id"));
+                                ->limit(1)
+                                ->execute(\Input::get("id"));
 
         if ($objSyncTime->syncFrom_tstamp != 0 && strlen($objSyncTime->syncFrom_user) != 0 && strlen($objSyncTime->syncFrom_alias) != 0) {
             $strLastSync = vsprintf($GLOBALS['TL_LANG']['MSC']['last_sync'], array(
@@ -94,13 +95,17 @@ class From extends Base
             \Message::addInfo($strLastSync);
         }
 
+        $backendUser          = BackendUser::getInstance();
+        $groupRightForceFiles = $backendUser->syncCto_hide_auto_sync;
+
+        $buttons               = [];
+        $buttons['start_sync'] = '<input type="submit" name="start_sync" id="start_sync" class="tl_submit" accesskey="s" value="' . specialchars($GLOBALS['TL_LANG']['MSC']['sync']) . '" />';
+        if ($groupRightForceFiles != true) {
+            $buttons['start_sync_all'] = '<input type="submit" name="start_sync_all" id="start_sync_all" class="tl_submit" accesskey="o" value="' . specialchars($GLOBALS['TL_LANG']['MSC']['syncAll']) . '" />';
+        }
+
         // Set buttons.
-        $objEvent->setButtons(array
-            (
-                'start_sync'     => '<input type="submit" name="start_sync" id="start_sync" class="tl_submit" accesskey="s" value="' . specialchars($GLOBALS['TL_LANG']['MSC']['sync']) . '" />',
-                'start_sync_all' => '<input type="submit" name="start_sync_all" id="start_sync_all" class="tl_submit" accesskey="o" value="' . specialchars($GLOBALS['TL_LANG']['MSC']['syncAll']) . '" />'
-            )
-        );
+        $objEvent->setButtons($buttons);
     }
 
     /**

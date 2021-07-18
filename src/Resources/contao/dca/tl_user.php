@@ -21,7 +21,7 @@ foreach (['extend', 'custom'] as $palette) {
     $parts = explode(';', $GLOBALS['TL_DCA']['tl_user']['palettes'][$palette]);
     if (is_array($parts)) {
         \array_insert($parts, (count($parts) - 1), [
-            '{syncCto_legend},syncCto_clients,syncCto_clients_p,syncCto_sync_options,syncCto_force_dbafs_overwrite',
+            '{syncCto_legend},syncCto_clients,syncCto_clients_p,syncCto_sync_options,syncCto_force_dbafs_overwrite,syncCto_hide_auto_sync',
             '{syncCto_tables_legend},syncCto_tables'
         ]);
         $GLOBALS['TL_DCA']['tl_user']['palettes'][$palette] = implode(';', $parts);
@@ -33,6 +33,13 @@ foreach (['extend', 'custom'] as $palette) {
  */
 $GLOBALS['TL_DCA']['tl_user']['fields']['syncCto_force_dbafs_overwrite'] = [
     'label'     => &$GLOBALS['TL_LANG']['tl_user']['syncCto_force_dbafs_overwrite'],
+    'exclude'   => true,
+    'inputType' => 'checkbox',
+    'sql'       => 'varchar(1)'
+];
+
+$GLOBALS['TL_DCA']['tl_user']['fields']['syncCto_hide_auto_sync'] = [
+    'label'     => &$GLOBALS['TL_LANG']['tl_user']['syncCto_hide_auto_sync'],
     'exclude'   => true,
     'inputType' => 'checkbox',
     'sql'       => 'varchar(1)'
