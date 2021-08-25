@@ -285,7 +285,7 @@ class FilePopupController
         if (strlen($strContent) == 0) {
             $this->arrListFile = [];
         } else {
-            $this->arrListFile = unserialize($strContent);
+            $this->arrListFile = \Contao\StringUtil::deserialize($strContent);
         }
 
         $objCompareList = new File($this->objSyncCtoHelper->standardizePath($GLOBALS['SYC_PATH']['tmp'],
@@ -294,7 +294,7 @@ class FilePopupController
         if (strlen($strContent) == 0) {
             $this->arrListCompare = [];
         } else {
-            $this->arrListCompare = unserialize($strContent);
+            $this->arrListCompare = \Contao\StringUtil::deserialize($strContent);
         }
     }
 
@@ -308,10 +308,12 @@ class FilePopupController
         $objFileList = new File($this->objSyncCtoHelper->standardizePath($GLOBALS['SYC_PATH']['tmp'],
             "syncfilelist-ID-" . $this->intClientID . ".txt"));
         $objFileList->write(serialize($this->arrListFile));
+        $objFileList->close();
 
         $objCompareList = new File($this->objSyncCtoHelper->standardizePath($GLOBALS['SYC_PATH']['tmp'],
             "synccomparelist-ID-" . $this->intClientID . ".txt"));
         $objCompareList->write(serialize($this->arrListCompare));
+        $objCompareList->close();
     }
 
     /**
