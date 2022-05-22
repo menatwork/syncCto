@@ -45,6 +45,16 @@ class SyncCtoHelper
     protected $arrSearch = array("\\", ".", "^", "?", "*", "/");
     protected $arrReplace = array("\\\\", "\\.", "\\^", ".?", ".*", "\\/");
 
+    /**
+     * @var string
+     */
+    protected $strTop;
+
+    /**
+     * @var string
+     */
+    protected $strBottom;
+
     /* -------------------------------------------------------------------------
      * Core
      */
@@ -335,8 +345,10 @@ class SyncCtoHelper
 
     public function getBlacklistFolder()
     {
-        $arrLocalconfig   = deserialize($GLOBALS['TL_CONFIG']['syncCto_folder_blacklist']);
-        $arrSyncCtoConfig = $GLOBALS['SYC_CONFIG']['folder_blacklist'];
+        $arrLocalconfig   = (isset($GLOBALS['TL_CONFIG']['syncCto_folder_blacklist']))
+            ? deserialize($GLOBALS['TL_CONFIG']['syncCto_folder_blacklist'])
+            : [];
+        $arrSyncCtoConfig = $GLOBALS['SYC_CONFIG']['folder_blacklist'] ?? [];
 
         return $this->mergeConfigs($arrLocalconfig, $arrSyncCtoConfig);
     }
@@ -353,7 +365,9 @@ class SyncCtoHelper
 
     public function getBlacklistFile()
     {
-        $arrLocalconfig   = deserialize($GLOBALS['TL_CONFIG']['syncCto_file_blacklist']);
+        $arrLocalconfig   = (isset($GLOBALS['TL_CONFIG']['syncCto_file_blacklist']))
+            ? deserialize($GLOBALS['TL_CONFIG']['syncCto_file_blacklist'])
+            : [];
         $arrSyncCtoConfig = $GLOBALS['SYC_CONFIG']['file_blacklist'];
 
         return $this->mergeConfigs($arrLocalconfig, $arrSyncCtoConfig);
@@ -371,7 +385,9 @@ class SyncCtoHelper
 
     public function getWhitelistFolder()
     {
-        $arrLocalconfig   = deserialize($GLOBALS['TL_CONFIG']['syncCto_folder_whitelist']);
+        $arrLocalconfig   = isset($GLOBALS['TL_CONFIG']['syncCto_folder_whitelist'])
+            ? deserialize($GLOBALS['TL_CONFIG']['syncCto_folder_whitelist'])
+            : [];
         $arrSyncCtoConfig = $GLOBALS['SYC_CONFIG']['folder_whitelist'];
 
         return $this->mergeConfigs($arrLocalconfig, $arrSyncCtoConfig);
@@ -379,7 +395,9 @@ class SyncCtoHelper
 
     public function getBlacklistLocalconfig()
     {
-        $arrLocalconfig   = deserialize($GLOBALS['TL_CONFIG']['syncCto_local_blacklist']);
+        $arrLocalconfig   = (isset($GLOBALS['TL_CONFIG']['syncCto_local_blacklist']))
+            ? deserialize($GLOBALS['TL_CONFIG']['syncCto_local_blacklist'])
+            : [];
         $arrSyncCtoConfig = $GLOBALS['SYC_CONFIG']['local_blacklist'];
 
         return $this->mergeConfigs($arrLocalconfig, $arrSyncCtoConfig);
@@ -387,7 +405,9 @@ class SyncCtoHelper
 
     public function getTablesHidden()
     {
-        $arrLocalconfig   = deserialize($GLOBALS['TL_CONFIG']['syncCto_hidden_tables']);
+        $arrLocalconfig   = (isset($GLOBALS['TL_CONFIG']['syncCto_hidden_tables']))
+            ? deserialize($GLOBALS['TL_CONFIG']['syncCto_hidden_tables'])
+            : [];
         $arrSyncCtoConfig = $GLOBALS['SYC_CONFIG']['table_hidden'];
 
         return $this->mergeConfigs($arrLocalconfig, $arrSyncCtoConfig);
@@ -403,12 +423,13 @@ class SyncCtoHelper
         $arrReturn = array();
 
         // Get the entries from the loclconfig and add them to the list.
-        $arrHiddenTableConfig = deserialize($GLOBALS['TL_CONFIG']['syncCto_hidden_tables_placeholder']);
-        if(is_array($arrHiddenTableConfig) && count($arrHiddenTableConfig) != 0)
-        {
-            foreach ($arrHiddenTableConfig as$value)
-            {
-                $arrReturn[] =  $value['entries'];
+        $arrHiddenTableConfig = (isset($GLOBALS['TL_CONFIG']['syncCto_hidden_tables_placeholder']))
+            ? deserialize($GLOBALS['TL_CONFIG']['syncCto_hidden_tables_placeholder'])
+            : [];
+
+        if (is_array($arrHiddenTableConfig) && count($arrHiddenTableConfig) != 0) {
+            foreach ($arrHiddenTableConfig as $value) {
+                $arrReturn[] = $value['entries'];
             }
         }
 
@@ -563,20 +584,29 @@ class SyncCtoHelper
      */
     public function checkLockStatus($strContent, $strTemplate)
     {
-        if ($strTemplate == 'be_main' && $GLOBALS['TL_CONFIG']['syncCto_attentionFlag'] == true)
-        {
+        if ($strTemplate == 'be_main'
+            && isset($GLOBALS['TL_CONFIG']['syncCto_attentionFlag'])
+            && $GLOBALS['TL_CONFIG']['syncCto_attentionFlag'] == true
+        ) {
             $objTemplate = new BackendTemplate("be_syncCto_attention");
 
             preg_match('/<div.*id=\"header\".*>/i', $strContent, $arrHeader);
-            preg_match('{<div\s+id="header"\s*>((?:(?:(?!<div[^>]*>|</div>).)++|<div[^>]*>(?1)</div>)*)</div>}si', $strContent, $arrInnderDiv);
+            preg_match(
+                '{<div\s+id="header"\s*>((?:(?:(?!<div[^>]*>|</div>).)++|<div[^>]*>(?1)</div>)*)</div>}si'
+                , $strContent,
+                $arrInnderDiv
+            );
             $strNew        = $arrHeader[0] . $arrInnderDiv[1] . $objTemplate->parse() . '</div>';
-            $strNewContent = preg_replace('{<div\s+id="header"\s*>((?:(?:(?!<div[^>]*>|</div>).)++|<div[^>]*>(?1)</div>)*)</div>}si', $strNew, $strContent, 1);
-            if ($strNewContent == "" && $arrInnderDiv[1] != '' && $arrHeader[0] != '')
-            {
+            $strNewContent = preg_replace(
+                '{<div\s+id="header"\s*>((?:(?:(?!<div[^>]*>|</div>).)++|<div[^>]*>(?1)</div>)*)</div>}si',
+                $strNew,
+                $strContent,
+                1
+            );
+
+            if ($strNewContent == "" && $arrInnderDiv[1] != '' && $arrHeader[0] != '') {
                 return $strContent;
-            }
-            else
-            {
+            } else {
                 $strContent = $strNewContent;
             }
         }

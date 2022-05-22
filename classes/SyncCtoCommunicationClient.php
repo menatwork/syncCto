@@ -71,7 +71,7 @@ class SyncCtoCommunicationClient extends \MenAtWork\CtoCommunicationBundle\Contr
     public function setClientBy($id)
     {
         // Load Client from database
-        $objClient = \Database::getInstance()->prepare("SELECT * FROM tl_synccto_clients WHERE id = %s")
+        $objClient = \Database::getInstance()->prepare("SELECT * FROM tl_synccto_clients WHERE id = ?")
             ->limit(1)
             ->execute((int)$id);
 
@@ -91,13 +91,24 @@ class SyncCtoCommunicationClient extends \MenAtWork\CtoCommunicationBundle\Contr
         }
 
         // Set debug modus for ctoCom.
-        if ($GLOBALS['TL_CONFIG']['syncCto_debug_mode'] == true)
-        {
+        if (isset($GLOBALS['TL_CONFIG']['syncCto_debug_mode'])
+            && $GLOBALS['TL_CONFIG']['syncCto_debug_mode'] == true
+        ) {
             $this->setDebug(true);
             $this->setMeasurement(true);
 
-            $this->setFileDebug($this->objSyncCtoHelper->standardizePath($GLOBALS['SYC_PATH']['debug'], "CtoComDebug.txt"));
-            $this->setFileMeasurement($this->objSyncCtoHelper->standardizePath($GLOBALS['SYC_PATH']['debug'], "CtoComMeasurement.txt"));
+            $this->setFileDebug(
+                $this->objSyncCtoHelper->standardizePath(
+                    $GLOBALS['SYC_PATH']['debug'],
+                    "CtoComDebug.txt"
+                )
+            );
+            $this->setFileMeasurement(
+                $this->objSyncCtoHelper->standardizePath(
+                    $GLOBALS['SYC_PATH']['debug'],
+                    "CtoComMeasurement.txt"
+                )
+            );
         }
 
         $this->arrClientData = array(
