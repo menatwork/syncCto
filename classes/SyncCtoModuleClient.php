@@ -4993,16 +4993,17 @@ class SyncCtoModuleClient extends \BackendModule
      */
     static public function parseSize($size)
     {
-        if (!is_int($size)) {
-            $size = (int)$size;
+        if (!is_string($size)) {
+            $size = (string) $size;
         }
 
-        if ($size == -1) {
+        if ((int) $size === -1) {
             return PHP_INT_MAX;
         }
 
         $size = trim($size);
         $last = strtolower($size[strlen($size) - 1]);
+        $size = (int) $size;
         switch ($last) {
             // The 'G' modifier is available since PHP 5.1.0
             case 'g':
