@@ -330,7 +330,9 @@ $GLOBALS['SYC_CONFIG']['file_blacklist'] = array_merge((array)$GLOBALS['SYC_CONF
     'TL_ROOT/.htaccess',
     'TL_ROOT/.htpasswd',
     'TL_ROOT/composer*',
-    '.DS_Store'
+    '.DS_Store',
+    '.public',
+    '.nosync'
 ));
 
 // Local config
