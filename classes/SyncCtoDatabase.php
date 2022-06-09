@@ -1181,8 +1181,6 @@ class SyncCtoDatabase extends \Backend
             $arrSourceTS,
             $arrDesTS,
             $arrAllowedTables,
-            null,
-            null,
             $strSrcName,
             $strDesName
         );
