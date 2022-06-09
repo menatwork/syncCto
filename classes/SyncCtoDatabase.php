@@ -926,9 +926,13 @@ class SyncCtoDatabase extends \Backend
                 $interactiveTimeout = max($interactiveTimeout, intval($GLOBALS['TL_CONFIG']['syncCto_interactive_timeout']));
             }
 
-            \Database::getInstance()
-                ->prepare('SET SESSION wait_timeout = ?,SESSION interactive_timeout = ?;')
-                ->execute(intval($waitTimeOut), intval($interactiveTimeout));
+            \Database::getInstance()->query(
+                sprintf(
+                    'SET SESSION wait_timeout = %s,SESSION interactive_timeout = %s;',
+                    intval($waitTimeOut),
+                    intval($interactiveTimeout)
+                )
+            );
 
             switch (pathinfo($strRestoreFile, PATHINFO_EXTENSION)) {
                 case "zip":
