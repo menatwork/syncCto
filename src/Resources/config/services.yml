@@ -1,1 +1,8 @@
 services:
+    _defaults:
+        autowire: true
+        autoconfigure: true
+
+    MenAtWork\SyncCto\Controller\:
+        resource: '../../Controller/'
+        tags: ['controller.service_arguments']

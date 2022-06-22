@@ -6,13 +6,13 @@
 -- * install tool to create and maintain database tables! *
 -- *                                                      *
 -- ********************************************************
- 
+
 --
 -- Table `tl_synccto_clients`
 --
 
 CREATE TABLE `tl_synccto_clients` (
-    `id` int(10) unsigned NOT NULL auto_increment,    
+    `id` int(10) unsigned NOT NULL auto_increment,
     `tstamp` int(10) unsigned NOT NULL default '0',
     `title` varchar(64) NOT NULL default '',
     `apikey` varchar(64) NOT NULL default '',
@@ -30,25 +30,25 @@ CREATE TABLE `tl_synccto_clients` (
     `client_timestamp` blob NULL,
     `server_timestamp` blob NULL,
     PRIMARY KEY  (`id`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 --
 -- Table `tl_synccto_stats`
 --
 
 CREATE TABLE `tl_synccto_stats` (
-    `id` int(10) unsigned NOT NULL auto_increment,    
+    `id` int(10) unsigned NOT NULL auto_increment,
     `tstamp` int(10) unsigned NOT NULL default '0',
     `client_id` varchar(64) NOT NULL default '',
     `sync_user` varchar(64) NOT NULL default '',
     `sync_start` int(10) unsigned NOT NULL default '0',
-    `sync_end` int(10) unsigned NOT NULL default '0',  
-    `sync_abort` int(10) unsigned NOT NULL default '0',  
-    `sync_abort_step` varchar(10) NOT NULL default '',  
-    `sync_direction` int(10) unsigned NOT NULL default '0', 
+    `sync_end` int(10) unsigned NOT NULL default '0',
+    `sync_abort` int(10) unsigned NOT NULL default '0',
+    `sync_abort_step` varchar(10) NOT NULL default '',
+    `sync_direction` int(10) unsigned NOT NULL default '0',
     `sync_options` blob NULL,
     PRIMARY KEY  (`id`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 -- --------------------------------------------------------
 
@@ -61,7 +61,7 @@ CREATE TABLE `tl_user_group` (
   `syncCto_clients_p` blob NULL,
   `syncCto_sync_options` blob NULL,
   `syncCto_tables` blob NULL
-) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 -- --------------------------------------------------------
 
@@ -75,4 +75,4 @@ CREATE TABLE `tl_user` (
   `syncCto_sync_options` blob NULL,
   `syncCto_tables` blob NULL
   `syncCto_useTranslatedNames` char(1) NOT NULL default '',
-) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
