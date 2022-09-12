@@ -283,7 +283,7 @@ class DatabasePopupController
         }
 
         // Get MM name
-        if (in_array('metamodels', Config::getActiveModules()) && preg_match("/^mm_/i", $strName)) {
+        if (in_array('metamodels', Config::getInstance()->getActiveModules()) && preg_match("/^mm_/i", $strName)) {
             try {
 //                if (!is_null(\MetaModels\Factory::byTableName($strName)))
 //                {

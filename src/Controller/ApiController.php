@@ -11,12 +11,11 @@
 
 namespace MenAtWork\SyncCto\Controller;
 
+use Contao\CoreBundle\Controller\AbstractController;
 use MenAtWork\SyncCto\Helper\Ping;
-use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\Routing\Annotation\Route;
 use SyncCtoPopupDB;
 use SyncCtoPopupFiles;
 
@@ -27,7 +26,6 @@ use SyncCtoPopupFiles;
  */
 class ApiController extends AbstractController
 {
-
     /**
      * @return Response
      */

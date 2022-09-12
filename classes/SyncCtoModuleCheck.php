@@ -492,7 +492,7 @@ class SyncCtoModuleCheck extends \Contao\BackendModule
 
     public function checkProFunctions($arrFunctions)
     {
-        $return .= '</table>';
+        $return = '</table>';
 
         $return .= '<table width="100%" cellspacing="0" cellpadding="0" class="extensions" summary="">';
         $return .= '<colgroup>';
@@ -540,7 +540,7 @@ class SyncCtoModuleCheck extends \Contao\BackendModule
 
     public function checkExtendedInformation($arrExtendedFunctions)
     {
-        $return .= '<table width="100%" cellspacing="0" cellpadding="0" class="extensions" summary="">';
+        $return = '<table width="100%" cellspacing="0" cellpadding="0" class="extensions" summary="">';
         $return .= '<colgroup>';
         $return .= '<col width="331" />';
         $return .= '<col width="*" />';

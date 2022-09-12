@@ -18,10 +18,10 @@
                 <span><?php echo vsprintf($value["title"], array($i)) ?></span>
             </h3>
             <p class="tl_help"><?php echo $value["description"]; ?></p>
-            <?php if (strlen($value["msg"])) : ?>
+            <?php if (isset($value["msg"]) && strlen($value["msg"])) : ?>
             <p class="tl_help"><?php echo $value["msg"]; ?></p>
             <?php endif; ?>
-            <?php if (strlen($value["html"]) != 0) : ?>
+            <?php if (isset($value["html"]) && strlen($value["html"]) != 0) : ?>
             <?php echo $value["html"]; ?>
             <?php endif; ?>
         </div>
@@ -33,12 +33,12 @@
 
     <?php if ($this->error) : ?>
         <div class="tl_box block">
-            <h4><?php echo $GLOBALS['TL_LANG']['MSC']['error']; ?></h4>
+            <h4><?php echo $GLOBALS['TL_LANG']['MSC']['error'] ?? 'Error'; ?></h4>
             <p class="tl_help"><?php echo $this->error_msg; ?></p>
         </div>
     <?php endif; ?>
 
-    <?php if ($GLOBALS['TL_CONFIG']['syncCto_debug_mode'] == true): ?>
+    <?php if (isset($GLOBALS['TL_CONFIG']['syncCto_debug_mode']) && $GLOBALS['TL_CONFIG']['syncCto_debug_mode'] == true): ?>
         <div class="tl_box block">
             <h3><?php echo $GLOBALS['TL_LANG']['MSC']['debug_mode']; ?></h3>
             <p class="debug tl_help">

@@ -73,7 +73,7 @@
                 <td class="<?php echo $arrCompareTable['client']['class']; ?>" title="<?php echo $arrCompareTable['client']['iname']; ?> (<?php echo $arrCompareTable['client']['tooltip']; ?>)"><?php echo $arrCompareTable['client']['tname']; ?></td>
                 <td>
                     <ul>
-                    <?php foreach(array_merge($arrCompareTable['client']['method'], $arrCompareTable['server']['method']) as $method): ?>
+                    <?php foreach(array_merge($arrCompareTable['client']['method'] ?? [], $arrCompareTable['server']['method'] ?? []) as $method): ?>
                         <li title="<?= $GLOBALS['TL_LANG']['MSC']['method'][$method][0] ?>">
                             <?= $GLOBALS['TL_LANG']['MSC']['method'][$method][1] ?>
                         </li>
@@ -84,8 +84,8 @@
         <?php endforeach; ?>
         </tbody>
         </table>
-        <?php endforeach; ?> 
-        
+        <?php endforeach; ?>
+
         <div class="bottom submit_container">
             <input class="tl_submit" name="transfer" type="submit" value="<?php echo $GLOBALS['TL_LANG']['MSC']['apply']; ?>" />
             <input class="tl_submit" name="delete" type="submit" value="<?php echo $GLOBALS['TL_LANG']['MSC']['updateRemove']; ?>" />

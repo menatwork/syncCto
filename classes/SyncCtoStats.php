@@ -144,12 +144,12 @@ class SyncCtoStats extends \Backend
     {
         // Clean sync options
         $arrSyncOptions = array();
-        if (is_array($arrOptions['post_data']) && !empty($arrOptions['post_data']))
-        {
-            foreach ($arrOptions['post_data'] as $key => $value)
-            {
-                if (in_array($key, $this->arrSkippedValues))
-                {
+        if (isset($arrOptions['post_data'])
+            && is_array($arrOptions['post_data'])
+            && !empty($arrOptions['post_data'])
+        ) {
+            foreach ($arrOptions['post_data'] as $key => $value) {
+                if (in_array($key, $this->arrSkippedValues)) {
                     continue;
                 }
 
