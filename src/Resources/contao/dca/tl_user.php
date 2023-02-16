@@ -35,14 +35,14 @@ $GLOBALS['TL_DCA']['tl_user']['fields']['syncCto_force_dbafs_overwrite'] = [
     'label'     => &$GLOBALS['TL_LANG']['tl_user']['syncCto_force_dbafs_overwrite'],
     'exclude'   => true,
     'inputType' => 'checkbox',
-    'sql'       => 'varchar(1)'
+    'sql'       => 'varchar(32)'
 ];
 
 $GLOBALS['TL_DCA']['tl_user']['fields']['syncCto_hide_auto_sync'] = [
     'label'     => &$GLOBALS['TL_LANG']['tl_user']['syncCto_hide_auto_sync'],
     'exclude'   => true,
     'inputType' => 'checkbox',
-    'sql'       => 'varchar(1)'
+    'sql'       => 'varchar(32)'
 ];
 
 $GLOBALS['TL_DCA']['tl_user']['fields']['syncCto_clients'] = array
