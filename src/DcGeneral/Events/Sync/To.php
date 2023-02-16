@@ -11,6 +11,7 @@
 
 namespace MenAtWork\SyncCto\DcGeneral\Events\Sync;
 
+use Contao\BackendUser;
 use ContaoCommunityAlliance\DcGeneral\Contao\View\Contao2BackendView\Event\GetEditModeButtonsEvent;
 use ContaoCommunityAlliance\DcGeneral\Data\ModelId;
 use ContaoCommunityAlliance\DcGeneral\Event\PrePersistModelEvent;
@@ -47,8 +48,15 @@ class To extends Base
         return 'tl_syncCto_clients_syncTo';
     }
 
+    public function preSetValues()
+    {
+
+    }
+
     /**
      * @param GetEditModeButtonsEvent $objEvent
+     *
+     * @throws \Exception
      */
     public function addButton(GetEditModeButtonsEvent $objEvent)
     {
@@ -95,13 +103,17 @@ class To extends Base
             \Message::addInfo($strLastSync);
         }
 
+        $backendUser          = BackendUser::getInstance();
+        $groupRightForceFiles = $backendUser->syncCto_hide_auto_sync;
+
+        $buttons = [];
+        $buttons['start_sync'] = '<input type="submit" name="start_sync" id="start_sync" class="tl_submit" accesskey="s" value="' . specialchars($GLOBALS['TL_LANG']['MSC']['sync']) . '" />';
+        if($groupRightForceFiles != true){
+            $buttons['start_sync_all'] =  '<input type="submit" name="start_sync_all" id="start_sync_all" class="tl_submit" accesskey="o" value="' . specialchars($GLOBALS['TL_LANG']['MSC']['syncAll']) . '" />';
+        }
+
         // Set buttons.
-        $objEvent->setButtons(array
-            (
-                'start_sync'     => '<input type="submit" name="start_sync" id="start_sync" class="tl_submit" accesskey="s" value="' . specialchars($GLOBALS['TL_LANG']['MSC']['sync']) . '" />',
-                'start_sync_all' => '<input type="submit" name="start_sync_all" id="start_sync_all" class="tl_submit" accesskey="o" value="' . specialchars($GLOBALS['TL_LANG']['MSC']['syncAll']) . '" />'
-            )
-        );
+        $objEvent->setButtons($buttons);
     }
 
     /**
@@ -125,6 +137,19 @@ class To extends Base
             }
         }
 
+        // If a special right is set the diff or the thetl_files overwrite can be forced.
+        $backendUser          = BackendUser::getInstance();
+        $groupRightForceFiles = $backendUser->syncCto_force_dbafs_overwrite;
+        $groupRightForceDiff  = $backendUser->syncCto_force_diff;
+        if($groupRightForceFiles == true || (\is_array($groupRightForceFiles) && $groupRightForceFiles[0] == true)){
+            $arrData['tl_files_check'] = true;
+        }
+
+        if($groupRightForceDiff == true || (\is_array($groupRightForceDiff) && $groupRightForceDiff[0] == true)){
+            $arrData['database_pages_check'] = true;
+        }
+
+        // Check if all or the normal sync should be running.
         if (isset($_POST['start_sync'])) {
             $this->runSync($arrData);
         } elseif (isset($_POST['start_sync_all'])) {

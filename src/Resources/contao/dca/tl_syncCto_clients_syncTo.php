@@ -60,7 +60,7 @@ $GLOBALS['TL_DCA']['tl_syncCto_clients_syncTo'] = array
                 'submitOnChange' => 'true'
             )
         ),
-        'tl_files_check'               => array
+        'tl_files_check' => array
         (
             'label'     => &$GLOBALS['TL_LANG']['tl_syncCto_clients_syncTo']['tl_files_check'],
             'inputType' => 'checkbox',
