@@ -128,7 +128,7 @@ class Ping
     {
         // Load Client from database.
         $objClient = \Database::getInstance()
-                              ->prepare('SELECT * FROM tl_synccto_clients WHERE id = %s')
+                              ->prepare('SELECT * FROM tl_synccto_clients WHERE id = ?')
                               ->limit(1)
                               ->execute($this->clientID);
 

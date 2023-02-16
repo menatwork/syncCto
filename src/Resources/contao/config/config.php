@@ -65,6 +65,45 @@ array_insert($GLOBALS['BE_MOD'], $i + 1, array
 ));
 
 /**
+ * Init the default config array if not set.
+ */
+if (!isset($GLOBALS['SYC_CONFIG'])) {
+    $GLOBALS['SYC_CONFIG'] = [];
+}
+
+if (!isset($GLOBALS['SYC_CONFIG']['mime_types'])) {
+    $GLOBALS['SYC_CONFIG']['mime_types'] = [];
+}
+
+if (!isset($GLOBALS['SYC_CONFIG']['folder_blacklist'])) {
+    $GLOBALS['SYC_CONFIG']['folder_blacklist'] = [];
+}
+
+if (!isset($GLOBALS['SYC_CONFIG']['file_blacklist'])) {
+    $GLOBALS['SYC_CONFIG']['file_blacklist'] = [];
+}
+
+if (!isset($GLOBALS['SYC_CONFIG']['local_blacklist'])) {
+    $GLOBALS['SYC_CONFIG']['local_blacklist'] = [];
+}
+
+if (!isset($GLOBALS['SYC_CONFIG']['folder_whitelist'])) {
+    $GLOBALS['SYC_CONFIG']['folder_whitelist'] = [];
+}
+
+if (!isset($GLOBALS['SYC_CONFIG']['maintance_options'])) {
+    $GLOBALS['SYC_CONFIG']['maintance_options'] = [];
+}
+
+if (!isset($GLOBALS['SYC_CONFIG']['database_mapping'])) {
+    $GLOBALS['SYC_CONFIG']['database_mapping'] = [];
+}
+
+if (!isset($GLOBALS['SYC_CONFIG']['syncCto_folder_blacklist'])) {
+    $GLOBALS['SYC_CONFIG']['syncCto_folder_blacklist'] = '';
+}
+
+/**
  * Mime types
  */
 $GLOBALS['SYC_CONFIG']['mime_types'] = array_merge((array)$GLOBALS['SYC_CONFIG']['mime_types'],
@@ -232,7 +271,9 @@ if ($strDo == 'synccto_clients' && $strAct != 'start' && in_array($strTable, arr
 /**
  * Include attention CSS
  */
-if ($GLOBALS['TL_CONFIG']['syncCto_attentionFlag'] == true) {
+if (isset($GLOBALS['TL_CONFIG']['syncCto_attentionFlag'])
+    && $GLOBALS['TL_CONFIG']['syncCto_attentionFlag'] == true
+) {
     $GLOBALS['TL_CSS'][] = 'bundles/synccto/css/attention.css';
 }
 
@@ -247,7 +288,11 @@ $GLOBALS['SYC_SIZE']['limit_ignore'] = 838860800;
  */
 
 // Add some files to the blacklist for the DBAFS from contao.
-$arrFileSyncExclude                      = trimsplit(',', $GLOBALS['TL_CONFIG']['fileSyncExclude']);
+if (isset($GLOBALS['TL_CONFIG']['fileSyncExclude'])) {
+    $arrFileSyncExclude = trimsplit(',', $GLOBALS['TL_CONFIG']['fileSyncExclude']);
+} else {
+    $arrFileSyncExclude = [];
+}
 $arrFileSyncExclude[]                    = 'syncCto_backups/debug';
 $GLOBALS['TL_CONFIG']['fileSyncExclude'] = implode(',', $arrFileSyncExclude);
 
@@ -287,7 +332,9 @@ $GLOBALS['SYC_CONFIG']['file_blacklist'] = array_merge((array)$GLOBALS['SYC_CONF
     'TL_ROOT/.htaccess',
     'TL_ROOT/.htpasswd',
     'TL_ROOT/composer*',
-    '.DS_Store'
+    '.DS_Store',
+    '.public',
+    '.nosync'
 ));
 
 // Local config
@@ -316,8 +363,8 @@ $GLOBALS['SYC_CONFIG']['folder_whitelist'] = array_merge((array)$GLOBALS['SYC_CO
  * Sync options
  */
 // Core ! The core isn't possible since we have a compser system. We have to rewrite some functions here first.
-$GLOBALS['SYC_CONFIG']['sync_options']['core'][] =  'core_change';
-$GLOBALS['SYC_CONFIG']['sync_options']['core'][] =  'core_delete';
+$GLOBALS['SYC_CONFIG']['sync_options']['core'][] = 'core_change';
+$GLOBALS['SYC_CONFIG']['sync_options']['core'][] = 'core_delete';
 // User
 $GLOBALS['SYC_CONFIG']['sync_options']['user'][] = 'user_change';
 $GLOBALS['SYC_CONFIG']['sync_options']['user'][] = 'user_delete';

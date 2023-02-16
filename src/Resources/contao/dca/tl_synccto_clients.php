@@ -256,7 +256,8 @@ class tl_synccto_clients extends Backend
      * @param type $icon
      * @param type $attributes
      * @param type $operations
-     * @return type
+     *
+     * @return string
      */
     public function checkPermissionClientButton($row, $href, $label, $title, $icon, $attributes, $operations)
     {
@@ -313,6 +314,7 @@ class tl_synccto_clients extends Backend
             $tableName = sprintf('tl_syncCto_clients_%s', $operations);
             $strIdName = 'id';
         } else {
+            $tableName = '';
             $strIdName = 'id';
         }
 
@@ -341,7 +343,13 @@ class tl_synccto_clients extends Backend
             }
             else
             {
-                return '<a href="' . $this->addToUrl($href . '&amp;' . $strIdName . '=' . $this->getID($row['id'], $tableName)) . '" title="' . specialchars($title) . '"' . $attributes . '>' . $this->generateImage($icon, $label) . '</a> ';
+                return \sprintf(
+                    '<a href="%s" title="%s" %s>%s</a> ',
+                    $this->addToUrl($href . '&amp;' . $strIdName . '=' . $this->getID($row['id'], $tableName)),
+                    specialchars($title),
+                    $attributes,
+                    $this->generateImage($icon, $label)
+                );
             }
         }
         else if (preg_match("/\.png/i", $icon))

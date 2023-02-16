@@ -174,11 +174,11 @@ class ZipArchiveCto extends ZipArchive
      * </p>
      * @return bool true on success or false on failure.
      */
-    public function addFile($filename, $localname = null, $start = 0, $length = 0)
+    public function addFile(string $filename, string $localname = null, int $start = 0, int $length = 0, int $flags = 0): int
     {
         $filename = TL_ROOT . "/" . $filename;
 
-        return parent::addFile($filename, $localname, $start, $length);
+        return parent::addFile($filename, $localname, $start, $length, $flags);
     }
 
     /**

@@ -335,16 +335,23 @@ class SyncCtoModuleClient extends \BackendModule
         $interactiveTimeout = $tmpResult->iTimeout;
 
         //overwrite the default values if higher ones are defined in the settings
-        if ($GLOBALS['TL_CONFIG']['syncCto_custom_settings'] == true && intval($GLOBALS['TL_CONFIG']['syncCto_wait_timeout']) > 0 &&
-            intval($GLOBALS['TL_CONFIG']['syncCto_interactive_timeout']) > 0
+        if (isset($GLOBALS['TL_CONFIG']['syncCto_custom_settings'])
+            && $GLOBALS['TL_CONFIG']['syncCto_custom_settings'] == true
+            && ((int)$GLOBALS['TL_CONFIG']['syncCto_wait_timeout']) > 0
+            && ((int)$GLOBALS['TL_CONFIG']['syncCto_interactive_timeout']) > 0
         ) {
-            $waitTimeOut        = max($waitTimeOut, intval($GLOBALS['TL_CONFIG']['syncCto_wait_timeout']));
-            $interactiveTimeout = max($interactiveTimeout, intval($GLOBALS['TL_CONFIG']['syncCto_interactive_timeout']));
+            $waitTimeOut        = max($waitTimeOut, (int) $GLOBALS['TL_CONFIG']['syncCto_wait_timeout']);
+            $interactiveTimeout = max($interactiveTimeout, (int) $GLOBALS['TL_CONFIG']['syncCto_interactive_timeout']);
         }
 
         \Database::getInstance()
-            ->prepare('SET SESSION wait_timeout = ?,SESSION interactive_timeout = ?;')
-            ->execute(intval($waitTimeOut), intval($interactiveTimeout));
+                 ->prepare('SET SESSION wait_timeout = CONVERT(?, SIGNED), SESSION interactive_timeout = CONVERT(?, SIGNED);')
+                 ->execute(
+                     [
+                         (int)$waitTimeOut,
+                         (int)$interactiveTimeout
+                     ]
+                 );
 
         if (\Input::get("abort") == "true") {
             // Load content from session
@@ -4986,12 +4993,17 @@ class SyncCtoModuleClient extends \BackendModule
      */
     static public function parseSize($size)
     {
-        if ($size == -1) {
+        if (!is_string($size)) {
+            $size = (string) $size;
+        }
+
+        if ((int) $size === -1) {
             return PHP_INT_MAX;
         }
 
         $size = trim($size);
         $last = strtolower($size[strlen($size) - 1]);
+        $size = (int) $size;
         switch ($last) {
             // The 'G' modifier is available since PHP 5.1.0
             case 'g':
