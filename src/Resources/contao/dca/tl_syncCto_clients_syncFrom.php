@@ -53,7 +53,7 @@ $GLOBALS['TL_DCA']['tl_syncCto_clients_syncFrom'] = array
     (
         'sync_options'                 => array
         (
-            'label'            => $GLOBALS['TL_LANG']['tl_syncCto_clients_syncFrom']['sync_options'],
+            'label'            => &$GLOBALS['TL_LANG']['tl_syncCto_clients_syncFrom']['sync_options'],
             'inputType'        => 'checkbox',
             'exclude'          => true,
             'reference'        => &$GLOBALS['TL_LANG']['SYC'],

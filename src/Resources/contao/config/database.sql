@@ -50,29 +50,3 @@ CREATE TABLE `tl_synccto_stats` (
     PRIMARY KEY  (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
--- --------------------------------------------------------
-
---
--- Table `tl_user_group`
---
-
-CREATE TABLE `tl_user_group` (
-  `syncCto_clients` blob NULL,
-  `syncCto_clients_p` blob NULL,
-  `syncCto_sync_options` blob NULL,
-  `syncCto_tables` blob NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
-
--- --------------------------------------------------------
-
---
--- Table `tl_user_group`
---
-
-CREATE TABLE `tl_user` (
-  `syncCto_clients` blob NULL,
-  `syncCto_clients_p` blob NULL,
-  `syncCto_sync_options` blob NULL,
-  `syncCto_tables` blob NULL
-  `syncCto_useTranslatedNames` char(1) NOT NULL default '',
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;

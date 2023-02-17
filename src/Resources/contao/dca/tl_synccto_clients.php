@@ -37,7 +37,7 @@ $GLOBALS['TL_DCA']['tl_synccto_clients'] = array
         'label' => array
         (
             'fields'              => array('title', 'id', 'address', 'port', 'id'),
-            'format'              => '<img class="ping" src="bundles/synccto/images/js/gray.png" alt="" /> %s <span style="color: #aaaaaa; padding-left: 3px;">(' . $GLOBALS['TL_LANG']['tl_syncCto_clients']['id'][0] . ': %s, ' . $GLOBALS['TL_LANG']['tl_syncCto_clients']['address'][0] . ': <span title="%s:%s">[URL]</span><span class="client-id invisible">%s</span>)</span>',
+            'format'              => '<img class="ping" src="bundles/synccto/images/js/gray.png" alt="" /> %s <span style="color: #aaaaaa; padding-left: 3px;">(' . ($GLOBALS['TL_LANG']['tl_syncCto_clients']['id'][0] ?? '') . ': %s, ' . ($GLOBALS['TL_LANG']['tl_syncCto_clients']['address'][0] ?? '') . ': <span title="%s:%s">[URL]</span><span class="client-id invisible">%s</span>)</span>',
             'label_callback'      => array('tl_synccto_clients', 'setLabel')
         ),
         'global_operations' => array
@@ -78,7 +78,7 @@ $GLOBALS['TL_DCA']['tl_synccto_clients'] = array
                 'label'           => &$GLOBALS['TL_LANG']['tl_syncCto_clients']['delete'],
                 'href'            => 'act=delete',
                 'icon'            => 'delete.gif',
-                'attributes'      => 'onclick="if (!confirm(\'' . $GLOBALS['TL_LANG']['MSC']['deleteConfirm'] . '\')) return false; Backend.getScrollOffset();"',
+                'attributes'      => 'onclick="if (!confirm(\'' . ($GLOBALS['TL_LANG']['MSC']['deleteConfirm'] ?? '') . '\')) return false; Backend.getScrollOffset();"',
                 'button_callback' => array('tl_synccto_clients', 'checkPermission_client_delete'),
             ),
             'showExtern' => array
@@ -93,7 +93,7 @@ $GLOBALS['TL_DCA']['tl_synccto_clients'] = array
                 'label'           => &$GLOBALS['TL_LANG']['tl_syncCto_clients']['syncFrom'],
                 'href'            => '&table=tl_syncCto_clients_syncFrom&act=startSync',
                 'icon'            => 'bundles/synccto/images/nav/iconSyncFrom.png',
-                'attributes'      => 'onclick="if (!confirm(\'' . $GLOBALS['TL_LANG']['tl_syncCto_clients']['syncFromConfirm'] . '\')) return false; Backend.getScrollOffset();"',
+                'attributes'      => 'onclick="if (!confirm(\'' . ($GLOBALS['TL_LANG']['tl_syncCto_clients']['syncFromConfirm'] ?? '') . '\')) return false; Backend.getScrollOffset();"',
                 'button_callback' => array('tl_synccto_clients', 'checkPermission_client_syncFrom'),
             ),
             'syncTo' => array
@@ -411,7 +411,7 @@ class tl_synccto_clients extends Backend
         $GLOBALS['TL_DCA']['tl_synccto_clients']['list']['sorting']['root'] = $root;
 
         $table = $this->Input->get('table');
-		$table = str_replace('tl_syncCto_clients_', '', $table);		
+		$table = str_replace('tl_syncCto_clients_', '', $table);
         if ($this->objBackendUser->hasAccess($table, 'syncCto_clients_p') == true || strlen($this->Input->get('act')) == 0)
         {
             return;
