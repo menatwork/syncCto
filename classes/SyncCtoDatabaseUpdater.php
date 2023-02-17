@@ -102,7 +102,11 @@ class SyncCtoDatabaseUpdater extends \Database\Installer
 
             foreach ($this->arrError as $key => $value)
             {
-                $strError .= sprintf("%i. %s. | ", $key + 1, $value['error']);
+                if (is_int($key)) {
+                    $strError .= sprintf("%i. %s. | ", ((int)$key) + 1, $value['error']);
+                } else {
+                    $strError .= sprintf("%s. %s. | ", $key, $value['error']);
+                }
             }
 
             throw new Exception('There was an error on updating the database: ' . $strError);
