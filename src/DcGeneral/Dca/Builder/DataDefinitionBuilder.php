@@ -53,7 +53,14 @@ class DataDefinitionBuilder extends DcaReadingDataDefinitionBuilder
 
         // Check if we have to force the file overwrite.
         if (
-            ($groupRightForceFiles == true || (\is_array($groupRightForceFiles) && $groupRightForceFiles[0] == true))
+            (
+                $groupRightForceFiles == true
+                || (
+                        \is_array($groupRightForceFiles)
+                        && !empty($groupRightForceFiles[0])
+                        && $groupRightForceFiles[0] == true
+                )
+            )
             && $palettesDefinition
             && $palettesDefinition->hasLegend('table')
             && $palettesDefinition->getLegend('table')->hasProperty('tl_files_check')

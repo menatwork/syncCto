@@ -43,7 +43,8 @@ $GLOBALS['TL_DCA']['tl_user_group']['fields']['syncCto_clients'] = [
     'exclude'    => true,
     'inputType'  => 'checkbox',
     'foreignKey' => 'tl_synccto_clients.title',
-    'eval'       => ['multiple' => true]
+    'eval'       => ['multiple' => true],
+    'sql'        => 'blob NULL'
 ];
 
 $GLOBALS['TL_DCA']['tl_user_group']['fields']['syncCto_clients_p'] = [
@@ -52,7 +53,8 @@ $GLOBALS['TL_DCA']['tl_user_group']['fields']['syncCto_clients_p'] = [
     'inputType' => 'checkbox',
     'options'   => ['create', 'edit', 'copy', 'delete', 'showExtern', 'syncTo', 'syncFrom'],
     'reference' => &$GLOBALS['TL_LANG']['MSC'],
-    'eval'      => ['multiple' => true]
+    'eval'      => ['multiple' => true],
+    'sql'       => 'blob NULL'
 ];
 
 $GLOBALS['TL_DCA']['tl_user_group']['fields']['syncCto_sync_options'] = [
@@ -61,13 +63,15 @@ $GLOBALS['TL_DCA']['tl_user_group']['fields']['syncCto_sync_options'] = [
     'inputType'        => 'checkbox',
     'reference'        => &$GLOBALS['TL_LANG']['SYC'],
     'options_callback' => ['SyncCtoHelper', 'getFileSyncOptions'],
-    'eval'             => ['multiple' => true]
+    'eval'             => ['multiple' => true],
+    'sql'              => 'blob NULL'
 ];
 
 $GLOBALS['TL_DCA']['tl_user_group']['fields']['syncCto_tables'] = [
     'label'            => &$GLOBALS['TL_LANG']['tl_user_group']['syncCto_tables'],
     'inputType'        => 'checkboxWizard',
     'exclude'          => true,
-    'eval'             => ['multiple' => true],
     'options_callback' => ['SyncCtoHelper', 'databaseTables'],
+    'eval'             => ['multiple' => true],
+    'sql'              => 'blob NULL'
 ];
