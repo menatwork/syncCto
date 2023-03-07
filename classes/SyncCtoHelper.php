@@ -531,7 +531,7 @@ class SyncCtoHelper
     {
         if ($strTemplate == 'be_main')
         {
-            if (!is_array($_SESSION["TL_INFO"]))
+            if (!is_array($_SESSION["TL_INFO"] ?? null))
             {
                 $_SESSION["TL_INFO"] = array();
             }
