@@ -1,0 +1,81 @@
+{% extends "@Contao/be_main" %}
+
+{% block main_content %}
+    <div class="tl_listing_container">
+        <div id="tl_buttons">
+            <a onclick="Backend.getScrollOffset();"
+               accesskey="b" title="{{ language.goBack }}" class="header_back" href="{{ goBack }}">
+                {{ language.goBack }}
+            </a>
+        </div>
+
+        <h2 class="sub_headline">
+            {{ headline }}
+            {% if direction == 'to' %} -> {% elseif direction == 'from' %} <- {% else %} - {% endif %}
+            {{ clientName }}
+        </h2>
+
+        <div class="tl_formbody_edit synccto_steps">
+            {% if information is not empty %}
+                <p class="info tl_info">{{ information }}</p>
+            {% endif %}
+
+            {% set i = 1 %}
+            {% for key,value in data %}
+                <div class="{% if key == 1 %}tl_tbox{% else %}tl_box{% endif %} block">
+                    <h3 id="step{{ key }}" class="headline">
+                        <img src="/bundles/synccto/images/steps/icon{{ value.state }}.gif" alt=""/>
+                        <span>{{ value.title | format(i) }}</span>
+                    </h3>
+                    <p class="tl_help">{{ value.description }}</p>
+                    {% if (value.msg is defined) and (value.msg is not empty) %}
+                        <p class="tl_help">{{ value.msg }}</p>
+                    {% endif %}
+                    {% if (value.html is defined) and (value.html is not empty) %}
+                        {{ value.html | raw }}
+                    {% endif %}
+                </div>
+                {% set i = i + 1 %}
+            {% endfor %}
+        </div>
+
+        {% if refresh == true and error == false and finished == false %}
+            <meta http-equiv="refresh"
+                  content="1; URL={{ base }}{{ url }}&amp;step={{ step }}"/>
+        {% endif %}
+
+        {% if error == true %}
+            <div class="tl_box block">
+                <h4>{{ language.error }}</h4>
+                <p class="tl_help">{{ error_msg }}</p>
+            </div>
+        {% endif %}
+
+        {% if showControl == true %}
+            <div class="tl_tbox" id="buttons">
+                <a href="{{ abortLink }}"
+                   onclick="$(this).setProperty('text', '{{ language.abort.1 }}');"
+                   class="tl_submit">{{ language.abort.0 }}</a>
+                {% if error == true %}
+                    <a href="{{ tryAgainLink }}"
+                       onclick="$(this).setProperty('text', '{{ language.repeat.1 }}');"
+                       class="tl_submit">{{ language.repeat.0 }}</a>
+                    {% if modeAll == true %}
+                        <a href="{{ nextClientLink }}"
+                           onclick="$(this).setProperty('text', '{{ language.next_sync.1 }}');"
+                           class="tl_submit">{{ language.next_sync.0 }}</a>
+                    {% endif %}
+                {% endif %}
+            </div>
+        {% endif %}
+
+        {% if showNextControl == true and modeAll == true %}
+            <div class="tl_tbox" id="buttons">
+                <a href="{{ nextClientLink }}"
+                   onclick="$(this).setProperty('text', '{{ language.next_sync.1 }}');"
+                   class="tl_submit">{{ language.next_sync.0 }}</a>
+            </div>
+        {% endif %}
+
+    </div>
+{% endblock %}

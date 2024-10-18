@@ -14,7 +14,7 @@
  */
 $parts = explode(';', $GLOBALS['TL_DCA']['tl_user_group']['palettes']['default']);
 if (is_array($parts)) {
-    \array_insert($parts, (count($parts) - 1), [
+    \Contao\ArrayUtil::arrayInsert($parts, (count($parts) - 1), [
         '{syncCto_legend},syncCto_clients,syncCto_clients_p,syncCto_sync_options,syncCto_force_dbafs_overwrite,syncCto_hide_auto_sync',
         '{syncCto_tables_legend},syncCto_tables'
     ]);

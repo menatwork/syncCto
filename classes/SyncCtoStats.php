@@ -1,15 +1,18 @@
 <?php
 
+use Contao\Backend;
+use Contao\System;
+use Symfony\Component\HttpFoundation\RequestStack;
+
 /**
  * Contao Open Source CMS
  *
  * @copyright  MEN AT WORK 2014
  * @package    syncCto
- * @license    GNU/LGPL 
+ * @license    GNU/LGPL
  * @filesource
  */
-
-class SyncCtoStats extends \Backend
+class SyncCtoStats extends Backend
 {
     /*
      * Constants
@@ -21,29 +24,29 @@ class SyncCtoStats extends \Backend
 
     /**
      * Instance
-     * 
-     * @var SyncCtoStats 
+     *
+     * @var SyncCtoStats
      */
     protected static $objInstance = null;
 
     /**
      * Key for the session name
-     * 
-     * @var string 
+     *
+     * @var string
      */
     protected $syncCtoStats = "syncCtoStats";
 
     /**
      * Data
-     * 
-     * @var array 
+     *
+     * @var array
      */
     protected $arrData = array();
 
     /**
      * List with skipped post values
-     * 
-     * @var array 
+     *
+     * @var array
      */
     protected $arrSkippedValues = array(
         'FORM_SUBMIT',
@@ -51,6 +54,10 @@ class SyncCtoStats extends \Backend
         'FORM_INPUTS',
         'start_sync'
     );
+    /**
+     * @var mixed|\Symfony\Component\HttpFoundation\Session\SessionInterface|null
+     */
+    protected mixed $session;
 
     /**
      * Construct
@@ -59,18 +66,22 @@ class SyncCtoStats extends \Backend
     {
         parent::__construct();
 
+        $container = System::getContainer();
+        /** @var RequestStack $requestStack */
+        $requestStack = $container->get('request_stack');
+        $this->session = $requestStack->getSession();
+
         $this->loadSession();
     }
 
     /**
      * Get current instance
-     * 
+     *
      * @return SyncCtoStats
      */
     public static function getInstance()
     {
-        if (is_null(self::$objInstance))
-        {
+        if (is_null(self::$objInstance)) {
             self::$objInstance = new self();
         }
 
@@ -84,7 +95,7 @@ class SyncCtoStats extends \Backend
      */
     protected function loadSession()
     {
-        $this->arrData = $this->Session->get($this->syncCtoStats);
+        $this->arrData = $this->session->get($this->syncCtoStats);
     }
 
     /**
@@ -92,7 +103,7 @@ class SyncCtoStats extends \Backend
      */
     protected function saveSession()
     {
-        $this->Session->set($this->syncCtoStats, $this->arrData);
+        $this->session->set($this->syncCtoStats, $this->arrData);
     }
 
     /**
@@ -101,19 +112,18 @@ class SyncCtoStats extends \Backend
     protected function setStartFlag($intId)
     {
         $this->arrData['startFlag'] = true;
-        $this->arrData['id']        = $intId;
+        $this->arrData['id'] = $intId;
         $this->saveSession();
     }
 
     /**
      * Get the id from session
-     * 
+     *
      * @return int
      */
     protected function getStartFlagId()
     {
-        if ($this->arrData['startFlag'] == true)
-        {
+        if ($this->arrData['startFlag'] == true) {
             return $this->arrData['id'];
         }
 
@@ -126,7 +136,7 @@ class SyncCtoStats extends \Backend
     protected function resetStartFlag()
     {
         $this->arrData['startFlag'] = false;
-        $this->arrData['id']        = false;
+        $this->arrData['id'] = false;
         $this->saveSession();
     }
 
@@ -134,14 +144,17 @@ class SyncCtoStats extends \Backend
 
     /**
      * Add a new sync to the stats
-     * 
-     * @param int $intUser id of user
-     * @param int $intClient id of client
-     * @param int $intStart time
+     *
+     * @param int   $intUser    id of user
+     * @param int   $intClient  id of client
+     * @param int   $intStart   time
      * @param array $arrOptions array with all options
      */
     public function addStartStat($intUser, $intClient, $intStart, $arrOptions, $intDirection)
     {
+        // ToDo: Fix it:
+        return 1;
+
         // Clean sync options
         $arrSyncOptions = array();
         if (isset($arrOptions['post_data'])
@@ -169,28 +182,32 @@ class SyncCtoStats extends \Backend
 
         // Insert new row
         $objResult = $this->Database
-                ->prepare("INSERT INTO tl_synccto_stats %s")
-                ->set($arrSet)
-                ->execute();
+            ->prepare("INSERT INTO tl_synccto_stats %s")
+            ->set($arrSet)
+            ->execute()
+        ;
 
         $this->setStartFlag($objResult->insertId);
     }
 
     /**
      * Add the end time to the stats
-     * 
+     *
      * @param int $intEnd time
      */
     public function addEndStat($intEnd)
     {
+        // ToDo: Fix it:
+        return;
+
         $intId = $this->getStartFlagId();
 
-        if ($intId !== false)
-        {
+        if ($intId !== false) {
             $this->Database
-                    ->prepare('UPDATE tl_synccto_stats %s WHERE id=?')
-                    ->set(array('sync_end' => $intEnd))
-                    ->execute($intId);
+                ->prepare('UPDATE tl_synccto_stats %s WHERE id=?')
+                ->set(array('sync_end' => $intEnd))
+                ->execute($intId)
+            ;
 
             $this->resetStartFlag();
         }
@@ -198,25 +215,29 @@ class SyncCtoStats extends \Backend
 
     /**
      * Add the end time to the stats
-     * 
+     *
      * @param int $intEnd time
      */
     public function addAbortStat($intEnd, $intStep)
     {
+        // ToDo: Fix it:
+        return;
+
         $intId = $this->getStartFlagId();
 
-        if ($intId !== false)
-        {
+        if ($intId !== false) {
             $this->Database
-                    ->prepare('UPDATE tl_synccto_stats %s WHERE id=?')
-                    ->set(array(
+                ->prepare('UPDATE tl_synccto_stats %s WHERE id=?')
+                ->set(
+                    array(
                         'sync_abort'      => $intEnd,
                         'sync_abort_step' => $intStep,
-                    ))
-                    ->execute($intId);
+                    )
+                )
+                ->execute($intId)
+            ;
 
             $this->resetStartFlag();
         }
     }
-
 }

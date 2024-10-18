@@ -1,8 +1,14 @@
 services:
-    _defaults:
-        autowire: true
-        autoconfigure: true
+  _defaults:
+    autowire: true
+    autoconfigure: true
 
-    MenAtWork\SyncCto\Controller\:
-        resource: '../../Controller/'
-        tags: ['controller.service_arguments']
+  ## Contao
+
+  MenAtWork\SyncCto\Contao\ScopeMatcher:
+    public: true
+
+  ## Controller
+  MenAtWork\SyncCto\Controller\:
+    resource: '../../Controller/'
+    tags: [ 'controller.service_arguments' ]

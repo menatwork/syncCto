@@ -1,13 +1,4 @@
 <?php
-/**
- * Phoenix Testlab - Corporate site - Feature bundle
- *
- * Created by MEN AT WORK Werbeagentur GmbH 2019
- *
- * @copyright  MEN AT WORK Werbeagentur GmbH 2019
- * @package    contao-pxt-feature-bundle
- * @author     Sven Meierhans <meierhans@men-at-work.de>
- */
 
 namespace MenAtWork\SyncCto\Controller;
 

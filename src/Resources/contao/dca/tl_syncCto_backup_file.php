@@ -14,7 +14,7 @@ $GLOBALS['TL_DCA']['tl_syncCto_backup_file'] = array
     // Config
     'config'      => array
     (
-        'dataContainer'    => 'General',
+        'dataContainer'    => \ContaoCommunityAlliance\DcGeneral\DC\General::class,
         'disableSubmit'    => false,
         'enableVersioning' => false
     ),

@@ -3,7 +3,7 @@
 namespace MenAtWork\SyncCto;
 
 use MenAtWork\SyncCto\DependencyInjection\SyncCtoExtension;
-use Symfony\Component\Console\Application;
+use Symfony\Component\DependencyInjection\Extension\ExtensionInterface;
 use Symfony\Component\HttpKernel\Bundle\Bundle;
 
 /**
@@ -13,22 +13,16 @@ use Symfony\Component\HttpKernel\Bundle\Bundle;
  */
 class SyncCtoBundle extends Bundle
 {
-    const SCOPE_BACKEND = 'backend';
-    const SCOPE_FRONTEND = 'frontend';
+    /**
+     * @var string
+     */
+    protected $name = 'SyncCto';
 
     /**
-     * {@inheritdoc}
+     * Returns the container extension that should be implicitly loaded.
      */
-    public function getContainerExtension()
+    public function getContainerExtension(): ?ExtensionInterface
     {
         return new SyncCtoExtension();
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function registerCommands(Application $application)
-    {
-        // disable automatic command registration
     }
 }

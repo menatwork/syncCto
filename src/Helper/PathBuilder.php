@@ -77,7 +77,7 @@ class PathBuilder
     public function getPath($withTlRoot = true)
     {
         // Build the path.
-        $return = (($withTlRoot) ? TL_ROOT . DIRECTORY_SEPARATOR : '')
+        $return = (($withTlRoot) ? \SyncCtoHelper::getInstance()->getContaoRoot() . DIRECTORY_SEPARATOR : '')
                   . implode(DIRECTORY_SEPARATOR, $this->pathParts);
 
         // Reset the array.
@@ -116,7 +116,7 @@ class PathBuilder
     protected function addString($path, $separator = '/')
     {
         // Remove blanks and split.
-        $parts = trimsplit($separator, $path);
+        $parts = \Contao\StringUtil::trimsplit($separator, $path);
 
         // Add.
         $this->addArray($parts);

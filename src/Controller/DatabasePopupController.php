@@ -13,16 +13,21 @@ namespace MenAtWork\SyncCto\Controller;
 
 use Contao\BackendTemplate;
 use Contao\Backend;
+use Contao\BackendUser;
 use Contao\Config;
+use Contao\Database;
 use Contao\Environment;
 use Contao\Input;
+use Contao\StringUtil;
 use Contao\System;
+use Symfony\Component\HttpFoundation\RequestStack;
+use Symfony\Component\HttpFoundation\Session\SessionInterface;
 use SyncCtoHelper;
 
 /**
  * Class SyncCtoPopup
  */
-class DatabasePopupController
+class DatabasePopupController extends APopUpController
 {
     // Vars
     protected $intClientID;
@@ -38,9 +43,14 @@ class DatabasePopupController
     protected $Template;
 
     /**
-     * @var \Contao\BackendTemplate
+     * @var BackendTemplate
      */
-    private $popupTemplate;
+    private BackendTemplate $popupTemplate;
+
+    /**
+     * @var SessionInterface
+     */
+    protected SessionInterface $session;
 
     // defines
     const STEP_NORMAL_DB = 'nd';
@@ -52,7 +62,10 @@ class DatabasePopupController
      */
     public function __construct()
     {
-        \define('TL_ASSETS_URL', '');
+        $container = System::getContainer();
+        /** @var RequestStack $requestStack */
+        $requestStack = $container->get('request_stack');
+        $this->session = $requestStack->getSession();
     }
 
     /**
@@ -60,18 +73,6 @@ class DatabasePopupController
      */
     public function runAction()
     {
-        \System::getContainer()->get('contao.framework')->initialize();
-
-        // Check user auth
-        \BackendUser::getInstance()->authenticate();
-
-        // Set language from get or user
-        if (Input::get('language') != '') {
-            $GLOBALS['TL_LANGUAGE'] = Input::get('language');
-        } else {
-            $GLOBALS['TL_LANGUAGE'] = \BackendUser::getInstance()->language;
-        }
-
         // Load language
         System::loadLanguageFile('default');
         System::loadLanguageFile("modules");
@@ -80,7 +81,6 @@ class DatabasePopupController
         $this->objSyncCtoHelper = SyncCtoHelper::getInstance();
 
         $this->initGetParams();
-
 
         if ($this->mixStep == self::STEP_NORMAL_DB) {
             // Set client for communication
@@ -92,7 +92,7 @@ class DatabasePopupController
                 unset($_POST);
             } catch (\Exception $exc) {
                 $this->arrErrors[] = $exc->getMessage();
-                $this->mixStep     = self::STEP_ERROR_DB;
+                $this->mixStep = self::STEP_ERROR_DB;
             }
         }
 
@@ -112,37 +112,21 @@ class DatabasePopupController
      */
     public function getResponse()
     {
-        // Clear all we want a clear array for this windows.
-        $GLOBALS['TL_CSS']        = array();
-        $GLOBALS['TL_JAVASCRIPT'] = array();
-
-        // Set stylesheets
-        $GLOBALS['TL_CSS'][] = 'system/themes/' . Backend::getTheme() . '/basic.css';
-        $GLOBALS['TL_CSS'][] = 'bundles/synccto/css/compare.css';
-
-        // Set javascript
-        $GLOBALS['TL_JAVASCRIPT'][] = 'assets/mootools/js/mootools-core.min.js';
-        $GLOBALS['TL_JAVASCRIPT'][] = 'assets/mootools/js/mootools-more.min.js';
-        $GLOBALS['TL_JAVASCRIPT'][] = 'bundles/synccto/js/compare.js';
-        $GLOBALS['TL_JAVASCRIPT'][] = 'bundles/synccto/js/htmltable.js';
+        $this->setupTemplate();
 
         // Set wrapper template information
-        $this->popupTemplate           = new BackendTemplate("be_syncCto_popup");
-        $this->popupTemplate->theme    = Backend::getTheme();
-        $this->popupTemplate->base     = Environment::get('base');
+        $this->popupTemplate = new BackendTemplate("be_syncCto_popup");
+        $this->popupTemplate->theme = Backend::getTheme();
+        $this->popupTemplate->base = Environment::get('base');
         $this->popupTemplate->language = $GLOBALS['TL_LANGUAGE'];
-        $this->popupTemplate->title    = $GLOBALS['TL_CONFIG']['websiteTitle'];
-        $this->popupTemplate->charset  = $GLOBALS['TL_CONFIG']['characterSet'];
-        $this->popupTemplate->headline = basename(
-            utf8_convert_encoding(
-                $this->strFile,
-                $GLOBALS['TL_CONFIG']['characterSet']
-            )
-        );
+        $this->popupTemplate->title = $GLOBALS['TL_CONFIG']['websiteTitle'];
+        $this->popupTemplate->charset = $GLOBALS['TL_CONFIG']['characterSet'];
+        $this->popupTemplate->headline = basename($this->strFile);
+        $this->popupTemplate->requestToken = $this->getRequestToken();
 
         // Set default information
-        $this->Template->id        = $this->intClientID;
-        $this->Template->step      = $this->mixStep;
+        $this->Template->id = $this->intClientID;
+        $this->Template->step = $this->mixStep;
         $this->Template->direction = $this->strMode;
 
         // Output template
@@ -171,12 +155,16 @@ class DatabasePopupController
 
             // Remove tables from the list.
             foreach ($arrRemoveTables as $value) {
-                if (isset($this->arrSyncSettings['syncCto_CompareTables']['recommended']) && array_key_exists($value,
-                        $this->arrSyncSettings['syncCto_CompareTables']['recommended'])) {
+                if (isset($this->arrSyncSettings['syncCto_CompareTables']['recommended']) && array_key_exists(
+                        $value,
+                        $this->arrSyncSettings['syncCto_CompareTables']['recommended']
+                    )) {
                     unset($this->arrSyncSettings['syncCto_CompareTables']['recommended'][$value]);
                 } else {
-                    if (isset($this->arrSyncSettings['syncCto_CompareTables']['nonRecommended']) && array_key_exists($value,
-                            $this->arrSyncSettings['syncCto_CompareTables']['nonRecommended'])) {
+                    if (isset($this->arrSyncSettings['syncCto_CompareTables']['nonRecommended']) && array_key_exists(
+                            $value,
+                            $this->arrSyncSettings['syncCto_CompareTables']['nonRecommended']
+                        )) {
                         unset($this->arrSyncSettings['syncCto_CompareTables']['nonRecommended'][$value]);
                     }
                 }
@@ -208,7 +196,7 @@ class DatabasePopupController
         ) {
             unset($this->arrSyncSettings['syncCto_CompareTables']);
             $this->arrSyncSettings['syncCto_SyncDeleteTables'] = array();
-            $this->arrSyncSettings['syncCto_SyncTables']       = array();
+            $this->arrSyncSettings['syncCto_SyncTables'] = array();
 
             $this->mixStep = self::STEP_CLOSE_DB;
 
@@ -216,7 +204,7 @@ class DatabasePopupController
         }
 
         // Make a look up
-        foreach ((array)$this->arrSyncSettings['syncCto_CompareTables']['recommended'] as $strKey => $arrValueA) {
+        foreach ((array) $this->arrSyncSettings['syncCto_CompareTables']['recommended'] as $strKey => $arrValueA) {
             $arrTransServer = $this->lookUpName($arrValueA['server']['name']);
             $arrTransClient = $this->lookUpName($arrValueA['client']['name']);
 
@@ -226,7 +214,7 @@ class DatabasePopupController
             $this->arrSyncSettings['syncCto_CompareTables']['recommended'][$strKey]['client']['iname'] = $arrTransClient['iname'];
         }
 
-        foreach ((array)$this->arrSyncSettings['syncCto_CompareTables']['nonRecommended'] as $strKey => $arrValueA) {
+        foreach ((array) $this->arrSyncSettings['syncCto_CompareTables']['nonRecommended'] as $strKey => $arrValueA) {
             $arrTransServer = $this->lookUpName($arrValueA['server']['name']);
             $arrTransClient = $this->lookUpName($arrValueA['client']['name']);
 
@@ -236,15 +224,16 @@ class DatabasePopupController
             $this->arrSyncSettings['syncCto_CompareTables']['nonRecommended'][$strKey]['client']['iname'] = $arrTransClient['iname'];
         }
 
-        $this->Template                 = new BackendTemplate("be_syncCto_database");
-        $this->Template->headline       = $GLOBALS['TL_LANG']['MSC']['comparelist'];
+        $this->Template = new BackendTemplate("be_syncCto_database");
+        $this->Template->headline = $GLOBALS['TL_LANG']['MSC']['comparelist'];
         $this->Template->arrCompareList = $this->arrSyncSettings['syncCto_CompareTables'];
-        $this->Template->close          = false;
-        $this->Template->error          = false;
+        $this->Template->close = false;
+        $this->Template->error = false;
 
-        $objExtern = \Database::getInstance()
-            ->prepare('SELECT address, port FROM tl_synccto_clients WHERE id=?')
-            ->execute($this->intClientID);
+        $objExtern = Database::getInstance()
+                             ->prepare('SELECT address, port FROM tl_synccto_clients WHERE id=?')
+                             ->execute($this->intClientID)
+        ;
 
         $this->Template->clientPath = $objExtern->address . ':' . $objExtern->port . '/ctoCommunication';
         $this->Template->serverPath = Environment::get('base');
@@ -273,8 +262,10 @@ class DatabasePopupController
         }
 
         // Make a lookup in synccto language files
-        if (is_array($GLOBALS['TL_LANG']['tl_syncCto_database']) && array_key_exists($strName,
-                $GLOBALS['TL_LANG']['tl_syncCto_database'])) {
+        if (is_array($GLOBALS['TL_LANG']['tl_syncCto_database']) && array_key_exists(
+                $strName,
+                $GLOBALS['TL_LANG']['tl_syncCto_database']
+            )) {
             if (is_array($GLOBALS['TL_LANG']['tl_syncCto_database'][$strName])) {
                 return $this->formateLookUpName($strName, $GLOBALS['TL_LANG']['tl_syncCto_database'][$strName][0]);
             } else {
@@ -282,37 +273,11 @@ class DatabasePopupController
             }
         }
 
-        // Get MM name
-        if (in_array('metamodels', Config::getInstance()->getActiveModules()) && preg_match("/^mm_/i", $strName)) {
-            try {
-//                if (!is_null(\MetaModels\Factory::byTableName($strName)))
-//                {
-//                    $objDCABuilder     = \MetaModels\Dca\MetaModelDcaBuilder::getInstance();
-//                    $objMetaModels     = \MetaModels\Factory::byTableName($strName);
-//                    $arrDCA            = $objDCABuilder->getDca($objMetaModels->get('id'));
-//                    $arrBackendcaption = deserialize($arrDCA['backendcaption']);
-//
-//                    $strReturn = $objMetaModels->getName();
-//
-//                    foreach ((array)$arrBackendcaption as $value)
-//                    {
-//                        if ($value['langcode'] == \BackendUser::getInstance()->language)
-//                        {
-//                            $strReturn = $value['label'];
-//                            break;
-//                        }
-//                    }
-//
-//                    return $this->formateLookUpName($strName, $strReturn);
-//                }
-            } catch (\Exception $exc) {
-                // Nothing to do;
-            }
-        }
-
         // Little mapping for names
-        if (is_array($GLOBALS['SYC_CONFIG']['database_mapping']) && array_key_exists($strName,
-                $GLOBALS['SYC_CONFIG']['database_mapping'])) {
+        if (is_array($GLOBALS['SYC_CONFIG']['database_mapping']) && array_key_exists(
+                $strName,
+                $GLOBALS['SYC_CONFIG']['database_mapping']
+            )) {
             $strRealSystemName = $GLOBALS['SYC_CONFIG']['database_mapping'][$strName];
 
             if (is_array($GLOBALS['TL_LANG']['MOD'][$strRealSystemName])) {
@@ -345,7 +310,7 @@ class DatabasePopupController
     protected function formateLookUpName($strTableName, $strReadableName)
     {
         // Check if the function is activate
-        if (\BackendUser::getInstance()->syncCto_useTranslatedNames) {
+        if (BackendUser::getInstance()->syncCto_useTranslatedNames) {
             return array(
                 'tname' => $strReadableName,
                 'iname' => $strTableName
@@ -363,10 +328,10 @@ class DatabasePopupController
      */
     public function showClose()
     {
-        $this->Template           = new BackendTemplate("be_syncCto_database");
+        $this->Template = new BackendTemplate("be_syncCto_database");
         $this->Template->headline = $GLOBALS['TL_LANG']['MSC']['backBT'];
-        $this->Template->close    = true;
-        $this->Template->error    = false;
+        $this->Template->close = true;
+        $this->Template->error = false;
     }
 
     /**
@@ -374,12 +339,12 @@ class DatabasePopupController
      */
     public function showError()
     {
-        $this->Template           = new BackendTemplate("be_syncCto_database");
+        $this->Template = new BackendTemplate("be_syncCto_database");
         $this->Template->headline = $GLOBALS['TL_LANG']['MSC']['error'];
         $this->Template->arrError = $this->arrErrors;
-        $this->Template->text     = $GLOBALS['TL_LANG']['ERR']['general'];
-        $this->Template->close    = false;
-        $this->Template->error    = true;
+        $this->Template->text = $GLOBALS['TL_LANG']['ERR']['general'];
+        $this->Template->close = false;
+        $this->Template->error = true;
     }
 
     // Helper functions --------------------------------------------------------
@@ -414,7 +379,7 @@ class DatabasePopupController
 
     protected function loadSyncSettings()
     {
-        $this->arrSyncSettings = \Session::getInstance()->get("syncCto_SyncSettings_" . $this->intClientID);
+        $this->arrSyncSettings = $this->session->get("syncCto_SyncSettings_" . $this->intClientID);
 
         if (!is_array($this->arrSyncSettings)) {
             $this->arrSyncSettings = array();
@@ -427,7 +392,6 @@ class DatabasePopupController
             $this->arrSyncSettings = array();
         }
 
-        \Session::getInstance()->set("syncCto_SyncSettings_" . $this->intClientID, $this->arrSyncSettings);
+        $this->session->set("syncCto_SyncSettings_" . $this->intClientID, $this->arrSyncSettings);
     }
-
 }

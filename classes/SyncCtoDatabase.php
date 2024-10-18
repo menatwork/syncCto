@@ -9,12 +9,17 @@
  * @filesource
  */
 
+use Contao\Backend;
+use Contao\Database;
+use Contao\File;
+use Contao\Files;
+use Contao\ZipReader;
 use MenAtWork\SyncCto\Helper\PathBuilder;
 
 /**
  * Core class for database operation
  */
-class SyncCtoDatabase extends \Backend
+class SyncCtoDatabase extends Backend
 {
     /* -------------------------------------------------------------------------
      * Vars
@@ -115,20 +120,29 @@ class SyncCtoDatabase extends \Backend
         parent::__construct();
 
         // Init some vars
-        $this->arrBackupTables    = [];
-        $this->strTimestampFormat = str_replace(array_keys($GLOBALS['SYC_CONFIG']['folder_file_replacement']), array_values($GLOBALS['SYC_CONFIG']['folder_file_replacement']), $GLOBALS['TL_CONFIG']['datimFormat']);
-        $this->intMaxMemoryUsage  = SyncCtoModuleClient::parseSize(ini_get('memory_limit'));
-        $this->intMaxMemoryUsage  = $this->intMaxMemoryUsage / 100 * 80;
+        $this->arrBackupTables = [];
+        $this->strTimestampFormat = str_replace(
+            array_keys($GLOBALS['SYC_CONFIG']['folder_file_replacement']),
+            array_values($GLOBALS['SYC_CONFIG']['folder_file_replacement']),
+            $GLOBALS['TL_CONFIG']['datimFormat']
+        );
+        $this->intMaxMemoryUsage = SyncCtoModuleClient::parseSize(ini_get('memory_limit'));
+        $this->intMaxMemoryUsage = $this->intMaxMemoryUsage / 100 * 80;
 
         // Load hidden tables
-        $this->arrHiddenTables = deserialize($GLOBALS['SYC_CONFIG']['table_hidden']);
+        if (is_array($GLOBALS['SYC_CONFIG']['table_hidden'])) {
+            $this->arrHiddenTables = $GLOBALS['SYC_CONFIG']['table_hidden'];
+        } else {
+            $this->arrHiddenTables = unserialize($GLOBALS['SYC_CONFIG']['table_hidden']);
+        }
+
         if (!is_array($this->arrHiddenTables)) {
             $this->arrHiddenTables = [];
         }
 
         // Load Helper
         $this->objSyncCtoHelper = SyncCtoHelper::getInstance();
-        $this->Database         = Database::getInstance();
+        $this->Database = Database::getInstance();
     }
 
     /**
@@ -281,8 +295,10 @@ class SyncCtoDatabase extends \Backend
         // Add to the backup array all tables
         if (is_array($mixTables)) {
             $this->arrBackupTables = array_merge($this->arrBackupTables, $mixTables);
-        } else if ($mixTables != "" && $mixTables != null) {
-            $this->arrBackupTables[] = $mixTables;
+        } else {
+            if ($mixTables != "" && $mixTables != null) {
+                $this->arrBackupTables[] = $mixTables;
+            }
         }
 
         // make the backup array unique
@@ -311,7 +327,12 @@ class SyncCtoDatabase extends \Backend
         $objGzFile->close();
 
         // Compression
-        $objGzFile = gzopen(TL_ROOT . "/" . $this->objSyncCtoHelper->standardizePath($GLOBALS['SYC_PATH']['tmp'], "TempSyncCtoDump.$strRandomToken"), "wb");
+        $objGzFile = gzopen(
+            SyncCtoHelper::getInstance()->getContaoRoot()
+            . "/"
+            . $this->objSyncCtoHelper->standardizePath($GLOBALS['SYC_PATH']['tmp'], "TempSyncCtoDump.$strRandomToken"),
+            "wb"
+        );
 
         // Create XML File
         $objXml = new XMLWriter();
@@ -422,7 +443,8 @@ class SyncCtoDatabase extends \Backend
                 $objData = $this->Database
                     ->prepare("SELECT * FROM $TableName")
                     ->limit($intElementsPerRequest, ($i * $intElementsPerRequest))
-                    ->executeUncached();
+                    ->execute()
+                ;
 
                 if ($objData->numRows == 0) {
                     break;
@@ -439,67 +461,69 @@ class SyncCtoDatabase extends \Backend
                         if (!isset($field_data)) {
                             $objXml->writeAttribute("type", "null");
                             $objXml->text("NULL");
-                        } else if ($field_data != "") {
-                            switch (strtolower($arrFieldMeta[$field_key]['type'])) {
-                                case 'binary':
-                                case 'varbinary':
-                                case 'blob':
-                                case 'tinyblob':
-                                case 'mediumblob':
-                                case 'longblob':
-                                    $objXml->writeAttribute("type", "blob");
-                                    $objXml->text("0x" . bin2hex($field_data));
-                                    break;
-
-                                case 'tinyint':
-                                case 'smallint':
-                                case 'mediumint':
-                                case 'int':
-                                case 'integer':
-                                case 'bigint':
-                                    $objXml->writeAttribute("type", "int");
-                                    $objXml->text($field_data);
-                                    break;
-
-                                case 'float':
-                                case 'double':
-                                case 'real':
-                                case 'decimal':
-                                case 'numeric':
-                                    $objXml->writeAttribute("type", "decimal");
-                                    $objXml->text($field_data);
-                                    break;
-
-                                case 'date':
-                                case 'datetime':
-                                case 'timestamp':
-                                case 'time':
-                                case 'year':
-                                    $objXml->writeAttribute("type", "date");
-                                    $objXml->text("'" . $field_data . "'");
-                                    break;
-
-                                case 'char':
-                                case 'varchar':
-                                case 'text':
-                                case 'tinytext':
-                                case 'mediumtext':
-                                case 'longtext':
-                                case 'enum':
-                                case 'set':
-                                    $objXml->writeAttribute("type", "text");
-                                    $objXml->writeCdata(base64_encode(str_replace($this->arrSearchFor, $this->arrReplaceWith, $field_data)));
-
-                                    break;
-
-                                default:
-                                    $objXml->writeAttribute("type", "default");
-                                    $objXml->writeCdata(base64_encode(str_replace($this->arrSearchFor, $this->arrReplaceWith, $field_data)));
-                                    break;
-                            }
                         } else {
-                            $objXml->writeAttribute("type", "empty");
-                            $objXml->text("''");
+                            if ($field_data != "") {
+                                switch (strtolower($arrFieldMeta[$field_key]['type'])) {
+                                    case 'binary':
+                                    case 'varbinary':
+                                    case 'blob':
+                                    case 'tinyblob':
+                                    case 'mediumblob':
+                                    case 'longblob':
+                                        $objXml->writeAttribute("type", "blob");
+                                        $objXml->text("0x" . bin2hex($field_data));
+                                        break;
+
+                                    case 'tinyint':
+                                    case 'smallint':
+                                    case 'mediumint':
+                                    case 'int':
+                                    case 'integer':
+                                    case 'bigint':
+                                        $objXml->writeAttribute("type", "int");
+                                        $objXml->text($field_data);
+                                        break;
+
+                                    case 'float':
+                                    case 'double':
+                                    case 'real':
+                                    case 'decimal':
+                                    case 'numeric':
+                                        $objXml->writeAttribute("type", "decimal");
+                                        $objXml->text($field_data);
+                                        break;
+
+                                    case 'date':
+                                    case 'datetime':
+                                    case 'timestamp':
+                                    case 'time':
+                                    case 'year':
+                                        $objXml->writeAttribute("type", "date");
+                                        $objXml->text("'" . $field_data . "'");
+                                        break;
+
+                                    case 'char':
+                                    case 'varchar':
+                                    case 'text':
+                                    case 'tinytext':
+                                    case 'mediumtext':
+                                    case 'longtext':
+                                    case 'enum':
+                                    case 'set':
+                                        $objXml->writeAttribute("type", "text");
+                                        $objXml->writeCdata(base64_encode(str_replace($this->arrSearchFor, $this->arrReplaceWith, $field_data)));
+
+                                        break;
+
+                                    default:
+                                        $objXml->writeAttribute("type", "default");
+                                        $objXml->writeCdata(base64_encode(str_replace($this->arrSearchFor, $this->arrReplaceWith, $field_data)));
+                                        break;
+                                }
+                            } else {
+                                $objXml->writeAttribute("type", "empty");
+                                $objXml->text("''");
+                            }
                         }
 
                         $objXml->endElement(); // End field
@@ -523,7 +547,7 @@ class SyncCtoDatabase extends \Backend
         if ($booOnlyMachine == false) {
             // Write header for sql file
             $today = date("Y-m-d");
-            $time  = date("H:i:s");
+            $time = date("H:i:s");
 
             // Write Header
             $string = "-- syncCto SQL Dump\r\n";
@@ -588,7 +612,8 @@ class SyncCtoDatabase extends \Backend
                     $objData = $this->Database
                         ->prepare("SELECT * FROM $TableName")
                         ->limit($intElementsPerRequest, ($i * $intElementsPerRequest))
-                        ->executeUncached();
+                        ->execute()
+                    ;
 
                     $strSQL = "";
 
@@ -621,38 +646,40 @@ class SyncCtoDatabase extends \Backend
                         foreach (array_keys($arrFieldMeta) as $fieldName) {
                             if (!isset($row[$fieldName])) {
                                 $arrTableData[] = "NULL";
-                            } else if ($row[$fieldName] != "") {
-                                switch (strtolower($arrFieldMeta[$fieldName]['type'])) {
-                                    case 'blob':
-                                    case 'tinyblob':
-                                    case 'mediumblob':
-                                    case 'longblob':
-                                        $arrTableData[] = "0x" . bin2hex($row[$fieldName]);
-                                        break;
-
-                                    case 'smallint':
-                                    case 'int':
-                                        $arrTableData[] = $row[$fieldName];
-                                        break;
-
-                                    case 'text':
-                                    case 'mediumtext':
-                                        if (strpos($row[$fieldName], "'") != false) {
+                            } else {
+                                if ($row[$fieldName] != "") {
+                                    switch (strtolower($arrFieldMeta[$fieldName]['type'])) {
+                                        case 'blob':
+                                        case 'tinyblob':
+                                        case 'mediumblob':
+                                        case 'longblob':
                                             $arrTableData[] = "0x" . bin2hex($row[$fieldName]);
                                             break;
-                                        }
-                                    default:
-                                        $arrTableData[] = "'" . str_replace($this->arrSearchFor, $this->arrReplaceWith, $row[$fieldName]) . "'";
-                                        break;
+
+                                        case 'smallint':
+                                        case 'int':
+                                            $arrTableData[] = $row[$fieldName];
+                                            break;
+
+                                        case 'text':
+                                        case 'mediumtext':
+                                            if (strpos($row[$fieldName], "'") != false) {
+                                                $arrTableData[] = "0x" . bin2hex($row[$fieldName]);
+                                                break;
+                                            }
+                                        default:
+                                            $arrTableData[] = "'" . str_replace($this->arrSearchFor, $this->arrReplaceWith, $row[$fieldName]) . "'";
+                                            break;
+                                    }
+                                } else {
+                                    $arrTableData[] = "''";
                                 }
-                            } else {
-                                $arrTableData[] = "''";
                             }
                         }
 
                         if ($booFirstEntry == true) {
                             $booFirstEntry = false;
-                            $strSQL        .= "\r\n(" . implode(", ", $arrTableData) . ")";
+                            $strSQL .= "\r\n(" . implode(", ", $arrTableData) . ")";
                         } else {
                             $strSQL .= ",\r\n(" . implode(", ", $arrTableData) . ")";
                         }
@@ -712,9 +739,9 @@ class SyncCtoDatabase extends \Backend
         $arrTables = [];
 
         // Current Values
-        $strCurrentTable         = "";
+        $strCurrentTable = "";
         $strCurrentNodeAttribute = "";
-        $strCurrentNodeName      = "";
+        $strCurrentNodeName = "";
 
         while ($this->objXMLReader->read()) {
             switch ($this->objXMLReader->nodeType) {
@@ -792,11 +819,11 @@ class SyncCtoDatabase extends \Backend
         $arrFields = [];
 
         // Current Values
-        $strCurrentTable             = "";
+        $strCurrentTable = "";
         $strCurrentNodeAttributeName = "";
         $strCurrentNodeAttributeType = "";
-        $strCurrentNodeName          = "";
-        $intCounter                  = 0;
+        $strCurrentNodeName = "";
+        $intCounter = 0;
 
         while ($this->objXMLReader->read()) {
             switch ($this->objXMLReader->nodeType) {
@@ -819,9 +846,9 @@ class SyncCtoDatabase extends \Backend
                     switch ($this->objXMLReader->localName) {
                         case "table":
                             $strCurrentTable = $this->objXMLReader->getAttribute("name");
-                            $arrValues       = [];
-                            $arrFields       = [];
-                            $intCounter      = 0;
+                            $arrValues = [];
+                            $arrFields = [];
+                            $intCounter = 0;
                             break;
 
                         case "field":
@@ -912,21 +939,22 @@ class SyncCtoDatabase extends \Backend
 
         try {
             // Set time out for database. Ticket #2653
-            $tmpResult = \Database::getInstance()
-                ->execute('SELECT @@SESSION.wait_timeout as wTimeout, @@SESSION.interactive_timeout as iTimeout');
+            $tmpResult = Database::getInstance()
+                                 ->execute('SELECT @@SESSION.wait_timeout as wTimeout, @@SESSION.interactive_timeout as iTimeout')
+            ;
 
-            $waitTimeOut        = $tmpResult->wTimeout;
+            $waitTimeOut = $tmpResult->wTimeout;
             $interactiveTimeout = $tmpResult->iTimeout;
 
             //overwrite the default values if higher ones are defined in the settings
             if ($GLOBALS['TL_CONFIG']['syncCto_custom_settings'] == true && intval($GLOBALS['TL_CONFIG']['syncCto_wait_timeout']) > 0 &&
                 intval($GLOBALS['TL_CONFIG']['syncCto_interactive_timeout']) > 0
             ) {
-                $waitTimeOut        = max($waitTimeOut, intval($GLOBALS['TL_CONFIG']['syncCto_wait_timeout']));
+                $waitTimeOut = max($waitTimeOut, intval($GLOBALS['TL_CONFIG']['syncCto_wait_timeout']));
                 $interactiveTimeout = max($interactiveTimeout, intval($GLOBALS['TL_CONFIG']['syncCto_interactive_timeout']));
             }
 
-            \Database::getInstance()->query(
+            Database::getInstance()->query(
                 sprintf(
                     'SET SESSION wait_timeout = %s,SESSION interactive_timeout = %s;',
                     intval($waitTimeOut),
@@ -943,7 +971,8 @@ class SyncCtoDatabase extends \Backend
                         $zipPath = $pathBuilder
                             ->addPath('system/tmp')
                             ->addUnknownPath(sprintf('%s.gz', $this->strFilenameSyncCto))
-                            ->getPath(false);
+                            ->getPath(false)
+                        ;
 
                         $objGzFile = new File($zipPath);
                         $objGzFile->write($objZipRead->unzip());
@@ -953,7 +982,8 @@ class SyncCtoDatabase extends \Backend
                     } else {
                         $strRestoreFile = $pathBuilder
                             ->addUnknownPath($strRestoreFile)
-                            ->getPath(false);
+                            ->getPath(false)
+                        ;
 
                         $arrRestoreTables = $this->runRestoreFromSer($strRestoreFile);
                     }
@@ -962,7 +992,8 @@ class SyncCtoDatabase extends \Backend
                 case "synccto":
                     $strRestoreFile = $pathBuilder
                         ->addUnknownPath($strRestoreFile)
-                        ->getPath(false);
+                        ->getPath(false)
+                    ;
 
                     $arrRestoreTables = $this->runRestoreFromXML($strRestoreFile);
                     break;
@@ -1008,7 +1039,7 @@ class SyncCtoDatabase extends \Backend
     protected function runRestoreFromXML($strRestoreFile)
     {
         // Unzip XML
-        $objGzFile = gzopen(TL_ROOT . "/" . $strRestoreFile, "r");
+        $objGzFile = gzopen(SyncCtoHelper::getInstance()->getContaoRoot() . "/" . $strRestoreFile, "r");
 
         $objXMLFile = new File("system/tmp/" . basename($strRestoreFile) . ".xml");
         $objXMLFile->write("");
@@ -1027,7 +1058,7 @@ class SyncCtoDatabase extends \Backend
 
         // Read XML
         $this->objXMLReader = new XMLReader();
-        $this->objXMLReader->open(TL_ROOT . "/system/tmp/" . basename($strRestoreFile) . ".xml");
+        $this->objXMLReader->open(SyncCtoHelper::getInstance()->getContaoRoot() . "/system/tmp/" . basename($strRestoreFile) . ".xml");
 
         while ($this->objXMLReader->read()) {
             switch ($this->objXMLReader->nodeType) {
@@ -1052,8 +1083,8 @@ class SyncCtoDatabase extends \Backend
 
     protected function runRestoreFromSer($strRestoreFile)
     {
-        $objZipArchive    = new ZipArchiveCto();
-        $objTempfile      = tmpfile();
+        $objZipArchive = new ZipArchiveCto();
+        $objTempfile = tmpfile();
         $arrRestoreTables = [];
 
         try {
@@ -1066,7 +1097,7 @@ class SyncCtoDatabase extends \Backend
             }
 
             $mixTables = $objZipArchive->getFromName($this->strFilenameTable);
-            $mixTables = trimsplit("\n", $mixTables);
+            $mixTables = \Contao\StringUtil::trimsplit("\n", $mixTables);
 
             // Create temp tables
             foreach ($mixTables as $key => $value) {
@@ -1251,29 +1282,36 @@ class SyncCtoDatabase extends \Backend
         $fields = $this->Database->listFields($strTableName);
 
         // Get list of indicies
-        $arrIndexes = $this->Database->prepare("SHOW INDEX FROM `$strTableName`")->executeUncached()->fetchAllAssoc();
+        $arrIndexes = $this->Database
+            ->prepare("SHOW INDEX FROM `$strTableName`")
+            ->execute()
+            ->fetchAllAssoc();
 
         foreach ($fields as $field) {
 
             if ($field["type"] == "index") {
                 if ($field["name"] == "PRIMARY") {
                     $return['TABLE_CREATE_DEFINITIONS'][$field["name"]] = "PRIMARY KEY (`" . implode("`,`", $field["index_fields"]) . "`)";
-                } else if ($field["index"] == "UNIQUE") {
-                    $return['TABLE_CREATE_DEFINITIONS'][$field["name"]] = "UNIQUE KEY `" . $field["name"] . "` (`" . implode("`,`", $field["index_fields"]) . "`)";
-                } else if ($field["index"] == "KEY") {
-                    foreach ($arrIndexes as $valueIndexes) {
-                        if ($valueIndexes["Key_name"] == $field["name"]) {
-                            switch ($valueIndexes["Index_type"]) {
-                                case "FULLTEXT":
-                                    $return['TABLE_CREATE_DEFINITIONS'][$field["name"]] = "FULLTEXT KEY `" . $field['name'] . "` (" . $this->getKeyFields($field["index_fields"]) . ")";
-                                    break;
+                } else {
+                    if ($field["index"] == "UNIQUE") {
+                        $return['TABLE_CREATE_DEFINITIONS'][$field["name"]] = "UNIQUE KEY `" . $field["name"] . "` (`" . implode("`,`", $field["index_fields"]) . "`)";
+                    } else {
+                        if ($field["index"] == "KEY") {
+                            foreach ($arrIndexes as $valueIndexes) {
+                                if ($valueIndexes["Key_name"] == $field["name"]) {
+                                    switch ($valueIndexes["Index_type"]) {
+                                        case "FULLTEXT":
+                                            $return['TABLE_CREATE_DEFINITIONS'][$field["name"]] = "FULLTEXT KEY `" . $field['name'] . "` (" . $this->getKeyFields($field["index_fields"]) . ")";
+                                            break;
 
-                                default:
-                                    $return['TABLE_CREATE_DEFINITIONS'][$field["name"]] = "KEY `" . $field['name'] . "` (" . $this->getKeyFields($field["index_fields"]) . ")";
+                                        default:
+                                            $return['TABLE_CREATE_DEFINITIONS'][$field["name"]] = "KEY `" . $field['name'] . "` (" . $this->getKeyFields($field["index_fields"]) . ")";
+                                            break;
+                                    }
+
                                     break;
+                                }
                             }
-
-                            break;
                         }
                     }
                 }
@@ -1283,7 +1321,7 @@ class SyncCtoDatabase extends \Backend
 
             unset($field['index']);
 
-            $name          = $field['name'];
+            $name = $field['name'];
             $field['name'] = '`' . $field['name'] . '`';
 
             // Field type
@@ -1297,18 +1335,24 @@ class SyncCtoDatabase extends \Backend
             // Default values
             if (in_array(strtolower($field['type']), $this->arrDefaultValueTypIgnore) || stristr($field['extra'], 'auto_increment')) {
                 unset($field['default']);
-            } else if (strtolower($field['default']) == 'null') {
-                $field['default'] = "default NULL";
-            } else if (is_null($field['default'])) {
-                $field['default'] = "";
-            } else if (in_array(strtoupper($field['default']), $this->arrDefaultValueFunctionIgnore)) {
-                $field['default'] = "default " . $field['default'];
             } else {
-                $field['default'] = "default '" . $field['default'] . "'";
+                if (strtolower($field['default']) == 'null') {
+                    $field['default'] = "default NULL";
+                } else {
+                    if (is_null($field['default'])) {
+                        $field['default'] = "";
+                    } else {
+                        if (in_array(strtoupper($field['default']), $this->arrDefaultValueFunctionIgnore)) {
+                            $field['default'] = "default " . $field['default'];
+                        } else {
+                            $field['default'] = "default '" . $field['default'] . "'";
+                        }
+                    }
+                }
             }
 
-            if($field['collation'] !== null){
-                $field['collation'] = "COLLATE " . $field['collation'] ;
+            if ($field['collation'] !== null) {
+                $field['collation'] = "COLLATE " . $field['collation'];
             }
 
             // Remove elements from the list, we did not want.
@@ -1320,7 +1364,7 @@ class SyncCtoDatabase extends \Backend
         }
 
         // Table status
-        $objStatus = $this->Database->prepare("SHOW TABLE STATUS")->executeUncached();
+        $objStatus = $this->Database->prepare("SHOW TABLE STATUS")->execute();
 
         while ($row = $objStatus->fetchAssoc()) {
             if ($row['Name'] != $strTableName) {
@@ -1355,8 +1399,8 @@ class SyncCtoDatabase extends \Backend
         foreach ($fieldList as $field) {
             if (preg_match("/.*\([0-9]+\)/i", $field)) {
                 $cutPosition = stripos($field, '(');
-                $name        = substr($field, 0, $cutPosition);
-                $sub         = substr($field, $cutPosition);
+                $name = substr($field, 0, $cutPosition);
+                $sub = substr($field, $cutPosition);
 
                 $return[] = sprintf('`%s` %s', $name, $sub);
             } else {
@@ -1379,8 +1423,9 @@ class SyncCtoDatabase extends \Backend
     {
         $string = "CREATE TABLE `" . $strName . "` (\n  " . implode(",\n  ", $arrTable['TABLE_FIELDS']) . (count((array) $arrTable['TABLE_CREATE_DEFINITIONS']) ? ',' : '') . "\n";
 
-        if (is_Array($arrTable['TABLE_CREATE_DEFINITIONS']))
+        if (is_Array($arrTable['TABLE_CREATE_DEFINITIONS'])) {
             $string .= "  " . implode(",\n  ", $arrTable['TABLE_CREATE_DEFINITIONS']) . "\n";
+        }
 
         $string .= ")" . $arrTable['TABLE_OPTIONS'] . ";";
 
@@ -1409,8 +1454,9 @@ class SyncCtoDatabase extends \Backend
                 $strBody .= "''";
             }
 
-            if ($i < count((array) $arrKeys) - 1)
+            if ($i < count((array) $arrKeys) - 1) {
                 $strBody .= ", ";
+            }
         }
 
         $strBody .= ")";
@@ -1421,5 +1467,4 @@ class SyncCtoDatabase extends \Backend
             return $strBody;
         }
     }
-
 }

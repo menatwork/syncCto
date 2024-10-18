@@ -115,7 +115,7 @@ class SyncCtoAjax extends SyncCtoCommunicationClient
         $this->output();
     }
 
-    protected function sendFile()
+    public function sendFile($strFolder, $strFile, $strMD5 = "", $intTyp = 1, $strSplitname = "")
     {
         if (strlen($strFile = $this->Input->post("file")) == 0)
         {

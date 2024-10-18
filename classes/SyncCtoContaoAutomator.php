@@ -1,5 +1,7 @@
 <?php
 
+use Contao\Automator;
+
 /**
  * Contao Open Source CMS
  *
@@ -8,9 +10,8 @@
  * @license    GNU/LGPL
  * @filesource
  */
-class SyncCtoContaoAutomator extends \Automator
+class SyncCtoContaoAutomator extends Automator
 {
-
     public function __construct()
     {
         parent::__construct();
@@ -21,8 +22,7 @@ class SyncCtoContaoAutomator extends \Automator
      */
     public function generateInternalCache()
     {
-        if ($GLOBALS['TL_CONFIG']['bypassCache'])
-        {
+        if ($GLOBALS['TL_CONFIG']['bypassCache']) {
             return;
         }
 
@@ -41,8 +41,7 @@ class SyncCtoContaoAutomator extends \Automator
      */
     public function purgeInternalCache()
     {
-        if ($GLOBALS['TL_CONFIG']['bypassCache'])
-        {
+        if ($GLOBALS['TL_CONFIG']['bypassCache']) {
             return;
         }
 
@@ -54,8 +53,7 @@ class SyncCtoContaoAutomator extends \Automator
      */
     public function createInternalCache()
     {
-        if ($GLOBALS['TL_CONFIG']['bypassCache'])
-        {
+        if ($GLOBALS['TL_CONFIG']['bypassCache']) {
             return;
         }
 
@@ -65,6 +63,4 @@ class SyncCtoContaoAutomator extends \Automator
 //        $this->generateLanguageCache();
 //        $this->generateDcaExtracts();
     }
-
-
 } 

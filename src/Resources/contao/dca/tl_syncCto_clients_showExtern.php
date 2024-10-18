@@ -14,7 +14,7 @@ $GLOBALS['TL_DCA']['tl_syncCto_clients_showExtern'] = array
     // Config
     'config'     => array
     (
-        'dataContainer' => 'General',
+        'dataContainer' => \ContaoCommunityAlliance\DcGeneral\DC\General::class,
         'closed'        => true,
         'disableSubmit' => false
     ),

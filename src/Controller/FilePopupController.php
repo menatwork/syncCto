@@ -51,10 +51,6 @@ class FilePopupController
      */
     public function runAction()
     {
-        \System::getContainer()->get('contao.framework')->initialize();
-        \System::loadLanguageFile('default');
-        \BackendUser::getInstance()->authenticate();
-
         $this->objSyncCtoHelper = SyncCtoHelper::getInstance();
         $this->initGetParams();
 
@@ -81,19 +77,7 @@ class FilePopupController
      */
     public function getResponse()
     {
-        // Clear all we want a clear array for this windows.
-        $GLOBALS['TL_CSS']        = [];
-        $GLOBALS['TL_JAVASCRIPT'] = [];
-
-        // Set stylesheets
-        $GLOBALS['TL_CSS'][] = 'system/themes/' . Backend::getTheme() . '/basic.css';
-        $GLOBALS['TL_CSS'][] = 'bundles/synccto/css/compare.css';
-
-        // Set javascript
-        $GLOBALS['TL_JAVASCRIPT'][] = 'assets/mootools/js/mootools-core.min.js';
-        $GLOBALS['TL_JAVASCRIPT'][] = 'assets/mootools/js/mootools-more.min.js';
-        $GLOBALS['TL_JAVASCRIPT'][] = 'bundles/synccto/js/compare.js';
-        $GLOBALS['TL_JAVASCRIPT'][] = 'bundles/synccto/js/htmltable.js';
+        $this->
 
         // Set wrapper template information
         $this->popupTemplate           = new BackendTemplate("be_syncCto_popup");
@@ -285,7 +269,7 @@ class FilePopupController
         if (strlen($strContent) == 0) {
             $this->arrListFile = [];
         } else {
-            $this->arrListFile = \Contao\StringUtil::deserialize($strContent);
+            $this->arrListFile = \Contao\StringUtil::unserialize($strContent);
         }
 
         $objCompareList = new File($this->objSyncCtoHelper->standardizePath($GLOBALS['SYC_PATH']['tmp'],
@@ -294,7 +278,7 @@ class FilePopupController
         if (strlen($strContent) == 0) {
             $this->arrListCompare = [];
         } else {
-            $this->arrListCompare = \Contao\StringUtil::deserialize($strContent);
+            $this->arrListCompare = \Contao\StringUtil::unserialize($strContent);
         }
     }
 

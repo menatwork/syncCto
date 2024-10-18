@@ -2,6 +2,10 @@
 
 namespace MenAtWork\SyncCto\Contao\Table;
 
+use Contao\Input;
+use Contao\System;
+use MenAtWork\SyncCto\Contao\ScopeMatcher;
+
 /**
  * Class SyncTo
  *
@@ -16,9 +20,11 @@ class Sync
      *
      * @return void
      */
-    public function onLoadCallback($container)
+    public function onLoadCallback($container): void
     {
-        if (TL_MODE == 'BE' && \Input::get('act') === 'startSync') {
+        /** @var ScopeMatcher $scopeMatcher */
+        $scopeMatcher = System::getContainer()->get(ScopeMatcher::class);
+        if ($scopeMatcher->isBackend() && Input::get('act') === 'startSync') {
             $GLOBALS['TL_CSS'][] = 'bundles/synccto/css/contao.css';
         }
     }

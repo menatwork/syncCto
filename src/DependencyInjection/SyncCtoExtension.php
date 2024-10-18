@@ -2,6 +2,7 @@
 
 namespace MenAtWork\SyncCto\DependencyInjection;
 
+use Exception;
 use Symfony\Component\Config\FileLocator;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Extension\Extension;
@@ -17,7 +18,7 @@ class SyncCtoExtension extends Extension
      *
      * @var array
      */
-    private $files = [
+    private array $files = [
         'listener.yml',
         'services.yml',
     ];
@@ -25,7 +26,7 @@ class SyncCtoExtension extends Extension
     /**
      * {@inheritdoc}
      */
-    public function getAlias()
+    public function getAlias(): string
     {
         return 'synccto-bundle';
     }
@@ -33,9 +34,9 @@ class SyncCtoExtension extends Extension
     /**
      * {@inheritdoc}
      *
-     * @throws \Exception
+     * @throws Exception
      */
-    public function load(array $configs, ContainerBuilder $container)
+    public function load(array $configs, ContainerBuilder $container): void
     {
         $loader = new YamlFileLoader(
             $container,

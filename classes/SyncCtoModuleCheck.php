@@ -10,6 +10,9 @@
  */
 
 // Workaround for missing posix_getpwuid function
+use Contao\BackendUser;
+use Contao\Environment;
+
 if (!function_exists('posix_getpwuid'))
 {
     function posix_getpwuid($int)
@@ -56,8 +59,8 @@ class SyncCtoModuleCheck extends \Contao\BackendModule
 
     protected function compile()
     {
-        $this->import('BackendUser', 'User');
-        $this->Template->script = $this->Environment->script;
+        $this->import(BackendUser::class, 'User');
+        $this->Template->script = Environment::get('script');
 
         $this->Template->checkPhpConfiguration    = $this->checkPhpConfiguration($this->getPhpConfigurations());
         $this->Template->checkPhpFunctions        = $this->checkPhpFunctions($this->getPhpFunctions());
@@ -521,11 +524,11 @@ class SyncCtoModuleCheck extends \Contao\BackendModule
         {
             if (!empty($arrFunctions['error_create']))
             {
-                $this->log('Error by checking trigger functions for syncCto Pro. ' . $arrFunctions['error_create'], __CLASS__ . '|' . __FUNCTION__, TL_ERROR);
+//                $this->log('Error by checking trigger functions for syncCto Pro. ' . $arrFunctions['error_create'], __CLASS__ . '|' . __FUNCTION__, TL_ERROR);
             }
             else if (!empty($arrFunctions['error_delete']))
             {
-                $this->log('Error by checking trigger functions for syncCto Pro. ' . $arrFunctions['error_create'], __CLASS__ . '|' . __FUNCTION__, TL_ERROR);
+//                $this->log('Error by checking trigger functions for syncCto Pro. ' . $arrFunctions['error_create'], __CLASS__ . '|' . __FUNCTION__, TL_ERROR);
             }
 
             $return .= '<tr class="' . ($ok ? 'ok' : 'warning') . '">';
@@ -584,7 +587,7 @@ class SyncCtoModuleCheck extends \Contao\BackendModule
 
     public function compareExtendedInformation($arrServerExtendedFunctions, $arrClientExtendedFunctions)
     {
-        $return .= '<table width="100%" cellspacing="0" cellpadding="0" class="extensions" summary="">';
+        $return = '<table width="100%" cellspacing="0" cellpadding="0" class="extensions" summary="">';
         $return .= '<colgroup>';
         $return .= '<col width="215" />';
         $return .= '<col width="35" />';

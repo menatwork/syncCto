@@ -5,17 +5,17 @@
  *
  * @copyright  MEN AT WORK 2014
  * @package    syncCto
- * @license    GNU/LGPL 
+ * @license    GNU/LGPL
  * @filesource
  */
 
 $GLOBALS['TL_DCA']['tl_syncCto_restore_file'] = array
 (
     // Config
-    'config' => array
+    'config'     => array
     (
-        'dataContainer'           => 'General',
-        'disableSubmit'           => false
+        'dataContainer' => 'General',
+        'disableSubmit' => false
     ),
     'dca_config' => array
     (
@@ -29,24 +29,24 @@ $GLOBALS['TL_DCA']['tl_syncCto_restore_file'] = array
         ),
     ),
     // Palettes
-    'palettes' => array
+    'palettes'   => array
     (
-        'default'                 => '{filelist_legend},filelist;',
+        'default' => '{filelist_legend},filelist;',
     ),
     // Fields
-    'fields' => array
+    'fields'     => array
     (
         'filelist' => array
         (
-            'label'               => &$GLOBALS['TL_LANG']['tl_syncCto_restore_file']['filelist'],
-            'inputType'           => 'fileTree',
-            'eval' => array
+            'label'     => &$GLOBALS['TL_LANG']['tl_syncCto_restore_file']['filelist'],
+            'inputType' => 'fileTree',
+            'eval'      => array
             (
-                'files'           => true,
-                'filesOnly'       => true,
-                'fieldType'       => 'radio',
-                'path'            => $GLOBALS['TL_CONFIG']['uploadPath'] . '/syncCto_backups/files', 
-                'extensions'      => 'rar,zip'
+                'files'      => true,
+                'filesOnly'  => true,
+                'fieldType'  => 'radio',
+                'path'       => 'files/syncCto_backups/files',
+                'extensions' => 'rar,zip'
             ),
         ),
     )

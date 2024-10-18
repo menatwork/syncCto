@@ -11,6 +11,10 @@
 
 namespace MenAtWork\SyncCto\Helper;
 
+use Contao\Controller;
+use Contao\Database;
+use Contao\Database\Result;
+
 /**
  * Class Ping
  *
@@ -28,7 +32,7 @@ class Ping
     /**
      * Holds the current client data from the database.
      *
-     * @var \Database\Result
+     * @var Result
      */
     protected $client;
 
@@ -87,7 +91,7 @@ class Ping
     public function __construct()
     {
         // Init some more things.
-        \Controller::loadLanguageFile('tl_synccto_clients');
+        Controller::loadLanguageFile('tl_synccto_clients');
     }
 
     /**
@@ -127,7 +131,7 @@ class Ping
     protected function loadClient()
     {
         // Load Client from database.
-        $objClient = \Database::getInstance()
+        $objClient = Database::getInstance()
                               ->prepare('SELECT * FROM tl_synccto_clients WHERE id = ?')
                               ->limit(1)
                               ->execute($this->clientID);

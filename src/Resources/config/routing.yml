@@ -1,11 +1,15 @@
+maw.sync_cto.client.run:
+  resource: \MenAtWork\SyncCto\Controller\ClientController
+  type: attribute
+
 maw.sync_cto.popup.files:
-  path:     /syncCto/popup/files
-  defaults: { _controller: MenAtWork\SyncCto\Controller\FilePopupController::runAction, _scope: backend, _token_check: true }
+  path: /syncCto/popup/files
+  defaults: { _controller: \MenAtWork\SyncCto\Controller\FilePopupController::runAction, _scope: backend, _token_check: true }
 
 maw.sync_cto.popup.database:
-  path:     /syncCto/popup/database
-  defaults: { _controller: MenAtWork\SyncCto\Controller\DatabasePopupController::runAction, _scope: backend, _token_check: true }
+  path: /syncCto/popup/database
+  defaults: { _controller: \MenAtWork\SyncCto\Controller\DatabasePopupController::runAction, _scope: backend, _token_check: true }
 
 maw.sync_cto.api.1_0.ping:
-  path:     /syncCto/api/1.0/ping
-  defaults: { _controller: MenAtWork\SyncCto\Controller\ApiController::pingAction, _scope: backend, _token_check: true }
+  path: /syncCto/api/1.0/ping
+  defaults: { _controller: \MenAtWork\SyncCto\Controller\ApiController::pingAction, _scope: backend, _token_check: true }

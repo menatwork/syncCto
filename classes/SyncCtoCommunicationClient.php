@@ -9,12 +9,16 @@
  * @filesource
  */
 
+use Contao\Database;
+use Contao\File;
+use MenAtWork\CtoCommunicationBundle\Controller\Server;
+
 /**
  * Communication Class
  *
  * Extends CtoCommunication witch special RPC-Requests
  */
-class SyncCtoCommunicationClient extends \MenAtWork\CtoCommunicationBundle\Controller\Server
+class SyncCtoCommunicationClient extends Server
 {
     /* -------------------------------------------------------------------------
      * Vars
@@ -40,7 +44,7 @@ class SyncCtoCommunicationClient extends \MenAtWork\CtoCommunicationBundle\Contr
         parent::__construct();
 
         // Objects
-        $this->objSyncCtoFiles  = SyncCtoFiles::getInstance();
+        $this->objSyncCtoFiles = SyncCtoFiles::getInstance();
         $this->objSyncCtoHelper = SyncCtoHelper::getInstance();
     }
 
@@ -51,8 +55,7 @@ class SyncCtoCommunicationClient extends \MenAtWork\CtoCommunicationBundle\Contr
      */
     public static function getInstance()
     {
-        if (self::$instance == null)
-        {
+        if (self::$instance == null) {
             self::$instance = new SyncCtoCommunicationClient();
         }
 
@@ -71,13 +74,13 @@ class SyncCtoCommunicationClient extends \MenAtWork\CtoCommunicationBundle\Contr
     public function setClientBy($id)
     {
         // Load Client from database
-        $objClient = \Database::getInstance()->prepare("SELECT * FROM tl_synccto_clients WHERE id = ?")
-            ->limit(1)
-            ->execute((int)$id);
+        $objClient = Database::getInstance()->prepare("SELECT * FROM tl_synccto_clients WHERE id = ?")
+                             ->limit(1)
+                             ->execute((int) $id)
+        ;
 
         // Check if a client was loaded
-        if ($objClient->numRows == 0)
-        {
+        if ($objClient->numRows == 0) {
             throw new Exception($GLOBALS['TL_LANG']['ERR']['unknown_client']);
         }
 
@@ -85,8 +88,7 @@ class SyncCtoCommunicationClient extends \MenAtWork\CtoCommunicationBundle\Contr
 
         $this->setClient($strUrl, $objClient->apikey, $objClient->codifyengine);
 
-        if ($objClient->http_auth == true)
-        {
+        if ($objClient->http_auth == true) {
             $this->setHttpAuth($objClient->http_username, $objClient->http_password);
         }
 
@@ -318,26 +320,25 @@ class SyncCtoCommunicationClient extends \MenAtWork\CtoCommunicationBundle\Contr
      *
      * @param array $arrChecksumList
      *
+     * @return array
      * @throws Exception
      *
-     * @return array
      */
     public function runCecksumCompare($arrChecksumList, $blnDisableDbafsConflicts = false)
     {
-        if (!is_array($arrChecksumList))
-        {
+        if (!is_array($arrChecksumList)) {
             throw new Exception("File list is not a array.");
         }
 
         $strPath = $this->objSyncCtoHelper->standardizePath($GLOBALS['SYC_PATH']['tmp'], "syncList.syncCto");
         $strMime = "application/octet-stream";
 
-        \Contao\File::putContent($strPath, serialize($arrChecksumList));
+        File::putContent($strPath, serialize($arrChecksumList));
 
         $arrData = array(
             array(
                 "name"  => "md5",
-                "value" => md5_file(TL_ROOT . "/" . $strPath),
+                "value" => md5_file(SyncCtoHelper::getInstance()->getContaoRoot() . "/" . $strPath),
             ),
             array(
                 "name"  => "file",
@@ -350,7 +351,7 @@ class SyncCtoCommunicationClient extends \MenAtWork\CtoCommunicationBundle\Contr
             array(
                 "name"     => md5($strPath),
                 "filename" => "syncList.syncCto",
-                "filepath" => TL_ROOT . "/" . $this->objSyncCtoHelper->standardizePath($GLOBALS['SYC_PATH']['tmp'], "syncList.syncCto"),
+                "filepath" => SyncCtoHelper::getInstance()->getContaoRoot() . "/" . $this->objSyncCtoHelper->standardizePath($GLOBALS['SYC_PATH']['tmp'], "syncList.syncCto"),
                 "mime"     => $strMime,
             )
         );
@@ -422,20 +423,19 @@ class SyncCtoCommunicationClient extends \MenAtWork\CtoCommunicationBundle\Contr
      */
     public function checkDeleteFiles($arrChecksumList)
     {
-        if (!is_array($arrChecksumList))
-        {
+        if (!is_array($arrChecksumList)) {
             throw new Exception("Filelist is not a array.");
         }
 
         $strPath = $this->objSyncCtoHelper->standardizePath($GLOBALS['SYC_PATH']['tmp'], "syncList.syncCto");
         $strMime = "application/octet-stream";
 
-        \Contao\File::putContent($strPath, serialize($arrChecksumList));
+        File::putContent($strPath, serialize($arrChecksumList));
 
         $arrData = array(
             array(
                 "name"  => "md5",
-                "value" => md5_file(TL_ROOT . "/" . $strPath),
+                "value" => md5_file(SyncCtoHelper::getInstance()->getContaoRoot() . "/" . $strPath),
             ),
             array(
                 "name"  => "file",
@@ -444,7 +444,7 @@ class SyncCtoCommunicationClient extends \MenAtWork\CtoCommunicationBundle\Contr
             array(
                 "name"     => md5($strPath),
                 "filename" => "syncList.syncCto",
-                "filepath" => TL_ROOT . "/" . $strPath,
+                "filepath" => SyncCtoHelper::getInstance()->getContaoRoot() . "/" . $strPath,
                 "mime"     => $strMime,
             )
         );
@@ -461,20 +461,19 @@ class SyncCtoCommunicationClient extends \MenAtWork\CtoCommunicationBundle\Contr
      */
     public function searchDeleteFolders($arrChecksumList)
     {
-        if (!is_array($arrChecksumList))
-        {
+        if (!is_array($arrChecksumList)) {
             throw new Exception("Filelist is not a array.");
         }
 
         $strPath = $this->objSyncCtoHelper->standardizePath($GLOBALS['SYC_PATH']['tmp'], "syncFolderList.syncCto");
         $strMime = "application/octet-stream";
 
-        \Contao\File::putContent($strPath, serialize($arrChecksumList));
+        File::putContent($strPath, serialize($arrChecksumList));
 
         $arrData = array(
             array(
                 "name"  => "md5",
-                "value" => md5_file(TL_ROOT . "/" . $strPath),
+                "value" => md5_file(SyncCtoHelper::getInstance()->getContaoRoot() . "/" . $strPath),
             ),
             array(
                 "name"  => "file",
@@ -483,7 +482,7 @@ class SyncCtoCommunicationClient extends \MenAtWork\CtoCommunicationBundle\Contr
             array(
                 "name"     => md5($strPath),
                 "filename" => "syncFolderList.syncCto",
-                "filepath" => TL_ROOT . "/" . $strPath,
+                "filepath" => SyncCtoHelper::getInstance()->getContaoRoot() . "/" . $strPath,
                 "mime"     => $strMime,
             )
         );
@@ -507,15 +506,13 @@ class SyncCtoCommunicationClient extends \MenAtWork\CtoCommunicationBundle\Contr
         $strFilePath = $this->objSyncCtoHelper->standardizePath($strFolder, $strFile);
 
         // Check file exsist
-        if (!file_exists(TL_ROOT . "/" . $strFilePath) || !is_file(TL_ROOT . "/" . $strFilePath))
-        {
+        if (!file_exists(SyncCtoHelper::getInstance()->getContaoRoot() . "/" . $strFilePath) || !is_file(SyncCtoHelper::getInstance()->getContaoRoot() . "/" . $strFilePath)) {
             throw new Exception(vsprintf($GLOBALS['TL_LANG']['ERR']['unknown_file'], array($strFilePath)));
         }
 
         // MD5 file hash
-        if ($strMD5 == "")
-        {
-            $strMD5 = md5_file(TL_ROOT . "/" . $strFilePath);
+        if ($strMD5 == "") {
+            $strMD5 = md5_file(SyncCtoHelper::getInstance()->getContaoRoot() . "/" . $strFilePath);
         }
 
         // Contenttyp
@@ -526,7 +523,7 @@ class SyncCtoCommunicationClient extends \MenAtWork\CtoCommunicationBundle\Contr
             array(
                 "name"     => $strMD5,
                 "filename" => $strFile,
-                "filepath" => TL_ROOT . "/" . $strFilePath,
+                "filepath" => SyncCtoHelper::getInstance()->getContaoRoot() . "/" . $strFilePath,
                 "mime"     => $strMime,
             ),
             array(
@@ -559,19 +556,17 @@ class SyncCtoCommunicationClient extends \MenAtWork\CtoCommunicationBundle\Contr
         @set_time_limit(3600);
 
         //Build path
-        $strSource      = $this->objSyncCtoHelper->standardizePath($strSource);
+        $strSource = $this->objSyncCtoHelper->standardizePath($strSource);
         $strDestination = $this->objSyncCtoHelper->standardizePath($strDestination);
 
         // Check file exsist
-        if (!file_exists(TL_ROOT . "/" . $strSource) || !is_file(TL_ROOT . "/" . $strSource))
-        {
+        if (!file_exists(SyncCtoHelper::getInstance()->getContaoRoot() . "/" . $strSource) || !is_file(SyncCtoHelper::getInstance()->getContaoRoot() . "/" . $strSource)) {
             throw new Exception(vsprintf($GLOBALS['TL_LANG']['ERR']['unknown_file'], array($strSource)));
         }
 
         // MD5 file hash
-        if ($strMD5 == "")
-        {
-            $strMD5 = md5_file(TL_ROOT . "/" . $strSource);
+        if ($strMD5 == "") {
+            $strMD5 = md5_file(SyncCtoHelper::getInstance()->getContaoRoot() . "/" . $strSource);
         }
 
         // Contenttyp
@@ -582,7 +577,7 @@ class SyncCtoCommunicationClient extends \MenAtWork\CtoCommunicationBundle\Contr
             array(
                 "name"     => $strMD5,
                 "filename" => basename($strSource),
-                "filepath" => TL_ROOT . "/" . $strSource,
+                "filepath" => SyncCtoHelper::getInstance()->getContaoRoot() . "/" . $strSource,
                 "mime"     => $strMime,
             ),
             array(
@@ -759,8 +754,8 @@ class SyncCtoCommunicationClient extends \MenAtWork\CtoCommunicationBundle\Contr
         );
 
         $arrResult = $this->run("SYNCCTO_GET_FILE", $arrData);
-        \Contao\File::putContent($strSavePath, base64_decode($arrResult["content"]));
-        if (md5_file(TL_ROOT . "/" . $strSavePath) != $arrResult["md5"]) {
+        File::putContent($strSavePath, base64_decode($arrResult["content"]));
+        if (md5_file(SyncCtoHelper::getInstance()->getContaoRoot() . "/" . $strSavePath) != $arrResult["md5"]) {
             throw new Exception($GLOBALS['TL_LANG']['ERR']['checksum_error']);
         }
 
@@ -973,10 +968,8 @@ class SyncCtoCommunicationClient extends \MenAtWork\CtoCommunicationBundle\Contr
         $arrConfig = $this->objSyncCtoHelper->loadConfigs(SyncCtoEnum::LOADCONFIG_KEY_VALUE);
 
         // Kick blacklist entries
-        foreach ($arrConfig as $key => $value)
-        {
-            if (in_array($key, $arrConfigBlacklist))
-            {
+        foreach ($arrConfig as $key => $value) {
+            if (in_array($key, $arrConfigBlacklist)) {
                 unset($arrConfig[$key]);
             }
         }
@@ -1034,8 +1027,8 @@ class SyncCtoCommunicationClient extends \MenAtWork\CtoCommunicationBundle\Contr
     /**
      * Create a file which contains the relative path
      *
-     * @throws Exception
      * @return boolean
+     * @throws Exception
      */
     public function createPathconfig()
     {
@@ -1057,7 +1050,4 @@ class SyncCtoCommunicationClient extends \MenAtWork\CtoCommunicationBundle\Contr
 
         return $this->run("SYNCCTO_AUTO_UPDATE", $arrData);
     }
-
 }
-
-?>

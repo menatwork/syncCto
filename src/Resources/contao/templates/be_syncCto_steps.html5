@@ -1,42 +1,5 @@
-<div id="tl_buttons">
-    <a onclick="Backend.getScrollOffset();" accesskey="b" title="<?php echo $GLOBALS['TL_LANG']['MSC']['backBT']; ?>" class="header_back" href="<?php echo $this->goBack; ?>"><?php echo $GLOBALS['TL_LANG']['MSC']['backBT']; ?></a>
-</div>
+<?php $this->extend('be_page'); ?>
 
-<h2 class="sub_headline"><?php echo $this->headline; ?> <?php echo (($this->direction == 'to')? '->' : (($this->direction == 'from')? '<-' : ' - ')); ?> <?php echo $this->clientName ?></h2>
-
-
-<div class="tl_formbody_edit synccto_steps">
-
-    <?php if (strlen($this->information) != 0): ?>
-        <p class="info tl_info"><?php echo $this->information; ?></p>
-    <?php endif; ?>
-
-    <?php $i = 0; foreach ($this->data as $key => $value): $i++; ?>
-        <div class="<?php echo ($key == 1) ? "tl_tbox" : "tl_box"; ?> block">
-            <h3 id="step<?php echo $key; ?>" class="headline">
-                <img src="bundles/synccto/images/steps/icon<?php echo $value["state"]; ?>.gif" alt="" />
-                <span><?php echo vsprintf($value["title"], array($i)) ?></span>
-            </h3>
-            <p class="tl_help"><?php echo $value["description"]; ?></p>
-            <?php if (isset($value["msg"]) && strlen($value["msg"])) : ?>
-            <p class="tl_help"><?php echo $value["msg"]; ?></p>
-            <?php endif; ?>
-            <?php if (isset($value["html"]) && strlen($value["html"]) != 0) : ?>
-            <?php echo $value["html"]; ?>
-            <?php endif; ?>
-        </div>
-    <?php endforeach; ?>
-
-    <?php if ($this->refresh == true && $this->error == false && $this->finished == false): ?>
-        <meta http-equiv="refresh" content="1; URL=<?php echo $this->Environment->base; ?><?php echo $this->url; ?>&amp;step=<?php echo $this->step ?>" />
-    <?php endif; ?>
-
-    <?php if ($this->error) : ?>
-        <div class="tl_box block">
-            <h4><?php echo $GLOBALS['TL_LANG']['MSC']['error'] ?? 'Error'; ?></h4>
-            <p class="tl_help"><?php echo $this->error_msg; ?></p>
-        </div>
-    <?php endif; ?>
 
     <?php if (isset($GLOBALS['TL_CONFIG']['syncCto_debug_mode']) && $GLOBALS['TL_CONFIG']['syncCto_debug_mode'] == true): ?>
         <div class="tl_box block">
@@ -49,23 +12,3 @@
             </p>
         </div>
     <?php endif; ?>
-
-    <?php if ($this->showControl == true): ?>
-        <div class="tl_tbox" id="buttons">
-            <a href="<?php echo $this->abortLink; ?>" onclick="$(this).setProperty('text', '<?php echo $GLOBALS['TL_LANG']['MSC']['abort_sync']['1']; ?>');" class="tl_submit"><?php echo $GLOBALS['TL_LANG']['MSC']['abort_sync']['0']; ?></a>
-        <?php if ($this->error): ?>
-            <a href="<?php echo $this->tryAgainLink; ?>" onclick="$(this).setProperty('text', '<?php echo $GLOBALS['TL_LANG']['MSC']['repeat_sync']['1']; ?>');" class="tl_submit"><?php echo $GLOBALS['TL_LANG']['MSC']['repeat_sync']['0']; ?></a>
-            <?php if ($this->modeAll): ?>
-            <a href="<?php echo $this->nextClientLink; ?>" onclick="$(this).setProperty('text', '<?php echo $GLOBALS['TL_LANG']['MSC']['next_sync']['1']; ?>');" class="tl_submit"><?php echo $GLOBALS['TL_LANG']['MSC']['next_sync']['0']; ?></a>
-            <?php endif; ?>
-        <?php endif; ?>
-        </div>
-    <?php endif; ?>
-
-   <?php if ($this->showNextControl && $this->modeAll): ?>
-        <div class="tl_tbox" id="buttons">
-            <a href="<?php echo $this->nextClientLink; ?>" onclick="$(this).setProperty('text', '<?php echo $GLOBALS['TL_LANG']['MSC']['next_sync']['1']; ?>');" class="tl_submit"><?php echo $GLOBALS['TL_LANG']['MSC']['next_sync']['0']; ?></a>
-        </div>
-    <?php endif; ?>
-
-</div>

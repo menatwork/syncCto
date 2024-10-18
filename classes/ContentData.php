@@ -14,95 +14,94 @@
  */
 class ContentData
 {
-
-    protected $arrValues;
-    protected $intStep;
+    /**
+     * @var array
+     */
+    protected array $values = array();
 
     /**
-     *
-     * @param type $arrContentData
-     * @param type $intStep
+     * @var int|type
      */
-    public function __construct($arrContentData, $intStep)
+    protected int $step = 0;
+
+    /**
+     * @param $contentData
+     * @param $step
+     */
+    public function __construct(array $contentData, int $step)
     {
-        $this->arrValues = $arrContentData;
-
-        if (!is_array($this->arrValues))
-        {
-            $this->arrValues = array();
-        }
-
-        $this->intStep = $intStep;
+        $this->values = $contentData;
+        $this->step = $step;
     }
 
     public function getArrValues()
     {
-        return $this->arrValues;
+        return $this->values;
     }
 
-    public function setArrValues($arrValues)
+    public function setArrValues($values)
     {
-        $this->arrValues = $arrValues;
+        $this->values = $values;
     }
 
     public function nextStep()
     {
-        $this->intStep++;
+        $this->step++;
     }
 
     public function getTitle()
     {
-        return $this->arrValues[$this->intStep]["title"];
+        return $this->values[$this->step]["title"];
     }
 
     public function setTitle($title)
     {
-        $this->arrValues[$this->intStep]["title"] = $title;
+        $this->values[$this->step]["title"] = $title;
     }
 
     public function getState()
     {
-        return $this->arrValues[$this->intStep]["state"];
+        return $this->values[$this->step]["state"];
     }
 
     public function setState($state)
     {
-        $this->arrValues[$this->intStep]["state"] = $state;
+        $this->values[$this->step]["state"] = $state;
     }
 
     public function getDescription()
     {
-        return $this->arrValues[$this->intStep]["description"];
+        return $this->values[$this->step]["description"];
     }
 
     public function setDescription($description)
     {
-        $this->arrValues[$this->intStep]["description"] = $description;
+        $this->values[$this->step]["description"] = $description;
     }
 
     public function getMsg()
     {
-        return $this->arrValues[$this->intStep]["msg"];
+        return $this->values[$this->step]["msg"];
     }
 
     public function setMsg($msg)
     {
-        $this->arrValues[$this->intStep]["msg"] = $msg;
+        $this->values[$this->step]["msg"] = $msg;
     }
 
     public function getHtml()
     {
-        return $this->arrValues[$this->intStep]["html"];
+        return $this->values[$this->step]["html"];
     }
 
     public function setHtml($html)
     {
-        $this->arrValues[$this->intStep]["html"] = $html;
+        $this->values[$this->step]["html"] = $html;
     }
 
     public function setStep($intStep)
     {
-        $this->intStep = $intStep;
+        $this->step = $intStep;
     }
 
     public function __get($name)

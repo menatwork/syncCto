@@ -1,33 +1,35 @@
 <?php
 
-/**
- * Contao Open Source CMS
- *
- * @copyright  MEN AT WORK 2014
- * @package    syncCto
- * @license    GNU/LGPL
- * @filesource
- */
+namespace MenAtWork\SyncCto\Controller;
 
-use Contao\BackendModule;
+use Contao\Backend;
 use Contao\BackendTemplate;
 use Contao\BackendUser;
-use Contao\Config;
+use Contao\CoreBundle\Controller\AbstractBackendController;
 use Contao\Database;
 use Contao\Environment;
 use Contao\File;
 use Contao\FilesModel;
-use Contao\Folder;
 use Contao\Input;
 use Contao\System;
+use ContentData;
 use MenAtWork\SyncCto\Sync\FileList\Base;
+use StepPool;
 use Symfony\Component\HttpFoundation\RequestStack;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\Session\SessionInterface;
+use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Routing\RouterInterface;
+use SyncCtoCommunicationClient;
+use SyncCtoDatabase;
+use SyncCtoEnum;
+use SyncCtoFiles;
+use SyncCtoHelper;
+use SyncCtoStats;
 
-/**
- * Class for client interaction
- */
-class SyncCtoModuleClient extends BackendModule
+
+#[Route('%contao.backend.route_prefix%/runsynccto', name: self::class, defaults: ['_scope' => 'backend'])]
+class ClientController extends AbstractBackendController
 {
     /**
      * Name of the session for the step pool.
@@ -93,6 +95,10 @@ class SyncCtoModuleClient extends BackendModule
      * @var mixed|SessionInterface
      */
     private mixed $session;
+
+    private                 $Template;
+    private array           $templateVars;
+    private RouterInterface $router;
 
     /**
      * @return int
@@ -256,46 +262,35 @@ class SyncCtoModuleClient extends BackendModule
         $this->floStart = $floStart;
     }
 
-    // Special getter / setter -------------------------------------------------
-
     public function addStep()
     {
         $this->intStep++;
     }
 
-    /* -------------------------------------------------------------------------
-     * Core Functions
-     */
-
-    /**
-     * Constructor
-     *
-     * @param DataContainer $objDc
-     */
-    public function __construct(DataContainer $objDc = null)
+    public function __construct()
     {
-        parent::__construct($objDc);
-
         // Load helper
+        $this->router = System::getContainer()->get('router');
+        $this->User = BackendUser::getInstance();
+        $this->twig = System::getContainer()->get('twig');
         $this->objSyncCtoDatabase = SyncCtoDatabase::getInstance();
         $this->objSyncCtoFiles = SyncCtoFiles::getInstance();
         $this->objSyncCtoCommunicationClient = SyncCtoCommunicationClient::getInstance();
         $this->objSyncCtoHelper = SyncCtoHelper::getInstance();
 
-        // Load language
-        $this->loadLanguageFile("tl_syncCto_steps");
-        $this->loadLanguageFile("tl_syncCto_check");
-
-        // Load CSS
-        $GLOBALS['TL_CSS'][] = 'bundles/synccto/css/steps.css';
-
-        // Init classes.
-        $this->User = BackendUser::getInstance();
-
         $container = System::getContainer();
         /** @var RequestStack $requestStack */
         $requestStack = $container->get('request_stack');
         $this->session = $requestStack->getSession();
+
+        $this->templateVars = [];
+
+        // Load language
+        System::loadLanguageFile("tl_syncCto_steps");
+        System::loadLanguageFile("tl_syncCto_check");
+
+        // Load CSS
+        $GLOBALS['TL_CSS'][] = 'bundles/synccto/css/steps.css';
     }
 
     protected function log()
@@ -305,9 +300,10 @@ class SyncCtoModuleClient extends BackendModule
     }
 
     /**
-     * Generate page
+     * @return Response
+     * @throws \Exception
      */
-    protected function compile()
+    public function __invoke(): Response
     {
         // Check if start is set
         if (Input::get("act") != "start" && Input::get('table') != 'tl_syncCto_clients_showExtern') {
@@ -325,25 +321,21 @@ class SyncCtoModuleClient extends BackendModule
         // Get Client id or check if we in allmode
         if (strlen(Input::get("id")) != 0 && Input::get("mode") != 'all') {
             $this->intClientID = intval(Input::get("id"));
+        } elseif (strlen(Input::get("id")) != 0 && Input::get("mode") == 'all' && Input::get("next") != '1') {
+            $this->blnAllMode = true;
+            $this->intClientID = intval(Input::get("id"));
+        } elseif (Input::get("mode") == 'all') {
+            $this->blnAllMode = true;
+            $this->initModeAll();
         } else {
-            if (strlen(Input::get("id")) != 0 && Input::get("mode") == 'all' && Input::get("next") != '1') {
-                $this->blnAllMode = true;
-                $this->intClientID = intval(Input::get("id"));
-            } else {
-                if (Input::get("mode") == 'all') {
-                    $this->blnAllMode = true;
-                    $this->initModeAll();
-                } else {
-                    $_SESSION["TL_ERROR"] = [$GLOBALS['TL_LANG']['ERR']['call_directly']];
-                    $this->redirect("contao?do=synccto_clients");
-                }
-            }
+            $_SESSION["TL_ERROR"] = [$GLOBALS['TL_LANG']['ERR']['call_directly']];
+            $this->redirect("contao?do=synccto_clients");
         }
 
         // Set client for communication
         try {
-            $arrClientInformations = $this->objSyncCtoCommunicationClient->setClientBy(intval($this->intClientID));
-            $this->Template->clientName = $arrClientInformations["title"];
+            $arrClientInformation = $this->objSyncCtoCommunicationClient->setClientBy(intval($this->intClientID));
+            $this->templateVars['clientName'] = $arrClientInformation["title"];
         } catch (Exception $exc) {
             throw $exc;
 //            \Contao\Message::addError($GLOBALS['TL_LANG']['ERR']['client_set']);
@@ -352,10 +344,12 @@ class SyncCtoModuleClient extends BackendModule
         }
 
         // Set template
-        $this->Template->showControl = true;
-        $this->Template->tryAgainLink = Environment::get('requestUri') . (($this->blnAllMode) ? '&mode=all' : '');
-        $this->Template->abortLink = Environment::get('requestUri') . "&abort=true" . (($this->blnAllMode) ? '&mode=all' : '');
-        $this->Template->nextClientLink = Environment::get('requestUri') . "&abort=true" . (($this->blnAllMode) ? '&mode=all&next=1' : '');
+        $this->templateVars['showControl'] = true;
+        $this->templateVars['showNextControl'] = false;
+        $this->templateVars['modeAll'] = false;
+        $this->templateVars['tryAgainLink'] = Environment::get('requestUri') . (($this->blnAllMode) ? '&mode=all' : '');
+        $this->templateVars['abortLink'] = Environment::get('requestUri') . "&abort=true" . (($this->blnAllMode) ? '&mode=all' : '');
+        $this->templateVars['nextClientLink'] = Environment::get('requestUri') . "&abort=true" . (($this->blnAllMode) ? '&mode=all&next=1' : '');
 
         // Load content from session
         if ($this->intStep != 0) {
@@ -402,9 +396,9 @@ class SyncCtoModuleClient extends BackendModule
             // Set template vars
             $this->setTemplateVars();
             // Hidden control
-            $this->Template->showControl = false;
+            $this->templateVars['showControl'] = false;
 
-            return;
+            return new Response('');
         }
 
         // Which table is in use
@@ -432,6 +426,11 @@ class SyncCtoModuleClient extends BackendModule
 
         // Set Vars for the template
         $this->setTemplateVars();
+        dump($this->templateVars);
+        return $this->render(
+            '@SyncCto/be_syncCto_steps.html.twig',
+            $this->templateVars
+        );
     }
 
     /**
@@ -495,28 +494,41 @@ class SyncCtoModuleClient extends BackendModule
 
     protected function setTemplateVars()
     {
+        $controllerUrl = $this->router->generate(self::class);
+        $this->templateVars['base'] = Environment::get('base');
+        $this->templateVars['url'] = $controllerUrl . '?' . $this->strUrl;
+        if (str_starts_with($this->templateVars['url'], '/')) {
+            $this->templateVars['url'] = substr($this->templateVars['url'], 1);
+        }
+
         // Set Tempalte
-        $this->Template->goBack = $this->strGoBack;
-        $this->Template->data = $this->objData->getArrValues();
-        $this->Template->step = $this->intStep;
-        $this->Template->subStep = $this->objStepPool->step;
-        $this->Template->error = $this->booError;
-        $this->Template->error_msg = $this->strError;
-        $this->Template->refresh = $this->booRefresh;
-        $this->Template->url = $this->strUrl;
-        $this->Template->start = $this->floStart;
-        $this->Template->headline = $this->strHeadline;
-        $this->Template->information = $this->strInformation;
-        $this->Template->finished = $this->booFinished;
-        $this->Template->allMode = $this->blnAllMode;
+        $this->templateVars['goBack'] = $this->strGoBack;
+        $this->templateVars['data'] = $this->objData->getArrValues();
+        $this->templateVars['step'] = $this->intStep;
+        $this->templateVars['subStep'] = $this->objStepPool->step;
+        $this->templateVars['error'] = $this->booError;
+        $this->templateVars['error_msg'] = $this->strError;
+        $this->templateVars['refresh'] = $this->booRefresh;
+        $this->templateVars['start'] = $this->floStart;
+        $this->templateVars['headline'] = $this->strHeadline;
+        $this->templateVars['information'] = $this->strInformation;
+        $this->templateVars['finished'] = $this->booFinished;
+        $this->templateVars['allMode'] = $this->blnAllMode;
+        $this->templateVars['language'] = [
+            'goBack'    => $GLOBALS['TL_LANG']['MSC']['backBT'],
+            'error'     => $GLOBALS['TL_LANG']['MSC']['error'],
+            'abort'     => $GLOBALS['TL_LANG']['MSC']['abort_sync'],
+            'repeat'    => $GLOBALS['TL_LANG']['MSC']['repeat_sync'],
+            'next_sync' => $GLOBALS['TL_LANG']['MSC']['next_sync']
+        ];
 
         if (Input::get('table') == 'tl_syncCto_clients_syncTo') {
-            $this->Template->direction = 'to';
+            $this->templateVars['direction'] = 'to';
         } else {
             if (Input::get('table') == 'tl_syncCto_clients_syncFrom') {
-                $this->Template->direction = 'from';
+                $this->templateVars['direction'] = 'from';
             } else {
-                $this->Template->direction = 'na';
+                $this->templateVars['direction'] = 'na';
             }
         }
     }
@@ -828,7 +840,7 @@ class SyncCtoModuleClient extends BackendModule
             $this->booFinished = false;
             $this->strError = "";
             $this->booRefresh = true;
-            $this->strUrl = "contao?do=synccto_clients&amp;table=tl_syncCto_clients_syncTo&amp;act=start&amp;id=" . $this->intClientID;
+            $this->strUrl = "do=synccto_clients&amp;table=tl_syncCto_clients_syncTo&amp;act=start&amp;id=" . $this->intClientID;
             $this->strGoBack = Environment::get('base') . "contao?do=synccto_clients";
             $this->strHeadline = $GLOBALS['TL_LANG']['tl_syncCto_sync']['edit'];
             $this->strInformation = "";
@@ -1011,7 +1023,7 @@ class SyncCtoModuleClient extends BackendModule
             $this->booFinished = false;
             $this->strError = "";
             $this->booRefresh = true;
-            $this->strUrl = "contao?do=synccto_clients&amp;table=tl_syncCto_clients_syncFrom&amp;act=start&amp;id=" . $this->intClientID;
+            $this->strUrl = "do=synccto_clients&amp;table=tl_syncCto_clients_syncFrom&amp;act=start&amp;id=" . $this->intClientID;
             $this->strGoBack = Environment::get('base') . "contao?do=synccto_clients";
             $this->strHeadline = $GLOBALS['TL_LANG']['tl_syncCto_sync']['edit'];
             $this->strInformation = "";
@@ -1187,7 +1199,7 @@ class SyncCtoModuleClient extends BackendModule
             $this->booFinished = false;
             $this->strError = "";
             $this->booRefresh = true;
-            $this->strUrl = "contao?do=synccto_clients&amp;table=tl_syncCto_clients_showExtern&amp;act=start&amp;id=" . $this->intClientID;
+            $this->strUrl = "do=synccto_clients&amp;table=tl_syncCto_clients_showExtern&amp;act=start&amp;id=" . $this->intClientID;
             $this->strGoBack = Environment::get('base') . "contao?do=synccto_clients";
             $this->strHeadline = $GLOBALS['TL_LANG']['tl_syncCto_check']['check'];
             $this->strInformation = "";
@@ -1291,7 +1303,7 @@ class SyncCtoModuleClient extends BackendModule
 
                     $this->booFinished = true;
                     $this->booRefresh = false;
-                    $this->Template->showControl = false;
+                    $this->templateVars['showControl'] = false;
 
                     $this->objStepPool->increaseSubStep();
 
@@ -1299,7 +1311,7 @@ class SyncCtoModuleClient extends BackendModule
                     $this->objData->setState(SyncCtoEnum::WORK_OK);
                     $this->booFinished = true;
                     $this->booRefresh = false;
-                    $this->Template->showControl = false;
+                    $this->templateVars['showControl'] = false;
                     break;
             }
         } catch (Exception $exc) {
@@ -3129,8 +3141,8 @@ class SyncCtoModuleClient extends BackendModule
                     }
 
                     // Hide control div
-                    $this->Template->showControl = false;
-                    $this->Template->showNextControl = true;
+                    $this->templateVars['showControl'] = false;
+                    $this->templateVars['showNextControl'] = true;
 
                     // If no files are send show success msg
                     if (!is_array((array) $this->arrListCompare) || (count((array) $this->arrListCompare['core']) == 0 && count((array) $this->arrListCompare['files']) == 0)) {
@@ -4703,8 +4715,8 @@ class SyncCtoModuleClient extends BackendModule
                     }
 
                     // Hide control div
-                    $this->Template->showControl = false;
-                    $this->Template->showNextControl = true;
+                    $this->templateVars['showControl'] = false;
+                    $this->templateVars['showNextControl'] = true;
 
                     // If no files are send show success msg
                     if (!is_array($this->arrListCompare) || (count((array) $this->arrListCompare['core']) == 0 && count((array) $this->arrListCompare['files']) == 0)) {
@@ -4997,4 +5009,3 @@ class SyncCtoModuleClient extends BackendModule
      * -------------------------------------------------------------------------
      */
 }
-
