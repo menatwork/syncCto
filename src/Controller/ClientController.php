@@ -2,17 +2,21 @@
 
 namespace MenAtWork\SyncCto\Controller;
 
-use Contao\Backend;
 use Contao\BackendTemplate;
 use Contao\BackendUser;
 use Contao\CoreBundle\Controller\AbstractBackendController;
+use Contao\CoreBundle\Exception\RedirectResponseException;
 use Contao\Database;
 use Contao\Environment;
 use Contao\File;
 use Contao\FilesModel;
 use Contao\Input;
+use Contao\StringUtil;
 use Contao\System;
 use ContentData;
+use Exception;
+use LimitIterator;
+use MenAtWork\SyncCto\Contao\API as SyncCtoContaoApi;
 use MenAtWork\SyncCto\Sync\FileList\Base;
 use StepPool;
 use Symfony\Component\HttpFoundation\RequestStack;
@@ -25,6 +29,7 @@ use SyncCtoDatabase;
 use SyncCtoEnum;
 use SyncCtoFiles;
 use SyncCtoHelper;
+use SyncCtoModuleCheck;
 use SyncCtoStats;
 
 
@@ -293,10 +298,31 @@ class ClientController extends AbstractBackendController
         $GLOBALS['TL_CSS'][] = 'bundles/synccto/css/steps.css';
     }
 
-    protected function log()
+    protected function log($msg, $context = [], $logLevel)
     {
         // ToDo we should replace the log function. This is only a placeholder
         // to fix it later.
+    }
+
+    /**
+     * Contao Callback support. Take and redirect it to the right address.
+     *
+     * @return void
+     */
+    public function generate()
+    {
+        if (Input::get("act") == "start" && Input::get('table') == 'tl_syncCto_clients_showExtern') {
+            $controllerUrl = $this->router->generate(self::class);
+            $redirectUrl = $controllerUrl;
+            $urlParam = [];
+            foreach (['table', 'act', 'do', 'id'] as $paramName) {
+                $urlParam[$paramName] = Input::get($paramName);
+            }
+            throw new RedirectResponseException($redirectUrl . '?' . http_build_query($urlParam), 302);
+        }
+
+        \Contao\Message::addError($GLOBALS['TL_LANG']['ERR']['call_directly']);
+        throw new RedirectResponseException("contao?do=synccto_clients", 302);
     }
 
     /**
@@ -307,8 +333,8 @@ class ClientController extends AbstractBackendController
     {
         // Check if start is set
         if (Input::get("act") != "start" && Input::get('table') != 'tl_syncCto_clients_showExtern') {
-            $_SESSION["TL_ERROR"] = [$GLOBALS['TL_LANG']['ERR']['call_directly']];
-            $this->redirect("contao?do=synccto_clients");
+            \Contao\Message::addError($GLOBALS['TL_LANG']['ERR']['call_directly']);
+            return $this->redirect("contao?do=synccto_clients");
         }
 
         // Get step
@@ -328,8 +354,8 @@ class ClientController extends AbstractBackendController
             $this->blnAllMode = true;
             $this->initModeAll();
         } else {
-            $_SESSION["TL_ERROR"] = [$GLOBALS['TL_LANG']['ERR']['call_directly']];
-            $this->redirect("contao?do=synccto_clients");
+            \Contao\Message::addError($GLOBALS['TL_LANG']['ERR']['call_directly']);
+            return $this->redirect("contao?do=synccto_clients");
         }
 
         // Set client for communication
@@ -337,10 +363,10 @@ class ClientController extends AbstractBackendController
             $arrClientInformation = $this->objSyncCtoCommunicationClient->setClientBy(intval($this->intClientID));
             $this->templateVars['clientName'] = $arrClientInformation["title"];
         } catch (Exception $exc) {
-            throw $exc;
-//            \Contao\Message::addError($GLOBALS['TL_LANG']['ERR']['client_set']);
+            \Contao\Message::addError($GLOBALS['TL_LANG']['ERR']['client_set']);
 //            $this->log($exc->getMessage(), __CLASS__ . " | " . __FUNCTION__, TL_ERROR);
 //            $this->redirect("contao?do=synccto_clients");
+            throw $exc;
         }
 
         // Set template
@@ -370,7 +396,7 @@ class ClientController extends AbstractBackendController
 
         //overwrite the default values if higher ones are defined in the settings
         if (isset($GLOBALS['TL_CONFIG']['syncCto_custom_settings'])
-            && $GLOBALS['TL_CONFIG']['syncCto_custom_settings'] == true
+            && $GLOBALS['TL_CONFIG']['syncCto_custom_settings']
             && ((int) $GLOBALS['TL_CONFIG']['syncCto_wait_timeout']) > 0
             && ((int) $GLOBALS['TL_CONFIG']['syncCto_interactive_timeout']) > 0
         ) {
@@ -426,7 +452,6 @@ class ClientController extends AbstractBackendController
 
         // Set Vars for the template
         $this->setTemplateVars();
-        dump($this->templateVars);
         return $this->render(
             '@SyncCto/be_syncCto_steps.html.twig',
             $this->templateVars
@@ -524,12 +549,10 @@ class ClientController extends AbstractBackendController
 
         if (Input::get('table') == 'tl_syncCto_clients_syncTo') {
             $this->templateVars['direction'] = 'to';
+        } elseif (Input::get('table') == 'tl_syncCto_clients_syncFrom') {
+            $this->templateVars['direction'] = 'from';
         } else {
-            if (Input::get('table') == 'tl_syncCto_clients_syncFrom') {
-                $this->templateVars['direction'] = 'from';
-            } else {
-                $this->templateVars['direction'] = 'na';
-            }
+            $this->templateVars['direction'] = 'na';
         }
     }
 
@@ -1307,7 +1330,7 @@ class ClientController extends AbstractBackendController
 
                     $this->objStepPool->increaseSubStep();
 
-                case 4:
+                case 5:
                     $this->objData->setState(SyncCtoEnum::WORK_OK);
                     $this->booFinished = true;
                     $this->booRefresh = false;
@@ -1801,7 +1824,7 @@ class ClientController extends AbstractBackendController
                         } else {
                             if (($this->arrSyncSettings["automode"] || array_key_exists("forward", $_POST)) && count((array) $this->arrListCompare) != 0) {
                                 $this->objData->setState(SyncCtoEnum::WORK_OK);
-                                $this->objData->setDescription(vsprintf($GLOBALS['TL_LANG']['tl_syncCto_sync']["step_2"]['description_4'], [$intCountMissing, $intCountNeed, $intCountDelete, $intCountIgnored, $this->getReadableSize($intTotalSizeNew), $this->getReadableSize($intTotalSizeChange), $this->getReadableSize($intTotalSizeDel)]));
+                                $this->objData->setDescription(vsprintf($GLOBALS['TL_LANG']['tl_syncCto_sync']["step_2"]['description_4'], [$intCountMissing, $intCountNeed, $intCountDelete, $intCountIgnored, SyncCtoContaoApi::getReadableSize($intTotalSizeNew), SyncCtoContaoApi::getReadableSize($intTotalSizeChange), SyncCtoContaoApi::getReadableSize($intTotalSizeDel)]));
                                 $this->objData->setHtml("");
                                 $this->booRefresh = true;
                                 $this->intStep++;
@@ -1821,7 +1844,20 @@ class ClientController extends AbstractBackendController
                     $objTemp->popupClassName = 'popup/files';
 
                     // Build content
-                    $this->objData->setDescription(vsprintf($GLOBALS['TL_LANG']['tl_syncCto_sync']["step_2"]['description_4'], [$intCountMissing, $intCountNeed, $intCountDelete, $intCountIgnored, $this->getReadableSize($intTotalSizeNew), $this->getReadableSize($intTotalSizeChange), $this->getReadableSize($intTotalSizeDel)]));
+                    $this->objData->setDescription(
+                        vsprintf(
+                            $GLOBALS['TL_LANG']['tl_syncCto_sync']["step_2"]['description_4'],
+                            [
+                                $intCountMissing,
+                                $intCountNeed,
+                                $intCountDelete,
+                                $intCountIgnored,
+                                SyncCtoContaoApi::getReadableSize($intTotalSizeNew),
+                                SyncCtoContaoApi::getReadableSize($intTotalSizeChange),
+                                SyncCtoContaoApi::getReadableSize($intTotalSizeDel)
+                            ]
+                        )
+                    );
                     $this->objData->setHtml($objTemp->parse());
                     $this->booRefresh = false;
 
@@ -2763,76 +2799,72 @@ class ClientController extends AbstractBackendController
                             foreach ($arrTransmission as $key => $value) {
                                 $this->arrListCompare['core'][$key] = $value;
                             }
-                        } else {
-                            if (iterator_count($itPrivate) != 0) { // Run private if we have files.
-                                // Get only 100 files.
-                                $itSupSet = new LimitIterator($itPrivate, 0, 100);
-                                $itSupSet = iterator_to_array($itSupSet);
+                        } elseif (iterator_count($itPrivate) != 0) { // Run private if we have files.
+                            // Get only 100 files.
+                            $itSupSet = new LimitIterator($itPrivate, 0, 100);
+                            $itSupSet = iterator_to_array($itSupSet);
 
-                                // Get the dbafs information.
-                                foreach ($itSupSet as $key => $value) {
-                                    // Get the information from the tl_files.
-                                    $objModel = FilesModel::findByPath($value['path']);
+                            // Get the dbafs information.
+                            foreach ($itSupSet as $key => $value) {
+                                // Get the information from the tl_files.
+                                $objModel = FilesModel::findByPath($value['path']);
 
-                                    // Okay we have the file ...
-                                    if ($objModel != null) {
+                                // Okay we have the file ...
+                                if ($objModel != null) {
+                                    $arrModelData = $objModel->row();
+
+                                    // PHP 7 compatibility
+                                    // See #309 (https://github.com/contao/core-bundle/issues/309)
+                                    $arrModelData['pid'] = (strlen($arrModelData['pid'])) ? StringUtil::binToUuid($arrModelData['pid']) : $arrModelData['pid'];
+                                    $arrModelData['uuid'] = StringUtil::binToUuid($arrModelData['uuid']);
+                                } // if not add it to the current DBAFS.
+                                else {
+                                    $objModel = \Dbafs::addResource($value['path']);
+                                    if ($objModel !== null) {
                                         $arrModelData = $objModel->row();
 
                                         // PHP 7 compatibility
                                         // See #309 (https://github.com/contao/core-bundle/issues/309)
-                                        $arrModelData['pid'] = (strlen($arrModelData['pid'])) ? \StringUtil::binToUuid($arrModelData['pid']) : $arrModelData['pid'];
-                                        $arrModelData['uuid'] = \StringUtil::binToUuid($arrModelData['uuid']);
-                                    } // if not add it to the current DBAFS.
-                                    else {
-                                        $objModel = \Dbafs::addResource($value['path']);
-                                        if ($objModel !== null) {
-                                            $arrModelData = $objModel->row();
+                                        $arrModelData['pid'] = (strlen($arrModelData['pid'])) ? StringUtil::binToUuid($arrModelData['pid']) : $arrModelData['pid'];
+                                        $arrModelData['uuid'] = StringUtil::binToUuid($arrModelData['uuid']);
 
-                                            // PHP 7 compatibility
-                                            // See #309 (https://github.com/contao/core-bundle/issues/309)
-                                            $arrModelData['pid'] = (strlen($arrModelData['pid'])) ? \StringUtil::binToUuid($arrModelData['pid']) : $arrModelData['pid'];
-                                            $arrModelData['uuid'] = \StringUtil::binToUuid($arrModelData['uuid']);
-
-                                            $itSupSet[$key]['tl_files'] = $arrModelData;
-                                        } else {
-                                            $itSupSet[$key]['tl_files'] = [];
-                                        }
+                                        $itSupSet[$key]['tl_files'] = $arrModelData;
+                                    } else {
+                                        $itSupSet[$key]['tl_files'] = [];
                                     }
                                 }
+                            }
 
-                                // Send the data to the client.
-                                $arrTransmission = $this
-                                    ->objSyncCtoCommunicationClient
-                                    ->runFileImport($itSupSet, true)
-                                ;
+                            // Send the data to the client.
+                            $arrTransmission = $this
+                                ->objSyncCtoCommunicationClient
+                                ->runFileImport($itSupSet, true)
+                            ;
 
-                                // Add the information to the current list.
-                                foreach ($arrTransmission as $key => $value) {
-                                    $this->arrListCompare['files'][$key] = $value;
+                            // Add the information to the current list.
+                            foreach ($arrTransmission as $key => $value) {
+                                $this->arrListCompare['files'][$key] = $value;
+                            }
+                        } elseif (iterator_count($itDbafs) != 0) { // Run private if we have files.
+                            // Get only 100 files.
+                            $itSupSet = new LimitIterator($itDbafs, 0, 100);
+
+                            // Send it to the client.
+                            $arrTransmission = $this
+                                ->objSyncCtoCommunicationClient
+                                ->updateDbafs(iterator_to_array($itSupSet))
+                            ;
+
+                            // Update the current list.
+                            foreach ($arrTransmission as $key => $value) {
+                                // Set the state.
+                                if ($value['saved']) {
+                                    $value["transmission"] = SyncCtoEnum::FILETRANS_SEND;
+                                } else {
+                                    $value["transmission"] = SyncCtoEnum::FILETRANS_SKIPPED;
                                 }
-                            } else {
-                                if (iterator_count($itDbafs) != 0) { // Run private if we have files.
-                                    // Get only 100 files.
-                                    $itSupSet = new LimitIterator($itDbafs, 0, 100);
 
-                                    // Send it to the client.
-                                    $arrTransmission = $this
-                                        ->objSyncCtoCommunicationClient
-                                        ->updateDbafs(iterator_to_array($itSupSet))
-                                    ;
-
-                                    // Update the current list.
-                                    foreach ($arrTransmission as $key => $value) {
-                                        // Set the state.
-                                        if ($value['saved']) {
-                                            $value["transmission"] = SyncCtoEnum::FILETRANS_SEND;
-                                        } else {
-                                            $value["transmission"] = SyncCtoEnum::FILETRANS_SKIPPED;
-                                        }
-
-                                        $this->arrListCompare['files'][$key] = $value;
-                                    }
-                                }
+                                $this->arrListCompare['files'][$key] = $value;
                             }
                         }
                     } catch (Exception $e) {
@@ -3676,7 +3708,7 @@ class ClientController extends AbstractBackendController
                         } else {
                             if (($this->arrSyncSettings["automode"] || array_key_exists("forward", $_POST)) && count((array) $this->arrListCompare) != 0) {
                                 $this->objData->setState(SyncCtoEnum::WORK_OK);
-                                $this->objData->setDescription(vsprintf($GLOBALS['TL_LANG']['tl_syncCto_sync']["step_2"]['description_4'], [$intCountMissing, $intCountNeed, $intCountDelete, $intCountIgnored, $this->getReadableSize($intTotalSizeNew), $this->getReadableSize($intTotalSizeChange), $this->getReadableSize($intTotalSizeDel)]));
+                                $this->objData->setDescription(vsprintf($GLOBALS['TL_LANG']['tl_syncCto_sync']["step_2"]['description_4'], [$intCountMissing, $intCountNeed, $intCountDelete, $intCountIgnored, SyncCtoContaoApi::getReadableSize($intTotalSizeNew), SyncCtoContaoApi::getReadableSize($intTotalSizeChange), SyncCtoContaoApi::getReadableSize($intTotalSizeDel)]));
                                 $this->objData->setHtml("");
                                 $this->booRefresh = true;
                                 $this->intStep++;
@@ -3696,7 +3728,7 @@ class ClientController extends AbstractBackendController
                     $objTemp->popupClassName = 'popup/files';
 
                     // Build content
-                    $this->objData->setDescription(vsprintf($GLOBALS['TL_LANG']['tl_syncCto_sync']["step_2"]['description_4'], [$intCountMissing, $intCountNeed, $intCountDelete, $intCountIgnored, $this->getReadableSize($intTotalSizeNew), $this->getReadableSize($intTotalSizeChange), $this->getReadableSize($intTotalSizeDel)]));
+                    $this->objData->setDescription(vsprintf($GLOBALS['TL_LANG']['tl_syncCto_sync']["step_2"]['description_4'], [$intCountMissing, $intCountNeed, $intCountDelete, $intCountIgnored, SyncCtoContaoApi::getReadableSize($intTotalSizeNew), SyncCtoContaoApi::getReadableSize($intTotalSizeChange), SyncCtoContaoApi::getReadableSize($intTotalSizeDel)]));
                     $this->objData->setHtml($objTemp->parse());
                     $this->booRefresh = false;
 
@@ -4368,7 +4400,7 @@ class ClientController extends AbstractBackendController
                         $mixLastTableTimestamp = Database::getInstance()
                                                          ->prepare("SELECT " . $location . "_timestamp FROM tl_synccto_clients WHERE id=?")
                                                          ->limit(1)
-                                                         ->executeUncached($this->intClientID)
+                                                         ->execute($this->intClientID)
                                                          ->fetchAllAssoc()
                         ;
 

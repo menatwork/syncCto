@@ -19,8 +19,10 @@ use Contao\File;
 use Contao\FilesModel;
 use Contao\Folder;
 use Contao\Input;
+use Contao\Message;
 use Contao\System;
 use MenAtWork\SyncCto\Sync\FileList\Base;
+use Psr\Log\LogLevel;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Session\SessionInterface;
 
@@ -298,7 +300,7 @@ class SyncCtoModuleClient extends BackendModule
         $this->session = $requestStack->getSession();
     }
 
-    protected function log()
+    protected function log($msg, $context = array(), $level = LOG_INFO)
     {
         // ToDo we should replace the log function. This is only a placeholder
         // to fix it later.
@@ -311,7 +313,7 @@ class SyncCtoModuleClient extends BackendModule
     {
         // Check if start is set
         if (Input::get("act") != "start" && Input::get('table') != 'tl_syncCto_clients_showExtern') {
-            $_SESSION["TL_ERROR"] = [$GLOBALS['TL_LANG']['ERR']['call_directly']];
+            Message::addError($GLOBALS['TL_LANG']['ERR']['call_directly']);
             $this->redirect("contao?do=synccto_clients");
         }
 
@@ -325,19 +327,15 @@ class SyncCtoModuleClient extends BackendModule
         // Get Client id or check if we in allmode
         if (strlen(Input::get("id")) != 0 && Input::get("mode") != 'all') {
             $this->intClientID = intval(Input::get("id"));
+        } elseif (strlen(Input::get("id")) != 0 && Input::get("mode") == 'all' && Input::get("next") != '1') {
+            $this->blnAllMode = true;
+            $this->intClientID = intval(Input::get("id"));
+        } elseif (Input::get("mode") == 'all') {
+            $this->blnAllMode = true;
+            $this->initModeAll();
         } else {
-            if (strlen(Input::get("id")) != 0 && Input::get("mode") == 'all' && Input::get("next") != '1') {
-                $this->blnAllMode = true;
-                $this->intClientID = intval(Input::get("id"));
-            } else {
-                if (Input::get("mode") == 'all') {
-                    $this->blnAllMode = true;
-                    $this->initModeAll();
-                } else {
-                    $_SESSION["TL_ERROR"] = [$GLOBALS['TL_LANG']['ERR']['call_directly']];
-                    $this->redirect("contao?do=synccto_clients");
-                }
-            }
+            Message::addError($GLOBALS['TL_LANG']['ERR']['call_directly']);
+            $this->redirect("contao?do=synccto_clients");
         }
 
         // Set client for communication
@@ -345,10 +343,9 @@ class SyncCtoModuleClient extends BackendModule
             $arrClientInformations = $this->objSyncCtoCommunicationClient->setClientBy(intval($this->intClientID));
             $this->Template->clientName = $arrClientInformations["title"];
         } catch (Exception $exc) {
-            throw $exc;
-//            \Contao\Message::addError($GLOBALS['TL_LANG']['ERR']['client_set']);
-//            $this->log($exc->getMessage(), __CLASS__ . " | " . __FUNCTION__, TL_ERROR);
-//            $this->redirect("contao?do=synccto_clients");
+            Message::addError($GLOBALS['TL_LANG']['ERR']['client_set']);
+            $this->log($exc->getMessage(), __CLASS__ . " | " . __FUNCTION__, LogLevel::ERROR);
+            $this->redirect("contao?do=synccto_clients");
         }
 
         // Set template
@@ -4356,7 +4353,7 @@ class SyncCtoModuleClient extends BackendModule
                         $mixLastTableTimestamp = Database::getInstance()
                                                          ->prepare("SELECT " . $location . "_timestamp FROM tl_synccto_clients WHERE id=?")
                                                          ->limit(1)
-                                                         ->executeUncached($this->intClientID)
+                                                         ->execute($this->intClientID)
                                                          ->fetchAllAssoc()
                         ;
 

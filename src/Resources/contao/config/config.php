@@ -3,6 +3,7 @@
 use Contao\ArrayUtil;
 use Contao\Input;
 use Contao\StringUtil;
+use MenAtWork\SyncCto\Controller\ClientController;
 
 /**
  * Contao Open Source CMS
@@ -43,21 +44,9 @@ ArrayUtil::arrayInsert(
                     'tl_syncCto_clients_showExtern'
                 ],
                 'icon'       => 'bundles/synccto/images/nav/iconClients.png',
-                'callback'   => 'SyncCtoModuleClient',
+                'callback'   => ClientController::class,
                 'stylesheet' => 'bundles/synccto/css/systemcheck.css',
             ],
-            //        'syncCto_backups' => array
-            //        (
-            //            'tables' => array
-            //            (
-            //                'tl_syncCto_backup_file',
-            //                'tl_syncCto_backup_db',
-            //                'tl_syncCto_restore_file',
-            //                'tl_syncCto_restore_db'
-            //            ),
-            //            'icon'              => 'bundles/synccto/images/nav/iconBackups.png',
-            //            'callback'          => 'SyncCtoModuleBackup',
-            //        ),
             'syncCto_check'    => [
                 'icon'       => 'bundles/synccto/images/nav/iconCheck.png',
                 'callback'   => 'SyncCtoModuleCheck',

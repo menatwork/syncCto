@@ -3,7 +3,6 @@
 namespace MenAtWork\SyncCto;
 
 use MenAtWork\SyncCto\DependencyInjection\SyncCtoExtension;
-use Symfony\Component\DependencyInjection\Extension\ExtensionInterface;
 use Symfony\Component\HttpKernel\Bundle\Bundle;
 
 /**
@@ -18,10 +17,7 @@ class SyncCtoBundle extends Bundle
      */
     protected $name = 'SyncCto';
 
-    /**
-     * Returns the container extension that should be implicitly loaded.
-     */
-    public function getContainerExtension(): ?ExtensionInterface
+    public function getContainerExtension(): \Symfony\Component\DependencyInjection\Extension\ExtensionInterface
     {
         return new SyncCtoExtension();
     }

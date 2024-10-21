@@ -15,14 +15,18 @@ use Contao\Backend;
 use Contao\BackendTemplate;
 use Contao\Environment;
 use Contao\File;
+use Contao\Input;
 use Contao\Session;
+use Contao\System;
+use Symfony\Component\HttpFoundation\RequestStack;
+use Symfony\Component\HttpFoundation\Session\SessionInterface;
 use SyncCtoEnum;
 use SyncCtoHelper;
 
 /**
  * Class SyncCtoPopupFiles
  */
-class FilePopupController
+class FilePopupController extends APopUpController
 {
     // Vars
     protected $intClientID;
@@ -39,11 +43,20 @@ class FilePopupController
     const STEP_ERROR_FILES = 'er';
 
     /**
+     * @var SessionInterface
+     */
+    protected SessionInterface $session;
+
+
+    /**
      * FilePopupController constructor.
      */
     public function __construct()
     {
-        \define('TL_ASSETS_URL', '');
+        $container = System::getContainer();
+        /** @var RequestStack $requestStack */
+        $requestStack = $container->get('request_stack');
+        $this->session = $requestStack->getSession();
     }
 
     /**
@@ -77,24 +90,19 @@ class FilePopupController
      */
     public function getResponse()
     {
-        $this->
+        $this->setupTemplate();
 
         // Set wrapper template information
-        $this->popupTemplate           = new BackendTemplate("be_syncCto_popup");
-        $this->popupTemplate->theme    = Backend::getTheme();
-        $this->popupTemplate->base     = Environment::get('base');
+        $this->popupTemplate = new BackendTemplate("be_syncCto_popup");
+        $this->popupTemplate->theme = Backend::getTheme();
+        $this->popupTemplate->base = Environment::get('base');
         $this->popupTemplate->language = $GLOBALS['TL_LANGUAGE'];
-        $this->popupTemplate->title    = $GLOBALS['TL_CONFIG']['websiteTitle'];
-        $this->popupTemplate->charset  = $GLOBALS['TL_CONFIG']['characterSet'];
-        $this->popupTemplate->headline = basename(
-            utf8_convert_encoding(
-                $this->strFile,
-                $GLOBALS['TL_CONFIG']['characterSet']
-            )
-        );
+        $this->popupTemplate->title = $GLOBALS['TL_CONFIG']['websiteTitle'];
+        $this->popupTemplate->charset = $GLOBALS['TL_CONFIG']['characterSet'];
+        $this->popupTemplate->headline = basename($this->strFile ?? '');
 
         // Set default information
-        $this->Template->id   = $this->intClientID;
+        $this->Template->id = $this->intClientID;
         $this->Template->step = $this->mixStep;
 
         // Output template
@@ -132,19 +140,19 @@ class FilePopupController
         }
 
         // Counter
-        $intCountMissing       = 0;
-        $intCountNeed          = 0;
-        $intCountIgnored       = 0;
-        $intCountDelete        = 0;
+        $intCountMissing = 0;
+        $intCountNeed = 0;
+        $intCountIgnored = 0;
+        $intCountDelete = 0;
         $intCountDbafsConflict = 0;
 
-        $intTotalSizeNew    = 0;
-        $intTotalSizeDel    = 0;
+        $intTotalSizeNew = 0;
+        $intTotalSizeDel = 0;
         $intTotalSizeChange = 0;
 
         // Lists
         $arrNormalFiles = [];
-        $arrBigFiles    = [];
+        $arrBigFiles = [];
 
         // Build list
         foreach ($this->arrListCompare as $strType => $arrLists) {
@@ -180,14 +188,16 @@ class FilePopupController
                     $value['dbafs_conflict'] = true;
                 }
 
-                if (in_array($value["state"],
+                if (in_array(
+                    $value["state"],
                     [
                         SyncCtoEnum::FILESTATE_TOO_BIG_DELETE,
                         SyncCtoEnum::FILESTATE_TOO_BIG_MISSING,
                         SyncCtoEnum::FILESTATE_TOO_BIG_NEED,
                         SyncCtoEnum::FILESTATE_TOO_BIG_SAME,
                         SyncCtoEnum::FILESTATE_BOMBASTIC_BIG,
-                    ])
+                    ]
+                )
                 ) {
                     $arrBigFiles[$key] = $value;
                 } else {
@@ -206,29 +216,29 @@ class FilePopupController
         uasort($arrNormalFiles, [$this, 'sort']);
 
         // Language array for filestate
-        $arrLanguageTags                                         = [];
-        $arrLanguageTags[SyncCtoEnum::FILESTATE_MISSING]         = $GLOBALS['TL_LANG']['MSC']['create'];
-        $arrLanguageTags[SyncCtoEnum::FILESTATE_NEED]            = $GLOBALS['TL_LANG']['MSC']['overrideSelected'];
-        $arrLanguageTags[SyncCtoEnum::FILESTATE_DELETE]          = $GLOBALS['TL_LANG']['MSC']['delete'];
-        $arrLanguageTags[SyncCtoEnum::FILESTATE_FOLDER_DELETE]   = $GLOBALS['TL_LANG']['MSC']['delete'];
+        $arrLanguageTags = [];
+        $arrLanguageTags[SyncCtoEnum::FILESTATE_MISSING] = $GLOBALS['TL_LANG']['MSC']['create'];
+        $arrLanguageTags[SyncCtoEnum::FILESTATE_NEED] = $GLOBALS['TL_LANG']['MSC']['overrideSelected'];
+        $arrLanguageTags[SyncCtoEnum::FILESTATE_DELETE] = $GLOBALS['TL_LANG']['MSC']['delete'];
+        $arrLanguageTags[SyncCtoEnum::FILESTATE_FOLDER_DELETE] = $GLOBALS['TL_LANG']['MSC']['delete'];
         $arrLanguageTags[SyncCtoEnum::FILESTATE_TOO_BIG_MISSING] = $GLOBALS['TL_LANG']['MSC']['skipped'];
-        $arrLanguageTags[SyncCtoEnum::FILESTATE_TOO_BIG_NEED]    = $GLOBALS['TL_LANG']['MSC']['skipped'];
-        $arrLanguageTags[SyncCtoEnum::FILESTATE_TOO_BIG_DELETE]  = $GLOBALS['TL_LANG']['MSC']['skipped'];
-        $arrLanguageTags[SyncCtoEnum::FILESTATE_BOMBASTIC_BIG]   = $GLOBALS['TL_LANG']['MSC']['ignored'];
-        $arrLanguageTags[SyncCtoEnum::FILESTATE_DBAFS_CONFLICT]  = $GLOBALS['TL_LANG']['MSC']['dbafs_conflict'];
+        $arrLanguageTags[SyncCtoEnum::FILESTATE_TOO_BIG_NEED] = $GLOBALS['TL_LANG']['MSC']['skipped'];
+        $arrLanguageTags[SyncCtoEnum::FILESTATE_TOO_BIG_DELETE] = $GLOBALS['TL_LANG']['MSC']['skipped'];
+        $arrLanguageTags[SyncCtoEnum::FILESTATE_BOMBASTIC_BIG] = $GLOBALS['TL_LANG']['MSC']['ignored'];
+        $arrLanguageTags[SyncCtoEnum::FILESTATE_DBAFS_CONFLICT] = $GLOBALS['TL_LANG']['MSC']['dbafs_conflict'];
 
         // Set template
-        $this->Template                  = new BackendTemplate('be_syncCto_files');
-        $this->Template->maxLength       = 55;
-        $this->Template->arrLangStates   = $arrLanguageTags;
-        $this->Template->normalFilelist  = $arrNormalFiles;
-        $this->Template->bigFilelist     = $arrBigFiles;
-        $this->Template->totalsizeNew    = $intTotalSizeNew;
-        $this->Template->totalsizeDel    = $intTotalSizeDel;
+        $this->Template = new BackendTemplate('be_syncCto_files');
+        $this->Template->maxLength = 55;
+        $this->Template->arrLangStates = $arrLanguageTags;
+        $this->Template->normalFilelist = $arrNormalFiles;
+        $this->Template->bigFilelist = $arrBigFiles;
+        $this->Template->totalsizeNew = $intTotalSizeNew;
+        $this->Template->totalsizeDel = $intTotalSizeDel;
         $this->Template->totalsizeChange = $intTotalSizeChange;
         $this->Template->compare_complex = false;
-        $this->Template->close           = false;
-        $this->Template->error           = false;
+        $this->Template->close = false;
+        $this->Template->error = false;
     }
 
     /**
@@ -236,10 +246,10 @@ class FilePopupController
      */
     public function showClose()
     {
-        $this->Template           = new BackendTemplate("be_syncCto_files");
+        $this->Template = new BackendTemplate("be_syncCto_files");
         $this->Template->headline = $GLOBALS['TL_LANG']['MSC']['backBT'];
-        $this->Template->close    = true;
-        $this->Template->error    = false;
+        $this->Template->close = true;
+        $this->Template->error = false;
     }
 
     /**
@@ -247,11 +257,11 @@ class FilePopupController
      */
     public function showError()
     {
-        $this->Template           = new BackendTemplate("be_syncCto_files");
+        $this->Template = new BackendTemplate("be_syncCto_files");
         $this->Template->headline = $GLOBALS['TL_LANG']['MSC']['error'];
-        $this->Template->text     = $GLOBALS['TL_LANG']['ERR']['general'];
-        $this->Template->close    = false;
-        $this->Template->error    = true;
+        $this->Template->text = $GLOBALS['TL_LANG']['ERR']['general'];
+        $this->Template->close = false;
+        $this->Template->error = true;
     }
 
     // Helper functions --------------------------------------------------------
@@ -263,22 +273,30 @@ class FilePopupController
      */
     protected function loadTempLists()
     {
-        $objFileList = new File($this->objSyncCtoHelper->standardizePath($GLOBALS['SYC_PATH']['tmp'],
-            "syncfilelist-ID-" . $this->intClientID . ".txt"));
-        $strContent  = $objFileList->getContent();
+        $objFileList = new File(
+            $this->objSyncCtoHelper->standardizePath(
+                $GLOBALS['SYC_PATH']['tmp'],
+                "syncfilelist-ID-" . $this->intClientID . ".txt"
+            )
+        );
+        $strContent = $objFileList->getContent();
         if (strlen($strContent) == 0) {
             $this->arrListFile = [];
         } else {
-            $this->arrListFile = \Contao\StringUtil::unserialize($strContent);
+            $this->arrListFile = \Contao\StringUtil::deserialize($strContent);
         }
 
-        $objCompareList = new File($this->objSyncCtoHelper->standardizePath($GLOBALS['SYC_PATH']['tmp'],
-            "synccomparelist-ID-" . $this->intClientID . ".txt"));
-        $strContent     = $objCompareList->getContent();
+        $objCompareList = new File(
+            $this->objSyncCtoHelper->standardizePath(
+                $GLOBALS['SYC_PATH']['tmp'],
+                "synccomparelist-ID-" . $this->intClientID . ".txt"
+            )
+        );
+        $strContent = $objCompareList->getContent();
         if (strlen($strContent) == 0) {
             $this->arrListCompare = [];
         } else {
-            $this->arrListCompare = \Contao\StringUtil::unserialize($strContent);
+            $this->arrListCompare = \Contao\StringUtil::deserialize($strContent);
         }
     }
 
@@ -289,13 +307,21 @@ class FilePopupController
      */
     protected function saveTempLists()
     {
-        $objFileList = new File($this->objSyncCtoHelper->standardizePath($GLOBALS['SYC_PATH']['tmp'],
-            "syncfilelist-ID-" . $this->intClientID . ".txt"));
+        $objFileList = new File(
+            $this->objSyncCtoHelper->standardizePath(
+                $GLOBALS['SYC_PATH']['tmp'],
+                "syncfilelist-ID-" . $this->intClientID . ".txt"
+            )
+        );
         $objFileList->write(serialize($this->arrListFile));
         $objFileList->close();
 
-        $objCompareList = new File($this->objSyncCtoHelper->standardizePath($GLOBALS['SYC_PATH']['tmp'],
-            "synccomparelist-ID-" . $this->intClientID . ".txt"));
+        $objCompareList = new File(
+            $this->objSyncCtoHelper->standardizePath(
+                $GLOBALS['SYC_PATH']['tmp'],
+                "synccomparelist-ID-" . $this->intClientID . ".txt"
+            )
+        );
         $objCompareList->write(serialize($this->arrListCompare));
         $objCompareList->close();
     }
@@ -305,7 +331,7 @@ class FilePopupController
      */
     protected function loadClientInformation()
     {
-        $this->arrClientInformation = Session::getInstance()->get("syncCto_ClientInformation_" . $this->intClientID);
+        $this->arrClientInformation = $this->session->get("syncCto_ClientInformation_" . $this->intClientID);
 
         if (!is_array($this->arrClientInformation)) {
             $this->arrClientInformation = [];
@@ -318,8 +344,8 @@ class FilePopupController
     protected function initGetParams()
     {
         // Get Client id
-        if (strlen(\Input::getInstance()->get("id")) != 0) {
-            $this->intClientID = intval(\Input::getInstance()->get("id"));
+        if (strlen(Input::get("id")) != 0) {
+            $this->intClientID = intval(Input::get("id"));
         } else {
             $this->mixStep = self::STEP_ERROR_FILES;
 
@@ -330,8 +356,8 @@ class FilePopupController
         $this->loadClientInformation();
 
         // Get next step
-        if (strlen(\Input::getInstance()->get("step")) != 0) {
-            $this->mixStep = \Input::getInstance()->get("step");
+        if (strlen(Input::get("step")) != 0) {
+            $this->mixStep = Input::get("step");
         } else {
             $this->mixStep = self::STEP_SHOW_FILES;
         }
@@ -353,5 +379,4 @@ class FilePopupController
 
         return ($a["state"] < $b["state"]) ? -1 : 1;
     }
-
 }

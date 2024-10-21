@@ -27,7 +27,7 @@
                         <img src="/bundles/synccto/images/steps/icon{{ value.state }}.gif" alt=""/>
                         <span>{{ value.title | format(i) }}</span>
                     </h3>
-                    <p class="tl_help">{{ value.description }}</p>
+                    <p class="tl_help">{{ value.description | raw }}</p>
                     {% if (value.msg is defined) and (value.msg is not empty) %}
                         <p class="tl_help">{{ value.msg }}</p>
                     {% endif %}
