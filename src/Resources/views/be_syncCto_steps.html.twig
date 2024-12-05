@@ -40,7 +40,7 @@
         </div>
 
         {% if refresh == true and error == false and finished == false %}
-            <meta http-equiv="refresh" content="1; URL={{ base }}{{ url }}&amp;step={{ step }}"/>
+            <meta http-equiv="refresh" content="10; URL={{ base | raw }}{{ url | raw }}&amp;step={{ step }}"/>
         {% endif %}
 
         {% if error == true %}
@@ -52,15 +52,15 @@
 
         {% if showControl == true %}
             <div class="tl_tbox" id="buttons">
-                <a href="{{ abortLink }}"
+                <a href="{{ abortLink | raw }}"
                    onclick="$(this).setProperty('text', '{{ language.abort.1 }}');"
                    class="tl_submit">{{ language.abort.0 }}</a>
                 {% if error == true %}
-                    <a href="{{ tryAgainLink }}"
+                    <a href="{{ tryAgainLink | raw }}"
                        onclick="$(this).setProperty('text', '{{ language.repeat.1 }}');"
                        class="tl_submit">{{ language.repeat.0 }}</a>
                     {% if modeAll == true %}
-                        <a href="{{ nextClientLink }}"
+                        <a href="{{ nextClientLink | raw }}"
                            onclick="$(this).setProperty('text', '{{ language.next_sync.1 }}');"
                            class="tl_submit">{{ language.next_sync.0 }}</a>
                     {% endif %}
