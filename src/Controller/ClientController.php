@@ -326,7 +326,7 @@ class ClientController extends AbstractBackendController
         }
 
         Message::addError($GLOBALS['TL_LANG']['ERR']['call_directly']);
-        throw new RedirectResponseException("contao?do=synccto_clients", 302);
+        throw new RedirectResponseException("/contao?do=synccto_clients", 302);
     }
 
     /**
@@ -341,7 +341,7 @@ class ClientController extends AbstractBackendController
         // Check if start is set
         if (Input::get("act") != "start" && Input::get('table') != 'tl_syncCto_clients_showExtern') {
             Message::addError($GLOBALS['TL_LANG']['ERR']['call_directly']);
-            return $this->redirect("contao?do=synccto_clients");
+            return $this->redirect("/contao?do=synccto_clients");
         }
 
         // Get step
@@ -362,7 +362,7 @@ class ClientController extends AbstractBackendController
             $this->initModeAll();
         } else {
             Message::addError($GLOBALS['TL_LANG']['ERR']['call_directly']);
-            return $this->redirect("contao?do=synccto_clients");
+            return $this->redirect("/contao?do=synccto_clients");
         }
 
         // Set client for communication
@@ -372,7 +372,7 @@ class ClientController extends AbstractBackendController
         } catch (Exception $exc) {
             Message::addError($GLOBALS['TL_LANG']['ERR']['client_set']);
 //            $this->log($exc->getMessage(), __CLASS__ . " | " . __FUNCTION__, TL_ERROR);
-//            $this->redirect("contao?do=synccto_clients");
+//            $this->redirect("/contao?do=synccto_clients");
             throw $exc;
         }
 
@@ -444,7 +444,7 @@ class ClientController extends AbstractBackendController
             $this->pageShowExtern();
         } else {
             $_SESSION["TL_ERROR"][] = $GLOBALS['TL_LANG']['ERR']['unknown_function'];
-            $this->redirect("contao?do=synccto_clients");
+            $this->redirect("/contao?do=synccto_clients");
         }
 
         // Save content in session
@@ -1040,7 +1040,7 @@ class ClientController extends AbstractBackendController
 
             default:
                 $_SESSION["TL_ERROR"] = ["Unknown step for sync."];
-                $this->redirect("contao?do=synccto_clients");
+                $this->redirect("/contao?do=synccto_clients");
                 break;
         }
 
@@ -1218,7 +1218,7 @@ class ClientController extends AbstractBackendController
 
             default:
                 $_SESSION["TL_ERROR"] = ["Unknown step for sync."];
-                $this->redirect("contao?do=synccto_clients");
+                $this->redirect("/contao?do=synccto_clients");
                 break;
         }
 
