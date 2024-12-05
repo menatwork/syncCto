@@ -40,8 +40,7 @@
         </div>
 
         {% if refresh == true and error == false and finished == false %}
-            <meta http-equiv="refresh"
-                  content="1; URL={{ base }}{{ url }}&amp;step={{ step }}"/>
+            <meta http-equiv="refresh" content="1; URL={{ base }}{{ url }}&amp;step={{ step }}"/>
         {% endif %}
 
         {% if error == true %}

@@ -11,6 +11,7 @@ use Contao\Environment;
 use Contao\File;
 use Contao\FilesModel;
 use Contao\Input;
+use Contao\Message;
 use Contao\StringUtil;
 use Contao\System;
 use ContentData;
@@ -18,6 +19,7 @@ use Exception;
 use LimitIterator;
 use MenAtWork\SyncCto\Contao\API as SyncCtoContaoApi;
 use MenAtWork\SyncCto\Sync\FileList\Base;
+use Psr\Log\LogLevel;
 use StepPool;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Response;
@@ -298,18 +300,20 @@ class ClientController extends AbstractBackendController
         $GLOBALS['TL_CSS'][] = 'bundles/synccto/css/steps.css';
     }
 
-    protected function log($msg, $context = [], $logLevel)
+    protected function log($msg, $context = [], $logLevel = LogLevel::INFO): void
     {
         // ToDo we should replace the log function. This is only a placeholder
         // to fix it later.
     }
 
     /**
-     * Contao Callback support. Take and redirect it to the right address.
+     * Contao Callback support. Take it and redirect it to the right address.
      *
      * @return void
+     * @see \MenAtWork\SyncCto\Controller\ClientController::__invoke
+     *
      */
-    public function generate()
+    public function generate(): void
     {
         if (Input::get("act") == "start" && Input::get('table') == 'tl_syncCto_clients_showExtern') {
             $controllerUrl = $this->router->generate(self::class);
@@ -321,19 +325,22 @@ class ClientController extends AbstractBackendController
             throw new RedirectResponseException($redirectUrl . '?' . http_build_query($urlParam), 302);
         }
 
-        \Contao\Message::addError($GLOBALS['TL_LANG']['ERR']['call_directly']);
+        Message::addError($GLOBALS['TL_LANG']['ERR']['call_directly']);
         throw new RedirectResponseException("contao?do=synccto_clients", 302);
     }
 
     /**
+     * New start point for the sync. We run our own controller now :)
+     *
      * @return Response
+     *
      * @throws \Exception
      */
     public function __invoke(): Response
     {
         // Check if start is set
         if (Input::get("act") != "start" && Input::get('table') != 'tl_syncCto_clients_showExtern') {
-            \Contao\Message::addError($GLOBALS['TL_LANG']['ERR']['call_directly']);
+            Message::addError($GLOBALS['TL_LANG']['ERR']['call_directly']);
             return $this->redirect("contao?do=synccto_clients");
         }
 
@@ -354,7 +361,7 @@ class ClientController extends AbstractBackendController
             $this->blnAllMode = true;
             $this->initModeAll();
         } else {
-            \Contao\Message::addError($GLOBALS['TL_LANG']['ERR']['call_directly']);
+            Message::addError($GLOBALS['TL_LANG']['ERR']['call_directly']);
             return $this->redirect("contao?do=synccto_clients");
         }
 
@@ -363,7 +370,7 @@ class ClientController extends AbstractBackendController
             $arrClientInformation = $this->objSyncCtoCommunicationClient->setClientBy(intval($this->intClientID));
             $this->templateVars['clientName'] = $arrClientInformation["title"];
         } catch (Exception $exc) {
-            \Contao\Message::addError($GLOBALS['TL_LANG']['ERR']['client_set']);
+            Message::addError($GLOBALS['TL_LANG']['ERR']['client_set']);
 //            $this->log($exc->getMessage(), __CLASS__ . " | " . __FUNCTION__, TL_ERROR);
 //            $this->redirect("contao?do=synccto_clients");
             throw $exc;
@@ -517,16 +524,26 @@ class ClientController extends AbstractBackendController
      * Helper function for session/tempfiles etc.
      */
 
-    protected function setTemplateVars()
+    /**
+     * Build the vars for the template.
+     *
+     * @return void
+     */
+    protected function setTemplateVars(): void
     {
-        $controllerUrl = $this->router->generate(self::class);
-        $this->templateVars['base'] = Environment::get('base');
-        $this->templateVars['url'] = $controllerUrl . '?' . $this->strUrl;
-        if (str_starts_with($this->templateVars['url'], '/')) {
-            $this->templateVars['url'] = substr($this->templateVars['url'], 1);
+        // There is a problem, where some users got a contao/contao in the url.
+        // So we clean it up.
+        $baseUrl = Environment::get('base');
+        if (str_ends_with($baseUrl, '/')) {
+            $baseUrl = substr($baseUrl, 0, -1);
         }
+        if (str_ends_with($baseUrl, '/contao')) {
+            $baseUrl = substr($baseUrl, 0, -7);
+        }
+        $controllerUrl = $this->router->generate(self::class);
 
-        // Set Tempalte
+        $this->templateVars['base'] = $baseUrl;
+        $this->templateVars['url'] = $controllerUrl . '?' . $this->strUrl;
         $this->templateVars['goBack'] = $this->strGoBack;
         $this->templateVars['data'] = $this->objData->getArrValues();
         $this->templateVars['step'] = $this->intStep;
