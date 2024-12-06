@@ -431,7 +431,11 @@ class ClientController extends AbstractBackendController
             // Hidden control
             $this->templateVars['showControl'] = false;
 
-            return new Response('');
+            $this->setTemplateVars();
+            return $this->render(
+                '@SyncCto/be_syncCto_steps.html.twig',
+                $this->templateVars
+            );
         }
 
         // Which table is in use

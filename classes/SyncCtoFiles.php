@@ -1420,52 +1420,67 @@ class SyncCtoFiles extends Backend
      *
      * @CtoCommunication Enable
      *
-     * @param type $strSplitname
-     * @param type $intSplitcount
-     * @param type $strMovepath
-     * @param type $strMD5
+     * @param string     $splitname
+     * @param int|string $splitcount
+     * @param string     $movepath
+     * @param string     $md5
      *
-     * @return type
+     * @return boolean
+     *
+     * @throws Exception
      */
-    public function rebuildSplitFiles($strSplitname, $intSplitcount, $strMovepath, $strMD5)
-    {
-        // Build savepath
-        $strSavePath = $this->objSyncCtoHelper->standardizePath($GLOBALS['SYC_PATH']['tmp'], "sync", $strMovepath);
+    public function rebuildSplitFiles(
+        string     $splitname,
+        int|string $splitcount,
+        string     $movepath,
+        string     $md5
+    ) {
+        $strSavePath = $this
+            ->objSyncCtoHelper
+            ->standardizePath($GLOBALS['SYC_PATH']['tmp'], "sync", $movepath)
+        ;
 
         // Create Folder
-        $objFolder = new Folder(dirname($strSavePath));
+        try {
+            new Folder(dirname($strSavePath));
+        } catch (Exception $e) {
+            throw new Exception(
+                sprintf(
+                    'Could not create folder "%s". Error: %s',
+                    dirname($strSavePath),
+                    $e->getMessage()
+                )
+            );
+        }
 
-        // Run for each part file
-        for ($i = 0; $i < $intSplitcount; $i++) {
-            // Build path for part file
-            $strReadFile = $this->objSyncCtoHelper->standardizePath($GLOBALS['SYC_PATH']['tmp'], $strSplitname, $strSplitname . ".sync" . $i);
+        $hanFileWhole = fopen(
+            $this->objSyncCtoHelper->getContaoRoot()
+            . DIRECTORY_SEPARATOR
+            . $strSavePath,
+            "a+"
+        );
+        for ($i = 0; $i < $splitcount; $i++) {
+            $strReadFile = $this
+                ->objSyncCtoHelper
+                ->standardizePath($GLOBALS['SYC_PATH']['tmp'], $splitname, $splitname . ".sync" . $i)
+            ;
 
             // Check if file exists
             if (!file_exists($this->objSyncCtoHelper->getContaoRoot() . DIRECTORY_SEPARATOR . $strReadFile)) {
-                throw new Exception(vsprintf($GLOBALS['TL_LANG']['ERR']['unknown_file'], array($strSplitname . ".sync" . $i)));
+                throw new Exception(vsprintf($GLOBALS['TL_LANG']['ERR']['unknown_file'], array($splitname . ".sync" . $i)));
             }
 
-            // Create new file objects
-            $objFilePart = new File($strReadFile);
-            $hanFileWhole = fopen($this->objSyncCtoHelper->getContaoRoot() . DIRECTORY_SEPARATOR . $strSavePath, "a+");
-
-            // Write part file to main file
-            fwrite($hanFileWhole, $objFilePart->getContent());
-
-            // Close objects
-            $objFilePart->close();
-            fclose($hanFileWhole);
-
-            // Free up memory
-            unset($objFilePart);
-            unset($hanFileWhole);
-
-            // wait
-            sleep(1);
+            fwrite(
+                $hanFileWhole,
+                file_get_contents($this->objSyncCtoHelper->getContaoRoot() . DIRECTORY_SEPARATOR . $strReadFile)
+            );
         }
 
+        fclose($hanFileWhole);
+        unset($hanFileWhole);
+
         // Check MD5 Checksum
-        if (md5_file($this->objSyncCtoHelper->getContaoRoot() . DIRECTORY_SEPARATOR . $strSavePath) != $strMD5) {
+        if (md5_file($this->objSyncCtoHelper->getContaoRoot() . DIRECTORY_SEPARATOR . $strSavePath) != $md5) {
             throw new Exception($GLOBALS['TL_LANG']['ERR']['checksum_error']);
         }
 
