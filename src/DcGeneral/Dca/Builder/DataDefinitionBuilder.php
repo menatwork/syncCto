@@ -77,7 +77,10 @@ class DataDefinitionBuilder extends DcaReadingDataDefinitionBuilder
 
         // Check if we have to force the diff.
         if (
-            ($groupRightForceDiff || (\is_array($groupRightForceDiff) && ($groupRightForceDiff[0] ?? false)))
+            (
+                (\is_array($groupRightForceDiff) && ($groupRightForceDiff[0] ?? false))
+                || $groupRightForceDiff
+            )
             && $palettesDefinition
             && $palettesDefinition->hasLegend('table')
             && $palettesDefinition->getLegend('table')->hasProperty('database_pages_check')
