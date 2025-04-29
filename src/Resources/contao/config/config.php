@@ -299,23 +299,27 @@ $GLOBALS['TL_CONFIG']['fileSyncExclude'] = implode(',', $arrFileSyncExclude);
 // Tables
 $GLOBALS['SYC_CONFIG']['table_hidden'] = array_merge((array)$GLOBALS['SYC_CONFIG']['table_hidden'], array
 (
-    'tl_files',
-    'tl_log',
-    'tl_lock',
-    'tl_cron',
-    'tl_opt_in',
-    'tl_opt_in_related',
-    'tl_remember_me',
-    'tl_session',
-    'tl_search',
-    'tl_search_index',
-    'tl_undo',
-    'tl_version',
     'tl_comments',
     'tl_comments_notify',
+    'tl_crawl_queue',
+    'tl_cron',
+    'tl_cron_job',
+    'tl_files',
+    'tl_lock',
+    'tl_log',
+    'tl_opt_in',
+    'tl_opt_in_related',
+    'tl_preview_link',
+    'tl_remember_me',
+    'tl_search',
+    'tl_search_index',
+    'tl_search_term',
+    'tl_session',
     'tl_synccto_clients',
     'tl_synccto_stats',
-    'tl_trusted_device'
+    'tl_trusted_device',
+    'tl_undo',
+    'tl_version'
 ));
 
 // Folders
@@ -328,6 +332,8 @@ $GLOBALS['SYC_CONFIG']['folder_blacklist'] = array_merge((array)$GLOBALS['SYC_CO
 // Files only sync.
 $GLOBALS['SYC_CONFIG']['file_blacklist'] = array_merge((array)$GLOBALS['SYC_CONFIG']['file_blacklist'], array
 (
+    'config/parameters*',
+    'TL_ROOT/.env.local',
     'TL_ROOT/.env',
     'TL_ROOT/.htaccess',
     'TL_ROOT/.htpasswd',
