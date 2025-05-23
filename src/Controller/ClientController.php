@@ -33,6 +33,7 @@ use SyncCtoFiles;
 use SyncCtoHelper;
 use SyncCtoModuleCheck;
 use SyncCtoStats;
+use SyncCtoStepDatabaseDiff;
 
 
 #[Route('%contao.backend.route_prefix%/runsynccto', name: self::class, defaults: ['_scope' => 'backend'])]
