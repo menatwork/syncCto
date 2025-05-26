@@ -531,7 +531,7 @@ class SyncCtoHelper
     {
         if ($strTemplate == 'be_main')
         {
-            if (!is_array($_SESSION["TL_INFO"]))
+            if (!is_array($_SESSION["TL_INFO"] ?? null))
             {
                 $_SESSION["TL_INFO"] = array();
             }
@@ -1358,7 +1358,7 @@ class SyncCtoHelper
 
         if (count($arrData) > 0)
         {
-            if (is_array($_SESSION["TL_ERROR"]))
+            if (isset($_SESSION["TL_ERROR"]) && is_array($_SESSION["TL_ERROR"]))
             {
                 if (array_key_exists($arrCheckSubmit['error']['key'], $_SESSION["TL_ERROR"]))
                 {
