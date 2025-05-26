@@ -1199,9 +1199,12 @@ class SyncCtoHelper
             }
         }
 
+
         if (count($arrData) > 0) {
-//            if (is_array($_SESSION["TL_ERROR"])) {
-//                if (array_key_exists($arrCheckSubmit['error']['key'], $_SESSION["TL_ERROR"])) {
+//            if (isset($_SESSION["TL_ERROR"]) && is_array($_SESSION["TL_ERROR"]))
+//            {
+//                if (array_key_exists($arrCheckSubmit['error']['key'], $_SESSION["TL_ERROR"]))
+//                {
 //                    unset($_SESSION["TL_ERROR"][$arrCheckSubmit['error']['key']]);
 //                }
 //            }

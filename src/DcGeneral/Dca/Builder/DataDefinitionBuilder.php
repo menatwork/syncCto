@@ -78,8 +78,8 @@ class DataDefinitionBuilder extends DcaReadingDataDefinitionBuilder
         // Check if we have to force the diff.
         if (
             (
-                (\is_array($groupRightForceDiff) && ($groupRightForceDiff[0] ?? false))
-                || $groupRightForceDiff
+                (\is_array($groupRightForceDiff) && ($groupRightForceDiff[0] ?? false) == true)
+                || $groupRightForceDiff === true
             )
             && $palettesDefinition
             && $palettesDefinition->hasLegend('table')
