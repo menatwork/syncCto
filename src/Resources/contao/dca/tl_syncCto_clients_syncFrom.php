@@ -14,7 +14,7 @@ $GLOBALS['TL_DCA']['tl_syncCto_clients_syncFrom'] = array
     // Config
     'config'      => array
     (
-        'dataContainer'    => 'General',
+        'dataContainer'    => \ContaoCommunityAlliance\DcGeneral\DC\General::class,
         'ptable'           => 'tl_synccto_clients',
         'forceEdit'        => true,
         'disableSubmit'    => false,

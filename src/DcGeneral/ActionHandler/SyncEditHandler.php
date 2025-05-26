@@ -45,9 +45,9 @@ class SyncEditHandler extends AbstractHandler
      *
      * @throws DcGeneralRuntimeException When the requested model could not be located in the database.
      */
-    public function process()
+    public function process(): void
     {
-        $event  = $this->getEvent();
+        $event = $this->getEvent();
         $action = $event->getAction();
 
         // Only handle if we do not have a manual sorting or we know where to insert.
@@ -62,18 +62,17 @@ class SyncEditHandler extends AbstractHandler
             return;
         }
 
-        $environment   = $this->getEnvironment();
+        $environment = $this->getEnvironment();
         $inputProvider = $environment->getInputProvider();
-        $view          = $environment->getView();
+        $view = $environment->getView();
         if (!$view instanceof BaseView) {
-
             return;
         }
 
         $editMask = new EditMask(
             $view,
             $environment->getDataProvider()->getEmptyModel(),
-            $clone,
+            $environment->getDataProvider()->getEmptyModel(),
             null,
             null,
             $view->breadcrumb()
@@ -87,10 +86,10 @@ class SyncEditHandler extends AbstractHandler
      *
      * @return bool
      */
-    private function checkPermission()
+    private function checkPermission(): bool
     {
-        $environment     = $this->getEnvironment();
-        $dataDefinition  = $environment->getDataDefinition();
+        $environment = $this->getEnvironment();
+        $dataDefinition = $environment->getDataDefinition();
         $basicDefinition = $dataDefinition->getBasicDefinition();
 
         if (true === $basicDefinition->isEditable()) {
@@ -129,12 +128,12 @@ class SyncEditHandler extends AbstractHandler
      */
     private function checkRestoreVersion(ModelId $modelId)
     {
-        $environment   = $this->getEnvironment();
-        $definition    = $environment->getDataDefinition();
+        $environment = $this->getEnvironment();
+        $definition = $environment->getDataDefinition();
         $inputProvider = $environment->getInputProvider();
 
-        $dataProviderDefinition  = $definition->getDataProviderDefinition();
-        $dataProvider            = $environment->getDataProvider($modelId->getDataProviderName());
+        $dataProviderDefinition = $definition->getDataProviderDefinition();
+        $dataProvider = $environment->getDataProvider($modelId->getDataProviderName());
         $dataProviderInformation = $dataProviderDefinition->getInformation($modelId->getDataProviderName());
 
         if ($dataProviderInformation->isVersioningEnabled()
@@ -151,17 +150,17 @@ class SyncEditHandler extends AbstractHandler
                     $modelId->getDataProviderName()
                 );
 
-                $environment->getEventDispatcher()->dispatch(
-                    ContaoEvents::SYSTEM_LOG,
-                    new LogEvent($message, TL_ERROR, 'DC_General - checkRestoreVersion()')
-                );
+//                $environment->getEventDispatcher()->dispatch(
+//                    ContaoEvents::SYSTEM_LOG,
+//                    new LogEvent($message, TL_ERROR, 'DC_General - checkRestoreVersion()')
+//                );
 
                 throw new DcGeneralRuntimeException($message);
             }
 
             $dataProvider->save($model);
             $dataProvider->setVersionActive($modelId->getId(), $modelVersion);
-            $environment->getEventDispatcher()->dispatch(ContaoEvents::CONTROLLER_RELOAD, new ReloadEvent());
+            $environment->getEventDispatcher()->dispatch(new ReloadEvent(), ContaoEvents::CONTROLLER_RELOAD);
         }
     }
 }

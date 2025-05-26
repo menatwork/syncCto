@@ -1,5 +1,11 @@
 <?php
 
+use Contao\Backend;
+use Contao\BackendUser;
+use Contao\Config;
+use Contao\File;
+use Contao\Files;
+
 /**
  * Contao Open Source CMS
  *
@@ -8,7 +14,6 @@
  * @license    GNU/LGPL
  * @filesource
  */
-
 class SyncCtoRPCFunctions extends Backend
 {
     /* -------------------------------------------------------------------------
@@ -37,9 +42,9 @@ class SyncCtoRPCFunctions extends Backend
 
         $this->Config = Config::getInstance();
 
-        $this->objSyncCtoFiles    = SyncCtoFiles::getInstance();
+        $this->objSyncCtoFiles = SyncCtoFiles::getInstance();
         $this->objSyncCtoDatabase = SyncCtoDatabase::getInstance();
-        $this->objSyncCtoHelper   = SyncCtoHelper::getInstance();
+        $this->objSyncCtoHelper = SyncCtoHelper::getInstance();
 
         $this->loadLanguageFile("default");
 
@@ -120,7 +125,7 @@ class SyncCtoRPCFunctions extends Backend
                 case 'file':
                 case 'debug':
                 case 'tmp':
-                    return $GLOBALS['SYC_PATH'][$strName];
+                    return $GLOBALS['SYC_PATH'][$strName] ?? [];
 
                 default:
                     throw new Exception("Unknown field");
@@ -189,11 +194,17 @@ class SyncCtoRPCFunctions extends Backend
         }
 
         $objFiles = Files::getInstance();
-        $objFiles->move_uploaded_file($_FILES[$strFilename]["tmp_name"],
-            $this->objSyncCtoHelper->standardizePath($GLOBALS['SYC_PATH']['tmp'], "syncListInc.syncCto"));
+        $objFiles->move_uploaded_file(
+            $_FILES[$strFilename]["tmp_name"],
+            $this->objSyncCtoHelper->standardizePath($GLOBALS['SYC_PATH']['tmp'], "syncListInc.syncCto")
+        );
 
-        $objFile         = new File($this->objSyncCtoHelper->standardizePath($GLOBALS['SYC_PATH']['tmp'],
-            "syncListInc.syncCto"));
+        $objFile = new File(
+            $this->objSyncCtoHelper->standardizePath(
+                $GLOBALS['SYC_PATH']['tmp'],
+                "syncListInc.syncCto"
+            )
+        );
         $arrChecksumList = unserialize($objFile->getContent());
 
         if (!is_array($arrChecksumList)) {
@@ -222,11 +233,17 @@ class SyncCtoRPCFunctions extends Backend
         }
 
         $objFiles = Files::getInstance();
-        $objFiles->move_uploaded_file($_FILES[$strFilename]["tmp_name"],
-            $this->objSyncCtoHelper->standardizePath($GLOBALS['SYC_PATH']['tmp'], "syncFolderListInc.syncCto"));
+        $objFiles->move_uploaded_file(
+            $_FILES[$strFilename]["tmp_name"],
+            $this->objSyncCtoHelper->standardizePath($GLOBALS['SYC_PATH']['tmp'], "syncFolderListInc.syncCto")
+        );
 
-        $objFile         = new File($this->objSyncCtoHelper->standardizePath($GLOBALS['SYC_PATH']['tmp'],
-            "syncFolderListInc.syncCto"));
+        $objFile = new File(
+            $this->objSyncCtoHelper->standardizePath(
+                $GLOBALS['SYC_PATH']['tmp'],
+                "syncFolderListInc.syncCto"
+            )
+        );
         $arrChecksumList = unserialize($objFile->getContent());
 
         if (!is_array($arrChecksumList)) {
@@ -255,11 +272,17 @@ class SyncCtoRPCFunctions extends Backend
         }
 
         $objFiles = Files::getInstance();
-        $objFiles->move_uploaded_file($_FILES[$strFilename]["tmp_name"],
-            $this->objSyncCtoHelper->standardizePath($GLOBALS['SYC_PATH']['tmp'], "syncListInc.syncCto"));
+        $objFiles->move_uploaded_file(
+            $_FILES[$strFilename]["tmp_name"],
+            $this->objSyncCtoHelper->standardizePath($GLOBALS['SYC_PATH']['tmp'], "syncListInc.syncCto")
+        );
 
-        $objFile         = new File($this->objSyncCtoHelper->standardizePath($GLOBALS['SYC_PATH']['tmp'],
-            "syncListInc.syncCto"));
+        $objFile = new File(
+            $this->objSyncCtoHelper->standardizePath(
+                $GLOBALS['SYC_PATH']['tmp'],
+                "syncListInc.syncCto"
+            )
+        );
         $arrChecksumList = unserialize($objFile->getContent());
 
         if (!is_array($arrChecksumList)) {

@@ -150,7 +150,7 @@ class ZipArchiveCto extends ZipArchive
      */
     public function open($filename, $flags = null)
     {
-        $filename = TL_ROOT . "/" . $filename;
+        $filename = SyncCtoHelper::getInstance()->getContaoRoot() . "/" . $filename;
 
         return parent::open($filename, $flags);
     }
@@ -176,7 +176,7 @@ class ZipArchiveCto extends ZipArchive
      */
     public function addFile(string $filename, string $localname = null, int $start = 0, int $length = 0, int $flags = 0): int
     {
-        $filename = TL_ROOT . "/" . $filename;
+        $filename = SyncCtoHelper::getInstance()->getContaoRoot() . "/" . $filename;
 
         return parent::addFile($filename, $localname, $start, $length, $flags);
     }
@@ -197,7 +197,7 @@ class ZipArchiveCto extends ZipArchive
      */
     public function extractTo($destination, $entries = null)
     {
-        $destination = TL_ROOT . "/" . $destination;
+        $destination = SyncCtoHelper::getInstance()->getContaoRoot() . "/" . $destination;
 
         return parent::extractTo($destination, $entries);
     }

@@ -11,6 +11,8 @@
 
 namespace MenAtWork\SyncCto\Contao;
 
+use Contao\Backend;
+
 /**
  * Class API
  *
@@ -31,6 +33,6 @@ class API
      */
     public static function getReadableSize($intSize, $intDecimals = 1)
     {
-        return \Backend::getReadableSize($intSize, $intDecimals);
+        return Backend::getReadableSize($intSize, $intDecimals);
     }
 }

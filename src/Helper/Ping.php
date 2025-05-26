@@ -11,6 +11,19 @@
 
 namespace MenAtWork\SyncCto\Helper;
 
+use Contao\Controller;
+use Contao\CoreBundle\Csrf\ContaoCsrfTokenManager;
+use Contao\Database;
+use Contao\Database\Result;
+use Contao\System;
+use ErrorException;
+use Exception;
+use GuzzleHttp\Client;
+use GuzzleHttp\Exception\GuzzleException;
+use GuzzleHttp\Psr7\Request;
+use Psr\Http\Message\ResponseInterface;
+use SyncCtoCommunicationClient;
+
 /**
  * Class Ping
  *
@@ -21,65 +34,64 @@ class Ping
     /**
      * The current client ID.
      *
-     * @var integer
+     * @var int|string
      */
-    protected $clientID;
+    protected string|int $clientID;
 
     /**
      * Holds the current client data from the database.
      *
-     * @var \Database\Result
+     * @var Result
      */
-    protected $client;
+    protected Result $client;
 
-    /**
-     * Class for simple http request.
-     *
-     * @var \Request
-     */
-    protected $request;
 
     /**
      * Holds the base urls.
      *
      * @var string
      */
-    protected $clientBaseUrl;
+    protected string $clientBaseUrl;
 
     /**
      * Flag if every things works.
      *
      * @var bool
      */
-    protected $success = false;
+    protected bool $success = false;
 
     /**
      * Flag id we have an error.
      *
      * @var bool
      */
-    protected $hasFatalErrors = false;
+    protected bool $hasFatalErrors = false;
 
     /**
      * The current state.
      *
      * @var int
      */
-    protected $state = 0;
+    protected int $state = 0;
 
     /**
      * Holds the error msg.
      *
      * @var string
      */
-    protected $errorMsg = '';
+    protected string $errorMsg = '';
 
     /**
      * Holds the msg.
      *
      * @var string
      */
-    protected $msg = '';
+    protected string $msg = '';
+
+    /**
+     * @var ContaoCsrfTokenManager
+     */
+    private ?object $tokenManager;
 
     /**
      * Ping constructor.
@@ -87,7 +99,10 @@ class Ping
     public function __construct()
     {
         // Init some more things.
-        \Controller::loadLanguageFile('tl_synccto_clients');
+        Controller::loadLanguageFile('tl_synccto_clients');
+
+        /** @var ContaoCsrfTokenManager $tokenManager */
+        $this->tokenManager = System::getContainer()->get('contao.csrf.token_manager');
     }
 
     /**
@@ -95,11 +110,11 @@ class Ping
      *
      * @param string $msg The messages.
      */
-    protected function addFatalError($msg)
+    protected function addFatalError(string $msg): void
     {
-        $this->success        = false;
+        $this->success = false;
         $this->hasFatalErrors = true;
-        $this->errorMsg       = $msg;
+        $this->errorMsg = $msg;
     }
 
     /**
@@ -111,11 +126,11 @@ class Ping
      *
      * @param string $errorMsg The error message.
      */
-    protected function addState($state, $msg, $errorMsg)
+    protected function addState(int $state, string $msg, string $errorMsg): void
     {
-        $this->success  = true;
-        $this->state    = $state;
-        $this->msg      = $msg;
+        $this->success = true;
+        $this->state = $state;
+        $this->msg = $msg;
         $this->errorMsg = $errorMsg;
     }
 
@@ -124,13 +139,14 @@ class Ping
      *
      * @return bool True means we have some data, false no data found.
      */
-    protected function loadClient()
+    protected function loadClient(): bool
     {
         // Load Client from database.
-        $objClient = \Database::getInstance()
-                              ->prepare('SELECT * FROM tl_synccto_clients WHERE id = ?')
-                              ->limit(1)
-                              ->execute($this->clientID);
+        $objClient = Database::getInstance()
+                             ->prepare('SELECT * FROM tl_synccto_clients WHERE id = ?')
+                             ->limit(1)
+                             ->execute($this->clientID)
+        ;
 
         // Check if a client was loaded
         if ($objClient->numRows == 0) {
@@ -143,39 +159,55 @@ class Ping
     }
 
     /**
-     * Setup the request class.
+     * Set up the request class.
+     *
+     * @param string $url The GET parameter.
+     *
+     * @return ResponseInterface
+     *
+     * @throws GuzzleException
      */
-    protected function initRequest()
+    protected function sendRequest(string $url): ResponseInterface
     {
-        // Setup request class.
-        $this->request = new \Request();
+        $this->clientBaseUrl = sprintf(
+            '%s:%s/ctoCommunication%s',
+            $this->client->address,
+            $this->client->port,
+            $url
+        );
 
-        if ($this->client->http_auth == true) {
-            $this->request->username = $this->client->http_username;
-            $this->request->password = $this->client->http_password;
+        $client = new Client();
+
+        $options = [
+            'timeout'         => 5,
+            'connect_timeout' => 5,
+            'http_errors'     => false
+        ];
+
+        if ($this->client->http_auth) {
+            $options['auth'] = [
+                $this->client->http_username,
+                $this->client->http_password
+            ];
         }
 
-        $this->clientBaseUrl = $this->client->address . ":" . $this->client->port . '/ctoCommunication';
+        return $request = $client->get(
+            $this->clientBaseUrl,
+            $options
+        );
     }
 
-    /**
-     * Send the request.
-     *
-     * @param $url
-     */
-    protected function sendRequest($url)
-    {
-        $this->request->send($this->clientBaseUrl . $url);
-    }
 
     /**
      * Ping the current client status
      *
-     * @param int $clientId The client id to check.
+     * @param int|string $clientId The client id to check.
      *
      * @return array An array with th status information.
+     *
+     * @throws GuzzleException
      */
-    public function pingClientStatus($clientId)
+    public function pingClientStatus(int|string $clientId): array
     {
         // Check if we have the id. If not end here.
         $this->clientID = intval($clientId);
@@ -183,20 +215,18 @@ class Ping
         // Check if we have the entry in the database.
         if (!$this->loadClient()) {
             $this->addFatalError('Unknown client id.');
-
             return $this->output();
         }
 
         try {
-            $this->initRequest();
             $this->pingCtoCom();
             $this->pingSyncCtoSystem();
 
             // State: Green => All systems ready.
             $this->addState(4, $GLOBALS['TL_LANG']['tl_synccto_clients']['state']['green'], '');
-        } catch (\ErrorException $exc) {
+        } catch (ErrorException $exc) {
             // Nothing to do, just don't run the default exception.
-        } catch (\Exception $exc) {
+        } catch (Exception $exc) {
             // Error.
             $this->addFatalError($exc->getMessage() . " " . $exc->getFile() . " on " . $exc->getLine());
         }
@@ -209,12 +239,13 @@ class Ping
      *
      * @return void
      *
-     * @throws \ErrorException
+     * @throws ErrorException
+     * @throws GuzzleException
      */
-    protected function pingCtoCom()
+    protected function pingCtoCom(): void
     {
-        $this->sendRequest('?act=ping');
-        if ($this->request->code != '200') {
+        $response = $this->sendRequest('?act=ping');
+        if ($response->getStatusCode() != '200') {
             $this->addState
             (
                 2,
@@ -231,9 +262,9 @@ class Ping
      *
      * @throws \Exception
      */
-    protected function pingSyncCtoSystem()
+    protected function pingSyncCtoSystem(): void
     {
-        $objSyncCtoClient = \SyncCtoCommunicationClient::getInstance();
+        $objSyncCtoClient = SyncCtoCommunicationClient::getInstance();
         $objSyncCtoClient->setClientBy($this->clientID);
 
         try {
@@ -243,9 +274,9 @@ class Ping
             try {
                 $mixVersion = $objSyncCtoClient->getVersionSyncCto();
                 if (strlen($mixVersion) == 0) {
-                    throw new \Exception('Missing syncCto Version.');
+                    throw new Exception('Missing syncCto Version.');
                 }
-            } catch (\Exception $exc) {
+            } catch (Exception $exc) {
                 // State: Blue => SyncCto missing.
                 $this->addState
                 (
@@ -254,11 +285,11 @@ class Ping
                     $exc->getMessage()
                 );
 
-                throw new \ErrorException();
+                throw new ErrorException();
             }
 
             $objSyncCtoClient->stopConnection();
-        } catch (\Exception $exc) {
+        } catch (Exception $exc) {
             // State: Orange => Key Error.
             $this->addState
             (
@@ -267,7 +298,7 @@ class Ping
                 $exc->getMessage()
             );
 
-            throw new \ErrorException();
+            throw new ErrorException();
         }
     }
 
@@ -276,29 +307,15 @@ class Ping
      *
      * @return array An array with the status information.
      */
-    protected function output()
+    protected function output(): array
     {
         // Build the basic array.
-        $output = array
-        (
-            'success' => false,
-            'value'   => 0,
-            'error'   => '',
-            'msg'     => $GLOBALS['TL_LANG']['tl_synccto_clients']['state']['gray'],
-            'token'   => REQUEST_TOKEN
-        );
-
-        // Add error.
-        if ($this->hasFatalErrors) {
-            $output['success'] = true;
-            $output['error']   = $this->errorMsg;
-        } else { // Or the default output.
-            $output['success'] = $this->success;
-            $output['value']   = $this->state;
-            $output['error']   = $this->errorMsg;
-            $output['msg']     = $this->msg;
-        }
-
-        return $output;
+        return [
+            'success' => $this->hasFatalErrors ? true : $this->success,
+            'value'   => $this->state ?? 0,
+            'error'   => $this->errorMsg ?? '',
+            'msg'     => $this->msg ?? $GLOBALS['TL_LANG']['tl_synccto_clients']['state']['gray'],
+            'token'   => $this->tokenManager->getDefaultTokenValue()
+        ];
     }
 }

@@ -9,21 +9,43 @@
  * @filesource
  */
 
+use Contao\Backend;
+use Contao\BackendTemplate;
+use Contao\BackendUser;
+use Contao\Config;
+use Contao\Controller;
+use Contao\Database;
+use Contao\FrontendUser;
+use Contao\Input;
+use Contao\Message;
+use Contao\StringUtil;
+use Contao\System;
+use Contao\Widget;
 use MenAtWork\SyncCto\Contao\API as ContaoApi;
+use MenAtWork\SyncCto\Contao\ScopeMatcher;
+use Symfony\Component\HttpFoundation\RequestStack;
+use Symfony\Component\HttpFoundation\Session\SessionInterface;
 
 /**
  * Helper class for syncCto. Callback functions, small global helper functions.
  */
 class SyncCtoHelper
 {
-    /* -------------------------------------------------------------------------
-     * Vars
-     */
-
     /**
      * @var null|SyncCtoHelper
      */
     protected static $instance = null;
+
+    /**
+     * @var ScopeMatcher|null
+     */
+    private ?ScopeMatcher $scopeMather;
+
+    /**
+     * @var string
+     */
+    private string $rootDir;
+
 
     /**
      * @var SyncCtoDatabase
@@ -31,7 +53,7 @@ class SyncCtoHelper
     protected $objSyncCtoDatabase;
 
     /**
-     * @var \FrontendUser|\BackendUser
+     * @var FrontendUser|BackendUser
      */
     protected $user;
 
@@ -42,7 +64,7 @@ class SyncCtoHelper
     protected $strPreparedTlRoot = '';
 
     // Config
-    protected $arrSearch = array("\\", ".", "^", "?", "*", "/");
+    protected $arrSearch  = array("\\", ".", "^", "?", "*", "/");
     protected $arrReplace = array("\\\\", "\\.", "\\^", ".?", ".*", "\\/");
 
     /**
@@ -55,83 +77,115 @@ class SyncCtoHelper
      */
     protected $strBottom;
 
-    /* -------------------------------------------------------------------------
-     * Core
+    /**
+     * @var SessionInterface
      */
+    private SessionInterface $session;
+
 
     /**
      * Constructor
      */
     public function __construct()
     {
-        // If we are in the Backend-Mode use the BackendUser.
-        if(TL_MODE == 'FE'){
-            $this->user = \FrontendUser::getInstance();
-        } else{
-            $this->user = \BackendUser::getInstance();
-        }
-
         // Language
-        \Controller::loadLanguageFile("default");
-        \Controller::loadLanguageFile('tl_synccto_clients');
+        Controller::loadLanguageFile("default");
+        Controller::loadLanguageFile('tl_synccto_clients');
+
+        $this->scopeMather = System::getContainer()->get(ScopeMatcher::class);
+
+        $container = System::getContainer();
+        /** @var RequestStack $requestStack */
+        $requestStack = $container->get('request_stack');
+        $this->session = $requestStack->getSession();
+
+        // If we are in the Backend-Mode use the BackendUser.
+        if ($this->scopeMather->isFrontend()) {
+            $this->user = FrontendUser::getInstance();
+        } else {
+            $this->user = BackendUser::getInstance();
+        }
 
         // Instance a list for regex from the blacklist for folders.
         $this->arrPreparedBlacklistFolder = array();
-        foreach ($this->getBlacklistFolder() as $key => $value)
-        {
+        foreach ($this->getBlacklistFolder() as $key => $value) {
             $this->arrPreparedBlacklistFolder[$key] = str_replace($this->arrSearch, $this->arrReplace, $value);
         }
 
         // Instance a list for regex from the blacklist for files.
         $this->arrPreparedBlacklistFiles = array();
-        foreach ($this->getBlacklistFile() as $key => $value)
-        {
+        foreach ($this->getBlacklistFile() as $key => $value) {
             $this->arrPreparedBlacklistFiles[$key] = str_replace($this->arrSearch, $this->arrReplace, $value);
         }
 
         // Instance a list for regex from the hidden table list.
         $this->arrPreparedHiddenTablePlaceholder = array();
-        foreach ($this->getHiddenTablePlaceholder() as $key => $value)
-        {
+        foreach ($this->getHiddenTablePlaceholder() as $key => $value) {
             $this->arrPreparedHiddenTablePlaceholder[$key] = str_replace($this->arrSearch, $this->arrReplace, $value);
         }
 
         // Replace some elements in TL_ROOT for regex.
-        $this->strPreparedTlRoot = str_replace('\\', '\\\\', TL_ROOT);
+        $this->strPreparedTlRoot = str_replace('\\', '\\\\', $this->getContaoRoot());
     }
 
     /**
      * Returns the SyncCtoHelper
-     * @return SyncCtoHelper
+     *
+     * @return SyncCtoHelper|null
      */
-    public static function getInstance()
+    public static function getInstance(): ?SyncCtoHelper
     {
-        if (self::$instance == null)
-        {
+        if (self::$instance == null) {
             self::$instance = new self();
         }
 
         return self::$instance;
     }
 
-    /* -------------------------------------------------------------------------
-     * Helper
+    /**
+     * Get the root of the contao installation.
+     *
+     * @return string
      */
+    public function getContaoRoot(): string
+    {
+        // If not set, get it.
+        if (empty($this->rootDir)) {
+            $this->rootDir = (string) System::getContainer()->getParameter('kernel.project_dir');
+        }
+
+        // If empty, something seems wrong.
+        if (empty($this->rootDir)) {
+            throw new \RuntimeException("Root directory not set");
+        }
+
+        return $this->rootDir;
+    }
+
+    /**
+     * Return the TL_ROOT prepared for regex.
+     *
+     * @return string
+     */
+    public function getPreparedTlRoot(): string
+    {
+        return $this->strPreparedTlRoot;
+    }
 
     /**
      * Parse size
+     *
      * @see http://us2.php.net/manual/en/function.ini-get.php#example-501
      *
      * @param string $size
      *
      * @return int|string
      */
-    static public function parseSize($size)
+    static public function parseSize(string $size): int|string
     {
         $size = trim($size);
         $last = strtolower($size[strlen($size) - 1]);
-        switch ($last)
-        {
+        switch ($last) {
             // The 'G' modifier is available since PHP 5.1.0
             case 'g':
                 $size *= 1024;
@@ -151,7 +205,7 @@ class SyncCtoHelper
      *
      * @return int The time parsed as int.
      */
-    static public function parseRuntime($time)
+    static public function parseRuntime(int $time): int
     {
         $time = intval($time);
         if ($time == 0 || $time == -1) {
@@ -161,105 +215,84 @@ class SyncCtoHelper
         return $time;
     }
 
-    /* -------------------------------------------------------------------------
-     * Config
-     */
-
     /**
      * Configuration merge functions
      *
-     * @param array $arrLocalconfig
-     * @param array $arrSyncCtoConfig
+     * @param array|null $configOne
+     * @param array|null $configTwo
      *
      * @return array
      */
-    private function mergeConfigs($arrLocalconfig, $arrSyncCtoConfig)
+    private function mergeConfigs(?array $configOne, ?array $configTwo): array
     {
-        if (is_array($arrLocalconfig) && is_array($arrSyncCtoConfig))
-        {
-            $arrLocalconfig   = array_filter($arrLocalconfig, 'strlen');
-            $arrSyncCtoConfig = array_filter($arrSyncCtoConfig, 'strlen');
+        if (is_array($configOne) && is_array($configTwo)) {
+            $configOne = array_filter($configOne, 'strlen');
+            $configTwo = array_filter($configTwo, 'strlen');
 
-            return array_keys(array_flip(array_merge($arrLocalconfig, $arrSyncCtoConfig)));
+            return array_keys(array_flip(array_merge($configOne, $configTwo)));
         }
-        else
-        {
-            if (!is_array($arrLocalconfig) && is_array($arrSyncCtoConfig))
-            {
-                return $arrSyncCtoConfig;
-            }
-            else
-            {
-                return array();
-            }
+
+        if (is_array($configOne)) {
+            return $configOne;
         }
+
+        return [];
     }
 
     /**
      * Get localconfig entries
      *
-     * @param int $intTyp
+     * @param int|string $intTyp
      *
+     * @return array
      * @throws Exception
-     *
-     * @return string
      */
-    public function loadConfigs($intTyp = 1)
+    public function loadConfigs(int|string $intTyp = 1): array
     {
-        if ($intTyp != SyncCtoEnum::LOADCONFIG_KEYS_ONLY && $intTyp != SyncCtoEnum::LOADCONFIG_KEY_VALUE)
-        {
+        if ($intTyp != SyncCtoEnum::LOADCONFIG_KEYS_ONLY && $intTyp != SyncCtoEnum::LOADCONFIG_KEY_VALUE) {
             throw new Exception("Unknown type for " . __CLASS__ . " in function " . __FUNCTION__);
+        }
+
+        if (!file_exists($this->getContaoRoot() . '/system/config/localconfig.php')) {
+            return array();
         }
 
         // Read the local configuration file
         $strMode = 'top';
-        $resFile = fopen(TL_ROOT . '/system/config/localconfig.php', 'rb');
+        $resFile = fopen($this->getContaoRoot() . '/system/config/localconfig.php', 'rb');
 
         $arrData = array();
 
-        while (!feof($resFile))
-        {
+        while (!feof($resFile)) {
             $strLine = fgets($resFile);
             $strTrim = trim($strLine);
 
-            if ($strTrim == '?>')
-            {
+            if ($strTrim == '?>') {
                 continue;
             }
 
-            if ($strTrim == '### INSTALL SCRIPT START ###')
-            {
+            if ($strTrim == '### INSTALL SCRIPT START ###') {
                 $strMode = 'data';
                 continue;
             }
 
-            if ($strTrim == '### INSTALL SCRIPT STOP ###')
-            {
+            if ($strTrim == '### INSTALL SCRIPT STOP ###') {
                 $strMode = 'bottom';
                 continue;
             }
 
-            if ($strMode == 'top')
-            {
+            if ($strMode == 'top') {
                 $this->strTop .= $strLine;
-            }
-            elseif ($strMode == 'bottom')
-            {
+            } elseif ($strMode == 'bottom') {
                 $this->strBottom .= $strLine;
-            }
-            elseif ($strTrim != '')
-            {
+            } elseif ($strTrim != '') {
                 $arrChunks = array_map('trim', explode('=', $strLine, 2));
 
-                if ($intTyp == SyncCtoEnum::LOADCONFIG_KEYS_ONLY)
-                {
+                if ($intTyp == SyncCtoEnum::LOADCONFIG_KEYS_ONLY) {
                     $arrData[] = str_replace(array("$", "GLOBALS['TL_CONFIG']['", "']"), array("", "", ""), $arrChunks[0]);
-                }
-                else
-                {
-                    if ($intTyp == SyncCtoEnum::LOADCONFIG_KEY_VALUE)
-                    {
-                        $key           = str_replace(array("$", "GLOBALS['TL_CONFIG']['", "']"), array("", "", ""), $arrChunks[0]);
+                } else {
+                    if ($intTyp == SyncCtoEnum::LOADCONFIG_KEY_VALUE) {
+                        $key = str_replace(array("$", "GLOBALS['TL_CONFIG']['", "']"), array("", "", ""), $arrChunks[0]);
                         $arrData[$key] = $GLOBALS['TL_CONFIG'][$key];
                     }
                 }
@@ -278,75 +311,20 @@ class SyncCtoHelper
      * configuration file exists, otherwise it will initialize a Files object and
      * prevent the install tool from loading the Safe Mode Hack (see #3215).
      *
-     * @throws Exception
      * @return boolean
+     * @throws Exception
+     *
+     * @deprecated No longer needed.
      */
-    public function createPathconfig()
+    public function createPathconfig(): bool
     {
-        // Check if we have the file
-        if (file_exists(TL_ROOT . '/system/config/pathconfig.php'))
-        {
-            return true;
-        }
-
-        // Check localconfig
-        if (!file_exists(TL_ROOT . '/system/config/localconfig.php'))
-        {
-            throw new Exception('Missing localconfig.php');
-        }
-
-        // Check tmp
-        if (!is_writable(TL_ROOT . '/system/tmp'))
-        {
-            throw new Exception('"/system/tmp" is not writable.');
-        }
-
-        // Write file
-        try
-        {
-            $objFile = new File('system/config/pathconfig.php');
-
-            // Check if we have the path
-            if (TL_PATH === null || TL_PATH == "")
-            {
-                $objFile->write("<?php\n\n// Relative path to the installation\nreturn '" . preg_replace('/\/ctoCommunication\?.*$/i', '', Environment::getInstance()->requestUri) . "';\n");
-            }
-            else
-            {
-                $objFile->write("<?php\n\n// Relative path to the installation\nreturn '" . TL_PATH . "';\n");
-            }
-
-            $objFile->close();
-        }
-        catch (Exception $e)
-        {
-            log_message($e->getMessage());
-            throw $e;
-        }
-
-        // All done
         return true;
     }
 
-    /* -------------------------------------------------------------------------
-     * Black and Whitelists
-     */
-
-    /**
-     * Return the TL_ROOT prepared for regex.
-     *
-     * @return string
-     */
-    public function getPreparedTlRoot()
+    public function getBlacklistFolder(): array
     {
-        return $this->strPreparedTlRoot;
-    }
-
-
-    public function getBlacklistFolder()
-    {
-        $arrLocalconfig   = (isset($GLOBALS['TL_CONFIG']['syncCto_folder_blacklist']))
-            ? deserialize($GLOBALS['TL_CONFIG']['syncCto_folder_blacklist'])
+        $arrLocalconfig = (isset($GLOBALS['TL_CONFIG']['syncCto_folder_blacklist']))
+            ? unserialize($GLOBALS['TL_CONFIG']['syncCto_folder_blacklist'])
             : [];
         $arrSyncCtoConfig = $GLOBALS['SYC_CONFIG']['folder_blacklist'] ?? [];
 
@@ -358,15 +336,15 @@ class SyncCtoHelper
      *
      * @return array
      */
-    public function getPreparedBlacklistFolder()
+    public function getPreparedBlacklistFolder(): array
     {
         return $this->arrPreparedBlacklistFolder;
     }
 
-    public function getBlacklistFile()
+    public function getBlacklistFile(): array
     {
-        $arrLocalconfig   = (isset($GLOBALS['TL_CONFIG']['syncCto_file_blacklist']))
-            ? deserialize($GLOBALS['TL_CONFIG']['syncCto_file_blacklist'])
+        $arrLocalconfig = (isset($GLOBALS['TL_CONFIG']['syncCto_file_blacklist']))
+            ? unserialize($GLOBALS['TL_CONFIG']['syncCto_file_blacklist'])
             : [];
         $arrSyncCtoConfig = $GLOBALS['SYC_CONFIG']['file_blacklist'];
 
@@ -385,8 +363,8 @@ class SyncCtoHelper
 
     public function getWhitelistFolder()
     {
-        $arrLocalconfig   = isset($GLOBALS['TL_CONFIG']['syncCto_folder_whitelist'])
-            ? deserialize($GLOBALS['TL_CONFIG']['syncCto_folder_whitelist'])
+        $arrLocalconfig = isset($GLOBALS['TL_CONFIG']['syncCto_folder_whitelist'])
+            ? unserialize($GLOBALS['TL_CONFIG']['syncCto_folder_whitelist'])
             : [];
         $arrSyncCtoConfig = $GLOBALS['SYC_CONFIG']['folder_whitelist'];
 
@@ -395,8 +373,8 @@ class SyncCtoHelper
 
     public function getBlacklistLocalconfig()
     {
-        $arrLocalconfig   = (isset($GLOBALS['TL_CONFIG']['syncCto_local_blacklist']))
-            ? deserialize($GLOBALS['TL_CONFIG']['syncCto_local_blacklist'])
+        $arrLocalconfig = (isset($GLOBALS['TL_CONFIG']['syncCto_local_blacklist']))
+            ? unserialize($GLOBALS['TL_CONFIG']['syncCto_local_blacklist'])
             : [];
         $arrSyncCtoConfig = $GLOBALS['SYC_CONFIG']['local_blacklist'];
 
@@ -405,8 +383,8 @@ class SyncCtoHelper
 
     public function getTablesHidden()
     {
-        $arrLocalconfig   = (isset($GLOBALS['TL_CONFIG']['syncCto_hidden_tables']))
-            ? deserialize($GLOBALS['TL_CONFIG']['syncCto_hidden_tables'])
+        $arrLocalconfig = (isset($GLOBALS['TL_CONFIG']['syncCto_hidden_tables']))
+            ? unserialize($GLOBALS['TL_CONFIG']['syncCto_hidden_tables'])
             : [];
         $arrSyncCtoConfig = $GLOBALS['SYC_CONFIG']['table_hidden'];
 
@@ -424,7 +402,7 @@ class SyncCtoHelper
 
         // Get the entries from the loclconfig and add them to the list.
         $arrHiddenTableConfig = (isset($GLOBALS['TL_CONFIG']['syncCto_hidden_tables_placeholder']))
-            ? deserialize($GLOBALS['TL_CONFIG']['syncCto_hidden_tables_placeholder'])
+            ? unserialize($GLOBALS['TL_CONFIG']['syncCto_hidden_tables_placeholder'])
             : [];
 
         if (is_array($arrHiddenTableConfig) && count($arrHiddenTableConfig) != 0) {
@@ -456,16 +434,13 @@ class SyncCtoHelper
     public function isTableHiddenByPlaceholder($strTable)
     {
         // Check if we have entries.
-        if (count($this->arrPreparedHiddenTablePlaceholder) == 0)
-        {
+        if (count($this->arrPreparedHiddenTablePlaceholder) == 0) {
             return false;
         }
 
         // Run each and check it with the given name.
-        foreach ($this->arrPreparedHiddenTablePlaceholder as $arrEntry)
-        {
-            if (preg_match('/^' . $arrEntry . '$/', $strTable))
-            {
+        foreach ($this->arrPreparedHiddenTablePlaceholder as $arrEntry) {
+            if (preg_match('/^' . $arrEntry . '$/', $strTable)) {
                 return true;
             }
         }
@@ -489,18 +464,16 @@ class SyncCtoHelper
     public function addLegend($strContent, $strTemplate)
     {
         // Check some vars if we have the overview.
-        $strDo    = \Input::get('do');
-        $strTable = \Input::get('table');
-        $strAct   = \Input::get('act');
+        $strDo = Input::get('do');
+        $strTable = Input::get('table');
+        $strAct = Input::get('act');
 
-        if ($strDo == 'synccto_clients' && empty($strAct) && empty($strTable) && $strTemplate == 'be_main')
-        {
+        if ($strDo == 'synccto_clients' && empty($strAct) && empty($strTable) && $strTemplate == 'be_main') {
             // Split on the form | globale btn
             $arrContent = explode('<div id="tl_buttons">', $strContent, 2);
 
             // Check if we have 2 elements.
-            if (count($arrContent) != 2)
-            {
+            if (count($arrContent) != 2) {
                 return $strContent;
             }
 
@@ -514,61 +487,6 @@ class SyncCtoHelper
             $strReturn .= $arrContent[1];
 
             return $strReturn;
-        }
-
-        return $strContent;
-    }
-
-    /**
-     * Check the required extensions and files for syncCto
-     *
-     * @param string $strContent
-     * @param string $strTemplate
-     *
-     * @return string
-     */
-    public function checkExtensions($strContent, $strTemplate)
-    {
-        if ($strTemplate == 'be_main')
-        {
-            if (!is_array($_SESSION["TL_INFO"] ?? null))
-            {
-                $_SESSION["TL_INFO"] = array();
-            }
-
-            // required extensions
-            $arrRequiredExtensions = array(
-                'ctoCommunication'  => 'ctoCommunication',
-                'MultiColumnWizard' => 'multicolumnwizard',
-                'DC_General'        => 'dc-general',
-                'ZipArchiveCto'     => 'ZipArchiveCto'
-            );
-
-            // check for required extensions
-            foreach ($arrRequiredExtensions as $key => $val)
-            {
-                if (!in_array($val, \ModuleLoader::getActive()))
-                {
-                    $_SESSION["TL_INFO"] = array_merge($_SESSION["TL_INFO"], array($val => 'Please install the required extension <strong>' . $key . '</strong>'));
-                }
-                else
-                {
-                    if (is_array($_SESSION["TL_INFO"]) && array_key_exists($val, $_SESSION["TL_INFO"]))
-                    {
-                        unset($_SESSION["TL_INFO"][$val]);
-                    }
-                }
-            }
-
-            // Check syncCtoPro, if not set remove triggers.
-            if (!in_array('syncCtoPro', \ModuleLoader::getActive())
-                && ($this->hasTrigger('tl_page') || $this->hasTrigger('tl_article') || $this->hasTrigger('tl_content'))
-            )
-            {
-                $this->dropTrigger('tl_page');
-                $this->dropTrigger('tl_article');
-                $this->dropTrigger('tl_content');
-            }
         }
 
         return $strContent;
@@ -592,11 +510,11 @@ class SyncCtoHelper
 
             preg_match('/<div.*id=\"header\".*>/i', $strContent, $arrHeader);
             preg_match(
-                '{<div\s+id="header"\s*>((?:(?:(?!<div[^>]*>|</div>).)++|<div[^>]*>(?1)</div>)*)</div>}si'
+                  '{<div\s+id="header"\s*>((?:(?:(?!<div[^>]*>|</div>).)++|<div[^>]*>(?1)</div>)*)</div>}si'
                 , $strContent,
-                $arrInnderDiv
+                  $arrInnderDiv
             );
-            $strNew        = $arrHeader[0] . $arrInnderDiv[1] . $objTemplate->parse() . '</div>';
+            $strNew = $arrHeader[0] . $arrInnderDiv[1] . $objTemplate->parse() . '</div>';
             $strNewContent = preg_replace(
                 '{<div\s+id="header"\s*>((?:(?:(?!<div[^>]*>|</div>).)++|<div[^>]*>(?1)</div>)*)</div>}si',
                 $strNew,
@@ -616,27 +534,21 @@ class SyncCtoHelper
 
     /**
      * Get a list with all file synchronization options
+     *
      * @return array
      */
     public function getFileSyncOptions()
     {
-        if ($this->user->isAdmin)
-        {
+        if ($this->user->isAdmin) {
             return $GLOBALS['SYC_CONFIG']['sync_options'];
-        }
-        else
-        {
+        } else {
             $arrUserSyncOptions = $this->user->syncCto_sync_options;
 
             $arrSyncOption = array();
-            foreach ($GLOBALS['SYC_CONFIG']['sync_options'] AS $fileType => $arrValue)
-            {
-                foreach ($arrValue AS $strRight)
-                {
-                    if (in_array($strRight, $arrUserSyncOptions))
-                    {
-                        if (!array_key_exists($fileType, $arrSyncOption))
-                        {
+            foreach ($GLOBALS['SYC_CONFIG']['sync_options'] as $fileType => $arrValue) {
+                foreach ($arrValue as $strRight) {
+                    if (in_array($strRight, $arrUserSyncOptions)) {
+                        if (!array_key_exists($fileType, $arrSyncOption)) {
                             $arrSyncOption[$fileType] = array();
                         }
 
@@ -650,6 +562,7 @@ class SyncCtoHelper
 
     /**
      * Get a list with all maintenance options
+     *
      * @return array
      */
     public function getMaintenanceOptions()
@@ -665,19 +578,16 @@ class SyncCtoHelper
         $arrReturn = array();
 
         // HOOK: do some last operations
-        if (isset($GLOBALS['TL_HOOKS']['syncExecuteFinalOperations']) && is_array($GLOBALS['TL_HOOKS']['syncExecuteFinalOperations']))
-        {
-            foreach ($GLOBALS['TL_HOOKS']['syncExecuteFinalOperations'] as $callback)
-            {
-                try
-                {
+        if (isset($GLOBALS['TL_HOOKS']['syncExecuteFinalOperations']) && is_array($GLOBALS['TL_HOOKS']['syncExecuteFinalOperations'])) {
+            foreach ($GLOBALS['TL_HOOKS']['syncExecuteFinalOperations'] as $callback) {
+                try {
                     // Add log.
-                    \Controller::log
-                    (
-                        "Start executing TL_HOOK $callback[0] | $callback[1]",
-                        __CLASS__ . "|" . __FUNCTION__
-                        , TL_GENERAL
-                    );
+//                    Controller::add
+//                    (
+//                          "Start executing TL_HOOK $callback[0] | $callback[1]",
+//                          __CLASS__ . "|" . __FUNCTION__
+//                        , TL_GENERAL
+//                    );
 
                     // Get the reflection class.
                     $objReflection = new \ReflectionClass($callback[0]);
@@ -709,21 +619,19 @@ class SyncCtoHelper
                     }
 
                     // Add final log.
-                    \Controller::log
-                    (
-                        "Finished executing TL_HOOK $callback[0] | $callback[1]",
-                        __CLASS__ . "|" . __FUNCTION__,
-                        TL_GENERAL
-                    );
-                }
-                catch (Exception $exc)
-                {
+//                    \Controller::log
+//                    (
+//                        "Finished executing TL_HOOK $callback[0] | $callback[1]",
+//                        __CLASS__ . "|" . __FUNCTION__,
+//                        TL_GENERAL
+//                    );
+                } catch (Exception $exc) {
                     $arrReturn [] = array(
                         'callback' => implode("|", $callback),
                         'info_msg' => "Error by: TL_HOOK $callback[0] | $callback[1] with Msg: " . $exc->getMessage()
                     );
 
-                    \Controller::log("Error by: TL_HOOK $callback[0] | $callback[1] with Msg: " . $exc->getMessage(), __CLASS__ . "|" . __FUNCTION__, TL_ERROR);
+//                    \Controller::log("Error by: TL_HOOK $callback[0] | $callback[1] with Msg: " . $exc->getMessage(), __CLASS__ . "|" . __FUNCTION__, TL_ERROR);
                 }
             }
         }
@@ -753,27 +661,19 @@ class SyncCtoHelper
         $strString = preg_replace('/[\t\n\r]+/', ' ', $strString);
         $strString = strip_tags($strString);
 
-        if (utf8_strlen($strString) <= $intNumberOfChars)
-        {
+        if (strlen($strString) <= $intNumberOfChars) {
             return $strString;
         }
 
-        $intCharCount   = 0;
-        $arrWords       = array();
-        $arrChunks      = preg_split('/\s+/', $strString);
+        $intCharCount = 0;
+        $arrWords = array();
+        $arrChunks = preg_split('/\s+/', $strString);
         $blnAddEllipsis = false;
 
         //first part
-        foreach ($arrChunks as $chunkKey => $strChunk)
-        {
-            if (version_compare(VERSION . '.' . BUILD, '3.5.5', '>=')) {
-                $intCharCount += utf8_strlen(\StringUtil::decodeEntities($strChunk));
-            } else {
-                $intCharCount += utf8_strlen(\String::decodeEntities($strChunk));
-            }
-
-            if ($intCharCount++ <= $intNumberOfChars / 2)
-            {
+        foreach ($arrChunks as $chunkKey => $strChunk) {
+            $intCharCount += strlen(StringUtil::decodeEntities($strChunk));
+            if ($intCharCount++ <= $intNumberOfChars / 2) {
                 // if we add the whole word remove it from list
                 unset($arrChunks[$chunkKey]);
 
@@ -782,14 +682,12 @@ class SyncCtoHelper
             }
 
             // If the first word is longer than $intNumberOfChars already, shorten it
-            // with utf8_substr() so the method does not return an empty string.
-            if (empty($arrWords))
-            {
-                $arrWords[] = utf8_substr($strChunk, 0, $intNumberOfChars / 2);
+            // with substr() so the method does not return an empty string.
+            if (empty($arrWords)) {
+                $arrWords[] = substr($strChunk, 0, $intNumberOfChars / 2);
             }
 
-            if ($strEllipsis !== false)
-            {
+            if ($strEllipsis !== false) {
                 $blnAddEllipsis = true;
             }
 
@@ -797,34 +695,25 @@ class SyncCtoHelper
         }
 
         // Backwards compatibility
-        if ($strEllipsis === true)
-        {
+        if ($strEllipsis === true) {
             $strEllipsis = ' […] ';
         }
 
         $intCharCount = 0;
-        $arrWordsPt2  = array();
+        $arrWordsPt2 = array();
 
         // Second path
-        foreach (array_reverse($arrChunks) as $strChunk)
-        {
-            if (version_compare(VERSION . '.' . BUILD, '3.5.5', '>=')) {
-                $intCharCount += utf8_strlen(\StringUtil::decodeEntities($strChunk));
-            } else {
-                $intCharCount += utf8_strlen(\String::decodeEntities($strChunk));
-            }
-
-            if ($intCharCount++ <= $intNumberOfChars / 2)
-            {
+        foreach (array_reverse($arrChunks) as $strChunk) {
+            $intCharCount += strlen(StringUtil::decodeEntities($strChunk));
+            if ($intCharCount++ <= $intNumberOfChars / 2) {
                 $arrWordsPt2[] = $strChunk;
                 continue;
             }
 
             // If the first word is longer than $intNumberOfChars already, shorten it
-            // with utf8_substr() so the method does not return an empty string.
-            if (empty($arrWordsPt2))
-            {
-                $arrWordsPt2[] = utf8_substr($strChunk, utf8_strlen($strChunk) - ($intNumberOfChars / 2), utf8_strlen($strChunk));
+            // with substr() so the method does not return an empty string.
+            if (empty($arrWordsPt2)) {
+                $arrWordsPt2[] = substr($strChunk, strlen($strChunk) - ($intNumberOfChars / 2), strlen($strChunk));
             }
             break;
         }
@@ -842,28 +731,24 @@ class SyncCtoHelper
     {
         $arrPath = func_get_args();
 
-        if (empty($arrPath))
-        {
+        if (empty($arrPath)) {
             return "";
         }
 
         $arrReturn = array();
 
-        foreach ($arrPath as $itPath)
-        {
+        foreach ($arrPath as $itPath) {
             // Make all directory separator to one type.
             $itPath = str_replace('\\', '/', $itPath);
             // Replace some chars.
-            $itPath = preg_replace('?^' . str_replace('\\', '\\\\', TL_ROOT) . '?i', '', $itPath);
+            $itPath = preg_replace('?^' . str_replace('\\', '\\\\', $this->getContaoRoot()) . '?i', '', $itPath);
             // Explode all elements.
             $itPath = explode('/', $itPath);
 
             // Run each part and check some none valid elements.
-            foreach ($itPath as $itFolder)
-            {
+            foreach ($itPath as $itFolder) {
                 // Remove all elements we don't want.
-                if ($itFolder === '' || $itFolder === null || $itFolder == "." || $itFolder == "..")
-                {
+                if ($itFolder === '' || $itFolder === null || $itFolder == "." || $itFolder == "..") {
                     continue;
                 }
 
@@ -884,19 +769,15 @@ class SyncCtoHelper
      */
     public function getFullPath($strPath)
     {
-        if ( empty($strPath) )
-        {
+        if (empty($strPath)) {
             return "";
         }
 
         // Check if we have a separator at the start.
-        if ( stripos($strPath, DIRECTORY_SEPARATOR) === 0 )
-        {
-            return TL_ROOT . $strPath;
-        }
-        else
-        {
-            return TL_ROOT . DIRECTORY_SEPARATOR . $strPath;
+        if (stripos($strPath, DIRECTORY_SEPARATOR) === 0) {
+            return $this->getContaoRoot() . $strPath;
+        } else {
+            return $this->getContaoRoot() . DIRECTORY_SEPARATOR . $strPath;
         }
     }
 
@@ -910,16 +791,13 @@ class SyncCtoHelper
     public function isPartOfFiles($strPath)
     {
         // Clean up the path.
-        $strPath       = $this->standardizePath($strPath);
+        $strPath = $this->standardizePath($strPath);
         $strUploadPath = $this->standardizePath($GLOBALS['TL_CONFIG']['uploadPath']);
 
         // Check the separator.
-        if ( DIRECTORY_SEPARATOR == '/' )
-        {
+        if (DIRECTORY_SEPARATOR == '/') {
             return preg_match('/' . $strUploadPath . '\//i', $strPath);
-        }
-        else
-        {
+        } else {
             return preg_match('/' . $strUploadPath . '\\\\/i', $strPath);
         }
     }
@@ -934,8 +812,7 @@ class SyncCtoHelper
     {
         $arrTables = array();
 
-        foreach (\Database::getInstance()->listTables() as $key => $value)
-        {
+        foreach (Database::getInstance()->listTables() as $key => $value) {
             $arrTables[] = $value;
         }
 
@@ -949,20 +826,17 @@ class SyncCtoHelper
      */
     public function databaseTables()
     {
-        $arrTables       = array();
+        $arrTables = array();
         $arrTablesHidden = $this->getTablesHidden();
 
-        foreach (\Database::getInstance()->listTables() as $key => $value)
-        {
+        foreach (Database::getInstance()->listTables() as $key => $value) {
             // Check if table is a hidden one.
-            if (in_array($value, $arrTablesHidden) || preg_match("/synccto_temp_.*/", $value))
-            {
+            if (in_array($value, $arrTablesHidden) || preg_match("/synccto_temp_.*/", $value)) {
                 continue;
             }
 
             // Check if is a hidden one by the placeholder.
-            if($this->isTableHiddenByPlaceholder($value))
-            {
+            if ($this->isTableHiddenByPlaceholder($value)) {
                 continue;
             }
 
@@ -980,9 +854,8 @@ class SyncCtoHelper
     public function databaseTablesRecommended()
     {
         // Recommended tables
-        $arrBlacklist = deserialize($GLOBALS['TL_CONFIG']['syncCto_database_tables']);
-        if (!is_array($arrBlacklist))
-        {
+        $arrBlacklist = unserialize($GLOBALS['TL_CONFIG']['syncCto_database_tables']);
+        if (!is_array($arrBlacklist)) {
             $arrBlacklist = array();
         }
 
@@ -990,15 +863,12 @@ class SyncCtoHelper
 
         $arrTables = array();
 
-        foreach ($this->databaseTables() as $key => $value)
-        {
-            if (in_array($value, $arrBlacklist) || preg_match("/synccto_temp_.*/", $value))
-            {
+        foreach ($this->databaseTables() as $key => $value) {
+            if (in_array($value, $arrBlacklist) || preg_match("/synccto_temp_.*/", $value)) {
                 continue;
             }
 
-            if (is_array($arrTablesPermission) && !in_array($value, $arrTablesPermission) && $this->user->isAdmin != true)
-            {
+            if (is_array($arrTablesPermission) && !in_array($value, $arrTablesPermission) && $this->user->isAdmin != true) {
                 continue;
             }
 
@@ -1016,9 +886,8 @@ class SyncCtoHelper
     public function databaseTablesNoneRecommended()
     {
         // None recommended tables
-        $arrBlacklist = deserialize($GLOBALS['TL_CONFIG']['syncCto_database_tables']);
-        if (!is_array($arrBlacklist))
-        {
+        $arrBlacklist = unserialize($GLOBALS['TL_CONFIG']['syncCto_database_tables']);
+        if (!is_array($arrBlacklist)) {
             $arrBlacklist = array();
         }
 
@@ -1026,15 +895,12 @@ class SyncCtoHelper
 
         $arrTables = array();
 
-        foreach ($this->databaseTables() as $key => $value)
-        {
-            if (!in_array($value, $arrBlacklist) || preg_match("/synccto_temp_.*/", $value))
-            {
+        foreach ($this->databaseTables() as $key => $value) {
+            if (!in_array($value, $arrBlacklist) || preg_match("/synccto_temp_.*/", $value)) {
                 continue;
             }
 
-            if (is_array($arrTablesPermission) && !in_array($value, $arrTablesPermission) && $this->user->isAdmin != true)
-            {
+            if (is_array($arrTablesPermission) && !in_array($value, $arrTablesPermission) && $this->user->isAdmin != true) {
                 continue;
             }
 
@@ -1052,15 +918,13 @@ class SyncCtoHelper
     public function databaseTablesNoneRecommendedWithHidden()
     {
         // None recommended tables
-        $arrBlacklist = deserialize($GLOBALS['TL_CONFIG']['syncCto_database_tables']);
-        if (!is_array($arrBlacklist))
-        {
+        $arrBlacklist = unserialize($GLOBALS['TL_CONFIG']['syncCto_database_tables']);
+        if (!is_array($arrBlacklist)) {
             $arrBlacklist = array();
         }
 
-        $arrHiddenlist = deserialize($GLOBALS['SYC_CONFIG']['table_hidden']);
-        if (!is_array($arrHiddenlist))
-        {
+        $arrHiddenlist = unserialize($GLOBALS['SYC_CONFIG']['table_hidden']);
+        if (!is_array($arrHiddenlist)) {
             $arrHiddenlist = array();
         }
 
@@ -1068,15 +932,12 @@ class SyncCtoHelper
 
         $arrTables = array();
 
-        foreach (\Database::getInstance()->listTables() as $key => $value)
-        {
-            if (!in_array($value, $arrBlacklist) && !in_array($value, $arrHiddenlist) || preg_match("/synccto_temp_.*/", $value))
-            {
+        foreach (Database::getInstance()->listTables() as $key => $value) {
+            if (!in_array($value, $arrBlacklist) && !in_array($value, $arrHiddenlist) || preg_match("/synccto_temp_.*/", $value)) {
                 continue;
             }
 
-            if (is_array($arrTablesPermission) && !in_array($value, $arrTablesPermission) && $this->user->isAdmin != true)
-            {
+            if (is_array($arrTablesPermission) && !in_array($value, $arrTablesPermission) && $this->user->isAdmin != true) {
                 continue;
             }
 
@@ -1091,53 +952,48 @@ class SyncCtoHelper
      *
      * @param string $strTableName Name of table.
      *
+     * @return string
      * @internal param bool $booHashSame
      *
-     * @return string
      */
     private function getTableMeta($strTableName)
     {
         // Count the entries.
-        $intCount = \Database::getInstance()
-            ->prepare("SELECT COUNT(*) as Count FROM $strTableName")
-            ->execute()
+        $intCount = Database::getInstance()
+                            ->prepare("SELECT COUNT(*) as Count FROM $strTableName")
+                            ->execute()
             ->Count;
 
         // Try to build the id list.
         $arrIdParts = array();
-        if (\Database::getInstance()->fieldExists('id', $strTableName))
-        {
-            $objIds = \Database::getInstance()
-                ->prepare('SELECT id FROM ' . $strTableName, ' ORDER BY id ASC')
-                ->execute();
+        if (Database::getInstance()->fieldExists('id', $strTableName)) {
+            $objIds = Database::getInstance()
+                              ->prepare('SELECT id FROM ' . $strTableName, ' ORDER BY id ASC')
+                              ->execute()
+            ;
 
-            $intStart   = null;
-            $intLast    = null;
+            $intStart = null;
+            $intLast = null;
 
-            while ($objIds->next())
-            {
+            while ($objIds->next()) {
                 // Init first num.
-                if ($intStart == null)
-                {
+                if ($intStart == null) {
                     $intStart = $objIds->id;
-                    $intLast  = $objIds->id;
+                    $intLast = $objIds->id;
                     continue;
                 }
 
                 // Check if the next number is in line.
-                if (($intLast + 1) == $objIds->id)
-                {
+                if (($intLast + 1) == $objIds->id) {
                     $intLast++;
-                }
-                else
-                {
+                } else {
                     $arrIdParts[] = array(
                         'start' => intval($intStart),
                         'end'   => intval($intLast),
                     );
 
                     $intStart = $objIds->id;
-                    $intLast  = $objIds->id;
+                    $intLast = $objIds->id;
                 }
             }
 
@@ -1151,7 +1007,7 @@ class SyncCtoHelper
             'name'  => $strTableName,
             'count' => $intCount,
             'ids'   => $arrIdParts,
-            'size'  => \Database::getInstance()->getSizeOf($strTableName)
+            'size'  => Database::getInstance()->getSizeOf($strTableName)
         );
 
         return $arrTableMeta;
@@ -1166,9 +1022,9 @@ class SyncCtoHelper
      */
     public function getStyledTableMeta($arrTableMeta)
     {
-        $strTableName    = $arrTableMeta['name'];
+        $strTableName = $arrTableMeta['name'];
         $intEntriesCount = $arrTableMeta['count'];
-        $intEntriesSize  = $arrTableMeta['size'];
+        $intEntriesSize = $arrTableMeta['size'];
 
         $strColor = '666966';
 
@@ -1191,12 +1047,9 @@ class SyncCtoHelper
     public function getDatabaseTablesTimestamp($mixTableNames = array())
     {
         // If we have only a string for tablenames set it as array
-        if (!is_array($mixTableNames))
-        {
+        if (!is_array($mixTableNames)) {
             $arrTableNames = array($mixTableNames);
-        }
-        else
-        {
+        } else {
             $arrTableNames = $mixTableNames;
         }
 
@@ -1204,47 +1057,47 @@ class SyncCtoHelper
         $arrTimestamp = array();
 
         // Load all Tables.
-        $arrTables = \Database::getInstance()->listTables();
+        $arrTables = Database::getInstance()->listTables();
 
         // Load from the meta data of mysql the change date.
         $arrDBSchema = array();
-        $objDBSchema = \Database::getInstance()
-                                ->prepare("SELECT TABLE_NAME, UPDATE_TIME FROM information_schema.TABLES WHERE TABLE_SCHEMA = ?")
-                                ->execute($GLOBALS['TL_CONFIG']['dbDatabase']);
+        $objDBSchema = Database::getInstance()
+                               ->prepare("SELECT TABLE_NAME, UPDATE_TIME FROM information_schema.TABLES WHERE TABLE_SCHEMA = ?")
+                               ->execute($GLOBALS['TL_CONFIG']['dbDatabase'])
+        ;
         while ($objDBSchema->next()) {
             $arrDBSchema[$objDBSchema->TABLE_NAME] = strtotime($objDBSchema->UPDATE_TIME);
         }
 
         // We run now each table and try some method to find out, when we have some last changes.
-        foreach ($arrTables as $strTable)
-        {
+        foreach ($arrTables as $strTable) {
             // Skip hidden tables
-            if (in_array($strTable, $GLOBALS['SYC_CONFIG']['table_hidden'], false))
-            {
+            if (in_array($strTable, $GLOBALS['SYC_CONFIG']['table_hidden'], false)) {
                 continue;
             }
 
             // Check if we search some special tables
-            if (is_array($arrTableNames) && count($arrTableNames) != 0 && !in_array($strTable, $arrTableNames))
-            {
+            if (is_array($arrTableNames) && count($arrTableNames) != 0 && !in_array($strTable, $arrTableNames)) {
                 continue;
             }
 
             // Check if we have rows in table
-            $objCount                            = \Database::getInstance()
-                                                            ->prepare("SELECT COUNT(*) as count FROM $strTable")
-                                                            ->execute();
+            $objCount = Database::getInstance()
+                                ->prepare("SELECT COUNT(*) as count FROM $strTable")
+                                ->execute()
+            ;
             $arrTimestamp[$strTable]['rowCount'] = $objCount->count;
 
             // Update date from the meta data.
             $arrTimestamp[$strTable]['metaDate'] = $arrDBSchema[$strTable];
 
             // Check the timestamp.
-            if (0 != $objCount->count && \Database::getInstance()->fieldExists('tstamp', $strTable)) {
-                $sql           = "SELECT max(tstamp) as lastUpdate FROM $strTable";
-                $objLastUpdate = \Database::getInstance()
-                                          ->prepare($sql)
-                                          ->execute();
+            if (0 != $objCount->count && Database::getInstance()->fieldExists('tstamp', $strTable)) {
+                $sql = "SELECT max(tstamp) as lastUpdate FROM $strTable";
+                $objLastUpdate = Database::getInstance()
+                                         ->prepare($sql)
+                                         ->execute()
+                ;
 
                 $arrTimestamp[$strTable]['lastUpdate'] = $objLastUpdate->lastUpdate;
             } else {
@@ -1253,10 +1106,11 @@ class SyncCtoHelper
 
             // Checksum.
             if (0 != $objCount->count) {
-                $sql         = "CHECKSUM TABLE $strTable";
-                $objChecksum = \Database::getInstance()
-                                        ->prepare($sql)
-                                        ->execute();
+                $sql = "CHECKSUM TABLE $strTable";
+                $objChecksum = Database::getInstance()
+                                       ->prepare($sql)
+                                       ->execute()
+                ;
 
                 $arrTimestamp[$strTable]['checksum'] = $objChecksum->Checksum;
             } else {
@@ -1278,20 +1132,15 @@ class SyncCtoHelper
     {
         $arrLocalConfig = $this->loadConfigs(SyncCtoEnum::LOADCONFIG_KEYS_ONLY);
 
-        foreach ($arrConfig as $key => $value)
-        {
-            if ($key == "disableRefererCheck" && $value == true)
-            {
-                \Config::getInstance()->update("\$GLOBALS['TL_CONFIG']['ctoCom_disableRefererCheck']", true);
+        foreach ($arrConfig as $key => $value) {
+            if ($key == "disableRefererCheck" && $value == true) {
+                Config::getInstance()->update("\$GLOBALS['TL_CONFIG']['ctoCom_disableRefererCheck']", true);
             }
 
-            if (in_array($key, $arrLocalConfig))
-            {
-                \Config::getInstance()->update("\$GLOBALS['TL_CONFIG']['" . $key . "']", $value);
-            }
-            else
-            {
-                \Config::getInstance()->add("\$GLOBALS['TL_CONFIG']['" . $key . "']", $value);
+            if (in_array($key, $arrLocalConfig)) {
+                Config::getInstance()->update("\$GLOBALS['TL_CONFIG']['" . $key . "']", $value);
+            } else {
+                Config::getInstance()->add("\$GLOBALS['TL_CONFIG']['" . $key . "']", $value);
             }
         }
 
@@ -1318,7 +1167,6 @@ class SyncCtoHelper
                 }
 
                 return true;
-                break;
         }
 
         return false;
@@ -1335,50 +1183,42 @@ class SyncCtoHelper
     {
         $arrPostUnset = array('FORM_SUBMIT', 'FORM_FIELDS', 'REQUEST_TOKEN', 'FORM_INPUTS', 'postUnset', 'error', 'redirectUrl');
 
-        if (is_array($arrCheckSubmit['postUnset']))
-        {
+        if (is_array($arrCheckSubmit['postUnset'])) {
             $arrPostUnset = array_merge($arrPostUnset, $arrCheckSubmit['postUnset']);
         }
 
-        foreach ($arrPostUnset AS $value)
-        {
-            if (array_key_exists($value, $arrData))
-            {
+        foreach ($arrPostUnset as $value) {
+            if (array_key_exists($value, $arrData)) {
                 unset($arrData[$value]);
             }
         }
 
-        foreach ($arrData AS $strKey => $value)
-        {
-            if (empty($value))
-            {
+        foreach ($arrData as $strKey => $value) {
+            if (empty($value)) {
                 unset($arrData[$strKey]);
             }
         }
 
-        if (count($arrData) > 0)
-        {
-            if (isset($_SESSION["TL_ERROR"]) && is_array($_SESSION["TL_ERROR"]))
-            {
-                if (array_key_exists($arrCheckSubmit['error']['key'], $_SESSION["TL_ERROR"]))
-                {
-                    unset($_SESSION["TL_ERROR"][$arrCheckSubmit['error']['key']]);
-                }
-            }
 
-            \Backend::redirect($arrCheckSubmit['redirectUrl']);
-        }
-        else
-        {
-            if (!is_array($_SESSION["TL_ERROR"]))
-            {
-                $_SESSION["TL_ERROR"] = array();
-            }
+        if (count($arrData) > 0) {
+//            if (isset($_SESSION["TL_ERROR"]) && is_array($_SESSION["TL_ERROR"]))
+//            {
+//                if (array_key_exists($arrCheckSubmit['error']['key'], $_SESSION["TL_ERROR"]))
+//                {
+//                    unset($_SESSION["TL_ERROR"][$arrCheckSubmit['error']['key']]);
+//                }
+//            }
+            Backend::redirect($arrCheckSubmit['redirectUrl']);
+        } else {
+//            if (!is_array($_SESSION["TL_ERROR"])) {
+//                $_SESSION["TL_ERROR"] = array();
+//            }
 
-            if (!array_key_exists($arrCheckSubmit['error']['key'], $_SESSION["TL_ERROR"]))
-            {
-                $_SESSION["TL_ERROR"][$arrCheckSubmit['error']['key']] = $arrCheckSubmit['error']['message'];
-            }
+//            if (!array_key_exists($arrCheckSubmit['error']['key'], $_SESSION["TL_ERROR"])) {
+//                $_SESSION["TL_ERROR"][$arrCheckSubmit['error']['key']] = $arrCheckSubmit['error']['message'];
+//            }
+
+            Message::addError($arrCheckSubmit['error']['message']);
         }
     }
 
@@ -1395,15 +1235,15 @@ class SyncCtoHelper
     {
         // Drop Update.
         $strQuery = "DROP TRIGGER IF EXISTS `" . $strTable . "_AfterUpdateHashRefresh`";
-        \Database::getInstance()->query($strQuery);
+        Database::getInstance()->query($strQuery);
 
         // Drop Insert.
         $strQuery = "DROP TRIGGER IF EXISTS `" . $strTable . "_AfterInsertHashRefresh`";
-        \Database::getInstance()->query($strQuery);
+        Database::getInstance()->query($strQuery);
 
         // Drop Delete.
         $strQuery = "DROP TRIGGER IF EXISTS `" . $strTable . "_AfterDeleteHashRefresh`";
-        \Database::getInstance()->query($strQuery);
+        Database::getInstance()->query($strQuery);
     }
 
     /**
@@ -1413,20 +1253,17 @@ class SyncCtoHelper
      */
     public function hasTrigger($strTable)
     {
-        $arrTriggers = \Database::getInstance()->query('SHOW TRIGGERS')->fetchEach('Trigger');
+        $arrTriggers = Database::getInstance()->query('SHOW TRIGGERS')->fetchEach('Trigger');
 
-        if (in_array($strTable . "_AfterUpdateHashRefresh", $arrTriggers))
-        {
+        if (in_array($strTable . "_AfterUpdateHashRefresh", $arrTriggers)) {
             return true;
         }
 
-        if (in_array($strTable . "_AfterInsertHashRefresh", $arrTriggers))
-        {
+        if (in_array($strTable . "_AfterInsertHashRefresh", $arrTriggers)) {
             return true;
         }
 
-        if (in_array($strTable . "_AfterDeleteHashRefresh", $arrTriggers))
-        {
+        if (in_array($strTable . "_AfterDeleteHashRefresh", $arrTriggers)) {
             return true;
         }
     }

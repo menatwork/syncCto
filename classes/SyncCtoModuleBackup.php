@@ -5,14 +5,23 @@
  *
  * @copyright  MEN AT WORK 2014
  * @package    syncCto
- * @license    GNU/LGPL 
+ * @license    GNU/LGPL
  * @filesource
  */
+
+use Contao\BackendModule;
+use Contao\BackendTemplate;
+use Contao\CoreBundle\Session\Attribute\ArrayAttributeBag;
+use Contao\Date;
+use Contao\Dbafs;
+use Contao\Environment;
+use Contao\File;
+use Contao\Input;
 
 /**
  * Class for backup functions
  */
-class SyncCtoModuleBackup extends \BackendModule
+class SyncCtoModuleBackup extends BackendModule
 {
     /* -------------------------------------------------------------------------
      * Variablen
@@ -42,7 +51,7 @@ class SyncCtoModuleBackup extends \BackendModule
     protected $arrBackupSettings;
 
     /**
-     * @var ContentData 
+     * @var ContentData
      */
     protected $objData;
 
@@ -51,14 +60,15 @@ class SyncCtoModuleBackup extends \BackendModule
      */
     protected $objStepPool;
 
-    /* -------------------------------------------------------------------------
-     * Core Functions
+    /**
+     * @var ArrayAttributeBag|null
      */
+    private mixed $session;
 
     /**
      * Constructor
-     * 
-     * @param DataContainer $objDc 
+     *
+     * @param DataContainer|null $objDc
      */
     public function __construct(DataContainer $objDc = null)
     {
@@ -67,29 +77,27 @@ class SyncCtoModuleBackup extends \BackendModule
         // Load helper
         $this->objSyncCtoDatabase = SyncCtoDatabase::getInstance();
         $this->objSyncCtoFiles = SyncCtoFiles::getInstance();
+        $this->session = Controller::getContainer()->get('contao.session.contao_backend');
 
         // Load language 
         $this->loadLanguageFile('tl_syncCto_backup');
         $this->loadLanguageFile('tl_syncCto_steps');
-        
+
         // Load CSS
         $GLOBALS['TL_CSS'][] = 'bundles/synccto/css/steps.css';
-               
+
         // Import
         $this->import('BackendUser', 'User');
 
         // Choose template
-        if (\Input::getInstance()->get("table") == "" && \Input::getInstance()->get("act") == "")
-        {
+        if (Input::get("table") == "" && Input::get("act") == "") {
             $this->strTemplate = "be_syncCto_backup";
-        }
-        else if (\Input::getInstance()->get("table") != "" && \Input::getInstance()->get("act") != "")
-        {
-            $this->strTemplate = "be_syncCto_steps";
-        }
-        else
-        {
-            $this->strTemplate = "be_syncCto_backup";
+        } else {
+            if (Input::get("table") != "" && Input::get("act") != "") {
+                $this->strTemplate = "be_syncCto_steps";
+            } else {
+                $this->strTemplate = "be_syncCto_backup";
+            }
         }
     }
 
@@ -99,17 +107,14 @@ class SyncCtoModuleBackup extends \BackendModule
     protected function compile()
     {
         // Choose template
-        if (\Input::getInstance()->get("table") == "" && \Input::getInstance()->get("act") == "")
-        {
+        if (Input::get("table") == "" && Input::get("act") == "") {
             $this->compileStart();
-        }
-        else if (\Input::getInstance()->get("table") != "" && \Input::getInstance()->get("act") != "")
-        {
-            $this->compileBackup();
-        }
-        else
-        {
-            $this->compileStart($GLOBALS['TL_LANG']['ERR']['call_directly']);
+        } else {
+            if (Input::get("table") != "" && Input::get("act") != "") {
+                $this->compileBackup();
+            } else {
+                $this->compileStart($GLOBALS['TL_LANG']['ERR']['call_directly']);
+            }
         }
     }
 
@@ -118,7 +123,7 @@ class SyncCtoModuleBackup extends \BackendModule
      */
     protected function compileStart()
     {
-        
+
     }
 
     /**
@@ -127,28 +132,23 @@ class SyncCtoModuleBackup extends \BackendModule
     protected function compileBackup()
     {
         // Check if start is set
-        if (\Input::getInstance()->get("act") != "start" || \Input::getInstance()->get("do") != "syncCto_backups")
-        {
+        if (Input::get("act") != "start" || Input::get("do") != "syncCto_backups") {
             $_SESSION["TL_ERROR"] = array($GLOBALS['TL_LANG']['ERR']['call_directly']);
             $this->redirect("contao/main.php?do=syncCto_backups");
         }
 
         // Get step
-        if (\Input::getInstance()->get("step") == "" || \Input::getInstance()->get("step") == null)
-        {
+        if (Input::get("step") == "" || Input::get("step") == null) {
             $this->intStep = 0;
-        }
-        else
-        {
-            $this->intStep = intval(\Input::getInstance()->get("step"));
+        } else {
+            $this->intStep = intval(Input::get("step"));
         }
 
         // Set template
         $this->Template->showControl = false;
 
         // Load content from session
-        if ($this->intStep != 0)
-        {
+        if ($this->intStep != 0) {
             $this->loadContenData();
         }
 
@@ -156,8 +156,7 @@ class SyncCtoModuleBackup extends \BackendModule
         $this->loadBackupSettings();
 
         // Which table is in use
-        switch (\Input::getInstance()->get("table"))
-        {
+        switch (Input::get("table")) {
             case 'tl_syncCto_backup_db':
                 $this->pageDbBackup();
                 break;
@@ -212,37 +211,36 @@ class SyncCtoModuleBackup extends \BackendModule
     }
 
     /**
-     * Save the current state of the page/sychronization 
+     * Save the current state of the page/sychronization
      */
     protected function saveContentData()
     {
         $arrContenData = array(
-            "error" => $this->booError,
-            "error_msg" => $this->strError,
-            "refresh" => $this->booRefresh,
-            "finished" => $this->booFinished,
-            "step" => $this->intStep,
-            "url" => $this->strUrl,
-            "goBack" => $this->strGoBack,
-            "start" => $this->floStart,
-            "headline" => $this->strHeadline,
+            "error"       => $this->booError,
+            "error_msg"   => $this->strError,
+            "refresh"     => $this->booRefresh,
+            "finished"    => $this->booFinished,
+            "step"        => $this->intStep,
+            "url"         => $this->strUrl,
+            "goBack"      => $this->strGoBack,
+            "start"       => $this->floStart,
+            "headline"    => $this->strHeadline,
             "information" => $this->strInformation,
-            "data" => $this->objData->getArrValues(),
-            "abort" => $this->booAbort,
+            "data"        => $this->objData->getArrValues(),
+            "abort"       => $this->booAbort,
         );
 
-         \Session::getInstance()->set("syncCto_Backup_Content", $arrContenData);
+        $this->session->set("syncCto_Backup_Content", $arrContenData);
     }
 
     /**
-     * Load the current state of the page/synchronization 
+     * Load the current state of the page/synchronization
      */
     protected function loadContenData()
     {
-        $arrContenData =  \Session::getInstance()->get("syncCto_Backup_Content");
+        $arrContenData = $this->session->get("syncCto_Backup_Content");
 
-        if (is_array($arrContenData) && count($arrContenData) != 0)
-        {
+        if (is_array($arrContenData) && count($arrContenData) != 0) {
             $this->booError = $arrContenData["error"];
             $this->booAbort = $arrContenData["abort"];
             $this->booFinished = $arrContenData["finished"];
@@ -255,9 +253,7 @@ class SyncCtoModuleBackup extends \BackendModule
             $this->intStep = $arrContenData["step"];
             $this->floStart = $arrContenData["start"];
             $this->objData = new ContentData($arrContenData["data"], $this->intStep);
-        }
-        else
-        {
+        } else {
             $this->booError = false;
             $this->booAbort = false;
             $this->booFinished = false;
@@ -275,30 +271,29 @@ class SyncCtoModuleBackup extends \BackendModule
 
     protected function loadStepPool()
     {
-        $arrStepPool =  \Session::getInstance()->get("syncCto_Backup_StepPool");
+        $arrStepPool = $this->session->get("syncCto_Backup_StepPool");
 
-        if ($arrStepPool == false || !is_array($arrStepPool))
-        {
+        if ($arrStepPool == false || !is_array($arrStepPool)) {
             $arrStepPool = array();
         }
 
-        $this->objStepPool = new StepPool($arrStepPool,  $this->intStep);
+        $this->objStepPool = new StepPool($arrStepPool, $this->intStep);
     }
 
     protected function saveStepPool()
     {
-         \Session::getInstance()->set("syncCto_Backup_StepPool", $this->objStepPool->getArrValues());
+        $this->session->set("syncCto_Backup_StepPool", $this->objStepPool->getArrValues());
     }
 
     protected function resetStepPool()
     {
-         \Session::getInstance()->set("syncCto_Backup_StepPool", FALSE);
+        $this->session->set("syncCto_Backup_StepPool", FALSE);
     }
 
     protected function initTempLists()
     {
         // Load Files
-        $objFileList = new \File($this->objSyncCtoHelper->standardizePath($GLOBALS['SYC_PATH']['tmp'], "syncfilelist-Backup.txt"));
+        $objFileList = new File($this->objSyncCtoHelper->standardizePath($GLOBALS['SYC_PATH']['tmp'], "syncfilelist-Backup.txt"));
         $objFileList->delete();
         $objFileList->close();
     }
@@ -306,14 +301,11 @@ class SyncCtoModuleBackup extends \BackendModule
     protected function loadTempLists()
     {
         // Load Files
-        $objFileList = new \File($this->objSyncCtoHelper->standardizePath($GLOBALS['SYC_PATH']['tmp'], "syncfilelist-Backup.txt"));
-        $strContent  = $objFileList->getContent();
-        if (strlen($strContent) == 0)
-        {
+        $objFileList = new File($this->objSyncCtoHelper->standardizePath($GLOBALS['SYC_PATH']['tmp'], "syncfilelist-Backup.txt"));
+        $strContent = $objFileList->getContent();
+        if (strlen($strContent) == 0) {
             $this->arrListFile = array();
-        }
-        else
-        {
+        } else {
             $this->arrListFile = unserialize($strContent);
         }
         $objFileList->close();
@@ -321,17 +313,16 @@ class SyncCtoModuleBackup extends \BackendModule
 
     protected function saveTempLists()
     {
-        $objFileList = new \File($this->objSyncCtoHelper->standardizePath($GLOBALS['SYC_PATH']['tmp'], "syncfilelist-Backup.txt"));
+        $objFileList = new File($this->objSyncCtoHelper->standardizePath($GLOBALS['SYC_PATH']['tmp'], "syncfilelist-Backup.txt"));
         $objFileList->write(serialize($this->arrListFile));
         $objFileList->close();
     }
 
     protected function loadBackupSettings()
     {
-        $this->arrBackupSettings =  \Session::getInstance()->get("syncCto_BackupSettings");
+        $this->arrBackupSettings = $this->session->get("syncCto_BackupSettings");
 
-        if (!is_array($this->arrBackupSettings))
-        {
+        if (!is_array($this->arrBackupSettings)) {
             $this->arrBackupSettings = array();
         }
     }
@@ -346,8 +337,7 @@ class SyncCtoModuleBackup extends \BackendModule
     protected function pageDbBackup()
     {
         // Init | Set Step to 1
-        if ($this->intStep == 0)
-        {
+        if ($this->intStep == 0) {
             // Init content
             $this->booError = false;
             $this->booAbort = false;
@@ -355,7 +345,7 @@ class SyncCtoModuleBackup extends \BackendModule
             $this->strError = "";
             $this->booRefresh = true;
             $this->strUrl = "contao/main.php?do=syncCto_backups&amp;table=tl_syncCto_backup_db&amp;act=start";
-            $this->strGoBack = \Environment::get('base') . "contao/main.php?do=syncCto_backups&table=tl_syncCto_backup_db";
+            $this->strGoBack = Environment::get('base') . "contao/main.php?do=syncCto_backups&table=tl_syncCto_backup_db";
             $this->strHeadline = $GLOBALS['TL_LANG']['tl_syncCto_backup_db']['edit'];
             $this->strInformation = "";
             $this->intStep = 1;
@@ -376,10 +366,8 @@ class SyncCtoModuleBackup extends \BackendModule
         $this->objData->setState(SyncCtoEnum::WORK_WORK);
         $this->objData->setHtml("");
 
-        try
-        {
-            switch ($this->intStep)
-            {
+        try {
+            switch ($this->intStep) {
                 // Init Page 
                 case 1:
                     $this->objData->setTitle($GLOBALS['TL_LANG']['MSC']['step'] . " %s");
@@ -391,13 +379,17 @@ class SyncCtoModuleBackup extends \BackendModule
 
                 // Run Dump
                 case 2:
-                    if(!file_exists(TL_ROOT . '/' . SyncCtoHelper::getInstance()->standardizePath($GLOBALS['SYC_PATH']['db'])))
-                    {
-                        throw new Exception(sprintf($GLOBALS['TL_LANG']['ERR']['missing_file_folder'] , SyncCtoHelper::getInstance()->standardizePath($GLOBALS['SYC_PATH']['db'])));
+                    if (!file_exists(
+                        SyncCtoHelper::getInstance()->getContaoRoot()
+                        . '/'
+                        . SyncCtoHelper::getInstance()->standardizePath($GLOBALS['SYC_PATH']['db'])
+                    )
+                    ) {
+                        throw new Exception(sprintf($GLOBALS['TL_LANG']['ERR']['missing_file_folder'], SyncCtoHelper::getInstance()->standardizePath($GLOBALS['SYC_PATH']['db'])));
                     }
-                    
+
                     $this->objStepPool->zipname = $this->objSyncCtoDatabase->runDump($this->arrBackupSettings['syncCto_BackupTables'], false, false);
-                    Dbafs::addResource(SyncCtoHelper::getInstance()->standardizePath($GLOBALS['SYC_PATH']['db'],$this->objStepPool->zipname));
+                    Dbafs::addResource(SyncCtoHelper::getInstance()->standardizePath($GLOBALS['SYC_PATH']['db'], $this->objStepPool->zipname));
 
                     $this->intStep++;
                     break;
@@ -405,7 +397,7 @@ class SyncCtoModuleBackup extends \BackendModule
                 // Show last page
                 case 3:
                     $this->booFinished = true;
-                    $this->booRefresh  = false;
+                    $this->booRefresh = false;
 
                     $this->objData->setStep(1);
                     $this->objData->setState(SyncCtoEnum::WORK_OK);
@@ -421,12 +413,10 @@ class SyncCtoModuleBackup extends \BackendModule
                     $this->objData->setState(SyncCtoEnum::WORK_OK);
                     break;
             }
-        }
-        catch (Exception $exc)
-        {
-            $objErrTemplate              = new BackendTemplate('be_syncCto_error');
+        } catch (Exception $exc) {
+            $objErrTemplate = new BackendTemplate('be_syncCto_error');
             $objErrTemplate->strErrorMsg = $exc->getMessage();
-            
+
             $this->booRefresh = false;
             $this->objData->setState(SyncCtoEnum::WORK_ERROR);
             $this->objData->setHtml($objErrTemplate->parse());
@@ -439,8 +429,7 @@ class SyncCtoModuleBackup extends \BackendModule
     protected function pageDbRestorePage()
     {
         // Init | Set Step to 1
-        if ($this->intStep == 0)
-        {
+        if ($this->intStep == 0) {
             // Init content
             $this->booError = false;
             $this->booAbort = false;
@@ -448,7 +437,7 @@ class SyncCtoModuleBackup extends \BackendModule
             $this->strError = "";
             $this->booRefresh = true;
             $this->strUrl = "contao/main.php?do=syncCto_backups&amp;table=tl_syncCto_restore_db&amp;act=start";
-            $this->strGoBack =  \Environment::get('base') . "contao/main.php?do=syncCto_backups&table=tl_syncCto_restore_db";
+            $this->strGoBack = Environment::get('base') . "contao/main.php?do=syncCto_backups&table=tl_syncCto_restore_db";
             $this->strHeadline = $GLOBALS['TL_LANG']['tl_syncCto_restore_db']['edit'];
             $this->strInformation = "";
             $this->intStep = 1;
@@ -469,10 +458,8 @@ class SyncCtoModuleBackup extends \BackendModule
         $this->objData->setState(SyncCtoEnum::WORK_WORK);
         $this->objData->setHtml("");
 
-        try
-        {
-            switch ($this->intStep)
-            {
+        try {
+            switch ($this->intStep) {
                 case 1:
                     $this->objData->setTitle($GLOBALS['TL_LANG']['MSC']['step'] . " %s");
                     $this->objData->setDescription($GLOBALS['TL_LANG']['tl_syncCto_restore_db']['step1']);
@@ -487,7 +474,7 @@ class SyncCtoModuleBackup extends \BackendModule
 
                 case 3:
                     $this->booFinished = true;
-                    $this->booRefresh  = false;
+                    $this->booRefresh = false;
 
                     $this->objData->setStep(1);
                     $this->objData->setState(SyncCtoEnum::WORK_OK);
@@ -498,10 +485,8 @@ class SyncCtoModuleBackup extends \BackendModule
                     $this->objData->setState(SyncCtoEnum::WORK_OK);
                     break;
             }
-        }
-        catch (Exception $exc)
-        {
-            $objErrTemplate              = new BackendTemplate('be_syncCto_error');
+        } catch (Exception $exc) {
+            $objErrTemplate = new BackendTemplate('be_syncCto_error');
             $objErrTemplate->strErrorMsg = $exc->getMessage();
 
             $this->booRefresh = false;
@@ -511,13 +496,12 @@ class SyncCtoModuleBackup extends \BackendModule
     }
 
     /**
-     * Backup filesystem 
+     * Backup filesystem
      */
     protected function pageFileBackupPage()
     {
         // Init | Set Step to 1
-        if ($this->intStep == 0)
-        {
+        if ($this->intStep == 0) {
             // Init content
             $this->booError = false;
             $this->booAbort = false;
@@ -525,7 +509,7 @@ class SyncCtoModuleBackup extends \BackendModule
             $this->strError = "";
             $this->booRefresh = true;
             $this->strUrl = "contao/main.php?do=syncCto_backups&amp;table=tl_syncCto_backup_file&amp;act=start";
-            $this->strGoBack =  \Environment::get('base') . "contao/main.php?do=syncCto_backups&table=tl_syncCto_backup_file";
+            $this->strGoBack = Environment::get('base') . "contao/main.php?do=syncCto_backups&table=tl_syncCto_backup_file";
             $this->strHeadline = $GLOBALS['TL_LANG']['tl_syncCto_backup_file']['edit'];
             $this->strInformation = "";
             $this->intStep = 1;
@@ -541,44 +525,46 @@ class SyncCtoModuleBackup extends \BackendModule
 
         // Set content back to normale mode
         $this->booRefresh = true;
-        
+
         $this->objData->setStep(1);
         $this->objData->setState(SyncCtoEnum::WORK_WORK);
         $this->objData->setHtml("");
 
-        try
-        {
-            switch ($this->intStep)
-            {
+        try {
+            switch ($this->intStep) {
                 case 1:
                     $this->objData->setTitle($GLOBALS['TL_LANG']['MSC']['step'] . " %s");
                     $this->objData->setDescription($GLOBALS['TL_LANG']['tl_syncCto_backup_file']['step1']);
                     $this->objData->setState(SyncCtoEnum::WORK_WORK);
 
-                    $this->objStepPool->zipname      = "";
+                    $this->objStepPool->zipname = "";
                     $this->objStepPool->skippedfiles = array();
 
                     $this->intStep++;
                     break;
 
                 case 2:
-                    if(!file_exists(TL_ROOT . '/' . SyncCtoHelper::getInstance()->standardizePath($GLOBALS['SYC_PATH']['file'])))
-                    {
-                        throw new Exception(sprintf($GLOBALS['TL_LANG']['ERR']['missing_file_folder'] , SyncCtoHelper::getInstance()->standardizePath($GLOBALS['SYC_PATH']['file'])));
+                    if (!file_exists(
+                        SyncCtoHelper::getInstance()->getContaoRoot()
+                        . '/'
+                        . SyncCtoHelper::getInstance()->standardizePath($GLOBALS['SYC_PATH']['file'])
+                    )
+                    ) {
+                        throw new Exception(sprintf($GLOBALS['TL_LANG']['ERR']['missing_file_folder'], SyncCtoHelper::getInstance()->standardizePath($GLOBALS['SYC_PATH']['file'])));
                     }
-                    
-                    $arrResult                       = $this->objSyncCtoFiles->runDump($this->arrBackupSettings['backup_name'], $this->arrBackupSettings['core_files'], $this->arrBackupSettings['filelist']);
-                    $this->objStepPool->zipname      = $arrResult["name"];
+
+                    $arrResult = $this->objSyncCtoFiles->runDump($this->arrBackupSettings['backup_name'], $this->arrBackupSettings['core_files'], $this->arrBackupSettings['filelist']);
+                    $this->objStepPool->zipname = $arrResult["name"];
                     $this->objStepPool->skippedfiles = $arrResult["skipped"];
 
-                    \Dbafs::addResource(SyncCtoHelper::getInstance()->standardizePath($GLOBALS['SYC_PATH']['file'],$this->objStepPool->zipname));
+                    Dbafs::addResource(SyncCtoHelper::getInstance()->standardizePath($GLOBALS['SYC_PATH']['file'], $this->objStepPool->zipname));
 
                     $this->intStep++;
                     break;
 
                 case 3:
                     $this->booFinished = true;
-                    $this->booRefresh  = false;
+                    $this->booRefresh = false;
 
                     $this->objData->setStep(1);
                     $this->objData->setState(SyncCtoEnum::WORK_OK);
@@ -587,13 +573,11 @@ class SyncCtoModuleBackup extends \BackendModule
                     $strHTML .= "<a onclick=\"Backend.openModalIframe({'width':600,'title':'" . $this->objStepPool->zipname . "','url':this.href,'height':216});return false\" href='contao/popup.php?src=" . base64_encode($GLOBALS['TL_CONFIG']['uploadPath'] . "/syncCto_backups/files/" . $this->objStepPool->zipname) . "'>" . $GLOBALS['TL_LANG']['MSC']['fileDownload'] . "</a>";
                     $strHTML .= "</p>";
 
-                    if (count($this->objStepPool->skippedfiles) != 0)
-                    {
+                    if (count($this->objStepPool->skippedfiles) != 0) {
                         $strHTML = '<br /><p class="tl_help">' . count($this->objStepPool->skippedfiles) . $GLOBALS['TL_LANG']['MSC']['skipped_files'] . '</p>';
 
                         $strHTML .= '<ul class="fileinfo">';
-                        foreach ($this->objStepPool->skippedfiles as $value)
-                        {
+                        foreach ($this->objStepPool->skippedfiles as $value) {
                             $strHTML .= "<li>" . $value . "</li>";
                         }
                         $strHTML .= "</ul>";
@@ -606,24 +590,21 @@ class SyncCtoModuleBackup extends \BackendModule
                     $this->objData->setState(SyncCtoEnum::WORK_OK);
                     break;
             }
-        }
-        catch (Exception $exc)
-        {
-            $objErrTemplate              = new BackendTemplate('be_syncCto_error');
+        } catch (Exception $exc) {
+            $objErrTemplate = new BackendTemplate('be_syncCto_error');
             $objErrTemplate->strErrorMsg = $exc->getMessage();
-            
+
             $this->booRefresh = false;
             $this->objData->setState(SyncCtoEnum::WORK_ERROR);
             $this->objData->setHtml($objErrTemplate->parse());
-            
+
         }
     }
 
     protected function pageFileRestorePage()
     {
         // Init | Set Step to 1
-        if ($this->intStep == 0)
-        {
+        if ($this->intStep == 0) {
             // Init content
             $this->booError = false;
 
@@ -632,7 +613,7 @@ class SyncCtoModuleBackup extends \BackendModule
             $this->strError = "";
             $this->booRefresh = true;
             $this->strUrl = "contao/main.php?do=syncCto_backups&amp;table=tl_syncCto_restore_file&amp;act=start";
-            $this->strGoBack =  \Environment::get('base') . "contao/main.php?do=syncCto_backups&table=tl_syncCto_restore_file";
+            $this->strGoBack = Environment::get('base') . "contao/main.php?do=syncCto_backups&table=tl_syncCto_restore_file";
             $this->strHeadline = $GLOBALS['TL_LANG']['tl_syncCto_restore_file']['edit'];
             $this->strInformation = "";
             $this->intStep = 1;
@@ -653,10 +634,8 @@ class SyncCtoModuleBackup extends \BackendModule
         $this->objData->setState(SyncCtoEnum::WORK_WORK);
         $this->objData->setHtml("");
 
-        try
-        {
-            switch ($this->intStep)
-            {
+        try {
+            switch ($this->intStep) {
                 case 1:
                     $this->objData->setTitle($GLOBALS['TL_LANG']['MSC']['step'] . " %s");
                     $this->objData->setDescription($GLOBALS['TL_LANG']['tl_syncCto_restore_file']['step1']);
@@ -665,17 +644,14 @@ class SyncCtoModuleBackup extends \BackendModule
                     break;
 
                 case 2:
-                    try
-                    {
+                    try {
                         $mixResponse = $this->objSyncCtoFiles->runRestore($this->arrBackupSettings['syncCto_restoreFile']);
 
-                        if ($mixResponse !== true)
-                        {
+                        if ($mixResponse !== true) {
                             $strHTML = $GLOBALS['TL_LANG']['ERR']['cant_extract_file'];
                             $strHTML .= "<br />";
                             $strHTML .= "<ul>";
-                            foreach ($mixResponse as $value)
-                            {
+                            foreach ($mixResponse as $value) {
                                 $strHTML .= "<li>" . $value . "</li>";
                             }
                             $strHTML .= "</ul>";
@@ -689,9 +665,7 @@ class SyncCtoModuleBackup extends \BackendModule
 
                         $this->intStep++;
                         break;
-                    }
-                    catch (Exception $exc)
-                    {
+                    } catch (Exception $exc) {
                         $this->booError = true;
                         $this->strError = $exc->getMessage();
                         $this->objData->setStep(1);
@@ -703,7 +677,7 @@ class SyncCtoModuleBackup extends \BackendModule
                     $objDate = new Date();
 
                     $this->booFinished = true;
-                    $this->booRefresh  = false;
+                    $this->booRefresh = false;
 
                     $this->objData->setStep(1);
                     $this->objData->setState(SyncCtoEnum::WORK_OK);
@@ -714,10 +688,8 @@ class SyncCtoModuleBackup extends \BackendModule
                     $this->objData->setState(SyncCtoEnum::WORK_OK);
                     break;
             }
-        }
-        catch (Exception $exc)
-        {
-            $objErrTemplate              = new BackendTemplate('be_syncCto_error');
+        } catch (Exception $exc) {
+            $objErrTemplate = new BackendTemplate('be_syncCto_error');
             $objErrTemplate->strErrorMsg = $exc->getMessage();
 
             $this->booRefresh = false;

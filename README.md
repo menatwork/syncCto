@@ -29,7 +29,6 @@ syncCto have a lot of system requirements, please check the system check at your
 Installation & Configuration
 ----------------------------
 
-* Use !every! time the contao extension repository
 * Install syncCto on your master installation
 * Install syncCto on your client installation
 * Get the api key from the contao settings at the client

@@ -9,14 +9,15 @@
  * @filesource
  */
 
+use Contao\Backend;
+
 /**
  * Class for syncCto settings
  */
 class SyncCtoTableSettings extends Backend
 {
-
-    protected $objSyncCtoHelper;
-    protected static $instance = null;
+    protected ?SyncCtoHelper $objSyncCtoHelper;
+    protected static         $instance = null;
 
     /**
      * Constructor
@@ -61,7 +62,7 @@ class SyncCtoTableSettings extends Backend
     protected function saveMcwEntries($strValue, $strConfigKey)
     {
         $arrConfigEntries = $GLOBALS['SYC_CONFIG'][$strConfigKey];
-        $arrList          = deserialize($strValue);
+        $arrList          = unserialize($strValue);
         $arrSaveList      = array();
 
         if (is_array($arrSaveList) && count($arrList) > 0)
@@ -93,7 +94,7 @@ class SyncCtoTableSettings extends Backend
     protected function saveEntries($strValue, $strConfigKey)
     {
         $arrConfigEntries = $GLOBALS['SYC_CONFIG'][$strConfigKey];
-        $arrList          = deserialize($strValue);
+        $arrList          = unserialize($strValue);
         $arrSaveList      = array();
 
         if (is_array($arrSaveList) && count($arrList) > 0)
@@ -155,7 +156,7 @@ class SyncCtoTableSettings extends Backend
      *
      * @param string $strValue
      *
-     * @return array
+     * @return string
      */
     public function saveBlacklistLocalconfig($strValue)
     {
@@ -266,7 +267,7 @@ class SyncCtoTableSettings extends Backend
      *
      * @param string $strValue
      *
-     * @return array
+     * @return string
      */
     public function saveTablesHidden($strValue)
     {

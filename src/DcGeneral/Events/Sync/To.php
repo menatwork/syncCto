@@ -12,11 +12,20 @@
 namespace MenAtWork\SyncCto\DcGeneral\Events\Sync;
 
 use Contao\BackendUser;
+use Contao\Database;
+use Contao\Environment;
+use Contao\File;
+use Contao\Input;
+use Contao\Message;
+use Contao\StringUtil;
+use Contao\System;
 use ContaoCommunityAlliance\DcGeneral\Contao\View\Contao2BackendView\Event\GetEditModeButtonsEvent;
 use ContaoCommunityAlliance\DcGeneral\Data\ModelId;
 use ContaoCommunityAlliance\DcGeneral\Event\PrePersistModelEvent;
 use RuntimeException;
 use MenAtWork\SyncCto\DcGeneral\Events\Base;
+use Symfony\Component\HttpFoundation\RequestStack;
+use Symfony\Component\HttpFoundation\Session\SessionInterface;
 use SyncCtoHelper;
 
 /**
@@ -33,11 +42,21 @@ class To extends Base
     const PRIORITY = 200;
 
     /**
+     * @var SessionInterface
+     */
+    private SessionInterface $session;
+
+    /**
      * Constructor
      */
     public function __construct()
     {
         $this->objSyncCtoHelper = SyncCtoHelper::getInstance();
+
+        $container = System::getContainer();
+        /** @var RequestStack $requestStack */
+        $requestStack = $container->get('request_stack');
+        $this->session = $requestStack->getSession();
     }
 
     /**
@@ -66,32 +85,37 @@ class To extends Base
 
         // Check the file cache.
         $strInitFilePath = '/system/config/initconfig.php';
-        if (file_exists(TL_ROOT . $strInitFilePath)) {
-            $strFile        = new \File($strInitFilePath);
+        if (file_exists($this->objSyncCtoHelper->getContaoRoot() . $strInitFilePath)) {
+            $strFile = new File($strInitFilePath);
             $arrFileContent = $strFile->getContentAsArray();
-            foreach ($arrFileContent AS $strContent) {
+            foreach ($arrFileContent as $strContent) {
                 if (!preg_match("/(\/\*|\*|\*\/|\/\/)/", $strContent)) {
                     //system/tmp.
                     if (preg_match("/system\/tmp/", $strContent)) {
                         // Set data.
-                        \Message::addInfo($GLOBALS['TL_LANG']['MSC']['disabled_cache']);
+                        Message::addInfo($GLOBALS['TL_LANG']['MSC']['disabled_cache']);
                     }
                 }
             }
         }
 
         // Update a field with last sync information
-        $objSyncTime = \Database::getInstance()
-            ->prepare("SELECT cl.syncTo_tstamp as syncTo_tstamp, user.name as syncTo_user, user.username as syncTo_alias
+        $objSyncTime = Database::getInstance()
+                               ->prepare(
+                                   "SELECT cl.syncTo_tstamp as syncTo_tstamp, user.name as syncTo_user, user.username as syncTo_alias
                             FROM tl_synccto_clients as cl
                             INNER JOIN tl_user as user
                             ON cl.syncTo_user = user.id
-                            WHERE cl.id = ?")
-            ->limit(1)
-            ->execute(\Input::get("id"));
+                            WHERE cl.id = ?"
+                               )
+                               ->limit(1)
+                               ->execute(Input::get("id"))
+        ;
 
         if ($objSyncTime->syncTo_tstamp != 0 && strlen($objSyncTime->syncTo_user) != 0 && strlen($objSyncTime->syncTo_alias) != 0) {
-            $strLastSync = vsprintf($GLOBALS['TL_LANG']['MSC']['last_sync'], array(
+            $strLastSync = vsprintf(
+                $GLOBALS['TL_LANG']['MSC']['last_sync'],
+                array(
                     date($GLOBALS['TL_CONFIG']['timeFormat'], $objSyncTime->syncTo_tstamp),
                     date($GLOBALS['TL_CONFIG']['dateFormat'], $objSyncTime->syncTo_tstamp),
                     $objSyncTime->syncTo_user,
@@ -100,17 +124,17 @@ class To extends Base
             );
 
             // Set data
-            \Message::addInfo($strLastSync);
+            Message::addInfo($strLastSync);
         }
 
-        $backendUser          = BackendUser::getInstance();
+        $backendUser = BackendUser::getInstance();
         $groupRightForceFiles = $backendUser->syncCto_hide_auto_sync;
 
         $buttons = [];
-        $buttons['start_sync'] = '<input type="submit" name="start_sync" id="start_sync" class="tl_submit" accesskey="s" value="' . specialchars($GLOBALS['TL_LANG']['MSC']['sync']) . '" />';
-        if($groupRightForceFiles != true){
-            $buttons['start_sync_all'] =  '<input type="submit" name="start_sync_all" id="start_sync_all" class="tl_submit" accesskey="o" value="' . specialchars($GLOBALS['TL_LANG']['MSC']['syncAll']) . '" />';
-        }
+        $buttons['start_sync'] = '<input type="submit" name="start_sync" id="start_sync" class="tl_submit" accesskey="s" value="' . StringUtil::specialchars($GLOBALS['TL_LANG']['MSC']['sync']) . '" />';
+//        if ($groupRightForceFiles != true) {
+//            $buttons['start_sync_all'] = '<input type="submit" name="start_sync_all" id="start_sync_all" class="tl_submit" accesskey="o" value="' . StringUtil::specialchars($GLOBALS['TL_LANG']['MSC']['syncAll']) . '" />';
+//        }
 
         // Set buttons.
         $objEvent->setButtons($buttons);
@@ -138,14 +162,20 @@ class To extends Base
         }
 
         // If a special right is set the diff or the thetl_files overwrite can be forced.
-        $backendUser          = BackendUser::getInstance();
+        $backendUser = BackendUser::getInstance();
         $groupRightForceFiles = $backendUser->syncCto_force_dbafs_overwrite;
-        $groupRightForceDiff  = $backendUser->syncCto_force_diff;
-        if($groupRightForceFiles == true || (\is_array($groupRightForceFiles) && $groupRightForceFiles[0] == true)){
+        $groupRightForceDiff = $backendUser->syncCto_force_diff;
+        if (
+            $groupRightForceFiles == true
+            || (\is_array($groupRightForceFiles) && ($groupRightForceFiles[0] ?? false) == true)
+        ) {
             $arrData['tl_files_check'] = true;
         }
 
-        if($groupRightForceDiff == true || (\is_array($groupRightForceDiff) && $groupRightForceDiff[0] == true)){
+        if (
+            $groupRightForceDiff == true
+            || (\is_array($groupRightForceDiff) && ($groupRightForceDiff[0] ?? false) == true)
+        ) {
             $arrData['database_pages_check'] = true;
         }
 
@@ -168,8 +198,8 @@ class To extends Base
      */
     protected function runSync($arrData)
     {
-        $id                           = ModelId::fromSerialized(\Input::get('id'));
-        $arrSyncSettings              = array();
+        $id = ModelId::fromSerialized(Input::get('id'));
+        $arrSyncSettings = array();
         $arrSyncSettings["post_data"] = $arrData;
 
         // Automode off.
@@ -218,17 +248,18 @@ class To extends Base
         }
 
         // Save Session.
-        \Session::getInstance()->set("syncCto_SyncSettings_" . $id->getId(), $arrSyncSettings);
+        $this->session->set("syncCto_SyncSettings_" . $id->getId(), $arrSyncSettings);
 
         // Check the vars.
-        $this->objSyncCtoHelper->checkSubmit(array(
-            'postUnset'   => array('start_sync'),
-            'error'       => array(
-                'key'     => 'syncCto_submit_false',
-                'message' => $GLOBALS['TL_LANG']['ERR']['no_functions']
+        $this->objSyncCtoHelper->checkSubmit(
+            array(
+                'postUnset'   => array('start_sync'),
+                'error'       => array(
+                    'key'     => 'syncCto_submit_false',
+                    'message' => $GLOBALS['TL_LANG']['ERR']['no_functions']
+                ),
+                'redirectUrl' => Environment::get('base') . "contao/runsynccto?do=synccto_clients&amp;table=tl_syncCto_clients_syncTo&amp;act=start&amp;step=0&amp;id=" . $id->getId()
             ),
-            'redirectUrl' => \Environment::get('base') . "contao/main.php?do=synccto_clients&amp;table=tl_syncCto_clients_syncTo&amp;act=start&amp;step=0&amp;id=" . $id->getId()
-        ),
             $arrSyncSettings
         );
     }
@@ -242,35 +273,36 @@ class To extends Base
      */
     protected function runSyncAll($arrData)
     {
-        $id              = ModelId::fromSerialized(\Input::get('id'));
+        $id = ModelId::fromSerialized(\Input::get('id'));
         $arrSyncSettings = array();
 
         // Set array.
-        $arrSyncSettings["automode"]                             = true;
-        $arrSyncSettings["syncCto_Type"]                         = array(
+        $arrSyncSettings["automode"] = true;
+        $arrSyncSettings["syncCto_Type"] = array(
             'core_change',
             'core_delete',
             'user_change',
             'user_delete',
             'localconfig_update'
         );
-        $arrSyncSettings["syncCto_SyncDatabase"]                 = true;
-        $arrSyncSettings["syncCto_SyncTlFiles"]                  = true;
+        $arrSyncSettings["syncCto_SyncDatabase"] = true;
+        $arrSyncSettings["syncCto_SyncTlFiles"] = true;
         $arrSyncSettings["syncCto_Systemoperations_Maintenance"] = array();
-        $arrSyncSettings["syncCto_AttentionFlag"]                = false;
-        $arrSyncSettings["syncCto_ShowError"]                    = false;
+        $arrSyncSettings["syncCto_AttentionFlag"] = false;
+        $arrSyncSettings["syncCto_ShowError"] = false;
 
         // Save Session
-        \Session::getInstance()->set("syncCto_SyncSettings_" . $id->getId(), $arrSyncSettings);
+        $this->session->set("syncCto_SyncSettings_" . $id->getId(), $arrSyncSettings);
 
-        $this->objSyncCtoHelper->checkSubmit(array(
-            'postUnset'   => array('start_sync'),
-            'error'       => array(
-                'key'     => 'syncCto_submit_false',
-                'message' => $GLOBALS['TL_LANG']['ERR']['missing_tables']
+        $this->objSyncCtoHelper->checkSubmit(
+            array(
+                'postUnset'   => array('start_sync'),
+                'error'       => array(
+                    'key'     => 'syncCto_submit_false',
+                    'message' => $GLOBALS['TL_LANG']['ERR']['missing_tables']
+                ),
+                'redirectUrl' => Environment::get('base') . "contao/runsynccto?do=synccto_clients&amp;table=tl_syncCto_clients_syncTo&amp;act=start&amp;step=0&amp;id=" . $id->getId()
             ),
-            'redirectUrl' => \Environment::get('base') . "contao/main.php?do=synccto_clients&amp;table=tl_syncCto_clients_syncTo&amp;act=start&amp;step=0&amp;id=" . $id->getId()
-        ),
             $arrSyncSettings
         );
     }

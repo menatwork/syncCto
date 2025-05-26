@@ -9,29 +9,23 @@
  * @filesource
  */
 
-$GLOBALS['TL_DCA']['tl_syncCto_clients_showExtern'] = array
-(
-    // Config
-    'config'     => array
-    (
-        'dataContainer' => 'General',
+use ContaoCommunityAlliance\DcGeneral\DC\General;
+
+$GLOBALS['TL_DCA']['tl_syncCto_clients_showExtern'] = [
+    'config'     => [
+        'dataContainer' => General::class,
         'closed'        => true,
         'disableSubmit' => false
-    ),
-    'dca_config' => array
-    (
-        'data_provider' => array
-        (
-            'default' => array
-            (
+    ],
+    'dca_config' => [
+        'data_provider' => [
+            'default' => [
                 'class'  => 'ContaoCommunityAlliance\DcGeneral\Data\NoOpDataProvider',
                 'source' => 'tl_syncCto_clients_showExtern'
-            ),
-        ),
-    ),
-    // Palettes
-    'palettes'   => array
-    (
+            ],
+        ],
+    ],
+    'palettes'   => [
         'default' => '',
-    ),
-);
+    ],
+];
