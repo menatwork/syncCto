@@ -4,7 +4,6 @@ services:
     autoconfigure: true
 
   ## Contao
-
   MenAtWork\SyncCto\Contao\ScopeMatcher:
     public: true
 
@@ -12,3 +11,8 @@ services:
   MenAtWork\SyncCto\Controller\:
     resource: '../../Controller/'
     tags: [ 'controller.service_arguments' ]
+
+  ## Migration
+  MenAtWork\SyncCto\Migration\DbMigration:
+    tags:
+      - { name: 'contao.migration', priority: 0 }
