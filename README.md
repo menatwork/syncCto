@@ -40,3 +40,19 @@ Troubleshooting
 ---------------
 
 If you are having problems using syncCto, please visit the issue tracker at https://github.com/menatwork/syncCto/issues
+
+
+Sponsors and Supporters
+-----------------------
+We would like to extend our heartfelt thanks to our valued sponsors, who significantly support the development and progress of Contao SyncCto / SyncCtoPro. Your commitment is crucial for the success and continued development of this important synchronization tool.
+
+Special thanks go to:
+
+- teammade by THREENET GbR 
+- Next Level Concept GmbH 
+- DP-Medsystems AG 
+- Contao Academy
+- And also to those who had already purchased SyncCtoPro before.
+
+Your support enables us to continuously improve SyncCto/SyncCtoPro and provide Contao users with a powerful tool.
+Thank you for your trust and valuable partnership!
