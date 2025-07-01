@@ -13,12 +13,12 @@ By using syncCto editors can work quickly and easily in a preview system, and th
 * Preview <-> Live
 * Development <-> Preview -> Live
 
+For more options, the [syncCto-Pro package](https://github.com/menatwork/syncCtoPro) can also be installed. Thanks to the sponsors for version 3, the Pro version is now also freely available.
 
 Screenshot
 -----------
 
 ![File overview](http://menatwork.github.io/sync-doku/screenshots/file-overview.png)
-
 
 System requirements
 -------------------
