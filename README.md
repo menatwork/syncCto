@@ -50,7 +50,7 @@ Special thanks go to:
 
 - teammade by THREENET GbR 
 - Next Level Concept GmbH 
-- DP-Medsystems AG 
+- dpmed GmbH 
 - Contao Academy
 - And also to those who had already purchased SyncCtoPro before.
 
