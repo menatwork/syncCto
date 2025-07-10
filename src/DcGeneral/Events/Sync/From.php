@@ -117,8 +117,8 @@ class From extends Base
             $strLastSync = vsprintf(
                 $GLOBALS['TL_LANG']['MSC']['last_sync'],
                 array(
-                    date($GLOBALS['TL_CONFIG']['timeFormat'], $objSyncTime->syncFrom_tstamp),
-                    date($GLOBALS['TL_CONFIG']['dateFormat'], $objSyncTime->syncFrom_tstamp),
+                    date(\Contao\Config::get('timeFormat'), $objSyncTime->syncFrom_tstamp),
+                    date(\Contao\Config::get('dateFormat'), $objSyncTime->syncFrom_tstamp),
                     $objSyncTime->syncFrom_user,
                     $objSyncTime->syncFrom_alias
                 )

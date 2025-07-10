@@ -181,7 +181,12 @@ class SyncCtoClients extends Backend
 
                         if ($blnFoundOne == true) {
                             $blnUserIsWorking = true;
-                            $arrNotices[] = sprintf($GLOBALS['TL_LANG']['MSC']['editWarning'], $objResult->username, date($GLOBALS['TL_CONFIG']['timeFormat'], $objResult->tstamp), $row['id']);
+                            $arrNotices[] = sprintf(
+                                $GLOBALS['TL_LANG']['MSC']['editWarning'],
+                                $objResult->username,
+                                date(\Contao\Config::get('timeFormat'), $objResult->tstamp),
+                                $row['id']
+                            );
                         }
                     }
                 }

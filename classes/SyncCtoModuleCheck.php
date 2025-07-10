@@ -186,7 +186,7 @@ class SyncCtoModuleCheck extends \Contao\BackendModule
         // Set the time formate.
         if(empty($strTimeFormate))
         {
-            $strTimeFormate = $GLOBALS['TL_CONFIG']['datimFormat'];
+            $strTimeFormate = \Contao\Config::get('datimFormat');
         }
 
         $arrReturn = array();

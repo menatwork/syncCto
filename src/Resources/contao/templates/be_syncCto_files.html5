@@ -138,7 +138,7 @@
                             <tr>
                                 <td class="state <?php echo $file["css"]; ?>"><?php echo $this->arrLangStates[$file["state"]]; ?><?php if ($file["state"] != 200 && $file['dbafs_conflict']): ?> / <?php echo $GLOBALS['TL_LANG']['MSC']['dbafs_conflict']; endif; ?></td>
                                 <td class="filesize"><?php echo ($file["size"] == -1) ? "N.A." : $this->getReadableSize($file["size"]); ?></td>
-                                <td class="filetime"><?php echo \Contao\Date::parse($GLOBALS['TL_CONFIG']['datimFormat'], $file["lastModified"]); ?></td>
+                                <td class="filetime"><?php echo \Contao\Date::parse(\Contao\Config::get('datimFormat'), $file["lastModified"]); ?></td>
                                 <?php if ($this->compare_complex == false): ?>
                                     <td class="checkbox"><input class="tl_checkbox" type="checkbox"
                                                                 name="del-file-<?php echo $key; ?>"

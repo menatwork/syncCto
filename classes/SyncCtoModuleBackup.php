@@ -17,6 +17,7 @@ use Contao\Dbafs;
 use Contao\Environment;
 use Contao\File;
 use Contao\Input;
+use MenAtWork\SyncCto\Contao\API;
 
 /**
  * Class for backup functions
@@ -403,7 +404,7 @@ class SyncCtoModuleBackup extends BackendModule
                     $this->objData->setState(SyncCtoEnum::WORK_OK);
 
                     $strHTML = "<p class='tl_help'><br />";
-                    $strHTML .= "<a onclick=\"Backend.openModalIframe({'width':600,'title':'" . $this->objStepPool->zipname . "','url':this.href,'height':216});return false\" href='contao/popup.php?src=" . base64_encode($GLOBALS['TL_CONFIG']['uploadPath'] . "/syncCto_backups/database/" . $this->objStepPool->zipname) . "'>" . $GLOBALS['TL_LANG']['MSC']['fileDownload'] . "</a>";
+                    $strHTML .= "<a onclick=\"Backend.openModalIframe({'width':600,'title':'" . $this->objStepPool->zipname . "','url':this.href,'height':216});return false\" href='contao/popup.php?src=" . base64_encode(API::getUploadPath() . "/syncCto_backups/database/" . $this->objStepPool->zipname) . "'>" . $GLOBALS['TL_LANG']['MSC']['fileDownload'] . "</a>";
                     $strHTML .= "</p>";
 
                     $this->objData->setStep(2);
@@ -570,7 +571,7 @@ class SyncCtoModuleBackup extends BackendModule
                     $this->objData->setState(SyncCtoEnum::WORK_OK);
 
                     $strHTML = "<p class='tl_help'><br />";
-                    $strHTML .= "<a onclick=\"Backend.openModalIframe({'width':600,'title':'" . $this->objStepPool->zipname . "','url':this.href,'height':216});return false\" href='contao/popup.php?src=" . base64_encode($GLOBALS['TL_CONFIG']['uploadPath'] . "/syncCto_backups/files/" . $this->objStepPool->zipname) . "'>" . $GLOBALS['TL_LANG']['MSC']['fileDownload'] . "</a>";
+                    $strHTML .= "<a onclick=\"Backend.openModalIframe({'width':600,'title':'" . $this->objStepPool->zipname . "','url':this.href,'height':216});return false\" href='contao/popup.php?src=" . base64_encode(API::getUploadPath() . "/syncCto_backups/files/" . $this->objStepPool->zipname) . "'>" . $GLOBALS['TL_LANG']['MSC']['fileDownload'] . "</a>";
                     $strHTML .= "</p>";
 
                     if (count($this->objStepPool->skippedfiles) != 0) {

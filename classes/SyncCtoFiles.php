@@ -17,6 +17,7 @@ use Contao\FilesModel;
 use Contao\Folder;
 use Contao\Model;
 use Contao\StringUtil;
+use MenAtWork\SyncCto\Contao\API;
 
 /**
  * Class for file operations
@@ -55,7 +56,7 @@ class SyncCtoFiles extends Backend
         // Init
         $this->objSyncCtoHelper = SyncCtoHelper::getInstance();
         $this->objFiles = Files::getInstance();
-        $this->strTimestampFormat = str_replace(array(':', ' '), array('', '_'), $GLOBALS['TL_CONFIG']['datimFormat']);
+        $this->strTimestampFormat = str_replace(array(':', ' '), array('', '_'), \Contao\Config::get('datimFormat'));
 
         // Load blacklists and whitelists
         $this->arrRootFolderList = $this->objSyncCtoHelper->getWhitelistFolder();
@@ -1224,7 +1225,12 @@ class SyncCtoFiles extends Backend
         // Run tl_files/files.
         if ($booFiles == true) {
             // Scann.
-            $objDirectoryIt = new RecursiveDirectoryIterator($this->objSyncCtoHelper->getContaoRoot() . DIRECTORY_SEPARATOR . $this->objSyncCtoHelper->standardizePath($GLOBALS['TL_CONFIG']['uploadPath'] ?? 'files'), $this->strRDIFlags);
+            $objDirectoryIt = new RecursiveDirectoryIterator(
+                  $this->objSyncCtoHelper->getContaoRoot()
+                  . DIRECTORY_SEPARATOR
+                  . $this->objSyncCtoHelper->standardizePath(API::getUploadPath())
+                , $this->strRDIFlags
+            );
             $objFilterIt = new SyncCtoFilterIteratorBase($objDirectoryIt);
             $objRecursiverIt = new RecursiveIteratorIterator($objFilterIt, RecursiveIteratorIterator::SELF_FIRST);
 
@@ -1274,7 +1280,12 @@ class SyncCtoFiles extends Backend
         // Run tl_files/files.
         if ($booFiles == true) {
             // Scann.
-            $objDirectoryIt = new RecursiveDirectoryIterator($this->objSyncCtoHelper->getContaoRoot() . DIRECTORY_SEPARATOR . $this->objSyncCtoHelper->standardizePath($GLOBALS['TL_CONFIG']['uploadPath'] ?? 'files'), $this->strRDIFlags);
+            $objDirectoryIt = new RecursiveDirectoryIterator(
+                  $this->objSyncCtoHelper->getContaoRoot()
+                  . DIRECTORY_SEPARATOR
+                  . $this->objSyncCtoHelper->standardizePath(API::getUploadPath())
+                , $this->strRDIFlags
+            );
             $objFilterIt = new SyncCtoFilterIteratorFolder($objDirectoryIt);
             $objRecursiverIt = new RecursiveIteratorIterator($objFilterIt, RecursiveIteratorIterator::SELF_FIRST);
 
