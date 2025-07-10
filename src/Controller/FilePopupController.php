@@ -98,7 +98,7 @@ class FilePopupController extends APopUpController
         $this->popupTemplate->base = Environment::get('base');
         $this->popupTemplate->language = $GLOBALS['TL_LANGUAGE'];
         $this->popupTemplate->title = $GLOBALS['TL_CONFIG']['websiteTitle'];
-        $this->popupTemplate->charset = $GLOBALS['TL_CONFIG']['characterSet'];
+        $this->popupTemplate->charset = \Contao\System::getContainer()->getParameter('kernel.charset');
         $this->popupTemplate->headline = basename($this->strFile ?? '');
 
         // Set default information

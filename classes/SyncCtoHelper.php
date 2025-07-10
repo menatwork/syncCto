@@ -792,7 +792,7 @@ class SyncCtoHelper
     {
         // Clean up the path.
         $strPath = $this->standardizePath($strPath);
-        $strUploadPath = $this->standardizePath($GLOBALS['TL_CONFIG']['uploadPath']);
+        $strUploadPath = $this->standardizePath(ContaoApi::getUploadPath());
 
         // Check the separator.
         if (DIRECTORY_SEPARATOR == '/') {
@@ -1063,7 +1063,7 @@ class SyncCtoHelper
         $arrDBSchema = array();
         $objDBSchema = Database::getInstance()
                                ->prepare("SELECT TABLE_NAME, UPDATE_TIME FROM information_schema.TABLES WHERE TABLE_SCHEMA = ?")
-                               ->execute($GLOBALS['TL_CONFIG']['dbDatabase'])
+                               ->execute(ContaoApi::getDatabaseName())
         ;
         while ($objDBSchema->next()) {
             $arrDBSchema[$objDBSchema->TABLE_NAME] = strtotime($objDBSchema->UPDATE_TIME);

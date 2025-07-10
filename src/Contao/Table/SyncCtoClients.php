@@ -181,7 +181,12 @@ class SyncCtoClients extends Backend
 
                         if ($blnFoundOne == true) {
                             $blnUserIsWorking = true;
-                            $arrNotices[] = sprintf($GLOBALS['TL_LANG']['MSC']['editWarning'], $objResult->username, date($GLOBALS['TL_CONFIG']['timeFormat'], $objResult->tstamp), $row['id']);
+                            $arrNotices[] = sprintf(
+                                $GLOBALS['TL_LANG']['MSC']['editWarning'],
+                                $objResult->username,
+                                date(\Contao\Config::get('timeFormat'), $objResult->tstamp),
+                                $row['id']
+                            );
                         }
                     }
                 }
@@ -292,12 +297,12 @@ class SyncCtoClients extends Backend
 
         $GLOBALS['TL_DCA']['tl_synccto_clients']['list']['sorting']['root'] = $root;
 
-        $table = $this->Input->get('table');
+        $table = \Contao\Input::get('table');
         $table = str_replace('tl_syncCto_clients_', '', $table);
-        if ($this->objBackendUser->hasAccess($table, 'syncCto_clients_p') == true || strlen($this->Input->get('act')) == 0) {
+        if ($this->objBackendUser->hasAccess($table, 'syncCto_clients_p') == true || strlen(\Contao\Input::get('act')) == 0) {
             return;
         } else {
-            $this->log('Not enough permissions to ' . $this->Input->get('act') . ' syncCto clients', 'tl_syncCto_clients checkPermissionClient', TL_ERROR);
+            $this->log('Not enough permissions to ' . \Contao\Input::get('act') . ' syncCto clients', 'tl_syncCto_clients checkPermissionClient', TL_ERROR);
             $this->redirect('contao?act=error');
         }
     }

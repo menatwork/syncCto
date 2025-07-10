@@ -22,6 +22,8 @@ class SyncCtoContaoAutomator extends Automator
      */
     public function generateInternalCache()
     {
+        return;
+
         if ($GLOBALS['TL_CONFIG']['bypassCache']) {
             return;
         }
@@ -53,6 +55,8 @@ class SyncCtoContaoAutomator extends Automator
      */
     public function createInternalCache()
     {
+        return;
+
         if ($GLOBALS['TL_CONFIG']['bypassCache']) {
             return;
         }

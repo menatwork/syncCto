@@ -124,7 +124,7 @@ class SyncCtoDatabase extends Backend
         $this->strTimestampFormat = str_replace(
             array_keys($GLOBALS['SYC_CONFIG']['folder_file_replacement']),
             array_values($GLOBALS['SYC_CONFIG']['folder_file_replacement']),
-            $GLOBALS['TL_CONFIG']['datimFormat']
+            \Contao\Config::get('datimFormat')
         );
         $this->intMaxMemoryUsage = SyncCtoModuleClient::parseSize(ini_get('memory_limit'));
         $this->intMaxMemoryUsage = $this->intMaxMemoryUsage / 100 * 80;

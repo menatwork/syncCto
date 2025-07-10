@@ -4,6 +4,7 @@ namespace MenAtWork\SyncCto\Controller;
 
 use Contao\BackendTemplate;
 use Contao\BackendUser;
+use Contao\Config;
 use Contao\CoreBundle\Controller\AbstractBackendController;
 use Contao\CoreBundle\Exception\RedirectResponseException;
 use Contao\Database;
@@ -1325,7 +1326,7 @@ class ClientController extends AbstractBackendController
                     $arrConfigurations = $this->objSyncCtoCommunicationClient->getPhpConfigurations();
                     $arrFunctions = $this->objSyncCtoCommunicationClient->getPhpFunctions();
                     $arrProFunctions = $this->objSyncCtoCommunicationClient->getProFunctions();
-                    $arrExtendedInformation = $this->objSyncCtoCommunicationClient->getExtendedInformation($GLOBALS['TL_CONFIG']['datimFormat']);
+                    $arrExtendedInformation = $this->objSyncCtoCommunicationClient->getExtendedInformation(\Contao\Config::get('datimFormat'));
                     $strVersion = $this->objSyncCtoCommunicationClient->getVersionSyncCto();
 
                     // Stop connection

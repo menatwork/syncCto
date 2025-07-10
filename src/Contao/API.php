@@ -12,6 +12,8 @@
 namespace MenAtWork\SyncCto\Contao;
 
 use Contao\Backend;
+use Contao\System;
+use Doctrine\DBAL\Exception;
 
 /**
  * Class API
@@ -34,5 +36,30 @@ class API
     public static function getReadableSize($intSize, $intDecimals = 1)
     {
         return Backend::getReadableSize($intSize, $intDecimals);
+    }
+
+    /**
+     * Get the upload path.
+     *
+     * @return string
+     */
+    public static function getUploadPath(): string
+    {
+        return (string) System::getContainer()
+                              ->getParameter('contao.upload_path') ?? 'files';
+    }
+
+    /**
+     * Get the database name.
+     *
+     * @return string
+     *
+     * @throws Exception
+     */
+    public static function getDatabaseName(): string
+    {
+        /** @var \Doctrine\DBAL\Connection $connection */
+        $connection = System::getContainer()->get('database_connection');
+        return (string) $connection->getDatabase();
     }
 }
