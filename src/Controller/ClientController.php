@@ -278,11 +278,6 @@ class ClientController extends AbstractBackendController
 
     public function __construct()
     {
-        dd(
-             \Contao\Config::get('timeFormat'),
-             \Contao\Config::get('dateFormat'),
-        );
-
         // Load helper
         $this->router = System::getContainer()->get('router');
         $this->User = BackendUser::getInstance();
