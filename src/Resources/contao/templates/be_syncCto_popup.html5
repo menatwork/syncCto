@@ -1,33 +1,42 @@
 <!DOCTYPE html>
 <html lang="<?php echo $this->language; ?>">
-    <head>
-        <meta charset="<?php echo $this->charset; ?>">
-        <title><?php echo $this->title; ?> - Contao Open Source CMS</title>
-        <base href="<?php echo $this->base; ?>">
-        <meta name="generator" content="Contao Open Source CMS">
-        <meta name="viewport" content="width=device-width,initial-scale=1.0,shrink-to-fit=no">
-        <meta name="referrer" content="origin">
+<head>
 
-        <link rel="stylesheet" href="<?= TL_ASSETS_URL ?>system/themes/<?= $this->theme ?>/fonts.css">
-        <link rel="stylesheet" href="<?= TL_ASSETS_URL ?>system/themes/<?= $this->theme ?>/basic.css">
-        <link rel="stylesheet" href="<?= TL_ASSETS_URL ?>system/themes/<?= $this->theme ?>/popup.css">
-        <?= $this->stylesheets ?>
+    <meta charset="<?php echo $this->charset; ?>">
+    <title><?php echo $this->title; ?> - Contao Open Source CMS</title>
+    <base href="<?php echo $this->base; ?>">
+    <meta name="generator" content="Contao Open Source CMS">
+    <meta name="viewport" content="width=device-width,initial-scale=1.0,shrink-to-fit=no">
+    <meta name="referrer" content="origin">
 
-        <script><?= $this->getLocaleString() ?></script>
-        <script src="<?= TL_ASSETS_URL ?>assets/mootools/js/mootools.min.js"></script>
-        <script src="<?= TL_ASSETS_URL ?>bundles/contaocore/mootao.min.js"></script>
-        <script src="<?= TL_ASSETS_URL ?>bundles/contaocore/core.min.js"></script>
-        <script><?= $this->getDateString() ?></script>
-        <?= $this->javascripts ?>
+    <link rel="stylesheet" href="<?= $this->asset('backend.css', 'system/themes/' . $this->theme) ?>">
+    <link rel="stylesheet" href="<?= $this->asset('popup.css', 'system/themes/' . $this->theme) ?>">
+    <?= $this->stylesheets ?>
 
-    </head>
-    <body class="<?= $this->ua ?> popup">
+    <script><?= $this->getLocaleString() ?></script>
+    <script src="<?= $this->asset('js/mootools.min.js', 'contao-components/mootools') ?>"></script>
+    <script><?= $this->getDateString() ?></script>
+    <?= $this->javascripts ?>
+    <script type="application/javascript">
+        function toggleCheckboxGroup(el, id) {
+            let item = $$(id);
+            if (item) {
+                item.each(function (checkbox) {
+                    if (checkbox.tagName.toLowerCase() === 'input' && checkbox.type === 'checkbox') {
+                        checkbox.checked = el.checked;
+                    }
+                });
+            }
+        }
+    </script>
+</head>
+<body class="<?= $this->ua ?> popup">
 
-        <div id="container" class="cf">
-            <div id="main">
-                <?php echo $this->content; ?>
-            </div>
-        </div>
+<div id="container" class="cf">
+    <div id="main">
+        <?php echo $this->content; ?>
+    </div>
+</div>
 
-    </body>
+</body>
 </html>

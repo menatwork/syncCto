@@ -128,7 +128,7 @@
                             <th class="filesize"><?php echo $GLOBALS['TL_LANG']['MSC']['fileSize']; ?></th>
                             <th class="filetime"><?php echo $GLOBALS['TL_LANG']['MSC']['fileTime']; ?></th>
                             <th class="checkbox table-th-nosort"><input class="tl_checkbox"
-                                                                        onclick="Backend.toggleCheckboxGroup(this, '<?php echo ($i == 1) ? 'normal' : 'big'; ?>filelist')"
+                                                                        onclick="toggleCheckboxGroup(this, '.checkbox input[type=checkbox]');"
                                                                         type="checkbox"/></th>
                             <th class="last"><?php echo $GLOBALS['TL_LANG']['MSC']['file']; ?></th>
                         </tr>
