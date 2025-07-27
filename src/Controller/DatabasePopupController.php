@@ -12,16 +12,11 @@
 namespace MenAtWork\SyncCto\Controller;
 
 use Contao\BackendTemplate;
-use Contao\Backend;
 use Contao\BackendUser;
-use Contao\Config;
 use Contao\Database;
 use Contao\Environment;
 use Contao\Input;
-use Contao\StringUtil;
 use Contao\System;
-use Symfony\Component\HttpFoundation\RequestStack;
-use Symfony\Component\HttpFoundation\Session\SessionInterface;
 use SyncCtoHelper;
 
 /**
@@ -30,27 +25,17 @@ use SyncCtoHelper;
 class DatabasePopupController extends APopUpController
 {
     // Vars
-    protected $intClientID;
-    protected $strMode;
+    protected string|int $intClientID;
+    protected string     $strMode;
     // Helper Classes
-    protected $objSyncCtoHelper;
+    protected SyncCtoHelper $objSyncCtoHelper;
     // Temp data
-    protected $arrSyncSettings = array();
-    protected $arrErrors       = array();
+    protected array $arrSyncSettings = array();
+    protected array $arrErrors       = array();
     // Intern var.
-    protected $mixStep;
-    protected $strFile;
-    protected $Template;
-
-    /**
-     * @var BackendTemplate
-     */
-    private BackendTemplate $popupTemplate;
-
-    /**
-     * @var SessionInterface
-     */
-    protected SessionInterface $session;
+    protected string          $mixStep;
+    protected string          $strFile;
+    protected BackendTemplate $Template;
 
     // defines
     const STEP_NORMAL_DB = 'nd';
@@ -58,20 +43,38 @@ class DatabasePopupController extends APopUpController
     const STEP_ERROR_DB  = 'er';
 
     /**
-     * DatabasePopupController constructor.
+     * Initialize get parameter
      */
-    public function __construct()
+    protected function initGetParams(): void
     {
-        $container = System::getContainer();
-        /** @var RequestStack $requestStack */
-        $requestStack = $container->get('request_stack');
-        $this->session = $requestStack->getSession();
+        // Get Client id
+        if (strlen(Input::get('id')) != 0) {
+            $this->intClientID = intval(Input::get('id'));
+        } else {
+            $this->mixStep = self::STEP_ERROR_DB;
+
+            return;
+        }
+
+        // Get next step
+        if (strlen(Input::get('step')) != 0) {
+            $this->mixStep = Input::get('step');
+        } else {
+            $this->mixStep = self::STEP_NORMAL_DB;
+        }
+
+        // Get direction
+        if (strlen(Input::get('direction')) != 0) {
+            $this->strMode = Input::get('direction');
+        }
     }
 
     /**
-     * Load the template list and go through the steps
+     * Run the action.
+     *
+     * @return string
      */
-    public function runAction()
+    protected function doAction(): string
     {
         // Load language
         System::loadLanguageFile('default');
@@ -79,7 +82,6 @@ class DatabasePopupController extends APopUpController
         System::loadLanguageFile("tl_syncCto_database");
 
         $this->objSyncCtoHelper = SyncCtoHelper::getInstance();
-
         $this->initGetParams();
 
         if ($this->mixStep == self::STEP_NORMAL_DB) {
@@ -104,41 +106,18 @@ class DatabasePopupController extends APopUpController
             $this->showError();
         }
 
-        return $this->getResponse();
-    }
-
-    /**
-     * Output templates
-     */
-    public function getResponse()
-    {
-        $this->setupTemplate();
-
-        // Set wrapper template information
-        $this->popupTemplate = new BackendTemplate("be_syncCto_popup");
-        $this->popupTemplate->theme = Backend::getTheme();
-        $this->popupTemplate->base = Environment::get('base');
-        $this->popupTemplate->language = $GLOBALS['TL_LANGUAGE'];
-        $this->popupTemplate->title = $GLOBALS['TL_CONFIG']['websiteTitle'];
-        $this->popupTemplate->charset = \Contao\System::getContainer()->getParameter('kernel.charset');
-        $this->popupTemplate->headline = basename($this->strFile);
-        $this->popupTemplate->requestToken = $this->getRequestToken();
-
         // Set default information
         $this->Template->id = $this->intClientID;
         $this->Template->step = $this->mixStep;
         $this->Template->direction = $this->strMode;
 
-        // Output template
-        $this->popupTemplate->content = $this->Template->parse();
-
-        return $this->popupTemplate->getResponse();
+        return $this->Template->getResponse()->getContent();
     }
 
     /**
      * Show database server and client compare list
      */
-    public function showNormalDatabase()
+    public function showNormalDatabase(): void
     {
         // Delete functionality.
         if (array_key_exists("delete", $_POST)) {
@@ -174,7 +153,7 @@ class DatabasePopupController extends APopUpController
             if (array_key_exists("transfer", $_POST)) {
                 foreach ($this->arrSyncSettings['syncCto_CompareTables'] as $arrType) {
                     foreach ($arrType as $keyTable => $valueTable) {
-                        if ($valueTable['del'] == true) {
+                        if ($valueTable['del']) {
                             $this->arrSyncSettings['syncCto_SyncDeleteTables'][] = $keyTable;
                         } else {
                             $this->arrSyncSettings['syncCto_SyncTables'][] = $keyTable;
@@ -204,7 +183,7 @@ class DatabasePopupController extends APopUpController
             return;
         }
 
-        // Make a look up
+        // Make a look-up
         foreach ((array) $this->arrSyncSettings['syncCto_CompareTables']['recommended'] as $strKey => $arrValueA) {
             $arrTransServer = $this->lookUpName($arrValueA['server']['name']);
             $arrTransClient = $this->lookUpName($arrValueA['client']['name']);
@@ -250,7 +229,7 @@ class DatabasePopupController extends APopUpController
      *
      * @return string
      */
-    public function lookUpName($strName)
+    public function lookUpName(string $strName): array|string
     {
         $strBase = str_replace('tl_', "", $strName);
 
@@ -350,33 +329,6 @@ class DatabasePopupController extends APopUpController
 
     // Helper functions --------------------------------------------------------
 
-    /**
-     * Initianize get parameter
-     */
-    protected function initGetParams()
-    {
-        // Get Client id
-        if (strlen(Input::get('id')) != 0) {
-            $this->intClientID = intval(Input::get('id'));
-        } else {
-            $this->mixStep = self::STEP_ERROR_DB;
-
-            return;
-        }
-
-        // Get next step
-        if (strlen(Input::get('step')) != 0) {
-            $this->mixStep = Input::get('step');
-        } else {
-            $this->mixStep = self::STEP_NORMAL_DB;
-        }
-
-        // Get direction
-        if (strlen(Input::get('direction')) != 0) {
-            $this->strMode = Input::get('direction');
-        }
-
-    }
 
     protected function loadSyncSettings()
     {

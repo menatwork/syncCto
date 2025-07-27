@@ -11,15 +11,9 @@
 
 namespace MenAtWork\SyncCto\Controller;
 
-use Contao\Backend;
 use Contao\BackendTemplate;
-use Contao\Environment;
 use Contao\File;
 use Contao\Input;
-use Contao\Session;
-use Contao\System;
-use Symfony\Component\HttpFoundation\RequestStack;
-use Symfony\Component\HttpFoundation\Session\SessionInterface;
 use SyncCtoEnum;
 use SyncCtoHelper;
 
@@ -29,13 +23,13 @@ use SyncCtoHelper;
 class FilePopupController extends APopUpController
 {
     // Vars
-    protected $intClientID;
+    protected string|int $intClientID;
     // Helper Classes
-    protected $objSyncCtoHelper;
+    protected SyncCtoHelper $objSyncCtoHelper;
     // Temp data
-    protected $arrListFile;
-    protected $arrListCompare;
-    protected $arrClientInformation;
+    protected array $arrListFile;
+    protected array $arrListCompare;
+    protected array $arrClientInformation;
 
     // defines
     const STEP_SHOW_FILES  = 'Sf';
@@ -43,26 +37,34 @@ class FilePopupController extends APopUpController
     const STEP_ERROR_FILES = 'er';
 
     /**
-     * @var SessionInterface
+     * Init get parameter
      */
-    protected SessionInterface $session;
-
-
-    /**
-     * FilePopupController constructor.
-     */
-    public function __construct()
+    protected function initGetParams(): void
     {
-        $container = System::getContainer();
-        /** @var RequestStack $requestStack */
-        $requestStack = $container->get('request_stack');
-        $this->session = $requestStack->getSession();
+        // Get Client id
+        if (strlen(Input::get("id")) != 0) {
+            $this->intClientID = intval(Input::get("id"));
+        } else {
+            $this->mixStep = self::STEP_ERROR_FILES;
+
+            return;
+        }
+
+        // Load information
+        $this->loadClientInformation();
+
+        // Get next step
+        if (strlen(Input::get("step")) != 0) {
+            $this->mixStep = Input::get("step");
+        } else {
+            $this->mixStep = self::STEP_SHOW_FILES;
+        }
     }
 
     /**
      * Load the template list and go through the steps
      */
-    public function runAction()
+    public function doAction(): string
     {
         $this->objSyncCtoHelper = SyncCtoHelper::getInstance();
         $this->initGetParams();
@@ -82,33 +84,10 @@ class FilePopupController extends APopUpController
             $this->showError();
         }
 
-        return $this->getResponse();
-    }
-
-    /**
-     * Output templates
-     */
-    public function getResponse()
-    {
-        $this->setupTemplate();
-
-        // Set wrapper template information
-        $this->popupTemplate = new BackendTemplate("be_syncCto_popup");
-        $this->popupTemplate->theme = Backend::getTheme();
-        $this->popupTemplate->base = Environment::get('base');
-        $this->popupTemplate->language = $GLOBALS['TL_LANGUAGE'];
-        $this->popupTemplate->title = $GLOBALS['TL_CONFIG']['websiteTitle'];
-        $this->popupTemplate->charset = \Contao\System::getContainer()->getParameter('kernel.charset');
-        $this->popupTemplate->headline = basename($this->strFile ?? '');
-
-        // Set default information
         $this->Template->id = $this->intClientID;
         $this->Template->step = $this->mixStep;
 
-        // Output template
-        $this->popupTemplate->content = $this->Template->parse();
-
-        return $this->popupTemplate->getResponse();
+        return $this->Template->getResponse()->getContent();
     }
 
     protected function showFiles()
@@ -339,39 +318,14 @@ class FilePopupController extends APopUpController
     }
 
     /**
-     * Initianize get parameter
-     */
-    protected function initGetParams()
-    {
-        // Get Client id
-        if (strlen(Input::get("id")) != 0) {
-            $this->intClientID = intval(Input::get("id"));
-        } else {
-            $this->mixStep = self::STEP_ERROR_FILES;
-
-            return;
-        }
-
-        // Load information
-        $this->loadClientInformation();
-
-        // Get next step
-        if (strlen(Input::get("step")) != 0) {
-            $this->mixStep = Input::get("step");
-        } else {
-            $this->mixStep = self::STEP_SHOW_FILES;
-        }
-    }
-
-    /**
      * Sort function
      *
-     * @param type $a
-     * @param type $b
+     * @param mixed $a
+     * @param mixed $b
      *
-     * @return type
+     * @return int
      */
-    public function sort($a, $b)
+    public function sort($a, $b): int
     {
         if ($a["state"] == $b["state"]) {
             return 0;
