@@ -4,30 +4,33 @@ namespace MenAtWork\SyncCto\Contao\Table;
 
 use Contao\Backend;
 use Contao\BackendUser;
-use Contao\Config;
 use Contao\DataContainer;
 use Contao\Image;
 use Contao\StringUtil;
 use ContaoCommunityAlliance\DcGeneral\Data\ModelId;
+use Monolog\Logger;
 use SyncCtoHelper;
 
 class SyncCtoClients extends Backend
 {
-// Objects
+    // Objects
     protected $objBackendUser;
     protected $objBackendHistory;
     // Vars
     protected $blnUserBackendHistory = false;
 
+    private Logger $logger;
+
     /**
      * Constructor
      */
-    public function __construct()
+    public function __construct(Logger $logger)
     {
         parent::__construct();
 
         $this->objBackendUser = BackendUser::getInstance();
         $this->blnUserBackendHistory = false;
+        $this->logger = $logger;
 
         // Check if we have 'BackendUserHistory'
 //        if (in_array('backendUserHistory', Config::getInstance()->getActiveModules()))
@@ -302,7 +305,9 @@ class SyncCtoClients extends Backend
         if ($this->objBackendUser->hasAccess($table, 'syncCto_clients_p') == true || strlen(\Contao\Input::get('act')) == 0) {
             return;
         } else {
-            $this->log('Not enough permissions to ' . \Contao\Input::get('act') . ' syncCto clients', 'tl_syncCto_clients checkPermissionClient', TL_ERROR);
+            $this->logger->info(
+                'Not enough permissions to ' . \Contao\Input::get('act') . ' syncCto clients'
+            );
             $this->redirect('contao?act=error');
         }
     }
@@ -312,8 +317,8 @@ class SyncCtoClients extends Backend
      */
     public function checkPermissionClientCreate()
     {
-        if (!$this->objBackendUser->hasAccess('create', 'syncCto_clients_p')) {
-            $GLOBALS['TL_DCA']['tl_synccto_clients']['config'] = array_unique(array_merge(array('closed' => true), $GLOBALS['TL_DCA']['tl_synccto_clients']['config']));
+        if ($this->objBackendUser->hasAccess('create', 'syncCto_clients_p')) {
+            $GLOBALS['TL_DCA']['tl_synccto_clients']['config']['closed'] = true;
         }
     }
 

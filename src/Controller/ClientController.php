@@ -4,7 +4,6 @@ namespace MenAtWork\SyncCto\Controller;
 
 use Contao\BackendTemplate;
 use Contao\BackendUser;
-use Contao\Config;
 use Contao\CoreBundle\Controller\AbstractBackendController;
 use Contao\CoreBundle\Exception\RedirectResponseException;
 use Contao\Database;
@@ -20,6 +19,8 @@ use Exception;
 use LimitIterator;
 use MenAtWork\SyncCto\Contao\API as SyncCtoContaoApi;
 use MenAtWork\SyncCto\Sync\FileList\Base;
+use Monolog\Logger;
+use Psr\Log\LoggerInterface;
 use Psr\Log\LogLevel;
 use StepPool;
 use Symfony\Component\HttpFoundation\RequestStack;
@@ -108,6 +109,7 @@ class ClientController extends AbstractBackendController
     private                 $Template;
     private array           $templateVars;
     private RouterInterface $router;
+    private LoggerInterface $logger;
 
     /**
      * @return int
@@ -276,9 +278,10 @@ class ClientController extends AbstractBackendController
         $this->intStep++;
     }
 
-    public function __construct()
+    public function __construct(LoggerInterface $logger)
     {
         // Load helper
+        $this->logger = $logger;
         $this->router = System::getContainer()->get('router');
         $this->User = BackendUser::getInstance();
         $this->twig = System::getContainer()->get('twig');
@@ -291,7 +294,6 @@ class ClientController extends AbstractBackendController
         /** @var RequestStack $requestStack */
         $requestStack = $container->get('request_stack');
         $this->session = $requestStack->getSession();
-
         $this->templateVars = [];
 
         // Load language
@@ -304,8 +306,7 @@ class ClientController extends AbstractBackendController
 
     protected function log($msg, $context = [], $logLevel = LogLevel::INFO): void
     {
-        // ToDo we should replace the log function. This is only a placeholder
-        // to fix it later.
+        $this->logger->log($logLevel, $msg, $context);
     }
 
     /**
@@ -562,12 +563,12 @@ class ClientController extends AbstractBackendController
         $this->templateVars['information'] = $this->strInformation;
         $this->templateVars['finished'] = $this->booFinished;
         $this->templateVars['allMode'] = $this->blnAllMode;
-        $this->templateVars['language'] = [
-            'goBack'    => $GLOBALS['TL_LANG']['MSC']['backBT'],
-            'error'     => $GLOBALS['TL_LANG']['MSC']['error'],
-            'abort'     => $GLOBALS['TL_LANG']['MSC']['abort_sync'],
-            'repeat'    => $GLOBALS['TL_LANG']['MSC']['repeat_sync'],
-            'next_sync' => $GLOBALS['TL_LANG']['MSC']['next_sync']
+        $this->templateVars['translations'] = [
+            'goBack'    => $GLOBALS['TL_LANG']['MSC']['backBT'] ?? 'Back',
+            'error'     => $GLOBALS['TL_LANG']['MSC']['error'] ?? ['Error', 'Error'],
+            'abort'     => $GLOBALS['TL_LANG']['MSC']['abort_sync'] ?? ['Abort', 'Abort'],
+            'repeat'    => $GLOBALS['TL_LANG']['MSC']['repeat_sync'] ?? ['Repeat', 'Repeat'],
+            'next_sync' => $GLOBALS['TL_LANG']['MSC']['next_sync'] ?? ['Next', 'Next'],
         ];
 
         if (Input::get('table') == 'tl_syncCto_clients_syncTo') {
@@ -1090,7 +1091,10 @@ class ClientController extends AbstractBackendController
             SyncCtoStats::getInstance()->addStartStat(BackendUser::getInstance()->id, $this->intClientID, time(), $this->arrSyncSettings, SyncCtoStats::SYNCDIRECTION_FROM);
 
             // Write log
-            $this->log(vsprintf("Start synchronization server with client ID %s.", [Input::get("id")]), __CLASS__ . " " . __FUNCTION__, "INFO");
+            $this->log(
+                vsprintf("Start synchronization server with client ID %s.", [Input::get("id")]),
+                [__CLASS__ . " " . __FUNCTION__]
+            );
 
             // Reset some Sessions
             $this->resetStepPoolByID([1, 2, 3, 4, 5, 6, 7]);
@@ -1918,14 +1922,14 @@ class ClientController extends AbstractBackendController
         $this->strError = "";
         $this->objData->setState(SyncCtoEnum::WORK_WORK);
 
+        $intSkippCount = 0;
+        $intSendCount = 0;
+        $intWaitCount = 0;
+        $intDelCount = 0;
+        $intSplitCount = 0;
+
         // Count files
         if (is_array($this->arrListCompare) && (count((array) $this->arrListCompare['core']) != 0 || count((array) $this->arrListCompare['files']) != 0)) {
-            $intSkippCount = 0;
-            $intSendCount = 0;
-            $intWaitCount = 0;
-            $intDelCount = 0;
-            $intSplitCount = 0;
-
             foreach ($this->arrListCompare as $strType => $arrLists) {
                 foreach ($arrLists as $key => $value) {
                     if ($value['state'] == SyncCtoEnum::FILESTATE_DBAFS_CONFLICT) {
@@ -2386,8 +2390,8 @@ class ClientController extends AbstractBackendController
                         );
 
                         // Get the tables count.
-                        $countRecommended = count((array) $arrCompareList['recommended']);
-                        $countNoneRecommended = count((array) $arrCompareList['none_recommended']);
+                        $countRecommended = count((array) $arrCompareList['recommended'] ?? []);
+                        $countNoneRecommended = count((array) $arrCompareList['none_recommended'] ?? []);
 
                         // Check the next step.
                         if ($countRecommended == 0 && $countNoneRecommended == 0) {
@@ -3027,7 +3031,10 @@ class ClientController extends AbstractBackendController
                         $this->objSyncCtoCommunicationClient->setAttentionFlag(false);
                     }
 
-                    $this->log(vsprintf("Successfully finishing of synchronization client ID %s.", [Input::get("id")]), __CLASS__ . " " . __FUNCTION__, "INFO");
+                    $this->log(
+                        vsprintf("Successfully finishing of synchronization client ID %s.", [Input::get("id")]),
+                        [__CLASS__ . " " . __FUNCTION__]
+                    );
 
                 /**
                  * Cleanup
@@ -3056,7 +3063,11 @@ class ClientController extends AbstractBackendController
         } catch (Exception $exc) {
             $this->objStepPool->increaseSubStep();
 
-            $this->log(vsprintf("Error on synchronization client ID %s with msg: %s", [Input::get("id"), $exc->getMessage()]), __CLASS__ . " " . __FUNCTION__, "ERROR");
+            $this->log(
+                vsprintf("Error on synchronization client ID %s with msg: %s", [Input::get("id"), $exc->getMessage()]),
+                [__CLASS__ . " " . __FUNCTION__],
+                LogLevel::ERROR
+            );
         }
     }
 
@@ -3134,7 +3145,11 @@ class ClientController extends AbstractBackendController
 
                             $objCallbackClass->{$arrCurrentFunction[1]}($this, $this->intClientID);
                         } catch (Exception $exc) {
-                            $this->log("Error by: TL_HOOK $arrCurrentFunction[0] | $arrCurrentFunction[1] with Msg: " . $exc->getMessage(), __CLASS__ . "|" . __FUNCTION__, TL_ERROR);
+                            $this->log(
+                                "Error by: TL_HOOK $arrCurrentFunction[0] | $arrCurrentFunction[1] with Msg: " . $exc->getMessage(),
+                                [__CLASS__ . "|" . __FUNCTION__],
+                                LogLevel::ERROR
+                            );
                         }
 
                         $this->objStepPool->additionalStep = $mixCurrentAdditionalStep + 1;
@@ -3159,15 +3174,16 @@ class ClientController extends AbstractBackendController
                  * Show information
                  */
                 case 6:
+                    $intSkippCount = 0;
+                    $intSendCount = 0;
+                    $intWaitCount = 0;
+                    $intDelCount = 0;
+                    $intSplitCount = 0;
+
+
                     // Count files
                     if (is_array($this->arrListCompare) && (count((array) $this->arrListCompare['core']) != 0 || count((array) $this->arrListCompare['files']) != 0)) {
-                        $intSkippCount = 0;
-                        $intSendCount = 0;
-                        $intWaitCount = 0;
-                        $intDelCount = 0;
-                        $intSplitCount = 0;
-
-                        foreach ($this->arrListCompare as $strType => $arrLists) {
+                       foreach ($this->arrListCompare as $strType => $arrLists) {
                             foreach ($arrLists as $key => $value) {
                                 switch ($value["transmission"]) {
                                     case SyncCtoEnum::FILETRANS_SEND:
@@ -3455,7 +3471,11 @@ class ClientController extends AbstractBackendController
         } catch (Exception $exc) {
             $this->objStepPool->increaseSubStep();
 
-            $this->log(vsprintf("Error on synchronization client ID %s with msg: %s", [Input::get("id"), $exc->getMessage()]), __CLASS__ . " " . __FUNCTION__, "ERROR");
+            $this->log(
+                vsprintf("Error on synchronization client ID %s with msg: %s", [Input::get("id"), $exc->getMessage()]),
+                [__CLASS__ . " " . __FUNCTION__],
+                LogLevel::ERROR
+            );
         }
     }
 
@@ -3770,7 +3790,11 @@ class ClientController extends AbstractBackendController
             $this->booRefresh = true;
             $this->intStep++;
 
-            $this->log(vsprintf("Error on synchronization client ID %s with msg: %s", [Input::get("id"), $exc->getMessage()]), __CLASS__ . " " . __FUNCTION__, "ERROR");
+            $this->log(
+                vsprintf("Error on synchronization client ID %s with msg: %s", [Input::get("id"), $exc->getMessage()]),
+                [__CLASS__ . " " . __FUNCTION__],
+                LogLevel::ERROR
+            );
         }
     }
 
@@ -3789,14 +3813,14 @@ class ClientController extends AbstractBackendController
         $this->strError = "";
         $this->objData->setState(SyncCtoEnum::WORK_WORK);
 
+        $intSkippCount = 0;
+        $intSendCount = 0;
+        $intWaitCount = 0;
+        $intDelCount = 0;
+        $intSplitCount = 0;
+
         // Count files
         if (is_array($this->arrListCompare) && count((array) $this->arrListCompare) != 0 && $this->arrListCompare != false) {
-            $intSkippCount = 0;
-            $intSendCount = 0;
-            $intWaitCount = 0;
-            $intDelCount = 0;
-            $intSplitCount = 0;
-
             foreach ($this->arrListCompare as $strType => $arrLists) {
                 foreach ($arrLists as $key => $value) {
                     switch ($value["transmission"]) {
@@ -4123,7 +4147,11 @@ class ClientController extends AbstractBackendController
             $this->booRefresh = true;
             $this->intStep++;
 
-            $this->log(vsprintf("Error on synchronization client ID %s with msg: %s", [Input::get("id"), $exc->getMessage()]), __CLASS__ . " " . __FUNCTION__, "ERROR");
+            $this->log(
+                vsprintf("Error on synchronization client ID %s with msg: %s", [Input::get("id"), $exc->getMessage()]),
+                [__CLASS__ . " " . __FUNCTION__],
+                LogLevel::ERROR
+            );
         }
     }
 
@@ -4252,7 +4280,7 @@ class ClientController extends AbstractBackendController
 
                         $arrCompareList = $this->objSyncCtoDatabase->getFormatedCompareList($arrClientTables, $arrServerTables, $arrHiddenTables, $arrHiddenTablesPlaceholder, $arrAllTimeStamps['client'], $arrAllTimeStamps['server'], $arrAllowedTables, 'client', 'server');
 
-                        if (count((array) $arrCompareList['recommended']) == 0 && count((array) $arrCompareList['none_recommended']) == 0) {
+                        if (count((array) $arrCompareList['recommended'] ?? []) == 0 && count((array) $arrCompareList['none_recommended'] ?? []) == 0) {
                             $this->objData->setState(SyncCtoEnum::WORK_SKIPPED);
                             $this->objData->setHtml("");
                             $this->intStep++;
@@ -4485,7 +4513,11 @@ class ClientController extends AbstractBackendController
             $this->booRefresh = true;
             $this->intStep++;
 
-            $this->log(vsprintf("Error on synchronization client ID %s with msg: %s", [Input::get("id"), $exc->getMessage()]), __CLASS__ . " " . __FUNCTION__, "ERROR");
+            $this->log(
+                vsprintf("Error on synchronization client ID %s with msg: %s", [Input::get("id"), $exc->getMessage()]),
+                [__CLASS__ . " " . __FUNCTION__],
+                LogLevel::ERROR
+            );
         }
     }
 
@@ -4653,7 +4685,10 @@ class ClientController extends AbstractBackendController
                         $this->objSyncCtoCommunicationClient->setAttentionFlag(false);
                     }
 
-                    $this->log(vsprintf("Successfully finishing of synchronization client ID %s.", [Input::get("id")]), __CLASS__ . " " . __FUNCTION__, "INFO");
+                    $this->log(
+                        vsprintf("Successfully finishing of synchronization client ID %s.", [Input::get("id")]),
+                        [__CLASS__ . " " . __FUNCTION__]
+                    );
 
                     $this->objData->setState(SyncCtoEnum::WORK_OK);
                     $this->objData->setDescription($GLOBALS['TL_LANG']['tl_syncCto_sync']["step_5"]['description_1']);
@@ -4664,7 +4699,11 @@ class ClientController extends AbstractBackendController
         } catch (Exception $exc) {
             $this->objStepPool->increaseSubStep();
 
-            $this->log(vsprintf("Error on synchronization client ID %s with msg: %s", [Input::get("id"), $exc->getMessage()]), __CLASS__ . " " . __FUNCTION__, "ERROR");
+            $this->log(
+                vsprintf("Error on synchronization client ID %s with msg: %s", [Input::get("id"), $exc->getMessage()]),
+                [__CLASS__ . " " . __FUNCTION__],
+                LogLevel::ERROR
+            );
         }
     }
 
@@ -4734,14 +4773,14 @@ class ClientController extends AbstractBackendController
                  * Show information
                  */
                 case 6:
+                    $intSkippCount = 0;
+                    $intSendCount = 0;
+                    $intWaitCount = 0;
+                    $intDelCount = 0;
+                    $intSplitCount = 0;
+
                     // Count files
                     if (is_array($this->arrListCompare) && (count((array) $this->arrListCompare['core']) != 0 || count((array) $this->arrListCompare['files']) != 0)) {
-                        $intSkippCount = 0;
-                        $intSendCount = 0;
-                        $intWaitCount = 0;
-                        $intDelCount = 0;
-                        $intSplitCount = 0;
-
                         foreach ($this->arrListCompare as $strType => $arrLists) {
                             foreach ($arrLists as $key => $value) {
                                 switch ($value["transmission"]) {
@@ -5023,7 +5062,11 @@ class ClientController extends AbstractBackendController
         } catch (Exception $exc) {
             $this->objStepPool->increaseSubStep();
 
-            $this->log(vsprintf("Error on synchronization client ID %s with msg: %s", [Input::get("id"), $exc->getMessage()]), __CLASS__ . " " . __FUNCTION__, "ERROR");
+            $this->log(
+                vsprintf("Error on synchronization client ID %s with msg: %s", [Input::get("id"), $exc->getMessage()]),
+                [__CLASS__ . " " . __FUNCTION__],
+                LogLevel::ERROR
+            );
         }
     }
 

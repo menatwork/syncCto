@@ -12,12 +12,10 @@
 use Contao\BackendModule;
 use Contao\BackendTemplate;
 use Contao\BackendUser;
-use Contao\Config;
 use Contao\Database;
 use Contao\Environment;
 use Contao\File;
 use Contao\FilesModel;
-use Contao\Folder;
 use Contao\Input;
 use Contao\Message;
 use Contao\System;
@@ -94,7 +92,8 @@ class SyncCtoModuleClient extends BackendModule
     /**
      * @var mixed|SessionInterface
      */
-    private mixed $session;
+    private mixed            $session;
+    private ?\Monolog\Logger $logger;
 
     /**
      * @return int
@@ -274,7 +273,7 @@ class SyncCtoModuleClient extends BackendModule
      *
      * @param DataContainer $objDc
      */
-    public function __construct(DataContainer $objDc = null)
+    public function __construct(DataContainer $objDc = null, \Monolog\Logger $logger = null)
     {
         parent::__construct($objDc);
 
@@ -298,6 +297,7 @@ class SyncCtoModuleClient extends BackendModule
         /** @var RequestStack $requestStack */
         $requestStack = $container->get('request_stack');
         $this->session = $requestStack->getSession();
+        $this->logger = $logger;
     }
 
     protected function log($msg, $context = array(), $level = LOG_INFO)
@@ -1844,14 +1844,14 @@ class SyncCtoModuleClient extends BackendModule
         $this->strError = "";
         $this->objData->setState(SyncCtoEnum::WORK_WORK);
 
+        $intSkippCount = 0;
+        $intSendCount = 0;
+        $intWaitCount = 0;
+        $intDelCount = 0;
+        $intSplitCount = 0;
+
         // Count files
         if (is_array($this->arrListCompare) && (count((array) $this->arrListCompare['core']) != 0 || count((array) $this->arrListCompare['files']) != 0)) {
-            $intSkippCount = 0;
-            $intSendCount = 0;
-            $intWaitCount = 0;
-            $intDelCount = 0;
-            $intSplitCount = 0;
-
             foreach ($this->arrListCompare as $strType => $arrLists) {
                 foreach ($arrLists as $key => $value) {
                     if ($value['state'] == SyncCtoEnum::FILESTATE_DBAFS_CONFLICT) {
@@ -1958,7 +1958,7 @@ class SyncCtoModuleClient extends BackendModule
                     } else {
                         foreach ($this->arrListCompare as $strType => $arrLists) {
                             foreach ($arrLists as $key => $value) {
-                                if ($value["split"] == true) {
+                                if ($value["split"]) {
                                     $this->objStepPool->increaseSubStep();
                                     $this->objData->setDescription($GLOBALS['TL_LANG']['tl_syncCto_sync']["step_3"]['description_3']);
 
@@ -1987,7 +1987,7 @@ class SyncCtoModuleClient extends BackendModule
                                 continue;
                             }
 
-                            if ($value["split"] == true) {
+                            if ($value["split"]) {
                                 $intCountSplit++;
                             }
                         }
@@ -1995,7 +1995,7 @@ class SyncCtoModuleClient extends BackendModule
 
                     foreach ($this->arrListCompare as $strType => $arrLists) {
                         foreach ($arrLists as $key => $value) {
-                            if ($value["split"] != true) {
+                            if (!$value["split"]) {
                                 continue;
                             }
 
@@ -3719,14 +3719,14 @@ class SyncCtoModuleClient extends BackendModule
         $this->strError = "";
         $this->objData->setState(SyncCtoEnum::WORK_WORK);
 
+        $intSkippCount = 0;
+        $intSendCount = 0;
+        $intWaitCount = 0;
+        $intDelCount = 0;
+        $intSplitCount = 0;
+
         // Count files
         if (is_array($this->arrListCompare) && count((array) $this->arrListCompare) != 0 && $this->arrListCompare != false) {
-            $intSkippCount = 0;
-            $intSendCount = 0;
-            $intWaitCount = 0;
-            $intDelCount = 0;
-            $intSplitCount = 0;
-
             foreach ($this->arrListCompare as $strType => $arrLists) {
                 foreach ($arrLists as $key => $value) {
                     switch ($value["transmission"]) {
@@ -4664,14 +4664,14 @@ class SyncCtoModuleClient extends BackendModule
                  * Show information
                  */
                 case 6:
+                    $intSkippCount = 0;
+                    $intSendCount = 0;
+                    $intWaitCount = 0;
+                    $intDelCount = 0;
+                    $intSplitCount = 0;
+
                     // Count files
                     if (is_array($this->arrListCompare) && (count((array) $this->arrListCompare['core']) != 0 || count((array) $this->arrListCompare['files']) != 0)) {
-                        $intSkippCount = 0;
-                        $intSendCount = 0;
-                        $intWaitCount = 0;
-                        $intDelCount = 0;
-                        $intSplitCount = 0;
-
                         foreach ($this->arrListCompare as $strType => $arrLists) {
                             foreach ($arrLists as $key => $value) {
                                 switch ($value["transmission"]) {

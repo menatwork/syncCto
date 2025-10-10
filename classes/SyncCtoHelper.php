@@ -854,7 +854,7 @@ class SyncCtoHelper
     public function databaseTablesRecommended()
     {
         // Recommended tables
-        $arrBlacklist = unserialize($GLOBALS['TL_CONFIG']['syncCto_database_tables']);
+        $arrBlacklist = unserialize($GLOBALS['TL_CONFIG']['syncCto_database_tables'] ?? '');
         if (!is_array($arrBlacklist)) {
             $arrBlacklist = array();
         }
@@ -886,7 +886,7 @@ class SyncCtoHelper
     public function databaseTablesNoneRecommended()
     {
         // None recommended tables
-        $arrBlacklist = unserialize($GLOBALS['TL_CONFIG']['syncCto_database_tables']);
+        $arrBlacklist = unserialize($GLOBALS['TL_CONFIG']['syncCto_database_tables'] ?? '');
         if (!is_array($arrBlacklist)) {
             $arrBlacklist = array();
         }
@@ -918,7 +918,7 @@ class SyncCtoHelper
     public function databaseTablesNoneRecommendedWithHidden()
     {
         // None recommended tables
-        $arrBlacklist = unserialize($GLOBALS['TL_CONFIG']['syncCto_database_tables']);
+        $arrBlacklist = unserialize($GLOBALS['TL_CONFIG']['syncCto_database_tables'] ?? '');
         if (!is_array($arrBlacklist)) {
             $arrBlacklist = array();
         }
