@@ -5,13 +5,13 @@ services:
 
     ## SyncCto
     MenAtWork\SyncCto\Contao\Table\SyncCtoClients:
-        arguments:
-            $logger: '@?logger'
+        calls:
+            -   setLogger: [ '@logger' ]
         public: true
 
     MenAtWork\SyncCto\Controller\ClientController:
-        arguments:
-            $logger: '@?logger'
+        calls:
+            -   setLogger: [ '@logger' ]
 
     ## Contao
     MenAtWork\SyncCto\Contao\ScopeMatcher:

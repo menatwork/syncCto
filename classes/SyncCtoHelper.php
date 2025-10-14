@@ -183,8 +183,17 @@ class SyncCtoHelper
      */
     static public function parseSize(string $size): int|string
     {
+        if (!is_string($size)) {
+            $size = (string) $size;
+        }
+
+        if ((int) $size === -1) {
+            return PHP_INT_MAX;
+        }
+
         $size = trim($size);
         $last = strtolower($size[strlen($size) - 1]);
+        $size = (int) $size;
         switch ($last) {
             // The 'G' modifier is available since PHP 5.1.0
             case 'g':
@@ -326,7 +335,7 @@ class SyncCtoHelper
         $arrLocalconfig = (isset($GLOBALS['TL_CONFIG']['syncCto_folder_blacklist']))
             ? unserialize($GLOBALS['TL_CONFIG']['syncCto_folder_blacklist'])
             : [];
-        $arrSyncCtoConfig = $GLOBALS['SYC_CONFIG']['folder_blacklist'] ?? [];
+        $arrSyncCtoConfig = ($GLOBALS['SYC_CONFIG']['folder_blacklist'] ?? []);
 
         return $this->mergeConfigs($arrLocalconfig, $arrSyncCtoConfig);
     }

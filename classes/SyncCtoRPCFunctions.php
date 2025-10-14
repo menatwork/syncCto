@@ -125,7 +125,7 @@ class SyncCtoRPCFunctions extends Backend
                 case 'file':
                 case 'debug':
                 case 'tmp':
-                    return $GLOBALS['SYC_PATH'][$strName] ?? [];
+                    return ($GLOBALS['SYC_PATH'][$strName] ?? []);
 
                 default:
                     throw new Exception("Unknown field");

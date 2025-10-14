@@ -153,7 +153,7 @@ class DatabasePopupController extends APopUpController
             if (array_key_exists("transfer", $_POST)) {
                 foreach ($this->arrSyncSettings['syncCto_CompareTables'] as $arrType) {
                     foreach ($arrType as $keyTable => $valueTable) {
-                        if ($valueTable['del']) {
+                        if ($valueTable['del'] ?? false) {
                             $this->arrSyncSettings['syncCto_SyncDeleteTables'][] = $keyTable;
                         } else {
                             $this->arrSyncSettings['syncCto_SyncTables'][] = $keyTable;
@@ -171,8 +171,8 @@ class DatabasePopupController extends APopUpController
 
         // If no table is found skip the view
         if (
-            count($this->arrSyncSettings['syncCto_CompareTables']['recommended'] ?? []) == 0
-            && count($this->arrSyncSettings['syncCto_CompareTables']['nonRecommended'] ?? []) == 0
+            count(($this->arrSyncSettings['syncCto_CompareTables']['recommended'] ?? [])) == 0
+            && count(($this->arrSyncSettings['syncCto_CompareTables']['nonRecommended'] ?? [])) == 0
         ) {
             unset($this->arrSyncSettings['syncCto_CompareTables']);
             $this->arrSyncSettings['syncCto_SyncDeleteTables'] = array();
@@ -194,7 +194,7 @@ class DatabasePopupController extends APopUpController
             $this->arrSyncSettings['syncCto_CompareTables']['recommended'][$strKey]['client']['iname'] = $arrTransClient['iname'];
         }
 
-        foreach ((array) $this->arrSyncSettings['syncCto_CompareTables']['nonRecommended'] as $strKey => $arrValueA) {
+        foreach ((array) ($this->arrSyncSettings['syncCto_CompareTables']['nonRecommended'] ?? []) as $strKey => $arrValueA) {
             $arrTransServer = $this->lookUpName($arrValueA['server']['name']);
             $arrTransClient = $this->lookUpName($arrValueA['client']['name']);
 
@@ -205,7 +205,7 @@ class DatabasePopupController extends APopUpController
         }
 
         $this->Template = new BackendTemplate("be_syncCto_database");
-        $this->Template->headline = $GLOBALS['TL_LANG']['MSC']['comparelist'];
+        $this->Template->headline = $GLOBALS['TL_LANG']['MSC']['comparelist'] ?? 'Comparelist';
         $this->Template->arrCompareList = $this->arrSyncSettings['syncCto_CompareTables'];
         $this->Template->close = false;
         $this->Template->error = false;
@@ -320,8 +320,8 @@ class DatabasePopupController extends APopUpController
     public function showError()
     {
         $this->Template = new BackendTemplate("be_syncCto_database");
-        $this->Template->headline = $GLOBALS['TL_LANG']['MSC']['error'];
-        $this->Template->arrError = $this->arrErrors;
+        $this->Template->headline = $GLOBALS['TL_LANG']['MSC']['error'] ?? 'Error';
+        $this->Template->arrError = ($this->arrErrors ?? []);
         $this->Template->text = $GLOBALS['TL_LANG']['ERR']['general'];
         $this->Template->close = false;
         $this->Template->error = true;

@@ -126,7 +126,7 @@ class SyncCtoDatabase extends Backend
             array_values($GLOBALS['SYC_CONFIG']['folder_file_replacement']),
             \Contao\Config::get('datimFormat')
         );
-        $this->intMaxMemoryUsage = SyncCtoModuleClient::parseSize(ini_get('memory_limit'));
+        $this->intMaxMemoryUsage = SyncCtoHelper::parseSize(ini_get('memory_limit'));
         $this->intMaxMemoryUsage = $this->intMaxMemoryUsage / 100 * 80;
 
         // Load hidden tables
@@ -1325,8 +1325,8 @@ class SyncCtoDatabase extends Backend
             $field['name'] = '`' . $field['name'] . '`';
 
             // Field type
-            if (strlen($field['length'])) {
-                $field['type'] .= '(' . $field['length'] . (strlen($field['precision']) ? ',' . $field['precision'] : '') . ')';
+            if (strlen(($field['length'] ?? ''))) {
+                $field['type'] .= '(' . $field['length'] . (strlen(($field['precision'] ?? '')) ? ',' . $field['precision'] : '') . ')';
 
                 unset($field['length']);
                 unset($field['precision']);

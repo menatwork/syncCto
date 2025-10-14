@@ -246,7 +246,7 @@ class SyncCtoModuleCheck extends \Contao\BackendModule
      */
     private function getSize($strValue)
     {
-        return SyncCtoModuleClient::parseSize($strValue);
+        return SyncCtoHelper::parseSize($strValue);
     }
 
     /**

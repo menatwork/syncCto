@@ -9,28 +9,30 @@ use Contao\Image;
 use Contao\StringUtil;
 use ContaoCommunityAlliance\DcGeneral\Data\ModelId;
 use Monolog\Logger;
+use Psr\Log\LoggerAwareTrait;
+use Psr\Log\LoggerTrait;
 use SyncCtoHelper;
 
 class SyncCtoClients extends Backend
 {
+    use LoggerTrait;
+    use LoggerAwareTrait;
+
     // Objects
     protected $objBackendUser;
     protected $objBackendHistory;
     // Vars
     protected $blnUserBackendHistory = false;
 
-    private Logger $logger;
-
     /**
      * Constructor
      */
-    public function __construct(Logger $logger)
+    public function __construct()
     {
         parent::__construct();
 
-        $this->objBackendUser = BackendUser::getInstance();
+        $this->objBackendUser        = BackendUser::getInstance();
         $this->blnUserBackendHistory = false;
-        $this->logger = $logger;
 
         // Check if we have 'BackendUserHistory'
 //        if (in_array('backendUserHistory', Config::getInstance()->getActiveModules()))
@@ -38,6 +40,11 @@ class SyncCtoClients extends Backend
 //            $this->blnUserBackendHistory = true;
 //            $this->objBackendHistory     = BackendUserHistory::getInstance();
 //        }
+    }
+
+    public function log($level, \Stringable|string $message, array $context = []): void
+    {
+        $this->logger->log($level, $message, $context);
     }
 
     public function checkPermission_client_edit()
@@ -130,7 +137,7 @@ class SyncCtoClients extends Backend
     public function checkClientStatus()
     {
         $GLOBALS['TL_JAVASCRIPT'][] = 'bundles/synccto/js/ping.js';
-        $GLOBALS['TL_CSS'][] = 'bundles/synccto/css/legend.css';
+        $GLOBALS['TL_CSS'][]        = 'bundles/synccto/css/legend.css';
     }
 
     /**
@@ -149,7 +156,7 @@ class SyncCtoClients extends Backend
     public function checkPermissionClientButton($row, $href, $label, $title, $icon, $attributes, $operations)
     {
         $blnUserIsWorking = false;
-        $arrNotices = array();
+        $arrNotices       = array();
 
         // Check if we have the userBackendHistory
         if ($this->blnUserBackendHistory) {
@@ -158,7 +165,7 @@ class SyncCtoClients extends Backend
             if ($objResult->numRows != 0) {
                 while ($objResult->next()) {
                     $blnFoundOne = false;
-                    $arrUrl = unserialize($objResult->url);
+                    $arrUrl      = unserialize($objResult->url);
 
                     // Check do and id
                     if ($arrUrl['do'] == 'synccto_clients' && $arrUrl['id'] == $row['id']) {
@@ -184,7 +191,7 @@ class SyncCtoClients extends Backend
 
                         if ($blnFoundOne == true) {
                             $blnUserIsWorking = true;
-                            $arrNotices[] = sprintf(
+                            $arrNotices[]     = sprintf(
                                 $GLOBALS['TL_LANG']['MSC']['editWarning'],
                                 $objResult->username,
                                 date(\Contao\Config::get('timeFormat'), $objResult->tstamp),
@@ -222,7 +229,7 @@ class SyncCtoClients extends Backend
                 }
 
                 $title = implode("<br/>", $arrNotices);
-                $url = $this->addToUrl(
+                $url   = $this->addToUrl(
                     $href
                     . '&amp;'
                     . $strIdName
@@ -305,7 +312,7 @@ class SyncCtoClients extends Backend
         if ($this->objBackendUser->hasAccess($table, 'syncCto_clients_p') == true || strlen(\Contao\Input::get('act')) == 0) {
             return;
         } else {
-            $this->logger->info(
+            $this->info(
                 'Not enough permissions to ' . \Contao\Input::get('act') . ' syncCto clients'
             );
             $this->redirect('contao?act=error');
@@ -330,7 +337,7 @@ class SyncCtoClients extends Backend
         $arrReturn = array();
 
         foreach ($GLOBALS["CTOCOM_ENGINE"] as $key => $value) {
-            if ($value["invisible"] == TRUE) {
+            if ($value["invisible"] == true) {
                 continue;
             }
 
@@ -376,10 +383,12 @@ class SyncCtoClients extends Backend
     {
         $intMaxChars = 65;
         $intMinChars = 30;
-        $intLeft = $intMaxChars - (strlen($row['title']) + strlen($row['id']));
-        $intLeft = max($intLeft, $intMinChars);
+        $intLeft     = $intMaxChars - (strlen($row['title']) + strlen($row['id']));
+        $intLeft     = max($intLeft, $intMinChars);
 
         $strAddress = SyncCtoHelper::getInstance()->substrCenter($row['address'] . ':' . $row['port'], $intLeft, ' [...] ');
         return str_replace('[URL]', $strAddress, $label);
     }
+
+
 }
