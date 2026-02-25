@@ -562,12 +562,12 @@ class ClientController extends AbstractBackendController
         $this->templateVars['information'] = $this->strInformation;
         $this->templateVars['finished'] = $this->booFinished;
         $this->templateVars['allMode'] = $this->blnAllMode;
-        $this->templateVars['language'] = [
-            'goBack'    => $GLOBALS['TL_LANG']['MSC']['backBT'],
-            'error'     => $GLOBALS['TL_LANG']['MSC']['error'],
-            'abort'     => $GLOBALS['TL_LANG']['MSC']['abort_sync'],
-            'repeat'    => $GLOBALS['TL_LANG']['MSC']['repeat_sync'],
-            'next_sync' => $GLOBALS['TL_LANG']['MSC']['next_sync']
+        $this->templateVars['language_trans'] = [
+            'goBack'    => $GLOBALS['TL_LANG']['MSC']['backBT'] ?? 'Back',
+            'error'     => $GLOBALS['TL_LANG']['MSC']['error'] ?? 'Error',
+            'abort'     => $GLOBALS['TL_LANG']['MSC']['abort_sync'] ?? 'Abort',
+            'repeat'    => $GLOBALS['TL_LANG']['MSC']['repeat_sync'] ?? 'Repeat',
+            'next_sync' => $GLOBALS['TL_LANG']['MSC']['next_sync'] ?? 'Next',
         ];
 
         if (Input::get('table') == 'tl_syncCto_clients_syncTo') {

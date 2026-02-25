@@ -4,8 +4,8 @@
     <div class="tl_listing_container">
         <div id="tl_buttons">
             <a onclick="Backend.getScrollOffset();"
-               accesskey="b" title="{{ language.goBack }}" class="header_back" href="{{ goBack }}">
-                {{ language.goBack }}
+               accesskey="b" title="{{ language_trans.goBack }}" class="header_back" href="{{ goBack }}">
+                {{ language_trans.goBack }}
             </a>
         </div>
 
@@ -45,7 +45,7 @@
 
         {% if error == true %}
             <div class="tl_box block">
-                <h4>{{ language.error }}</h4>
+                <h4>{{ language_trans.error }}</h4>
                 <p class="tl_help">{{ error_msg }}</p>
             </div>
         {% endif %}
@@ -53,16 +53,16 @@
         {% if showControl == true %}
             <div class="tl_tbox" id="buttons">
                 <a href="{{ abortLink | raw }}"
-                   onclick="$(this).setProperty('text', '{{ language.abort.1 }}');"
-                   class="tl_submit">{{ language.abort.0 }}</a>
+                   onclick="$(this).setProperty('text', '{{ language_trans.abort.1 }}');"
+                   class="tl_submit">{{ language_trans.abort.0 }}</a>
                 {% if error == true %}
                     <a href="{{ tryAgainLink | raw }}"
-                       onclick="$(this).setProperty('text', '{{ language.repeat.1 }}');"
-                       class="tl_submit">{{ language.repeat.0 }}</a>
+                       onclick="$(this).setProperty('text', '{{ language_trans.repeat.1 }}');"
+                       class="tl_submit">{{ language_trans.repeat.0 }}</a>
                     {% if modeAll == true %}
                         <a href="{{ nextClientLink | raw }}"
-                           onclick="$(this).setProperty('text', '{{ language.next_sync.1 }}');"
-                           class="tl_submit">{{ language.next_sync.0 }}</a>
+                           onclick="$(this).setProperty('text', '{{ language_trans.next_sync.1 }}');"
+                           class="tl_submit">{{ language_trans.next_sync.0 }}</a>
                     {% endif %}
                 {% endif %}
             </div>
@@ -71,8 +71,8 @@
         {% if showNextControl == true and modeAll == true %}
             <div class="tl_tbox" id="buttons">
                 <a href="{{ nextClientLink }}"
-                   onclick="$(this).setProperty('text', '{{ language.next_sync.1 }}');"
-                   class="tl_submit">{{ language.next_sync.0 }}</a>
+                   onclick="$(this).setProperty('text', '{{ language_trans.next_sync.1 }}');"
+                   class="tl_submit">{{ language_trans.next_sync.0 }}</a>
             </div>
         {% endif %}
 
