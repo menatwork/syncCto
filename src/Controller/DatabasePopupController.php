@@ -203,8 +203,9 @@ class DatabasePopupController
         }
 
         // If no table is found skip the view
-        if (count($this->arrSyncSettings['syncCto_CompareTables']['recommended']) == 0
-            && count($this->arrSyncSettings['syncCto_CompareTables']['nonRecommended']) == 0
+        if (
+            count($this->arrSyncSettings['syncCto_CompareTables']['recommended'] ?? []) == 0
+            && count($this->arrSyncSettings['syncCto_CompareTables']['nonRecommended'] ?? []) == 0
         ) {
             unset($this->arrSyncSettings['syncCto_CompareTables']);
             $this->arrSyncSettings['syncCto_SyncDeleteTables'] = array();
