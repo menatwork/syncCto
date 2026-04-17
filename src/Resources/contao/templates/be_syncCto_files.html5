@@ -3,7 +3,7 @@
 
         <?php if ($this->close): ?>
 
-    <img class="loader" src="<?php echo $this->Environment->base; ?>bundles/synccto/images/steps/loader.gif" alt=""/>
+    <img class="loader" src="<?php echo  \Contao\Environment::get('base'); ?>bundles/synccto/images/steps/loader.gif" alt=""/>
         <script>
             window.addEvent("domready", function () {
                 window.parent.document.getElement('input[name=forward]').click();
@@ -19,7 +19,7 @@
     <?php else: ?>
     <?php $url = sprintf(
         '%ssyncCto/popup/files?id=%s&amp;step=%s',
-        $this->Environment->base,
+        \Contao\Environment::get('base'),
         $this->id,
         $this->step
     ); ?>
@@ -136,9 +136,9 @@
                         <tbody>
                         <?php foreach ($arrFileList as $key => $file): ?>
                             <tr>
-                                <td class="state <?php echo $file["css"]; ?>"><?php echo $this->arrLangStates[$file["state"]]; ?><?php if ($file["state"] != 200 && $file['dbafs_conflict']): ?> / <?php echo $GLOBALS['TL_LANG']['MSC']['dbafs_conflict']; endif; ?></td>
+                                <td class="state <?php echo $file["css"]; ?>"><?php echo $this->arrLangStates[$file["state"]]; ?><?php if ($file["state"] != 200 && ($file['dbafs_conflict'] ?? false)): ?> / <?php echo $GLOBALS['TL_LANG']['MSC']['dbafs_conflict']; endif; ?></td>
                                 <td class="filesize"><?php echo ($file["size"] == -1) ? "N.A." : $this->getReadableSize($file["size"]); ?></td>
-                                <td class="filetime"><?php echo \Contao\Date::parse(\Contao\Config::get('datimFormat'), $file["lastModified"]); ?></td>
+                                <td class="filetime"><?php echo \Contao\Date::parse(\Contao\Config::get('datimFormat'), ($file["lastModified"] ?? 0)); ?></td>
                                 <?php if ($this->compare_complex == false): ?>
                                     <td class="checkbox"><input class="tl_checkbox" type="checkbox"
                                                                 name="del-file-<?php echo $key; ?>"

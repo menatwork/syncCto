@@ -1953,7 +1953,7 @@ class ClientController extends AbstractBackendController
                         $intDelCount++;
                     }
 
-                    if ($value["split"] == true) {
+                    if (($value["split"] ?? false)) {
                         $intSplitCount++;
                     }
                 }
@@ -1997,7 +1997,7 @@ class ClientController extends AbstractBackendController
                                 continue;
                             }
 
-                            if ($value["split"] == true) {
+                            if (($value["split"] ?? false) == true) {
                                 continue;
                             }
 
@@ -2035,7 +2035,7 @@ class ClientController extends AbstractBackendController
                     } else {
                         foreach ($this->arrListCompare as $strType => $arrLists) {
                             foreach ($arrLists as $key => $value) {
-                                if ($value["split"] == true) {
+                                if (($value["split"] ?? false) == true) {
                                     $this->objStepPool->increaseSubStep();
                                     $this->objData->setDescription($GLOBALS['TL_LANG']['tl_syncCto_sync']["step_3"]['description_3']);
 
@@ -2064,7 +2064,7 @@ class ClientController extends AbstractBackendController
                                 continue;
                             }
 
-                            if ($value["split"] == true) {
+                            if (($value["split"] ?? false) == true) {
                                 $intCountSplit++;
                             }
                         }
@@ -2072,7 +2072,7 @@ class ClientController extends AbstractBackendController
 
                     foreach ($this->arrListCompare as $strType => $arrLists) {
                         foreach ($arrLists as $key => $value) {
-                            if ($value["split"] != true) {
+                            if (($value["split"] ?? false) != true) {
                                 continue;
                             }
 
@@ -2080,7 +2080,7 @@ class ClientController extends AbstractBackendController
                                 continue;
                             }
 
-                            if ($value["split"] != 0 && $value["splitname"] != "") {
+                            if (($value["split"] ?? false) != false && $value["splitname"] != "") {
                                 $intCount++;
                                 continue;
                             }
@@ -2118,7 +2118,7 @@ class ClientController extends AbstractBackendController
                                 continue;
                             }
 
-                            if ($value["split"] == true) {
+                            if (($value["split"] ?? false) == true) {
                                 $intCountSplit++;
                             }
                         }
@@ -2126,7 +2126,7 @@ class ClientController extends AbstractBackendController
 
                     foreach ($this->arrListCompare as $strType => $arrLists) {
                         foreach ($arrLists as $key => $value) {
-                            if ($value["split"] != true) {
+                            if (($value["split"] ?? false) != true) {
                                 continue;
                             }
 
@@ -2198,7 +2198,7 @@ class ClientController extends AbstractBackendController
                                 continue;
                             }
 
-                            if ($value["split"] == true) {
+                            if (($value["split"] ?? false) == true) {
                                 $intCountSplit++;
                             }
                         }
@@ -2206,7 +2206,7 @@ class ClientController extends AbstractBackendController
 
                     foreach ($this->arrListCompare as $strType => $arrLists) {
                         foreach ($arrLists as $key => $value) {
-                            if ($value["split"] != true) {
+                            if (($value["split"] ?? false) != true) {
                                 continue;
                             }
 
@@ -3207,7 +3207,7 @@ class ClientController extends AbstractBackendController
                                     $intDelCount++;
                                 }
 
-                                if ($value["split"] == true) {
+                                if (($value["split"] ?? false) == true) {
                                     $intSplitCount++;
                                 }
                             }
@@ -3855,7 +3855,7 @@ class ClientController extends AbstractBackendController
                         $intDelCount++;
                     }
 
-                    if ($value["split"] == true) {
+                    if (($value["split"] ?? false) == true) {
                         $intSplitCount++;
                     }
                 }
@@ -3899,7 +3899,7 @@ class ClientController extends AbstractBackendController
                                 continue;
                             }
 
-                            if ($value["split"] == true) {
+                            if (($value["split"] ?? false) == true) {
                                 continue;
                             }
 
@@ -3943,7 +3943,7 @@ class ClientController extends AbstractBackendController
                     } else {
                         foreach ($this->arrListCompare as $strType => $arrLists) {
                             foreach ($arrLists as $key => $value) {
-                                if ($value["split"] == true) {
+                                if (($value["split"] ?? false) == true) {
                                     $this->objStepPool->increaseSubStep();
                                     $this->objData->setDescription($GLOBALS['TL_LANG']['tl_syncCto_sync']["step_3"]['description_3']);
 
@@ -3968,7 +3968,7 @@ class ClientController extends AbstractBackendController
 
                     foreach ($this->arrListCompare as $strType => $arrLists) {
                         foreach ($arrLists as $key => $value) {
-                            if ($value["split"] == true) {
+                            if (($value["split"] ?? false) == true) {
                                 $intCountSplit++;
                             }
                         }
@@ -3976,11 +3976,11 @@ class ClientController extends AbstractBackendController
 
                     foreach ($this->arrListCompare as $strType => $arrLists) {
                         foreach ($arrLists as $key => $value) {
-                            if ($value["split"] != true) {
+                            if (($value["split"] ?? false) != true) {
                                 continue;
                             }
 
-                            if ($value["split"] != 0 && $value["splitname"] != "") {
+                            if (($value["split"] ?? false) != false && $value["splitname"] != "") {
                                 $intCount++;
                                 continue;
                             }
@@ -4015,7 +4015,7 @@ class ClientController extends AbstractBackendController
 
                     foreach ($this->arrListCompare as $strType => $arrLists) {
                         foreach ($arrLists as $key => $value) {
-                            if ($value["split"] == true) {
+                            if (($value["split"] ?? false) == true) {
                                 $intCountSplit++;
                             }
                         }
@@ -4023,7 +4023,7 @@ class ClientController extends AbstractBackendController
 
                     foreach ($this->arrListCompare as $strType => $arrLists) {
                         foreach ($arrLists as $key => $value) {
-                            if ($value["split"] != true) {
+                            if (($value["split"] ?? false) != true) {
                                 continue;
                             }
 
@@ -4094,7 +4094,7 @@ class ClientController extends AbstractBackendController
 
                     foreach ($this->arrListCompare as $strType => $arrLists) {
                         foreach ($arrLists as $key => $value) {
-                            if ($value["split"] == true) {
+                            if (($value["split"] ?? false) == true) {
                                 $intCountSplit++;
                             }
                         }
@@ -4102,7 +4102,7 @@ class ClientController extends AbstractBackendController
 
                     foreach ($this->arrListCompare as $strType => $arrLists) {
                         foreach ($arrLists as $key => $value) {
-                            if ($value["split"] != true) {
+                            if (($value["split"] ?? false) != true) {
                                 continue;
                             }
 
@@ -4812,7 +4812,7 @@ class ClientController extends AbstractBackendController
                                     $intDelCount++;
                                 }
 
-                                if ($value["split"] == true) {
+                                if (($value["split"] ?? false) == true) {
                                     $intSplitCount++;
                                 }
                             }

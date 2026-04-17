@@ -180,7 +180,7 @@ class FilePopupController extends APopUpController
                 ) {
                     $arrBigFiles[$key] = $value;
                 } else {
-                    if ($value["split"] == 1) {
+                    if (($value["split"] ?? false)) {
                         $arrBigFiles[$key] = $value;
                     } elseif ($value["size"] > $this->arrClientInformation["upload_sizeLimit"]) {
                         $arrBigFiles[$key] = $value;
