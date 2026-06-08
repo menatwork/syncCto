@@ -549,26 +549,26 @@ class ClientController extends AbstractBackendController
         }
         $controllerUrl = $this->router->generate(self::class);
 
-        $this->templateVars['base']         = $baseUrl;
-        $this->templateVars['url']          = $controllerUrl . '?' . $this->strUrl;
-        $this->templateVars['goBack']       = $this->strGoBack;
-        $this->templateVars['data']         = $this->objData->getArrValues();
-        $this->templateVars['step']         = $this->intStep;
-        $this->templateVars['subStep']      = $this->objStepPool?->step ?? 1;
-        $this->templateVars['error']        = $this->booError;
-        $this->templateVars['error_msg']    = $this->strError;
-        $this->templateVars['refresh']      = $this->booRefresh;
-        $this->templateVars['start']        = $this->floStart;
-        $this->templateVars['headline']     = $this->strHeadline;
-        $this->templateVars['information']  = $this->strInformation;
-        $this->templateVars['finished']     = $this->booFinished;
-        $this->templateVars['allMode']      = $this->blnAllMode;
-        $this->templateVars['translations'] = [
+        $this->templateVars['base'] = $baseUrl;
+        $this->templateVars['url'] = $controllerUrl . '?' . $this->strUrl;
+        $this->templateVars['goBack'] = $this->strGoBack;
+        $this->templateVars['data'] = $this->objData->getArrValues();
+        $this->templateVars['step'] = $this->intStep;
+        $this->templateVars['subStep'] = $this->objStepPool->step;
+        $this->templateVars['error'] = $this->booError;
+        $this->templateVars['error_msg'] = $this->strError;
+        $this->templateVars['refresh'] = $this->booRefresh;
+        $this->templateVars['start'] = $this->floStart;
+        $this->templateVars['headline'] = $this->strHeadline;
+        $this->templateVars['information'] = $this->strInformation;
+        $this->templateVars['finished'] = $this->booFinished;
+        $this->templateVars['allMode'] = $this->blnAllMode;
+        $this->templateVars['language_trans'] = [
             'goBack'    => $GLOBALS['TL_LANG']['MSC']['backBT'] ?? 'Back',
             'error'     => $GLOBALS['TL_LANG']['MSC']['error'] ?? 'Error',
-            'abort'     => $GLOBALS['TL_LANG']['MSC']['abort_sync'] ?? ['Abort', 'Abort'],
-            'repeat'    => $GLOBALS['TL_LANG']['MSC']['repeat_sync'] ?? ['Repeat', 'Repeat'],
-            'next_sync' => $GLOBALS['TL_LANG']['MSC']['next_sync'] ?? ['Next', 'Next'],
+            'abort'     => $GLOBALS['TL_LANG']['MSC']['abort_sync'] ?? 'Abort',
+            'repeat'    => $GLOBALS['TL_LANG']['MSC']['repeat_sync'] ?? 'Repeat',
+            'next_sync' => $GLOBALS['TL_LANG']['MSC']['next_sync'] ?? 'Next',
         ];
 
         if (Input::get('table') == 'tl_syncCto_clients_syncTo') {
