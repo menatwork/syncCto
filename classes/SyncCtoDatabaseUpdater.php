@@ -91,9 +91,12 @@ class SyncCtoDatabaseUpdater extends \Contao\Database\Installer
             return true;
         } else {
             $strError = '';
+            $i = 1;
 
-            foreach ($this->arrError as $key => $value) {
-                $strError .= sprintf("%i. %s. | ", $key + 1, $value['error']);
+            foreach ($this->arrError as $strAction => $arrErrors) {
+                foreach ($arrErrors as $value) {
+                    $strError .= sprintf("%d. [%s] %s. | ", $i++, $strAction, $value['error']);
+                }
             }
 
             throw new Exception('There was an error on updating the database: ' . $strError);
