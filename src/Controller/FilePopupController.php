@@ -136,24 +136,24 @@ class FilePopupController extends APopUpController
         // Build list
         foreach ($this->arrListCompare as $strType => $arrLists) {
             foreach ($arrLists as $key => $value) {
-                switch ($value['state']) {
+                switch ($value['state'] ?? null) {
                     case SyncCtoEnum::FILESTATE_TOO_BIG_MISSING:
                     case SyncCtoEnum::FILESTATE_MISSING:
                         $intCountMissing++;
-                        $intTotalSizeNew += $value["size"];
+                        $intTotalSizeNew += $value["size"] ?? 0;
                         break;
 
                     case SyncCtoEnum::FILESTATE_TOO_BIG_NEED:
                     case SyncCtoEnum::FILESTATE_NEED:
                         $intCountNeed++;
-                        $intTotalSizeChange += $value["size"];
+                        $intTotalSizeChange += $value["size"] ?? 0;
                         break;
 
                     case SyncCtoEnum::FILESTATE_TOO_BIG_DELETE :
                     case SyncCtoEnum::FILESTATE_DELETE:
                     case SyncCtoEnum::FILESTATE_FOLDER_DELETE:
                         $intCountDelete++;
-                        $intTotalSizeDel += $value["size"];
+                        $intTotalSizeDel += $value["size"] ?? 0;
                         break;
 
                     case SyncCtoEnum::FILESTATE_BOMBASTIC_BIG:
@@ -162,13 +162,13 @@ class FilePopupController extends APopUpController
                 }
 
                 // Check for dbafs conflict.
-                if ($value["state"] == SyncCtoEnum::FILESTATE_DBAFS_CONFLICT || isset($value["dbafs_state"]) || isset($value["dbafs_tail_state"])) {
+                if (($value["state"] ?? null) == SyncCtoEnum::FILESTATE_DBAFS_CONFLICT || isset($value["dbafs_state"]) || isset($value["dbafs_tail_state"])) {
                     $intCountDbafsConflict++;
                     $value['dbafs_conflict'] = true;
                 }
 
                 if (in_array(
-                    $value["state"],
+                    $value["state"] ?? null,
                     [
                         SyncCtoEnum::FILESTATE_TOO_BIG_DELETE,
                         SyncCtoEnum::FILESTATE_TOO_BIG_MISSING,
@@ -182,7 +182,7 @@ class FilePopupController extends APopUpController
                 } else {
                     if (($value["split"] ?? false)) {
                         $arrBigFiles[$key] = $value;
-                    } elseif ($value["size"] > $this->arrClientInformation["upload_sizeLimit"]) {
+                    } elseif (($value["size"] ?? 0) > ($this->arrClientInformation["upload_sizeLimit"] ?? 0)) {
                         $arrBigFiles[$key] = $value;
                     } else {
                         $arrNormalFiles[$key] = $value;

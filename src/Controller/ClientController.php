@@ -611,18 +611,18 @@ class ClientController extends AbstractBackendController
         $arrContenData = $this->session->get("syncCto_Content");
 
         if (is_array($arrContenData) && count((array) $arrContenData) != 0) {
-            $this->booError = $arrContenData["error"];
-            $this->booAbort = $arrContenData["abort"];
-            $this->booFinished = $arrContenData["finished"];
-            $this->booRefresh = $arrContenData["refresh"];
-            $this->strError = $arrContenData["error_msg"];
-            $this->strUrl = $arrContenData["url"];
-            $this->strGoBack = $arrContenData["goBack"];
-            $this->strHeadline = $arrContenData["headline"];
-            $this->strInformation = $arrContenData["information"];
-            $this->intStep = $arrContenData["step"];
-            $this->floStart = $arrContenData["start"];
-            $this->objData = new ContentData($arrContenData["data"], $this->intStep);
+            $this->booError       = $arrContenData["error"] ?? false;
+            $this->booAbort       = $arrContenData["abort"] ?? false;
+            $this->booFinished    = $arrContenData["finished"] ?? false;
+            $this->booRefresh     = $arrContenData["refresh"] ?? false;
+            $this->strError       = $arrContenData["error_msg"] ?? '';
+            $this->strUrl         = $arrContenData["url"] ?? '';
+            $this->strGoBack      = $arrContenData["goBack"] ?? '';
+            $this->strHeadline    = $arrContenData["headline"] ?? '';
+            $this->strInformation = $arrContenData["information"] ?? '';
+            $this->intStep        = $arrContenData["step"] ?? 0;
+            $this->floStart       = $arrContenData["start"] ?? 0;
+            $this->objData        = new ContentData($arrContenData["data"] ?? [], $this->intStep);
         } else {
             $this->booError = false;
             $this->booAbort = false;
@@ -1467,7 +1467,7 @@ class ClientController extends AbstractBackendController
                     $this->arrClientInformation["upload_Parameter"] = $arrClientParameter;
 
                     // Check if everything is okay
-                    if ($arrClientParameter['file_uploads'] != 1) {
+                    if (($arrClientParameter['file_uploads'] ?? 0) != 1) {
                         $this->objData->setState(SyncCtoEnum::WORK_ERROR);
                         $this->booError = true;
                         $this->strError = $GLOBALS['TL_LANG']['ERR']['upload_ini'];
@@ -1475,9 +1475,9 @@ class ClientController extends AbstractBackendController
                         break;
                     }
 
-                    $intClientUploadLimit = static::parseSize($arrClientParameter['upload_max_filesize']);
-                    $intClientMemoryLimit = static::parseSize($arrClientParameter['memory_limit']);
-                    $intClientPostLimit = static::parseSize($arrClientParameter['post_max_size']);
+                    $intClientUploadLimit = static::parseSize($arrClientParameter['upload_max_filesize'] ?? '0');
+                    $intClientMemoryLimit = static::parseSize($arrClientParameter['memory_limit'] ?? '0');
+                    $intClientPostLimit   = static::parseSize($arrClientParameter['post_max_size'] ?? '0');
                     $intLocalMemoryLimit = static::parseSize(ini_get('memory_limit'));
 
                     // Check if memory limit on server and client is enough for upload

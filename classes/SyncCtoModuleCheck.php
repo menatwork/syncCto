@@ -218,7 +218,7 @@ class SyncCtoModuleCheck extends \Contao\BackendModule
 
         foreach ($arrServerInfo as $strKey => $strValue)
         {
-            $arrReturn[$strKey] = $_SERVER[$strValue];
+            $arrReturn[$strKey] = $_SERVER[$strValue] ?? '';
         }
 
         // Time
@@ -281,7 +281,7 @@ class SyncCtoModuleCheck extends \Contao\BackendModule
         $return .= '</tr>';
 
         // Safe mode
-        $safe_mode = $arrConfigurations['safe_mode'];
+        $safe_mode = $arrConfigurations['safe_mode'] ?? '';
         $ok        = ($safe_mode == '' || $safe_mode == 0 || $safe_mode == 'Off');
         $return .= '<tr class="' . ($ok ? 'ok' : 'warning') . '">';
         $return .= '<td>' . $GLOBALS['TL_LANG']['tl_syncCto_check']['safemode'] . '</td>';
@@ -296,7 +296,7 @@ class SyncCtoModuleCheck extends \Contao\BackendModule
         }
 
         // Maximum execution time
-        $max_execution_time = $arrConfigurations['max_execution_time'];
+        $max_execution_time = $arrConfigurations['max_execution_time'] ?? 0;
         $ok                 = ($max_execution_time >= 30 || $max_execution_time == 0);
         $return .= '<tr class="' . ($ok ? 'ok' : 'warning') . '">';
         $return .= '<td>' . $GLOBALS['TL_LANG']['tl_syncCto_check']['met'][0] . '</td>';
@@ -306,7 +306,7 @@ class SyncCtoModuleCheck extends \Contao\BackendModule
         $return .= '</tr>';
 
         // Memory limit
-        $memory_limit = $arrConfigurations['memory_limit'];
+        $memory_limit = $arrConfigurations['memory_limit'] ?? 0;
         $ok           = (intval($memory_limit) >= 134217728);
         $return .= '<tr class="' . ($ok ? 'ok' : 'warning') . '">';
         $return .= '<td>' . $GLOBALS['TL_LANG']['tl_syncCto_check']['memory_limit'][0] . '</td>';
@@ -316,7 +316,7 @@ class SyncCtoModuleCheck extends \Contao\BackendModule
         $return .= '</tr>';
 
         // Register globals
-        $register_globals = $arrConfigurations['register_globals'];
+        $register_globals = $arrConfigurations['register_globals'] ?? '';
         $ok               = ($register_globals == '' || $register_globals == 0 || $register_globals == 'Off');
         $return .= '<tr class="' . ($ok ? 'ok' : 'warning') . '">';
         $return .= '<td>' . $GLOBALS['TL_LANG']['tl_syncCto_check']['register_globals'] . '</td>';
@@ -326,7 +326,7 @@ class SyncCtoModuleCheck extends \Contao\BackendModule
         $return .= '</tr>';
 
         // File uploads
-        $file_uploads = $arrConfigurations['file_uploads'];
+        $file_uploads = $arrConfigurations['file_uploads'] ?? 0;
         $ok           = ($file_uploads == 1 || $file_uploads == 'On');
         $return .= '<tr class="' . ($ok ? 'ok' : 'warning') . '">';
         $return .= '<td>' . $GLOBALS['TL_LANG']['tl_syncCto_check']['file_uploads'] . '</td>';
@@ -336,7 +336,7 @@ class SyncCtoModuleCheck extends \Contao\BackendModule
         $return .= '</tr>';
 
         // Upload maximum filesize
-        $upload_max_filesize = $arrConfigurations['upload_max_filesize'];
+        $upload_max_filesize = $arrConfigurations['upload_max_filesize'] ?? 0;
         $ok                  = (intval($upload_max_filesize) >= 8388608);
         $return .= '<tr class="' . ($ok ? 'ok' : 'warning') . '">';
         $return .= '<td>' . $GLOBALS['TL_LANG']['tl_syncCto_check']['umf'][0] . '</td>';
@@ -346,7 +346,7 @@ class SyncCtoModuleCheck extends \Contao\BackendModule
         $return .= '</tr>';
 
         // Post maximum size
-        $post_max_size = $arrConfigurations['post_max_size'];
+        $post_max_size = $arrConfigurations['post_max_size'] ?? 0;
         $ok            = (intval($post_max_size) >= 8388608);
         $return .= '<tr class="' . ($ok ? 'ok' : 'warning') . '">';
         $return .= '<td>' . $GLOBALS['TL_LANG']['tl_syncCto_check']['pms'][0] . '</td>';
@@ -356,7 +356,7 @@ class SyncCtoModuleCheck extends \Contao\BackendModule
         $return .= '</tr>';
 
         // Maximum input time
-        $max_input_time = $arrConfigurations['max_input_time'];
+        $max_input_time = $arrConfigurations['max_input_time'] ?? 0;
         $ok             = ($max_input_time == '-1' || (intval($max_input_time) >= 60));
         $return .= '<tr class="' . ($ok ? 'ok' : 'warning') . '">';
         $return .= '<td>' . $GLOBALS['TL_LANG']['tl_syncCto_check']['mit'][0] . '</td>';
@@ -366,7 +366,7 @@ class SyncCtoModuleCheck extends \Contao\BackendModule
         $return .= '</tr>';
 
         // Default socket timeout
-        $default_socket_timeout = $arrConfigurations['default_socket_timeout'];
+        $default_socket_timeout = $arrConfigurations['default_socket_timeout'] ?? 0;
         $ok                     = (intval($default_socket_timeout) >= 32);
         $return .= '<tr class="' . ($ok ? 'ok' : 'warning') . '">';
         $return .= '<td>' . $GLOBALS['TL_LANG']['tl_syncCto_check']['dst'][0] . '</td>';
@@ -376,7 +376,7 @@ class SyncCtoModuleCheck extends \Contao\BackendModule
         $return .= '</tr>';
 
         // suhosin
-        $suhosin = $arrConfigurations['suhosin'];
+        $suhosin = $arrConfigurations['suhosin'] ?? false;
         $ok      = ($suhosin == false);
         $return .= '<tr class="' . ($ok ? 'ok' : 'warning') . '">';
         $return .= '<td>' . $GLOBALS['TL_LANG']['tl_syncCto_check']['suhosin'] . '</td>';
@@ -412,7 +412,7 @@ class SyncCtoModuleCheck extends \Contao\BackendModule
         $return .= '</tr>';
 
         // fsockopen
-        $fsockopen = $arrFunctions['fsockopen'];
+        $fsockopen = $arrFunctions['fsockopen'] ?? false;
         $ok        = ($fsockopen == true);
         $return .= '<tr class="' . ($ok ? 'ok' : 'warning') . '">';
         $return .= '<td>' . $GLOBALS['TL_LANG']['tl_syncCto_check']['fsocket'] . '</td>';
@@ -422,7 +422,7 @@ class SyncCtoModuleCheck extends \Contao\BackendModule
         $return .= '</tr>';
 
         // ZipArchive
-        $zip_archive = $arrFunctions['zip_archive'];
+        $zip_archive = $arrFunctions['zip_archive'] ?? false;
         $ok          = ($zip_archive == true);
         $return .= '<tr class="' . ($ok ? 'ok' : 'warning') . '">';
         $return .= '<td>' . $GLOBALS['TL_LANG']['tl_syncCto_check']['zip_archive'] . '</td>';
@@ -432,7 +432,7 @@ class SyncCtoModuleCheck extends \Contao\BackendModule
         $return .= '</tr>';
 
         // mcrypt
-        $mcrypt = $arrFunctions['mcrypt'];
+        $mcrypt = $arrFunctions['mcrypt'] ?? false;
         $ok     = ($mcrypt == true);
         $return .= '<tr class="' . ($ok ? 'ok' : 'warning') . '">';
         $return .= '<td>' . $GLOBALS['TL_LANG']['tl_syncCto_check']['mcrypt'] . '</td>';
@@ -442,7 +442,7 @@ class SyncCtoModuleCheck extends \Contao\BackendModule
         $return .= '</tr>';
 
         // XMLWriter
-        $xmlwriter = $arrFunctions['xmlwriter'];
+        $xmlwriter = $arrFunctions['xmlwriter'] ?? false;
         $ok        = ($xmlwriter == true);
         $return .= '<tr class="' . ($ok ? 'ok' : 'warning') . '">';
         $return .= '<td>' . $GLOBALS['TL_LANG']['tl_syncCto_check']['xmlwriter'] . '</td>';
@@ -452,7 +452,7 @@ class SyncCtoModuleCheck extends \Contao\BackendModule
         $return .= '</tr>';
 
         // XMLReader
-        $xmlreader = $arrFunctions['xmlreader'];
+        $xmlreader = $arrFunctions['xmlreader'] ?? false;
         $ok        = ($xmlreader == true);
         $return .= '<tr class="' . ($ok ? 'ok' : 'warning') . '">';
         $return .= '<td>' . $GLOBALS['TL_LANG']['tl_syncCto_check']['xmlreader'] . '</td>';
@@ -461,8 +461,8 @@ class SyncCtoModuleCheck extends \Contao\BackendModule
         $return .= '<td>' . $GLOBALS['TL_LANG']['tl_syncCto_check']['setting_on'] . '</td>';
         $return .= '</tr>';
 
-        $gmp    = $arrFunctions['gmp'];
-        $bcmath = $arrFunctions['bcmath'];
+        $gmp    = $arrFunctions['gmp'] ?? false;
+        $bcmath = $arrFunctions['bcmath'] ?? false;
 
         // bcmath
         if ($bcmath == true || ($bcmath == false && $gmp == false))
