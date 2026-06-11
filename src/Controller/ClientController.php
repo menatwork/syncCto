@@ -1241,6 +1241,8 @@ class ClientController extends AbstractBackendController
      */
     private function pageShowExtern()
     {
+        $GLOBALS['TL_CSS'][] = 'bundles/synccto/css/systemcheck.css';
+
         // Init | Set Step to 1
         if ($this->intStep == 0) {
             // Init content

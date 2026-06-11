@@ -22,6 +22,10 @@ services:
         resource: '../../Controller/'
         tags: [ 'controller.service_arguments' ]
 
+    ## EventListener
+    MenAtWork\SyncCto\EventListener\:
+        resource: '../../EventListener/'
+
     ## Migration
     MenAtWork\SyncCto\Migration\DbMigration:
         tags:

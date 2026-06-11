@@ -24,7 +24,7 @@
         $this->step
     ); ?>
 
-        <form id="filelist_form" action="<?php echo $url; ?>" method="post">
+        <form id="filelist_form" action="<?php echo $url; ?>" method="post" data-turbo="false">
             <div class="formbody">
                 <input type="hidden" name="FORM_SUBMIT" value="<?php echo $this->formId; ?>"/>
                 <input type="hidden" name="REQUEST_TOKEN" value="<?= $this->requestToken; ?>">

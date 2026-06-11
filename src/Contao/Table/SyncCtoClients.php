@@ -324,7 +324,7 @@ class SyncCtoClients extends Backend
      */
     public function checkPermissionClientCreate()
     {
-        if ($this->objBackendUser->hasAccess('create', 'syncCto_clients_p')) {
+        if (!$this->objBackendUser->hasAccess('create', 'syncCto_clients_p')) {
             $GLOBALS['TL_DCA']['tl_synccto_clients']['config']['closed'] = true;
         }
     }

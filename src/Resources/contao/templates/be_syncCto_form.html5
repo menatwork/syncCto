@@ -21,7 +21,7 @@
     });
 </script>
 
-<form id="<?php echo $this->cssId; ?>" action="<?= \Contao\Environment::get('base'); ?>contao/runsynccto?do=synccto_clients&amp;table=tl_syncCto_clients_sync<?php echo $this->direction; ?>&amp;act=start&amp;step=<?php echo $this->step; ?>&amp;id=<?php echo $this->id; ?>" method="post">
+<form id="<?php echo $this->cssId; ?>" action="<?= \Contao\Environment::get('base'); ?>contao/runsynccto?do=synccto_clients&amp;table=tl_syncCto_clients_sync<?php echo $this->direction; ?>&amp;act=start&amp;step=<?php echo $this->step; ?>&amp;id=<?php echo $this->id; ?>" method="post" data-turbo="false">
     <div class="formbody">
         <input type="hidden" name="FORM_SUBMIT" value="<?php echo $this->formId; ?>" />
         <input type="hidden" name="REQUEST_TOKEN" value="<?= $this->requestToken ?>">
