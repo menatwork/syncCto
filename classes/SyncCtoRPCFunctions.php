@@ -264,29 +264,74 @@ class SyncCtoRPCFunctions extends Backend
     public function runCecksumCompare($strMD5, $strFilename, $blnDisableDbafsConflicts)
     {
         if (!key_exists($strFilename, $_FILES)) {
-            throw new Exception(vsprintf($GLOBALS['TL_LANG']['ERR']['unknown_file'], array($strFilename)));
+            $availableKeys = empty($_FILES) ? '(none)' : implode(', ', array_keys($_FILES));
+            throw new Exception(sprintf(
+                'File key "%s" not found in $_FILES. Available keys: %s',
+                $strFilename,
+                $availableKeys
+            ));
         }
 
-        if (md5_file($_FILES[$strFilename]["tmp_name"]) != $strMD5) {
-            throw new Exception($GLOBALS['TL_LANG']['ERR']['checksum_error']);
+        $uploadError = $_FILES[$strFilename]['error'] ?? UPLOAD_ERR_OK;
+        if ($uploadError !== UPLOAD_ERR_OK) {
+            $errorMessages = [
+                UPLOAD_ERR_INI_SIZE   => 'File exceeds upload_max_filesize (' . ini_get('upload_max_filesize') . ')',
+                UPLOAD_ERR_FORM_SIZE  => 'File exceeds MAX_FILE_SIZE in form',
+                UPLOAD_ERR_PARTIAL    => 'File was only partially uploaded',
+                UPLOAD_ERR_NO_FILE    => 'No file was uploaded',
+                UPLOAD_ERR_NO_TMP_DIR => 'Missing temporary folder',
+                UPLOAD_ERR_CANT_WRITE => 'Failed to write file to disk',
+                UPLOAD_ERR_EXTENSION  => 'Upload stopped by PHP extension',
+            ];
+            throw new Exception(sprintf(
+                'Upload error for "%s": %s (code %d)',
+                $strFilename,
+                $errorMessages[$uploadError] ?? 'Unknown error',
+                $uploadError
+            ));
+        }
+
+        $tmpPath  = $_FILES[$strFilename]['tmp_name'];
+        $fileSize = file_exists($tmpPath) ? filesize($tmpPath) : -1;
+
+        if ($fileSize === 0) {
+            throw new Exception(sprintf('File "%s" was uploaded but is empty (0 bytes). tmp_name: %s', $strFilename, $tmpPath));
+        }
+
+        if ($fileSize === -1) {
+            throw new Exception(sprintf('Uploaded file "%s" does not exist at tmp path: %s', $strFilename, $tmpPath));
+        }
+
+        $actualMD5 = md5_file($tmpPath);
+        if ($actualMD5 !== $strMD5) {
+            throw new Exception(sprintf(
+                'Checksum mismatch for "%s": expected %s, got %s (size: %d bytes)',
+                $strFilename,
+                $strMD5,
+                $actualMD5,
+                $fileSize
+            ));
         }
 
         $objFiles = Files::getInstance();
         $objFiles->move_uploaded_file(
-            $_FILES[$strFilename]["tmp_name"],
+            $tmpPath,
             $this->objSyncCtoHelper->standardizePath($GLOBALS['SYC_PATH']['tmp'], "syncListInc.syncCto")
         );
 
-        $objFile = new File(
-            $this->objSyncCtoHelper->standardizePath(
-                $GLOBALS['SYC_PATH']['tmp'],
-                "syncListInc.syncCto"
-            )
-        );
-        $arrChecksumList = unserialize($objFile->getContent());
+        $destPath = $this->objSyncCtoHelper->standardizePath($GLOBALS['SYC_PATH']['tmp'], "syncListInc.syncCto");
+        $objFile  = new File($destPath);
+        $content  = $objFile->getContent();
+
+        $arrChecksumList = unserialize($content);
 
         if (!is_array($arrChecksumList)) {
-            throw new Exception("Could not rebuild array.");
+            throw new Exception(sprintf(
+                'Could not unserialize checksum list from "%s" (size: %d bytes, preview: %s)',
+                $destPath,
+                strlen($content),
+                substr($content, 0, 100)
+            ));
         }
 
         return $this->objSyncCtoFiles->runCecksumCompare($arrChecksumList, $blnDisableDbafsConflicts);
