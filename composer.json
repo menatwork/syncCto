@@ -30,7 +30,7 @@
     "contao/core-bundle": "^5.3",
     "menatwork/contao-multicolumnwizard-bundle": "~3.2",
     "menatwork/ctocommunication": "^5.0.0",
-    "contao-community-alliance/dc-general": "^2.4"
+    "contao-community-alliance/dc-general": "^2.4 || ^2.5"
   },
   "require-dev": {
     "phpcq/all-tasks": "~1.2",
