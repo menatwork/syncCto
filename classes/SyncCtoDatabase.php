@@ -286,8 +286,8 @@ class SyncCtoDatabase extends Backend
         set_time_limit(0);
 
         // Set limit for db query. Ticket #163
-        if (($GLOBALS['TL_CONFIG']['syncCto_custom_settings'] ?? false) && intval($GLOBALS['TL_CONFIG']['syncCto_db_query_limt']) > 0) {
-            $intElementsPerRequest = intval($GLOBALS['TL_CONFIG']['syncCto_db_query_limt']);
+        if (($GLOBALS['TL_CONFIG']['syncCto_custom_settings'] ?? false) && intval($GLOBALS['TL_CONFIG']['syncCto_db_query_limt'] ?? 0) > 0) {
+            $intElementsPerRequest = intval($GLOBALS['TL_CONFIG']['syncCto_db_query_limt'] ?? 0);
         } else {
             $intElementsPerRequest = 500;
         }
@@ -812,7 +812,14 @@ class SyncCtoDatabase extends Backend
     protected function doRestoreData()
     {
         // Config
-        $intMaxInsert = 1000;
+        if (
+            ($GLOBALS['TL_CONFIG']['syncCto_custom_settings'] ?? false)
+            && intval($GLOBALS['TL_CONFIG']['syncCto_db_query_limt'] ?? 0) > 0
+        ) {
+            $intMaxInsert = intval($GLOBALS['TL_CONFIG']['syncCto_db_query_limt']);
+        } else {
+            $intMaxInsert = 1000;
+        }
 
         // Buffer
         $arrValues = [];
@@ -947,11 +954,11 @@ class SyncCtoDatabase extends Backend
             $interactiveTimeout = $tmpResult->iTimeout;
 
             //overwrite the default values if higher ones are defined in the settings
-            if (($GLOBALS['TL_CONFIG']['syncCto_custom_settings'] ?? false) && intval($GLOBALS['TL_CONFIG']['syncCto_wait_timeout']) > 0 &&
-                intval($GLOBALS['TL_CONFIG']['syncCto_interactive_timeout']) > 0
+            if (($GLOBALS['TL_CONFIG']['syncCto_custom_settings'] ?? false) && intval($GLOBALS['TL_CONFIG']['syncCto_wait_timeout'] ?? 0) > 0 &&
+                intval($GLOBALS['TL_CONFIG']['syncCto_interactive_timeout'] ?? 0) > 0
             ) {
-                $waitTimeOut = max($waitTimeOut, intval($GLOBALS['TL_CONFIG']['syncCto_wait_timeout']));
-                $interactiveTimeout = max($interactiveTimeout, intval($GLOBALS['TL_CONFIG']['syncCto_interactive_timeout']));
+                $waitTimeOut = max($waitTimeOut, intval($GLOBALS['TL_CONFIG']['syncCto_wait_timeout'] ?? 0));
+                $interactiveTimeout = max($interactiveTimeout, intval($GLOBALS['TL_CONFIG']['syncCto_interactive_timeout'] ?? 0));
             }
 
             Database::getInstance()->query(

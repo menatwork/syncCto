@@ -407,8 +407,8 @@ class ClientController extends AbstractBackendController
         //overwrite the default values if higher ones are defined in the settings
         if (isset($GLOBALS['TL_CONFIG']['syncCto_custom_settings'])
             && $GLOBALS['TL_CONFIG']['syncCto_custom_settings']
-            && ((int) $GLOBALS['TL_CONFIG']['syncCto_wait_timeout']) > 0
-            && ((int) $GLOBALS['TL_CONFIG']['syncCto_interactive_timeout']) > 0
+            && ((int) ($GLOBALS['TL_CONFIG']['syncCto_wait_timeout'] ?? 0)) > 0
+            && ((int) ($GLOBALS['TL_CONFIG']['syncCto_interactive_timeout'] ?? 0)) > 0
         ) {
             $waitTimeOut = max($waitTimeOut, (int) $GLOBALS['TL_CONFIG']['syncCto_wait_timeout']);
             $interactiveTimeout = max($interactiveTimeout, (int) $GLOBALS['TL_CONFIG']['syncCto_interactive_timeout']);
@@ -554,7 +554,7 @@ class ClientController extends AbstractBackendController
         $this->templateVars['goBack'] = $this->strGoBack;
         $this->templateVars['data'] = $this->objData->getArrValues();
         $this->templateVars['step'] = $this->intStep;
-        $this->templateVars['subStep'] = $this->objStepPool->step;
+        $this->templateVars['subStep'] = $this->objStepPool?->step;
         $this->templateVars['error'] = $this->booError;
         $this->templateVars['error_msg'] = $this->strError;
         $this->templateVars['refresh'] = $this->booRefresh;
