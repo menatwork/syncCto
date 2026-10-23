@@ -208,7 +208,7 @@ class Database extends Base
      *
      * @param GetPropertyOptionsEvent $event
      *
-     * @return array
+     * @return void
      */
     public function databaseTablesNoneRecommendedWithHidden(GetPropertyOptionsEvent $event)
     {

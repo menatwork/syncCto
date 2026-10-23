@@ -1,18 +1,32 @@
 services:
-  _defaults:
-    autowire: true
-    autoconfigure: true
+    _defaults:
+        autowire: true
+        autoconfigure: true
 
-  ## Contao
-  MenAtWork\SyncCto\Contao\ScopeMatcher:
-    public: true
+    ## SyncCto
+    MenAtWork\SyncCto\Contao\Table\SyncCtoClients:
+        calls:
+            -   setLogger: [ '@logger' ]
+        public: true
 
-  ## Controller
-  MenAtWork\SyncCto\Controller\:
-    resource: '../../Controller/'
-    tags: [ 'controller.service_arguments' ]
+    MenAtWork\SyncCto\Controller\ClientController:
+        calls:
+            -   setLogger: [ '@logger' ]
 
-  ## Migration
-  MenAtWork\SyncCto\Migration\DbMigration:
-    tags:
-      - { name: 'contao.migration', priority: 0 }
+    ## Contao
+    MenAtWork\SyncCto\Contao\ScopeMatcher:
+        public: true
+
+    ## Controller
+    MenAtWork\SyncCto\Controller\:
+        resource: '../../Controller/'
+        tags: [ 'controller.service_arguments' ]
+
+    ## EventListener
+    MenAtWork\SyncCto\EventListener\:
+        resource: '../../EventListener/'
+
+    ## Migration
+    MenAtWork\SyncCto\Migration\DbMigration:
+        tags:
+            - { name: 'contao.migration', priority: 0 }

@@ -62,7 +62,7 @@ class SyncCtoFiles extends Backend
         $this->arrRootFolderList = $this->objSyncCtoHelper->getWhitelistFolder();
 
         // Get memory limit
-        $this->intMaxMemoryUsage = SyncCtoModuleClient::parseSize(ini_get('memory_limit'));
+        $this->intMaxMemoryUsage = SyncCtoHelper::parseSize(ini_get('memory_limit'));
         $this->intMaxMemoryUsage = $this->intMaxMemoryUsage / 100 * 30;
 
         // Get execution limit
@@ -412,7 +412,7 @@ class SyncCtoFiles extends Backend
         foreach ($arrFileList as $key => $arrFile) {
             $arrFile['path'] = $this->objSyncCtoHelper->standardizePath($arrFile['path']);
 
-            if ($arrFile['dbafs_state'] == SyncCtoEnum::DBAFS_DATA_CONFLICT) {
+            if (($arrFile['dbafs_state'] ?? null) == SyncCtoEnum::DBAFS_DATA_CONFLICT) {
                 // Get the information from the tl_files.
                 $objModel = FilesModel::findByPath(str_replace('\\\\', '/', $arrFile['path']));
 
@@ -425,7 +425,7 @@ class SyncCtoFiles extends Backend
                     continue;
                 }
 
-                $objModel->meta = $arrFile['tl_files']['meta'];
+                $objModel->meta = $arrFile['tl_files']['meta'] ?? null;
                 $objModel->save();
 
                 // Add a status report for debugging and co.

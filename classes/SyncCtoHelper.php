@@ -183,8 +183,17 @@ class SyncCtoHelper
      */
     static public function parseSize(string $size): int|string
     {
+        if (!is_string($size)) {
+            $size = (string) $size;
+        }
+
+        if ((int) $size === -1) {
+            return PHP_INT_MAX;
+        }
+
         $size = trim($size);
         $last = strtolower($size[strlen($size) - 1]);
+        $size = (int) $size;
         switch ($last) {
             // The 'G' modifier is available since PHP 5.1.0
             case 'g':
@@ -293,7 +302,7 @@ class SyncCtoHelper
                 } else {
                     if ($intTyp == SyncCtoEnum::LOADCONFIG_KEY_VALUE) {
                         $key = str_replace(array("$", "GLOBALS['TL_CONFIG']['", "']"), array("", "", ""), $arrChunks[0]);
-                        $arrData[$key] = $GLOBALS['TL_CONFIG'][$key];
+                        $arrData[$key] = $GLOBALS['TL_CONFIG'][$key] ?? null;
                     }
                 }
             }
@@ -326,7 +335,7 @@ class SyncCtoHelper
         $arrLocalconfig = (isset($GLOBALS['TL_CONFIG']['syncCto_folder_blacklist']))
             ? unserialize($GLOBALS['TL_CONFIG']['syncCto_folder_blacklist'])
             : [];
-        $arrSyncCtoConfig = $GLOBALS['SYC_CONFIG']['folder_blacklist'] ?? [];
+        $arrSyncCtoConfig = ($GLOBALS['SYC_CONFIG']['folder_blacklist'] ?? []);
 
         return $this->mergeConfigs($arrLocalconfig, $arrSyncCtoConfig);
     }
@@ -346,7 +355,7 @@ class SyncCtoHelper
         $arrLocalconfig = (isset($GLOBALS['TL_CONFIG']['syncCto_file_blacklist']))
             ? unserialize($GLOBALS['TL_CONFIG']['syncCto_file_blacklist'])
             : [];
-        $arrSyncCtoConfig = $GLOBALS['SYC_CONFIG']['file_blacklist'];
+        $arrSyncCtoConfig = $GLOBALS['SYC_CONFIG']['file_blacklist'] ?? [];
 
         return $this->mergeConfigs($arrLocalconfig, $arrSyncCtoConfig);
     }
@@ -366,7 +375,7 @@ class SyncCtoHelper
         $arrLocalconfig = isset($GLOBALS['TL_CONFIG']['syncCto_folder_whitelist'])
             ? unserialize($GLOBALS['TL_CONFIG']['syncCto_folder_whitelist'])
             : [];
-        $arrSyncCtoConfig = $GLOBALS['SYC_CONFIG']['folder_whitelist'];
+        $arrSyncCtoConfig = $GLOBALS['SYC_CONFIG']['folder_whitelist'] ?? [];
 
         return $this->mergeConfigs($arrLocalconfig, $arrSyncCtoConfig);
     }
@@ -376,7 +385,7 @@ class SyncCtoHelper
         $arrLocalconfig = (isset($GLOBALS['TL_CONFIG']['syncCto_local_blacklist']))
             ? unserialize($GLOBALS['TL_CONFIG']['syncCto_local_blacklist'])
             : [];
-        $arrSyncCtoConfig = $GLOBALS['SYC_CONFIG']['local_blacklist'];
+        $arrSyncCtoConfig = $GLOBALS['SYC_CONFIG']['local_blacklist'] ?? [];
 
         return $this->mergeConfigs($arrLocalconfig, $arrSyncCtoConfig);
     }
@@ -386,7 +395,7 @@ class SyncCtoHelper
         $arrLocalconfig = (isset($GLOBALS['TL_CONFIG']['syncCto_hidden_tables']))
             ? unserialize($GLOBALS['TL_CONFIG']['syncCto_hidden_tables'])
             : [];
-        $arrSyncCtoConfig = $GLOBALS['SYC_CONFIG']['table_hidden'];
+        $arrSyncCtoConfig = $GLOBALS['SYC_CONFIG']['table_hidden'] ?? [];
 
         return $this->mergeConfigs($arrLocalconfig, $arrSyncCtoConfig);
     }
@@ -540,12 +549,12 @@ class SyncCtoHelper
     public function getFileSyncOptions()
     {
         if ($this->user->isAdmin) {
-            return $GLOBALS['SYC_CONFIG']['sync_options'];
+            return $GLOBALS['SYC_CONFIG']['sync_options'] ?? [];
         } else {
             $arrUserSyncOptions = $this->user->syncCto_sync_options;
 
             $arrSyncOption = array();
-            foreach ($GLOBALS['SYC_CONFIG']['sync_options'] as $fileType => $arrValue) {
+            foreach (($GLOBALS['SYC_CONFIG']['sync_options'] ?? []) as $fileType => $arrValue) {
                 foreach ($arrValue as $strRight) {
                     if (in_array($strRight, $arrUserSyncOptions)) {
                         if (!array_key_exists($fileType, $arrSyncOption)) {
@@ -567,7 +576,7 @@ class SyncCtoHelper
      */
     public function getMaintenanceOptions()
     {
-        return $GLOBALS['SYC_CONFIG']['maintance_options'];
+        return $GLOBALS['SYC_CONFIG']['maintance_options'] ?? [];
     }
 
     /**
@@ -854,7 +863,7 @@ class SyncCtoHelper
     public function databaseTablesRecommended()
     {
         // Recommended tables
-        $arrBlacklist = unserialize($GLOBALS['TL_CONFIG']['syncCto_database_tables']);
+        $arrBlacklist = unserialize($GLOBALS['TL_CONFIG']['syncCto_database_tables'] ?? '');
         if (!is_array($arrBlacklist)) {
             $arrBlacklist = array();
         }
@@ -886,7 +895,7 @@ class SyncCtoHelper
     public function databaseTablesNoneRecommended()
     {
         // None recommended tables
-        $arrBlacklist = unserialize($GLOBALS['TL_CONFIG']['syncCto_database_tables']);
+        $arrBlacklist = unserialize($GLOBALS['TL_CONFIG']['syncCto_database_tables'] ?? '');
         if (!is_array($arrBlacklist)) {
             $arrBlacklist = array();
         }
@@ -918,12 +927,12 @@ class SyncCtoHelper
     public function databaseTablesNoneRecommendedWithHidden()
     {
         // None recommended tables
-        $arrBlacklist = unserialize($GLOBALS['TL_CONFIG']['syncCto_database_tables']);
+        $arrBlacklist = unserialize($GLOBALS['TL_CONFIG']['syncCto_database_tables'] ?? '');
         if (!is_array($arrBlacklist)) {
             $arrBlacklist = array();
         }
 
-        $arrHiddenlist = unserialize($GLOBALS['SYC_CONFIG']['table_hidden']);
+        $arrHiddenlist = unserialize($GLOBALS['SYC_CONFIG']['table_hidden'] ?? '');
         if (!is_array($arrHiddenlist)) {
             $arrHiddenlist = array();
         }
@@ -1072,7 +1081,7 @@ class SyncCtoHelper
         // We run now each table and try some method to find out, when we have some last changes.
         foreach ($arrTables as $strTable) {
             // Skip hidden tables
-            if (in_array($strTable, $GLOBALS['SYC_CONFIG']['table_hidden'], false)) {
+            if (in_array($strTable, $GLOBALS['SYC_CONFIG']['table_hidden'] ?? [], false)) {
                 continue;
             }
 
