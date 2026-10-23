@@ -798,7 +798,8 @@ class SyncCtoFiles extends Backend
 
                         $arrFileList[$key]['dbafs_state'] = SyncCtoEnum::DBAFS_CONFLICT;
                     } // Second check the meta
-                    elseif ($arrLocaleDBAFSInformation['meta'] != $value['tl_files']['meta']) {
+                    // Strict, so NULL and an empty string are different, see the MetaWizard.
+                    elseif ($arrLocaleDBAFSInformation['meta'] !== ($value['tl_files']['meta'] ?? null)) {
                         $arrFileList[$key] = $arrChecksumList[$key];
                         $arrFileList[$key]['state'] = SyncCtoEnum::FILESTATE_DBAFS_CONFLICT;
                         $arrFileList[$key]['dbafs_state'] = SyncCtoEnum::DBAFS_DATA_CONFLICT;
