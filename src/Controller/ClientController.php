@@ -2845,6 +2845,8 @@ class ClientController extends AbstractBackendController
                                     // See #309 (https://github.com/contao/core-bundle/issues/309)
                                     $arrModelData['pid'] = (strlen($arrModelData['pid'])) ? StringUtil::binToUuid($arrModelData['pid']) : $arrModelData['pid'];
                                     $arrModelData['uuid'] = StringUtil::binToUuid($arrModelData['uuid']);
+
+                                    $itSupSet[$key]['tl_files'] = $arrModelData;
                                 } // if not add it to the current DBAFS.
                                 else {
                                     $objModel = \Dbafs::addResource($value['path']);
