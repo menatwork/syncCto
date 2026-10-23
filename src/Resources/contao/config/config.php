@@ -96,6 +96,10 @@ if (!isset($GLOBALS['SYC_CONFIG']['syncCto_folder_blacklist'])) {
     $GLOBALS['SYC_CONFIG']['syncCto_folder_blacklist'] = '';
 }
 
+if (!isset($GLOBALS['SYC_CONFIG']['dbafs_ignore_fields'])) {
+    $GLOBALS['SYC_CONFIG']['dbafs_ignore_fields'] = [];
+}
+
 /**
  * Mime types
  */
@@ -300,6 +304,25 @@ if (isset($GLOBALS['TL_CONFIG']['fileSyncExclude'])) {
 }
 $arrFileSyncExclude[] = 'syncCto_backups/debug';
 $GLOBALS['TL_CONFIG']['fileSyncExclude'] = implode(',', $arrFileSyncExclude);
+
+// DBAFS - fields of tl_files which are not compared and not transferred by the file sync.
+// They are managed by the DBAFS itself or compared on their own (uuid, hash).
+$GLOBALS['SYC_CONFIG']['dbafs_ignore_fields'] = array_merge(
+    (array) $GLOBALS['SYC_CONFIG']['dbafs_ignore_fields'],
+    [
+        'id',
+        'pid',
+        'tstamp',
+        'uuid',
+        'type',
+        'path',
+        'extension',
+        'hash',
+        'lastModified',
+        'found',
+        'name',
+    ]
+);
 
 // Tables
 $GLOBALS['SYC_CONFIG']['table_hidden'] = array_merge(

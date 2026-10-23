@@ -10,6 +10,7 @@
  */
 
 use Contao\Backend;
+use Contao\Database;
 use Contao\Dbafs;
 use Contao\File;
 use Contao\Files;
@@ -18,6 +19,7 @@ use Contao\Folder;
 use Contao\Model;
 use Contao\StringUtil;
 use MenAtWork\SyncCto\Contao\API;
+use MenAtWork\SyncCto\Helper\DbafsData;
 
 /**
  * Class for file operations
@@ -193,6 +195,40 @@ class SyncCtoFiles extends Backend
     ////////////////////////////////////////////////////////////////////////////
     // DBAFS - Support for contao 3 and the tl_files
     ////////////////////////////////////////////////////////////////////////////
+
+    /**
+     * Get the fields of tl_files, which are not compared and not transferred.
+     *
+     * @return string[]
+     */
+    protected function getDbafsIgnoreFields(): array
+    {
+        return array_values(array_unique((array) ($GLOBALS['SYC_CONFIG']['dbafs_ignore_fields'] ?? [])));
+    }
+
+    /**
+     * Write the DBAFS data of the source to a local model.
+     *
+     * All fields are written, except the ignored ones and fields which do not exist locally.
+     *
+     * @param Model $objModel     The local model of tl_files.
+     *
+     * @param mixed $arrTlFiles   The tl_files data of the source.
+     *
+     * @return void
+     */
+    protected function applyDbafsData($objModel, $arrTlFiles): void
+    {
+        $arrData = DbafsData::getTransferData(
+            (array) $arrTlFiles,
+            Database::getInstance()->getFieldNames('tl_files'),
+            $this->getDbafsIgnoreFields()
+        );
+
+        foreach ($arrData as $strField => $mixValue) {
+            $objModel->$strField = $mixValue;
+        }
+    }
 
     /**
      * Get the file information from a file and add these to the file array.
@@ -425,7 +461,7 @@ class SyncCtoFiles extends Backend
                     continue;
                 }
 
-                $objModel->meta = $arrFile['tl_files']['meta'] ?? null;
+                $this->applyDbafsData($objModel, $arrFile['tl_files'] ?? []);
                 $objModel->save();
 
                 // Add a status report for debugging and co.
@@ -465,7 +501,7 @@ class SyncCtoFiles extends Backend
                     $objLocaleData = Dbafs::addResource($arrFile['path']);
 
                     $objLocaleData->uuid = StringUtil::uuidToBin($arrFile['tl_files']['uuid']);
-                    $objLocaleData->meta = $arrFile['tl_files']['meta'];
+                    $this->applyDbafsData($objLocaleData, $arrFile['tl_files']);
                     $objLocaleData->save();
 
                     // Add a status report for debugging and co.
@@ -797,12 +833,16 @@ class SyncCtoFiles extends Backend
                         }
 
                         $arrFileList[$key]['dbafs_state'] = SyncCtoEnum::DBAFS_CONFLICT;
-                    } // Second check the meta
-                    // Strict, so NULL and an empty string are different, see the MetaWizard.
-                    elseif ($arrLocaleDBAFSInformation['meta'] !== ($value['tl_files']['meta'] ?? null)) {
+                    } // Second check the data, all fields except the ignored ones.
+                    elseif (!empty($arrDiffFields = DbafsData::getDifferences(
+                        (array) ($value['tl_files'] ?? []),
+                        $arrLocaleDBAFSInformation,
+                        $this->getDbafsIgnoreFields()
+                    ))) {
                         $arrFileList[$key] = $arrChecksumList[$key];
                         $arrFileList[$key]['state'] = SyncCtoEnum::FILESTATE_DBAFS_CONFLICT;
                         $arrFileList[$key]['dbafs_state'] = SyncCtoEnum::DBAFS_DATA_CONFLICT;
+                        $arrFileList[$key]['dbafs_fields'] = $arrDiffFields;
                     }
 
                     // And than the tails.
@@ -1553,7 +1593,7 @@ class SyncCtoFiles extends Backend
                             // First add it to the dbafs.
                             $objLocaleData = Dbafs::addResource($strFileDestination);
                             $objLocaleData->uuid = StringUtil::uuidToBin($value['tl_files']['uuid']);
-                            $objLocaleData->meta = $value['tl_files']['meta'];
+                            $this->applyDbafsData($objLocaleData, $value['tl_files']);
                             $objLocaleData->save();
 
                             // Add a status report for debugging and co.
@@ -1571,7 +1611,7 @@ class SyncCtoFiles extends Backend
                             // If success add file to the database.
                             if ($blnMovedFile) {
                                 $objLocaleData->hash = $value['checksum'];
-                                $objLocaleData->meta = $value['tl_files']['meta'];
+                                $this->applyDbafsData($objLocaleData, $value['tl_files']);
                                 $objLocaleData->save();
 
                                 // Add a status report for debugging and co.
@@ -1613,7 +1653,7 @@ class SyncCtoFiles extends Backend
                                 // First add it to the dbafs.
                                 $objLocaleData = Dbafs::addResource($strFileDestination);
                                 $objLocaleData->uuid = StringUtil::uuidToBin($value['tl_files']['uuid']);
-                                $objLocaleData->meta = $value['tl_files']['meta'];
+                                $this->applyDbafsData($objLocaleData, $value['tl_files']);
                                 $objLocaleData->save();
 
                                 // Add a status report for debugging and co.
